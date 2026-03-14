@@ -1,0 +1,212 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Shopify Session (required by @shopify/shopify-app-session-storage-prisma) ───
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String    @db.Text
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?   @db.Text
+  refreshTokenExpires DateTime?
+}
+
+// ─── Core App Models ───
+
+model Shop {
+  id              String    @id @default(cuid())
+  shopDomain      String    @unique
+  accessToken     String    @db.Text
+  plan            String    @default("free") // free | pro | enterprise
+  installDate     DateTime  @default(now())
+  settings        String?   @db.LongText // JSON
+  lastActiveAt    DateTime?
+  uninstalledAt   DateTime?
+
+  sections        Section[]
+  pages           Page[]
+  themes          Theme[]
+  urgencyTimers   UrgencyTimer[]
+  reviewRequests  ReviewRequest[]
+  analyticsEvents AnalyticsEvent[]
+  extractions     Extraction[]
+  libraryItems    LibraryItem[]
+  pushHistories   PushHistory[]
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  shopId    String
+  type      String   // hero, testimonial, faq, etc.
+  name      String
+  config    String?  @db.LongText // JSON
+  position  Int      @default(0)
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model Page {
+  id             String    @id @default(cuid())
+  shopId         String
+  slug           String
+  title          String
+  content        String?   @db.LongText // JSON block-based
+  seoTitle       String?
+  seoDescription String?   @db.Text
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, slug])
+  @@index([shopId])
+}
+
+model Theme {
+  id              String    @id @default(cuid())
+  shopId          String
+  name            String
+  previewImageUrl String?   @db.Text
+  cssVariables    String?   @db.LongText // JSON
+  isActive        Boolean   @default(false)
+  appliedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model UrgencyTimer {
+  id           String    @id @default(cuid())
+  shopId       String
+  productId    String?
+  collectionId String?
+  deadline     DateTime?
+  displayType  String    @default("countdown") // countdown | scarcity | banner
+  message      String?   @db.Text
+  isActive     Boolean   @default(false)
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model ReviewRequest {
+  id              String    @id @default(cuid())
+  shopId          String
+  orderId         String?
+  customerId      String?
+  productId       String?
+  status          String    @default("pending") // pending | sent | completed
+  generatedReview String?   @db.LongText
+  sentAt          DateTime?
+  completedAt     DateTime?
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  shopId      String
+  eventType   String   // pageview | feature_interact | purchase
+  value       Decimal? @db.Decimal(10, 2)
+  featureName String?
+  sessionId   String?
+  createdAt   DateTime @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([createdAt])
+}
+
+model Extraction {
+  id               String   @id @default(cuid())
+  shopId           String
+  sectionKey       String
+  sectionName      String?
+  rawLiquid        String?  @db.LongText
+  rawCSS           String?  @db.LongText
+  rawSchema        String?  @db.LongText
+  processedLiquid  String?  @db.LongText
+  processedCSS     String?  @db.LongText
+  processedSchema  String?  @db.LongText
+  themeCheckerPass Boolean  @default(false)
+  errors           String?  @db.LongText // JSON
+  createdAt        DateTime @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model LibraryItem {
+  id              String    @id @default(cuid())
+  shopId          String
+  name            String
+  description     String?   @db.Text
+  tags            String?   @db.Text // comma-separated
+  liquidCode      String?   @db.LongText
+  cssCode         String?   @db.LongText
+  schemaCode      String?   @db.LongText
+  previewImageUrl String?   @db.Text
+  isPublic        Boolean   @default(false)
+  usageCount      Int       @default(0)
+  shareToken      String?   @unique
+  shareExpiresAt  DateTime?
+  createdAt       DateTime  @default(now())
+
+  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pushHistories PushHistory[]
+
+  @@index([shopId])
+}
+
+model PushHistory {
+  id              String   @id @default(cuid())
+  shopId          String
+  libraryItemId   String
+  targetThemeId   String?
+  targetThemeName String?
+  pushedAt        DateTime @default(now())
+  status          String   @default("pending") // pending | success | failed
+  errorMessage    String?  @db.Text
+  backupLiquid    String?  @db.LongText
+
+  shop        Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  libraryItem LibraryItem @relation(fields: [libraryItemId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([libraryItemId])
+}
