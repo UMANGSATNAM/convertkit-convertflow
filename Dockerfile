@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Generate Prisma Client while dev tools and binary targets are available
-RUN npx prisma@6.19.2 generate
+RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
 RUN npm prune --omit=dev --legacy-peer-deps && npm cache clean --force
