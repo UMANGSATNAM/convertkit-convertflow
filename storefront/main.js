@@ -11,35 +11,14 @@ import CountdownWidget from './widgets/urgency-countdown.js';
 import BuyerNotificationWidget from './widgets/urgency-buyer-notification.js';
 import CartThresholdWidget from './widgets/urgency-cart-threshold.js';
 import OfferBannerWidget from './widgets/urgency-offer-banner.js';
+import ConvertKitAnalytics from './widgets/analytics.js';
+import UpsellIncartWidget from './widgets/upsell-incart.js';
 
 (function () {
   'use strict';
 
   // Config injected by the script tag query params or fetched from server
   let config = window.__CONVERTKIT_CONFIG__ || {};
-
-  // ── Analytics Event Tracker Stub ──
-  const analytics = {
-    _queue: [],
-    track(eventType, data) {
-      this._queue.push({ eventType, data, ts: Date.now() });
-      if (this._queue.length >= 50) {
-        this.flush();
-      }
-    },
-    flush() {
-      if (this._queue.length === 0) return;
-      const payload = this._queue.splice(0, 50);
-      if (config.analyticsEndpoint) {
-        navigator.sendBeacon(
-          config.analyticsEndpoint,
-          JSON.stringify(payload)
-        );
-      }
-    },
-  };
-
-  window.addEventListener('beforeunload', () => analytics.flush());
 
   // ── Widget Registry ──
   const widgets = {};
@@ -52,7 +31,8 @@ import OfferBannerWidget from './widgets/urgency-offer-banner.js';
 
     if (config.shop && !config._fetched) {
       try {
-        const appUrl = document.currentScript?.src?.split('/convertkit-widget')[0] || '';
+        const scriptTag = document.currentScript || document.querySelector('script[src*="convertkit-widget"]');
+        const appUrl = scriptTag ? scriptTag.src.split('/convertkit-widget')[0] : '';
         const resp = await fetch(`${appUrl}/api/storefront-config?shop=${config.shop}`);
         if (resp.ok) {
           const serverConfig = await resp.json();
@@ -66,6 +46,13 @@ import OfferBannerWidget from './widgets/urgency-offer-banner.js';
 
   async function initWidgets() {
     config = await loadConfig();
+
+    const scriptTag = document.currentScript || document.querySelector('script[src*="convertkit-widget"]');
+    const appUrl = scriptTag ? scriptTag.src.split('/convertkit-widget')[0] : '';
+    
+    // Initialize Tracker
+    ConvertKitAnalytics.init(config, appUrl);
+    const analytics = ConvertKitAnalytics;
 
     // ── Sticky Add to Cart ──
     if (config.stickyCart !== false) {
@@ -106,6 +93,13 @@ import OfferBannerWidget from './widgets/urgency-offer-banner.js';
       widgets.offerBanner = OfferBannerWidget;
       OfferBannerWidget.init(urgency.banner, analytics);
     }
+
+    // ── Upsell Engine ──
+    const upsell = config.upsell || {};
+    if (upsell.isActive) {
+      widgets.upsellIncart = UpsellIncartWidget;
+      UpsellIncartWidget.init(upsell, analytics);
+    }
   }
 
   // ── Initialize when DOM is ready ──
@@ -117,7 +111,7 @@ import OfferBannerWidget from './widgets/urgency-offer-banner.js';
 
   // ── Expose API ──
   window.__CONVERTKIT__ = {
-    analytics,
+    analytics: ConvertKitAnalytics,
     widgets,
     version: '1.0.0',
   };
