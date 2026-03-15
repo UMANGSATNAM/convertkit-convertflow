@@ -1,17 +1,26 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import mariadb from "mariadb";
 
-const connectionString = process.env.DATABASE_URL;
-const pool = mariadb.createPool(connectionString);
-const adapter = new PrismaMariaDb(pool);
+let prisma;
 
-if (process.env.NODE_ENV !== "production") {
-  if (!global.prismaGlobal) {
-    global.prismaGlobal = new PrismaClient({ adapter });
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
+} else {
+  if (!global.prisma) {
+    global.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+    });
   }
+  prisma = global.prisma;
 }
-
-const prisma = global.prismaGlobal ?? new PrismaClient({ adapter });
 
 export default prisma;
