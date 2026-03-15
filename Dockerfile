@@ -20,7 +20,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
 # Install Prisma CLI explicitly since it is required for `npm run setup` in production
-RUN npm install -g prisma@7.5.0
+RUN npm install -g prisma@6.19.2
 
 # Copy only the necessary folders from the builder stage
 COPY --from=builder /app/build ./build
