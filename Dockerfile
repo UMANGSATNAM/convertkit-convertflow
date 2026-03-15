@@ -11,6 +11,7 @@ COPY . .
 RUN npm run build
 
 # Generate Prisma Client while dev tools and binary targets are available
+ENV DATABASE_URL="mysql://dummy:dummy@localhost:3306/dummy"
 RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
