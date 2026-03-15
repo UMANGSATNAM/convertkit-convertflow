@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import mariadb from "mariadb";
+import * as mariadb from "mariadb";
 
 const connectionString = process.env.DATABASE_URL ? process.env.DATABASE_URL.replace("mysql://", "mariadb://") : undefined;
 const pool = mariadb.createPool(connectionString);
