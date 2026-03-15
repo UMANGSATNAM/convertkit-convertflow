@@ -35,5 +35,4 @@ COPY --from=builder /app/extensions ./extensions
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 ENV HOST="0.0.0.0"
-ENV PORT=3000
 CMD ["npm", "run", "docker-start"]
