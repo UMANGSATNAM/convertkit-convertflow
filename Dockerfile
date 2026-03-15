@@ -18,7 +18,9 @@ ENV NODE_ENV=production
 
 # Only install production dependencies here
 COPY package.json package-lock.json* ./
-# Copy Prisma schema and generating client
+RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
+
+# Copy Prisma schema and generate client
 COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
 
