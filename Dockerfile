@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Generate Prisma Client while dev tools and binary targets are available
-ENV DATABASE_URL="mysql://dummy:dummy@localhost:3306/dummy"
+ENV DATABASE_URL="mysql://u352022980_umangp1199:Umangsatnam4456@srv1872.hstgr.io:3306/u352022980_conv"
 RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
@@ -32,6 +32,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app/db.server.js ./app/db.server.js
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 ENV HOST="0.0.0.0"
 CMD ["npm", "run", "docker-start"]
