@@ -9,7 +9,7 @@ ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
 
-RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
+RUN npm ci --include=dev --legacy-peer-deps && npm cache clean --force
 # Remove CLI packages since we don't need them in production by default.
 # Remove this line if you want to run CLI commands in your container.
 RUN npm remove @shopify/cli --legacy-peer-deps
@@ -17,5 +17,8 @@ RUN npm remove @shopify/cli --legacy-peer-deps
 COPY . .
 
 RUN npm run build
+
+# Remove dev dependencies to keep the image small
+RUN npm prune --omit=dev --legacy-peer-deps && npm cache clean --force
 
 CMD ["npm", "run", "docker-start"]
