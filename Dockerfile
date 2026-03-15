@@ -22,7 +22,7 @@ RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
 
 # Copy Prisma schema and generate client
 COPY --from=builder /app/prisma ./prisma
-RUN npx prisma generate
+RUN npx prisma@6.19.2 generate
 
 # Copy only the necessary folders from the builder stage
 COPY --from=builder /app/build ./build
