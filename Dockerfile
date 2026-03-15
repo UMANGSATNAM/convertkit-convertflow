@@ -32,6 +32,5 @@ COPY --from=builder /app/app/db.server.js ./app/db.server.js
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
 
-ENV PORT=3000
-EXPOSE 3000
+ENV HOST="0.0.0.0"
 CMD ["npm", "run", "docker-start"]
