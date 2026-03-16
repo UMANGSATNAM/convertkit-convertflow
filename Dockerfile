@@ -11,7 +11,6 @@ COPY . .
 RUN npm run build
 
 # Generate Prisma Client while dev tools and binary targets are available
-ENV DATABASE_URL="mysql://u352022980_umangp1199:Umangsatnam4456@srv1872.hstgr.io:3306/u352022980_conv?connection_limit=2&pool_timeout=20"
 RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
