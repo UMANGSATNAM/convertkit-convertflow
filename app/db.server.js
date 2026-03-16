@@ -22,10 +22,10 @@ function buildPool() {
     user: url.username,
     password: url.password,
     database: url.pathname.replace(/^\//, ""),
-    connectionLimit: 1,        // Never open more than 1 connection — Hostinger limit
+    connectionLimit: 5,        // Allow up to 5 connections to avoid pool exhaustion
     acquireTimeout: 60_000,    // Wait up to 60 s for a connection before error
     connectTimeout: 30_000,    // TCP connect timeout
-    idleTimeout: 60_000,       // Close idle connections after 60 s
+    idleTimeout: 30_000,       // Close idle connections after 30 s
     allowPublicKeyRetrieval: true,
     ssl: false,                // Hostinger shared MySQL — no SSL on port 3306
   });
