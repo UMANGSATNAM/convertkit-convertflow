@@ -32,7 +32,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app/db.server.js ./app/db.server.js
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
-
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 ENV HOST="0.0.0.0"
 CMD ["npm", "run", "docker-start"]
