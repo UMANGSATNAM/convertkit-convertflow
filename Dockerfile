@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install ALL dependencies (including devDeps like esbuild/vite)
 COPY package.json package-lock.json* ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy source and build the app
 COPY . .
