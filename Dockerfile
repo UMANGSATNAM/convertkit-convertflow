@@ -3,17 +3,13 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
 COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
-# Copy full source
 COPY . .
 
-# Build the application
+RUN rm -rf build/
 RUN npm run build
-
-# Generate Prisma Client
 RUN npx prisma generate
 
 
@@ -22,13 +18,10 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install required system dependency for Prisma
 RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
-ENV HOST="0.0.0.0"
 
-# Copy runtime files from builder
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
@@ -38,5 +31,4 @@ COPY --from=builder /app/app ./app
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
 
-# Start application
 CMD ["sh","-c","npx prisma db push --accept-data-loss && npm start"]
