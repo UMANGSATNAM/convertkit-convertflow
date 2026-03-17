@@ -10,7 +10,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-# Generate Prisma Client while dev tools and binary targets are available
+# Generate Prisma Client (prisma.config.ts handles missing DATABASE_URL at build time)
 RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
