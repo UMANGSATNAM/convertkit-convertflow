@@ -10,7 +10,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-# Generate Prisma Client (prisma.config.ts handles missing DATABASE_URL at build time)
+# Generate Prisma Client (build environment must provide DATABASE_URL somehow, or skip)
 RUN npx prisma generate
 
 # Remove all dev dependencies to prepare node_modules for production
@@ -28,7 +28,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/app/db.server.js ./app/db.server.js
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
