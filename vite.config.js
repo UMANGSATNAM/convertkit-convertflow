@@ -65,14 +65,10 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   ssr: {
-    external: ["@prisma/adapter-mariadb", "mariadb"],
     noExternal: [],
   },
   build: {
     assetsInlineLimit: 0,
-    rollupOptions: {
-      external: ["@prisma/adapter-mariadb", "mariadb"],
-    },
   },
   optimizeDeps: {
     include: ["@shopify/app-bridge-react", "@shopify/polaris"],
