@@ -26,8 +26,6 @@ WORKDIR /app
 RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=3000
 
 # Copy runtime files from builder
 COPY --from=builder /app/package.json ./package.json
@@ -40,7 +38,7 @@ COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
 
 # Expose port for Railway
-EXPOSE 3000
+EXPOSE 8080
 
 # Start application
-CMD ["sh","-c","npx prisma db push && npm start"]
+CMD ["sh","-c","npx prisma db push --accept-data-loss && npm start"]
