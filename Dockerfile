@@ -28,10 +28,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/app/db.server.js ./app/db.server.js
 COPY --from=builder /app/storefront ./storefront
 COPY --from=builder /app/extensions ./extensions
 
 
 ENV HOST="0.0.0.0"
-CMD ["npm", "run", "docker-start"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start"]
