@@ -22,7 +22,7 @@ export const action = async ({ request }) => {
 
   try {
     // 1. Fetch raw asset
-    const rawContent = await fetchAsset(admin, themeId, sectionKey);
+    const rawContent = await fetchAsset(admin, session, themeId, sectionKey);
     if (!rawContent) {
       return json({ error: "Asset not found or empty" }, { status: 404 });
     }

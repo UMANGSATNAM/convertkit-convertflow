@@ -9,13 +9,13 @@ import { listThemes, listThemeSections } from "../lib/convertflow.server";
  *   — returns section file keys for that theme
  */
 export const loader = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const themeId = url.searchParams.get("themeId");
 
   try {
     if (themeId) {
-      const sections = await listThemeSections(admin, themeId);
+      const sections = await listThemeSections(admin, session, themeId);
       return json({ sections });
     }
     const themes = await listThemes(admin);

@@ -1,36 +1,61 @@
 /**
  * ConvertFlow Liquid Extraction Engine
- * Fetches theme files via Shopify Admin REST API, parses section .liquid files,
- * and processes extracted code with Gemini AI.
+ * Fetches theme files via Shopify Admin GraphQL + REST API,
+ * parses section .liquid files, and processes with Gemini AI.
  */
 
 import { getClient } from "./gemini.server.js";
 
-// ─── Shopify Theme REST API helpers ───
+// ─── Shopify Theme API helpers (GraphQL + fetch-based REST) ───
 
 /**
- * List all themes for the authenticated shop.
+ * List all themes for the authenticated shop using GraphQL.
  */
 export async function listThemes(admin) {
-  const response = await admin.rest.get({ path: "themes" });
-  const body = await response.json();
-  return (body.themes || []).map((t) => ({
-    id: t.id,
+  const response = await admin.graphql(`
+    query {
+      themes(first: 25) {
+        nodes {
+          id
+          name
+          role
+        }
+      }
+    }
+  `);
+
+  const data = await response.json();
+  const themes = data.data?.themes?.nodes || [];
+
+  return themes.map((t) => ({
+    id: t.id.split("/").pop(), // Extract numeric ID from GID
+    gid: t.id,
     name: t.name,
     role: t.role,
-    previewable: t.previewable,
-    updated_at: t.updated_at,
   }));
 }
 
 /**
  * List section files (sections/*.liquid) inside a theme.
+ * Uses the Shopify REST Assets API via direct fetch since admin.rest may not be available.
  */
-export async function listThemeSections(admin, themeId) {
-  const response = await admin.rest.get({
-    path: `themes/${themeId}/assets`,
+export async function listThemeSections(admin, session, themeId) {
+  const shop = session.shop;
+  const token = session.accessToken;
+
+  const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json`;
+  const resp = await fetch(url, {
+    headers: {
+      "X-Shopify-Access-Token": token,
+      "Content-Type": "application/json",
+    },
   });
-  const body = await response.json();
+
+  if (!resp.ok) {
+    throw new Error(`Failed to list assets: ${resp.status} ${resp.statusText}`);
+  }
+
+  const body = await resp.json();
   const assets = body.assets || [];
 
   return assets
@@ -38,7 +63,6 @@ export async function listThemeSections(admin, themeId) {
     .map((a) => ({
       key: a.key,
       name: a.key.replace("sections/", "").replace(".liquid", ""),
-      size: a.size,
       updated_at: a.updated_at,
     }));
 }
@@ -46,12 +70,23 @@ export async function listThemeSections(admin, themeId) {
 /**
  * Fetch a single asset's content from a theme.
  */
-export async function fetchAsset(admin, themeId, assetKey) {
-  const response = await admin.rest.get({
-    path: `themes/${themeId}/assets`,
-    query: { "asset[key]": assetKey },
+export async function fetchAsset(admin, session, themeId, assetKey) {
+  const shop = session.shop;
+  const token = session.accessToken;
+
+  const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json?asset[key]=${encodeURIComponent(assetKey)}`;
+  const resp = await fetch(url, {
+    headers: {
+      "X-Shopify-Access-Token": token,
+      "Content-Type": "application/json",
+    },
   });
-  const body = await response.json();
+
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch asset: ${resp.status} ${resp.statusText}`);
+  }
+
+  const body = await resp.json();
   return body.asset?.value || "";
 }
 
@@ -173,10 +208,10 @@ Return a JSON object with keys: "liquid", "css", "schema" containing the cleaned
 }
 
 /**
- * Push a component to a Shopify theme via the Assets API.
+ * Push a component to a Shopify theme via the REST Assets API.
  * Combines liquid, css, and schema into a complete section file.
  */
-export async function pushToTheme(admin, themeId, sectionKey, liquid, css, schema) {
+export async function pushToTheme(admin, session, themeId, sectionKey, liquid, css, schema) {
   let fileContent = liquid;
 
   if (css) {
@@ -187,16 +222,25 @@ export async function pushToTheme(admin, themeId, sectionKey, liquid, css, schem
     fileContent += `\n\n{% schema %}\n${schema}\n{% endschema %}`;
   }
 
-  const response = await admin.rest.put({
-    path: `themes/${themeId}/assets`,
-    data: {
-      asset: {
-        key: sectionKey.startsWith("sections/") ? sectionKey : `sections/${sectionKey}.liquid`,
-        value: fileContent,
-      },
+  const shop = session.shop;
+  const token = session.accessToken;
+  const key = sectionKey.startsWith("sections/") ? sectionKey : `sections/${sectionKey}.liquid`;
+
+  const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json`;
+  const resp = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "X-Shopify-Access-Token": token,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({
+      asset: { key, value: fileContent },
+    }),
   });
 
-  const body = await response.json();
-  return body;
+  if (!resp.ok) {
+    throw new Error(`Failed to push asset: ${resp.status} ${resp.statusText}`);
+  }
+
+  return await resp.json();
 }

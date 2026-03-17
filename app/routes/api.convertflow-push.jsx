@@ -35,7 +35,7 @@ export const action = async ({ request }) => {
     // Backup existing content
     let backupLiquid = "";
     try {
-      backupLiquid = await fetchAsset(admin, themeId, sectionKey);
+      backupLiquid = await fetchAsset(admin, session, themeId, sectionKey);
     } catch {
       // File doesn't exist yet, no backup needed
     }
@@ -43,6 +43,7 @@ export const action = async ({ request }) => {
     // Push to theme
     await pushToTheme(
       admin,
+      session,
       themeId,
       sectionKey,
       item.liquidCode || "",
