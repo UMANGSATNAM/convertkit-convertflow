@@ -27,6 +27,7 @@ RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV HOST="0.0.0.0"
+ENV PORT="8080"
 
 # Copy runtime files from builder
 COPY --from=builder /app/package.json ./package.json
