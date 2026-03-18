@@ -1,21 +1,24 @@
 import { authenticate } from "../shopify.server";
+import { json } from "@remix-run/node";
 import fs from "node:fs";
 import path from "node:path";
 
 /**
  * GET /app/convertflow/proxy?shop=xxx&path=/some-path
  * Server-side HTML proxy that:
- * 1. Fetches the merchant's store page server-side
- * 2. Rewrites all relative URLs to absolute
- * 3. Rewrites internal nav links to go through this proxy
- * 4. Injects the inspector.js script inline before </body>
- * 5. Serves the modified HTML from the app's own origin (same-origin iframe)
+ * 1. Checks if store is password protected (returns JSON error if so)
+ * 2. Fetches the merchant's STOREFRONT page (public site, not admin)
+ * 3. Rewrites all relative URLs to absolute
+ * 4. Rewrites internal navigation links to stay in the proxy
+ * 5. Injects the inspector.js script inline before </body>
+ * 6. Serves modified HTML from the app's own origin (same-origin iframe)
  */
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const shopDomain = url.searchParams.get("shop") || session.shop;
   const pagePath = url.searchParams.get("path") || "/";
+  const token = session.accessToken;
 
   if (!shopDomain) {
     return new Response(errorPage("Missing shop domain"), {
@@ -23,16 +26,98 @@ export const loader = async ({ request }) => {
     });
   }
 
+  // ── Step 1: Check if store is password protected ──
+  try {
+    const shopResp = await fetch(`https://${shopDomain}/admin/api/2025-01/shop.json`, {
+      headers: { "X-Shopify-Access-Token": token },
+    });
+    if (shopResp.ok) {
+      const shopData = await shopResp.json();
+      if (shopData.shop?.password_enabled) {
+        return json({
+          error: "PASSWORD_PROTECTED",
+          shopDomain,
+          customDomain: shopData.shop.domain || shopDomain,
+        }, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+  } catch (e) {
+    // Non-fatal — continue and try to fetch anyway
+    console.warn("Shop check failed:", e.message);
+  }
+
+  // ── Step 2: Try to fetch storefront with storefront access token ──
+  let storefrontToken = null;
+  try {
+    const tokensResp = await fetch(
+      `https://${shopDomain}/admin/api/2025-01/storefront_access_tokens.json`,
+      { headers: { "X-Shopify-Access-Token": token } }
+    );
+    if (tokensResp.ok) {
+      const tokensData = await tokensResp.json();
+      const tokens = tokensData.storefront_access_tokens || [];
+      if (tokens.length > 0) {
+        storefrontToken = tokens[0].access_token;
+      }
+    }
+  } catch (e) {
+    // Non-fatal
+  }
+
+  // ── Step 3: Fetch the storefront page ──
   try {
     const storeUrl = `https://${shopDomain}${pagePath}`;
+    const fetchHeaders = {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+    };
+
+    // Add storefront token if available
+    if (storefrontToken) {
+      fetchHeaders["X-Shopify-Storefront-Access-Token"] = storefrontToken;
+    }
+
+    // First try with manual redirect handling
     const resp = await fetch(storeUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-      },
-      redirect: "follow",
+      method: "GET",
+      redirect: "manual",
+      headers: fetchHeaders,
     });
+
+    // Handle redirects
+    if (resp.status === 301 || resp.status === 302 || resp.status === 307 || resp.status === 308) {
+      const location = resp.headers.get("location") || "";
+
+      // Redirect to accounts.shopify.com or password page = protected store
+      if (location.includes("accounts.shopify.com") || location.includes("/password")) {
+        return json({
+          error: "PASSWORD_PROTECTED",
+          shopDomain,
+          redirectTo: location,
+        }, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Follow other redirects (e.g. www → non-www, HTTP → HTTPS)
+      const followResp = await fetch(location, {
+        headers: fetchHeaders,
+        redirect: "follow",
+      });
+
+      if (!followResp.ok) {
+        return new Response(
+          errorPage(`Store returned ${followResp.status} after redirect`),
+          { headers: { "Content-Type": "text/html; charset=utf-8" } }
+        );
+      }
+
+      return processAndServe(await followResp.text(), shopDomain);
+    }
 
     if (!resp.ok) {
       return new Response(
@@ -41,65 +126,7 @@ export const loader = async ({ request }) => {
       );
     }
 
-    let html = await resp.text();
-
-    // ── Rewrite relative URLs to absolute ──
-    // src="/...", href="/...", action="/..."
-    html = html.replace(
-      /((?:src|href|action|poster|data-src|data-srcset)\s*=\s*["'])\/((?!\/)[^"']*["'])/gi,
-      `$1https://${shopDomain}/$2`
-    );
-
-    // srcset="/..." — each URL in the comma-separated list
-    html = html.replace(/srcset\s*=\s*"([^"]*)"/gi, (match, srcset) => {
-      const rewritten = srcset.replace(
-        /\/((?!\/)[^\s,]+)/g,
-        `https://${shopDomain}/$1`
-      );
-      return `srcset="${rewritten}"`;
-    });
-
-    // url(/...) in inline styles and style tags
-    html = html.replace(
-      /url\(\s*['"]?\/((?!\/)[^'")]+)['"]?\s*\)/gi,
-      `url(https://${shopDomain}/$1)`
-    );
-
-    // ── Rewrite internal navigation links to proxy ──
-    // href="https://{shopDomain}/..." → href="/app/convertflow/proxy?shop=...&path=/..."
-    const proxyBase = `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=`;
-    const escapedDomain = shopDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    html = html.replace(
-      new RegExp(`(href\\s*=\\s*["'])https://${escapedDomain}(/[^"'#]*)`, "gi"),
-      (match, prefix, storePath) => {
-        // Don't rewrite asset URLs (CDN, images, CSS, JS)
-        if (/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)(\?|$)/i.test(storePath)) {
-          return match;
-        }
-        return `${prefix}${proxyBase}${encodeURIComponent(storePath)}`;
-      }
-    );
-
-    // ── Inject inspector script inline before </body> ──
-    const inspectorScript = getInspectorScript();
-    html = html.replace(
-      /<\/body>/i,
-      `<script id="__ck_inspector">${inspectorScript}</script></body>`
-    );
-
-    // ── Remove Content-Security-Policy that blocks our injection ──
-    html = html.replace(
-      /<meta[^>]*http-equiv\s*=\s*["']Content-Security-Policy["'][^>]*>/gi,
-      ""
-    );
-
-    return new Response(html, {
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
-    });
+    return processAndServe(await resp.text(), shopDomain);
   } catch (err) {
     console.error("Proxy error:", err);
     return new Response(errorPage(`Proxy error: ${err.message}`), {
@@ -107,6 +134,66 @@ export const loader = async ({ request }) => {
     });
   }
 };
+
+/**
+ * Process HTML: rewrite URLs, rewrite navigation, inject inspector, serve.
+ */
+function processAndServe(html, shopDomain) {
+  // ── Rewrite relative URLs to absolute ──
+  html = html.replace(
+    /((?:src|href|action|poster|data-src)\s*=\s*["'])\/((?!\/)[^"']*["'])/gi,
+    `$1https://${shopDomain}/$2`
+  );
+
+  // srcset="/..." — each URL in the comma-separated list
+  html = html.replace(/srcset\s*=\s*"([^"]*)"/gi, (match, srcset) => {
+    const rewritten = srcset.replace(
+      /\/((?!\/)[^\s,]+)/g,
+      `https://${shopDomain}/$1`
+    );
+    return `srcset="${rewritten}"`;
+  });
+
+  // url(/...) in inline styles and style tags
+  html = html.replace(
+    /url\(\s*['"]?\/((?!\/)[^'")]+)['"]?\s*\)/gi,
+    `url(https://${shopDomain}/$1)`
+  );
+
+  // ── Rewrite internal navigation links to proxy ──
+  const proxyBase = `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=`;
+  const escapedDomain = shopDomain.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  html = html.replace(
+    new RegExp(`(href\\s*=\\s*["'])https://${escapedDomain}(/[^"'#]*)`, "gi"),
+    (match, prefix, storePath) => {
+      if (/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)(\?|$)/i.test(storePath)) {
+        return match;
+      }
+      return `${prefix}${proxyBase}${encodeURIComponent(storePath)}`;
+    }
+  );
+
+  // ── Inject inspector script inline before </body> ──
+  const inspectorScript = getInspectorScript();
+  html = html.replace(
+    /<\/body>/i,
+    `<script id="__ck_inspector">${inspectorScript}</script></body>`
+  );
+
+  // ── Remove Content-Security-Policy ──
+  html = html.replace(
+    /<meta[^>]*http-equiv\s*=\s*["']Content-Security-Policy["'][^>]*>/gi,
+    ""
+  );
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
+}
 
 /** Read inspector.js from disk and return as string */
 function getInspectorScript() {
@@ -123,7 +210,6 @@ function getInspectorScript() {
   } catch (e) {
     console.error("Failed to read inspector.js:", e);
   }
-  // Fallback: return minimal script that signals ready
   return `(function(){window.parent.postMessage({type:"CK_INSPECTOR_READY"},"*");console.warn("ConvertKit inspector.js not found on disk. Using fallback.")})();`;
 }
 

@@ -59,6 +59,7 @@ export default function ConvertFlow() {
   const [sectionsOnPage, setSectionsOnPage] = useState([]);
   const [error, setError] = useState("");
   const [monacoLoaded, setMonacoLoaded] = useState(false);
+  const [storePasswordProtected, setStorePasswordProtected] = useState(false);
 
   const proxyIframeRef = useRef(null);
   const editorRef = useRef(null);
@@ -89,7 +90,27 @@ export default function ConvertFlow() {
   const navigateTo = useCallback((path) => {
     setCurrentPath(path);
     setIframeLoading(true);
+    setStorePasswordProtected(false);
     setIframeKey((k) => k + 1);
+  }, []);
+
+  // ── Handle iframe load — check if proxy returned JSON error ──
+  const handleIframeLoad = useCallback(() => {
+    setIframeLoading(false);
+    try {
+      const iframeDoc = proxyIframeRef.current?.contentDocument;
+      if (iframeDoc) {
+        const bodyText = iframeDoc.body?.innerText?.trim() || "";
+        if (bodyText.startsWith("{")) {
+          const data = JSON.parse(bodyText);
+          if (data.error === "PASSWORD_PROTECTED") {
+            setStorePasswordProtected(true);
+          }
+        }
+      }
+    } catch (e) {
+      // Cross-origin or parse error — ignore
+    }
   }, []);
 
   // ── Fetch section code ──
@@ -420,7 +441,7 @@ export default function ConvertFlow() {
 
           {/* Proxy iframe */}
           <div style={{ flex: 1, position: "relative" }}>
-            {iframeLoading && (
+            {iframeLoading && !storePasswordProtected && (
               <div style={{
                 position: "absolute", inset: 0, display: "flex", alignItems: "center",
                 justifyContent: "center", background: "#f3f4f6", zIndex: 5,
@@ -431,13 +452,51 @@ export default function ConvertFlow() {
                 </div>
               </div>
             )}
+
+            {/* Password-protected error UI */}
+            {storePasswordProtected && (
+              <div style={{
+                position: "absolute", inset: 0, display: "flex", alignItems: "center",
+                justifyContent: "center", background: "#f9fafb", zIndex: 6,
+              }}>
+                <div style={{
+                  textAlign: "center", padding: 40, background: "#FEF3C7",
+                  borderRadius: 12, maxWidth: 420,
+                }}>
+                  <p style={{ fontSize: 32, margin: "0 0 8px" }}>🔒</p>
+                  <h3 style={{ color: "#92400E", margin: "0 0 8px", fontSize: 16 }}>
+                    Store is password protected
+                  </h3>
+                  <p style={{ color: "#92400E", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
+                    Your store has password protection enabled. You need to disable it
+                    temporarily to use the Visual Inspector.
+                  </p>
+                  <a
+                    href={`https://${shopDomain}/admin/online_store/preferences`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-block", background: "#92400E", color: "#fff",
+                      padding: "10px 20px", borderRadius: 8, textDecoration: "none",
+                      fontSize: 13, fontWeight: 600,
+                    }}
+                  >
+                    Disable Password Protection →
+                  </a>
+                  <p style={{ fontSize: 11, color: "#B45309", marginTop: 12 }}>
+                    After disabling, click the ↻ refresh button in the toolbar above.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <iframe
               ref={proxyIframeRef}
               key={iframeKey}
               src={proxyUrl}
               title="Store Preview"
               style={{ width: "100%", height: "100%", border: "none" }}
-              onLoad={() => setIframeLoading(false)}
+              onLoad={handleIframeLoad}
             />
           </div>
         </div>
