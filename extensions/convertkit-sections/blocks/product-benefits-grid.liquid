@@ -1,0 +1,107 @@
+{% comment %}
+  ConvertKit — Product Benefits Grid Block
+  3 or 4 column grid, collapses to 2-col on mobile.
+  Each benefit: SVG icon, title, description. All inline SVG.
+{% endcomment %}
+
+<div class="ck-benefits-grid"
+  data-ck-feature="benefits_grid"
+  style="
+    display:grid;
+    grid-template-columns:repeat({{ section.settings.columns | default: 3 }}, 1fr);
+    gap:{{ section.settings.gap | default: 24 }}px;
+    max-width:{{ section.settings.max_width | default: 1200 }}px;
+    margin:{{ section.settings.margin_y | default: 32 }}px auto;
+    padding:0 {{ section.settings.padding_x | default: 16 }}px;
+    font-family:var(--font-body-family,-apple-system,sans-serif);
+  ">
+
+  {%- for block in section.blocks -%}
+  <div class="ck-benefits-grid__item" {{ block.shopify_attributes }} style="
+    text-align:{{ section.settings.alignment | default: 'center' }};
+    padding:{{ section.settings.item_padding | default: 16 }}px;
+  ">
+    <div class="ck-benefits-grid__icon" style="
+      width:{{ section.settings.icon_size | default: 40 }}px;
+      height:{{ section.settings.icon_size | default: 40 }}px;
+      color:{{ section.settings.icon_color | default: '#4F46E5' }};
+      margin:0 {{ section.settings.alignment | default: 'center' | replace: 'center', 'auto' | replace: 'left', '0' | replace: 'right', '0 0 0 auto' }} 12px;
+    ">
+      {%- case block.settings.icon -%}
+        {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        {%- when 'refresh' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        {%- when 'headphones' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3v5zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3v5z"/></svg>
+        {%- when 'check-circle' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        {%- when 'star' -%}<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        {%- when 'zap' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        {%- when 'leaf' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
+        {%- when 'award' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      {%- endcase -%}
+    </div>
+    {% if block.settings.title != blank %}
+      <h4 style="margin:0 0 6px;font-size:{{ section.settings.title_size | default: 15 }}px;font-weight:600;color:{{ section.settings.title_color | default: '#111827' }}">
+        {{ block.settings.title }}
+      </h4>
+    {% endif %}
+    {% if block.settings.description != blank %}
+      <p style="margin:0;font-size:{{ section.settings.desc_size | default: 13 }}px;color:{{ section.settings.desc_color | default: '#6b7280' }};line-height:1.5">
+        {{ block.settings.description }}
+      </p>
+    {% endif %}
+  </div>
+  {%- endfor -%}
+</div>
+
+<style>
+  @media(max-width:767px) {
+    .ck-benefits-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "CK Benefits Grid",
+  "target": "section",
+  "settings": [
+    { "type": "range", "id": "columns", "label": "Columns (Desktop)", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "select", "id": "alignment", "label": "Text Alignment", "default": "center", "options": [
+      {"value":"left","label":"Left"},{"value":"center","label":"Center"}
+    ]},
+    { "type": "color", "id": "icon_color", "label": "Icon Color", "default": "#4F46E5" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#111827" },
+    { "type": "color", "id": "desc_color", "label": "Description Color", "default": "#6b7280" },
+    { "type": "range", "id": "icon_size", "label": "Icon Size", "min": 24, "max": 56, "step": 4, "default": 40 },
+    { "type": "range", "id": "title_size", "label": "Title Size", "min": 13, "max": 20, "step": 1, "default": 15 },
+    { "type": "range", "id": "desc_size", "label": "Description Size", "min": 11, "max": 16, "step": 1, "default": 13 },
+    { "type": "range", "id": "gap", "label": "Grid Gap", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "max_width", "label": "Max Width", "min": 600, "max": 1400, "step": 50, "default": 1200 },
+    { "type": "range", "id": "margin_y", "label": "Vertical Margin", "min": 0, "max": 64, "step": 4, "default": 32 },
+    { "type": "range", "id": "padding_x", "label": "Side Padding", "min": 0, "max": 48, "step": 4, "default": 16 },
+    { "type": "range", "id": "item_padding", "label": "Item Padding", "min": 0, "max": 32, "step": 4, "default": 16 }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "default": "check-circle", "options": [
+          {"value":"truck","label":"Truck"},{"value":"shield","label":"Shield"},{"value":"refresh","label":"Returns"},{"value":"headphones","label":"Support"},{"value":"check-circle","label":"Check"},{"value":"star","label":"Star"},{"value":"heart","label":"Heart"},{"value":"zap","label":"Lightning"},{"value":"leaf","label":"Eco"},{"value":"award","label":"Award"}
+        ]},
+        { "type": "text", "id": "title", "label": "Title", "default": "Benefit" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Describe this benefit" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "CK Benefits Grid",
+    "blocks": [
+      { "type": "benefit", "settings": { "icon": "truck", "title": "Free Shipping", "description": "On all orders over $50" }},
+      { "type": "benefit", "settings": { "icon": "refresh", "title": "Easy Returns", "description": "30-day money-back guarantee" }},
+      { "type": "benefit", "settings": { "icon": "headphones", "title": "24/7 Support", "description": "We're here to help anytime" }}
+    ]
+  }]
+}
+{% endschema %}

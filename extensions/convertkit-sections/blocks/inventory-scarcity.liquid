@@ -1,0 +1,108 @@
+{% comment %}
+  ConvertKit — Inventory Scarcity Block
+  Reads REAL Shopify inventory, shows "Only X left" with progress bar.
+  Updates via JS fetch on variant change.
+{% endcomment %}
+
+{%- liquid
+  assign threshold = section.settings.threshold | default: 10
+  assign current_variant = product.selected_or_first_available_variant
+  assign qty = current_variant.inventory_quantity | default: 0
+  assign tracked = current_variant.inventory_management
+-%}
+
+{% if tracked != blank and qty > 0 and qty <= threshold %}
+<div class="ck-inv-scarcity"
+  id="ck-inv-scarcity-{{ section.id }}"
+  data-ck-feature="inventory_scarcity"
+  data-threshold="{{ threshold }}"
+  data-product-handle="{{ product.handle }}"
+  style="
+    margin:{{ section.settings.margin_y | default: 8 }}px 0;
+    font-family:var(--font-body-family,-apple-system,sans-serif);
+    font-size:{{ section.settings.font_size | default: 13 }}px;
+    color:{{ section.settings.text_color | default: '#374151' }};
+  ">
+
+  {%- assign pct = qty | times: 100 | divided_by: threshold -%}
+  {%- if pct > 100 -%}{%- assign pct = 100 -%}{%- endif -%}
+
+  {%- if qty <= 5 -%}
+    {%- assign bar_color = section.settings.color_red | default: '#DC2626' -%}
+  {%- elsif qty <= 10 -%}
+    {%- assign bar_color = section.settings.color_orange | default: '#D97706' -%}
+  {%- else -%}
+    {%- assign bar_color = section.settings.color_green | default: '#059669' -%}
+  {%- endif -%}
+
+  <p class="ck-inv-scarcity__text" style="margin:0 0 6px">
+    <strong>Only {{ qty }} left</strong> in stock
+  </p>
+  <div class="ck-inv-scarcity__bar-bg" style="
+    height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;
+  ">
+    <div class="ck-inv-scarcity__bar" style="
+      height:100%;border-radius:3px;width:{{ pct }}%;background:{{ bar_color }};
+      transition:width 0.5s ease;
+    "></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var el = document.getElementById('ck-inv-scarcity-{{ section.id }}');
+  if (!el) return;
+  var threshold = parseInt(el.dataset.threshold, 10);
+  var handle = el.dataset.productHandle;
+
+  function update(variantId) {
+    fetch('/products/' + handle + '.js')
+      .then(function(r) { return r.json(); })
+      .then(function(product) {
+        var v = variantId
+          ? product.variants.find(function(x) { return x.id == variantId; })
+          : product.variants[0];
+        if (!v || !v.inventory_management) { el.style.display = 'none'; return; }
+        var qty = v.inventory_quantity;
+        if (qty == null || qty > threshold) { el.style.display = 'none'; return; }
+        el.style.display = '';
+        var pct = Math.min((qty / threshold) * 100, 100);
+        var c = qty <= 5 ? '#DC2626' : qty <= 10 ? '#D97706' : '#059669';
+        el.querySelector('.ck-inv-scarcity__text').innerHTML = '<strong>Only ' + qty + ' left</strong> in stock';
+        var bar = el.querySelector('.ck-inv-scarcity__bar');
+        bar.style.width = pct + '%';
+        bar.style.background = c;
+      })
+      .catch(function() {});
+  }
+
+  // Listen for variant changes
+  var form = document.querySelector('form[action*="/cart/add"]');
+  if (form) {
+    form.addEventListener('change', function(e) {
+      var idInput = form.querySelector('[name="id"]');
+      if (idInput) update(parseInt(idInput.value, 10));
+    });
+  }
+  document.addEventListener('variant:change', function(e) {
+    if (e.detail && e.detail.variantId) update(e.detail.variantId);
+  });
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "CK Inventory Scarcity",
+  "target": "section",
+  "settings": [
+    { "type": "range", "id": "threshold", "label": "Show when stock below", "min": 3, "max": 50, "step": 1, "default": 10 },
+    { "type": "color", "id": "color_red", "label": "Low Stock Color", "default": "#DC2626" },
+    { "type": "color", "id": "color_orange", "label": "Medium Stock Color", "default": "#D97706" },
+    { "type": "color", "id": "color_green", "label": "Good Stock Color", "default": "#059669" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#374151" },
+    { "type": "range", "id": "font_size", "label": "Font Size", "min": 11, "max": 16, "step": 1, "default": 13 },
+    { "type": "range", "id": "margin_y", "label": "Vertical Margin (px)", "min": 0, "max": 24, "step": 2, "default": 8 }
+  ]
+}
+{% endschema %}

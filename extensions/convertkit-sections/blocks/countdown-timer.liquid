@@ -1,0 +1,94 @@
+{% comment %}
+  ConvertKit — Countdown Timer Block
+  Real deadline, auto-hides when expired.
+  Uses requestAnimationFrame, not setInterval.
+{% endcomment %}
+
+{%- assign deadline_str = section.settings.deadline -%}
+
+{% if deadline_str != blank %}
+<div class="ck-timer-block"
+  id="ck-timer-{{ section.id }}"
+  data-ck-feature="countdown_timer"
+  data-deadline="{{ deadline_str }}"
+  style="
+    text-align:center;
+    padding:{{ section.settings.padding_y | default: 20 }}px {{ section.settings.padding_x | default: 16 }}px;
+    background:{{ section.settings.bg_color | default: '#111827' }};
+    color:{{ section.settings.text_color | default: '#ffffff' }};
+    font-family:var(--font-body-family,-apple-system,sans-serif);
+  ">
+
+  {% if section.settings.headline != blank %}
+    <p style="margin:0 0 8px;font-weight:600;font-size:{{ section.settings.headline_size | default: 16 }}px">
+      {{ section.settings.headline }}
+    </p>
+  {% endif %}
+
+  <div class="ck-timer-block__display" style="
+    font-size:{{ section.settings.timer_size | default: 28 }}px;
+    font-weight:700;
+    letter-spacing:2px;
+    font-variant-numeric:tabular-nums;
+  "></div>
+</div>
+
+<script>
+(function() {
+  var el = document.getElementById('ck-timer-{{ section.id }}');
+  if (!el) return;
+  var deadline = new Date(el.dataset.deadline).getTime();
+  if (isNaN(deadline) || deadline <= Date.now()) {
+    var expiredText = {{ section.settings.expired_text | default: '' | json }};
+    if (expiredText) {
+      el.querySelector('.ck-timer-block__display').textContent = expiredText;
+    } else {
+      el.style.display = 'none';
+    }
+    return;
+  }
+
+  var display = el.querySelector('.ck-timer-block__display');
+  var lastSec = -1;
+
+  function tick() {
+    var diff = deadline - Date.now();
+    if (diff <= 0) {
+      var expText = {{ section.settings.expired_text | default: '' | json }};
+      if (expText) { display.textContent = expText; }
+      else { el.style.display = 'none'; }
+      return;
+    }
+    var sec = Math.floor(diff / 1000);
+    if (sec !== lastSec) {
+      lastSec = sec;
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      display.textContent = d + 'd ' + String(h).padStart(2,'0') + 'h ' + String(m).padStart(2,'0') + 'm ' + String(s).padStart(2,'0') + 's';
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "CK Countdown Timer",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "headline", "label": "Headline", "default": "Sale ends in" },
+    { "type": "text", "id": "deadline", "label": "Deadline (ISO datetime)", "info": "e.g. 2025-12-31T23:59:59" },
+    { "type": "text", "id": "expired_text", "label": "Expired Text", "default": "Sale has ended" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#111827" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "range", "id": "headline_size", "label": "Headline Font Size", "min": 12, "max": 24, "step": 1, "default": 16 },
+    { "type": "range", "id": "timer_size", "label": "Timer Font Size", "min": 18, "max": 48, "step": 2, "default": 28 },
+    { "type": "range", "id": "padding_y", "label": "Vertical Padding", "min": 8, "max": 48, "step": 4, "default": 20 },
+    { "type": "range", "id": "padding_x", "label": "Horizontal Padding", "min": 8, "max": 48, "step": 4, "default": 16 }
+  ]
+}
+{% endschema %}

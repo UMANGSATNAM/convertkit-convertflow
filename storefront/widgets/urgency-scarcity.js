@@ -1,6 +1,8 @@
 /**
  * ConvertKit — Inventory Scarcity Counter Widget
- * Shows "Only X left in stock" with color-coded progress bar
+ * Shows "Only X left in stock" with color-coded progress bar.
+ * Uses REAL Shopify inventory via product.js endpoint.
+ * Updates dynamically when variant changes.
  */
 
 import scarcityCSS from './urgency-scarcity.css';
@@ -14,67 +16,140 @@ function injectStyles() {
 }
 
 const ScarcityWidget = {
+  productData: null,
+  threshold: 10,
+  analytics: null,
+  el: null,
+
   init(config, analytics) {
     if (!config || !config.threshold) return;
-    injectStyles();
+    this.threshold = config.threshold;
+    this.analytics = analytics;
 
-    // Find product form to insert scarcity bar near ATC
-    const form = document.querySelector('form[action*="/cart/add"]');
-    if (!form) return;
-
-    // Get inventory from product JSON
-    this.fetchInventory(config.threshold, form, analytics);
-  },
-
-  async fetchInventory(threshold, form, analytics) {
     const path = window.location.pathname;
     if (!path.includes('/products/')) return;
 
+    injectStyles();
+    this.fetchAndRender();
+    this.listenForVariantChanges();
+  },
+
+  async fetchAndRender() {
+    const path = window.location.pathname;
     try {
       const resp = await fetch(path + '.js');
       if (!resp.ok) return;
-      const product = await resp.json();
+      this.productData = await resp.json();
 
-      // Get selected variant
+      // Get initial variant from URL or first available
       const params = new URLSearchParams(window.location.search);
       const variantId = parseInt(params.get('variant'), 10);
       const variant = variantId
-        ? product.variants.find((v) => v.id === variantId)
-        : product.variants.find((v) => v.available) || product.variants[0];
+        ? this.productData.variants.find(v => v.id === variantId)
+        : this.productData.variants.find(v => v.available) || this.productData.variants[0];
 
-      if (!variant) return;
-
-      // Shopify doesn't expose exact inventory via .js — use available as proxy
-      // For real inventory, the admin API endpoint would be needed
-      const quantity = variant.available ? Math.min(threshold, Math.floor(Math.random() * threshold) + 1) : 0;
-
-      if (quantity > 0 && quantity <= threshold) {
-        this.render(quantity, threshold, form);
-        if (analytics) {
-          analytics.track('feature_interact', { feature: 'scarcity', action: 'impression' });
-        }
-      }
-    } catch (e) { /* silent */ }
+      if (variant) this.renderForVariant(variant);
+    } catch (e) { /* silent — never break merchant page */ }
   },
 
-  render(quantity, threshold, form) {
-    const el = document.createElement('div');
-    el.className = 'ck-scarcity';
+  renderForVariant(variant) {
+    // Only show for inventory-tracked variants
+    if (!variant.inventory_management) {
+      this.removeEl();
+      return;
+    }
 
-    let barColor = '#22c55e'; // green
-    if (quantity <= 5) barColor = '#ef4444'; // red
-    else if (quantity <= 10) barColor = '#f59e0b'; // orange
+    // Shopify's .js endpoint exposes inventory_quantity when
+    // "Track quantity" is on. If it's null/undefined, we bail.
+    const qty = variant.inventory_quantity;
+    if (qty == null || qty > this.threshold) {
+      this.removeEl();
+      return;
+    }
 
-    const pct = Math.min((quantity / threshold) * 100, 100);
+    if (qty <= 0) {
+      // Show "Sold out" state
+      this.renderBar(0, 'Sold Out', '#DC2626');
+      return;
+    }
 
-    el.innerHTML = `
-      <p class="ck-scarcity__text">Only <strong>${quantity}</strong> left in stock</p>
+    const color = qty <= 5 ? '#DC2626' : qty <= 10 ? '#D97706' : '#059669';
+    this.renderBar(qty, `Only <strong>${qty}</strong> left in stock`, color);
+
+    if (this.analytics) {
+      this.analytics.trackEvent('feature_impression', null, 'urgency_scarcity');
+    }
+  },
+
+  renderBar(qty, text, color) {
+    const pct = Math.min((qty / this.threshold) * 100, 100);
+
+    if (!this.el) {
+      this.el = document.createElement('div');
+      this.el.className = 'ck-scarcity';
+      this.el.dataset.ckFeature = 'urgency_scarcity';
+
+      // Insert near the ATC button
+      const form = document.querySelector('form[action*="/cart/add"]');
+      if (form) {
+        form.parentNode.insertBefore(this.el, form);
+      } else {
+        return;
+      }
+    }
+
+    this.el.innerHTML = `
+      <p class="ck-scarcity__text">${text}</p>
       <div class="ck-scarcity__bar-bg">
-        <div class="ck-scarcity__bar" style="width:${pct}%;background:${barColor}"></div>
+        <div class="ck-scarcity__bar" style="width:${pct}%;background:${color}"></div>
       </div>
     `;
+  },
 
-    form.parentNode.insertBefore(el, form);
+  removeEl() {
+    if (this.el) {
+      this.el.remove();
+      this.el = null;
+    }
+  },
+
+  listenForVariantChanges() {
+    // Listen for standard form changes
+    const form = document.querySelector('form[action*="/cart/add"]');
+    if (form) {
+      form.addEventListener('change', () => {
+        const idInput = form.querySelector('[name="id"]');
+        if (idInput && this.productData) {
+          const variantId = parseInt(idInput.value, 10);
+          const variant = this.productData.variants.find(v => v.id === variantId);
+          if (variant) this.renderForVariant(variant);
+        }
+      });
+    }
+
+    // Listen for URL-based variant changes
+    let lastUrl = window.location.href;
+    const observer = new MutationObserver(() => {
+      if (window.location.href !== lastUrl) {
+        lastUrl = window.location.href;
+        const params = new URLSearchParams(window.location.search);
+        const variantId = parseInt(params.get('variant'), 10);
+        if (variantId && this.productData) {
+          const variant = this.productData.variants.find(v => v.id === variantId);
+          if (variant) this.renderForVariant(variant);
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Listen for custom variant:change events from sticky cart
+    document.addEventListener('variant:change', (e) => {
+      const variantId = e.detail?.variantId;
+      if (variantId && this.productData) {
+        const variant = this.productData.variants.find(v => v.id === variantId);
+        if (variant) this.renderForVariant(variant);
+      }
+    });
   },
 };
 

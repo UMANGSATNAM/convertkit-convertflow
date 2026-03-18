@@ -1,98 +1,226 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
+import prisma from "../db.server";
 
-const TEMPLATES = {
-  about_us: {
-    title: "About Us",
-    bodyHtml: `<h2>Our Story</h2><p>Welcome to our store. We are passionate about bringing you the best products.</p><h2>Our Mission</h2><p>Our mission is to provide exceptional value and customer service.</p>`
-  },
-  contact: {
-    title: "Contact Us",
-    bodyHtml: `<p>We would love to hear from you!</p><p>Email: support@example.com</p><p>Phone: 1-800-123-4567</p>`
-  },
-  faq: {
-    title: "Frequently Asked Questions",
-    bodyHtml: `<h3>How long does shipping take?</h3><p>Shipping typically takes 3-5 business days.</p><h3>Do you offer returns?</h3><p>Yes, we offer a 30-day money-back guarantee.</p>`
-  },
-  shipping: {
-    title: "Shipping Policy",
-    bodyHtml: `<h2>Shipping Options</h2><p>We offer standard and expedited shipping via major carriers.</p><h2>Processing Time</h2><p>Orders are processed within 24-48 hours.</p>`
-  },
-  track_order: {
-    title: "Track Your Order",
-    bodyHtml: `<p>Please enter your tracking number below to view the status of your shipment.</p><!-- You can embed a tracking widget here -->`
-  },
-  returns: {
-    title: "Returns & Refunds",
-    bodyHtml: `<h2>Return Policy</h2><p>You have 30 days to return an item from the date you received it.</p><h2>Refunds</h2><p>Once we receive your item, we will initiate a refund to your original method of payment.</p>`
-  },
-  size_guide: {
-    title: "Size Guide",
-    bodyHtml: `<p>Use this guide to find your perfect fit.</p><table><tr><th>Size</th><th>Bust</th><th>Waist</th></tr><tr><td>S</td><td>34"</td><td>26"</td></tr><tr><td>M</td><td>36"</td><td>28"</td></tr><tr><td>L</td><td>38"</td><td>30"</td></tr></table>`
-  },
-  tos: {
-    title: "Terms of Service",
-    bodyHtml: `<p>By accessing or using our website, you agree to be bound by these Terms of Service.</p><h2>Products or Services</h2><p>We reserve the right to limit the sales of our products or Services to any person, geographic region or jurisdiction.</p>`
-  }
-};
-
+/**
+ * POST /api/page-publish
+ * Creates a Shopify page and pushes the template to the merchant's active theme.
+ * Body: { title, slug, templateSlug, themeId }
+ */
 export const action = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
-  
-  if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+  const { admin, session } = await authenticate.admin(request);
+  const { title, slug, templateSlug, themeId } = await request.json();
+
+  if (!title || !slug || !templateSlug) {
+    return json({ error: "title, slug, and templateSlug are required" }, { status: 400 });
   }
 
-  const formData = await request.formData();
-  const templateId = formData.get("templateId");
-
-  if (!templateId || !TEMPLATES[templateId]) {
-    return json({ error: "Invalid template ID" }, { status: 400 });
-  }
-
-  const template = TEMPLATES[templateId];
+  const shopDomain = session.shop;
+  const token = session.accessToken;
 
   try {
-    const response = await admin.graphql(
-      `mutation pageCreate($page: PageCreateInput!) {
-        pageCreate(page: $page) {
-          page {
-            id
-            title
-            handle
-          }
-          userErrors {
-            field
-            message
-          }
-        }
-      }`,
-      {
-        variables: {
-          page: {
-            title: template.title,
-            bodyHtml: template.bodyHtml,
-            isPublished: true,
-          },
-        },
-      }
-    );
+    const shop = await prisma.shop.findUnique({ where: { shopDomain } });
+    if (!shop) return json({ error: "Shop not found" }, { status: 404 });
 
-    const parsed = await response.json();
-    
-    if (parsed.data?.pageCreate?.userErrors?.length > 0) {
-      return json({ 
-        error: parsed.data.pageCreate.userErrors[0].message 
-      }, { status: 400 });
-    }
+    // ── Step 1: Build template content ──
+    const templateContent = buildPageTemplate(templateSlug);
 
-    return json({ 
-      success: true, 
-      page: parsed.data.pageCreate.page 
+    // ── Step 2: Push template to theme via Assets API ──
+    const templateKey = `templates/page.${slug}.json`;
+
+    const pushUrl = `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json`;
+    const pushResp = await fetch(pushUrl, {
+      method: "PUT",
+      headers: {
+        "X-Shopify-Access-Token": token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        asset: { key: templateKey, value: templateContent },
+      }),
     });
 
+    if (!pushResp.ok) {
+      const errBody = await pushResp.text();
+      throw new Error(`Failed to push template: ${pushResp.status} ${errBody}`);
+    }
+
+    // ── Step 3: Create the Shopify page ──
+    const pageResp = await admin.graphql(`
+      mutation createPage($input: PageInput!) {
+        pageCreate(page: $input) {
+          page { id title handle }
+          userErrors { field message }
+        }
+      }
+    `, {
+      variables: {
+        input: {
+          title,
+          handle: slug,
+          templateSuffix: slug,
+          body: "",
+          isPublished: true,
+        },
+      },
+    });
+
+    const pageData = await pageResp.json();
+    const page = pageData.data?.pageCreate?.page;
+    const userErrors = pageData.data?.pageCreate?.userErrors || [];
+
+    if (userErrors.length > 0) {
+      return json({ error: userErrors[0].message, userErrors }, { status: 400 });
+    }
+
+    // ── Step 4: Save to DB ──
+    await prisma.page.create({
+      data: {
+        shopId: shop.id,
+        slug,
+        title,
+        content: JSON.stringify({ templateSlug, themeId }),
+        publishedAt: new Date(),
+      },
+    });
+
+    return json({
+      success: true,
+      page,
+      customizeUrl: `https://${shopDomain}/admin/themes/${themeId}/editor?template=page.${slug}`,
+    });
   } catch (error) {
-    console.error("Failed to publish page:", error);
-    return json({ error: "Failed to communicate with Shopify API" }, { status: 500 });
+    console.error("Page publish error:", error);
+    return json({ error: error.message }, { status: 500 });
   }
 };
+
+/**
+ * Build JSON template content for Online Store 2.0 pages.
+ */
+function buildPageTemplate(templateSlug) {
+  const templates = {
+    homepage: {
+      name: "ConvertKit Homepage",
+      sections: {
+        "ck-hero": {
+          type: "image-banner",
+          settings: { image_overlay_opacity: 40 },
+        },
+        "ck-trust": {
+          type: "apps",
+          blocks: { "trust-1": { type: "shopify://apps/convertkit/blocks/trust-badges" } },
+        },
+        "ck-collection": {
+          type: "featured-collection",
+          settings: { title: "Featured Products", products_to_show: 8 },
+        },
+        "ck-faq": {
+          type: "apps",
+          blocks: { "faq-1": { type: "shopify://apps/convertkit/blocks/faq-accordion" } },
+        },
+      },
+      order: ["ck-hero", "ck-trust", "ck-collection", "ck-faq"],
+    },
+    "product-launch": {
+      name: "Product Launch",
+      sections: {
+        "ck-countdown": {
+          type: "apps",
+          blocks: { "cd-1": { type: "shopify://apps/convertkit/blocks/countdown-timer" } },
+        },
+        "ck-hero": {
+          type: "image-banner",
+          settings: {},
+        },
+        "ck-benefits": {
+          type: "apps",
+          blocks: { "bn-1": { type: "shopify://apps/convertkit/blocks/product-benefits-grid" } },
+        },
+        "ck-testimonials": {
+          type: "apps",
+          blocks: { "ts-1": { type: "shopify://apps/convertkit/blocks/testimonials-grid" } },
+        },
+      },
+      order: ["ck-countdown", "ck-hero", "ck-benefits", "ck-testimonials"],
+    },
+    "about-us": {
+      name: "About Us",
+      sections: {
+        "ck-hero": { type: "image-banner", settings: {} },
+        "ck-benefits": {
+          type: "apps",
+          blocks: { "bn-1": { type: "shopify://apps/convertkit/blocks/product-benefits-grid" } },
+        },
+        "ck-testimonials": {
+          type: "apps",
+          blocks: { "ts-1": { type: "shopify://apps/convertkit/blocks/testimonials-grid" } },
+        },
+      },
+      order: ["ck-hero", "ck-benefits", "ck-testimonials"],
+    },
+    faq: {
+      name: "FAQ",
+      sections: {
+        "ck-faq": {
+          type: "apps",
+          blocks: { "faq-1": { type: "shopify://apps/convertkit/blocks/faq-accordion" } },
+        },
+      },
+      order: ["ck-faq"],
+    },
+    contact: {
+      name: "Contact",
+      sections: {
+        "ck-text": { type: "rich-text", settings: { heading: "Contact Us" } },
+        "ck-trust": {
+          type: "apps",
+          blocks: { "trust-1": { type: "shopify://apps/convertkit/blocks/trust-badges" } },
+        },
+      },
+      order: ["ck-text", "ck-trust"],
+    },
+    "bundle-builder": {
+      name: "Bundle Builder",
+      sections: {
+        "ck-collection": {
+          type: "featured-collection",
+          settings: { title: "Build Your Bundle", products_to_show: 12 },
+        },
+        "ck-trust": {
+          type: "apps",
+          blocks: { "trust-1": { type: "shopify://apps/convertkit/blocks/trust-badges" } },
+        },
+      },
+      order: ["ck-collection", "ck-trust"],
+    },
+    "post-purchase": {
+      name: "Post-Purchase",
+      sections: {
+        "ck-text": { type: "rich-text", settings: { heading: "Thank You for Your Order!" } },
+        "ck-collection": {
+          type: "featured-collection",
+          settings: { title: "You Might Also Like", products_to_show: 4 },
+        },
+      },
+      order: ["ck-text", "ck-collection"],
+    },
+    "coming-soon": {
+      name: "Coming Soon",
+      sections: {
+        "ck-countdown": {
+          type: "apps",
+          blocks: { "cd-1": { type: "shopify://apps/convertkit/blocks/countdown-timer" } },
+        },
+        "ck-popup": {
+          type: "apps",
+          blocks: { "ep-1": { type: "shopify://apps/convertkit/blocks/email-popup" } },
+        },
+      },
+      order: ["ck-countdown", "ck-popup"],
+    },
+  };
+
+  const template = templates[templateSlug] || templates.homepage;
+  return JSON.stringify(template, null, 2);
+}

@@ -1,14 +1,16 @@
 /**
- * ConvertKit — Sticky Add to Cart Widget
+ * ConvertKit — Sticky Add to Cart Widget (Production)
  * Vanilla JS, < 8kb target. No dependencies.
  *
  * Features:
  * - IntersectionObserver to detect native ATC button
  * - Two-way variant sync with main product form
  * - Shopify AJAX Cart API integration
- * - Check animation + View Cart link
+ * - Checkmark animation 1.5s → View Cart link
  * - Hidden on mobile < 768px (configurable)
  * - 200ms ease-out slide-in, zero CLS
+ * - Out-of-stock: Notify Me email capture modal
+ * - Variant dropdown selector in sticky bar
  */
 
 import styles from './sticky-cart.css';
@@ -25,6 +27,7 @@ function injectStyles() {
 // ── SVG Icons ──
 const CART_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`;
 const CHECK_ICON = `<svg class="ck-sticky-cart__check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const BELL_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
 
 // ── Helpers ──
 function truncate(str, len) {
@@ -41,7 +44,6 @@ function formatMoney(cents) {
 
 // ── Product Data ──
 function getProductData() {
-  // Try multiple common sources for product JSON
   const scriptTags = document.querySelectorAll('script[type="application/json"]');
   for (const tag of scriptTags) {
     try {
@@ -50,18 +52,13 @@ function getProductData() {
       if (data?.variants) return data;
     } catch (e) { /* skip */ }
   }
-
-  // Try window.product or meta tag
   if (window.product) return window.product;
-
-  // Try Shopify's product JSON from the page URL
   return null;
 }
 
 async function fetchProductData() {
   const path = window.location.pathname;
   if (!path.includes('/products/')) return null;
-
   try {
     const resp = await fetch(path + '.js');
     if (resp.ok) return await resp.json();
@@ -79,6 +76,7 @@ class StickyCart {
     this.isVisible = false;
     this.analytics = null;
     this.options = {};
+    this._syncing = false;
   }
 
   async init(options = {}, analytics = null) {
@@ -87,29 +85,25 @@ class StickyCart {
 
     injectStyles();
 
-    // Get product data
     this.product = getProductData() || (await fetchProductData());
     if (!this.product || !this.product.variants) return;
 
-    // Set initial variant
-    this.selectedVariant =
-      this.product.variants.find((v) => v.available) || this.product.variants[0];
+    // Set initial variant from URL or first available
+    const params = new URLSearchParams(window.location.search);
+    const urlVariantId = parseInt(params.get('variant'), 10);
+    if (urlVariantId) {
+      this.selectedVariant = this.product.variants.find(v => v.id === urlVariantId);
+    }
+    if (!this.selectedVariant) {
+      this.selectedVariant = this.product.variants.find(v => v.available) || this.product.variants[0];
+    }
 
-    // Build the DOM
     this.render();
-
-    // Set up IntersectionObserver on native ATC button
     this.observeNativeButton();
-
-    // Listen for variant changes on the main product form
     this.syncVariants();
 
-    // Track impression
     if (this.analytics) {
-      this.analytics.track('feature_interact', {
-        feature: 'sticky_cart',
-        action: 'impression',
-      });
+      this.analytics.trackEvent('feature_impression', null, 'sticky_cart');
     }
   }
 
@@ -121,7 +115,6 @@ class StickyCart {
     }
     this.el.setAttribute('role', 'complementary');
     this.el.setAttribute('aria-label', 'Quick add to cart');
-
     this.update();
     document.body.appendChild(this.el);
   }
@@ -130,55 +123,104 @@ class StickyCart {
     if (!this.el || !this.product || !this.selectedVariant) return;
 
     const v = this.selectedVariant;
-    const image =
-      v.featured_image?.src ||
-      this.product.featured_image ||
-      this.product.images?.[0] ||
-      '';
+    const image = v.featured_image?.src || this.product.featured_image || this.product.images?.[0] || '';
     const title = truncate(this.product.title, 40);
-    const variantTitle =
-      v.title && v.title !== 'Default Title' ? v.title : '';
+    const variantTitle = v.title && v.title !== 'Default Title' ? v.title : '';
     const price = formatMoney(v.price);
-    const comparePrice =
-      v.compare_at_price && v.compare_at_price > v.price
-        ? formatMoney(v.compare_at_price)
-        : '';
+    const comparePrice = v.compare_at_price && v.compare_at_price > v.price ? formatMoney(v.compare_at_price) : '';
     const isAvailable = v.available;
-    const btnText = isAvailable ? 'Add to Cart' : 'Sold Out';
+    const hasMultipleVariants = this.product.variants.length > 1;
+
+    // Build variant selector for multi-variant products
+    let variantSelectHtml = '';
+    if (hasMultipleVariants) {
+      const optionsHtml = this.product.variants.map(vr => {
+        const label = vr.title !== 'Default Title' ? vr.title : `Variant ${vr.id}`;
+        return `<option value="${vr.id}" ${vr.id === v.id ? 'selected' : ''} ${!vr.available ? 'disabled' : ''}>${label}${!vr.available ? ' (Sold out)' : ''}</option>`;
+      }).join('');
+      variantSelectHtml = `<select class="ck-sticky-cart__variant-select" aria-label="Select variant">${optionsHtml}</select>`;
+    }
+
+    let btnHtml;
+    if (isAvailable) {
+      btnHtml = `<button class="ck-sticky-cart__btn" aria-label="Add to Cart">${CART_ICON} Add to Cart</button>`;
+    } else {
+      btnHtml = `<button class="ck-sticky-cart__btn ck-sticky-cart__btn--notify" aria-label="Notify Me">${BELL_ICON} Notify Me</button>`;
+    }
 
     this.el.innerHTML = `
       <div class="ck-sticky-cart__inner">
         ${image ? `<img class="ck-sticky-cart__image" src="${image}" alt="${title}" width="48" height="48" loading="lazy">` : ''}
         <div class="ck-sticky-cart__info">
           <p class="ck-sticky-cart__title">${title}</p>
-          ${variantTitle ? `<p class="ck-sticky-cart__variant">${variantTitle}</p>` : ''}
+          ${!hasMultipleVariants && variantTitle ? `<p class="ck-sticky-cart__variant">${variantTitle}</p>` : ''}
         </div>
+        ${variantSelectHtml}
         <div class="ck-sticky-cart__price">
           ${price}
           ${comparePrice ? `<span class="ck-sticky-cart__price--compare">${comparePrice}</span>` : ''}
         </div>
-        <button
-          class="ck-sticky-cart__btn"
-          ${!isAvailable ? 'disabled' : ''}
-          aria-label="${btnText}"
-        >
-          ${CART_ICON} ${btnText}
-        </button>
+        ${btnHtml}
       </div>
     `;
 
-    // Bind add to cart
-    const btn = this.el.querySelector('.ck-sticky-cart__btn');
-    if (btn && isAvailable) {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.addToCart();
+    // Bind variant select change (sticky → main form sync)
+    const select = this.el.querySelector('.ck-sticky-cart__variant-select');
+    if (select) {
+      select.addEventListener('change', (e) => {
+        const newVariantId = parseInt(e.target.value, 10);
+        const newVariant = this.product.variants.find(vr => vr.id === newVariantId);
+        if (newVariant) {
+          this._syncing = true;
+          this.selectedVariant = newVariant;
+          this.update();
+          this.pushVariantToMainForm(newVariantId);
+          this._syncing = false;
+        }
       });
+    }
+
+    // Bind button click
+    const btn = this.el.querySelector('.ck-sticky-cart__btn');
+    if (btn) {
+      if (isAvailable) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.addToCart();
+        });
+      } else {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.showNotifyModal();
+        });
+      }
     }
   }
 
+  /**
+   * Push variant selection from sticky bar back to the main product form.
+   */
+  pushVariantToMainForm(variantId) {
+    const productForm = document.querySelector('form[action*="/cart/add"]');
+    if (!productForm) return;
+
+    // Update hidden variant ID input
+    const idInput = productForm.querySelector('[name="id"]');
+    if (idInput) {
+      idInput.value = variantId;
+      idInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // Update URL for themes that read variant from URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('variant', variantId);
+    window.history.replaceState({}, '', url.toString());
+
+    // Dispatch a custom event so themes like Dawn can respond
+    document.dispatchEvent(new CustomEvent('variant:change', { detail: { variantId } }));
+  }
+
   observeNativeButton() {
-    // Find the native add-to-cart button — try common selectors
     const selectors = [
       'form[action*="/cart/add"] button[type="submit"]',
       'form[action*="/cart/add"] [name="add"]',
@@ -197,8 +239,7 @@ class StickyCart {
     }
 
     if (!nativeBtn) {
-      // Fallback: show sticky after scrolling 600px
-      this.fallbackScrollListener();
+      this.fallbackObserver();
       return;
     }
 
@@ -208,7 +249,6 @@ class StickyCart {
           if (entry.isIntersecting) {
             this.hide();
           } else {
-            // Only show when scrolled past (button above viewport)
             if (entry.boundingClientRect.top < 0) {
               this.show();
             }
@@ -221,21 +261,31 @@ class StickyCart {
     this.observer.observe(nativeBtn);
   }
 
-  fallbackScrollListener() {
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (window.scrollY > 600) {
-            this.show();
-          } else {
+  /**
+   * Fallback: use IntersectionObserver on a sentinel element placed at 600px scroll depth.
+   * No scroll event listeners used.
+   */
+  fallbackObserver() {
+    const sentinel = document.createElement('div');
+    sentinel.style.cssText = 'position:absolute;top:600px;left:0;width:1px;height:1px;pointer-events:none';
+    sentinel.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(sentinel);
+
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
             this.hide();
+          } else {
+            if (entry.boundingClientRect.top < 0) {
+              this.show();
+            }
           }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
+        }
+      },
+      { threshold: 0 }
+    );
+    this.observer.observe(sentinel);
   }
 
   show() {
@@ -251,15 +301,12 @@ class StickyCart {
   }
 
   syncVariants() {
-    // Listen for variant changes from the main product form
-    // Works with most Shopify themes that use URL params or form inputs
-    const productForm = document.querySelector(
-      'form[action*="/cart/add"]'
-    );
+    const productForm = document.querySelector('form[action*="/cart/add"]');
     if (!productForm) return;
 
-    // Watch select/input changes
+    // Watch form input changes (main form → sticky bar)
     productForm.addEventListener('change', (e) => {
+      if (this._syncing) return;
       const input = e.target;
       if (
         input.name === 'id' ||
@@ -270,9 +317,10 @@ class StickyCart {
       }
     });
 
-    // Also listen for URL changes (some themes use URL-based variant switching)
+    // Watch URL changes (some themes modify the URL for variant switching)
     let lastUrl = window.location.href;
     const urlObserver = new MutationObserver(() => {
+      if (this._syncing) return;
       if (window.location.href !== lastUrl) {
         lastUrl = window.location.href;
         this.handleUrlVariantChange();
@@ -282,13 +330,10 @@ class StickyCart {
   }
 
   handleVariantChange(form) {
-    // Try to get the selected variant ID from the form
     const idInput = form.querySelector('[name="id"]');
     if (idInput) {
       const variantId = parseInt(idInput.value, 10);
-      const variant = this.product.variants.find(
-        (v) => v.id === variantId
-      );
+      const variant = this.product.variants.find(v => v.id === variantId);
       if (variant) {
         this.selectedVariant = variant;
         this.update();
@@ -300,9 +345,7 @@ class StickyCart {
     const params = new URLSearchParams(window.location.search);
     const variantId = parseInt(params.get('variant'), 10);
     if (variantId) {
-      const variant = this.product.variants.find(
-        (v) => v.id === variantId
-      );
+      const variant = this.product.variants.find(v => v.id === variantId);
       if (variant) {
         this.selectedVariant = variant;
         this.update();
@@ -318,7 +361,7 @@ class StickyCart {
     btn.innerHTML = `${CART_ICON} Adding…`;
 
     try {
-      const resp = await fetch('/cart/add.js', {
+      const resp = await fetch(window.Shopify?.routes?.root ? window.Shopify.routes.root + 'cart/add.js' : '/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -329,38 +372,30 @@ class StickyCart {
 
       if (!resp.ok) throw new Error('Cart add failed');
 
-      // Success state
+      // Success animation
       btn.classList.remove('ck-sticky-cart__btn--loading');
       btn.classList.add('ck-sticky-cart__btn--success');
       btn.innerHTML = `${CHECK_ICON} Added!`;
 
-      // Track add to cart
       if (this.analytics) {
-        this.analytics.track('feature_interact', {
-          feature: 'sticky_cart',
-          action: 'add_to_cart',
-          variantId: this.selectedVariant.id,
-          price: this.selectedVariant.price,
-        });
+        this.analytics.trackEvent('feature_interact', this.selectedVariant.price / 100, 'sticky_cart_atc');
       }
 
-      // Show View Cart link after 1.5s
       setTimeout(() => {
         btn.classList.remove('ck-sticky-cart__btn--success');
         btn.innerHTML = `${CART_ICON} Add to Cart`;
 
-        // Add a "View Cart" link
-        const viewCart = document.createElement('a');
-        viewCart.className = 'ck-sticky-cart__view-cart';
-        viewCart.href = '/cart';
-        viewCart.textContent = 'View Cart →';
+        // Add View Cart link
         const inner = this.el.querySelector('.ck-sticky-cart__inner');
         if (inner && !inner.querySelector('.ck-sticky-cart__view-cart')) {
+          const viewCart = document.createElement('a');
+          viewCart.className = 'ck-sticky-cart__view-cart';
+          viewCart.href = '/cart';
+          viewCart.textContent = 'View Cart →';
           inner.appendChild(viewCart);
         }
       }, 1500);
 
-      // Update cart count in theme (common theme patterns)
       this.updateThemeCartCount();
     } catch (err) {
       btn.classList.remove('ck-sticky-cart__btn--loading');
@@ -376,8 +411,6 @@ class StickyCart {
       const resp = await fetch('/cart.js');
       if (!resp.ok) return;
       const cart = await resp.json();
-
-      // Update common cart count selectors
       const countSelectors = [
         '.cart-count',
         '.cart-count-bubble span',
@@ -390,12 +423,53 @@ class StickyCart {
         const el = document.querySelector(sel);
         if (el) el.textContent = cart.item_count;
       }
-
-      // Dispatch custom event for themes that listen
-      document.dispatchEvent(
-        new CustomEvent('cart:updated', { detail: cart })
-      );
+      document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
     } catch (e) { /* non-critical */ }
+  }
+
+  showNotifyModal() {
+    const existing = document.getElementById('ck-notify-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'ck-notify-overlay';
+    overlay.className = 'ck-notify-overlay';
+    overlay.innerHTML = `
+      <div class="ck-notify-modal" style="position:relative">
+        <button class="ck-notify-modal__close" aria-label="Close">&times;</button>
+        <h3>Get notified when it's back</h3>
+        <p>${truncate(this.product.title, 50)}${this.selectedVariant.title !== 'Default Title' ? ' — ' + this.selectedVariant.title : ''}</p>
+        <input type="email" class="ck-notify-modal__input" placeholder="Enter your email" aria-label="Email address" required>
+        <button class="ck-notify-modal__submit">Notify Me</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.ck-notify-modal__close').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    const submitBtn = overlay.querySelector('.ck-notify-modal__submit');
+    const emailInput = overlay.querySelector('.ck-notify-modal__input');
+
+    submitBtn.addEventListener('click', () => {
+      const email = emailInput.value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailInput.style.borderColor = '#ef4444';
+        return;
+      }
+
+      submitBtn.textContent = 'Subscribed!';
+      submitBtn.disabled = true;
+
+      if (this.analytics) {
+        this.analytics.trackEvent('feature_interact', null, 'sticky_cart_notify');
+      }
+
+      setTimeout(() => overlay.remove(), 1500);
+    });
+
+    emailInput.focus();
   }
 
   destroy() {

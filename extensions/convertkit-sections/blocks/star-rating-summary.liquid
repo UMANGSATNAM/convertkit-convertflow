@@ -1,0 +1,75 @@
+{% comment %}
+  ConvertKit — Star Rating Summary Block
+  Reads from Shopify native, Judge.me, or Okendo metafields.
+{% endcomment %}
+
+{%- liquid
+  assign rating_value = 0
+  assign rating_count = 0
+
+  if product.metafields.reviews.rating.value != blank
+    assign rating_value = product.metafields.reviews.rating.value.value | plus: 0.0
+    assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  elsif product.metafields.judgeme.rating != blank
+    assign rating_value = product.metafields.judgeme.rating | plus: 0.0
+    assign rating_count = product.metafields.judgeme.review_count | default: 0
+  elsif product.metafields.okendo.reviewsAverageValue != blank
+    assign rating_value = product.metafields.okendo.reviewsAverageValue | plus: 0.0
+    assign rating_count = product.metafields.okendo.reviewsCount | default: 0
+  endif
+-%}
+
+{% if rating_value > 0 %}
+<div class="ck-star-rating" data-ck-feature="star_rating" style="
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-body-family,-apple-system,sans-serif);
+  font-size:{{ section.settings.font_size | default: 14 }}px;
+  color:{{ section.settings.text_color | default: '#374151' }};
+  margin:{{ section.settings.margin_y | default: 8 }}px 0;
+">
+  {%- assign star_color = section.settings.star_color | default: '#FBBF24' -%}
+  {%- assign full_stars = rating_value | floor -%}
+  {%- assign decimal = rating_value | modulo: 1 -%}
+  {%- assign has_half = false -%}
+  {%- if decimal >= 0.25 and decimal < 0.75 -%}
+    {%- assign has_half = true -%}
+  {%- elsif decimal >= 0.75 -%}
+    {%- assign full_stars = full_stars | plus: 1 -%}
+  {%- endif -%}
+
+  <div class="ck-star-rating__stars" style="display:flex;gap:2px" aria-label="{{ rating_value }} out of 5 stars">
+    {%- for i in (1..5) -%}
+      {%- if i <= full_stars -%}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ star_color }}" stroke="{{ star_color }}" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      {%- elsif has_half and i == full_stars | plus: 1 -%}
+        <svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="ck-half-{{ section.id }}"><stop offset="50%" stop-color="{{ star_color }}"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="url(#ck-half-{{ section.id }})" stroke="{{ star_color }}" stroke-width="1"/></svg>
+      {%- else -%}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#e5e7eb" stroke="#e5e7eb" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  <span style="font-weight:600">{{ rating_value }}</span>
+
+  {% if section.settings.show_count and rating_count > 0 %}
+    <span style="color:{{ section.settings.muted_color | default: '#6b7280' }}">
+      ({{ rating_count }} {{ rating_count | pluralize: 'review', 'reviews' }})
+    </span>
+  {% endif %}
+</div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "CK Star Rating",
+  "target": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_count", "label": "Show Review Count", "default": true },
+    { "type": "color", "id": "star_color", "label": "Star Color", "default": "#FBBF24" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#374151" },
+    { "type": "color", "id": "muted_color", "label": "Muted Text Color", "default": "#6b7280" },
+    { "type": "range", "id": "font_size", "label": "Font Size", "min": 12, "max": 18, "step": 1, "default": 14 },
+    { "type": "range", "id": "margin_y", "label": "Vertical Margin", "min": 0, "max": 24, "step": 2, "default": 8 }
+  ]
+}
+{% endschema %}

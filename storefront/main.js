@@ -17,13 +17,9 @@ import UpsellIncartWidget from './widgets/upsell-incart.js';
 (function () {
   'use strict';
 
-  // Config injected by the script tag query params or fetched from server
   let config = window.__CONVERTKIT_CONFIG__ || {};
-
-  // ── Widget Registry ──
   const widgets = {};
 
-  // ── Fetch config from server if not inline ──
   async function loadConfig() {
     if (!config.shop && window.Shopify?.shop) {
       config.shop = window.Shopify.shop;
@@ -49,8 +45,8 @@ import UpsellIncartWidget from './widgets/upsell-incart.js';
 
     const scriptTag = document.currentScript || document.querySelector('script[src*="convertkit-widget"]');
     const appUrl = scriptTag ? scriptTag.src.split('/convertkit-widget')[0] : '';
-    
-    // Initialize Tracker
+
+    // Initialize Analytics Tracker
     ConvertKitAnalytics.init(config, appUrl);
     const analytics = ConvertKitAnalytics;
 
@@ -100,6 +96,11 @@ import UpsellIncartWidget from './widgets/upsell-incart.js';
       widgets.upsellIncart = UpsellIncartWidget;
       UpsellIncartWidget.init(upsell, analytics);
     }
+
+    // ── Observe feature impressions for analytics ──
+    requestAnimationFrame(() => {
+      ConvertKitAnalytics.observeImpressions();
+    });
   }
 
   // ── Initialize when DOM is ready ──
@@ -109,10 +110,19 @@ import UpsellIncartWidget from './widgets/upsell-incart.js';
     initWidgets();
   }
 
-  // ── Expose API ──
+  // ── Expose global API ──
   window.__CONVERTKIT__ = {
     analytics: ConvertKitAnalytics,
     widgets,
     version: '1.0.0',
+  };
+
+  // ── ConvertKit event bus ──
+  window.ConvertKit = {
+    config,
+    events: new EventTarget(),
+    emit(event, data) {
+      this.events.dispatchEvent(new CustomEvent(event, { detail: data }));
+    },
   };
 })();
