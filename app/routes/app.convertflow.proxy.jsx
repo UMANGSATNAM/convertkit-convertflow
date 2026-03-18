@@ -1,4 +1,4 @@
-import { authenticate } from "../../shopify.server";
+import { authenticate } from "../shopify.server";
 import fs from "node:fs";
 import path from "node:path";
 
