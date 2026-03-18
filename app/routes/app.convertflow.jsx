@@ -1,18 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Page,
-  Card,
-  BlockStack,
-  InlineStack,
-  Text,
-  Select,
-  Button,
   Badge,
   Banner,
   Spinner,
-  Tabs,
-  Box,
-  Divider,
+  Text,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -48,590 +40,579 @@ export const loader = async ({ request }) => {
   return json({ shopDomain, themeId, productHandle });
 };
 
-// ── Sections that need product context ──
-const PRODUCT_CONTEXT_SECTIONS = [
-  "inventory-scarcity", "star-rating-summary", "before-after-slider",
-  "product-benefits-grid", "tabbed-product-info", "complementary-products",
-  "size-guide",
-];
-
-function buildPreviewUrl(shopDomain, sectionName, themeId, productHandle) {
-  if (!shopDomain || !sectionName) return "";
-  const cleanName = sectionName.replace("sections/", "").replace(".liquid", "");
-  const needsProduct = PRODUCT_CONTEXT_SECTIONS.some((s) => cleanName.includes(s));
-  const base = `https://${shopDomain}`;
-  const path = needsProduct && productHandle ? `/products/${productHandle}` : "/";
-  const url = new URL(path, base);
-  url.searchParams.set("section_id", cleanName);
-  if (themeId) url.searchParams.set("preview_theme_id", themeId);
-  url.searchParams.set("_ck_ts", Date.now().toString());
-  return url.toString();
-}
-
-// ── Iframe with loading/timeout fallback ──
-function PreviewIframe({ src, label, labelColor, style }) {
-  const [status, setStatus] = useState("loading");
-  const iframeRef = useRef(null);
-
-  useEffect(() => {
-    if (!src || src === "pending") { setStatus("loading"); return; }
-    setStatus("loading");
-    const timer = setTimeout(() => setStatus((s) => s === "loading" ? "timeout" : s), 12000);
-    return () => clearTimeout(timer);
-  }, [src]);
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", ...style }}>
-      {/* Label bar */}
-      <div style={{
-        padding: "8px 14px", background: labelColor || "#374151",
-        color: "#fff", fontSize: 12, fontWeight: 600,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        flexShrink: 0, borderRadius: "8px 8px 0 0",
-      }}>
-        <span>{label}</span>
-        {src && src !== "pending" && (
-          <a href={src} target="_blank" rel="noopener noreferrer"
-            style={{ color: "#d1d5db", fontSize: 11, textDecoration: "none" }}>
-            Open ↗
-          </a>
-        )}
-      </div>
-      {/* Content */}
-      <div style={{
-        flex: 1, position: "relative", background: "#f9fafb",
-        borderRadius: "0 0 8px 8px", overflow: "hidden",
-        minHeight: 200,
-      }}>
-        {(!src || src === "pending") && (
-          <div style={{
-            display: "flex", alignItems: "center", justifyContent: "center",
-            height: "100%", color: "#9ca3af", fontSize: 13, padding: 20,
-            textAlign: "center",
-          }}>
-            {src === "pending"
-              ? "Push code to theme to see preview"
-              : "Select a section to preview"
-            }
-          </div>
-        )}
-
-        {src && src !== "pending" && (status === "error" || status === "timeout") && (
-          <div style={{
-            display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", height: "100%", gap: 10,
-            padding: 20, background: "#fef3c7",
-          }}>
-            <p style={{ margin: 0, fontWeight: 600, fontSize: 13, color: "#92400e" }}>
-              {status === "timeout" ? "Preview timed out" : "Could not load"}
-            </p>
-            <a href={src} target="_blank" rel="noopener noreferrer" style={{
-              padding: "6px 14px", borderRadius: 6, background: "#92400e",
-              color: "#fff", textDecoration: "none", fontSize: 12, fontWeight: 600,
-            }}>
-              Open in store →
-            </a>
-          </div>
-        )}
-
-        {src && src !== "pending" && status === "loading" && (
-          <div style={{
-            position: "absolute", inset: 0, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            background: "#f3f4f6", zIndex: 2,
-          }}>
-            <Spinner size="large" />
-          </div>
-        )}
-
-        {src && src !== "pending" && (
-          <iframe
-            ref={iframeRef}
-            src={src}
-            title={label}
-            style={{
-              width: "100%", height: "100%", border: "none",
-              display: status === "loaded" || status === "loading" ? "block" : "none",
-            }}
-            onLoad={() => setStatus("loaded")}
-            onError={() => setStatus("error")}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function ConvertFlow() {
   const { shopDomain, themeId, productHandle } = useLoaderData();
 
-  const [themes, setThemes] = useState([]);
-  const [selectedTheme, setSelectedTheme] = useState("");
-  const [sections, setSections] = useState([]);
-  const [selectedSection, setSelectedSection] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loadingThemes, setLoadingThemes] = useState(false);
-  const [extractionResult, setExtractionResult] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
-  const [error, setError] = useState("");
+  // ── State ──
+  const [inspectorEnabled, setInspectorEnabled] = useState(true);
+  const [currentPath, setCurrentPath] = useState("/");
+  const [iframeKey, setIframeKey] = useState(0);
+  const [iframeLoading, setIframeLoading] = useState(true);
+  const [clickedSection, setClickedSection] = useState(null);
+  const [extraction, setExtraction] = useState(null);
+  const [loadingCode, setLoadingCode] = useState(false);
+  const [activeTab, setActiveTab] = useState("liquid");
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [pushing, setPushing] = useState(false);
-  const [pushSuccess, setPushSuccess] = useState(false);
+  const [livePreviewLoading, setLivePreviewLoading] = useState(false);
+  const [sectionsOnPage, setSectionsOnPage] = useState([]);
+  const [error, setError] = useState("");
+  const [monacoLoaded, setMonacoLoaded] = useState(false);
 
-  // Preview state
-  const [beforeUrl, setBeforeUrl] = useState("");
-  const [afterUrl, setAfterUrl] = useState("");
-  const [previewMode, setPreviewMode] = useState("split"); // split | before | after
-  const [previewViewport, setPreviewViewport] = useState("desktop");
+  const proxyIframeRef = useRef(null);
+  const editorRef = useRef(null);
+  const monacoRef = useRef(null);
+  const editorContainerRef = useRef(null);
+  const cssDebounceRef = useRef(null);
+  const liquidDebounceRef = useRef(null);
+  const currentCodeRef = useRef({ liquid: "", css: "", schema: "", combined: "" });
 
-  // Load themes
-  const loadThemes = useCallback(async () => {
-    setLoadingThemes(true);
-    setError("");
-    try {
-      const res = await fetch("/api/convertflow-themes");
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setThemes(data.themes || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoadingThemes(false);
+  // ── Proxy URL ──
+  const proxyUrl = `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=${encodeURIComponent(currentPath)}`;
+
+  // ── Send message to proxy iframe ──
+  const sendToIframe = useCallback((msg) => {
+    if (proxyIframeRef.current?.contentWindow) {
+      proxyIframeRef.current.contentWindow.postMessage(msg, "*");
     }
   }, []);
 
-  // Load sections for selected theme
-  const loadSections = useCallback(async (tid) => {
-    setSelectedTheme(tid);
-    setSelectedSection("");
-    setExtractionResult(null);
-    setBeforeUrl("");
-    setAfterUrl("");
-    if (!tid) return;
+  // ── Toggle inspector ──
+  const toggleInspector = useCallback(() => {
+    const next = !inspectorEnabled;
+    setInspectorEnabled(next);
+    sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: next });
+  }, [inspectorEnabled, sendToIframe]);
 
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/convertflow-themes?themeId=${tid}`);
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setSections(data.sections || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  // ── Navigate inside proxy iframe ──
+  const navigateTo = useCallback((path) => {
+    setCurrentPath(path);
+    setIframeLoading(true);
+    setIframeKey((k) => k + 1);
   }, []);
 
-  // When section is selected, immediately set BEFORE preview
-  const handleSectionSelect = useCallback((sectionKey) => {
-    setSelectedSection(sectionKey);
-    setExtractionResult(null);
-    setAfterUrl("");
-    setPushSuccess(false);
-
-    if (sectionKey && shopDomain) {
-      const sectionName = sectionKey.replace("sections/", "").replace(".liquid", "");
-      const url = buildPreviewUrl(shopDomain, sectionName, themeId || selectedTheme, productHandle);
-      setBeforeUrl(url);
-    } else {
-      setBeforeUrl("");
-    }
-  }, [shopDomain, themeId, selectedTheme, productHandle]);
-
-  // Extract section
-  const extractSection = useCallback(async () => {
-    if (!selectedTheme || !selectedSection) return;
-
-    setLoading(true);
+  // ── Fetch section code ──
+  const fetchSectionCode = useCallback(async (sectionId) => {
+    setLoadingCode(true);
     setError("");
-    setExtractionResult(null);
-    setAfterUrl("");
-    setPushSuccess(false);
     try {
       const res = await fetch("/api/convertflow-extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          themeId: selectedTheme,
-          sectionKey: selectedSection,
+          themeId,
+          sectionKey: `sections/${sectionId}.liquid`,
         }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      setExtractionResult(data.extraction);
+
+      const ext = data.extraction || {};
+      const liquid = ext.processedLiquid || ext.rawLiquid || "";
+      const css = ext.processedCSS || ext.rawCSS || "";
+      const schema = ext.processedSchema || ext.rawSchema || "";
+      const combined = css ? `<style>\n${css}\n</style>\n\n${liquid}` : liquid;
+
+      setExtraction({ liquid, css, schema, combined, themeCheck: ext.themeCheckerPass });
+      currentCodeRef.current = { liquid, css, schema, combined };
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setLoadingCode(false);
     }
-  }, [selectedTheme, selectedSection]);
+  }, [themeId]);
 
-  // Push to theme and set AFTER preview
-  const pushToTheme = useCallback(async () => {
-    if (!extractionResult || !selectedTheme || !selectedSection) return;
+  // ── Handle messages from iframe ──
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || typeof e.data.type !== "string") return;
+      if (!e.data.type.startsWith("CK_")) return;
 
-    setPushing(true);
-    setError("");
+      switch (e.data.type) {
+        case "CK_INSPECTOR_READY":
+          sendToIframe({ type: "CK_GET_SECTIONS" });
+          sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: inspectorEnabled });
+          break;
+        case "CK_SECTION_CLICKED":
+          setClickedSection({ sectionId: e.data.sectionId, sectionType: e.data.sectionType });
+          setIsEditing(false);
+          setSaveSuccess(false);
+          fetchSectionCode(e.data.sectionId);
+          break;
+        case "CK_SECTIONS_LIST":
+          setSectionsOnPage(e.data.sections || []);
+          break;
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [sendToIframe, fetchSectionCode, inspectorEnabled]);
+
+  // ── Load Monaco from CDN ──
+  useEffect(() => {
+    if (monacoLoaded) return;
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js";
+    script.onload = () => {
+      window.require.config({
+        paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" },
+      });
+      window.require(["vs/editor/editor.main"], () => {
+        // Register Liquid language
+        window.monaco.languages.register({ id: "liquid" });
+        window.monaco.languages.setMonarchTokensProvider("liquid", {
+          tokenizer: {
+            root: [
+              [/\{%[-]?/, { token: "delimiter.liquid", next: "@liquidTag" }],
+              [/\{\{[-]?/, { token: "delimiter.liquid", next: "@liquidOutput" }],
+              [/<style[\s>]/, { token: "tag", next: "@css" }],
+              [/<\/?[\w]+/, "tag"],
+              [/[^<{]+/, ""],
+            ],
+            liquidTag: [
+              [/[-]?%\}/, { token: "delimiter.liquid", next: "@pop" }],
+              [/\b(if|else|elsif|endif|for|endfor|unless|endunless|case|when|endcase|capture|endcapture|assign|include|render|section|schema|endschema|comment|endcomment|raw|endraw)\b/, "keyword"],
+              [/"[^"]*"/, "string"],
+              [/'[^']*'/, "string"],
+              [/\|/, "operator"],
+              [/\b\d+\b/, "number"],
+              [/./, ""],
+            ],
+            liquidOutput: [
+              [/[-]?\}\}/, { token: "delimiter.liquid", next: "@pop" }],
+              [/\|/, "operator"],
+              [/"[^"]*"/, "string"],
+              [/'[^']*'/, "string"],
+              [/\b\d+\b/, "number"],
+              [/./, "variable"],
+            ],
+            css: [
+              [/<\/style>/, { token: "tag", next: "@pop" }],
+              [/./, ""],
+            ],
+          },
+        });
+        setMonacoLoaded(true);
+      });
+    };
+    document.head.appendChild(script);
+  }, [monacoLoaded]);
+
+  // ── Create/update Monaco editor ──
+  useEffect(() => {
+    if (!monacoLoaded || !extraction || !editorContainerRef.current) return;
+    if (!window.monaco) return;
+
+    const lang = activeTab === "css" ? "css" : activeTab === "schema" ? "json" : "liquid";
+    const value = extraction[activeTab] || "";
+
+    if (editorRef.current) {
+      editorRef.current.dispose();
+    }
+
+    const editor = window.monaco.editor.create(editorContainerRef.current, {
+      value,
+      language: lang,
+      theme: "vs-dark",
+      readOnly: !isEditing,
+      minimap: { enabled: false },
+      fontSize: 13,
+      lineNumbers: "on",
+      wordWrap: "on",
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      padding: { top: 12 },
+    });
+
+    editor.onDidChangeModelContent(() => {
+      if (!isEditing) return;
+      const newValue = editor.getValue();
+      currentCodeRef.current[activeTab] = newValue;
+
+      if (activeTab === "css") {
+        clearTimeout(cssDebounceRef.current);
+        cssDebounceRef.current = setTimeout(() => {
+          sendToIframe({ type: "CK_INJECT_CSS", css: newValue });
+        }, 300);
+      } else if (activeTab === "liquid" || activeTab === "combined") {
+        clearTimeout(liquidDebounceRef.current);
+        liquidDebounceRef.current = setTimeout(() => {
+          previewLiquid(newValue);
+        }, 800);
+      }
+    });
+
+    editorRef.current = editor;
+
+    return () => {
+      clearTimeout(cssDebounceRef.current);
+      clearTimeout(liquidDebounceRef.current);
+    };
+  }, [monacoLoaded, extraction, activeTab, isEditing]);
+
+  // ── Live preview Liquid via server ──
+  const previewLiquid = useCallback(async (code) => {
+    if (!clickedSection) return;
+    setLivePreviewLoading(true);
     try {
+      const res = await fetch("/api/convertflow/preview-liquid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          liquidCode: code,
+          cssCode: currentCodeRef.current.css,
+          sectionId: clickedSection.sectionId,
+          themeId,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.html) {
+        sendToIframe({
+          type: "CK_INJECT_HTML",
+          sectionId: clickedSection.sectionId,
+          html: data.html,
+        });
+      }
+    } catch (err) {
+      console.error("Live preview error:", err);
+    } finally {
+      setLivePreviewLoading(false);
+    }
+  }, [clickedSection, themeId, sendToIframe]);
+
+  // ── Save to live theme ──
+  const handleSaveToTheme = useCallback(async () => {
+    if (!clickedSection || !isEditing) return;
+    setSaving(true);
+    setError("");
+    setSaveSuccess(false);
+    try {
+      // Save backup to library first
+      await fetch("/api/convertflow-library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `Backup: ${clickedSection.sectionId}`,
+          description: `Auto-backup before save to live theme`,
+          tags: "backup",
+          liquidCode: extraction.liquid,
+          cssCode: extraction.css,
+          schemaCode: extraction.schema,
+        }),
+      });
+
+      // Push to live theme
+      const combined = currentCodeRef.current.css
+        ? `<style>\n${currentCodeRef.current.css}\n</style>\n\n${currentCodeRef.current.liquid}`
+        : currentCodeRef.current.liquid;
+
+      const schemaBlock = currentCodeRef.current.schema
+        ? `\n\n{% schema %}\n${currentCodeRef.current.schema}\n{% endschema %}`
+        : "";
+
       const res = await fetch("/api/convertflow-push", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          themeId: selectedTheme,
-          sectionKey: selectedSection,
-          liquidCode: extractionResult.processedLiquid || extractionResult.rawLiquid,
-          cssCode: extractionResult.processedCSS || extractionResult.rawCSS,
-          schemaCode: extractionResult.processedSchema || extractionResult.rawSchema,
+          themeId,
+          sectionKey: `sections/${clickedSection.sectionId}.liquid`,
+          code: combined + schemaBlock,
+          sectionName: clickedSection.sectionId,
         }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      setPushSuccess(true);
-
-      // Wait 2 seconds for Shopify to process, then set AFTER URL
-      setTimeout(() => {
-        const sectionName = selectedSection.replace("sections/", "").replace(".liquid", "");
-        setAfterUrl(buildPreviewUrl(shopDomain, sectionName, themeId || selectedTheme, productHandle));
-      }, 2000);
+      setSaveSuccess(true);
+      // Reload iframe after 1.5s to show live result
+      setTimeout(() => setIframeKey((k) => k + 1), 1500);
     } catch (err) {
       setError(err.message);
     } finally {
-      setPushing(false);
+      setSaving(false);
     }
-  }, [extractionResult, selectedTheme, selectedSection, shopDomain, themeId, productHandle]);
+  }, [clickedSection, isEditing, themeId, extraction]);
 
-  // Save to library
-  const saveToLibrary = useCallback(async () => {
-    if (!extractionResult) return;
-    setSaveSuccess(false);
-    try {
-      const res = await fetch("/api/convertflow-library", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: extractionResult.sectionName,
-          description: `Extracted from ${extractionResult.sectionKey}`,
-          tags: "extracted",
-          liquidCode: extractionResult.processedLiquid,
-          cssCode: extractionResult.processedCSS,
-          schemaCode: extractionResult.processedSchema,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setSaveSuccess(true);
-    } catch (err) {
-      setError(err.message);
-    }
-  }, [extractionResult]);
+  // ── Copy to clipboard ──
+  const copyCode = useCallback(() => {
+    const code = currentCodeRef.current[activeTab] || "";
+    navigator.clipboard.writeText(code).catch(() => {});
+  }, [activeTab]);
 
-  const themeOptions = [
-    { label: "Select a theme...", value: "" },
-    ...themes.map((t) => ({
-      label: `${t.name} ${t.role === "main" ? "(Live)" : `(${t.role})`}`,
-      value: String(t.id),
-    })),
+  // ── Tab data ──
+  const TABS = [
+    { id: "liquid", label: "Liquid" },
+    { id: "css", label: "CSS" },
+    { id: "schema", label: "Schema" },
+    { id: "combined", label: "Combined" },
   ];
-
-  const sectionOptions = [
-    { label: "Select a section...", value: "" },
-    ...sections.map((s) => ({ label: s.name, value: s.key })),
-  ];
-
-  const tabs = [
-    { id: "liquid", content: "Liquid", panelID: "liquid" },
-    { id: "css", content: "CSS", panelID: "css" },
-    { id: "schema", content: "Schema", panelID: "schema" },
-  ];
-
-  const getTabContent = () => {
-    if (!extractionResult) return "";
-    switch (activeTab) {
-      case 0: return extractionResult.processedLiquid || extractionResult.rawLiquid || "";
-      case 1: return extractionResult.processedCSS || extractionResult.rawCSS || "";
-      case 2: return extractionResult.processedSchema || extractionResult.rawSchema || "";
-      default: return "";
-    }
-  };
-
-  const iframeContainerWidth = previewViewport === "mobile" ? "390px" : "100%";
 
   return (
     <Page title="ConvertFlow" fullWidth>
-      <TitleBar title="ConvertFlow — Liquid Extraction Engine" />
-      <BlockStack gap="400">
-        {error && (
+      <TitleBar title="ConvertFlow — Visual Section Inspector" />
+
+      {error && (
+        <div style={{ padding: "0 0 12px" }}>
           <Banner tone="critical" onDismiss={() => setError("")}>
             <Text as="p">{error}</Text>
           </Banner>
-        )}
-        {saveSuccess && (
-          <Banner tone="success" onDismiss={() => setSaveSuccess(false)}>
-            <Text as="p">Component saved to library.</Text>
-          </Banner>
-        )}
+        </div>
+      )}
 
-        {/* 3-column layout */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "22% 40% 38%",
-          gap: "16px",
-          minHeight: "calc(100vh - 200px)",
-        }}>
+      {/* ── 2-Panel Layout ── */}
+      <div style={{ display: "flex", height: "calc(100vh - 120px)", overflow: "hidden", borderRadius: 10, border: "1px solid #e5e7eb" }}>
 
-          {/* ── Column 1: Section List (22%) ── */}
-          <div style={{ overflow: "auto" }}>
-            <Card>
-              <BlockStack gap="400">
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="h2" variant="headingMd">Theme Explorer</Text>
-                  <Badge tone="info">Pro</Badge>
-                </InlineStack>
-                <Divider />
+        {/* ══════════ LEFT PANEL: Store Preview (60%) ══════════ */}
+        <div style={{ width: "60%", display: "flex", flexDirection: "column", borderRight: "1px solid #e5e7eb" }}>
 
-                <Button onClick={loadThemes} loading={loadingThemes} variant="primary" fullWidth>
-                  {themes.length > 0 ? "Refresh Themes" : "Load Themes"}
-                </Button>
-
-                {themes.length > 0 && (
-                  <Select label="Theme" options={themeOptions} value={selectedTheme} onChange={loadSections} />
-                )}
-
-                {loading && !extractionResult && (
-                  <Box padding="400">
-                    <InlineStack align="center"><Spinner size="small" /></InlineStack>
-                  </Box>
-                )}
-
-                {/* Section list */}
-                {sections.length > 0 && (
-                  <>
-                    <Divider />
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {sections.length} sections found
-                    </Text>
-                    <div style={{ maxHeight: 500, overflowY: "auto" }}>
-                      {sections.map((s) => (
-                        <div
-                          key={s.key}
-                          onClick={() => handleSectionSelect(s.key)}
-                          style={{
-                            padding: "10px 12px",
-                            cursor: "pointer",
-                            borderRadius: 6,
-                            marginBottom: 2,
-                            background: selectedSection === s.key ? "#EEF2FF" : "transparent",
-                            borderLeft: selectedSection === s.key ? "3px solid #4F46E5" : "3px solid transparent",
-                            fontSize: 13,
-                            fontWeight: selectedSection === s.key ? 600 : 400,
-                            transition: "all 100ms",
-                          }}
-                        >
-                          {s.name}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {selectedSection && (
-                  <>
-                    <Divider />
-                    <Button onClick={extractSection} loading={loading} variant="primary" tone="success" fullWidth>
-                      Extract Section
-                    </Button>
-                  </>
-                )}
-              </BlockStack>
-            </Card>
-          </div>
-
-          {/* ── Column 2: Code Editor (40%) ── */}
-          <div style={{ overflow: "auto" }}>
-            <Card>
-              <BlockStack gap="300">
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="h2" variant="headingMd">Extraction Result</Text>
-                  {extractionResult && (
-                    <InlineStack gap="200">
-                      {extractionResult.themeCheckerPass ? (
-                        <Badge tone="success">Passed</Badge>
-                      ) : (
-                        <Badge tone="warning">Warnings</Badge>
-                      )}
-                      <Button onClick={saveToLibrary} size="slim">Save to Library</Button>
-                      <Button onClick={pushToTheme} loading={pushing} variant="primary" size="slim">
-                        Push to Theme
-                      </Button>
-                    </InlineStack>
-                  )}
-                </InlineStack>
-
-                {pushSuccess && (
-                  <Banner tone="success" onDismiss={() => setPushSuccess(false)}>
-                    <Text as="p">Pushed to theme. After preview loading…</Text>
-                  </Banner>
-                )}
-
-                {loading && (
-                  <Box padding="800">
-                    <BlockStack gap="300" inlineAlign="center">
-                      <Spinner size="large" />
-                      <Text as="p" variant="bodyMd" tone="subdued">
-                        Extracting and processing with AI…
-                      </Text>
-                    </BlockStack>
-                  </Box>
-                )}
-
-                {!loading && !extractionResult && (
-                  <Box padding="800">
-                    <Text as="p" variant="bodyLg" tone="subdued" alignment="center">
-                      Select a section and click Extract to get production-ready code.
-                    </Text>
-                  </Box>
-                )}
-
-                {!loading && extractionResult && (
-                  <Tabs tabs={tabs} selected={activeTab} onSelect={setActiveTab}>
-                    <Box padding="200">
-                      <div style={{
-                        background: "#1e1e2e", borderRadius: 8, padding: 16,
-                        overflow: "auto", maxHeight: 500,
-                      }}>
-                        <pre style={{
-                          color: "#cdd6f4",
-                          fontFamily: "'Fira Code','Cascadia Code',monospace",
-                          fontSize: 13, lineHeight: 1.6, margin: 0,
-                          whiteSpace: "pre-wrap", wordBreak: "break-word",
-                        }}>
-                          {getTabContent() || "(empty)"}
-                        </pre>
-                      </div>
-                    </Box>
-                  </Tabs>
-                )}
-              </BlockStack>
-            </Card>
-          </div>
-
-          {/* ── Column 3: Before/After Preview (38%) ── */}
+          {/* Browser toolbar */}
           <div style={{
-            display: "flex", flexDirection: "column", gap: 12,
-            overflow: "hidden",
+            height: 44, borderBottom: "1px solid #e5e7eb", background: "#f9fafb",
+            display: "flex", alignItems: "center", gap: 6, padding: "0 10px", flexShrink: 0,
           }}>
-            {/* Preview controls */}
+            {/* Nav buttons */}
+            <button onClick={() => { try { proxyIframeRef.current?.contentWindow?.history.back(); } catch(e){} }} style={navBtnStyle} title="Back">←</button>
+            <button onClick={() => { try { proxyIframeRef.current?.contentWindow?.history.forward(); } catch(e){} }} style={navBtnStyle} title="Forward">→</button>
+            <button onClick={() => setIframeKey((k) => k + 1)} style={navBtnStyle} title="Refresh">↻</button>
+
+            {/* URL bar */}
             <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "8px 12px", background: "#f3f4f6", borderRadius: 8,
-              flexShrink: 0,
+              flex: 1, display: "flex", alignItems: "center", gap: 6,
+              background: "#fff", border: "1px solid #d1d5db", borderRadius: 6,
+              padding: "4px 10px", fontSize: 12, color: "#374151", overflow: "hidden",
             }}>
-              <div style={{ display: "flex", gap: 4 }}>
-                {["split", "before", "after"].map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setPreviewMode(mode)}
-                    style={{
-                      padding: "4px 10px", border: "1px solid #d1d5db", borderRadius: 4,
-                      background: previewMode === mode ? "#111827" : "#fff",
-                      color: previewMode === mode ? "#fff" : "#374151",
-                      fontSize: 11, fontWeight: 600, cursor: "pointer",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {mode}
-                  </button>
-                ))}
-              </div>
-              <div style={{ display: "flex", gap: 4 }}>
-                <button
-                  onClick={() => setPreviewViewport("desktop")}
-                  style={{
-                    padding: "4px 8px", border: "1px solid #d1d5db", borderRadius: 4,
-                    background: previewViewport === "desktop" ? "#111827" : "#fff",
-                    color: previewViewport === "desktop" ? "#fff" : "#374151",
-                    fontSize: 11, fontWeight: 600, cursor: "pointer",
-                  }}
-                >
-                  🖥
-                </button>
-                <button
-                  onClick={() => setPreviewViewport("mobile")}
-                  style={{
-                    padding: "4px 8px", border: "1px solid #d1d5db", borderRadius: 4,
-                    background: previewViewport === "mobile" ? "#111827" : "#fff",
-                    color: previewViewport === "mobile" ? "#fff" : "#374151",
-                    fontSize: 11, fontWeight: 600, cursor: "pointer",
-                  }}
-                >
-                  📱
-                </button>
-              </div>
+              <span style={{ color: "#059669", fontSize: 11 }}>🔒</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {shopDomain}{currentPath}
+              </span>
             </div>
 
-            {/* Preview iframes */}
+            {/* Quick nav */}
+            <button onClick={() => navigateTo("/")} style={navBtnStyle}>Home</button>
+            <button onClick={() => navigateTo("/collections")} style={navBtnStyle}>Collections</button>
+            <button onClick={() => navigateTo("/products")} style={navBtnStyle}>Products</button>
+
+            {/* Inspector toggle */}
+            <button
+              onClick={toggleInspector}
+              style={{
+                ...navBtnStyle,
+                background: inspectorEnabled ? "#059669" : "#9ca3af",
+                color: "#fff",
+                fontWeight: 700,
+                minWidth: 70,
+              }}
+            >
+              {inspectorEnabled ? "Inspector ON" : "Inspector OFF"}
+            </button>
+          </div>
+
+          {/* Hint banner */}
+          {inspectorEnabled && !clickedSection && (
             <div style={{
-              flex: 1, display: "flex", flexDirection: "column", gap: 8,
-              overflow: "hidden",
+              padding: "6px 14px", background: "#EEEDFE", color: "#4338CA",
+              fontSize: 11, flexShrink: 0,
             }}>
-              {(previewMode === "split" || previewMode === "before") && (
-                <div style={{
-                  flex: 1, display: "flex", justifyContent: "center",
-                  overflow: "hidden",
-                }}>
-                  <div style={{
-                    width: iframeContainerWidth, maxWidth: "100%", height: "100%",
-                    border: previewViewport === "mobile" ? "3px solid #1f2937" : "none",
-                    borderRadius: previewViewport === "mobile" ? 16 : 0,
-                    overflow: "hidden",
-                  }}>
-                    <PreviewIframe
-                      src={beforeUrl}
-                      label="BEFORE — Original theme code"
-                      labelColor="#374151"
-                      style={{ height: "100%" }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {(previewMode === "split" || previewMode === "after") && (
-                <div style={{
-                  flex: 1, display: "flex", justifyContent: "center",
-                  overflow: "hidden",
-                }}>
-                  <div style={{
-                    width: iframeContainerWidth, maxWidth: "100%", height: "100%",
-                    border: previewViewport === "mobile" ? "3px solid #1f2937" : "none",
-                    borderRadius: previewViewport === "mobile" ? 16 : 0,
-                    overflow: "hidden",
-                  }}>
-                    <PreviewIframe
-                      src={afterUrl || (extractionResult ? "pending" : "")}
-                      label="AFTER — ConvertFlow extracted code"
-                      labelColor="#059669"
-                      style={{ height: "100%" }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {!beforeUrl && !afterUrl && (
-                <div style={{
-                  flex: 1, display: "flex", alignItems: "center",
-                  justifyContent: "center", color: "#9ca3af", fontSize: 14,
-                  background: "#f9fafb", borderRadius: 8,
-                }}>
-                  Select a section to see a live preview
-                </div>
-              )}
+              👆 Hover over any section to highlight it. Click to open its code in the editor.
             </div>
+          )}
+
+          {/* Proxy iframe */}
+          <div style={{ flex: 1, position: "relative" }}>
+            {iframeLoading && (
+              <div style={{
+                position: "absolute", inset: 0, display: "flex", alignItems: "center",
+                justifyContent: "center", background: "#f3f4f6", zIndex: 5,
+              }}>
+                <div style={{ textAlign: "center" }}>
+                  <Spinner size="large" />
+                  <p style={{ marginTop: 12, color: "#6b7280", fontSize: 13 }}>Loading store preview…</p>
+                </div>
+              </div>
+            )}
+            <iframe
+              ref={proxyIframeRef}
+              key={iframeKey}
+              src={proxyUrl}
+              title="Store Preview"
+              style={{ width: "100%", height: "100%", border: "none" }}
+              onLoad={() => setIframeLoading(false)}
+            />
           </div>
         </div>
-      </BlockStack>
+
+        {/* ══════════ RIGHT PANEL: Code Editor (40%) ══════════ */}
+        <div style={{ width: "40%", display: "flex", flexDirection: "column", background: "#1E2530" }}>
+
+          {/* Panel header */}
+          <div style={{
+            height: 44, borderBottom: "1px solid #374151", background: "#f9fafb",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "0 14px", flexShrink: 0,
+          }}>
+            {!clickedSection ? (
+              <span style={{ color: "#9ca3af", fontSize: 13 }}>
+                Click any section in the preview to see its code
+              </span>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
+                <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>
+                  {clickedSection.sectionId}
+                </span>
+                <span style={{ fontSize: 11, color: "#6b7280" }}>
+                  sections/{clickedSection.sectionId}.liquid
+                </span>
+                {extraction && (
+                  <Badge tone={extraction.themeCheck ? "success" : "warning"}>
+                    {extraction.themeCheck ? "PASS" : "WARN"}
+                  </Badge>
+                )}
+                {livePreviewLoading && (
+                  <span style={{ fontSize: 11, color: "#4F46E5" }}>Updating preview…</span>
+                )}
+              </div>
+            )}
+            {clickedSection && (
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                style={{
+                  padding: "4px 12px", border: "1px solid #d1d5db", borderRadius: 4,
+                  background: isEditing ? "#4F46E5" : "#fff",
+                  color: isEditing ? "#fff" : "#374151",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}
+              >
+                {isEditing ? "Editing" : "Read Only"}
+              </button>
+            )}
+          </div>
+
+          {/* Tab bar */}
+          <div style={{
+            display: "flex", borderBottom: "1px solid #374151", flexShrink: 0,
+          }}>
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  flex: 1, padding: "8px 0", border: "none", cursor: "pointer",
+                  background: "transparent",
+                  color: activeTab === tab.id ? "#fff" : "#9ca3af",
+                  fontSize: 12, fontWeight: 600,
+                  borderBottom: activeTab === tab.id ? "2px solid #4F46E5" : "2px solid transparent",
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Editor area */}
+          <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+            {/* Empty state */}
+            {!clickedSection && !loadingCode && (
+              <div style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                justifyContent: "center", height: "100%", gap: 12,
+              }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+                <span style={{ color: "#6b7280", fontSize: 14 }}>
+                  Click any section to see its code
+                </span>
+              </div>
+            )}
+
+            {/* Loading state */}
+            {loadingCode && (
+              <div style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                justifyContent: "center", height: "100%", gap: 12,
+              }}>
+                <Spinner size="large" />
+                <span style={{ color: "#9ca3af", fontSize: 13 }}>Fetching section code…</span>
+              </div>
+            )}
+
+            {/* Monaco container */}
+            {extraction && !loadingCode && (
+              <div ref={editorContainerRef} id="ck-monaco-container" style={{ width: "100%", height: "100%" }} />
+            )}
+          </div>
+
+          {/* Bottom action bar */}
+          <div style={{
+            height: 52, borderTop: "1px solid #374151", background: "#f9fafb",
+            display: "flex", alignItems: "center", justifyContent: "flex-end",
+            gap: 8, padding: "0 14px", flexShrink: 0,
+          }}>
+            <button onClick={copyCode} style={actionBtnStyle}>
+              Copy {activeTab}
+            </button>
+            <button
+              onClick={async () => {
+                if (!extraction) return;
+                try {
+                  await fetch("/api/convertflow-library", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      name: clickedSection?.sectionId || "untitled",
+                      description: `Saved from visual inspector`,
+                      tags: "inspector",
+                      liquidCode: currentCodeRef.current.liquid,
+                      cssCode: currentCodeRef.current.css,
+                      schemaCode: currentCodeRef.current.schema,
+                    }),
+                  });
+                } catch (e) { setError(e.message); }
+              }}
+              style={actionBtnStyle}
+              disabled={!extraction}
+            >
+              Save to Library
+            </button>
+            <button
+              onClick={handleSaveToTheme}
+              disabled={!isEditing || !extraction || saving}
+              style={{
+                ...actionBtnStyle,
+                background: !isEditing || !extraction ? "#d1d5db" : saveSuccess ? "#059669" : "#4F46E5",
+                color: "#fff",
+                cursor: !isEditing || !extraction ? "not-allowed" : "pointer",
+              }}
+            >
+              {saving ? "Saving…" : saveSuccess ? "Saved! ✓" : "Save to Live Theme"}
+            </button>
+          </div>
+        </div>
+      </div>
     </Page>
   );
 }
+
+// ── Shared button styles ──
+const navBtnStyle = {
+  padding: "4px 8px",
+  border: "1px solid #d1d5db",
+  borderRadius: 4,
+  background: "#fff",
+  fontSize: 12,
+  cursor: "pointer",
+  color: "#374151",
+  fontWeight: 500,
+};
+
+const actionBtnStyle = {
+  padding: "6px 14px",
+  border: "1px solid #d1d5db",
+  borderRadius: 6,
+  background: "#fff",
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: "pointer",
+  color: "#374151",
+};
