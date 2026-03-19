@@ -94,15 +94,21 @@ const TYPE_BADGE_TONE = {
   conversion: "critical",
 };
 
-// ── Build Shopify theme preview URL ──
-function buildPreviewUrl(shopDomain, sectionSlug, themeId, productHandle) {
+// ── Build preview URLs ──
+function buildProxyPreviewUrl(shopDomain, sectionSlug, themeId, productHandle) {
+  const needsProduct = PRODUCT_SECTIONS.includes(sectionSlug);
+  const storePath = needsProduct && productHandle ? `/products/${productHandle}` : "/";
+  const pathWithSection = `${storePath}${storePath.includes("?") ? "&" : "?"}section_id=${sectionSlug}${themeId ? `&preview_theme_id=${themeId}` : ""}`;
+  return `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=${encodeURIComponent(pathWithSection)}&_t=${Date.now()}`;
+}
+
+function buildDirectUrl(shopDomain, sectionSlug, themeId, productHandle) {
   const needsProduct = PRODUCT_SECTIONS.includes(sectionSlug);
   const base = `https://${shopDomain}`;
   const path = needsProduct && productHandle ? `/products/${productHandle}` : "/";
   const url = new URL(path, base);
   url.searchParams.set("section_id", sectionSlug);
   if (themeId) url.searchParams.set("preview_theme_id", themeId);
-  url.searchParams.set("_ck_ts", Date.now().toString());
   return url.toString();
 }
 
@@ -172,10 +178,11 @@ function PreviewIframe({ src, title, style, onLoad }) {
 function PreviewPanel({ section, shopDomain, themeId, productHandle, onClose }) {
   const [viewport, setViewport] = useState("desktop");
   const [previewUrl, setPreviewUrl] = useState("");
+  const directUrl = section ? buildDirectUrl(shopDomain, section.slug, themeId, productHandle) : "";
 
   useEffect(() => {
     if (section && shopDomain) {
-      setPreviewUrl(buildPreviewUrl(shopDomain, section.slug, themeId, productHandle));
+      setPreviewUrl(buildProxyPreviewUrl(shopDomain, section.slug, themeId, productHandle));
     }
   }, [section, shopDomain, themeId, productHandle]);
 
@@ -189,7 +196,7 @@ function PreviewPanel({ section, shopDomain, themeId, productHandle, onClose }) 
   if (!section) return null;
 
   const refreshPreview = () => {
-    setPreviewUrl(buildPreviewUrl(shopDomain, section.slug, themeId, productHandle));
+    setPreviewUrl(buildProxyPreviewUrl(shopDomain, section.slug, themeId, productHandle));
   };
 
   const iframeWidth = viewport === "mobile" ? "390px" : "100%";
@@ -259,7 +266,7 @@ function PreviewPanel({ section, shopDomain, themeId, productHandle, onClose }) 
             </button>
             {/* Open in store */}
             <a
-              href={previewUrl}
+              href={directUrl}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -354,9 +361,6 @@ export default function Sections() {
           <div style={{ paddingTop: "16px" }}>
             <Grid>
               {filteredSections.map((section) => {
-                const thumbUrl = shopDomain
-                  ? buildPreviewUrl(shopDomain, section.slug, themeId, productHandle)
-                  : null;
                 return (
                   <Grid.Cell
                     key={section.slug}
@@ -364,35 +368,21 @@ export default function Sections() {
                   >
                     <Card>
                       <BlockStack gap="300">
-                        {/* Thumbnail preview */}
+                        {/* Thumbnail placeholder */}
                         <div
                           onClick={() => setPreviewSection(section)}
                           style={{
                             position: "relative", height: 140, overflow: "hidden",
-                            borderRadius: 8, background: "#f3f4f6", cursor: "pointer",
+                            borderRadius: 8, background: "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)", cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            flexDirection: "column", gap: 8,
                           }}
                         >
-                          {thumbUrl ? (
-                            <iframe
-                              src={thumbUrl}
-                              title={section.name}
-                              style={{
-                                width: "250%", height: "250%",
-                                transform: "scale(0.4)", transformOrigin: "top left",
-                                border: "none", pointerEvents: "none",
-                              }}
-                              sandbox="allow-scripts allow-same-origin"
-                              loading="lazy"
-                              tabIndex={-1}
-                            />
-                          ) : (
-                            <div style={{
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              height: "100%", color: "#9ca3af", fontSize: 13,
-                            }}>
-                              Preview unavailable
-                            </div>
-                          )}
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+                            <rect x="2" y="3" width="20" height="14" rx="2" />
+                            <path d="M8 21h8M12 17v4" />
+                          </svg>
+                          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>Click to preview</span>
                           {/* Hover overlay */}
                           <div
                             className="ck-thumb-overlay"
