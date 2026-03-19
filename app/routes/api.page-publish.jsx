@@ -1,6 +1,7 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
+import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
 
 /**
  * POST /api/page-publish
@@ -29,7 +30,7 @@ export const action = async ({ request }) => {
     const templateKey = `templates/page.${slug}.json`;
 
     const pushUrl = `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json`;
-    const pushResp = await fetch(pushUrl, {
+    const pushResp = await shopifyFetchWithRetry(pushUrl, {
       method: "PUT",
       headers: {
         "X-Shopify-Access-Token": token,

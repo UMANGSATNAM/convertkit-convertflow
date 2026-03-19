@@ -2,6 +2,7 @@ import { authenticate } from "../shopify.server";
 import { json } from "@remix-run/node";
 import fs from "node:fs";
 import path from "node:path";
+import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
 
 /**
  * GET /app/convertflow/proxy?shop=xxx&path=/some-path
@@ -28,7 +29,7 @@ export const loader = async ({ request }) => {
 
   // ── Step 1: Check if store is password protected ──
   try {
-    const shopResp = await fetch(`https://${shopDomain}/admin/api/2025-01/shop.json`, {
+    const shopResp = await shopifyFetchWithRetry(`https://${shopDomain}/admin/api/2025-01/shop.json`, {
       headers: { "X-Shopify-Access-Token": token },
     });
     if (shopResp.ok) {
@@ -51,7 +52,7 @@ export const loader = async ({ request }) => {
   // ── Step 2: Try to fetch storefront with storefront access token ──
   let storefrontToken = null;
   try {
-    const tokensResp = await fetch(
+    const tokensResp = await shopifyFetchWithRetry(
       `https://${shopDomain}/admin/api/2025-01/storefront_access_tokens.json`,
       { headers: { "X-Shopify-Access-Token": token } }
     );

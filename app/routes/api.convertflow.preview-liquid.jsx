@@ -1,5 +1,6 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
+import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
 
 /**
  * POST /api/convertflow/preview-liquid
@@ -31,7 +32,7 @@ export const action = async ({ request }) => {
       : liquidCode;
 
     const pushUrl = `https://${shopDomain}/admin/api/2025-01/themes/${previewThemeId}/assets.json`;
-    const pushResp = await fetch(pushUrl, {
+    const pushResp = await shopifyFetchWithRetry(pushUrl, {
       method: "PUT",
       headers: {
         "X-Shopify-Access-Token": token,
@@ -93,7 +94,7 @@ async function getOrCreatePreviewTheme(shopDomain, token) {
   const baseUrl = `https://${shopDomain}/admin/api/2025-01`;
 
   // Check existing themes
-  const themesResp = await fetch(`${baseUrl}/themes.json`, {
+  const themesResp = await shopifyFetchWithRetry(`${baseUrl}/themes.json`, {
     headers: { "X-Shopify-Access-Token": token },
   });
 
@@ -109,7 +110,7 @@ async function getOrCreatePreviewTheme(shopDomain, token) {
   }
 
   // Create unpublished preview theme
-  const createResp = await fetch(`${baseUrl}/themes.json`, {
+  const createResp = await shopifyFetchWithRetry(`${baseUrl}/themes.json`, {
     method: "POST",
     headers: {
       "X-Shopify-Access-Token": token,

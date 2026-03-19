@@ -5,6 +5,7 @@
  */
 
 import { getClient } from "./gemini.server.js";
+import { shopifyFetchWithRetry } from "./shopify-fetch.server.js";
 
 // ─── Shopify Theme API helpers (GraphQL + fetch-based REST) ───
 
@@ -44,7 +45,7 @@ export async function listThemeSections(admin, session, themeId) {
   const token = session.accessToken;
 
   const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json`;
-  const resp = await fetch(url, {
+  const resp = await shopifyFetchWithRetry(url, {
     headers: {
       "X-Shopify-Access-Token": token,
       "Content-Type": "application/json",
@@ -75,7 +76,7 @@ export async function fetchAsset(admin, session, themeId, assetKey) {
   const token = session.accessToken;
 
   const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json?asset[key]=${encodeURIComponent(assetKey)}`;
-  const resp = await fetch(url, {
+  const resp = await shopifyFetchWithRetry(url, {
     headers: {
       "X-Shopify-Access-Token": token,
       "Content-Type": "application/json",
@@ -227,7 +228,7 @@ export async function pushToTheme(admin, session, themeId, sectionKey, liquid, c
   const key = sectionKey.startsWith("sections/") ? sectionKey : `sections/${sectionKey}.liquid`;
 
   const url = `https://${shop}/admin/api/2025-01/themes/${themeId}/assets.json`;
-  const resp = await fetch(url, {
+  const resp = await shopifyFetchWithRetry(url, {
     method: "PUT",
     headers: {
       "X-Shopify-Access-Token": token,
