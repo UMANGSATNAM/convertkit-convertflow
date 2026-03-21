@@ -1,165 +1,154 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import {
-  Page,
-  Badge,
-  Banner,
-  Spinner,
-  Text,
-} from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import { listThemeSections, fetchAsset } from "../lib/convertflow.server.js";
+import { parseShopifySchema, sectionKeyToLabel } from "../utils/schema-parser";
+import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
 
-// ── Loader: fetch shop domain, active theme ID, product handle ──
+// ── Loader: fetch theme data in parallel ──
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const shopDomain = session.shop;
+  const token = session.accessToken;
   let themeId = "";
+  let themeName = "";
+  let passwordEnabled = false;
   let productHandle = "";
+  let sections = [];
+  let sectionSchemas = {};
+  let settingsData = {};
 
   try {
-    const themesRes = await admin.graphql(`
-      query { themes(first: 10) { edges { node { id name role } } } }
-    `);
+    // Parallel fetch: theme + product
+    const [themesRes, productsRes, shopRes] = await Promise.all([
+      admin.graphql(`query { themes(first: 10) { edges { node { id name role } } } }`),
+      admin.graphql(`query { products(first: 1, query: "status:active") { edges { node { handle } } } }`),
+      shopifyFetchWithRetry(`https://${shopDomain}/admin/api/2025-01/shop.json`, {
+        headers: { "X-Shopify-Access-Token": token },
+      }),
+    ]);
+
     const themesData = await themesRes.json();
-    const activeTheme = themesData.data.themes.edges.find(
-      (e) => e.node.role === "MAIN"
-    )?.node;
+    const activeTheme = themesData.data.themes.edges.find((e) => e.node.role === "MAIN")?.node;
     themeId = activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
-  } catch (e) { /* silent */ }
+    themeName = activeTheme?.name || "Theme";
 
-  try {
-    const productsRes = await admin.graphql(`
-      query { products(first: 1, query: "status:active") { edges { node { handle } } } }
-    `);
     const productsData = await productsRes.json();
     productHandle = productsData.data.products.edges[0]?.node?.handle || "";
-  } catch (e) { /* silent */ }
 
-  return json({ shopDomain, themeId, productHandle });
+    if (shopRes.ok) {
+      const shopData = await shopRes.json();
+      passwordEnabled = shopData.shop?.password_enabled || false;
+    }
+  } catch (e) {
+    console.error("ConvertFlow loader error:", e.message);
+  }
+
+  // Fetch sections and their schemas
+  if (themeId) {
+    try {
+      sections = await listThemeSections(admin, session, themeId);
+
+      // Fetch settings_data.json
+      try {
+        const raw = await fetchAsset(admin, session, themeId, "config/settings_data.json");
+        settingsData = JSON.parse(raw);
+      } catch (e) { /* no settings data */ }
+
+      // Fetch schemas for first 30 sections (limit API calls)
+      const sectionFiles = sections.slice(0, 30);
+      const schemaPromises = sectionFiles.map(async (s) => {
+        try {
+          const content = await fetchAsset(admin, session, themeId, s.key);
+          const schema = parseShopifySchema(content);
+          return { key: s.key, name: s.name, schema };
+        } catch (e) {
+          return { key: s.key, name: s.name, schema: { name: sectionKeyToLabel(s.key), settings: [], blocks: [] } };
+        }
+      });
+      const results = await Promise.all(schemaPromises);
+      results.forEach((r) => { sectionSchemas[r.key] = r.schema; });
+    } catch (e) {
+      console.error("Section fetch error:", e.message);
+    }
+  }
+
+  return json({
+    shopDomain, themeId, themeName, passwordEnabled,
+    productHandle, sections, sectionSchemas, settingsData,
+  });
 };
 
-export default function ConvertFlow() {
-  const { shopDomain, themeId, productHandle } = useLoaderData();
+// ── Section groups: header, template, footer ──
+function categorizeSections(sections, schemas) {
+  const header = [];
+  const footer = [];
+  const template = [];
 
-  // ── State ──
-  const [inspectorEnabled, setInspectorEnabled] = useState(true);
+  for (const s of sections) {
+    const schema = schemas[s.key];
+    const name = (schema?.name || s.name).toLowerCase();
+    if (name.includes("header") || name.includes("announcement")) {
+      header.push({ ...s, schema, group: "header" });
+    } else if (name.includes("footer")) {
+      footer.push({ ...s, schema, group: "footer" });
+    } else {
+      template.push({ ...s, schema, group: "template" });
+    }
+  }
+  return { header, template, footer };
+}
+
+// ── MAIN COMPONENT ──
+export default function ConvertFlowEditor() {
+  const {
+    shopDomain, themeId, themeName, passwordEnabled,
+    productHandle, sections, sectionSchemas, settingsData,
+  } = useLoaderData();
+
+  // State
+  const [selectedSectionKey, setSelectedSectionKey] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({});
   const [currentPath, setCurrentPath] = useState("/");
   const [iframeKey, setIframeKey] = useState(0);
   const [iframeLoading, setIframeLoading] = useState(true);
-  const [clickedSection, setClickedSection] = useState(null);
-  const [extraction, setExtraction] = useState(null);
-  const [loadingCode, setLoadingCode] = useState(false);
-  const [activeTab, setActiveTab] = useState("liquid");
-  const [isEditing, setIsEditing] = useState(false);
+  const [viewport, setViewport] = useState("desktop");
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [livePreviewLoading, setLivePreviewLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [settingValues, setSettingValues] = useState({});
   const [sectionsOnPage, setSectionsOnPage] = useState([]);
-  const [error, setError] = useState("");
-  const [monacoLoaded, setMonacoLoaded] = useState(false);
-  const [storePasswordProtected, setStorePasswordProtected] = useState(false);
 
   const proxyIframeRef = useRef(null);
-  const editorRef = useRef(null);
-  const monacoRef = useRef(null);
-  const editorContainerRef = useRef(null);
-  const cssDebounceRef = useRef(null);
-  const liquidDebounceRef = useRef(null);
-  const currentCodeRef = useRef({ liquid: "", css: "", schema: "", combined: "" });
+  const settingsDebounceRef = useRef(null);
 
-  // ── Proxy URL ──
   const proxyUrl = `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=${encodeURIComponent(currentPath)}`;
+  const { header, template, footer } = categorizeSections(sections, sectionSchemas);
+  const selectedSchema = selectedSectionKey ? sectionSchemas[selectedSectionKey] : null;
 
-  // ── Send message to proxy iframe ──
+  // Initialize setting values from settingsData
+  useEffect(() => {
+    if (settingsData?.current?.sections) {
+      setSettingValues(settingsData.current.sections);
+    }
+  }, []);
+
+  // Send message to iframe
   const sendToIframe = useCallback((msg) => {
-    if (proxyIframeRef.current?.contentWindow) {
-      proxyIframeRef.current.contentWindow.postMessage(msg, "*");
-    }
+    proxyIframeRef.current?.contentWindow?.postMessage(msg, "*");
   }, []);
 
-  // ── Toggle inspector ──
-  const toggleInspector = useCallback(() => {
-    const next = !inspectorEnabled;
-    setInspectorEnabled(next);
-    sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: next });
-  }, [inspectorEnabled, sendToIframe]);
-
-  // ── Navigate inside proxy iframe ──
-  const navigateTo = useCallback((path) => {
-    setCurrentPath(path);
-    setIframeLoading(true);
-    setStorePasswordProtected(false);
-    setIframeKey((k) => k + 1);
-  }, []);
-
-  // ── Handle iframe load — check if proxy returned JSON error ──
-  const handleIframeLoad = useCallback(() => {
-    setIframeLoading(false);
-    try {
-      const iframeDoc = proxyIframeRef.current?.contentDocument;
-      if (iframeDoc) {
-        const bodyText = iframeDoc.body?.innerText?.trim() || "";
-        if (bodyText.startsWith("{")) {
-          const data = JSON.parse(bodyText);
-          if (data.error === "PASSWORD_PROTECTED") {
-            setStorePasswordProtected(true);
-          }
-        }
-      }
-    } catch (e) {
-      // Cross-origin or parse error — ignore
-    }
-  }, []);
-
-  // ── Fetch section code ──
-  const fetchSectionCode = useCallback(async (sectionId) => {
-    setLoadingCode(true);
-    setError("");
-    try {
-      const res = await fetch("/api/convertflow-extract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          themeId,
-          sectionKey: `sections/${sectionId}.liquid`,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
-      const ext = data.extraction || {};
-      const liquid = ext.processedLiquid || ext.rawLiquid || "";
-      const css = ext.processedCSS || ext.rawCSS || "";
-      const schema = ext.processedSchema || ext.rawSchema || "";
-      const combined = css ? `<style>\n${css}\n</style>\n\n${liquid}` : liquid;
-
-      setExtraction({ liquid, css, schema, combined, themeCheck: ext.themeCheckerPass });
-      currentCodeRef.current = { liquid, css, schema, combined };
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoadingCode(false);
-    }
-  }, [themeId]);
-
-  // ── Handle messages from iframe ──
+  // Handle iframe messages
   useEffect(() => {
     const handler = (e) => {
-      if (!e.data || typeof e.data.type !== "string") return;
-      if (!e.data.type.startsWith("CK_")) return;
-
+      if (!e.data?.type?.startsWith?.("CK_")) return;
       switch (e.data.type) {
         case "CK_INSPECTOR_READY":
           sendToIframe({ type: "CK_GET_SECTIONS" });
-          sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: inspectorEnabled });
+          sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: true });
           break;
         case "CK_SECTION_CLICKED":
-          setClickedSection({ sectionId: e.data.sectionId, sectionType: e.data.sectionType });
-          setIsEditing(false);
-          setSaveSuccess(false);
-          fetchSectionCode(e.data.sectionId);
+          setSelectedSectionKey(`sections/${e.data.sectionId}.liquid`);
           break;
         case "CK_SECTIONS_LIST":
           setSectionsOnPage(e.data.sections || []);
@@ -168,510 +157,458 @@ export default function ConvertFlow() {
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [sendToIframe, fetchSectionCode, inspectorEnabled]);
+  }, [sendToIframe]);
 
-  // ── Load Monaco from CDN ──
-  useEffect(() => {
-    if (monacoLoaded) return;
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js";
-    script.onload = () => {
-      window.require.config({
-        paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" },
-      });
-      window.require(["vs/editor/editor.main"], () => {
-        // Register Liquid language
-        window.monaco.languages.register({ id: "liquid" });
-        window.monaco.languages.setMonarchTokensProvider("liquid", {
-          tokenizer: {
-            root: [
-              [/\{%[-]?/, { token: "delimiter.liquid", next: "@liquidTag" }],
-              [/\{\{[-]?/, { token: "delimiter.liquid", next: "@liquidOutput" }],
-              [/<style[\s>]/, { token: "tag", next: "@css" }],
-              [/<\/?[\w]+/, "tag"],
-              [/[^<{]+/, ""],
-            ],
-            liquidTag: [
-              [/[-]?%\}/, { token: "delimiter.liquid", next: "@pop" }],
-              [/\b(if|else|elsif|endif|for|endfor|unless|endunless|case|when|endcase|capture|endcapture|assign|include|render|section|schema|endschema|comment|endcomment|raw|endraw)\b/, "keyword"],
-              [/"[^"]*"/, "string"],
-              [/'[^']*'/, "string"],
-              [/\|/, "operator"],
-              [/\b\d+\b/, "number"],
-              [/./, ""],
-            ],
-            liquidOutput: [
-              [/[-]?\}\}/, { token: "delimiter.liquid", next: "@pop" }],
-              [/\|/, "operator"],
-              [/"[^"]*"/, "string"],
-              [/'[^']*'/, "string"],
-              [/\b\d+\b/, "number"],
-              [/./, "variable"],
-            ],
-            css: [
-              [/<\/style>/, { token: "tag", next: "@pop" }],
-              [/./, ""],
-            ],
-          },
-        });
-        setMonacoLoaded(true);
-      });
-    };
-    document.head.appendChild(script);
-  }, [monacoLoaded]);
+  // Handle iframe load
+  const handleIframeLoad = useCallback(() => {
+    setIframeLoading(false);
+  }, []);
 
-  // ── Create/update Monaco editor ──
-  useEffect(() => {
-    if (!monacoLoaded || !extraction || !editorContainerRef.current) return;
-    if (!window.monaco) return;
-
-    const lang = activeTab === "css" ? "css" : activeTab === "schema" ? "json" : "liquid";
-    const value = extraction[activeTab] || "";
-
-    if (editorRef.current) {
-      editorRef.current.dispose();
-    }
-
-    const editor = window.monaco.editor.create(editorContainerRef.current, {
-      value,
-      language: lang,
-      theme: "vs-dark",
-      readOnly: !isEditing,
-      minimap: { enabled: false },
-      fontSize: 13,
-      lineNumbers: "on",
-      wordWrap: "on",
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      padding: { top: 12 },
+  // Handle setting change
+  const handleSettingChange = useCallback((settingId, value) => {
+    setHasChanges(true);
+    setSettingValues((prev) => {
+      const sectionName = selectedSectionKey?.replace("sections/", "").replace(".liquid", "") || "";
+      return {
+        ...prev,
+        [sectionName]: { ...(prev[sectionName] || {}), [settingId]: value },
+      };
     });
 
-    editor.onDidChangeModelContent(() => {
-      if (!isEditing) return;
-      const newValue = editor.getValue();
-      currentCodeRef.current[activeTab] = newValue;
+    // Debounced CSS injection for color/font settings
+    clearTimeout(settingsDebounceRef.current);
+    settingsDebounceRef.current = setTimeout(() => {
+      sendToIframe({ type: "CK_INJECT_CSS", settingId, value });
+    }, 300);
+  }, [selectedSectionKey, sendToIframe]);
 
-      if (activeTab === "css") {
-        clearTimeout(cssDebounceRef.current);
-        cssDebounceRef.current = setTimeout(() => {
-          sendToIframe({ type: "CK_INJECT_CSS", css: newValue });
-        }, 300);
-      } else if (activeTab === "liquid" || activeTab === "combined") {
-        clearTimeout(liquidDebounceRef.current);
-        liquidDebounceRef.current = setTimeout(() => {
-          previewLiquid(newValue);
-        }, 800);
-      }
-    });
+  // Toggle section expand
+  const toggleExpand = useCallback((key) => {
+    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
 
-    editorRef.current = editor;
+  // Viewport dimensions
+  const vpStyle = viewport === "mobile"
+    ? { width: 390, margin: "0 auto" }
+    : viewport === "tablet"
+    ? { width: 768, margin: "0 auto" }
+    : { width: "100%" };
 
-    return () => {
-      clearTimeout(cssDebounceRef.current);
-      clearTimeout(liquidDebounceRef.current);
-    };
-  }, [monacoLoaded, extraction, activeTab, isEditing]);
-
-  // ── Live preview Liquid via server ──
-  const previewLiquid = useCallback(async (code) => {
-    if (!clickedSection) return;
-    setLivePreviewLoading(true);
-    try {
-      const res = await fetch("/api/convertflow/preview-liquid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          liquidCode: code,
-          cssCode: currentCodeRef.current.css,
-          sectionId: clickedSection.sectionId,
-          themeId,
-        }),
-      });
-      const data = await res.json();
-      if (data.success && data.html) {
-        sendToIframe({
-          type: "CK_INJECT_HTML",
-          sectionId: clickedSection.sectionId,
-          html: data.html,
-        });
-      }
-    } catch (err) {
-      console.error("Live preview error:", err);
-    } finally {
-      setLivePreviewLoading(false);
-    }
-  }, [clickedSection, themeId, sendToIframe]);
-
-  // ── Save to live theme ──
-  const handleSaveToTheme = useCallback(async () => {
-    if (!clickedSection || !isEditing) return;
-    setSaving(true);
-    setError("");
-    setSaveSuccess(false);
-    try {
-      // Save backup to library first
-      await fetch("/api/convertflow-library", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: `Backup: ${clickedSection.sectionId}`,
-          description: `Auto-backup before save to live theme`,
-          tags: "backup",
-          liquidCode: extraction.liquid,
-          cssCode: extraction.css,
-          schemaCode: extraction.schema,
-        }),
-      });
-
-      // Push to live theme
-      const combined = currentCodeRef.current.css
-        ? `<style>\n${currentCodeRef.current.css}\n</style>\n\n${currentCodeRef.current.liquid}`
-        : currentCodeRef.current.liquid;
-
-      const schemaBlock = currentCodeRef.current.schema
-        ? `\n\n{% schema %}\n${currentCodeRef.current.schema}\n{% endschema %}`
-        : "";
-
-      const res = await fetch("/api/convertflow-push", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          themeId,
-          sectionKey: `sections/${clickedSection.sectionId}.liquid`,
-          code: combined + schemaBlock,
-          sectionName: clickedSection.sectionId,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
-      setSaveSuccess(true);
-      // Reload iframe after 1.5s to show live result
-      setTimeout(() => setIframeKey((k) => k + 1), 1500);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  }, [clickedSection, isEditing, themeId, extraction]);
-
-  // ── Copy to clipboard ──
-  const copyCode = useCallback(() => {
-    const code = currentCodeRef.current[activeTab] || "";
-    navigator.clipboard.writeText(code).catch(() => {});
-  }, [activeTab]);
-
-  // ── Tab data ──
-  const TABS = [
-    { id: "liquid", label: "Liquid" },
-    { id: "css", label: "CSS" },
-    { id: "schema", label: "Schema" },
-    { id: "combined", label: "Combined" },
-  ];
-
+  // ──────── RENDER ────────
   return (
-    <Page title="ConvertFlow" fullWidth>
-      <TitleBar title="ConvertFlow — Visual Section Inspector" />
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflow: "hidden" }}>
 
-      {error && (
-        <div style={{ padding: "0 0 12px" }}>
-          <Banner tone="critical" onDismiss={() => setError("")}>
-            <Text as="p">{error}</Text>
-          </Banner>
-        </div>
-      )}
-
-      {/* ── 2-Panel Layout ── */}
-      <div style={{ display: "flex", height: "calc(100vh - 120px)", overflow: "hidden", borderRadius: 10, border: "1px solid #e5e7eb" }}>
-
-        {/* ══════════ LEFT PANEL: Store Preview (60%) ══════════ */}
-        <div style={{ width: "60%", display: "flex", flexDirection: "column", borderRight: "1px solid #e5e7eb" }}>
-
-          {/* Browser toolbar */}
-          <div style={{
-            height: 44, borderBottom: "1px solid #e5e7eb", background: "#f9fafb",
-            display: "flex", alignItems: "center", gap: 6, padding: "0 10px", flexShrink: 0,
-          }}>
-            {/* Nav buttons */}
-            <button onClick={() => { try { proxyIframeRef.current?.contentWindow?.history.back(); } catch(e){} }} style={navBtnStyle} title="Back">←</button>
-            <button onClick={() => { try { proxyIframeRef.current?.contentWindow?.history.forward(); } catch(e){} }} style={navBtnStyle} title="Forward">→</button>
-            <button onClick={() => setIframeKey((k) => k + 1)} style={navBtnStyle} title="Refresh">↻</button>
-
-            {/* URL bar */}
-            <div style={{
-              flex: 1, display: "flex", alignItems: "center", gap: 6,
-              background: "#fff", border: "1px solid #d1d5db", borderRadius: 6,
-              padding: "4px 10px", fontSize: 12, color: "#374151", overflow: "hidden",
-            }}>
-              <span style={{ color: "#059669", fontSize: 11 }}>🔒</span>
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {shopDomain}{currentPath}
-              </span>
-            </div>
-
-            {/* Quick nav */}
-            <button onClick={() => navigateTo("/")} style={navBtnStyle}>Home</button>
-            <button onClick={() => navigateTo("/collections")} style={navBtnStyle}>Collections</button>
-            <button onClick={() => navigateTo("/products")} style={navBtnStyle}>Products</button>
-
-            {/* Inspector toggle */}
-            <button
-              onClick={toggleInspector}
-              style={{
-                ...navBtnStyle,
-                background: inspectorEnabled ? "#059669" : "#9ca3af",
-                color: "#fff",
-                fontWeight: 700,
-                minWidth: 70,
-              }}
-            >
-              {inspectorEnabled ? "Inspector ON" : "Inspector OFF"}
-            </button>
-          </div>
-
-          {/* Hint banner */}
-          {inspectorEnabled && !clickedSection && (
-            <div style={{
-              padding: "6px 14px", background: "#EEEDFE", color: "#4338CA",
-              fontSize: 11, flexShrink: 0,
-            }}>
-              👆 Hover over any section to highlight it. Click to open its code in the editor.
-            </div>
-          )}
-
-          {/* Proxy iframe */}
-          <div style={{ flex: 1, position: "relative" }}>
-            {iframeLoading && !storePasswordProtected && (
-              <div style={{
-                position: "absolute", inset: 0, display: "flex", alignItems: "center",
-                justifyContent: "center", background: "#f3f4f6", zIndex: 5,
-              }}>
-                <div style={{ textAlign: "center" }}>
-                  <Spinner size="large" />
-                  <p style={{ marginTop: 12, color: "#6b7280", fontSize: 13 }}>Loading store preview…</p>
-                </div>
-              </div>
-            )}
-
-            {/* Password-protected error UI */}
-            {storePasswordProtected && (
-              <div style={{
-                position: "absolute", inset: 0, display: "flex", alignItems: "center",
-                justifyContent: "center", background: "#f9fafb", zIndex: 6,
-              }}>
-                <div style={{
-                  textAlign: "center", padding: 40, background: "#FEF3C7",
-                  borderRadius: 12, maxWidth: 420,
-                }}>
-                  <p style={{ fontSize: 32, margin: "0 0 8px" }}>🔒</p>
-                  <h3 style={{ color: "#92400E", margin: "0 0 8px", fontSize: 16 }}>
-                    Store is password protected
-                  </h3>
-                  <p style={{ color: "#92400E", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
-                    Your store has password protection enabled. You need to disable it
-                    temporarily to use the Visual Inspector.
-                  </p>
-                  <a
-                    href={`https://${shopDomain}/admin/online_store/preferences`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-block", background: "#92400E", color: "#fff",
-                      padding: "10px 20px", borderRadius: 8, textDecoration: "none",
-                      fontSize: 13, fontWeight: 600,
-                    }}
-                  >
-                    Disable Password Protection →
-                  </a>
-                  <p style={{ fontSize: 11, color: "#B45309", marginTop: 12 }}>
-                    After disabling, click the ↻ refresh button in the toolbar above.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <iframe
-              ref={proxyIframeRef}
-              key={iframeKey}
-              src={proxyUrl}
-              title="Store Preview"
-              style={{ width: "100%", height: "100%", border: "none" }}
-              onLoad={handleIframeLoad}
-            />
-          </div>
+      {/* ══ TOP BAR ══ */}
+      <div style={{
+        height: 52, background: "#1a1a1a", display: "flex", alignItems: "center",
+        justifyContent: "space-between", padding: "0 16px", flexShrink: 0,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <a href="/app" style={{ color: "#999", textDecoration: "none", fontSize: 18, lineHeight: 1 }}>←</a>
+          <select
+            style={{ background: "#333", color: "#fff", border: "none", padding: "6px 10px", borderRadius: 4, fontSize: 13, fontWeight: 600 }}
+            value={currentPath}
+            onChange={(e) => { setCurrentPath(e.target.value); setIframeKey((k) => k + 1); setIframeLoading(true); }}
+          >
+            <option value="/">Home page</option>
+            <option value="/collections">Collections</option>
+            <option value="/products">Products</option>
+            <option value="/cart">Cart</option>
+            <option value="/pages/contact">Contact</option>
+          </select>
         </div>
 
-        {/* ══════════ RIGHT PANEL: Code Editor (40%) ══════════ */}
-        <div style={{ width: "40%", display: "flex", flexDirection: "column", background: "#1E2530" }}>
-
-          {/* Panel header */}
-          <div style={{
-            height: 44, borderBottom: "1px solid #374151", background: "#f9fafb",
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "0 14px", flexShrink: 0,
-          }}>
-            {!clickedSection ? (
-              <span style={{ color: "#9ca3af", fontSize: 13 }}>
-                Click any section in the preview to see its code
-              </span>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
-                <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>
-                  {clickedSection.sectionId}
-                </span>
-                <span style={{ fontSize: 11, color: "#6b7280" }}>
-                  sections/{clickedSection.sectionId}.liquid
-                </span>
-                {extraction && (
-                  <Badge tone={extraction.themeCheck ? "success" : "warning"}>
-                    {extraction.themeCheck ? "PASS" : "WARN"}
-                  </Badge>
-                )}
-                {livePreviewLoading && (
-                  <span style={{ fontSize: 11, color: "#4F46E5" }}>Updating preview…</span>
-                )}
-              </div>
-            )}
-            {clickedSection && (
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                style={{
-                  padding: "4px 12px", border: "1px solid #d1d5db", borderRadius: 4,
-                  background: isEditing ? "#4F46E5" : "#fff",
-                  color: isEditing ? "#fff" : "#374151",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer",
-                }}
-              >
-                {isEditing ? "Editing" : "Read Only"}
-              </button>
-            )}
-          </div>
-
-          {/* Tab bar */}
-          <div style={{
-            display: "flex", borderBottom: "1px solid #374151", flexShrink: 0,
-          }}>
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  flex: 1, padding: "8px 0", border: "none", cursor: "pointer",
-                  background: "transparent",
-                  color: activeTab === tab.id ? "#fff" : "#9ca3af",
-                  fontSize: 12, fontWeight: 600,
-                  borderBottom: activeTab === tab.id ? "2px solid #4F46E5" : "2px solid transparent",
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Editor area */}
-          <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
-            {/* Empty state */}
-            {!clickedSection && !loadingCode && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center", height: "100%", gap: 12,
-              }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                </svg>
-                <span style={{ color: "#6b7280", fontSize: 14 }}>
-                  Click any section to see its code
-                </span>
-              </div>
-            )}
-
-            {/* Loading state */}
-            {loadingCode && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center", height: "100%", gap: 12,
-              }}>
-                <Spinner size="large" />
-                <span style={{ color: "#9ca3af", fontSize: 13 }}>Fetching section code…</span>
-              </div>
-            )}
-
-            {/* Monaco container */}
-            {extraction && !loadingCode && (
-              <div ref={editorContainerRef} id="ck-monaco-container" style={{ width: "100%", height: "100%" }} />
-            )}
-          </div>
-
-          {/* Bottom action bar */}
-          <div style={{
-            height: 52, borderTop: "1px solid #374151", background: "#f9fafb",
-            display: "flex", alignItems: "center", justifyContent: "flex-end",
-            gap: 8, padding: "0 14px", flexShrink: 0,
-          }}>
-            <button onClick={copyCode} style={actionBtnStyle}>
-              Copy {activeTab}
-            </button>
+        {/* Viewport toggles */}
+        <div style={{ display: "flex", gap: 4 }}>
+          {[
+            { id: "desktop", icon: "🖥" },
+            { id: "tablet", icon: "📱" },
+            { id: "mobile", icon: "📲" },
+          ].map((v) => (
             <button
-              onClick={async () => {
-                if (!extraction) return;
-                try {
-                  await fetch("/api/convertflow-library", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name: clickedSection?.sectionId || "untitled",
-                      description: `Saved from visual inspector`,
-                      tags: "inspector",
-                      liquidCode: currentCodeRef.current.liquid,
-                      cssCode: currentCodeRef.current.css,
-                      schemaCode: currentCodeRef.current.schema,
-                    }),
-                  });
-                } catch (e) { setError(e.message); }
-              }}
-              style={actionBtnStyle}
-              disabled={!extraction}
-            >
-              Save to Library
-            </button>
-            <button
-              onClick={handleSaveToTheme}
-              disabled={!isEditing || !extraction || saving}
+              key={v.id}
+              onClick={() => setViewport(v.id)}
               style={{
-                ...actionBtnStyle,
-                background: !isEditing || !extraction ? "#d1d5db" : saveSuccess ? "#059669" : "#4F46E5",
-                color: "#fff",
-                cursor: !isEditing || !extraction ? "not-allowed" : "pointer",
+                padding: "6px 10px", border: "none", borderRadius: 4, cursor: "pointer",
+                background: viewport === v.id ? "#444" : "transparent",
+                color: viewport === v.id ? "#fff" : "#888", fontSize: 14,
               }}
             >
-              {saving ? "Saving…" : saveSuccess ? "Saved! ✓" : "Save to Live Theme"}
+              {v.icon}
             </button>
-          </div>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {saving && <span style={{ color: "#999", fontSize: 12 }}>Saving...</span>}
+          <button
+            style={{
+              padding: "7px 20px", borderRadius: 6, border: "none", cursor: "pointer",
+              background: hasChanges ? "#fff" : "#555",
+              color: hasChanges ? "#1a1a1a" : "#999",
+              fontSize: 13, fontWeight: 600,
+            }}
+            disabled={!hasChanges}
+          >
+            Save
+          </button>
         </div>
       </div>
-    </Page>
+
+      {/* ══ MAIN 3-PANEL LAYOUT ══ */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+
+        {/* ─── LEFT PANEL: Section Tree (280px) ─── */}
+        <div style={{
+          width: 280, flexShrink: 0, borderRight: "1px solid #e3e3e3",
+          background: "#fff", overflowY: "auto", fontSize: 13,
+        }}>
+          {/* Header group */}
+          <SectionGroup label="Header" items={header} selectedKey={selectedSectionKey}
+            expandedSections={expandedSections} onSelect={setSelectedSectionKey}
+            onToggle={toggleExpand} draggable={false} />
+
+          {/* Template group */}
+          <SectionGroup label="Template" items={template} selectedKey={selectedSectionKey}
+            expandedSections={expandedSections} onSelect={setSelectedSectionKey}
+            onToggle={toggleExpand} draggable={true} />
+
+          {/* Footer group */}
+          <SectionGroup label="Footer" items={footer} selectedKey={selectedSectionKey}
+            expandedSections={expandedSections} onSelect={setSelectedSectionKey}
+            onToggle={toggleExpand} draggable={false} />
+        </div>
+
+        {/* ─── CENTER PANEL: Live Preview ─── */}
+        <div style={{ flex: 1, background: "#e8e8e8", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {passwordEnabled ? (
+            <PasswordProtectedUI shopDomain={shopDomain} />
+          ) : (
+            <div style={{ flex: 1, position: "relative", display: "flex", justifyContent: "center", overflow: "hidden" }}>
+              {iframeLoading && <SkeletonOverlay />}
+              <div style={{ ...vpStyle, height: "100%", position: "relative", transition: "width 300ms ease" }}>
+                {viewport === "mobile" && <MobileFrame />}
+                {viewport === "tablet" && <TabletFrame />}
+                <iframe
+                  ref={proxyIframeRef}
+                  key={iframeKey}
+                  src={proxyUrl}
+                  title="Store Preview"
+                  style={{
+                    width: "100%", height: "100%", border: "none",
+                    borderRadius: viewport !== "desktop" ? 8 : 0,
+                    background: "#fff",
+                  }}
+                  onLoad={handleIframeLoad}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ─── RIGHT PANEL: Settings (300px) ─── */}
+        <div style={{
+          width: 300, flexShrink: 0, borderLeft: "1px solid #e3e3e3",
+          background: "#fff", overflowY: "auto",
+        }}>
+          {selectedSchema ? (
+            <SettingsPanel
+              schema={selectedSchema}
+              sectionKey={selectedSectionKey}
+              values={settingValues}
+              onChange={handleSettingChange}
+            />
+          ) : (
+            <div style={{ padding: 20, textAlign: "center", color: "#616161", fontSize: 13 }}>
+              <p style={{ margin: "40px 0 8px" }}>Select a section to edit its settings</p>
+              <p style={{ fontSize: 12, color: "#999" }}>Click any section in the left panel or in the store preview</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
-// ── Shared button styles ──
-const navBtnStyle = {
-  padding: "4px 8px",
-  border: "1px solid #d1d5db",
-  borderRadius: 4,
-  background: "#fff",
-  fontSize: 12,
-  cursor: "pointer",
-  color: "#374151",
-  fontWeight: 500,
-};
+// ══════════════════════════════════════════════════════════════
+// SUB-COMPONENTS
+// ══════════════════════════════════════════════════════════════
 
-const actionBtnStyle = {
-  padding: "6px 14px",
-  border: "1px solid #d1d5db",
-  borderRadius: 6,
-  background: "#fff",
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: "pointer",
-  color: "#374151",
-};
+function SectionGroup({ label, items, selectedKey, expandedSections, onSelect, onToggle, draggable }) {
+  return (
+    <div style={{ borderBottom: "1px solid #e3e3e3" }}>
+      <div style={{ padding: "10px 16px 4px", fontSize: 11, fontWeight: 600, color: "#616161", textTransform: "uppercase", letterSpacing: 1 }}>
+        {label}
+      </div>
+      {items.map((item) => {
+        const isSelected = item.key === selectedKey;
+        const isExpanded = expandedSections[item.key];
+        const schema = item.schema;
+        const hasBlocks = schema?.blocks?.length > 0;
+        return (
+          <div key={item.key}>
+            <div
+              onClick={() => onSelect(item.key)}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "8px 16px", cursor: "pointer",
+                background: isSelected ? "#e8f0fe" : "transparent",
+                color: isSelected ? "#005bd3" : "#303030",
+                fontSize: 13, fontWeight: isSelected ? 600 : 400,
+                transition: "background 100ms",
+              }}
+              onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "#f1f1f1"; }}
+              onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
+            >
+              {draggable && <span style={{ cursor: "grab", color: "#999", fontSize: 11, userSelect: "none" }}>⠿</span>}
+              {hasBlocks && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); onToggle(item.key); }}
+                  style={{ fontSize: 10, color: "#999", cursor: "pointer", width: 14, textAlign: "center" }}
+                >
+                  {isExpanded ? "▼" : "▶"}
+                </span>
+              )}
+              <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {schema?.name || sectionKeyToLabel(item.key)}
+              </span>
+            </div>
+            {/* Blocks */}
+            {isExpanded && hasBlocks && (
+              <div>
+                {schema.blocks.map((block, idx) => (
+                  <div key={idx} style={{
+                    padding: "6px 16px 6px 48px", fontSize: 12, color: "#616161", cursor: "pointer",
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#f1f1f1"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    {block.name}
+                  </div>
+                ))}
+                <div style={{ padding: "6px 16px 6px 48px" }}>
+                  <span style={{ fontSize: 12, color: "#005bd3", cursor: "pointer" }}>+ Add block</span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ padding: "6px 16px 10px" }}>
+        <span style={{ fontSize: 12, color: "#005bd3", cursor: "pointer" }}>+ Add section</span>
+      </div>
+    </div>
+  );
+}
+
+function SettingsPanel({ schema, sectionKey, values, onChange }) {
+  if (!schema?.settings?.length) {
+    return <div style={{ padding: 20, color: "#616161", fontSize: 13 }}>No settings for this section</div>;
+  }
+
+  const sectionName = sectionKey?.replace("sections/", "").replace(".liquid", "") || "";
+  const sectionVals = values[sectionName] || {};
+
+  return (
+    <div style={{ padding: "16px 20px" }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", marginBottom: 16 }}>
+        {schema.name}
+      </div>
+      {schema.settings.map((setting, idx) => {
+        if (setting.type === "header") {
+          return (
+            <div key={idx} style={{
+              fontWeight: 600, fontSize: 13, color: "#1a1a1a",
+              borderBottom: "1px solid #e3e3e3", paddingBottom: 8,
+              margin: "16px 0 8px",
+            }}>
+              {setting.content || setting.label}
+            </div>
+          );
+        }
+        if (setting.type === "paragraph") {
+          return <p key={idx} style={{ fontSize: 12, color: "#616161", margin: "0 0 8px" }}>{setting.content || setting.info}</p>;
+        }
+        const val = sectionVals[setting.id] ?? setting.default ?? "";
+        return (
+          <div key={idx} style={{ marginBottom: 14 }}>
+            {setting.label && (
+              <label style={{ display: "block", fontSize: 13, color: "#616161", marginBottom: 4 }}>
+                {setting.label}
+              </label>
+            )}
+            <SettingInput setting={setting} value={val} onChange={(v) => onChange(setting.id, v)} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SettingInput({ setting, value, onChange }) {
+  const baseInput = {
+    width: "100%", height: 36, border: "1px solid #e3e3e3", borderRadius: 4,
+    padding: "0 10px", fontSize: 13, color: "#303030", boxSizing: "border-box",
+    outline: "none", fontFamily: "inherit",
+  };
+
+  switch (setting.type) {
+    case "text":
+    case "url":
+    case "link_list":
+    case "collection":
+      return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} style={baseInput} placeholder={setting.placeholder || ""} />;
+
+    case "textarea":
+      return <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3}
+        style={{ ...baseInput, height: "auto", padding: "8px 10px", resize: "vertical" }} />;
+
+    case "number":
+      return <input type="number" value={value} onChange={(e) => onChange(Number(e.target.value))} style={baseInput}
+        min={setting.min} max={setting.max} step={setting.step} />;
+
+    case "color":
+      return (
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="color" value={value || "#000000"} onChange={(e) => onChange(e.target.value)}
+            style={{ width: 36, height: 36, border: "1px solid #e3e3e3", borderRadius: 4, padding: 2, cursor: "pointer" }} />
+          <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
+            style={{ ...baseInput, flex: 1 }} />
+        </div>
+      );
+
+    case "select":
+    case "color_scheme":
+      return (
+        <select value={value} onChange={(e) => onChange(e.target.value)} style={baseInput}>
+          {(setting.options || []).map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      );
+
+    case "radio":
+      return (
+        <div style={{ display: "flex", gap: 0 }}>
+          {(setting.options || []).map((opt) => (
+            <button key={opt.value} onClick={() => onChange(opt.value)}
+              style={{
+                flex: 1, padding: "6px 4px", border: "1px solid #e3e3e3", fontSize: 12, fontWeight: 600, cursor: "pointer",
+                background: value === opt.value ? "#005bd3" : "#fff",
+                color: value === opt.value ? "#fff" : "#303030",
+                borderRadius: 0,
+              }}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      );
+
+    case "range":
+      return (
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="range" value={value} onChange={(e) => onChange(Number(e.target.value))}
+            min={setting.min || 0} max={setting.max || 100} step={setting.step || 1}
+            style={{ flex: 1, accentColor: "#005bd3" }} />
+          <span style={{ fontSize: 12, color: "#303030", minWidth: 36, textAlign: "right" }}>
+            {value}{setting.unit || ""}
+          </span>
+        </div>
+      );
+
+    case "checkbox":
+      return (
+        <button onClick={() => onChange(!value)} style={{
+          width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+          background: value ? "#005bd3" : "#d1d5db", position: "relative", transition: "background 200ms",
+        }}>
+          <span style={{
+            position: "absolute", top: 2, left: value ? 22 : 2,
+            width: 20, height: 20, borderRadius: "50%", background: "#fff",
+            transition: "left 200ms", boxShadow: "0 1px 3px rgba(0,0,0,.2)",
+          }} />
+        </button>
+      );
+
+    case "image_picker":
+      return (
+        <button style={{
+          ...baseInput, cursor: "pointer", background: "#f9fafb", textAlign: "left",
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ color: "#005bd3", fontSize: 13 }}>Select image</span>
+        </button>
+      );
+
+    default:
+      return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} style={baseInput} />;
+  }
+}
+
+function PasswordProtectedUI({ shopDomain }) {
+  return (
+    <div style={{
+      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "#f9fafb",
+    }}>
+      <div style={{ textAlign: "center", padding: 40, maxWidth: 420 }}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="1.5" style={{ marginBottom: 12 }}>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+        </svg>
+        <h3 style={{ color: "#92400e", margin: "0 0 8px", fontSize: 16 }}>Store is password protected</h3>
+        <p style={{ color: "#92400e", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
+          Disable password protection to use the Visual Store Builder.
+        </p>
+        <a href={`https://${shopDomain}/admin/online_store/preferences`} target="_blank" rel="noopener noreferrer"
+          style={{
+            display: "inline-block", background: "#92400e", color: "#fff",
+            padding: "10px 20px", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
+          }}>
+          Open Store Settings →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonOverlay() {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, background: "#f3f4f6", zIndex: 5,
+      display: "flex", flexDirection: "column", padding: 20, gap: 12,
+    }}>
+      {[...Array(5)].map((_, i) => (
+        <div key={i} style={{
+          height: i === 0 ? 60 : 40, borderRadius: 6,
+          background: "linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%)",
+          backgroundSize: "400% 100%",
+          animation: "skeletonShimmer 1.5s infinite",
+        }} />
+      ))}
+      <style>{`@keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+    </div>
+  );
+}
+
+function MobileFrame() {
+  return (
+    <div style={{ position: "absolute", inset: -16, pointerEvents: "none", zIndex: 1 }}>
+      <div style={{
+        position: "absolute", top: 0, left: "50%", transform: "translateX(-50)",
+        width: 120, height: 24, background: "#1a1a1a", borderRadius: "0 0 16px 16px",
+      }} />
+      <div style={{
+        position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)",
+        width: 120, height: 4, background: "#1a1a1a", borderRadius: 2,
+      }} />
+    </div>
+  );
+}
+
+function TabletFrame() {
+  return (
+    <div style={{
+      position: "absolute", inset: -8, border: "3px solid #1a1a1a",
+      borderRadius: 16, pointerEvents: "none", zIndex: 1,
+    }} />
+  );
+}
