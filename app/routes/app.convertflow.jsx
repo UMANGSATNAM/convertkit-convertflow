@@ -196,7 +196,7 @@ export default function ConvertFlowEditor() {
 
   // ──────── RENDER ────────
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflow: "hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)", fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflow: "hidden", margin: "-16px", position: "relative" }}>
 
       {/* ══ TOP BAR ══ */}
       <div style={{
