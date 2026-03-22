@@ -56,24 +56,8 @@ export default function CenterPreview({
     { id: "mobile", Icon: MobileIcon },
   ];
 
-  if (passwordEnabled || loadError) {
-    return (
-      <div style={{ flex: 1, background: "#F4F6F8", display: "flex", alignItems: "center", justifyContent: "center", height: "calc(100vh - 56px)" }}>
-        <div style={{ textAlign: "center", maxWidth: 420, padding: 40, background: "#fff", borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1a1a1a", margin: "0 0 8px" }}>
-            {passwordEnabled ? "Store is password protected" : "Preview unavailable"}
-          </h3>
-          <p style={{ fontSize: 13, color: "#6b6b6b", margin: "0 0 24px", lineHeight: 1.6 }}>
-            {passwordEnabled ? "Disable password protection in your store settings." : "The store preview couldn't load. You can still edit using the sidebars."}
-          </p>
-          <a href={`https://${shopDomain}${passwordEnabled ? "/admin/online_store/preferences" : ""}`} target="_blank" rel="noopener noreferrer"
-             style={{ display: "inline-block", padding: "8px 16px", background: "#008060", color: "#fff", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 500 }}>
-             Open store
-          </a>
-        </div>
-      </div>
-    );
-  }
+  // Removed strict blocking for password screens to allow users to interact with the iframe (e.g. to log in).
+  // if (passwordEnabled || loadError) { ... }
 
   return (
     <div style={{

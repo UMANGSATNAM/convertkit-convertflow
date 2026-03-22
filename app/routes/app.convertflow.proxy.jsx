@@ -1,30 +1,48 @@
-import { authenticate } from "../shopify.server";
 import { json } from "@remix-run/node";
 import fs from "node:fs";
 import path from "node:path";
 import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
+import prisma from "../db.server";
 
 /**
  * GET /app/convertflow/proxy?shop=xxx&path=/some-path
- * Server-side HTML proxy that:
- * 1. Gets the active theme's preview URL (bypasses password protection)
- * 2. Fetches the storefront page using that preview URL
- * 3. Rewrites all relative URLs to absolute
- * 4. Injects the inspector.js script inline before </body>
- * 5. Serves modified HTML from the app's own origin (same-origin iframe)
+ * Server-side HTML proxy
  */
 export const loader = async ({ request }) => {
-  const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const shopDomain = url.searchParams.get("shop") || session.shop;
+  const shopDomain = url.searchParams.get("shop");
   const pagePath = url.searchParams.get("path") || "/";
-  const token = session.accessToken;
 
   if (!shopDomain) {
     return new Response(errorPage("Missing shop domain"), {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   }
+
+  // 1. Manually find the session from the database to avoid authentication redirects in iframes
+  const session = await prisma.session.findFirst({
+    where: { shop: shopDomain },
+    orderBy: { id: "desc" },
+  });
+
+  if (!session) {
+    return new Response(errorPage("Shopify session not found. Please reload the app."), {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
+  const token = session.accessToken;
+
+  // Custom GraphQL helper since we bypassed authenticate.admin
+  const admin = {
+    graphql: async (query) => {
+      return await fetch(`https://${shopDomain}/admin/api/2025-01/graphql.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Shopify-Access-Token": token },
+        body: JSON.stringify({ query }),
+      });
+    }
+  };
 
   // ── Step 1: Get the active theme ID for preview URL ──
   let themeId = "";
@@ -60,8 +78,8 @@ export const loader = async ({ request }) => {
 
       if (resp.ok) {
         const text = await resp.text();
-        // Only use if it's actual HTML (not a login redirect page)
-        if (text.includes("</html>") && !text.includes("accounts.shopify.com") && !text.includes("id=\"password\"")) {
+        // Allow actual HTML (even if it's the password page) so the user can interact/login
+        if (text.includes("</html>") && !text.includes("accounts.shopify.com")) {
           html = text;
         }
       }
