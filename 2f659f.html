@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Editor - Dawn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Inter', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        sidebar: {
+                            bg: '#1A1A1F',
+                            hover: '#2E2E38',
+                            border: '#2A2A35',
+                            text: '#E3E3E3',
+                            muted: '#9CA3AF'
+                        },
+                        accent: {
+                            DEFAULT: '#5C6AC4',
+                            hover: '#4B56A3',
+                            bg: '#25252D'
+                        },
+                        canvas: '#F4F6F8',
+                        success: '#008060',
+                        input: {
+                            bg: '#F9FAFB',
+                            border: '#E4E7EB',
+                            text: '#111827',
+                            label: '#6B7280'
+                        }
+                    },
+                    boxShadow: {
+                        'popover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0,0,0,0.05)',
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        .dark-scroll ::-webkit-scrollbar-thumb {
+            background: #3A3A45;
+        }
+        .dark-scroll ::-webkit-scrollbar-thumb:hover {
+            background: #4B4B5A;
+        }
+        
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #5C6AC4;
+            cursor: pointer;
+            margin-top: -6px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #E5E7EB;
+            border-radius: 2px;
+        }
+        
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        
+        /* Tree connector lines */
+        .tree-line {
+            position: absolute;
+            left: 19px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #2A2A35;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="font-body h-screen w-screen overflow-hidden flex flex-col bg-sidebar-bg text-sm antialiased">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-14 bg-[#0F0F13] border-b border-sidebar-border flex items-center justify-between px-4 shrink-0 z-50">
+        <!-- Left: Logo & Store -->
+        <div class="flex items-center gap-4 w-1/3">
+            <div class="flex items-center gap-2 cursor-pointer hover:bg-sidebar-hover px-2 py-1.5 rounded transition-colors">
+                <div class="w-6 h-6 bg-[#008060] rounded flex items-center justify-center">
+                    <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="Shopify" class="w-4 h-4 brightness-0 invert opacity-90">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-white font-medium text-xs leading-tight">My Store</span>
+                    <span class="text-sidebar-muted text-[10px] leading-tight">Dawn Theme — Live</span>
+                </div>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-sidebar-muted ml-1"></i>
+            </div>
+            <div class="hidden lg:flex items-center text-sidebar-muted text-xs">
+                <span>Themes</span>
+                <i data-lucide="chevron-right" class="w-3 h-3 mx-1"></i>
+                <span class="text-white">Customize</span>
+            </div>
+        </div>
+
+        <!-- Center: Theme Status -->
+        <div class="flex items-center justify-center w-1/3">
+            <div class="bg-sidebar-hover px-3 py-1.5 rounded text-xs font-medium text-white flex items-center gap-2 border border-sidebar-border">
+                <span>Home page</span>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-sidebar-muted"></i>
+            </div>
+            <div class="w-2 h-2 rounded-full bg-amber-500 ml-3" title="Unsaved changes"></div>
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="flex items-center justify-end gap-3 w-1/3">
+            <button class="p-2 text-sidebar-muted hover:text-white hover:bg-sidebar-hover rounded transition-colors">
+                <i data-lucide="undo-2" class="w-4 h-4"></i>
+            </button>
+            <button class="p-2 text-sidebar-muted hover:text-white hover:bg-sidebar-hover rounded transition-colors">
+                <i data-lucide="redo-2" class="w-4 h-4"></i>
+            </button>
+            <div class="h-4 w-px bg-sidebar-border mx-1"></div>
+            <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sidebar-muted hover:text-white hover:bg-sidebar-hover rounded text-xs font-medium transition-colors">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                Preview
+            </button>
+            <button class="bg-success hover:bg-[#006e52] text-white px-4 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-colors flex items-center gap-2">
+                Save
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN EDITOR LAYOUT -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- LEFT PANEL: SECTION TREE -->
+        <aside class="w-[280px] bg-sidebar-bg border-r border-sidebar-border flex flex-col shrink-0 dark-scroll hidden xl:flex z-40">
+            <!-- Global Settings Header -->
+            <div class="p-3 border-b border-sidebar-border">
+                <div class="flex items-center gap-3 px-2 py-2 hover:bg-sidebar-hover rounded cursor-pointer group">
+                    <i data-lucide="settings-2" class="w-4 h-4 text-sidebar-muted group-hover:text-white"></i>
+                    <span class="text-sidebar-text text-sm font-medium group-hover:text-white">Theme settings</span>
+                </div>
+            </div>
+
+            <!-- Tree Content -->
+            <div class="flex-1 overflow-y-auto py-2">
+                
+                <!-- Group: Header -->
+                <div class="mb-2">
+                    <div class="px-4 py-1.5 text-[11px] font-bold text-sidebar-muted uppercase tracking-wider flex items-center justify-between group cursor-pointer">
+                        <span>Header</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+                    
+                    <!-- Tree Item -->
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="megaphone" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Announcement bar</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Tree Item -->
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="layout-template" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Header</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group: Template -->
+                <div class="mb-2">
+                    <div class="px-4 py-1.5 text-[11px] font-bold text-sidebar-muted uppercase tracking-wider flex items-center justify-between group cursor-pointer">
+                        <span>Template</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+
+                    <!-- Active Tree Item: Image Banner -->
+                    <div class="group relative flex items-center gap-2 px-3 py-2 bg-accent-bg border-l-[3px] border-accent cursor-pointer text-white">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="image" class="w-3.5 h-3.5 text-white"></i>
+                        <span class="text-[13px] font-medium flex-1 truncate">Image banner</span>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-white"></i>
+                            <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-white ml-1"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Nested Blocks for Image Banner -->
+                    <div class="relative ml-3 pl-3 border-l border-sidebar-border my-1">
+                        <div class="group flex items-center gap-2 px-2 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text rounded-sm mb-0.5">
+                            <i data-lucide="grip-vertical" class="w-3 h-3 text-sidebar-muted opacity-0 group-hover:opacity-100"></i>
+                            <i data-lucide="type" class="w-3 h-3 text-sidebar-muted"></i>
+                            <span class="text-[12px] flex-1 truncate">Heading</span>
+                        </div>
+                        <div class="group flex items-center gap-2 px-2 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text rounded-sm mb-0.5">
+                            <i data-lucide="grip-vertical" class="w-3 h-3 text-sidebar-muted opacity-0 group-hover:opacity-100"></i>
+                            <i data-lucide="pilcrow" class="w-3 h-3 text-sidebar-muted"></i>
+                            <span class="text-[12px] flex-1 truncate">Text</span>
+                        </div>
+                        <div class="group flex items-center gap-2 px-2 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text rounded-sm mb-0.5">
+                            <i data-lucide="grip-vertical" class="w-3 h-3 text-sidebar-muted opacity-0 group-hover:opacity-100"></i>
+                            <i data-lucide="mouse-pointer-2" class="w-3 h-3 text-sidebar-muted"></i>
+                            <span class="text-[12px] flex-1 truncate">Buttons</span>
+                        </div>
+                        <div class="px-2 py-1 text-[11px] text-accent hover:text-white cursor-pointer mt-1 flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Add block
+                        </div>
+                    </div>
+
+                    <!-- Other Template Items -->
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Featured collection</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="columns" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Multicolumn</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="mail" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Email signup</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group: Footer -->
+                <div class="mb-2">
+                    <div class="px-4 py-1.5 text-[11px] font-bold text-sidebar-muted uppercase tracking-wider flex items-center justify-between group cursor-pointer">
+                        <span>Footer</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+                    <div class="group relative flex items-center gap-2 px-3 py-1.5 hover:bg-sidebar-hover cursor-pointer text-sidebar-text">
+                        <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-sidebar-muted opacity-0 group-hover:opacity-100 cursor-grab"></i>
+                        <i data-lucide="panel-bottom" class="w-3.5 h-3.5 text-sidebar-muted"></i>
+                        <span class="text-[13px] flex-1 truncate">Footer</span>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-sidebar-muted hover:text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Section Button -->
+            <div class="p-3 border-t border-sidebar-border">
+                <button class="w-full flex items-center justify-center gap-2 text-accent hover:text-white hover:bg-sidebar-hover py-2 rounded text-xs font-medium transition-colors">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Add section
+                </button>
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL: CANVAS PREVIEW -->
+        <section class="flex-1 flex flex-col bg-canvas min-w-0 relative z-0">
+            <!-- Canvas Toolbar -->
+            <div class="h-12 bg-white border-b border-input-border flex items-center justify-center relative shrink-0">
+                <div class="absolute left-4 text-xs text-gray-500 font-mono hidden md:block">https://dawn-theme-default.myshopify.com</div>
+                
+                <div class="flex bg-gray-100 p-1 rounded-lg">
+                    <button class="p-1.5 rounded bg-white shadow-sm text-gray-800 hover:text-black transition-all">
+                        <i data-lucide="monitor" class="w-4 h-4"></i>
+                    </button>
+                    <button class="p-1.5 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-200 transition-all mx-1">
+                        <i data-lucide="tablet" class="w-4 h-4"></i>
+                    </button>
+                    <button class="p-1.5 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-200 transition-all">
+                        <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="absolute right-4 flex items-center gap-2">
+                    <button class="p-1.5 rounded hover:bg-gray-100 text-gray-500">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                    <div class="flex items-center gap-1 text-xs text-gray-600 bg-white border border-gray-200 rounded px-2 py-1 cursor-pointer hover:bg-gray-50">
+                        <span>100%</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Iframe Container -->
+            <div class="flex-1 overflow-hidden flex items-center justify-center p-4 md:p-8">
+                <div class="bg-white w-full h-full max-w-[1200px] shadow-2xl rounded-sm overflow-hidden flex flex-col relative group transition-all duration-300">
+                    
+                    <!-- Mock Storefront Header -->
+                    <div class="h-16 border-b border-gray-100 flex items-center justify-between px-8 shrink-0">
+                        <div class="flex items-center gap-6">
+                            <span class="font-bold text-xl tracking-tight">Dawn</span>
+                            <nav class="hidden md:flex gap-6 text-sm text-gray-600">
+                                <a href="#" class="hover:underline hover:text-black">Home</a>
+                                <a href="#" class="hover:underline hover:text-black">Catalog</a>
+                                <a href="#" class="hover:underline hover:text-black">Contact</a>
+                            </nav>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-600">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mock Storefront Content (Scrollable) -->
+                    <div class="flex-1 overflow-y-auto bg-white relative">
+                        <!-- Active Section Highlight Overlay -->
+                        <div class="absolute top-0 left-0 right-0 h-[480px] border-2 border-accent pointer-events-none z-10 flex items-start justify-center">
+                            <div class="bg-accent text-white text-xs font-medium px-2 py-1 rounded-b shadow-sm flex items-center gap-1 pointer-events-auto cursor-pointer">
+                                <span>Image banner</span>
+                                <i data-lucide="pencil" class="w-3 h-3 ml-1"></i>
+                            </div>
+                        </div>
+
+                        <!-- Hero Section -->
+                        <div class="relative h-[480px] bg-gray-100 flex items-center justify-center text-center px-4">
+                            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" class="absolute inset-0 w-full h-full object-cover opacity-90" alt="Hero">
+                            <div class="absolute inset-0 bg-black/20"></div>
+                            <div class="relative z-0 max-w-xl bg-white/90 backdrop-blur-sm p-8 md:p-12 shadow-sm">
+                                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Browse our latest collection</h2>
+                                <p class="text-gray-700 mb-6 text-lg">Hand-crafted styles for the modern home.</p>
+                                <div class="flex gap-3 justify-center">
+                                    <button class="bg-black text-white px-6 py-3 text-sm font-medium hover:bg-gray-800 transition-colors">Shop All</button>
+                                    <button class="bg-transparent border border-black text-black px-6 py-3 text-sm font-medium hover:bg-black hover:text-white transition-colors">Read More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Featured Collection -->
+                        <div class="py-16 px-8 max-w-6xl mx-auto">
+                            <h3 class="text-2xl font-medium text-gray-900 mb-8">Featured Products</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                <!-- Product 1 -->
+                                <div class="group cursor-pointer">
+                                    <div class="aspect-[3/4] bg-gray-100 mb-3 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        <div class="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i data-lucide="plus" class="w-4 h-4"></i>
+                                        </div>
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 group-hover:underline">Classic Red Sneaker</h4>
+                                    <p class="text-sm text-gray-500">$129.00</p>
+                                </div>
+                                <!-- Product 2 -->
+                                <div class="group cursor-pointer">
+                                    <div class="aspect-[3/4] bg-gray-100 mb-3 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 group-hover:underline">Minimalist Watch</h4>
+                                    <p class="text-sm text-gray-500">$189.00</p>
+                                </div>
+                                <!-- Product 3 -->
+                                <div class="group cursor-pointer">
+                                    <div class="aspect-[3/4] bg-gray-100 mb-3 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 group-hover:underline">Premium Headphones</h4>
+                                    <p class="text-sm text-gray-500">$299.00</p>
+                                </div>
+                                <!-- Product 4 -->
+                                <div class="group cursor-pointer">
+                                    <div class="aspect-[3/4] bg-gray-100 mb-3 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 group-hover:underline">Canvas Tote</h4>
+                                    <p class="text-sm text-gray-500">$45.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: SETTINGS INSPECTOR -->
+        <aside class="w-[320px] bg-white border-l border-input-border flex flex-col shrink-0 overflow-hidden hidden lg:flex z-40">
+            <!-- Header -->
+            <div class="h-12 border-b border-input-border flex items-center px-4 gap-2 shrink-0">
+                <button class="p-1 -ml-1 hover:bg-gray-100 rounded text-gray-500">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+                <span class="font-medium text-sm text-gray-900">Image banner</span>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                
+                <!-- Image Picker -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[11px] font-semibold text-input-label uppercase tracking-wider">First image</label>
+                    </div>
+                    <div class="border border-dashed border-gray-300 rounded-md bg-gray-50 p-4 flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-colors cursor-pointer group">
+                        <div class="w-full aspect-video bg-gray-200 rounded overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="text-white text-xs font-medium">Change</span>
+                            </div>
+                        </div>
+                        <button class="text-xs text-gray-600 font-medium hover:underline">Select image</button>
+                    </div>
+                </div>
+
+                <!-- Range Slider -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[11px] font-semibold text-input-label uppercase tracking-wider">Image overlay opacity</label>
+                        <span class="text-xs text-gray-500">20%</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="range" min="0" max="100" value="20" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Select Dropdown -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold text-input-label uppercase tracking-wider">Banner height</label>
+                    <div class="relative">
+                        <select class="w-full appearance-none bg-white border border-input-border text-gray-900 text-sm rounded-md focus:ring-accent focus:border-accent block p-2.5 pr-8">
+                            <option>Small</option>
+                            <option selected>Medium</option>
+                            <option>Large</option>
+                            <option>Adapt to first image</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Select Dropdown -->
+                <div class="space-y-2">
+                    <label class="text-[11px] font-semibold text-input-label uppercase tracking-wider">Desktop content position</label>
+                    <div class="relative">
+                        <select class="w-full appearance-none bg-white border border-input-border text-gray-900 text-sm rounded-md focus:ring-accent focus:border-accent block p-2.5 pr-8">
+                            <option>Top left</option>
+                            <option>Top center</option>
+                            <option>Top right</option>
+                            <option>Middle left</option>
+                            <option selected>Middle center</option>
+                            <option>Middle right</option>
+                            <option>Bottom left</option>
+                            <option>Bottom center</option>
+                            <option>Bottom right</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="flex items-start gap-3 pt-2">
+                    <div class="flex items-center h-5">
+                        <input id="container" type="checkbox" value="" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 text-accent" checked>
+                    </div>
+                    <label for="container" class="text-sm font-medium text-gray-900 select-none">Show container on desktop</label>
+                </div>
+
+                <div class="h-px bg-gray-200 my-4"></div>
+
+                <!-- Color Scheme -->
+                <div class="space-y-3">
+                    <label class="text-[11px] font-semibold text-input-label uppercase tracking-wider">Color scheme</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="border-2 border-accent rounded p-2 cursor-pointer bg-white flex flex-col gap-1">
+                            <div class="flex gap-1">
+                                <div class="w-4 h-4 rounded-full bg-gray-100 border border-gray-200"></div>
+                                <div class="w-4 h-4 rounded-full bg-black"></div>
+                            </div>
+                            <span class="text-xs font-medium">Scheme 1</span>
+                        </div>
+                        <div class="border border-input-border rounded p-2 cursor-pointer bg-white hover:bg-gray-50 flex flex-col gap-1">
+                            <div class="flex gap-1">
+                                <div class="w-4 h-4 rounded-full bg-black"></div>
+                                <div class="w-4 h-4 rounded-full bg-white border border-gray-200"></div>
+                            </div>
+                            <span class="text-xs text-gray-600">Scheme 2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Settings Accordion -->
+                <div class="border-t border-input-border pt-4 mt-4">
+                    <button class="flex items-center justify-between w-full text-left group">
+                        <span class="text-sm font-medium text-gray-900">Mobile layout</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 group-hover:text-gray-900"></i>
+                    </button>
+                </div>
+                
+                <!-- Section Padding -->
+                <div class="border-t border-input-border pt-4 mt-4">
+                    <button class="flex items-center justify-between w-full text-left group mb-4">
+                        <span class="text-sm font-medium text-gray-900">Section padding</span>
+                        <i data-lucide="chevron-up" class="w-4 h-4 text-gray-500 group-hover:text-gray-900"></i>
+                    </button>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs text-gray-600">Top padding</label>
+                                <span class="text-xs text-gray-500">40px</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="40" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs text-gray-600">Bottom padding</label>
+                                <span class="text-xs text-gray-500">52px</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="52" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom CSS -->
+                <div class="border-t border-input-border pt-4 mt-4 pb-8">
+                    <button class="flex items-center justify-between w-full text-left group">
+                        <span class="text-sm font-medium text-gray-900">Custom CSS</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 group-hover:text-gray-900"></i>
+                    </button>
+                </div>
+
+            </div>
+            
+            <!-- Remove Section Button -->
+            <div class="p-4 border-t border-input-border bg-gray-50">
+                <button class="flex items-center justify-center gap-2 w-full text-red-600 hover:bg-red-50 hover:text-red-700 py-2 rounded text-xs font-medium transition-colors border border-transparent hover:border-red-200">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    Remove section
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- MOBILE BOTTOM NAV (Visible only on small screens) -->
+    <nav class="xl:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-gray-200 flex items-center justify-around z-50">
+        <button class="flex flex-col items-center justify-center gap-1 text-gray-500 w-full h-full hover:bg-gray-50">
+            <i data-lucide="list-tree" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">Sections</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-1 text-accent w-full h-full bg-gray-50 border-t-2 border-accent">
+            <i data-lucide="monitor" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">Preview</span>
+        </button>
+        <button class="flex flex-col items-center justify-center gap-1 text-gray-500 w-full h-full hover:bg-gray-50">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">Settings</span>
+        </button>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
