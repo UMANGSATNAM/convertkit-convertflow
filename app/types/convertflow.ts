@@ -62,8 +62,6 @@ export interface SelectedSectionState {
 export interface TopBarProps {
   currentPage: string;
   onPageChange: (page: string) => void;
-  viewport: ViewportMode;
-  onViewportChange: (mode: ViewportMode) => void;
   hasChanges: boolean;
   saving: boolean;
   onSave: () => void;
@@ -86,6 +84,7 @@ export interface CenterPreviewProps {
   shopDomain: string;
   currentPath: string;
   viewport: ViewportMode;
+  onViewportChange: (mode: ViewportMode) => void;
   passwordEnabled: boolean;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   iframeKey: number;

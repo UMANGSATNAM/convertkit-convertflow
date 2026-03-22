@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { TopBarProps, ViewportMode } from "../../types/convertflow";
+import type { TopBarProps } from "../../types/convertflow";
 
 const PAGES = [
   { value: "/", label: "Home page" },
@@ -9,41 +9,11 @@ const PAGES = [
   { value: "/pages/contact", label: "Contact" },
 ];
 
-// SVG Icons
-function DesktopIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <rect x="2" y="3" width="16" height="11" rx="1.5" stroke={active ? "#fff" : "#8a8a8a"} strokeWidth="1.5" />
-      <path d="M7 17h6M10 14v3" stroke={active ? "#fff" : "#8a8a8a"} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function TabletIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <rect x="3" y="1" width="14" height="18" rx="2" stroke={active ? "#fff" : "#8a8a8a"} strokeWidth="1.5" />
-      <circle cx="10" cy="16" r="1" fill={active ? "#fff" : "#8a8a8a"} />
-    </svg>
-  );
-}
-
-function MobileIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <rect x="5" y="1" width="10" height="18" rx="2" stroke={active ? "#fff" : "#8a8a8a"} strokeWidth="1.5" />
-      <path d="M8 16h4" stroke={active ? "#fff" : "#8a8a8a"} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export default function TopBar({
-  currentPage, onPageChange, viewport, onViewportChange,
+  currentPage, onPageChange,
   hasChanges, saving, onSave,
 }: TopBarProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [pageDropdownOpen, setPageDropdownOpen] = useState(false);
-
   const currentLabel = PAGES.find((p) => p.value === currentPage)?.label || "Home page";
 
   const handlePageSelect = useCallback((val: string) => {
@@ -51,74 +21,73 @@ export default function TopBar({
     setPageDropdownOpen(false);
   }, [onPageChange]);
 
-  const viewports: { id: ViewportMode; Icon: typeof DesktopIcon }[] = [
-    { id: "desktop", Icon: DesktopIcon },
-    { id: "tablet", Icon: TabletIcon },
-    { id: "mobile", Icon: MobileIcon },
-  ];
-
   return (
-    <div style={{
-      height: 52, background: "#1a1a1a", display: "flex", alignItems: "center",
-      justifyContent: "space-between", padding: "0 12px", flexShrink: 0, position: "relative",
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    <header style={{
+      height: 56, background: "#0F0F13", borderBottom: "1px solid #2A2A35",
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "0 16px", flexShrink: 0, position: "relative", zIndex: 50,
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
-      {/* Left side */}
-      <div style={{ display: "flex", alignItems: "center", gap: 4, zIndex: 2 }}>
-        {/* Three-dot menu */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
+      {/* ── Left: Logo & Store ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, width: "33.33%" }}>
+        {/* Store badge */}
+        <div
           style={{
-            width: 32, height: 32, border: "none", background: "transparent",
-            color: "#8a8a8a", cursor: "pointer", borderRadius: 6, fontSize: 16,
-            display: "flex", alignItems: "center", justifyContent: "center",
+            display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
+            padding: "6px 8px", borderRadius: 6, transition: "background 150ms",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
         >
-          ⋯
-        </button>
-        {menuOpen && (
           <div style={{
-            position: "absolute", top: 44, left: 8, background: "#fff", borderRadius: 8,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
-            padding: "4px 0", minWidth: 200, zIndex: 100,
+            width: 24, height: 24, background: "#008060", borderRadius: 4,
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            {["Preview store", "Keyboard shortcuts", "Contact support"].map((item) => (
-              <div key={item}
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  padding: "8px 14px", fontSize: 13, color: "#303030", cursor: "pointer",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "#f4f4f4"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-              >
-                {item}
-              </div>
-            ))}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
           </div>
-        )}
+          <div style={{ display: "flex", flexDirection: "column" as const }}>
+            <span style={{ color: "#fff", fontWeight: 500, fontSize: 12, lineHeight: "1.2" }}>My Store</span>
+            <span style={{ color: "#9CA3AF", fontSize: 10, lineHeight: "1.2" }}>Dawn Theme — Live</span>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3 5l3 3 3-3" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </div>
 
-        {/* Page selector */}
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", color: "#9CA3AF", fontSize: 12 }}>
+          <span>Themes</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ margin: "0 4px" }}>
+            <path d="M4 3l3 3-3 3" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <span style={{ color: "#fff" }}>Customize</span>
+        </div>
+      </div>
+
+      {/* ── Center: Page Selector ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "33.33%" }}>
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setPageDropdownOpen(!pageDropdownOpen)}
             style={{
-              height: 32, padding: "0 10px", background: "transparent", border: "none",
-              color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 6, borderRadius: 6,
+              background: "#2E2E38", padding: "6px 12px", borderRadius: 4,
+              fontSize: 12, fontWeight: 500, color: "#fff", border: "1px solid #2A2A35",
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+              fontFamily: "inherit",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
-            {currentLabel}
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 4l3 3 3-3" stroke="#8a8a8a" strokeWidth="1.5" strokeLinecap="round" />
+            <span>{currentLabel}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 5l3 3 3-3" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
           {pageDropdownOpen && (
             <div style={{
-              position: "absolute", top: 36, left: 0, background: "#fff", borderRadius: 8,
+              position: "absolute", top: 36, left: "50%", transform: "translateX(-50%)",
+              background: "#fff", borderRadius: 8,
               boxShadow: "0 4px 16px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
               padding: "4px 0", minWidth: 200, zIndex: 100,
             }}>
@@ -127,9 +96,9 @@ export default function TopBar({
                   onClick={() => handlePageSelect(page.value)}
                   style={{
                     padding: "8px 14px", fontSize: 13, cursor: "pointer",
-                    color: page.value === currentPage ? "#005bd3" : "#303030",
+                    color: page.value === currentPage ? "#5C6AC4" : "#303030",
                     fontWeight: page.value === currentPage ? 600 : 400,
-                    background: page.value === currentPage ? "#e8f0fe" : "transparent",
+                    background: page.value === currentPage ? "#f0f0ff" : "transparent",
                   }}
                   onMouseEnter={(e) => { if (page.value !== currentPage) e.currentTarget.style.background = "#f4f4f4"; }}
                   onMouseLeave={(e) => { if (page.value !== currentPage) e.currentTarget.style.background = "transparent"; }}
@@ -140,69 +109,75 @@ export default function TopBar({
             </div>
           )}
         </div>
+        {/* Unsaved changes indicator */}
+        {hasChanges && (
+          <div style={{
+            width: 8, height: 8, borderRadius: "50%", background: "#F59E0B", marginLeft: 12,
+          }} title="Unsaved changes" />
+        )}
       </div>
 
-      {/* Center — viewport toggles */}
-      <div style={{
-        position: "absolute", left: "50%", transform: "translateX(-50%)",
-        display: "flex", gap: 2,
-      }}>
-        {viewports.map(({ id, Icon }) => (
-          <button
-            key={id}
-            onClick={() => onViewportChange(id)}
-            style={{
-              width: 36, height: 36, border: "none", borderRadius: 6, cursor: "pointer",
-              background: viewport === id ? "rgba(255,255,255,0.12)" : "transparent",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <Icon active={viewport === id} />
-          </button>
-        ))}
-      </div>
-
-      {/* Right side */}
-      <div style={{ display: "flex", alignItems: "center", gap: 4, zIndex: 2 }}>
+      {/* ── Right: Actions ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, width: "33.33%" }}>
         {/* Undo */}
-        <button style={iconBtnStyle} title="Undo">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M4 8l4-4M4 8l4 4M4 8h10a4 4 0 010 8H9" stroke="#8a8a8a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <button style={iconBtnStyle} title="Undo"
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 7v6h6" /><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
           </svg>
         </button>
         {/* Redo */}
-        <button style={iconBtnStyle} title="Redo">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M16 8l-4-4M16 8l-4 4M16 8H6a4 4 0 000 8h5" stroke="#8a8a8a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <button style={iconBtnStyle} title="Redo"
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" />
           </svg>
         </button>
-        {/* Preview (eye) */}
-        <button style={iconBtnStyle} title="Preview">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z" stroke="#8a8a8a" strokeWidth="1.5" />
-            <circle cx="10" cy="10" r="3" stroke="#8a8a8a" strokeWidth="1.5" />
+
+        <div style={{ height: 16, width: 1, background: "#2A2A35", margin: "0 4px" }} />
+
+        {/* Preview */}
+        <button style={{
+          ...iconBtnStyle, padding: "0 12px", gap: 8, fontSize: 12, fontWeight: 500, color: "#9CA3AF",
+          width: "auto", fontFamily: "inherit",
+        }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9CA3AF"; }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
           </svg>
+          Preview
         </button>
+
         {/* Save */}
         <button
           onClick={onSave}
           disabled={!hasChanges && !saving}
           style={{
-            height: 32, padding: "0 14px", borderRadius: 6, border: "none", cursor: hasChanges ? "pointer" : "default",
-            background: hasChanges ? "#fff" : "rgba(255,255,255,0.08)",
-            color: hasChanges ? "#1a1a1a" : "#8a8a8a",
-            fontSize: 13, fontWeight: 600, marginLeft: 4,
+            height: 32, padding: "0 16px", borderRadius: 8, border: "none", cursor: hasChanges ? "pointer" : "default",
+            background: hasChanges ? "#008060" : "rgba(0,128,96,0.3)",
+            color: "#fff", fontSize: 12, fontWeight: 500,
+            boxShadow: hasChanges ? "0 1px 2px rgba(0,0,0,0.15)" : "none",
+            display: "flex", alignItems: "center", gap: 8,
+            fontFamily: "inherit", transition: "background 150ms",
           }}
+          onMouseEnter={(e) => { if (hasChanges) e.currentTarget.style.background = "#006e52"; }}
+          onMouseLeave={(e) => { if (hasChanges) e.currentTarget.style.background = "#008060"; }}
         >
           {saving ? "Saving…" : "Save"}
         </button>
       </div>
-    </div>
+    </header>
   );
 }
 
 const iconBtnStyle: React.CSSProperties = {
   width: 32, height: 32, border: "none", background: "transparent",
   borderRadius: 6, cursor: "pointer", display: "flex",
-  alignItems: "center", justifyContent: "center",
+  alignItems: "center", justifyContent: "center", transition: "background 150ms, color 150ms",
 };

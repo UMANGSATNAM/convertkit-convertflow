@@ -43,7 +43,7 @@ export const loader = async ({ request }: { request: Request }) => {
     const productsData = await productsRes.json();
     productHandle = (productsData as any).data.products.edges[0]?.node?.handle || "";
 
-    if (shopRes.ok) {
+    if (shopRes?.ok) {
       const shopData = await shopRes.json();
       passwordEnabled = (shopData as any).shop?.password_enabled || false;
     }
@@ -190,10 +190,9 @@ export default function ConvertFlowEditor() {
     <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", position: "fixed", inset: 0, zIndex: 999, background: "#e8e8e8" }}>
       <TopBar
         currentPage={currentPage} onPageChange={handlePageChange}
-        viewport={viewport} onViewportChange={setViewport}
         hasChanges={hasChanges} saving={saving} onSave={handleSave}
       />
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", background: "#1A1A1F" }}>
         <LeftSidebar
           headerSections={header} templateSections={template} footerSections={footer}
           selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
@@ -204,6 +203,7 @@ export default function ConvertFlowEditor() {
         />
         <CenterPreview
           shopDomain={shopDomain} currentPath={currentPage} viewport={viewport}
+          onViewportChange={setViewport}
           passwordEnabled={passwordEnabled} iframeRef={proxyIframeRef}
           iframeKey={iframeKey} iframeLoading={iframeLoading}
           onIframeLoad={() => setIframeLoading(false)}

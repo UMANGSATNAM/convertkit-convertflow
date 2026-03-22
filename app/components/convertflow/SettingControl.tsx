@@ -1,17 +1,18 @@
 import type { SettingControlProps } from "../../types/convertflow";
 
 const inputStyle: React.CSSProperties = {
-  height: 36, width: "100%", border: "1px solid #c9cccf", borderRadius: 6,
-  padding: "0 10px", fontSize: 13, color: "#303030", background: "#fff",
+  height: 36, width: "100%", border: "1px solid #E5E7EB", borderRadius: 6,
+  padding: "0 10px", fontSize: 13, color: "#111827", background: "#F9FAFB",
   boxSizing: "border-box", outline: "none", fontFamily: "inherit",
+  transition: "border-color 150ms, box-shadow 150ms",
 };
 
 const focusHandler = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-  e.currentTarget.style.borderColor = "#005bd3";
-  e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,91,211,0.2)";
+  e.currentTarget.style.borderColor = "#5C6AC4";
+  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(92,106,196,0.15)";
 };
 const blurHandler = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-  e.currentTarget.style.borderColor = "#c9cccf";
+  e.currentTarget.style.borderColor = "#E5E7EB";
   e.currentTarget.style.boxShadow = "none";
 };
 
