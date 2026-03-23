@@ -44,16 +44,19 @@ export const loader = async ({ request }) => {
     }
   };
 
-  // ── Step 1: Get the active theme ID for preview URL ──
-  let themeId = "";
+  // ── Step 1: Get the theme ID for preview URL ──
+  let themeId = url.searchParams.get("themeId");
   let previewUrl = "";
-  try {
-    const themesResp = await admin.graphql(`query { themes(first: 10) { edges { node { id name role } } } }`);
-    const themesData = await themesResp.json();
-    const activeTheme = themesData.data.themes.edges.find((e) => e.node.role === "MAIN")?.node;
-    themeId = activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
-  } catch (e) {
-    console.warn("Theme fetch failed:", e.message);
+  if (!themeId) {
+    try {
+      const themesResp = await admin.graphql(`query { themes(first: 10) { edges { node { id name role } } } }`);
+      const themesData = await themesResp.json();
+      const draftTheme = themesData.data.themes.edges.find((e) => e.node.name.includes("ConvertFlow Draft"))?.node;
+      const activeTheme = themesData.data.themes.edges.find((e) => e.node.role === "MAIN")?.node;
+      themeId = draftTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
+    } catch (e) {
+      console.warn("Theme fetch failed:", e.message);
+    }
   }
 
   // ── Step 2: Try multiple approaches to fetch the store page ──
@@ -153,7 +156,12 @@ export const loader = async ({ request }) => {
   // Approach C: Direct fetch (works for non-password-protected stores)
   if (!html) {
     try {
-      const storeUrl = `https://${shopDomain}${pagePath}`;
+      const sectionId = url.searchParams.get("section_id");
+      let storeUrl = `https://${shopDomain}${pagePath}`;
+      if (sectionId) {
+        storeUrl += (storeUrl.includes("?") ? "&" : "?") + `section_id=${sectionId}`;
+      }
+
       const resp = await fetch(storeUrl, {
         method: "GET",
         redirect: "manual",
@@ -162,6 +170,12 @@ export const loader = async ({ request }) => {
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
       });
+
+      // If we are just fetching an isolated section snippet, return it immediately without rewriting
+      if (sectionId && resp.ok) {
+        const rawSectionHtml = await resp.text();
+        return new Response(rawSectionHtml, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+      }
 
       // Handle redirects
       if (resp.status >= 300 && resp.status < 400) {

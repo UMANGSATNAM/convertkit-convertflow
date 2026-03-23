@@ -82,6 +82,7 @@ export interface LeftSidebarProps {
 
 export interface CenterPreviewProps {
   shopDomain: string;
+  themeId: string;
   currentPath: string;
   viewport: ViewportMode;
   onViewportChange: (mode: ViewportMode) => void;

@@ -184,6 +184,47 @@
         }
         break;
 
+      case "CK_RELOAD_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          // Fuzzy match if exact ID not found (e.g. generic schema name used)
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.style.opacity = "0.5";
+            secNode.style.transition = "opacity 200ms";
+            
+            var fetchUrl = window.location.pathname + window.location.search;
+            if (fetchUrl.indexOf("section_id=") === -1) {
+              fetchUrl += (fetchUrl.indexOf("?") > -1 ? "&" : "?") + "section_id=" + e.data.sectionId;
+            } else {
+              fetchUrl = fetchUrl.replace(/section_id=[^&]+/, "section_id=" + e.data.sectionId);
+            }
+            
+            fetch(fetchUrl)
+              .then(function(res) { return res.text(); })
+              .then(function(html) {
+                secNode.innerHTML = html;
+                secNode.style.opacity = "1";
+                if (activeSection && activeSection.sectionId === e.data.sectionId) {
+                  positionOverlay(secNode.getBoundingClientRect());
+                }
+              })
+              .catch(function(err) {
+                console.error("Section reload failed:", err);
+                secNode.style.opacity = "1";
+              });
+          }
+        }
+        break;
+
       case "CK_GET_SECTIONS":
         var nodes = document.querySelectorAll("[data-section-id]");
         var sections = [];

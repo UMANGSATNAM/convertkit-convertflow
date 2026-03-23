@@ -119,14 +119,48 @@ export default function SettingControl({ setting, value, onChange }: SettingCont
       );
     }
 
+    case "product":
+    case "collection":
+      return (
+        <button onClick={async () => {
+          try {
+            const shp = (window as any).shopify;
+            if (shp?.resourcePicker) {
+              const res = await shp.resourcePicker({ type: setting.type, action: "select", multiple: false });
+              if (res && res.length > 0) {
+                onChange(res[0].handle);
+              }
+            } else {
+              alert("Shopify App Bridge is not initialized.");
+            }
+          } catch (e) {
+            console.error("Resource picker error:", e);
+          }
+        }}
+        style={{
+          ...inputStyle, cursor: "pointer", background: "#F9FAFB", textAlign: "left",
+          display: "flex", alignItems: "center", gap: 8, color: "#111827", fontWeight: 500,
+          border: "1px dashed #D1D5DB"
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/><circle cx="12" cy="12" r="10"/>
+          </svg>
+          {val ? String(val) : `Select ${setting.type}`}
+        </button>
+      );
+
     case "image_picker":
       return (
-        <button style={{
-          ...inputStyle, cursor: "pointer", background: "#fff", textAlign: "left",
-          display: "flex", alignItems: "center", gap: 8, color: "#303030",
-        }}>
-          Select image
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {val && (
+            <div style={{ width: "100%", height: 120, borderRadius: 6, border: "1px solid #E5E7EB", overflow: "hidden", background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img src={String(val)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => e.currentTarget.style.display = "none"} />
+            </div>
+          )}
+          <input type="text" value={String(val)} onChange={(e) => onChange(e.target.value)}
+            placeholder="Image URL (e.g. shopify://...)"
+            style={inputStyle} onFocus={focusHandler} onBlur={blurHandler} />
+        </div>
       );
 
     default:

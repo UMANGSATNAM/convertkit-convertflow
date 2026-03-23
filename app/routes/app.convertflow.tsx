@@ -36,9 +36,35 @@ export const loader = async ({ request }: { request: Request }) => {
     ]);
 
     const themesData = await themesRes.json();
-    const activeTheme = (themesData as any).data.themes.edges.find((e: any) => e.node.role === "MAIN")?.node;
-    themeId = activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
-    themeName = activeTheme?.name || "Theme";
+    const themesList = (themesData as any).data.themes.edges.map((e: any) => e.node);
+    const mainTheme = themesList.find((t: any) => t.role === "MAIN");
+    const draftTheme = themesList.find((t: any) => t.name.includes("ConvertFlow Draft"));
+    
+    if (!draftTheme && mainTheme) {
+      const mainThemeId = mainTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
+      const createRes = await shopifyFetchWithRetry(`https://${shopDomain}/admin/api/2025-01/themes.json`, {
+        method: "POST",
+        headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          theme: { name: "ConvertFlow Draft", role: "unpublished" },
+          source_theme_id: parseInt(mainThemeId)
+        })
+      });
+      if (createRes?.ok) {
+        const createData = await createRes.json();
+        themeId = createData.theme.id.toString();
+        themeName = createData.theme.name;
+      } else {
+        themeId = mainThemeId;
+        themeName = mainTheme.name;
+      }
+    } else if (draftTheme) {
+      themeId = draftTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
+      themeName = draftTheme.name;
+    } else if (mainTheme) {
+      themeId = mainTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
+      themeName = mainTheme.name;
+    }
 
     const productsData = await productsRes.json();
     productHandle = (productsData as any).data.products.edges[0]?.node?.handle || "";
@@ -106,6 +132,7 @@ function categorizeSections(
 export default function ConvertFlowEditor() {
   const { shopDomain, themeId, passwordEnabled, sections, sectionSchemas, settingsData, templates } = useLoaderData<typeof loader>();
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
+  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState("/");
   const [iframeKey, setIframeKey] = useState(0);
@@ -138,7 +165,15 @@ export default function ConvertFlowEditor() {
         sendToIframe({ type: "CK_GET_SECTIONS" });
         sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: true });
       } else if (e.data.type === "CK_SECTION_CLICKED") {
-        setSelectedSectionKey(`sections/${e.data.sectionId}.liquid`);
+        let sid = e.data.sectionType;
+        if (!sid) {
+          sid = e.data.sectionId || "";
+          if (sid.includes("__")) sid = sid.split("__").pop();
+        }
+        if (sid) {
+          setSelectedSectionKey(`sections/${sid}.liquid`);
+          setSelectedInstanceId(e.data.sectionId);
+        }
       }
     };
     window.addEventListener("message", handler);
@@ -154,15 +189,35 @@ export default function ConvertFlowEditor() {
   const handleSettingChange = useCallback((settingId: string, value: unknown) => {
     setHasChanges(true);
     const sectionName = selectedSectionKey?.replace("sections/", "").replace(".liquid", "") || "";
-    setSettingValues((prev) => ({
-      ...prev,
-      [sectionName]: { ...((prev[sectionName] as Record<string, unknown>) || {}), [settingId]: value },
-    }));
-    if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
-    settingsDebounceRef.current = setTimeout(() => {
-      sendToIframe({ type: "CK_INJECT_CSS", settingId, value });
-    }, 400);
-  }, [selectedSectionKey, sendToIframe]);
+    
+    setSettingValues((prev) => {
+      const next = {
+        ...prev,
+        [sectionName]: { ...((prev[sectionName] as Record<string, unknown>) || {}), [settingId]: value },
+      };
+      
+      if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
+      settingsDebounceRef.current = setTimeout(async () => {
+        // Instant CSS injection
+        sendToIframe({ type: "CK_INJECT_CSS", settingId, value });
+        
+        // Auto-save to draft theme for Section Rendering API to pick it up
+        try {
+          await fetch("/api/convertflow/settings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ themeId, settings: next }),
+          });
+          // Dispatch Hot-Swap reload mapped to the inspector script
+          sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: selectedInstanceId || sectionName });
+        } catch (e) {
+          console.error("Auto-save failed", e);
+        }
+      }, 500);
+      
+      return next;
+    });
+  }, [selectedSectionKey, selectedInstanceId, sendToIframe, themeId]);
 
   const selectedSection: SelectedSectionState | null = selectedSectionKey
     ? { key: selectedSectionKey, name: selectedSectionKey.replace("sections/", "").replace(".liquid", ""), schema: sectionSchemas[selectedSectionKey] || null }
@@ -196,13 +251,16 @@ export default function ConvertFlowEditor() {
         <LeftSidebar
           headerSections={header} templateSections={template} footerSections={footer}
           selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
-          onSelectSection={setSelectedSectionKey}
+          onSelectSection={(key) => {
+            setSelectedSectionKey(key);
+            setSelectedInstanceId(null);
+          }}
           onToggleExpand={(key) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }))}
           onAddSection={handleAddSection}
           activeTab={sidebarTab} onTabChange={setSidebarTab}
         />
         <CenterPreview
-          shopDomain={shopDomain} currentPath={currentPage} viewport={viewport}
+          shopDomain={shopDomain} themeId={themeId} currentPath={currentPage} viewport={viewport}
           onViewportChange={setViewport}
           passwordEnabled={passwordEnabled} iframeRef={proxyIframeRef}
           iframeKey={iframeKey} iframeLoading={iframeLoading}
@@ -219,7 +277,10 @@ export default function ConvertFlowEditor() {
         templates={templates as any}
         onClose={() => setAddModalVisible(false)}
         onSelectTemplate={(id) => { console.log("Selected template:", id); }}
-        onSelectSection={(key) => { setSelectedSectionKey(key); }}
+        onSelectSection={(key) => { 
+          setSelectedSectionKey(key); 
+          setSelectedInstanceId(null);
+        }}
       />
     </div>
   );

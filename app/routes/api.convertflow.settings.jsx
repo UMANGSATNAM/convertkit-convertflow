@@ -51,30 +51,34 @@ export const action = async ({ request }) => {
     const { session } = await authenticate.admin(request);
     const shopDomain = session.shop;
     const token = session.accessToken;
-    const { sectionId, settingId, value, themeId } = await request.json();
+    const { themeId, settings } = await request.json();
 
-    if (!sectionId || !settingId || !themeId) {
-      return json({ error: "sectionId, settingId, and themeId are required" }, { status: 400 });
+    if (!themeId || !settings) {
+      return json({ error: "themeId and settings are required" }, { status: 400 });
     }
 
     const assetUrl = `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json`;
 
-    // Read current settings_data.json
+    // Read current settings_data.json (necessary to preserve other theme settings like colors/fonts)
     const getResp = await shopifyFetchWithRetry(
       `${assetUrl}?asset[key]=${encodeURIComponent("config/settings_data.json")}`,
       { headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" } }
     );
 
-    if (!getResp.ok) throw new Error(`Failed to read settings: ${getResp.status}`);
-    const getBody = await getResp.json();
-    const settingsData = JSON.parse(getBody.asset?.value || "{}");
+    let settingsData = { current: { sections: {} } };
+    if (getResp.ok) {
+      const getBody = await getResp.json();
+      settingsData = JSON.parse(getBody.asset?.value || "{}");
+    }
 
-    // Update the specific setting
+    // Deep merge settings
     if (!settingsData.current) settingsData.current = {};
     if (!settingsData.current.sections) settingsData.current.sections = {};
-    if (!settingsData.current.sections[sectionId]) settingsData.current.sections[sectionId] = {};
 
-    settingsData.current.sections[sectionId][settingId] = value;
+    settingsData.current.sections = {
+      ...settingsData.current.sections,
+      ...settings,
+    };
 
     // Push updated settings_data.json
     const putResp = await shopifyFetchWithRetry(assetUrl, {
@@ -93,7 +97,7 @@ export const action = async ({ request }) => {
       throw new Error(`Failed to save settings: ${putResp.status} ${errText}`);
     }
 
-    return json({ success: true, sectionId, settingId, value });
+    return json({ success: true, themeId });
   } catch (error) {
     console.error("Settings PUT error:", error);
     return json({ error: error.message }, { status: 500 });
