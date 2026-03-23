@@ -132,7 +132,7 @@ function categorizeSections(
 export default function ConvertFlowEditor() {
   const { shopDomain, themeId, passwordEnabled, sections, sectionSchemas, settingsData, templates } = useLoaderData<typeof loader>();
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
-  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [pageInstances, setPageInstances] = useState<Array<{ id: string; type: string }>>([]);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState("/");
   const [iframeKey, setIframeKey] = useState(0);
@@ -164,16 +164,10 @@ export default function ConvertFlowEditor() {
       if (e.data.type === "CK_INSPECTOR_READY") {
         sendToIframe({ type: "CK_GET_SECTIONS" });
         sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: true });
+      } else if (e.data.type === "CK_SECTIONS_LIST") {
+        setPageInstances(e.data.sections.map((s: any) => ({ id: s.sectionId, type: s.sectionType })));
       } else if (e.data.type === "CK_SECTION_CLICKED") {
-        let sid = e.data.sectionType;
-        if (!sid) {
-          sid = e.data.sectionId || "";
-          if (sid.includes("__")) sid = sid.split("__").pop();
-        }
-        if (sid) {
-          setSelectedSectionKey(`sections/${sid}.liquid`);
-          setSelectedInstanceId(e.data.sectionId);
-        }
+        setSelectedSectionKey(e.data.sectionId);
       }
     };
     window.addEventListener("message", handler);
@@ -188,12 +182,12 @@ export default function ConvertFlowEditor() {
 
   const handleSettingChange = useCallback((settingId: string, value: unknown) => {
     setHasChanges(true);
-    const sectionName = selectedSectionKey?.replace("sections/", "").replace(".liquid", "") || "";
+    const instanceId = selectedSectionKey || "";
     
     setSettingValues((prev) => {
       const next = {
         ...prev,
-        [sectionName]: { ...((prev[sectionName] as Record<string, unknown>) || {}), [settingId]: value },
+        [instanceId]: { ...((prev[instanceId] as Record<string, unknown>) || {}), [settingId]: value },
       };
       
       if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
@@ -209,7 +203,7 @@ export default function ConvertFlowEditor() {
             body: JSON.stringify({ themeId, settings: next }),
           });
           // Dispatch Hot-Swap reload mapped to the inspector script
-          sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: selectedInstanceId || sectionName });
+          sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: instanceId });
         } catch (e) {
           console.error("Auto-save failed", e);
         }
@@ -217,11 +211,47 @@ export default function ConvertFlowEditor() {
       
       return next;
     });
-  }, [selectedSectionKey, selectedInstanceId, sendToIframe, themeId]);
+  }, [selectedSectionKey, sendToIframe, themeId]);
 
   const selectedSection: SelectedSectionState | null = selectedSectionKey
-    ? { key: selectedSectionKey, name: selectedSectionKey.replace("sections/", "").replace(".liquid", ""), schema: sectionSchemas[selectedSectionKey] || null }
+    ? (() => {
+        const instance = pageInstances.find(p => p.id === selectedSectionKey);
+        let type = instance?.type;
+        if (!type && selectedSectionKey.includes("__")) type = selectedSectionKey.split("__").pop();
+        if (!type) type = selectedSectionKey;
+        const schema = sectionSchemas[`sections/${type}.liquid`] || null;
+        return { key: selectedSectionKey, name: schema?.name || type || "", schema };
+      })()
     : null;
+
+  const liveHeader: ShopifySection[] = [];
+  const liveTemplate: ShopifySection[] = [];
+  const liveFooter: ShopifySection[] = [];
+
+  pageInstances.forEach((instance) => {
+    let type = instance.type;
+    if (!type && instance.id.includes("__")) type = instance.id.split("__").pop() || "";
+    if (!type) type = instance.id;
+
+    const schemaKey = `sections/${type}.liquid`;
+    const schema = sectionSchemas[schemaKey];
+    const n = (schema?.name || type).toLowerCase();
+    
+    let group = "template";
+    if (n.includes("header") || n.includes("announcement")) group = "header";
+    else if (n.includes("footer")) group = "footer";
+
+    const sec: ShopifySection = {
+      key: instance.id,
+      name: schema?.name || type,
+      schema,
+      group: group as any,
+    };
+
+    if (group === "header") liveHeader.push(sec);
+    else if (group === "footer") liveFooter.push(sec);
+    else liveTemplate.push(sec);
+  });
 
   const handleAddSection = useCallback((_pos: number, _group: string) => {
     setAddModalPos({ top: 200, left: 100 });
@@ -249,12 +279,9 @@ export default function ConvertFlowEditor() {
       />
       <div style={{ display: "flex", flex: 1, overflow: "hidden", background: "#1A1A1F" }}>
         <LeftSidebar
-          headerSections={header} templateSections={template} footerSections={footer}
+          headerSections={liveHeader} templateSections={liveTemplate} footerSections={liveFooter}
           selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
-          onSelectSection={(key) => {
-            setSelectedSectionKey(key);
-            setSelectedInstanceId(null);
-          }}
+          onSelectSection={setSelectedSectionKey}
           onToggleExpand={(key) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }))}
           onAddSection={handleAddSection}
           activeTab={sidebarTab} onTabChange={setSidebarTab}
@@ -278,8 +305,8 @@ export default function ConvertFlowEditor() {
         onClose={() => setAddModalVisible(false)}
         onSelectTemplate={(id) => { console.log("Selected template:", id); }}
         onSelectSection={(key) => { 
-          setSelectedSectionKey(key); 
-          setSelectedInstanceId(null);
+          console.log("Adding schema:", key);
+          setAddModalVisible(false);
         }}
       />
     </div>

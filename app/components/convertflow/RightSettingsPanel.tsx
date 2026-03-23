@@ -17,7 +17,7 @@ export default function RightSettingsPanel({ selectedSection, values, onChange, 
   }
 
   const schema = selectedSection.schema;
-  const sectionName = selectedSection.key.replace("sections/", "").replace(".liquid", "");
+  const sectionName = selectedSection.key;
   const sectionVals = (values[sectionName] || {}) as Record<string, unknown>;
 
   return (
