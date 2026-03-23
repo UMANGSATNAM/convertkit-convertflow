@@ -1,7 +1,7 @@
 import type { RightSettingsPanelProps } from "../../types/convertflow";
 import SettingControl from "./SettingControl";
 
-export default function RightSettingsPanel({ selectedSection, values, onChange, onBack }: RightSettingsPanelProps) {
+export default function RightSettingsPanel({ selectedSection, values, onChange, onBack, onRemoveSection }: RightSettingsPanelProps) {
   if (!selectedSection || !selectedSection.schema) {
     return (
       <div style={{
@@ -99,7 +99,9 @@ export default function RightSettingsPanel({ selectedSection, values, onChange, 
 
         {/* Remove section button */}
         <div style={{ padding: "24px 20px 8px 20px", marginTop: 8, borderTop: "1px solid #E5E7EB" }}>
-          <button style={{
+          <button
+            onClick={() => onRemoveSection(selectedSection.key)}
+            style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             color: "#DC2626", background: "transparent", border: "1px solid transparent", borderRadius: 6,
             padding: "10px 0", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 150ms",

@@ -141,9 +141,11 @@ export default function ConvertFlowEditor() {
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [settingValues, setSettingValues] = useState<Record<string, unknown>>({});
+  const [themeSettingValues, setThemeSettingValues] = useState<Record<string, unknown>>({});
   const [sidebarTab, setSidebarTab] = useState<"sections" | "settings">("sections");
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [addModalPos, setAddModalPos] = useState({ top: 200, left: 100 });
+  const [addModalInsertIndex, setAddModalInsertIndex] = useState<number | undefined>();
   const proxyIframeRef = useRef<HTMLIFrameElement | null>(null);
   const settingsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -152,6 +154,11 @@ export default function ConvertFlowEditor() {
   useEffect(() => {
     const sd = settingsData as any;
     if (sd?.current?.sections) setSettingValues(sd.current.sections);
+    // Extract global theme settings (non-section keys from current)
+    if (sd?.current) {
+      const { sections: _s, ...globalSettings } = sd.current;
+      setThemeSettingValues(globalSettings);
+    }
   }, []);
 
   const sendToIframe = useCallback((msg: unknown) => {
@@ -165,7 +172,20 @@ export default function ConvertFlowEditor() {
         sendToIframe({ type: "CK_GET_SECTIONS" });
         sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: true });
       } else if (e.data.type === "CK_SECTIONS_LIST") {
-        setPageInstances(e.data.sections.map((s: any) => ({ id: s.sectionId, type: s.sectionType })));
+        setPageInstances(e.data.sections.map((s: any) => {
+          let type = s.sectionType;
+          if (!type && s.sectionId.includes("__")) type = s.sectionId.split("__").pop();
+          if (!type) {
+            const idLower = s.sectionId.toLowerCase();
+            let best = "";
+            for (const k of Object.keys(sectionSchemas)) {
+              const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
+              if (idLower.startsWith(base) && base.length > best.length) best = k;
+            }
+            if (best) type = best.replace("sections/","").replace(".liquid","");
+          }
+          return { id: s.sectionId, type: type || s.sectionId };
+        }));
       } else if (e.data.type === "CK_SECTION_CLICKED") {
         setSelectedSectionKey(e.data.sectionId);
       }
@@ -190,6 +210,12 @@ export default function ConvertFlowEditor() {
         [instanceId]: { ...((prev[instanceId] as Record<string, unknown>) || {}), [settingId]: value },
       };
       
+      let tKey = "templates/index.json";
+      if (currentPage.includes("/products/")) tKey = "templates/product.json";
+      else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+      else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+      else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
       if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
       settingsDebounceRef.current = setTimeout(async () => {
         // Instant CSS injection
@@ -200,7 +226,11 @@ export default function ConvertFlowEditor() {
           await fetch("/api/convertflow/settings", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ themeId, settings: next }),
+            body: JSON.stringify({ 
+              themeId, 
+              settings: { [instanceId]: next[instanceId] },
+              templateKey: tKey 
+            }),
           });
           // Dispatch Hot-Swap reload mapped to the inspector script
           sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: instanceId });
@@ -211,14 +241,12 @@ export default function ConvertFlowEditor() {
       
       return next;
     });
-  }, [selectedSectionKey, sendToIframe, themeId]);
+  }, [selectedSectionKey, sendToIframe, themeId, currentPage]);
 
   const selectedSection: SelectedSectionState | null = selectedSectionKey
     ? (() => {
         const instance = pageInstances.find(p => p.id === selectedSectionKey);
-        let type = instance?.type;
-        if (!type && selectedSectionKey.includes("__")) type = selectedSectionKey.split("__").pop();
-        if (!type) type = selectedSectionKey;
+        const type = instance?.type || selectedSectionKey;
         const schema = sectionSchemas[`sections/${type}.liquid`] || null;
         return { key: selectedSectionKey, name: schema?.name || type || "", schema };
       })()
@@ -229,10 +257,7 @@ export default function ConvertFlowEditor() {
   const liveFooter: ShopifySection[] = [];
 
   pageInstances.forEach((instance) => {
-    let type = instance.type;
-    if (!type && instance.id.includes("__")) type = instance.id.split("__").pop() || "";
-    if (!type) type = instance.id;
-
+    const type = instance.type;
     const schemaKey = `sections/${type}.liquid`;
     const schema = sectionSchemas[schemaKey];
     const n = (schema?.name || type).toLowerCase();
@@ -244,6 +269,7 @@ export default function ConvertFlowEditor() {
     const sec: ShopifySection = {
       key: instance.id,
       name: schema?.name || type,
+      disabled: (settingValues[instance.id] as any)?.disabled === true,
       schema,
       group: group as any,
     };
@@ -253,10 +279,135 @@ export default function ConvertFlowEditor() {
     else liveTemplate.push(sec);
   });
 
-  const handleAddSection = useCallback((_pos: number, _group: string) => {
+  const handleAddSection = useCallback((pos: number, _group: string) => {
+    setAddModalInsertIndex(pos);
     setAddModalPos({ top: 200, left: 100 });
     setAddModalVisible(true);
   }, []);
+
+  const handleToggleVisibility = useCallback((sectionKey: string) => {
+    setHasChanges(true);
+    setSettingValues((prev) => {
+      const current = (prev[sectionKey] as Record<string, unknown>) || {};
+      const nextDisabled = !(current.disabled === true);
+      const next = { ...prev, [sectionKey]: { ...current, disabled: nextDisabled } };
+
+      let tKey = "templates/index.json";
+      if (currentPage.includes("/products/")) tKey = "templates/product.json";
+      else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+      else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+      else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
+      if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
+      settingsDebounceRef.current = setTimeout(async () => {
+        try {
+          await fetch("/api/convertflow/settings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              themeId, 
+              settings: { [sectionKey]: next[sectionKey] },
+              templateKey: tKey 
+            }),
+          });
+          sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: sectionKey });
+        } catch (e) { console.error("Visibility toggle failed", e); }
+      }, 500);
+
+      return next;
+    });
+  }, [themeId, currentPage, sendToIframe]);
+
+  const handleRemoveSection = useCallback(async (sectionKey: string) => {
+    if (!confirm(`Remove this section? This action cannot be undone.`)) return;
+
+    let tKey = "templates/index.json";
+    if (currentPage.includes("/products/")) tKey = "templates/product.json";
+    else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+    else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+    else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
+    try {
+      await fetch("/api/convertflow/settings", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ themeId, sectionId: sectionKey, templateKey: tKey }),
+      });
+      setSelectedSectionKey(null);
+      setSettingValues((prev) => {
+        const next = { ...prev };
+        delete next[sectionKey];
+        return next;
+      });
+      setIframeKey((k) => k + 1);
+    } catch (e) {
+      console.error("Remove section failed:", e);
+    }
+  }, [themeId, currentPage]);
+
+  const handleReorderSections = useCallback(async (fromIdx: number, toIdx: number) => {
+    const reordered = [...liveTemplate];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+
+    // Optimistic update: swap pageInstances to match
+    const templateInstances = pageInstances.filter((inst) => {
+      const type = inst.type;
+      const schemaKey = `sections/${type}.liquid`;
+      const schema = sectionSchemas[schemaKey];
+      const n = (schema?.name || type).toLowerCase();
+      return !n.includes("header") && !n.includes("announcement") && !n.includes("footer");
+    });
+    const nonTemplate = pageInstances.filter((inst) => {
+      const type = inst.type;
+      const schemaKey = `sections/${type}.liquid`;
+      const schema = sectionSchemas[schemaKey];
+      const n = (schema?.name || type).toLowerCase();
+      return n.includes("header") || n.includes("announcement") || n.includes("footer");
+    });
+
+    const reorderedInstances = [...templateInstances];
+    const [movedInst] = reorderedInstances.splice(fromIdx, 1);
+    reorderedInstances.splice(toIdx, 0, movedInst);
+    setPageInstances([...nonTemplate, ...reorderedInstances]);
+
+    let tKey = "templates/index.json";
+    if (currentPage.includes("/products/")) tKey = "templates/product.json";
+    else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+    else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+    else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
+    const newOrder = reordered.map((s) => s.key);
+    try {
+      await fetch("/api/convertflow/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ themeId, templateKey: tKey, order: newOrder }),
+      });
+      setIframeKey((k) => k + 1);
+    } catch (e) {
+      console.error("Reorder failed:", e);
+    }
+  }, [liveTemplate, pageInstances, sectionSchemas, themeId, currentPage]);
+
+  const handleThemeSettingChange = useCallback((_groupIdx: number, settingId: string, value: unknown) => {
+    setHasChanges(true);
+    setThemeSettingValues((prev) => ({ ...prev, [settingId]: value }));
+
+    if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
+    settingsDebounceRef.current = setTimeout(async () => {
+      try {
+        await fetch("/api/convertflow/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ themeId, globalSettings: { [settingId]: value } }),
+        });
+        sendToIframe({ type: "CK_RELOAD_PAGE" });
+      } catch (e) {
+        console.error("Theme setting save failed:", e);
+      }
+    }, 800);
+  }, [themeId, sendToIframe]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -264,12 +415,12 @@ export default function ConvertFlowEditor() {
       await fetch("/api/convertflow/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ themeId, settings: settingValues }),
+        body: JSON.stringify({ themeId, settings: settingValues, globalSettings: themeSettingValues }),
       });
       setHasChanges(false);
     } catch (e) { console.error("Save error:", e); }
     finally { setSaving(false); }
-  }, [themeId, settingValues]);
+  }, [themeId, settingValues, themeSettingValues]);
 
   return (
     <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", position: "fixed", inset: 0, zIndex: 999, background: "#e8e8e8" }}>
@@ -281,10 +432,17 @@ export default function ConvertFlowEditor() {
         <LeftSidebar
           headerSections={liveHeader} templateSections={liveTemplate} footerSections={liveFooter}
           selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
-          onSelectSection={setSelectedSectionKey}
+          onSelectSection={(key) => {
+            setSelectedSectionKey(key);
+            sendToIframe({ type: "CK_SELECT_SECTION", sectionId: key });
+          }}
           onToggleExpand={(key) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }))}
           onAddSection={handleAddSection}
+          onReorderSections={handleReorderSections}
+          onToggleVisibility={handleToggleVisibility}
           activeTab={sidebarTab} onTabChange={setSidebarTab}
+          themeSettings={themeSettingValues}
+          onThemeSettingChange={handleThemeSettingChange}
         />
         <CenterPreview
           shopDomain={shopDomain} themeId={themeId} currentPath={currentPage} viewport={viewport}
@@ -296,17 +454,69 @@ export default function ConvertFlowEditor() {
         <RightSettingsPanel
           selectedSection={selectedSection} values={settingValues}
           onChange={handleSettingChange} onBack={() => setSelectedSectionKey(null)}
+          onRemoveSection={handleRemoveSection}
         />
       </div>
       <AddSectionModal
         visible={addModalVisible} position={addModalPos}
         sections={[...header, ...template, ...footer]}
         templates={templates as any}
+        insertIndex={addModalInsertIndex}
         onClose={() => setAddModalVisible(false)}
-        onSelectTemplate={(id) => { console.log("Selected template:", id); }}
-        onSelectSection={(key) => { 
-          console.log("Adding schema:", key);
+        onSelectTemplate={async (id, idx) => { 
           setAddModalVisible(false);
+          setSaving(true);
+          let tKey = "templates/index.json";
+          if (currentPage.includes("/products/")) tKey = "templates/product.json";
+          else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+          else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+          else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
+          try {
+            const res = await fetch("/api/convertflow/install-template", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ themeId, templateId: id, templateKey: tKey, insertIndex: idx })
+            });
+            if (res.ok) {
+              setIframeKey((k) => k + 1);
+            }
+          } catch (e) {
+            console.error("Install template failed:", e);
+          } finally {
+            setSaving(false);
+          }
+        }}
+        onSelectSection={async (key, idx) => { 
+          setAddModalVisible(false);
+          const baseType = key.replace("sections/", "").replace(".liquid", "");
+          const newInstanceId = `${baseType}_${Math.random().toString(36).slice(-6)}`;
+          
+          let tKey = "templates/index.json";
+          if (currentPage.includes("/products/")) tKey = "templates/product.json";
+          else if (currentPage.includes("/collections/")) tKey = "templates/collection.json";
+          else if (currentPage.includes("/pages/")) tKey = "templates/page.json";
+          else if (currentPage.includes("/cart")) tKey = "templates/cart.json";
+
+          try {
+            await fetch("/api/convertflow/settings", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                insertIndex: idx,
+                themeId,
+                templateKey: tKey,
+                settings: {
+                  [newInstanceId]: { type: baseType, settings: {} }
+                }
+              }),
+            });
+            // Force fully reload iframe to show newly appended section
+            setIframeKey((k) => k + 1);
+            setSelectedSectionKey(newInstanceId);
+          } catch (e) {
+             console.error("Failed to add section", e);
+          }
         }}
       />
     </div>

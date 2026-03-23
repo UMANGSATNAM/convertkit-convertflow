@@ -1,7 +1,7 @@
 export interface CKTemplate {
   id: string;
   name: string;
-  category: "header"|"hero"|"banner"|"collection"|"social-proof"|"gallery"|"faq"|"footer";
+  category: "header"|"hero"|"banner"|"collection"|"social-proof"|"gallery"|"faq"|"footer"|"conversion";
   niche: string;
   liquidCode: string;
   cssCode: string;
@@ -363,8 +363,83 @@ S({name:"CK Newsletter Footer",settings:[{type:"text",id:"heading",label:"Headin
 // ── FAQ (added to fill gallery slot since no gallery templates needed) ──
 const faqTemplates: CKTemplate[] = [];
 
+// ── CONVERSION TEMPLATES (2) ──
+const conversion: CKTemplate[] = [
+  h("conv-sticky-cart", "Sticky Add to Cart", "conversion", "general",
+    `<div class="ck-sticky-cart" id="ck-sticky-cart" style="display:none;background:{{ section.settings.bg }};">
+      <div class="page-width ck-sticky-cart__inner">
+        <div class="ck-sticky-cart__product">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | image_url: width: 80 }}" alt="{{ product.title }}" loading="lazy">
+          {%- endif -%}
+          <div>
+            <div class="ck-sticky-cart__title" style="color:{{ section.settings.text_color }}">{{ product.title }}</div>
+            <div class="ck-sticky-cart__price" style="color:{{ section.settings.text_color }}">{{ product.price | money }}</div>
+          </div>
+        </div>
+        <button class="ck-sticky-cart__btn" style="background:{{ section.settings.btn_bg }};color:{{ section.settings.btn_color }}" onclick="document.querySelector('form[action=\\'/cart/add\\'] button[type=\\'submit\\']').click()">{{ section.settings.btn_text }}</button>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("scroll", () => {
+        const sc = document.getElementById("ck-sticky-cart");
+        const btn = document.querySelector('form[action="/cart/add"] button[type="submit"]');
+        if(!sc || !btn) return;
+        const rect = btn.getBoundingClientRect();
+        if(rect.bottom < 0) {
+          sc.style.display = 'block';
+          setTimeout(() => sc.classList.add('is-visible'), 10);
+        } else {
+          sc.classList.remove('is-visible');
+          setTimeout(() => { if(!sc.classList.contains('is-visible')) sc.style.display='none'; }, 300);
+        }
+      });
+    </script>`,
+    `.ck-sticky-cart { position:fixed; bottom:0; left:0; width:100%; z-index:999; box-shadow:0 -4px 12px rgba(0,0,0,0.1); transform:translateY(100%); transition:transform 0.3s ease; padding: 12px 0; }
+     .ck-sticky-cart.is-visible { transform:translateY(0); }
+     .ck-sticky-cart__inner { display:flex; justify-content:space-between; align-items:center; }
+     .ck-sticky-cart__product { display:flex; align-items:center; gap: 16px; }
+     .ck-sticky-cart__product img { width: 48px; height: 48px; border-radius: 4px; object-fit: cover; }
+     .ck-sticky-cart__title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+     .ck-sticky-cart__price { font-size: 13px; opacity: 0.8; }
+     .ck-sticky-cart__btn { font-weight:700; border:none; padding:12px 24px; border-radius:6px; cursor:pointer; font-size:14px; text-transform:uppercase; letter-spacing:1px; transition:opacity 0.2s; }
+     .ck-sticky-cart__btn:hover { opacity:0.9; }
+     @media (max-width: 768px) { .ck-sticky-cart__product { display:none; } .ck-sticky-cart__btn { width:100%; } }`,
+    JSON.stringify({
+      name: "Sticky Add to Cart",
+      limit: 1,
+      enabled_on: { templates: ["product"] },
+      settings: [
+        { type: "color", id: "bg", label: "Background", default: "#ffffff" },
+        { type: "color", id: "text_color", label: "Text", default: "#1a1a1a" },
+        { type: "color", id: "btn_bg", label: "Button Background", default: "#1a1a1a" },
+        { type: "color", id: "btn_color", label: "Button Text", default: "#ffffff" },
+        { type: "text", id: "btn_text", label: "Button Label", default: "Add to Cart" }
+      ]
+    })
+  ),
+  h("conv-urgency", "Urgency / Low Stock", "conversion", "general",
+    `<div class="ck-urgency" style="background:{{ section.settings.bg }}; color:{{ section.settings.text_color }};">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>{{ section.settings.text | replace: '[inventory]', product.selected_or_first_available_variant.inventory_quantity }}</span>
+    </div>`,
+    `.ck-urgency { display:flex; align-items:center; gap: 8px; padding: 12px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; margin-bottom: 16px; }
+     .ck-urgency svg { animation: ck-pulse 2s infinite; color: #dc2626; }
+     @keyframes ck-pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }`,
+    JSON.stringify({
+      name: "Urgency Indicator",
+      enabled_on: { templates: ["product"] },
+      settings: [
+        { type: "text", id: "text", label: "Message", default: "Hurry! Only [inventory] items left in stock." },
+        { type: "color", id: "bg", label: "Background", default: "#fee2e2" },
+        { type: "color", id: "text_color", label: "Text Color", default: "#991b1b" }
+      ]
+    })
+  )
+];
+
 export const CONVERTKIT_TEMPLATES: CKTemplate[] = [
-  ...headers, ...heroes, ...banners, ...collections, ...socialProof, ...footers, ...faqTemplates,
+  ...headers, ...heroes, ...banners, ...collections, ...socialProof, ...footers, ...faqTemplates, ...conversion,
 ];
 
 export function getTemplateById(id: string): CKTemplate | undefined {

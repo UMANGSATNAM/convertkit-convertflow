@@ -259,6 +259,26 @@
         );
         break;
 
+      case "CK_SELECT_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.scrollIntoView({ behavior: "smooth", block: "center" });
+            positionOverlay(secNode.getBoundingClientRect());
+            activeSection = getSectionForElement(secNode.children[0] || secNode);
+          }
+        }
+        break;
+
       case "CK_TOGGLE_INSPECTOR":
         inspectorEnabled = !!e.data.enabled;
         if (!inspectorEnabled) hideOverlay();

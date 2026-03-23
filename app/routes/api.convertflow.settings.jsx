@@ -43,7 +43,7 @@ export const loader = async ({ request }) => {
 };
 
 export const action = async ({ request }) => {
-  if (request.method !== "PUT") {
+  if (request.method !== "PUT" && request.method !== "DELETE" && request.method !== "PATCH") {
     return json({ error: "Method not allowed" }, { status: 405 });
   }
 
@@ -51,50 +51,129 @@ export const action = async ({ request }) => {
     const { session } = await authenticate.admin(request);
     const shopDomain = session.shop;
     const token = session.accessToken;
-    const { themeId, settings } = await request.json();
+    const { themeId, settings, templateKey, sectionId, order, globalSettings, insertIndex } = await request.json();
 
-    if (!themeId || !settings) {
-      return json({ error: "themeId and settings are required" }, { status: 400 });
+    if (!themeId) {
+      return json({ error: "themeId required" }, { status: 400 });
     }
 
     const assetUrl = `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json`;
 
-    // Read current settings_data.json (necessary to preserve other theme settings like colors/fonts)
-    const getResp = await shopifyFetchWithRetry(
+    // 1. Fetch config/settings_data.json
+    const sdResp = await shopifyFetchWithRetry(
       `${assetUrl}?asset[key]=${encodeURIComponent("config/settings_data.json")}`,
       { headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" } }
     );
 
-    let settingsData = { current: { sections: {} } };
-    if (getResp.ok) {
-      const getBody = await getResp.json();
-      settingsData = JSON.parse(getBody.asset?.value || "{}");
+    let sd = { current: { sections: {} } };
+    if (sdResp.ok) {
+      const getBody = await sdResp.json();
+      sd = JSON.parse(getBody.asset?.value || "{}");
     }
 
-    // Deep merge settings
-    if (!settingsData.current) settingsData.current = {};
-    if (!settingsData.current.sections) settingsData.current.sections = {};
+    // 2. Fetch active template file (e.g. templates/index.json)
+    let tpl = null;
+    if (templateKey) {
+      const tResp = await shopifyFetchWithRetry(
+        `${assetUrl}?asset[key]=${encodeURIComponent(templateKey)}`,
+        { headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" } }
+      );
+      if (tResp.ok) {
+        const getBody = await tResp.json();
+        tpl = JSON.parse(getBody.asset?.value || "{}");
+      }
+    }
 
-    settingsData.current.sections = {
-      ...settingsData.current.sections,
-      ...settings,
-    };
+    let sdUpdated = false;
+    let tplUpdated = false;
 
-    // Push updated settings_data.json
-    const putResp = await shopifyFetchWithRetry(assetUrl, {
-      method: "PUT",
-      headers: {
-        "X-Shopify-Access-Token": token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        asset: { key: "config/settings_data.json", value: JSON.stringify(settingsData) },
-      }),
-    });
+    // PATCH: Handle drag-and-drop reordering
+    if (request.method === "PATCH") {
+      if (tpl && order) {
+        tpl.order = order;
+        tplUpdated = true;
+      }
+    }
 
-    if (!putResp.ok) {
-      const errText = await putResp.text();
-      throw new Error(`Failed to save settings: ${putResp.status} ${errText}`);
+    // DELETE: Handle remove section
+    if (request.method === "DELETE") {
+      if (sectionId) {
+        if (tpl && tpl.sections && tpl.sections[sectionId]) {
+          delete tpl.sections[sectionId];
+          tpl.order = tpl.order.filter(id => id !== sectionId);
+          tplUpdated = true;
+        } else if (sd.current?.sections?.[sectionId]) {
+          delete sd.current.sections[sectionId];
+          sdUpdated = true;
+        }
+      }
+    }
+
+    // PUT: Route updates
+    if (request.method === "PUT") {
+      if (globalSettings) {
+        if (!sd.current) sd.current = {};
+        for (const [k, v] of Object.entries(globalSettings)) {
+          sd.current[k] = v;
+        }
+        sdUpdated = true;
+      }
+
+      if (settings) {
+        for (const [instanceId, instanceSettings] of Object.entries(settings)) {
+          if (sd.current?.sections?.[instanceId]) {
+            // Exists in settings_data.json
+            sd.current.sections[instanceId] = { ...sd.current.sections[instanceId], ...instanceSettings };
+            sdUpdated = true;
+          } else if (tpl && tpl.sections && tpl.sections[instanceId]) {
+            // Exists in JSON template
+            tpl.sections[instanceId] = { ...tpl.sections[instanceId], ...instanceSettings };
+            tplUpdated = true;
+          } else {
+            // Treat as new - guess by name
+            if (instanceId.includes("header") || instanceId.includes("footer") || instanceId.includes("announcement")) {
+              if (!sd.current) sd.current = {};
+              if (!sd.current.sections) sd.current.sections = {};
+              sd.current.sections[instanceId] = instanceSettings;
+              sdUpdated = true;
+            } else if (tpl) {
+              if (!tpl.sections) tpl.sections = {};
+              tpl.sections[instanceId] = instanceSettings;
+              if (tpl.order && !tpl.order.includes(instanceId)) {
+                if (typeof insertIndex === 'number') {
+                  tpl.order.splice(insertIndex, 0, instanceId);
+                } else {
+                  tpl.order.push(instanceId);
+                }
+              }
+              tplUpdated = true;
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Save updates back to Shopify
+    if (sdUpdated) {
+      const putResp = await shopifyFetchWithRetry(assetUrl, {
+        method: "PUT",
+        headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          asset: { key: "config/settings_data.json", value: JSON.stringify(sd) },
+        }),
+      });
+      if (!putResp.ok) throw new Error("Failed to save settings_data");
+    }
+
+    if (tplUpdated && templateKey && tpl) {
+      const putResp = await shopifyFetchWithRetry(assetUrl, {
+        method: "PUT",
+        headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          asset: { key: templateKey, value: JSON.stringify(tpl) },
+        }),
+      });
+      if (!putResp.ok) throw new Error("Failed to save template " + templateKey);
     }
 
     return json({ success: true, themeId });

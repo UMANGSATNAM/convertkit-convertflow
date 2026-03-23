@@ -38,6 +38,7 @@ export interface ShopifySchema {
 export interface ShopifySection {
   key: string;
   name: string;
+  disabled?: boolean;
   updated_at?: string;
   schema?: ShopifySchema;
   group: "header" | "template" | "footer";
@@ -75,9 +76,13 @@ export interface LeftSidebarProps {
   expandedSections: Record<string, boolean>;
   onSelectSection: (key: string) => void;
   onToggleExpand: (key: string) => void;
+  onToggleVisibility: (key: string) => void;
   onAddSection: (position: number, group: string) => void;
+  onReorderSections: (fromIdx: number, toIdx: number) => void;
   activeTab: "sections" | "settings";
   onTabChange: (tab: "sections" | "settings") => void;
+  themeSettings: Record<string, unknown>;
+  onThemeSettingChange: (groupIdx: number, settingId: string, value: unknown) => void;
 }
 
 export interface CenterPreviewProps {
@@ -98,6 +103,7 @@ export interface RightSettingsPanelProps {
   values: Record<string, unknown>;
   onChange: (settingId: string, value: unknown) => void;
   onBack: () => void;
+  onRemoveSection: (sectionKey: string) => void;
 }
 
 export interface SettingControlProps {
@@ -112,6 +118,7 @@ export interface AddSectionModalProps {
   sections: ShopifySection[];
   templates: ConvertKitTemplate[];
   onClose: () => void;
-  onSelectTemplate: (templateId: string) => void;
-  onSelectSection: (sectionKey: string) => void;
+  onSelectTemplate: (templateId: string, insertIndex?: number) => void;
+  onSelectSection: (sectionKey: string, insertIndex?: number) => void;
+  insertIndex?: number;
 }

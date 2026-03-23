@@ -7,6 +7,7 @@ const CATEGORIES: Array<{ key: string; label: string }> = [
   { key: "banner", label: "Promotional" },
   { key: "collection", label: "Collections" },
   { key: "social-proof", label: "Social proof" },
+  { key: "conversion", label: "Conversion Tools" },
   { key: "footer", label: "Footers" },
 ];
 
