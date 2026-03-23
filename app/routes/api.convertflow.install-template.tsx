@@ -6,7 +6,7 @@ import { getTemplateById } from "../data/convertkit-templates";
 
 export const action = async ({ request }: { request: Request }) => {
   try {
-    const { session } = await authenticate.admin(request);
+    const { admin, session } = await authenticate.admin(request);
     const shopDomain = session.shop;
     const token = session.accessToken;
     const { themeId, templateId, templateKey, insertIndex } = await request.json();
@@ -20,18 +20,18 @@ export const action = async ({ request }: { request: Request }) => {
       return json({ error: "Template not found: " + templateId }, { status: 404 });
     }
 
-    const assetUrl = \`https://\${shopDomain}/admin/api/2025-01/themes/\${themeId}/assets.json\`;
+    const assetUrl = `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json`;
 
     // 1. Create the new section liquid file
-    const newSectionKey = \`sections/ck-\${templateId}.liquid\`;
-    const fullLiquidCode = \`\${ckTemplate.liquidCode}
+    const newSectionKey = `sections/ck-${templateId}.liquid`;
+    const fullLiquidCode = `${ckTemplate.liquidCode}
 {% schema %}
-\${ckTemplate.schemaCode}
+${ckTemplate.schemaCode}
 {% endschema %}
 {% style %}
-\${ckTemplate.cssCode}
+${ckTemplate.cssCode}
 {% endstyle %}
-\`;
+`;
 
     const putAssetResp = await shopifyFetchWithRetry(assetUrl, {
       method: "PUT",
@@ -41,15 +41,15 @@ export const action = async ({ request }: { request: Request }) => {
       })
     });
 
-    if (!putAssetResp.ok) {
-      const err = await putAssetResp.json();
+    if (!putAssetResp || !putAssetResp.ok) {
+      const err = putAssetResp ? await putAssetResp.json() : "Unknown error";
       throw new Error("Failed to create section file: " + JSON.stringify(err));
     }
 
     // 2. Fetch the target JSON template
     let tpl: any;
     try {
-      const tplRaw = await fetchAsset({ graphql: session.graphql } as any, session, themeId, templateKey);
+      const tplRaw = await fetchAsset(admin as any, session, themeId, templateKey);
       tpl = JSON.parse(tplRaw);
     } catch (e) {
       throw new Error("Target template not found: " + templateKey);
@@ -59,10 +59,10 @@ export const action = async ({ request }: { request: Request }) => {
     if (!tpl.order) tpl.order = [];
 
     // 3. Generate a dynamic instance ID
-    const newInstanceId = \`ck_\${templateId}_\${Math.random().toString(36).slice(-6)}\`;
+    const newInstanceId = `ck_${templateId}_${Math.random().toString(36).slice(-6)}`;
 
     tpl.sections[newInstanceId] = {
-      type: \`ck-\${templateId}\`,
+      type: `ck-${templateId}`,
       settings: {}
     };
 
@@ -82,7 +82,7 @@ export const action = async ({ request }: { request: Request }) => {
       })
     });
 
-    if (!putTplResp.ok) {
+    if (!putTplResp || !putTplResp.ok) {
       throw new Error("Failed to save updated JSON template");
     }
 
