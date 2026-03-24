@@ -12,6 +12,8 @@ const PAGES = [
 export default function TopBar({
   currentPage, onPageChange,
   hasChanges, saving, onSave,
+  canUndo, canRedo, onUndo, onRedo,
+  isPreviewMode, onTogglePreview
 }: TopBarProps) {
   const [pageDropdownOpen, setPageDropdownOpen] = useState(false);
   const currentLabel = PAGES.find((p) => p.value === currentPage)?.label || "Home page";
@@ -120,18 +122,20 @@ export default function TopBar({
       {/* ── Right: Actions ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, width: "33.33%" }}>
         {/* Undo */}
-        <button style={iconBtnStyle} title="Undo"
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+        <button style={{ ...iconBtnStyle, opacity: canUndo ? 1 : 0.3, cursor: canUndo ? "pointer" : "not-allowed" }}
+          title="Undo" onClick={canUndo ? onUndo : undefined}
+          onMouseEnter={(e) => { if (canUndo) e.currentTarget.style.background = "#2E2E38"; }}
+          onMouseLeave={(e) => { if (canUndo) e.currentTarget.style.background = "transparent"; }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 7v6h6" /><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
           </svg>
         </button>
         {/* Redo */}
-        <button style={iconBtnStyle} title="Redo"
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+        <button style={{ ...iconBtnStyle, opacity: canRedo ? 1 : 0.3, cursor: canRedo ? "pointer" : "not-allowed" }}
+          title="Redo" onClick={canRedo ? onRedo : undefined}
+          onMouseEnter={(e) => { if (canRedo) e.currentTarget.style.background = "#2E2E38"; }}
+          onMouseLeave={(e) => { if (canRedo) e.currentTarget.style.background = "transparent"; }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" />
@@ -141,17 +145,19 @@ export default function TopBar({
         <div style={{ height: 16, width: 1, background: "#2A2A35", margin: "0 4px" }} />
 
         {/* Preview */}
-        <button style={{
-          ...iconBtnStyle, padding: "0 12px", gap: 8, fontSize: 12, fontWeight: 500, color: "#9CA3AF",
-          width: "auto", fontFamily: "inherit",
-        }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; e.currentTarget.style.color = "#fff"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9CA3AF"; }}
+        <button 
+          onClick={onTogglePreview}
+          style={{
+            ...iconBtnStyle, padding: "0 12px", gap: 8, fontSize: 12, fontWeight: 500, color: isPreviewMode ? "#fff" : "#9CA3AF",
+            width: "auto", fontFamily: "inherit", background: isPreviewMode ? "#5C6AC4" : "transparent"
+          }}
+          onMouseEnter={(e) => { if (!isPreviewMode) { e.currentTarget.style.background = "#2E2E38"; e.currentTarget.style.color = "#fff"; } }}
+          onMouseLeave={(e) => { if (!isPreviewMode) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9CA3AF"; } }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
           </svg>
-          Preview
+          {isPreviewMode ? "Exit Preview" : "Preview"}
         </button>
 
         {/* Save */}

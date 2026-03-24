@@ -38,30 +38,8 @@ export const loader = async ({ request }: { request: Request }) => {
     const themesData = await themesRes.json();
     const themesList = (themesData as any).data.themes.edges.map((e: any) => e.node);
     const mainTheme = themesList.find((t: any) => t.role === "MAIN");
-    const draftTheme = themesList.find((t: any) => t.name.includes("ConvertFlow Draft"));
     
-    if (!draftTheme && mainTheme) {
-      const mainThemeId = mainTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
-      const createRes = await shopifyFetchWithRetry(`https://${shopDomain}/admin/api/2025-01/themes.json`, {
-        method: "POST",
-        headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          theme: { name: "ConvertFlow Draft", role: "unpublished" },
-          source_theme_id: parseInt(mainThemeId)
-        })
-      });
-      if (createRes?.ok) {
-        const createData = await createRes.json();
-        themeId = createData.theme.id.toString();
-        themeName = createData.theme.name;
-      } else {
-        themeId = mainThemeId;
-        themeName = mainTheme.name;
-      }
-    } else if (draftTheme) {
-      themeId = draftTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
-      themeName = draftTheme.name;
-    } else if (mainTheme) {
+    if (mainTheme) {
       themeId = mainTheme.id.replace("gid://shopify/OnlineStoreTheme/", "");
       themeName = mainTheme.name;
     }
@@ -130,7 +108,7 @@ function categorizeSections(
 
 // ── Component ──
 export default function ConvertFlowEditor() {
-  const { shopDomain, themeId, passwordEnabled, sections, sectionSchemas, settingsData, templates } = useLoaderData<typeof loader>();
+  const { shopDomain, themeId, themeName, passwordEnabled, sections, sectionSchemas, settingsData, templates } = useLoaderData<typeof loader>();
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
   const [pageInstances, setPageInstances] = useState<Array<{ id: string; type: string }>>([]);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -146,8 +124,15 @@ export default function ConvertFlowEditor() {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [addModalPos, setAddModalPos] = useState({ top: 200, left: 100 });
   const [addModalInsertIndex, setAddModalInsertIndex] = useState<number | undefined>();
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const proxyIframeRef = useRef<HTMLIFrameElement | null>(null);
   const settingsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Undo/Redo State
+  const [history, setHistory] = useState<{
+    past: Array<{ settings: any, themeSettings: any, instances: any }>;
+    future: Array<{ settings: any, themeSettings: any, instances: any }>;
+  }>({ past: [], future: [] });
 
   const { header, template, footer } = categorizeSections(sections, sectionSchemas);
 
@@ -164,6 +149,48 @@ export default function ConvertFlowEditor() {
   const sendToIframe = useCallback((msg: unknown) => {
     proxyIframeRef.current?.contentWindow?.postMessage(msg, "*");
   }, []);
+
+  const pushHistory = useCallback((nextSettings: any, nextThemeSettings: any, nextInstances: any) => {
+    setHistory(prev => {
+      const newPast = [...prev.past, { settings: settingValues, themeSettings: themeSettingValues, instances: pageInstances }];
+      if (newPast.length > 50) newPast.shift(); // Limit to 50 steps
+      return { past: newPast, future: [] };
+    });
+  }, [settingValues, themeSettingValues, pageInstances]);
+
+  const handleUndo = useCallback(() => {
+    setHistory(prev => {
+      if (prev.past.length === 0) return prev;
+      const previous = prev.past[prev.past.length - 1];
+      const newPast = prev.past.slice(0, -1);
+      setSettingValues(previous.settings);
+      setThemeSettingValues(previous.themeSettings);
+      setPageInstances(previous.instances);
+      setHasChanges(true);
+      sendToIframe({ type: "CK_RELOAD_PAGE" });
+      return {
+        past: newPast,
+        future: [{ settings: settingValues, themeSettings: themeSettingValues, instances: pageInstances }, ...prev.future]
+      };
+    });
+  }, [settingValues, themeSettingValues, pageInstances, sendToIframe]);
+
+  const handleRedo = useCallback(() => {
+    setHistory(prev => {
+      if (prev.future.length === 0) return prev;
+      const next = prev.future[0];
+      const newFuture = prev.future.slice(1);
+      setSettingValues(next.settings);
+      setThemeSettingValues(next.themeSettings);
+      setPageInstances(next.instances);
+      setHasChanges(true);
+      sendToIframe({ type: "CK_RELOAD_PAGE" });
+      return {
+        past: [...prev.past, { settings: settingValues, themeSettings: themeSettingValues, instances: pageInstances }],
+        future: newFuture
+      };
+    });
+  }, [settingValues, themeSettingValues, pageInstances, sendToIframe]);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -209,6 +236,7 @@ export default function ConvertFlowEditor() {
         ...prev,
         [instanceId]: { ...((prev[instanceId] as Record<string, unknown>) || {}), [settingId]: value },
       };
+      pushHistory(next, themeSettingValues, pageInstances);
       
       let tKey = "templates/index.json";
       if (currentPage.includes("/products/")) tKey = "templates/product.json";
@@ -218,30 +246,20 @@ export default function ConvertFlowEditor() {
 
       if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
       settingsDebounceRef.current = setTimeout(async () => {
-        // Instant CSS injection
         sendToIframe({ type: "CK_INJECT_CSS", settingId, value });
-        
-        // Auto-save to draft theme for Section Rendering API to pick it up
         try {
           await fetch("/api/convertflow/settings", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              themeId, 
-              settings: { [instanceId]: next[instanceId] },
-              templateKey: tKey 
-            }),
+            body: JSON.stringify({ themeId, settings: { [instanceId]: next[instanceId] }, templateKey: tKey }),
           });
-          // Dispatch Hot-Swap reload mapped to the inspector script
           sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: instanceId });
-        } catch (e) {
-          console.error("Auto-save failed", e);
-        }
+        } catch (e) { console.error("Auto-save failed", e); }
       }, 500);
       
       return next;
     });
-  }, [selectedSectionKey, sendToIframe, themeId, currentPage]);
+  }, [selectedSectionKey, sendToIframe, themeId, currentPage, pushHistory, themeSettingValues, pageInstances]);
 
   const selectedSection: SelectedSectionState | null = selectedSectionKey
     ? (() => {
@@ -291,6 +309,10 @@ export default function ConvertFlowEditor() {
       const current = (prev[sectionKey] as Record<string, unknown>) || {};
       const nextDisabled = !(current.disabled === true);
       const next = { ...prev, [sectionKey]: { ...current, disabled: nextDisabled } };
+      pushHistory(next, themeSettingValues, pageInstances);
+
+      // Instant DOM visibility toggle
+      sendToIframe({ type: "CK_HIDE_SECTION", sectionId: sectionKey, hidden: nextDisabled });
 
       let tKey = "templates/index.json";
       if (currentPage.includes("/products/")) tKey = "templates/product.json";
@@ -304,19 +326,14 @@ export default function ConvertFlowEditor() {
           await fetch("/api/convertflow/settings", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              themeId, 
-              settings: { [sectionKey]: next[sectionKey] },
-              templateKey: tKey 
-            }),
+            body: JSON.stringify({ themeId, settings: { [sectionKey]: next[sectionKey] }, templateKey: tKey }),
           });
-          sendToIframe({ type: "CK_RELOAD_SECTION", sectionId: sectionKey });
         } catch (e) { console.error("Visibility toggle failed", e); }
       }, 500);
 
       return next;
     });
-  }, [themeId, currentPage, sendToIframe]);
+  }, [themeId, currentPage, sendToIframe, pushHistory, themeSettingValues, pageInstances]);
 
   const handleRemoveSection = useCallback(async (sectionKey: string) => {
     if (!confirm(`Remove this section? This action cannot be undone.`)) return;
@@ -350,7 +367,6 @@ export default function ConvertFlowEditor() {
     const [moved] = reordered.splice(fromIdx, 1);
     reordered.splice(toIdx, 0, moved);
 
-    // Optimistic update: swap pageInstances to match
     const templateInstances = pageInstances.filter((inst) => {
       const type = inst.type;
       const schemaKey = `sections/${type}.liquid`;
@@ -369,7 +385,14 @@ export default function ConvertFlowEditor() {
     const reorderedInstances = [...templateInstances];
     const [movedInst] = reorderedInstances.splice(fromIdx, 1);
     reorderedInstances.splice(toIdx, 0, movedInst);
-    setPageInstances([...nonTemplate, ...reorderedInstances]);
+    
+    const newInstances = [...nonTemplate, ...reorderedInstances];
+    pushHistory(settingValues, themeSettingValues, newInstances);
+    setPageInstances(newInstances);
+    setHasChanges(true);
+
+    // Instant DOM section move
+    sendToIframe({ type: "CK_MOVE_SECTION", fromId: movedInst.id, toId: reorderedInstances[toIdx === 0 ? 1 : toIdx - 1]?.id, appendAfter: toIdx !== 0 });
 
     let tKey = "templates/index.json";
     if (currentPage.includes("/products/")) tKey = "templates/product.json";
@@ -384,30 +407,29 @@ export default function ConvertFlowEditor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ themeId, templateKey: tKey, order: newOrder }),
       });
-      setIframeKey((k) => k + 1);
-    } catch (e) {
-      console.error("Reorder failed:", e);
-    }
-  }, [liveTemplate, pageInstances, sectionSchemas, themeId, currentPage]);
+    } catch (e) { console.error("Reorder failed:", e); }
+  }, [liveTemplate, pageInstances, sectionSchemas, themeId, currentPage, pushHistory, settingValues, themeSettingValues, sendToIframe]);
 
   const handleThemeSettingChange = useCallback((_groupIdx: number, settingId: string, value: unknown) => {
     setHasChanges(true);
-    setThemeSettingValues((prev) => ({ ...prev, [settingId]: value }));
+    setThemeSettingValues((prev) => {
+      const next = { ...prev, [settingId]: value };
+      pushHistory(settingValues, next, pageInstances);
 
-    if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
-    settingsDebounceRef.current = setTimeout(async () => {
-      try {
-        await fetch("/api/convertflow/settings", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ themeId, globalSettings: { [settingId]: value } }),
-        });
-        sendToIframe({ type: "CK_RELOAD_PAGE" });
-      } catch (e) {
-        console.error("Theme setting save failed:", e);
-      }
-    }, 800);
-  }, [themeId, sendToIframe]);
+      if (settingsDebounceRef.current) clearTimeout(settingsDebounceRef.current);
+      settingsDebounceRef.current = setTimeout(async () => {
+        try {
+          await fetch("/api/convertflow/settings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ themeId, globalSettings: { [settingId]: value } }),
+          });
+          sendToIframe({ type: "CK_RELOAD_PAGE" });
+        } catch (e) { console.error("Theme setting save failed:", e); }
+      }, 800);
+      return next;
+    });
+  }, [themeId, sendToIframe, pushHistory, settingValues, pageInstances]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -425,25 +447,34 @@ export default function ConvertFlowEditor() {
   return (
     <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", position: "fixed", inset: 0, zIndex: 999, background: "#e8e8e8" }}>
       <TopBar
+        shopDomain={shopDomain} themeName={themeName}
         currentPage={currentPage} onPageChange={handlePageChange}
         hasChanges={hasChanges} saving={saving} onSave={handleSave}
+        canUndo={history.past.length > 0} canRedo={history.future.length > 0}
+        onUndo={handleUndo} onRedo={handleRedo}
+        isPreviewMode={isPreviewMode} onTogglePreview={() => {
+          setIsPreviewMode(!isPreviewMode);
+          sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: isPreviewMode }); // If entering preview mode, disable inspector hover borders
+        }}
       />
       <div style={{ display: "flex", flex: 1, overflow: "hidden", background: "#1A1A1F" }}>
-        <LeftSidebar
-          headerSections={liveHeader} templateSections={liveTemplate} footerSections={liveFooter}
-          selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
-          onSelectSection={(key) => {
-            setSelectedSectionKey(key);
-            sendToIframe({ type: "CK_SELECT_SECTION", sectionId: key });
-          }}
-          onToggleExpand={(key) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }))}
-          onAddSection={handleAddSection}
-          onReorderSections={handleReorderSections}
-          onToggleVisibility={handleToggleVisibility}
-          activeTab={sidebarTab} onTabChange={setSidebarTab}
-          themeSettings={themeSettingValues}
-          onThemeSettingChange={handleThemeSettingChange}
-        />
+        {!isPreviewMode && (
+          <LeftSidebar
+            headerSections={liveHeader} templateSections={liveTemplate} footerSections={liveFooter}
+            selectedSectionKey={selectedSectionKey} expandedSections={expandedSections}
+            onSelectSection={(key) => {
+              setSelectedSectionKey(key);
+              sendToIframe({ type: "CK_SELECT_SECTION", sectionId: key });
+            }}
+            onToggleExpand={(key) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }))}
+            onAddSection={handleAddSection}
+            onReorderSections={handleReorderSections}
+            onToggleVisibility={handleToggleVisibility}
+            activeTab={sidebarTab} onTabChange={setSidebarTab}
+            themeSettings={themeSettingValues}
+            onThemeSettingChange={handleThemeSettingChange}
+          />
+        )}
         <CenterPreview
           shopDomain={shopDomain} themeId={themeId} currentPath={currentPage} viewport={viewport}
           onViewportChange={setViewport}
@@ -451,11 +482,13 @@ export default function ConvertFlowEditor() {
           iframeKey={iframeKey} iframeLoading={iframeLoading}
           onIframeLoad={() => setIframeLoading(false)}
         />
-        <RightSettingsPanel
-          selectedSection={selectedSection} values={settingValues}
-          onChange={handleSettingChange} onBack={() => setSelectedSectionKey(null)}
-          onRemoveSection={handleRemoveSection}
-        />
+        {!isPreviewMode && (
+          <RightSettingsPanel
+            selectedSection={selectedSection} values={settingValues}
+            onChange={handleSettingChange} onBack={() => setSelectedSectionKey(null)}
+            onRemoveSection={handleRemoveSection}
+          />
+        )}
       </div>
       <AddSectionModal
         visible={addModalVisible} position={addModalPos}

@@ -61,11 +61,19 @@ export interface SelectedSectionState {
 }
 
 export interface TopBarProps {
+  shopDomain?: string;
+  themeName?: string;
   currentPage: string;
   onPageChange: (page: string) => void;
   hasChanges: boolean;
   saving: boolean;
   onSave: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  isPreviewMode?: boolean;
+  onTogglePreview?: () => void;
 }
 
 export interface LeftSidebarProps {

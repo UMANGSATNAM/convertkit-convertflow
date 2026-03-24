@@ -51,9 +51,8 @@ export const loader = async ({ request }) => {
     try {
       const themesResp = await admin.graphql(`query { themes(first: 10) { edges { node { id name role } } } }`);
       const themesData = await themesResp.json();
-      const draftTheme = themesData.data.themes.edges.find((e) => e.node.name.includes("ConvertFlow Draft"))?.node;
       const activeTheme = themesData.data.themes.edges.find((e) => e.node.role === "MAIN")?.node;
-      themeId = draftTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
+      themeId = activeTheme?.id?.replace("gid://shopify/OnlineStoreTheme/", "") || "";
     } catch (e) {
       console.warn("Theme fetch failed:", e.message);
     }

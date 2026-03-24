@@ -184,6 +184,54 @@
         }
         break;
 
+      case "CK_HIDE_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.style.display = e.data.hidden ? "none" : "";
+            if (activeSection && activeSection.sectionId === e.data.sectionId && e.data.hidden) {
+              hideOverlay();
+            }
+          }
+        }
+        break;
+
+      case "CK_MOVE_SECTION":
+        if (e.data.fromId && e.data.toId) {
+          var fromNode = document.getElementById("shopify-section-" + e.data.fromId);
+          var toNode = document.getElementById("shopify-section-" + e.data.toId);
+          
+          if (!fromNode || !toNode) {
+            var allS = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var m = 0; m < allS.length; m++) {
+              if (allS[m].id.indexOf(e.data.fromId) > -1) fromNode = allS[m];
+              if (allS[m].id.indexOf(e.data.toId) > -1) toNode = allS[m];
+            }
+          }
+
+          if (fromNode && toNode && fromNode !== toNode) {
+            fromNode.parentNode.removeChild(fromNode);
+            if (e.data.appendAfter) {
+              toNode.insertAdjacentElement('afterend', fromNode);
+            } else {
+              toNode.insertAdjacentElement('beforebegin', fromNode);
+            }
+            if (activeSection && activeSection.sectionId === e.data.fromId) {
+               positionOverlay(fromNode.getBoundingClientRect());
+            }
+          }
+        }
+        break;
+
       case "CK_RELOAD_SECTION":
         if (e.data.sectionId) {
           var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
