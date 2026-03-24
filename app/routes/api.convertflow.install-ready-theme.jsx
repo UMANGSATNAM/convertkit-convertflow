@@ -21,8 +21,8 @@ export const action = async ({ request }) => {
 
   try {
     const MUTATION = `
-      mutation themeCreate($src: URL!, $name: String!, $role: ThemeRole!) {
-        themeCreate(src: $src, name: $name, role: $role) {
+      mutation themeCreate($source: URL!, $name: String!, $role: ThemeRole!) {
+        themeCreate(source: $source, name: $name, role: $role) {
           theme {
             id
             name
@@ -38,7 +38,7 @@ export const action = async ({ request }) => {
 
     const response = await admin.graphql(MUTATION, {
       variables: {
-        src: fullThemeUrl,
+        source: fullThemeUrl,
         name: themeName,
         role: "UNPUBLISHED",
       },
