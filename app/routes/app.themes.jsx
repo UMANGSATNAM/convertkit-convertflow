@@ -52,6 +52,17 @@ export default function Themes() {
     );
   };
 
+  const readyThemeFetcher = useFetcher();
+  const installingReadyTheme = readyThemeFetcher.state !== "idle";
+  const readyThemeResult = readyThemeFetcher.data;
+
+  const installReadyTheme = (path, name) => {
+    readyThemeFetcher.submit(
+      { themePath: path, themeName: name },
+      { method: "POST", action: "/api/convertflow/install-ready-theme" }
+    );
+  };
+
   return (
     <Page title="Themes">
       <TitleBar title="Theme Presets" />
@@ -155,6 +166,71 @@ export default function Themes() {
             );
           })}
         </Grid>
+
+        <Box paddingBlockStart="800">
+          <Text as="h2" variant="headingLg">Ready-Made Full Themes</Text>
+          <Box paddingBlockStart="200">
+            <Text as="p" variant="bodyMd" tone="subdued">
+              Install a complete, structurally customized Shopify theme packed with ConvertFlow features natively built-in.
+            </Text>
+          </Box>
+        </Box>
+
+        {readyThemeResult?.success && (
+          <Banner tone="success" onDismiss={() => {}}>
+            <p>
+              Theme <strong>{readyThemeResult.theme.name}</strong> has been successfully installed to your online store as a draft!
+            </p>
+          </Banner>
+        )}
+        
+        {readyThemeResult?.error && (
+          <Banner tone="critical" onDismiss={() => {}}>
+            <p>{readyThemeResult.error}</p>
+          </Banner>
+        )}
+
+        <Grid>
+          <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+            <Card>
+              <BlockStack gap="300">
+                <Box
+                  background="bg-surface"
+                  borderRadius="200"
+                  padding="400"
+                  minHeight="120px"
+                >
+                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #1f2937, #111827)", borderRadius: "8px", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center" }}>
+                    <Text as="span" variant="headingLg" tone="textInverse">Asian Footwears</Text>
+                  </div>
+                </Box>
+
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text as="h3" variant="headingMd">
+                    Asian Footwears v2
+                  </Text>
+                  <Badge tone="info">Premium</Badge>
+                </InlineStack>
+
+                <Badge>Apparel & Footwear</Badge>
+
+                <Text as="p" variant="bodySm" tone="subdued">
+                  A high-converting, modern storefront designed for dropshipping, apparel, and custom footwear brands. Powered natively by ConvertFlow UI blocks.
+                </Text>
+
+                <Button
+                  variant="primary"
+                  onClick={() => installReadyTheme("/themes/asian-footwears-shopify-theme-v2.zip", "Asian Footwears v2 - ConvertFlow")}
+                  loading={installingReadyTheme}
+                  disabled={installingReadyTheme}
+                >
+                  Install to Store
+                </Button>
+              </BlockStack>
+            </Card>
+          </Grid.Cell>
+        </Grid>
+
       </BlockStack>
     </Page>
   );
