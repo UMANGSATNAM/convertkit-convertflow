@@ -20,23 +20,41 @@ export const action = async ({ request }) => {
   const fullThemeUrl = `${url.protocol}//${url.host}${themePath}`;
 
   try {
-    const response = await admin.rest.post({
-      path: "themes",
-      data: {
-        theme: {
-          name: themeName,
-          src: fullThemeUrl,
-          role: "unpublished"
+    const MUTATION = `
+      mutation themeCreate($src: URL!, $name: String!, $role: ThemeRole!) {
+        themeCreate(src: $src, name: $name, role: $role) {
+          theme {
+            id
+            name
+            role
+          }
+          userErrors {
+            field
+            message
+          }
         }
       }
+    `;
+
+    const response = await admin.graphql(MUTATION, {
+      variables: {
+        src: fullThemeUrl,
+        name: themeName,
+        role: "UNPUBLISHED",
+      },
     });
 
-    const data = await response.json();
-    if (data.errors) {
-       return json({ error: JSON.stringify(data.errors) }, { status: 400 });
+    const body = await response.json();
+
+    if (body.data?.themeCreate?.userErrors?.length > 0) {
+      return json({ error: body.data.themeCreate.userErrors[0].message }, { status: 400 });
     }
 
-    return json({ success: true, theme: data.theme });
+    if (!body.data?.themeCreate?.theme) {
+       return json({ error: "Failed to create theme via GraphQL" }, { status: 400 });
+    }
+
+    return json({ success: true, theme: body.data.themeCreate.theme });
   } catch (error) {
     console.error("Install ready theme error:", error.message);
     return json({ error: `Failed to install theme: ${error.message}` }, { status: 500 });
