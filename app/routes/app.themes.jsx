@@ -191,104 +191,120 @@ export default function Themes() {
         )}
 
         <Grid>
-          <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-            <Card>
-              <BlockStack gap="300">
-                <Box
-                  background="bg-surface"
-                  borderRadius="200"
-                  padding="400"
-                  minHeight="120px"
-                >
-                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #1f2937, #111827)", borderRadius: "8px", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center" }}>
-                    <Text as="span" variant="headingLg" tone="textInverse">Asian Footwears</Text>
-                  </div>
-                </Box>
-
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="h3" variant="headingMd">
-                    Asian Footwears v2
-                  </Text>
-                  <Badge tone="info">Premium</Badge>
-                </InlineStack>
-
-                <Badge>Apparel & Footwear</Badge>
-
-                <Text as="p" variant="bodySm" tone="subdued">
-                  A high-converting, modern storefront designed for dropshipping, apparel, and custom footwear brands. Powered natively by ConvertFlow UI blocks.
-                </Text>
-
-                <Button
-                  variant="primary"
-                  onClick={() => installReadyTheme("/themes/asian-footwears-shopify-theme-v2.zip", "Asian Footwears v2 - ConvertFlow")}
-                  loading={installingReadyTheme}
-                  disabled={installingReadyTheme}
-                >
-                  Install to Store
-                </Button>
-              </BlockStack>
-            </Card>
-          </Grid.Cell>
-
-          <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-            <Card>
-              <BlockStack gap="300">
-                <Box background="bg-surface" borderRadius="200" padding="400" minHeight="120px">
-                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #111111, #D4AF37)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Text as="span" variant="headingLg" tone="textInverse">Aura Luxe</Text>
-                  </div>
-                </Box>
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="h3" variant="headingMd">Luxe Fashion</Text>
-                  <Badge tone="success">50% CVR</Badge>
-                </InlineStack>
-                <Badge>High-End Apparel</Badge>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Minimalist high-end luxury theme featuring Playfair Display, Off-White palettes, and high-urgency layout triggers.
-                </Text>
-                <Button
-                  variant="primary"
-                  onClick={() => installReadyTheme("/themes/luxe-fashion-theme-v1.zip", "Aura Luxe Fashion - ConvertFlow")}
-                  loading={installingReadyTheme}
-                  disabled={installingReadyTheme}
-                >
-                  Install to Store
-                </Button>
-              </BlockStack>
-            </Card>
-          </Grid.Cell>
-
-          <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-            <Card>
-              <BlockStack gap="300">
-                <Box background="bg-surface" borderRadius="200" padding="400" minHeight="120px">
-                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #FF3366, #CCFF00)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Text as="span" variant="headingLg" style={{ color: "black" }}>Streetwear</Text>
-                  </div>
-                </Box>
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="h3" variant="headingMd">Velocity Streetwear</Text>
-                  <Badge tone="success">50% CVR</Badge>
-                </InlineStack>
-                <Badge>Sneakers & Hype</Badge>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Bold hypebeast theme built for velocity. Neon accents, aggressive Oswald font, and max-urgency conversion timers.
-                </Text>
-                <Button
-                  variant="primary"
-                  onClick={() => installReadyTheme("/themes/velocity-streetwear-theme-v1.zip", "Velocity Streetwear - ConvertFlow")}
-                  loading={installingReadyTheme}
-                  disabled={installingReadyTheme}
-                >
-                  Install to Store
-                </Button>
-              </BlockStack>
-            </Card>
-          </Grid.Cell>
-
+          <ReadyThemeCard
+            title="Asian Footwears v2"
+            subtitle="Asian Footwears"
+            badge="Premium"
+            badgeTone="info"
+            category="Apparel & Footwear"
+            description="A high-converting, modern storefront designed for dropshipping, apparel, and custom footwear brands. Powered natively by ConvertFlow UI blocks."
+            gradient="linear-gradient(135deg, #1f2937, #111827)"
+            textColor="textInverse"
+            themePath="/themes/asian-footwears-shopify-theme-v4.zip"
+            themeName="Asian Footwears v2 - ConvertFlow"
+          />
+          <ReadyThemeCard
+            title="Luxe Fashion"
+            subtitle="Aura Luxe"
+            badge="50% CVR"
+            badgeTone="success"
+            category="High-End Apparel"
+            description="Minimalist high-end luxury theme featuring Playfair Display, Off-White palettes, and high-urgency layout triggers."
+            gradient="linear-gradient(135deg, #111111, #D4AF37)"
+            textColor="textInverse"
+            themePath="/themes/luxe-fashion-theme-v2.zip"
+            themeName="Aura Luxe Fashion - ConvertFlow"
+          />
+          <ReadyThemeCard
+            title="Velocity Streetwear"
+            subtitle="Streetwear"
+            badge="50% CVR"
+            badgeTone="success"
+            category="Sneakers & Hype"
+            description="Bold hypebeast theme built for velocity. Neon accents, aggressive Oswald font, and max-urgency conversion timers."
+            gradient="linear-gradient(135deg, #FF3366, #CCFF00)"
+            textColor="black"
+            themePath="/themes/velocity-streetwear-theme-v2.zip"
+            themeName="Velocity Streetwear - ConvertFlow"
+          />
         </Grid>
-
       </BlockStack>
     </Page>
+  );
+}
+
+function ReadyThemeCard({
+  title,
+  subtitle,
+  badge,
+  badgeTone,
+  category,
+  description,
+  gradient,
+  textColor,
+  themePath,
+  themeName,
+}) {
+  const fetcher = useFetcher();
+  const isInstalling = fetcher.state !== "idle";
+
+  const installReadyTheme = (path, name) => {
+    fetcher.submit(
+      { themePath: path, themeName: name },
+      { method: "POST", action: "/api/convertflow/install-ready-theme" }
+    );
+  };
+
+  return (
+    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+      <Card>
+        <BlockStack gap="300">
+          <Box
+            background="bg-surface"
+            borderRadius="200"
+            padding="400"
+            minHeight="120px"
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                background: gradient,
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text as="span" variant="headingLg" tone={textColor === "black" ? undefined : textColor} style={textColor === "black" ? { color: "black" } : {}}>
+                {subtitle}
+              </Text>
+            </div>
+          </Box>
+
+          <InlineStack align="space-between" blockAlign="center">
+            <Text as="h3" variant="headingMd">
+              {title}
+            </Text>
+            <Badge tone={badgeTone}>{badge}</Badge>
+          </InlineStack>
+
+          <Badge>{category}</Badge>
+
+          <Text as="p" variant="bodySm" tone="subdued">
+            {description}
+          </Text>
+
+          <Button
+            variant="primary"
+            onClick={() => installReadyTheme(themePath, themeName)}
+            loading={isInstalling}
+            disabled={isInstalling}
+          >
+            Install to Store
+          </Button>
+        </BlockStack>
+      </Card>
+    </Grid.Cell>
   );
 }

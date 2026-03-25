@@ -15,9 +15,26 @@ export const action = async ({ request }) => {
     return json({ error: "Missing theme path or name" }, { status: 400 });
   }
 
-  // Determine the base URL of this request to build the full absolute URL required by Shopify
-  const url = new URL(request.url);
-  const fullThemeUrl = `${url.protocol}//${url.host}${themePath}`;
+  // Build the absolute base URL that Shopify can reach.
+  // Priority 1: SHOPIFY_APP_URL env var (clean any stray quotes)
+  // Priority 2: X-Forwarded-Host + X-Forwarded-Proto (used by Railway/Cloudflare proxies)
+  // Priority 3: Fallback to request.url host
+  let baseUrl = (process.env.SHOPIFY_APP_URL || "").replace(/['"]/g, "").replace(/\/$/, "");
+
+  if (!baseUrl.startsWith("http")) {
+    // Try forwarded headers from the proxy (Railway sets these)
+    const forwardedHost = request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    if (forwardedHost) {
+      baseUrl = `${forwardedProto}://${forwardedHost}`.replace(/\/$/, "");
+    } else {
+      const reqUrl = new URL(request.url);
+      baseUrl = `${reqUrl.protocol}//${reqUrl.host}`;
+    }
+  }
+
+  const fullThemeUrl = `${baseUrl}${themePath.startsWith("/") ? themePath : "/" + themePath}`;
+  console.log("[THEME INSTALL] base:", baseUrl, "| full URL:", fullThemeUrl);
 
   try {
     const MUTATION = `
