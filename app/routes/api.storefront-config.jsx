@@ -55,9 +55,17 @@ export const loader = async ({ request }) => {
       throw new Error("Shop not found");
     }
 
-    // Parse settings for upsell
+    // Parse settings for upsell rules
     const settings = shop.settings ? JSON.parse(shop.settings) : {};
-    const upsell = settings.upsell || { isActive: false };
+    // Support both array (new) and singular (legacy) format
+    let upsellRules = settings.upsells || [];
+    if (!Array.isArray(upsellRules) || upsellRules.length === 0) {
+      if (settings.upsell) {
+        upsellRules = [settings.upsell];
+      }
+    }
+    // Filter only active rules
+    const activeUpsellRules = upsellRules.filter((r) => r.isActive !== false);
 
     // Fetch urgency configs
     const timers = await prisma.urgencyTimer.findMany({
@@ -71,8 +79,8 @@ export const loader = async ({ request }) => {
     });
 
     const config = {
-      stickyCart: true, // Always enabled if script tag is present
-      upsell,
+      stickyCart: true,
+      upsellRules: activeUpsellRules,
       urgency: {
         scarcity: null,
         countdown: null,

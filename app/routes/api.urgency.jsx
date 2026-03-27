@@ -14,8 +14,15 @@ export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
 
   try {
+    const shop = await prisma.shop.findUnique({
+      where: { shopDomain: session.shop },
+      select: { id: true },
+    });
+
+    if (!shop) return json({ timers: [], error: "Shop not found" });
+
     const timers = await prisma.urgencyTimer.findMany({
-      where: { shopId: session.shop },
+      where: { shopId: shop.id },
     });
     return json({ timers });
   } catch (e) {
@@ -27,7 +34,7 @@ export const action = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const formData = await request.formData();
 
-  const toolType = formData.get("toolType"); // countdown | scarcity | banner | buyer | threshold
+  const toolType = formData.get("toolType");
   const isActive = formData.get("isActive") === "true";
   const message = formData.get("message") || null;
   const deadline = formData.get("deadline") || null;
@@ -40,9 +47,21 @@ export const action = async ({ request }) => {
   }
 
   try {
+    // Look up shop by domain to get the cuid
+    const shop = await prisma.shop.findUnique({
+      where: { shopDomain: session.shop },
+      select: { id: true },
+    });
+
+    if (!shop) {
+      return json({ error: "Shop not found" }, { status: 404 });
+    }
+
+    const shopId = shop.id;
+
     // Upsert: one config per tool type per shop
     const existingTimer = await prisma.urgencyTimer.findFirst({
-      where: { shopId: session.shop, displayType: toolType },
+      where: { shopId, displayType: toolType },
     });
 
     let timer;
@@ -61,7 +80,7 @@ export const action = async ({ request }) => {
     } else {
       timer = await prisma.urgencyTimer.create({
         data: {
-          shopId: session.shop,
+          shopId,
           isActive,
           message,
           deadline: deadline ? new Date(deadline) : null,

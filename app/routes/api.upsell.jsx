@@ -2,69 +2,81 @@ import { json } from "@remix-run/node";
 import prisma from "../db.server";
 
 /**
- * GET /api/upsell?product=<productId>
- * Returns a recommended upsell product for the given product.
- * Uses simple collection-based recommendation:
- *   1. Find which collection the product belongs to
- *   2. Return another available product from the same collection
- *   3. Never recommend the same product
+ * GET /api/upsell?product=<productHandle>&shop=<shopDomain>
+ * Returns a matching upsell offer for the given trigger product.
+ * Reads from settings.upsells (array) with settings.upsell (single) as fallback.
  */
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
-  const productId = url.searchParams.get("product");
+  const productHandle = url.searchParams.get("product");
   const shopDomain = url.searchParams.get("shop");
 
-  if (!productId) {
-    return json({ upsellProduct: null }, {
-      headers: { "Access-Control-Allow-Origin": "*" },
-    });
+  const corsHeaders = { "Access-Control-Allow-Origin": "*" };
+
+  if (!productHandle || !shopDomain) {
+    return json({ upsellProduct: null }, { headers: corsHeaders });
   }
 
   try {
-    // Look up shop settings for upsell configuration
-    let upsellConfig = null;
-    if (shopDomain) {
-      const shop = await prisma.shop.findUnique({
-        where: { shopDomain },
-        select: { settings: true },
-      });
-      if (shop?.settings) {
-        const settings = JSON.parse(shop.settings);
-        upsellConfig = settings.upsell;
-      }
-    }
-
-    // If merchant has a specific upsell product configured, use that
-    if (upsellConfig?.offerHandle) {
-      // Fetch the offer product via Storefront API (public endpoint)
-      const productUrl = `https://${shopDomain}/products/${upsellConfig.offerHandle}.js`;
-      const resp = await fetch(productUrl);
-      if (resp.ok) {
-        const product = await resp.json();
-        const firstAvailableVariant = product.variants.find(v => v.available);
-        if (firstAvailableVariant) {
-          return json({
-            upsellProduct: {
-              title: product.title,
-              image_url: product.images?.[0] || "",
-              price: firstAvailableVariant.price,
-              variant_id: firstAvailableVariant.id,
-              handle: product.handle,
-            },
-          }, {
-            headers: { "Access-Control-Allow-Origin": "*" },
-          });
-        }
-      }
-    }
-
-    return json({ upsellProduct: null }, {
-      headers: { "Access-Control-Allow-Origin": "*" },
+    const shop = await prisma.shop.findUnique({
+      where: { shopDomain },
+      select: { settings: true },
     });
+
+    if (!shop?.settings) {
+      return json({ upsellProduct: null }, { headers: corsHeaders });
+    }
+
+    const settings = JSON.parse(shop.settings);
+
+    // Support both array format (new) and singular object (legacy)
+    let rules = settings.upsells || [];
+    if (!Array.isArray(rules) || rules.length === 0) {
+      if (settings.upsell) {
+        rules = [settings.upsell];
+      }
+    }
+
+    // Find a matching rule for the trigger product
+    const matchedRule = rules.find(
+      (r) => r.isActive !== false && r.triggerHandle === productHandle
+    );
+
+    if (!matchedRule?.offerHandle) {
+      return json({ upsellProduct: null }, { headers: corsHeaders });
+    }
+
+    // Fetch the offer product from storefront
+    const productUrl = `https://${shopDomain}/products/${matchedRule.offerHandle}.js`;
+    const resp = await fetch(productUrl);
+
+    if (!resp.ok) {
+      return json({ upsellProduct: null }, { headers: corsHeaders });
+    }
+
+    const product = await resp.json();
+    const firstAvailableVariant = product.variants.find((v) => v.available);
+
+    if (!firstAvailableVariant) {
+      return json({ upsellProduct: null }, { headers: corsHeaders });
+    }
+
+    return json(
+      {
+        upsellProduct: {
+          title: product.title,
+          image_url: product.images?.[0] || "",
+          price: firstAvailableVariant.price,
+          variant_id: firstAvailableVariant.id,
+          handle: product.handle,
+          discountText: matchedRule.discountText || "",
+          popupTitle: matchedRule.title || "Complete your order",
+        },
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
     console.error("Upsell API error:", error);
-    return json({ upsellProduct: null }, {
-      headers: { "Access-Control-Allow-Origin": "*" },
-    });
+    return json({ upsellProduct: null }, { headers: corsHeaders });
   }
 };

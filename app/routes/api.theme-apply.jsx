@@ -78,31 +78,39 @@ export const action = async ({ request }) => {
 
     // ── Step 5: Record in database ──
     try {
-      // Deactivate previous themes for this shop
-      await prisma.theme.updateMany({
-        where: { shopId: session.shop, isActive: true },
-        data: { isActive: false },
+      // Look up shop by domain to get cuid
+      const shop = await prisma.shop.findUnique({
+        where: { shopDomain: session.shop },
+        select: { id: true },
       });
 
-      // Upsert the theme record
-      await prisma.theme.upsert({
-        where: {
-          id: `${session.shop}-${themeName}`,
-        },
-        update: {
-          isActive: true,
-          appliedAt: new Date(),
-          cssVariables: JSON.stringify(THEME_PRESETS[themeName].variables),
-        },
-        create: {
-          id: `${session.shop}-${themeName}`,
-          shopId: session.shop,
-          name: themeName,
-          isActive: true,
-          appliedAt: new Date(),
-          cssVariables: JSON.stringify(THEME_PRESETS[themeName].variables),
-        },
-      });
+      if (shop) {
+        // Deactivate previous themes for this shop
+        await prisma.theme.updateMany({
+          where: { shopId: shop.id, isActive: true },
+          data: { isActive: false },
+        });
+
+        // Upsert the theme record
+        await prisma.theme.upsert({
+          where: {
+            id: `${shop.id}-${themeName}`,
+          },
+          update: {
+            isActive: true,
+            appliedAt: new Date(),
+            cssVariables: JSON.stringify(THEME_PRESETS[themeName].variables),
+          },
+          create: {
+            id: `${shop.id}-${themeName}`,
+            shopId: shop.id,
+            name: themeName,
+            isActive: true,
+            appliedAt: new Date(),
+            cssVariables: JSON.stringify(THEME_PRESETS[themeName].variables),
+          },
+        });
+      }
     } catch (dbErr) {
       // DB write is non-critical — theme was still applied to storefront
       console.error("Theme DB write failed:", dbErr.message);

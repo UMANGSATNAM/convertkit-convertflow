@@ -10,7 +10,13 @@ export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   let timers = [];
   try {
-    timers = await prisma.urgencyTimer.findMany({ where: { shopId: session.shop } });
+    const shop = await prisma.shop.findUnique({
+      where: { shopDomain: session.shop },
+      select: { id: true },
+    });
+    if (shop) {
+      timers = await prisma.urgencyTimer.findMany({ where: { shopId: shop.id } });
+    }
   } catch {}
   const configMap = {};
   for (const t of timers) {
