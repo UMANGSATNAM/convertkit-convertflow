@@ -1,5 +1,6 @@
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
+import { rateLimit } from "../utils/security.server";
 
 /**
  * API Route: /api/storefront-config
@@ -33,6 +34,12 @@ export const loader = async ({ request }) => {
     return json({ error: "Missing shop parameter" }, { status: 400 });
   }
 
+  // Rate limit per shop
+  const { allowed } = rateLimit(`config:${shopDomain}`, 60, 60_000);
+  if (!allowed) {
+    return json({ error: "Rate limit exceeded" }, { status: 429, headers: { "Access-Control-Allow-Origin": "*" } });
+  }
+
   // Check cache
   const cached = getCached(`config:${shopDomain}`);
   if (cached) {
@@ -56,7 +63,8 @@ export const loader = async ({ request }) => {
     }
 
     // Parse settings for upsell rules
-    const settings = shop.settings ? JSON.parse(shop.settings) : {};
+    let settings = {};
+    try { settings = shop.settings ? JSON.parse(shop.settings) : {}; } catch { settings = {}; }
     // Support both array (new) and singular (legacy) format
     let upsellRules = settings.upsells || [];
     if (!Array.isArray(upsellRules) || upsellRules.length === 0) {

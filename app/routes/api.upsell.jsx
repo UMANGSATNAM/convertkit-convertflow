@@ -1,5 +1,6 @@
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
+import { rateLimit } from "../utils/security.server";
 
 /**
  * GET /api/upsell?product=<productHandle>&shop=<shopDomain>
@@ -17,6 +18,12 @@ export const loader = async ({ request }) => {
     return json({ upsellProduct: null }, { headers: corsHeaders });
   }
 
+  // Rate limit per shop
+  const { allowed } = rateLimit(`upsell:${shopDomain}`, 60, 60_000);
+  if (!allowed) {
+    return json({ upsellProduct: null }, { headers: corsHeaders });
+  }
+
   try {
     const shop = await prisma.shop.findUnique({
       where: { shopDomain },
@@ -27,7 +34,8 @@ export const loader = async ({ request }) => {
       return json({ upsellProduct: null }, { headers: corsHeaders });
     }
 
-    const settings = JSON.parse(shop.settings);
+    let settings = {};
+    try { settings = JSON.parse(shop.settings); } catch { /* malformed settings */ }
 
     // Support both array format (new) and singular object (legacy)
     let rules = settings.upsells || [];
