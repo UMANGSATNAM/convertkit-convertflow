@@ -23,7 +23,6 @@ export default function SettingControl({ setting, value, onChange }: SettingCont
     case "text":
     case "url":
     case "link_list":
-    case "collection":
       return (
         <input type="text" value={String(val)} onChange={(e) => onChange(e.target.value)}
           style={inputStyle} placeholder={setting.placeholder || ""} onFocus={focusHandler} onBlur={blurHandler} />

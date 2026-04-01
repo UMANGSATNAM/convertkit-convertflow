@@ -6,7 +6,7 @@ import { listThemeSections, fetchAsset } from "../lib/convertflow.server.js";
 import { parseShopifySchema, sectionKeyToLabel } from "../utils/schema-parser";
 import { shopifyFetchWithRetry } from "../lib/shopify-fetch.server.js";
 import { CONVERTKIT_TEMPLATES } from "../data/convertkit-templates";
-import type { ShopifySection, ShopifySchema, ViewportMode, SelectedSectionState } from "../types/convertflow";
+import type { ShopifySection, ShopifySchema, ViewportMode, SelectedSectionState, ThemeSettingGroup } from "../types/convertflow";
 import TopBar from "../components/convertflow/TopBar";
 import LeftSidebar from "../components/convertflow/LeftSidebar";
 import CenterPreview from "../components/convertflow/CenterPreview";
@@ -55,6 +55,8 @@ export const loader = async ({ request }: { request: Request }) => {
     console.error("ConvertFlow loader error:", e.message);
   }
 
+  let settingsSchemaGroups: ThemeSettingGroup[] = [];
+
   if (themeId) {
     try {
       sections = await listThemeSections(admin, session, themeId);
@@ -62,6 +64,17 @@ export const loader = async ({ request }: { request: Request }) => {
         const raw = await fetchAsset(admin, session, themeId, "config/settings_data.json");
         settingsData = JSON.parse(raw);
       } catch (_e) { /* no settings data */ }
+
+      // Load global theme settings schema
+      try {
+        const schemaRaw = await fetchAsset(admin, session, themeId, "config/settings_schema.json");
+        const parsed = JSON.parse(schemaRaw);
+        if (Array.isArray(parsed)) {
+          settingsSchemaGroups = parsed
+            .filter((g: any) => g.name && Array.isArray(g.settings))
+            .map((g: any) => ({ name: g.name, settings: g.settings }));
+        }
+      } catch (_e) { /* no settings schema */ }
 
       const sectionFiles = sections.slice(0, 30);
       const results = await Promise.all(
@@ -82,7 +95,7 @@ export const loader = async ({ request }: { request: Request }) => {
 
   return json({
     shopDomain, themeId, themeName, passwordEnabled, productHandle,
-    sections, sectionSchemas, settingsData,
+    sections, sectionSchemas, settingsData, settingsSchemaGroups,
     templates: CONVERTKIT_TEMPLATES.map((t) => ({ id: t.id, name: t.name, category: t.category, niche: t.niche, liquidCode: "", cssCode: "", schemaCode: "" })),
   });
 };
@@ -108,7 +121,7 @@ function categorizeSections(
 
 // ── Component ──
 export default function ConvertFlowEditor() {
-  const { shopDomain, themeId, themeName, passwordEnabled, sections, sectionSchemas, settingsData, templates } = useLoaderData<typeof loader>();
+  const { shopDomain, themeId, themeName, passwordEnabled, sections, sectionSchemas, settingsData, templates, settingsSchemaGroups } = useLoaderData<typeof loader>();
   const [selectedSectionKey, setSelectedSectionKey] = useState<string | null>(null);
   const [pageInstances, setPageInstances] = useState<Array<{ id: string; type: string }>>([]);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -125,6 +138,7 @@ export default function ConvertFlowEditor() {
   const [addModalPos, setAddModalPos] = useState({ top: 200, left: 100 });
   const [addModalInsertIndex, setAddModalInsertIndex] = useState<number | undefined>();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [zoom, setZoom] = useState(100);
   const proxyIframeRef = useRef<HTMLIFrameElement | null>(null);
   const settingsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -199,17 +213,33 @@ export default function ConvertFlowEditor() {
         sendToIframe({ type: "CK_GET_SECTIONS" });
         sendToIframe({ type: "CK_TOGGLE_INSPECTOR", enabled: true });
       } else if (e.data.type === "CK_SECTIONS_LIST") {
-        setPageInstances(e.data.sections.map((s: any) => {
+        // Deduplicate by sectionId
+        const seen = new Set<string>();
+        const deduped = (e.data.sections as any[]).filter((s: any) => {
+          if (seen.has(s.sectionId)) return false;
+          seen.add(s.sectionId);
+          return true;
+        });
+        setPageInstances(deduped.map((s: any) => {
           let type = s.sectionType;
+          // Strategy 1: Use sectionType if provided
           if (!type && s.sectionId.includes("__")) type = s.sectionId.split("__").pop();
+          // Strategy 2: Match against known section schema keys (longest match)
           if (!type) {
-            const idLower = s.sectionId.toLowerCase();
+            const idLower = s.sectionId.toLowerCase().replace(/-/g, "_");
             let best = "";
             for (const k of Object.keys(sectionSchemas)) {
               const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
               if (idLower.startsWith(base) && base.length > best.length) best = k;
+              // Also try: sectionId contains the base name anywhere
+              if (!best && idLower.includes(base) && base.length > 3) best = k;
             }
             if (best) type = best.replace("sections/","").replace(".liquid","");
+          }
+          // Strategy 3: Try exact key match with dashes
+          if (!type) {
+            const dashKey = `sections/${s.sectionId.replace(/_/g, "-")}.liquid`;
+            if (sectionSchemas[dashKey]) type = s.sectionId.replace(/_/g, "-");
           }
           return { id: s.sectionId, type: type || s.sectionId };
         }));
@@ -265,7 +295,19 @@ export default function ConvertFlowEditor() {
     ? (() => {
         const instance = pageInstances.find(p => p.id === selectedSectionKey);
         const type = instance?.type || selectedSectionKey;
-        const schema = sectionSchemas[`sections/${type}.liquid`] || null;
+        // Multi-strategy schema lookup
+        let schema = sectionSchemas[`sections/${type}.liquid`] || null;
+        if (!schema) {
+          // Try with dashes instead of underscores
+          schema = sectionSchemas[`sections/${type.replace(/_/g, "-")}.liquid`] || null;
+        }
+        if (!schema) {
+          // Try finding by schema name match
+          for (const [k, v] of Object.entries(sectionSchemas)) {
+            const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
+            if (type.toLowerCase().replace(/-/g,"_").startsWith(base)) { schema = v; break; }
+          }
+        }
         return { key: selectedSectionKey, name: schema?.name || type || "", schema };
       })()
     : null;
@@ -473,6 +515,7 @@ export default function ConvertFlowEditor() {
             activeTab={sidebarTab} onTabChange={setSidebarTab}
             themeSettings={themeSettingValues}
             onThemeSettingChange={handleThemeSettingChange}
+            settingsSchema={settingsSchemaGroups}
           />
         )}
         <CenterPreview
@@ -481,6 +524,8 @@ export default function ConvertFlowEditor() {
           passwordEnabled={passwordEnabled} iframeRef={proxyIframeRef}
           iframeKey={iframeKey} iframeLoading={iframeLoading}
           onIframeLoad={() => setIframeLoading(false)}
+          onRefresh={() => { setIframeKey((k) => k + 1); setIframeLoading(true); }}
+          zoom={zoom} onZoomChange={setZoom}
         />
         {!isPreviewMode && (
           <RightSettingsPanel

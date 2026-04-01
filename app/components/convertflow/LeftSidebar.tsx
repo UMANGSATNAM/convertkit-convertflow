@@ -132,7 +132,7 @@ export default function LeftSidebar({
   headerSections, templateSections, footerSections,
   selectedSectionKey, expandedSections, onSelectSection, onToggleExpand,
   onAddSection, onReorderSections, onToggleVisibility, activeTab, onTabChange,
-  themeSettings, onThemeSettingChange,
+  themeSettings, onThemeSettingChange, settingsSchema,
 }: LeftSidebarProps) {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -211,7 +211,7 @@ export default function LeftSidebar({
         ) : (
           <ThemeSettingsPanel
             themeSettings={themeSettings}
-            settingsSchema={[]}
+            settingsSchema={settingsSchema}
             onChange={onThemeSettingChange}
             onBack={() => onTabChange("sections")}
           />

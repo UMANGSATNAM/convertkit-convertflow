@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { TopBarProps } from "../../types/convertflow";
 
 const PAGES = [
@@ -10,18 +10,34 @@ const PAGES = [
 ];
 
 export default function TopBar({
+  shopDomain, themeName,
   currentPage, onPageChange,
   hasChanges, saving, onSave,
   canUndo, canRedo, onUndo, onRedo,
   isPreviewMode, onTogglePreview
 }: TopBarProps) {
   const [pageDropdownOpen, setPageDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const currentLabel = PAGES.find((p) => p.value === currentPage)?.label || "Home page";
+  const storeName = shopDomain ? shopDomain.replace(".myshopify.com", "").replace(/-/g, " ") : "My Store";
+  const themeLabel = themeName || "Theme";
 
   const handlePageSelect = useCallback((val: string) => {
     onPageChange(val);
     setPageDropdownOpen(false);
   }, [onPageChange]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!pageDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setPageDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [pageDropdownOpen]);
 
   return (
     <header style={{
@@ -51,8 +67,8 @@ export default function TopBar({
             </svg>
           </div>
           <div style={{ display: "flex", flexDirection: "column" as const }}>
-            <span style={{ color: "#fff", fontWeight: 500, fontSize: 12, lineHeight: "1.2" }}>My Store</span>
-            <span style={{ color: "#9CA3AF", fontSize: 10, lineHeight: "1.2" }}>Dawn Theme — Live</span>
+            <span style={{ color: "#fff", fontWeight: 500, fontSize: 12, lineHeight: "1.2", textTransform: "capitalize" }}>{storeName}</span>
+            <span style={{ color: "#9CA3AF", fontSize: 10, lineHeight: "1.2" }}>{themeLabel} — Live</span>
           </div>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M3 5l3 3 3-3" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
@@ -71,7 +87,7 @@ export default function TopBar({
 
       {/* ── Center: Page Selector ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "33.33%" }}>
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }} ref={dropdownRef}>
           <button
             onClick={() => setPageDropdownOpen(!pageDropdownOpen)}
             style={{

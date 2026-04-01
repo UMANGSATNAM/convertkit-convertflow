@@ -170,7 +170,18 @@
           styleEl.id = "__ck_injected_css";
           document.head.appendChild(styleEl);
         }
-        styleEl.textContent = e.data.css || "";
+        // Support both full CSS string and settingId+value pair
+        if (e.data.css) {
+          styleEl.textContent = e.data.css;
+        } else if (e.data.settingId && e.data.value !== undefined) {
+          // Build a CSS variable override for the setting
+          var cssVar = "--ck-" + e.data.settingId.replace(/[^a-zA-Z0-9_-]/g, "-");
+          document.documentElement.style.setProperty(cssVar, String(e.data.value));
+        }
+        break;
+
+      case "CK_RELOAD_PAGE":
+        window.location.reload();
         break;
 
       case "CK_INJECT_HTML":

@@ -1,5 +1,10 @@
 export type ViewportMode = "desktop" | "tablet" | "mobile";
 
+export interface ThemeSettingGroup {
+  name: string;
+  settings: ShopifySetting[];
+}
+
 export interface ShopifySetting {
   type: string;
   id?: string;
@@ -91,6 +96,7 @@ export interface LeftSidebarProps {
   onTabChange: (tab: "sections" | "settings") => void;
   themeSettings: Record<string, unknown>;
   onThemeSettingChange: (groupIdx: number, settingId: string, value: unknown) => void;
+  settingsSchema: ThemeSettingGroup[];
 }
 
 export interface CenterPreviewProps {
@@ -104,6 +110,9 @@ export interface CenterPreviewProps {
   iframeKey: number;
   iframeLoading: boolean;
   onIframeLoad: () => void;
+  onRefresh: () => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
 }
 
 export interface RightSettingsPanelProps {

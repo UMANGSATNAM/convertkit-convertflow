@@ -1,11 +1,6 @@
-import { useState, useMemo } from "react";
-import type { ShopifySetting } from "../../types/convertflow";
+import { useState } from "react";
+import type { ShopifySetting, ThemeSettingGroup } from "../../types/convertflow";
 import SettingControl from "./SettingControl";
-
-interface ThemeSettingGroup {
-  name: string;
-  settings: ShopifySetting[];
-}
 
 interface ThemeSettingsPanelProps {
   themeSettings: Record<string, unknown>;
@@ -131,6 +126,14 @@ function GroupIcon({ name }: { name: string }) {
   );
 }
 
+// Dark-themed input style for the theme settings panel (inside dark sidebar)
+const darkInputStyle: React.CSSProperties = {
+  height: 36, width: "100%", border: "1px solid #3A3A45", borderRadius: 6,
+  padding: "0 10px", fontSize: 13, color: "#E3E3E3", background: "#25252D",
+  boxSizing: "border-box", outline: "none", fontFamily: "inherit",
+  transition: "border-color 150ms, box-shadow 150ms",
+};
+
 export default function ThemeSettingsPanel({
   themeSettings,
   settingsSchema,
@@ -151,22 +154,22 @@ export default function ThemeSettingsPanel({
       }}>
         {/* Group header */}
         <div style={{
-          height: 52, borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center",
-          padding: "0 16px", flexShrink: 0, gap: 10, background: "#fff",
+          height: 52, borderBottom: "1px solid #2A2A35", display: "flex", alignItems: "center",
+          padding: "0 16px", flexShrink: 0, gap: 10, background: "#1A1A1F",
         }}>
           <button onClick={() => setExpandedGroup(null)} style={{
             width: 28, height: 28, border: "none", background: "transparent",
             cursor: "pointer", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#6B7280", transition: "background 150ms, color 150ms", marginLeft: -4,
+            color: "#9CA3AF", transition: "background 150ms, color 150ms", marginLeft: -4,
           }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; e.currentTarget.style.color = "#111827"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#6B7280"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9CA3AF"; }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
             </svg>
           </button>
-          <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "#111827" }}>{group.name}</span>
+          <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "#fff" }}>{group.name}</span>
         </div>
 
         {/* Settings list */}
@@ -175,8 +178,8 @@ export default function ThemeSettingsPanel({
             if (setting.type === "header") {
               return (
                 <div key={idx} style={{
-                  padding: "14px 0 10px 0", fontSize: 13, fontWeight: 600, color: "#111827",
-                  borderTop: idx > 0 ? "1px solid #E5E7EB" : "none", marginTop: idx > 0 ? 12 : 0,
+                  padding: "14px 0 10px 0", fontSize: 13, fontWeight: 600, color: "#E3E3E3",
+                  borderTop: idx > 0 ? "1px solid #2A2A35" : "none", marginTop: idx > 0 ? 12 : 0,
                 }}>
                   {setting.content || setting.label}
                 </div>
@@ -184,7 +187,7 @@ export default function ThemeSettingsPanel({
             }
             if (setting.type === "paragraph") {
               return (
-                <p key={idx} style={{ fontSize: 13, color: "#6B7280", margin: "0 0 14px 0", lineHeight: 1.5 }}>
+                <p key={idx} style={{ fontSize: 13, color: "#9CA3AF", margin: "0 0 14px 0", lineHeight: 1.5 }}>
                   {setting.content || setting.info}
                 </p>
               );
@@ -207,7 +210,7 @@ export default function ThemeSettingsPanel({
                 )}
                 <SettingControl setting={setting} value={val} onChange={(v) => setting.id && onChange(groupIdx, setting.id, v)} />
                 {setting.info && (
-                  <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 4 }}>{setting.info}</div>
+                  <div style={{ fontSize: 11, color: "#6B7280", marginTop: 4 }}>{setting.info}</div>
                 )}
               </div>
             );
@@ -224,22 +227,22 @@ export default function ThemeSettingsPanel({
     }}>
       {/* Header */}
       <div style={{
-        height: 52, borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center",
-        padding: "0 16px", flexShrink: 0, gap: 10, background: "#fff",
+        height: 52, borderBottom: "1px solid #2A2A35", display: "flex", alignItems: "center",
+        padding: "0 16px", flexShrink: 0, gap: 10, background: "#1A1A1F",
       }}>
         <button onClick={onBack} style={{
           width: 28, height: 28, border: "none", background: "transparent",
           cursor: "pointer", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#6B7280", transition: "background 150ms, color 150ms", marginLeft: -4,
+          color: "#9CA3AF", transition: "background 150ms, color 150ms", marginLeft: -4,
         }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; e.currentTarget.style.color = "#111827"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#6B7280"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9CA3AF"; }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
           </svg>
         </button>
-        <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "#111827" }}>Theme settings</span>
+        <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "#fff" }}>Theme settings</span>
       </div>
 
       {/* Group list */}
@@ -250,9 +253,9 @@ export default function ThemeSettingsPanel({
             onClick={() => setExpandedGroup(group.name)}
             style={{
               display: "flex", alignItems: "center", gap: 12, padding: "10px 16px",
-              cursor: "pointer", transition: "background 150ms", color: "#374151", fontSize: 14,
+              cursor: "pointer", transition: "background 150ms", color: "#E3E3E3", fontSize: 14,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#F9FAFB"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#2E2E38"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <GroupIcon name={group.name} />

@@ -25,13 +25,16 @@ function MobileIcon({ active }: { active: boolean }) {
   );
 }
 
+const ZOOM_LEVELS = [50, 75, 100, 125, 150];
+
 export default function CenterPreview({
   shopDomain, currentPath, viewport, onViewportChange, passwordEnabled,
-  iframeRef, iframeKey, iframeLoading, onIframeLoad,
+  iframeRef, iframeKey, iframeLoading, onIframeLoad, onRefresh, zoom, onZoomChange,
 }: CenterPreviewProps) {
   const proxyUrl = `/app/convertflow/proxy?shop=${encodeURIComponent(shopDomain)}&path=${encodeURIComponent(currentPath)}`;
   const vpWidth = viewport === "mobile" ? 390 : viewport === "tablet" ? 768 : "100%";
   const [loadError, setLoadError] = useState(false);
+  const [zoomDropdownOpen, setZoomDropdownOpen] = useState(false);
 
   useEffect(() => { setLoadError(false); }, [iframeKey]);
 
@@ -55,9 +58,6 @@ export default function CenterPreview({
     { id: "tablet", Icon: TabletIcon },
     { id: "mobile", Icon: MobileIcon },
   ];
-
-  // Removed strict blocking for password screens to allow users to interact with the iframe (e.g. to log in).
-  // if (passwordEnabled || loadError) { ... }
 
   return (
     <div style={{
@@ -101,22 +101,62 @@ export default function CenterPreview({
           ))}
         </div>
 
-        {/* Right: Zoom/Refresh */}
+        {/* Right: Refresh/Zoom */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "33%" }}>
-          <button style={{
-            display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none",
-            color: "#4B5563", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 8px", borderRadius: 6,
-          }} onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
+          {/* Refresh */}
+          <button 
+            onClick={onRefresh}
+            title="Refresh preview"
+            style={{
+              display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none",
+              color: "#4B5563", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 8px", borderRadius: 6,
+            }} 
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; }} 
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
           <div style={{ height: 16, width: 1, background: "#E5E7EB", margin: "0 4px" }} />
-          <button style={{
-            display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none",
-            color: "#4B5563", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 8px", borderRadius: 6,
-          }} onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
-            100%
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
+          {/* Zoom dropdown */}
+          <div style={{ position: "relative" }}>
+            <button 
+              onClick={() => setZoomDropdownOpen(!zoomDropdownOpen)}
+              style={{
+                display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none",
+                color: "#4B5563", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 8px", borderRadius: 6,
+              }} 
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; }} 
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              {zoom}%
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            {zoomDropdownOpen && (
+              <>
+                <div onClick={() => setZoomDropdownOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 98 }} />
+                <div style={{
+                  position: "absolute", top: 36, right: 0, background: "#fff", borderRadius: 8, zIndex: 99,
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)", padding: "4px 0", minWidth: 100,
+                }}>
+                  {ZOOM_LEVELS.map((z) => (
+                    <div key={z}
+                      onClick={() => { onZoomChange(z); setZoomDropdownOpen(false); }}
+                      style={{
+                        padding: "6px 14px", fontSize: 13, cursor: "pointer",
+                        color: z === zoom ? "#5C6AC4" : "#303030",
+                        fontWeight: z === zoom ? 600 : 400,
+                        background: z === zoom ? "#f0f0ff" : "transparent",
+                      }}
+                      onMouseEnter={(e) => { if (z !== zoom) e.currentTarget.style.background = "#f4f4f4"; }}
+                      onMouseLeave={(e) => { if (z !== zoom) e.currentTarget.style.background = "transparent"; }}
+                    >
+                      {z}%
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -143,9 +183,10 @@ export default function CenterPreview({
         {/* Iframe */}
         <div style={{
           width: vpWidth, height: viewport === "desktop" ? "100%" : "800px", minHeight: viewport === "desktop" ? "100%" : "auto", 
-          maxWidth: 1200, transition: "width 300ms ease", position: "relative",
+          maxWidth: 1200, transition: "width 300ms ease, transform 300ms ease", position: "relative",
           background: "#fff", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
           borderRadius: viewport === "desktop" ? 8 : 24, overflow: "hidden", border: viewport === "desktop" ? "none" : "8px solid #111827",
+          transform: `scale(${zoom / 100})`, transformOrigin: "top center",
         }}>
           <iframe
             ref={iframeRef as React.LegacyRef<HTMLIFrameElement>}

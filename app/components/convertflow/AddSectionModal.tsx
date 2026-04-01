@@ -12,7 +12,7 @@ const CATEGORIES: Array<{ key: string; label: string }> = [
 ];
 
 export default function AddSectionModal({
-  visible, position, sections, templates, onClose, onSelectTemplate, onSelectSection,
+  visible, position, sections, templates, onClose, onSelectTemplate, onSelectSection, insertIndex,
 }: AddSectionModalProps) {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"theme" | "convertkit">("theme");
@@ -95,7 +95,7 @@ export default function AddSectionModal({
               <div style={{ padding: 20, textAlign: "center", color: "#6b6b6b", fontSize: 13 }}>No sections found</div>
             ) : (
               filteredSections.map((s) => (
-                <div key={s.key} onClick={() => { onSelectSection(s.key); onClose(); }}
+                <div key={s.key} onClick={() => { onSelectSection(s.key, insertIndex); onClose(); }}
                   style={{ height: 40, padding: "0 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: "#303030" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "#f4f4f4"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
