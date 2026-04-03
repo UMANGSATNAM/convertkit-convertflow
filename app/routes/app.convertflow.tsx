@@ -302,10 +302,35 @@ export default function ConvertFlowEditor() {
           schema = sectionSchemas[`sections/${type.replace(/_/g, "-")}.liquid`] || null;
         }
         if (!schema) {
-          // Try finding by schema name match
+          // Try with underscores instead of dashes
+          schema = sectionSchemas[`sections/${type.replace(/-/g, "_")}.liquid`] || null;
+        }
+        if (!schema) {
+          // Try removing numeric suffixes (e.g. "hero_abc123" -> "hero")
+          const baseType = type.replace(/_[a-f0-9]{6,}$/i, "").replace(/-[a-f0-9]{6,}$/i, "");
+          schema = sectionSchemas[`sections/${baseType}.liquid`]
+            || sectionSchemas[`sections/${baseType.replace(/_/g, "-")}.liquid`]
+            || null;
+        }
+        if (!schema) {
+          // Try finding by schema name match (partial)
+          const typeLower = type.toLowerCase().replace(/-/g, "_");
           for (const [k, v] of Object.entries(sectionSchemas)) {
             const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
-            if (type.toLowerCase().replace(/-/g,"_").startsWith(base)) { schema = v; break; }
+            if (typeLower.startsWith(base) || typeLower.includes(base) || base.includes(typeLower)) {
+              schema = v; break;
+            }
+          }
+        }
+        if (!schema) {
+          // Fallback: try matching the selectedSectionKey directly against static sections
+          const staticMatch = sections.find(s => {
+            const sBase = s.key.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
+            const tBase = type.replace(/-/g,"_").toLowerCase();
+            return sBase === tBase || tBase.startsWith(sBase) || sBase.startsWith(tBase);
+          });
+          if (staticMatch) {
+            schema = sectionSchemas[staticMatch.key] || null;
           }
         }
         return { key: selectedSectionKey, name: schema?.name || type || "", schema };
@@ -318,8 +343,25 @@ export default function ConvertFlowEditor() {
 
   pageInstances.forEach((instance) => {
     const type = instance.type;
-    const schemaKey = `sections/${type}.liquid`;
-    const schema = sectionSchemas[schemaKey];
+    // Multi-strategy schema lookup for live sections
+    let schema = sectionSchemas[`sections/${type}.liquid`] || null;
+    if (!schema) schema = sectionSchemas[`sections/${type.replace(/_/g, "-")}.liquid`] || null;
+    if (!schema) schema = sectionSchemas[`sections/${type.replace(/-/g, "_")}.liquid`] || null;
+    if (!schema) {
+      const baseType = type.replace(/_[a-f0-9]{6,}$/i, "").replace(/-[a-f0-9]{6,}$/i, "");
+      schema = sectionSchemas[`sections/${baseType}.liquid`]
+        || sectionSchemas[`sections/${baseType.replace(/_/g, "-")}.liquid`]
+        || null;
+    }
+    if (!schema) {
+      const typeLower = type.toLowerCase().replace(/-/g, "_");
+      for (const [k, v] of Object.entries(sectionSchemas)) {
+        const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
+        if (typeLower.startsWith(base) || typeLower.includes(base) || base.includes(typeLower)) {
+          schema = v; break;
+        }
+      }
+    }
     const n = (schema?.name || type).toLowerCase();
     
     let group = "template";
