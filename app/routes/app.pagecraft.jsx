@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect } from "react";
 import { authenticate } from "../shopify.server";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import SectionEditor, { editorStyles } from "../components/pagecraft/SectionEditor";
+import AddSectionPanel, { addSectionStyles } from "../components/pagecraft/AddSectionPanel";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -61,6 +63,8 @@ export default function PageCraftBuilder() {
   const [error, setError] = useState("");
   const [activePreview, setActivePreview] = useState("desktop");
   const [selectedSection, setSelectedSection] = useState(null);
+  const [showAddSection, setShowAddSection] = useState(false);
+  const [rightTab, setRightTab] = useState("edit"); // "edit" | "score"
 
   const handleGenerate = useCallback(async () => {
     setGenerating(true);
@@ -132,9 +136,48 @@ export default function PageCraftBuilder() {
     }
   }, [generatedPage, storeName, improvements]);
 
+  // --- Section editing handlers ---
+  const handleSectionChange = useCallback((idx, updated) => {
+    if (!generatedPage) return;
+    const sections = [...generatedPage.sections];
+    sections[idx] = updated;
+    setGeneratedPage({ ...generatedPage, sections });
+  }, [generatedPage]);
+
+  const handleSectionDelete = useCallback((idx) => {
+    if (!generatedPage) return;
+    const sections = generatedPage.sections.filter((_, i) => i !== idx);
+    setGeneratedPage({ ...generatedPage, sections });
+    setSelectedSection(null);
+  }, [generatedPage]);
+
+  const handleSectionMoveUp = useCallback((idx) => {
+    if (!generatedPage || idx === 0) return;
+    const sections = [...generatedPage.sections];
+    [sections[idx - 1], sections[idx]] = [sections[idx], sections[idx - 1]];
+    setGeneratedPage({ ...generatedPage, sections });
+    setSelectedSection(idx - 1);
+  }, [generatedPage]);
+
+  const handleSectionMoveDown = useCallback((idx) => {
+    if (!generatedPage || idx >= generatedPage.sections.length - 1) return;
+    const sections = [...generatedPage.sections];
+    [sections[idx], sections[idx + 1]] = [sections[idx + 1], sections[idx]];
+    setGeneratedPage({ ...generatedPage, sections });
+    setSelectedSection(idx + 1);
+  }, [generatedPage]);
+
+  const handleAddSection = useCallback((newSection) => {
+    if (!generatedPage) return;
+    const sections = [...generatedPage.sections, newSection];
+    setGeneratedPage({ ...generatedPage, sections });
+    setSelectedSection(sections.length - 1);
+    setRightTab("edit");
+  }, [generatedPage]);
+
   return (
     <div style={containerStyles}>
-      <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
+      <style dangerouslySetInnerHTML={{ __html: globalStyles + editorStyles + addSectionStyles }} />
 
       {/* Sidebar */}
       <div className="pc-sidebar">
@@ -176,12 +219,13 @@ export default function PageCraftBuilder() {
               <div
                 key={idx}
                 className={`pc-tree-item ${selectedSection === idx ? "pc-tree-item--active" : ""}`}
-                onClick={() => setSelectedSection(idx)}
+                onClick={() => { setSelectedSection(idx); setRightTab("edit"); }}
               >
                 <span className="pc-tree-icon">{sectionIcon(sec.type)}</span>
                 <span className="pc-tree-label">{sectionLabel(sec.type)}</span>
               </div>
             ))}
+            <button className="pc-add-section-btn" onClick={() => setShowAddSection(true)}>+ Add Section</button>
           </div>
         )}
 
@@ -351,66 +395,85 @@ export default function PageCraftBuilder() {
                 <div className="pc-preview-label">Live Preview</div>
               </div>
               <div className="pc-preview-frame" style={{ maxWidth: activePreview === "mobile" ? 390 : "100%" }}>
-                <PagePreview sections={generatedPage.sections} selectedIdx={selectedSection} />
+                <PagePreview sections={generatedPage.sections} selectedIdx={selectedSection} onSelect={(idx) => { setSelectedSection(idx); setRightTab("edit"); }} />
               </div>
             </div>
 
-            {/* Score Panel */}
+            {/* Right Panel — Tabbed: Edit / Score */}
             <div className="pc-score-panel">
-              <div className="pc-score-ring-wrap">
-                <ScoreRing score={score || 0} />
-                <div className="pc-score-grade">
-                  {score >= 90 ? "A+" : score >= 80 ? "A" : score >= 70 ? "B" : score >= 60 ? "C" : "D"}
-                </div>
-              </div>
-              <h3 className="pc-score-title">Conversion Score</h3>
-
-              {/* Breakdown */}
-              <div className="pc-breakdown">
-                {scoreBreakdown.map((item, i) => (
-                  <div key={i} className={`pc-bd-item ${item.passed ? "pc-bd-item--pass" : "pc-bd-item--fail"}`}>
-                    <span>{item.passed ? "✓" : "✗"}</span>
-                    <span>{item.name}</span>
-                    <span className="pc-bd-pts">+{item.points}/{item.maxPoints}</span>
-                  </div>
-                ))}
+              <div className="pc-tab-bar">
+                <button className={`pc-tab ${rightTab === "edit" ? "pc-tab--active" : ""}`} onClick={() => setRightTab("edit")}>Edit</button>
+                <button className={`pc-tab ${rightTab === "score" ? "pc-tab--active" : ""}`} onClick={() => setRightTab("score")}>Score</button>
               </div>
 
-              {/* Improvements */}
-              {improvements.length > 0 && (
-                <div className="pc-improvements">
-                  <h4 className="pc-imp-title">Top Improvements</h4>
-                  {improvements.slice(0, 3).map((imp, i) => (
-                    <div key={i} className="pc-imp-item">
-                      <span className="pc-imp-text">{typeof imp === "string" ? imp : imp.text || imp}</span>
-                      {imp.fixType && (
-                        <button className="pc-imp-fix" onClick={() => handleApplyFix(imp.fixType)}>
-                          Fix
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {error && <div className="pc-error" style={{ marginTop: 16 }}>{error}</div>}
-
-              {/* Actions */}
-              <div className="pc-score-actions">
-                <button className="pc-back-btn" onClick={() => { setStep(3); setGeneratedPage(null); }}>
-                  Regenerate
-                </button>
-                <button className="pc-publish-btn" disabled={publishing} onClick={handlePublish}>
-                  {publishing ? (
-                    <><span className="pc-spinner" /> Publishing…</>
+              <div className="pc-tab-content">
+                {rightTab === "edit" && (
+                  selectedSection !== null && generatedPage.sections[selectedSection] ? (
+                    <SectionEditor
+                      section={generatedPage.sections[selectedSection]}
+                      index={selectedSection}
+                      onChange={handleSectionChange}
+                      onDelete={handleSectionDelete}
+                      onMoveUp={handleSectionMoveUp}
+                      onMoveDown={handleSectionMoveDown}
+                      isFirst={selectedSection === 0}
+                      isLast={selectedSection === generatedPage.sections.length - 1}
+                    />
                   ) : (
-                    <>Publish to Shopify</>
+                    <div className="pc-empty-editor">
+                      <div style={{ fontSize: 32, marginBottom: 12 }}>👈</div>
+                      <p style={{ color: "#64748B", fontSize: 13, textAlign: "center", lineHeight: 1.6 }}>Select a section from the sidebar or click on the preview to start editing.</p>
+                    </div>
+                  )
+                )}
+
+                {rightTab === "score" && (<>
+                  <div className="pc-score-ring-wrap" style={{ marginTop: 16 }}>
+                    <ScoreRing score={score || 0} />
+                    <div className="pc-score-grade">
+                      {score >= 90 ? "A+" : score >= 80 ? "A" : score >= 70 ? "B" : score >= 60 ? "C" : "D"}
+                    </div>
+                  </div>
+                  <h3 className="pc-score-title">Conversion Score</h3>
+                  <div className="pc-breakdown">
+                    {scoreBreakdown.map((item, i) => (
+                      <div key={i} className={`pc-bd-item ${item.passed ? "pc-bd-item--pass" : "pc-bd-item--fail"}`}>
+                        <span>{item.passed ? "✓" : "✗"}</span>
+                        <span>{item.name}</span>
+                        <span className="pc-bd-pts">+{item.points}/{item.maxPoints}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {improvements.length > 0 && (
+                    <div className="pc-improvements">
+                      <h4 className="pc-imp-title">Top Improvements</h4>
+                      {improvements.slice(0, 3).map((imp, i) => (
+                        <div key={i} className="pc-imp-item">
+                          <span className="pc-imp-text">{typeof imp === "string" ? imp : imp.text || imp}</span>
+                          {imp.fixType && (
+                            <button className="pc-imp-fix" onClick={() => handleApplyFix(imp.fixType)}>Fix</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
+                </>)}
+              </div>
+
+              {error && <div className="pc-error" style={{ marginTop: 16, margin: "0 16px" }}>{error}</div>}
+
+              <div className="pc-score-actions">
+                <button className="pc-back-btn" onClick={() => { setStep(3); setGeneratedPage(null); }}>Regenerate</button>
+                <button className="pc-publish-btn" disabled={publishing} onClick={handlePublish}>
+                  {publishing ? (<><span className="pc-spinner" /> Publishing…</>) : (<>Publish to Shopify</>)}
                 </button>
               </div>
             </div>
           </div>
         )}
+
+        {/* Add Section Modal */}
+        {showAddSection && <AddSectionPanel onAdd={handleAddSection} onClose={() => setShowAddSection(false)} />}
 
         {/* Step 5: Published! */}
         {step === 5 && published && (
@@ -463,12 +526,13 @@ function ScoreRing({ score }) {
   );
 }
 
-function PagePreview({ sections, selectedIdx }) {
+function PagePreview({ sections, selectedIdx, onSelect }) {
   return (
     <div className="pc-live-preview">
       {sections.map((sec, idx) => (
         <div key={idx} className={`pc-preview-section ${selectedIdx === idx ? "pc-preview-section--selected" : ""}`}
-          style={{ outline: selectedIdx === idx ? "2px solid #10B981" : "none", borderRadius: 8 }}>
+          onClick={() => onSelect && onSelect(idx)}
+          style={{ outline: selectedIdx === idx ? "2px solid #10B981" : "none", borderRadius: 8, cursor: "pointer" }}>
           {sec.type === "hero" && (
             <div style={{ background: sec.background_gradient || sec.background_color || "#0F172A", padding: "48px 20px", textAlign: "center", color: "#fff", borderRadius: 8 }}>
               <h2 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 10px", lineHeight: 1.15 }}>{sec.headline}</h2>
@@ -684,23 +748,32 @@ const globalStyles = `
   .pc-preview-section { transition: outline 0.15s; }
   .pc-preview-section--selected { outline: 2px solid #10B981; border-radius: 8px; }
 
-  /* Score Panel */
-  .pc-score-panel { width: 320px; min-width: 320px; background: #0F1524; border-left: 1px solid rgba(255,255,255,0.06); padding: 28px 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-  .pc-score-ring-wrap { position: relative; margin-bottom: 8px; }
+  /* Score Panel / Editor Panel */
+  .pc-score-panel { width: 340px; min-width: 340px; background: #0F1524; border-left: 1px solid rgba(255,255,255,0.06); overflow-y: auto; display: flex; flex-direction: column; }
+  .pc-tab-bar { display: flex; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+  .pc-tab { flex: 1; padding: 12px; background: none; border: none; color: #64748B; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'Nunito Sans', sans-serif; border-bottom: 2px solid transparent; }
+  .pc-tab--active { color: #10B981; border-bottom-color: #10B981; background: rgba(16,185,129,0.04); }
+  .pc-tab:hover:not(.pc-tab--active) { color: #94A3B8; }
+  .pc-tab-content { flex: 1; overflow-y: auto; }
+  .pc-empty-editor { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; height: 100%; }
+  .pc-add-section-btn { width: calc(100% - 8px); margin: 8px 4px 0; padding: 10px; background: rgba(16,185,129,0.06); border: 1.5px dashed rgba(16,185,129,0.4); border-radius: 8px; color: #10B981; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'Nunito Sans', sans-serif; }
+  .pc-add-section-btn:hover { background: rgba(16,185,129,0.12); border-color: #10B981; }
+  .pc-preview-section:hover { outline: 1px dashed rgba(16,185,129,0.4) !important; }
+  .pc-score-ring-wrap { position: relative; margin-bottom: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; }
   .pc-score-grade { position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #10B981; color: #fff; font-family: 'Rubik', sans-serif; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 999px; }
-  .pc-score-title { font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 700; color: #CBD5E1; margin: 8px 0 20px; }
-  .pc-breakdown { width: 100%; margin-bottom: 20px; }
+  .pc-score-title { font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 700; color: #CBD5E1; margin: 8px 0 20px; text-align: center; }
+  .pc-breakdown { width: 100%; margin-bottom: 20px; padding: 0 16px; box-sizing: border-box; }
   .pc-bd-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: #64748B; }
   .pc-bd-item--pass span:first-child { color: #10B981; }
   .pc-bd-item--fail span:first-child { color: #EF4444; }
   .pc-bd-pts { margin-left: auto; font-weight: 600; font-size: 11px; }
-  .pc-improvements { width: 100%; margin-bottom: 20px; }
+  .pc-improvements { width: 100%; margin-bottom: 20px; padding: 0 16px; box-sizing: border-box; }
   .pc-imp-title { font-size: 12px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; }
   .pc-imp-item { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; }
   .pc-imp-text { font-size: 12px; color: #CBD5E1; line-height: 1.5; flex: 1; }
   .pc-imp-fix { background: #10B981; color: #fff; border: none; border-radius: 6px; padding: 4px 12px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
   .pc-imp-fix:hover { background: #059669; }
-  .pc-score-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+  .pc-score-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding: 16px; box-sizing: border-box; }
 
   /* Published */
   .pc-published-card { text-align: center; }
