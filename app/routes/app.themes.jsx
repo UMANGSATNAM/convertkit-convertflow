@@ -17,13 +17,13 @@ const THEMES = [
     badge: "PREMIUM",
     category: "Apparel & Footwear",
     description:
-      "High-converting storefront engineered for dropshipping, apparel, and custom footwear brands. ConvertFlow UI blocks let you launch urgency widgets without writing a line of code.",
+      "High-converting storefront engineered for dropshipping, apparel, and custom footwear brands. PageCraft AI blocks let you launch urgency widgets without writing a line of code.",
     cvr: null,
     gradient: "linear-gradient(145deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%)",
     accentColor: "#e8c547",
     textOverlay: "AF",
     zipPath: "/themes/asian-footwears-shopify-theme-v4.zip",
-    themeName: "Asian Footwears v2 - ConvertFlow",
+    themeName: "Asian Footwears v2 - PageCraft",
     previewUrl: "https://uwyhex-nb.myshopify.com/?preview_theme_id=",
     highlights: ["Speed-first layout", "Sticky urgency bar", "Mobile-native"],
   },
@@ -40,7 +40,7 @@ const THEMES = [
     accentColor: "#d4af37",
     textOverlay: "LX",
     zipPath: "/themes/luxe-fashion-theme-v3.zip",
-    themeName: "Aura Luxe Fashion - ConvertFlow",
+    themeName: "Aura Luxe Fashion - PageCraft",
     previewUrl: null,
     highlights: ["Playfair Display", "Off-white palette", "High-urgency triggers"],
   },
@@ -57,7 +57,7 @@ const THEMES = [
     accentColor: "#39ff14",
     textOverlay: "VS",
     zipPath: "/themes/velocity-streetwear-theme-v3.zip",
-    themeName: "Velocity Streetwear - ConvertFlow",
+    themeName: "Velocity Streetwear - PageCraft",
     previewUrl: null,
     highlights: ["Oswald typography", "Neon accent system", "Countdown timers"],
   },
@@ -72,12 +72,12 @@ export default function Themes() {
       <div className="cf-themes-page">
         {/* — Header — */}
         <div className="cf-themes-header">
-          <div className="cf-themes-header-eyebrow">ConvertFlow Theme Store</div>
+          <div className="cf-themes-header-eyebrow">PageCraft Theme Store</div>
           <h1 className="cf-themes-header-title">
             Themes engineered to <em>convert</em>
           </h1>
           <p className="cf-themes-header-sub">
-            Structurally customized Shopify themes with ConvertFlow urgency features natively built-in.
+            Structurally customized Shopify themes with PageCraft urgency features natively built-in.
             Install in one click. Go live today.
           </p>
         </div>

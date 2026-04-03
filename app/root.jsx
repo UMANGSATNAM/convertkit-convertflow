@@ -7,11 +7,11 @@ import {
 } from "@remix-run/react";
 
 export const meta = () => [
-  { title: "ConvertFlow — Conversion Toolkit for Shopify" },
-  { name: "description", content: "All-in-one conversion toolkit: urgency tools, AI reviews, upsells, themes, and 30+ high-converting sections for Shopify stores." },
+  { title: "PageCraft AI — Shopify Page Builder" },
+  { name: "description", content: "Build high-converting Shopify pages in 60 seconds. AI-powered page builder with sections, themes, urgency tools, and conversion scoring." },
   { name: "robots", content: "noindex, nofollow" },
-  { property: "og:title", content: "ConvertFlow — Conversion Toolkit for Shopify" },
-  { property: "og:description", content: "Increase revenue with urgency tools, AI review writing, upsell popups, and premium themes." },
+  { property: "og:title", content: "PageCraft AI — Shopify Page Builder" },
+  { property: "og:description", content: "AI page builder that helps Shopify merchants create stunning store pages with zero design experience." },
   { property: "og:type", content: "website" },
 ];
 

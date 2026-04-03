@@ -24,6 +24,15 @@ export const action = async ({ request }) => {
 
 const NAV_CARDS = [
   {
+    label: "PageCraft Builder",
+    href: "/app/pagecraft",
+    desc: "AI-powered page builder — 60 seconds",
+    count: "AI",
+    color: "#059669",
+    bg: "#ECFDF5",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>`,
+  },
+  {
     label: "Sections",
     href: "/app/sections",
     desc: "30+ conversion-optimized blocks",
@@ -73,8 +82,8 @@ const NAV_CARDS = [
     href: "/app/analytics",
     desc: "Track conversions and tool impact",
     count: "Live",
-    color: "#059669",
-    bg: "#ECFDF5",
+    color: "#0891B2",
+    bg: "#ECFEFF",
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>`,
   },
   {
@@ -82,14 +91,14 @@ const NAV_CARDS = [
     href: "/app/pages",
     desc: "Publish policy & trust pages",
     count: "8",
-    color: "#0891B2",
+    color: "#0E7490",
     bg: "#ECFEFF",
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>`,
   },
   {
-    label: "ConvertFlow Editor",
+    label: "PageCraft Editor",
     href: "/app/convertflow",
-    desc: "Drag-and-drop theme builder",
+    desc: "Visual drag-and-drop theme editor",
     count: "Pro",
     color: "#BE185D",
     bg: "#FDF2F8",
@@ -118,10 +127,10 @@ export default function Index() {
         {/* Hero Welcome */}
         <div className="dash-hero">
           <div className="dash-hero-text">
-            <div className="dash-eyebrow">ConvertFlow Dashboard</div>
-            <h1 className="dash-title">{GREETING}, let's convert.</h1>
+            <div className="dash-eyebrow">PageCraft AI</div>
+            <h1 className="dash-title">{GREETING}, let's build.</h1>
             <p className="dash-subtitle">
-              Your all-in-one conversion toolkit for Shopify. Every tool below is engineered to increase revenue.
+              Your AI-powered page builder for Shopify. Build stunning, high-converting pages in 60 seconds flat.
             </p>
           </div>
           <div className="dash-plan-chip" data-plan={isFree ? "free" : "pro"}>
@@ -135,7 +144,7 @@ export default function Index() {
           {[
             { label: "Active Tools", value: "0", max: "8", icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" /></svg>` },
             { label: "Sections Available", value: "30", max: null, icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>` },
-            { label: "Themes Ready", value: "3", max: null, icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" /></svg>` },
+            { label: "AI Page Score", value: "—", max: null, icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>` },
             { label: "Estimated CVR Lift", value: "+50%", max: null, icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>` },
           ].map(({ label, value, icon }) => (
             <div className="dash-stat-card" key={label}>
@@ -169,9 +178,9 @@ export default function Index() {
             <div className="dash-upgrade-content">
               <div className="dash-upgrade-badge">PRO</div>
               <div>
-                <h3 className="dash-upgrade-title">Unlock the full ConvertFlow arsenal</h3>
+                <h3 className="dash-upgrade-title">Unlock the full PageCraft AI arsenal</h3>
                 <p className="dash-upgrade-sub">
-                  All 30+ sections, all themes, urgency tools, AI review writing, upsell engine, and ConvertFlow code extraction. Everything that turns a Shopify store into a revenue machine.
+                  All 30+ sections, all themes, urgency tools, AI review writing, upsell engine, and the visual PageCraft Editor. Everything that turns a Shopify store into a revenue machine.
                 </p>
               </div>
             </div>
@@ -207,7 +216,7 @@ const styles = `
     gap: 24px;
     flex-wrap: wrap;
   }
-  .dash-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #2563EB; margin-bottom: 12px; }
+  .dash-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #059669; margin-bottom: 12px; }
   .dash-title {
     font-family: 'Rubik', sans-serif;
     font-size: clamp(30px, 4vw, 46px);
@@ -233,11 +242,11 @@ const styles = `
     flex-shrink: 0;
     margin-top: 4px;
   }
-  .dash-plan-chip[data-plan="pro"] { border-color: #BFDBFE; background: #EFF6FF; color: #2563EB; }
+  .dash-plan-chip[data-plan="pro"] { border-color: #A7F3D0; background: #ECFDF5; color: #059669; }
   .dash-plan-dot {
     width: 8px; height: 8px; border-radius: 50%; background: #CBD5E1;
   }
-  .dash-plan-chip[data-plan="pro"] .dash-plan-dot { background: #2563EB; }
+  .dash-plan-chip[data-plan="pro"] .dash-plan-dot { background: #059669; }
 
   /* Stats */
   .dash-stats-row {
@@ -269,7 +278,7 @@ const styles = `
 
   .dash-nav-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-bottom: 36px;
   }
@@ -307,7 +316,7 @@ const styles = `
   /* Upgrade Banner */
   .dash-upgrade-banner {
     position: relative;
-    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
     border-radius: 20px;
     padding: 36px 40px;
     display: flex;
@@ -321,7 +330,7 @@ const styles = `
     position: absolute;
     top: -60px; right: -60px;
     width: 240px; height: 240px;
-    background: radial-gradient(circle, rgba(37,99,235,0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%);
     pointer-events: none;
   }
   .dash-upgrade-content { display: flex; align-items: flex-start; gap: 20px; flex: 1; position: relative; }
@@ -332,7 +341,7 @@ const styles = `
     letter-spacing: 0.1em;
     padding: 5px 12px;
     border-radius: 8px;
-    background: #F97316;
+    background: #10B981;
     color: #fff;
     flex-shrink: 0;
     margin-top: 3px;
@@ -349,17 +358,17 @@ const styles = `
     padding: 14px 28px;
     border-radius: 12px;
     border: none;
-    background: linear-gradient(135deg, #F97316, #EA580C);
+    background: linear-gradient(135deg, #10B981, #059669);
     color: #fff;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     position: relative;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(249,115,22,0.5);
+    box-shadow: 0 4px 20px rgba(16,185,129,0.5);
   }
   .dash-upgrade-btn svg { width: 16px; height: 16px; }
-  .dash-upgrade-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(249,115,22,0.6); }
+  .dash-upgrade-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(16,185,129,0.6); }
 
   @media (max-width: 640px) {
     .dash-upgrade-banner { padding: 28px 24px; flex-direction: column; }
