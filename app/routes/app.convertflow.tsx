@@ -291,59 +291,12 @@ export default function ConvertFlowEditor() {
     });
   }, [selectedSectionKey, sendToIframe, themeId, currentPage, pushHistory, themeSettingValues, pageInstances]);
 
-  const selectedSection: SelectedSectionState | null = selectedSectionKey
-    ? (() => {
-        const instance = pageInstances.find(p => p.id === selectedSectionKey);
-        const type = instance?.type || selectedSectionKey;
-        // Multi-strategy schema lookup
-        let schema = sectionSchemas[`sections/${type}.liquid`] || null;
-        if (!schema) {
-          // Try with dashes instead of underscores
-          schema = sectionSchemas[`sections/${type.replace(/_/g, "-")}.liquid`] || null;
-        }
-        if (!schema) {
-          // Try with underscores instead of dashes
-          schema = sectionSchemas[`sections/${type.replace(/-/g, "_")}.liquid`] || null;
-        }
-        if (!schema) {
-          // Try removing numeric suffixes (e.g. "hero_abc123" -> "hero")
-          const baseType = type.replace(/_[a-f0-9]{6,}$/i, "").replace(/-[a-f0-9]{6,}$/i, "");
-          schema = sectionSchemas[`sections/${baseType}.liquid`]
-            || sectionSchemas[`sections/${baseType.replace(/_/g, "-")}.liquid`]
-            || null;
-        }
-        if (!schema) {
-          // Try finding by schema name match (partial)
-          const typeLower = type.toLowerCase().replace(/-/g, "_");
-          for (const [k, v] of Object.entries(sectionSchemas)) {
-            const base = k.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
-            if (typeLower.startsWith(base) || typeLower.includes(base) || base.includes(typeLower)) {
-              schema = v; break;
-            }
-          }
-        }
-        if (!schema) {
-          // Fallback: try matching the selectedSectionKey directly against static sections
-          const staticMatch = sections.find(s => {
-            const sBase = s.key.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
-            const tBase = type.replace(/-/g,"_").toLowerCase();
-            return sBase === tBase || tBase.startsWith(sBase) || sBase.startsWith(tBase);
-          });
-          if (staticMatch) {
-            schema = sectionSchemas[staticMatch.key] || null;
-          }
-        }
-        return { key: selectedSectionKey, name: schema?.name || type || "", schema };
-      })()
-    : null;
-
+  // Build live section lists FIRST (so selectedSection resolver can reuse their schemas)
   const liveHeader: ShopifySection[] = [];
   const liveTemplate: ShopifySection[] = [];
   const liveFooter: ShopifySection[] = [];
 
-  pageInstances.forEach((instance) => {
-    const type = instance.type;
-    // Multi-strategy schema lookup for live sections
+  const resolveSchema = (type: string) => {
     let schema = sectionSchemas[`sections/${type}.liquid`] || null;
     if (!schema) schema = sectionSchemas[`sections/${type.replace(/_/g, "-")}.liquid`] || null;
     if (!schema) schema = sectionSchemas[`sections/${type.replace(/-/g, "_")}.liquid`] || null;
@@ -362,6 +315,20 @@ export default function ConvertFlowEditor() {
         }
       }
     }
+    if (!schema) {
+      const staticMatch = sections.find(s => {
+        const sBase = s.key.replace("sections/","").replace(".liquid","").replace(/-/g,"_").toLowerCase();
+        const tBase = type.replace(/-/g,"_").toLowerCase();
+        return sBase === tBase || tBase.startsWith(sBase) || sBase.startsWith(tBase);
+      });
+      if (staticMatch) schema = sectionSchemas[staticMatch.key] || null;
+    }
+    return schema;
+  };
+
+  pageInstances.forEach((instance) => {
+    const type = instance.type;
+    const schema = resolveSchema(type);
     const n = (schema?.name || type).toLowerCase();
     
     let group = "template";
@@ -380,6 +347,29 @@ export default function ConvertFlowEditor() {
     else if (group === "footer") liveFooter.push(sec);
     else liveTemplate.push(sec);
   });
+
+  // Now resolve selectedSection — first try the already-resolved live sections
+  const selectedSection: SelectedSectionState | null = selectedSectionKey
+    ? (() => {
+        // Strategy 1: Reuse schema from already-built live sections (most reliable)
+        const allLive = [...liveHeader, ...liveTemplate, ...liveFooter];
+        const liveMatch = allLive.find(s => s.key === selectedSectionKey);
+        console.log("[PageCraft Debug] selectedSectionKey:", selectedSectionKey);
+        console.log("[PageCraft Debug] pageInstances count:", pageInstances.length);
+        console.log("[PageCraft Debug] liveMatch:", liveMatch ? { key: liveMatch.key, name: liveMatch.name, hasSchema: !!liveMatch.schema, settingsCount: liveMatch.schema?.settings?.length } : "NOT FOUND");
+        console.log("[PageCraft Debug] sectionSchemas keys:", Object.keys(sectionSchemas));
+        if (liveMatch?.schema) {
+          return { key: selectedSectionKey, name: liveMatch.schema.name || liveMatch.name || "", schema: liveMatch.schema };
+        }
+        // Strategy 2: Full resolve using instance type
+        const instance = pageInstances.find(p => p.id === selectedSectionKey);
+        const type = instance?.type || selectedSectionKey;
+        console.log("[PageCraft Debug] instance type:", type);
+        const schema = resolveSchema(type);
+        console.log("[PageCraft Debug] resolved schema:", schema ? { name: schema.name, settingsCount: schema.settings?.length } : "NULL");
+        return { key: selectedSectionKey, name: schema?.name || type || "", schema };
+      })()
+    : null;
 
   const handleAddSection = useCallback((pos: number, _group: string) => {
     setAddModalInsertIndex(pos);
