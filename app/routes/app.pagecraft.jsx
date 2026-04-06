@@ -244,10 +244,9 @@ export default function PageCraftBuilder() {
   }, []);
 
   // Section operations
-  const handleSectionChange = useCallback((id, updated) => {
-    pushHistory();
-    setSections((prev) => prev.map((s) => (s.id === id ? updated : s)));
-  }, [pushHistory]);
+  const handleSectionChange = useCallback((id, partialUpdate) => {
+    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...partialUpdate } : s)));
+  }, []);
 
   const handleReorder = useCallback((fromIdx, toIdx) => {
     pushHistory();

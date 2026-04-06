@@ -59,12 +59,7 @@ export default function EditorCanvas({
                   </div>
                 )}
                 <div
-                  className={`pcc-section ${isSelected ? "pcc-section--selected" : ""} ${isDragging ? "pcc-section--dragging" : ""}`}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, idx)}
-                  onDragOver={(e) => handleDragOver(e, idx)}
-                  onDrop={(e) => handleDrop(e, idx)}
-                  onDragEnd={handleDragEnd}
+                  className={`pcc-section ${isSelected ? "pcc-section--selected" : ""}`}
                   onClick={() => onSelect(sec.id)}
                   onMouseEnter={() => setHoveredId(sec.id)}
                   onMouseLeave={() => setHoveredId(null)}

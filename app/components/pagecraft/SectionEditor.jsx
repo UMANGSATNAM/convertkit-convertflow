@@ -6,19 +6,19 @@ export default function SectionEditor({ section, onChange, onDelete, onDuplicate
   if (!section) return <EmptyState />;
 
   const meta = getSectionMeta(section.type);
-  const update = (key, value) => onChange(section.id, { ...section, [key]: value });
+  const update = (key, value) => onChange(section.id, { [key]: value });
   const updateNested = (key, subIdx, subKey, value) => {
     const arr = [...(section[key] || [])];
     arr[subIdx] = { ...arr[subIdx], [subKey]: value };
-    onChange(section.id, { ...section, [key]: arr });
+    onChange(section.id, { [key]: arr });
   };
   const addToArray = (key, defaultItem) => {
     const arr = [...(section[key] || []), defaultItem];
-    onChange(section.id, { ...section, [key]: arr });
+    onChange(section.id, { [key]: arr });
   };
   const removeFromArray = (key, subIdx) => {
     const arr = (section[key] || []).filter((_, i) => i !== subIdx);
-    onChange(section.id, { ...section, [key]: arr });
+    onChange(section.id, { [key]: arr });
   };
 
   return (
