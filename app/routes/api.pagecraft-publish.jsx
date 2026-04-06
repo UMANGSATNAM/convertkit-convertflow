@@ -102,6 +102,27 @@ function buildPageHtml(sections) {
       case "urgency_bar":
         parts.push(buildUrgencyBarHtml(section));
         break;
+      case "announcement_bar":
+        parts.push(buildAnnouncementBarHtml(section));
+        break;
+      case "image_with_text":
+        parts.push(buildImageWithTextHtml(section));
+        break;
+      case "newsletter":
+        parts.push(buildNewsletterHtml(section));
+        break;
+      case "countdown_timer":
+        parts.push(buildCountdownTimerHtml(section));
+        break;
+      case "video_hero":
+        parts.push(buildVideoHeroHtml(section));
+        break;
+      case "brand_logos":
+        parts.push(buildBrandLogosHtml(section));
+        break;
+      case "cta_banner":
+        parts.push(buildCtaBannerHtml(section));
+        break;
       case "footer":
         parts.push(buildFooterHtml(section));
         break;
@@ -238,6 +259,110 @@ function escHtml(str) {
   if (!str) return "";
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+
+function buildAnnouncementBarHtml(s) {
+  const bg = s.background_color || "#1E293B";
+  const color = s.text_color || "#fff";
+  return `
+<div style="background:${bg};color:${color};padding:${s.padding_y || 12}px 20px;text-align:center;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;">
+  <span>${escHtml(s.message || "")}</span>
+  ${s.link_text ? `<a href="${escHtml(s.link_url || "#")}" style="color:${color};opacity:0.85;font-size:12px;">${escHtml(s.link_text)} →</a>` : ""}
+</div>`;
+}
+
+function buildImageWithTextHtml(s) {
+  const imgFirst = s.image_position !== "right";
+  const imgBlock = s.image_url
+    ? `<div style="min-height:300px;"><img src="${escHtml(s.image_url)}" alt="" style="width:100%;height:100%;object-fit:cover;" /></div>`
+    : `<div style="min-height:300px;background:linear-gradient(135deg,#CBD5E1,#94A3B8);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">Image</div>`;
+  const textBlock = `
+    <div style="padding:${s.padding_y || 48}px 32px;display:flex;flex-direction:column;justify-content:center;gap:12px;">
+      <h2 style="font-size:28px;font-weight:700;color:#1E293B;margin:0;">${escHtml(s.headline || "Our Story")}</h2>
+      <p style="font-size:15px;color:#475569;line-height:1.7;margin:0;">${escHtml(s.text || "")}</p>
+      ${s.cta_text ? `<a href="${escHtml(s.cta_url || "#")}" style="display:inline-block;padding:12px 24px;background:${s.cta_color || "#10B981"};color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;align-self:flex-start;">${escHtml(s.cta_text)}</a>` : ""}
+    </div>`;
+  return `
+<div style="display:grid;grid-template-columns:1fr 1fr;background:${s.background_color || "#F8FAFC"};border-radius:12px;overflow:hidden;margin-bottom:24px;">
+  ${imgFirst ? imgBlock + textBlock : textBlock + imgBlock}
+</div>`;
+}
+
+function buildNewsletterHtml(s) {
+  return `
+<div style="background:${s.background_color || "#0F172A"};color:${s.text_color || "#fff"};padding:${s.padding_y || 48}px 24px;text-align:center;border-radius:12px;margin-bottom:24px;">
+  <h2 style="font-size:28px;font-weight:700;margin:0 0 8px;">${escHtml(s.headline || "Stay in the Loop")}</h2>
+  <p style="font-size:15px;opacity:0.7;margin:0 0 24px;">${escHtml(s.subtext || "")}</p>
+  <div style="display:flex;gap:8px;justify-content:center;max-width:420px;margin:0 auto;">
+    <input type="email" placeholder="${escHtml(s.placeholder || "Enter your email")}" style="flex:1;padding:12px 16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:14px;outline:none;" />
+    <button style="padding:12px 24px;background:${s.button_color || "#10B981"};color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">${escHtml(s.button_text || "Subscribe")}</button>
+  </div>
+</div>`;
+}
+
+function buildCountdownTimerHtml(s) {
+  const endDate = s.end_date || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  return `
+<div style="background:${s.background_color || "#0F172A"};color:${s.text_color || "#fff"};padding:${s.padding_y || 48}px 24px;text-align:center;border-radius:12px;margin-bottom:24px;">
+  <h2 style="font-size:28px;font-weight:700;margin:0 0 8px;">${escHtml(s.headline || "Sale Ends In")}</h2>
+  <p style="font-size:15px;opacity:0.7;margin:0 0 24px;">${escHtml(s.subtext || "")}</p>
+  <div id="pc-countdown" style="display:flex;justify-content:center;gap:16px;" data-end="${escHtml(endDate)}">
+    ${["Days", "Hrs", "Min", "Sec"].map(u => `
+      <div style="text-align:center;">
+        <div style="font-size:36px;font-weight:800;background:rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;min-width:60px;border:2px solid ${s.accent_color || "#EF4444"};">--</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-top:6px;opacity:0.6;">${u}</div>
+      </div>`).join("")}
+  </div>
+  <script>
+    (function(){
+      var el=document.getElementById('pc-countdown');if(!el)return;
+      var end=new Date(el.dataset.end).getTime();
+      var divs=el.querySelectorAll('div > div:first-child');
+      setInterval(function(){
+        var now=Date.now(),d=Math.max(0,end-now);
+        var days=Math.floor(d/86400000),hrs=Math.floor((d%86400000)/3600000),min=Math.floor((d%3600000)/60000),sec=Math.floor((d%60000)/1000);
+        if(divs[0])divs[0].textContent=String(days).padStart(2,'0');
+        if(divs[1])divs[1].textContent=String(hrs).padStart(2,'0');
+        if(divs[2])divs[2].textContent=String(min).padStart(2,'0');
+        if(divs[3])divs[3].textContent=String(sec).padStart(2,'0');
+      },1000);
+    })();
+  </script>
+</div>`;
+}
+
+function buildVideoHeroHtml(s) {
+  const bg = s.background_color || "#000";
+  return `
+<div style="background:${bg};padding:${s.padding_y || 80}px 24px;text-align:center;color:${s.text_color || "#fff"};border-radius:12px;margin-bottom:24px;">
+  <h1 style="font-size:36px;font-weight:800;margin:0 0 12px;">${escHtml(s.headline || "See It In Action")}</h1>
+  <p style="font-size:16px;opacity:0.75;margin:0 0 24px;max-width:560px;margin-left:auto;margin-right:auto;">${escHtml(s.subtext || "")}</p>
+  <div style="max-width:640px;margin:0 auto;border-radius:12px;overflow:hidden;aspect-ratio:16/9;">
+    <iframe src="${escHtml(s.video_url || "")}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
+  </div>
+  ${s.cta_text ? `<a href="/collections/all" style="display:inline-block;padding:14px 36px;background:${s.cta_color || "#3B82F6"};color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px;margin-top:24px;">${escHtml(s.cta_text)}</a>` : ""}
+</div>`;
+}
+
+function buildBrandLogosHtml(s) {
+  return `
+<div style="padding:${s.padding_y || 32}px 24px;text-align:center;background:${s.background_color || "#fff"};border-radius:12px;margin-bottom:24px;">
+  ${s.headline ? `<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94A3B8;margin:0 0 20px;">${escHtml(s.headline)}</p>` : ""}
+  <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;align-items:center;">
+    ${(s.logos || []).map(l => `<span style="font-size:16px;font-weight:800;color:#475569;letter-spacing:0.05em;opacity:0.5;">${escHtml(l.text || l.name)}</span>`).join("")}
+  </div>
+</div>`;
+}
+
+function buildCtaBannerHtml(s) {
+  return `
+<div style="background:${s.background_color || "#10B981"};color:${s.text_color || "#fff"};padding:${s.padding_y || 48}px 24px;text-align:center;border-radius:12px;margin-bottom:24px;">
+  <h2 style="font-size:32px;font-weight:800;margin:0 0 8px;">${escHtml(s.headline || "Ready to Get Started?")}</h2>
+  <p style="font-size:16px;opacity:0.85;margin:0 0 24px;">${escHtml(s.subtext || "")}</p>
+  ${s.cta_text ? `<a href="${escHtml(s.cta_url || "/collections/all")}" style="display:inline-block;padding:14px 36px;background:${s.cta_color || "rgba(255,255,255,0.2)"};color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px;border:2px solid rgba(255,255,255,0.4);">${escHtml(s.cta_text)}</a>` : ""}
+</div>`;
+}
+
+
 
 function buildWhatsAppWidgetHtml(phone, storeName) {
   const cleanPhone = phone.replace(/[^\d+]/g, "");

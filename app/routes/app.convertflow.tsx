@@ -249,7 +249,7 @@ export default function ConvertFlowEditor() {
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [sendToIframe]);
+  }, [sendToIframe, sectionSchemas]);
 
   const handlePageChange = useCallback((page: string) => {
     setCurrentPage(page);
@@ -351,22 +351,14 @@ export default function ConvertFlowEditor() {
   // Now resolve selectedSection — first try the already-resolved live sections
   const selectedSection: SelectedSectionState | null = selectedSectionKey
     ? (() => {
-        // Strategy 1: Reuse schema from already-built live sections (most reliable)
         const allLive = [...liveHeader, ...liveTemplate, ...liveFooter];
         const liveMatch = allLive.find(s => s.key === selectedSectionKey);
-        console.log("[PageCraft Debug] selectedSectionKey:", selectedSectionKey);
-        console.log("[PageCraft Debug] pageInstances count:", pageInstances.length);
-        console.log("[PageCraft Debug] liveMatch:", liveMatch ? { key: liveMatch.key, name: liveMatch.name, hasSchema: !!liveMatch.schema, settingsCount: liveMatch.schema?.settings?.length } : "NOT FOUND");
-        console.log("[PageCraft Debug] sectionSchemas keys:", Object.keys(sectionSchemas));
         if (liveMatch?.schema) {
           return { key: selectedSectionKey, name: liveMatch.schema.name || liveMatch.name || "", schema: liveMatch.schema };
         }
-        // Strategy 2: Full resolve using instance type
         const instance = pageInstances.find(p => p.id === selectedSectionKey);
         const type = instance?.type || selectedSectionKey;
-        console.log("[PageCraft Debug] instance type:", type);
         const schema = resolveSchema(type);
-        console.log("[PageCraft Debug] resolved schema:", schema ? { name: schema.name, settingsCount: schema.settings?.length } : "NULL");
         return { key: selectedSectionKey, name: schema?.name || type || "", schema };
       })()
     : null;
