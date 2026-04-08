@@ -22,6 +22,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Overview
         </Link>
+        <Link to="/app/builder">Page Builder</Link>
         <Link to="/app/pagecraft">PageCraft Builder</Link>
         <Link to="/app/sections">Sections</Link>
         <Link to="/app/pages">Pages</Link>
