@@ -13,6 +13,16 @@ import proteinData from "./templates/lp-protein-supplement.json";
 import skincareData from "./templates/lp-korean-skincare.json";
 import petData from "./templates/lp-pet-supplies.json";
 import coffeeData from "./templates/lp-coffee-brand.json";
+import matchaData from "./templates/lp-superfood-matcha.json";
+import securityData from "./templates/lp-smart-security.json";
+import watchData from "./templates/lp-luxury-watch.json";
+import cleaningData from "./templates/lp-eco-cleaning.json";
+import journalData from "./templates/lp-productivity-journal.json";
+import luggageData from "./templates/lp-travel-luggage.json";
+import serumData from "./templates/lp-haircare-serum.json";
+import yogaData from "./templates/lp-yoga-equipment.json";
+import chairData from "./templates/lp-ergonomic-chair.json";
+import snacksData from "./templates/lp-vegan-snacks.json";
 import { generateId } from "../components/pagecraft/sectionRegistry";
 
 // ── Template Metadata ──
@@ -196,6 +206,126 @@ export const TEMPLATES = [
     tags: ["Coffee", "Food", "Subscription", "Specialty"],
     data: coffeeData,
   },
+  {
+    id: "superfood-matcha",
+    name: "ZenBlend — Superfood Matcha",
+    category: "food",
+    niche: "superfoods",
+    description: "Vibrant, high-energy superfood matcha page with vibrant green tones, health benefits grids, recipe sections, and a subscription funnel.",
+    icon: "🍵",
+    gradient: "linear-gradient(135deg, #22C55E, #DCFCE7)",
+    sectionCount: 8,
+    tags: ["Food", "Superfoods", "Subscription", "Energy"],
+    data: matchaData,
+  },
+  {
+    id: "smart-security",
+    name: "SecureLens — Smart Home Security",
+    category: "electronics",
+    niche: "security",
+    description: "Tech-driven smart home security page with a dark aesthetic, 4K camera features, AI detection callouts, and multi-camera bundles.",
+    icon: "📸",
+    gradient: "linear-gradient(135deg, #3B82F6, #1E293B)",
+    sectionCount: 7,
+    tags: ["Electronics", "Security", "Smart Home", "Bundles"],
+    data: securityData,
+  },
+  {
+    id: "luxury-watch",
+    name: "Chronos — Luxury Automatic Watch",
+    category: "fashion",
+    niche: "watches",
+    description: "Premium dark-mode watch landing page featuring auto-movement specs, craftsmanship storytelling, macro imagery placeholders, and elegant serif typography.",
+    icon: "⏱️",
+    gradient: "linear-gradient(135deg, #D4AF37, #111111)",
+    sectionCount: 7,
+    tags: ["Fashion", "Watches", "Luxury", "Pre-Order"],
+    data: watchData,
+  },
+  {
+    id: "eco-cleaning",
+    name: "PureEarth — Eco Cleaning",
+    category: "home",
+    niche: "cleaning",
+    description: "Clean, airy pastel landing page for eco-friendly cleaning supplies. Focuses on safe ingredients, reusable bottles, and subscription refilling.",
+    icon: "🫧",
+    gradient: "linear-gradient(135deg, #14B8A6, #CCFBF1)",
+    sectionCount: 6,
+    tags: ["Home", "Cleaning", "Eco-Friendly", "Subscription"],
+    data: cleaningData,
+  },
+  {
+    id: "productivity-journal",
+    name: "FocusFlow — Productivity Journal",
+    category: "general",
+    niche: "stationery",
+    description: "Warm, minimalist productivity journal landing page with cream and gold tones. Highlights habit tracking layouts and 90-day focus psychology.",
+    icon: "📓",
+    gradient: "linear-gradient(135deg, #CA8A04, #FAFAF9)",
+    sectionCount: 6,
+    tags: ["Journal", "Stationery", "Productivity", "Mindfulness"],
+    data: journalData,
+  },
+  {
+    id: "travel-luggage",
+    name: "AeroTrek — Premium Luggage",
+    category: "general",
+    niche: "travel",
+    description: "Sleek, modern luggage landing page showcasing indestructible polycarbonate shells, 360 spinner wheels, and lifetime warranties. Metallic silver and navy tones.",
+    icon: "✈️",
+    gradient: "linear-gradient(135deg, #1E3A8A, #E2E8F0)",
+    sectionCount: 7,
+    tags: ["Travel", "Luggage", "Premium", "Durable"],
+    data: luggageData,
+  },
+  {
+    id: "haircare-serum",
+    name: "AuraLocks — Hair Growth Serum",
+    category: "beauty",
+    niche: "haircare",
+    description: "Luxurious, scientifically backed haircare serum landing page with deep purple and gold tones. Highlights clinical trials, before/after galleries, and subscriptions.",
+    icon: "💧",
+    gradient: "linear-gradient(135deg, #4C1D95, #DDD6FE)",
+    sectionCount: 7,
+    tags: ["Beauty", "Haircare", "Science", "Subscription"],
+    data: serumData,
+  },
+  {
+    id: "yoga-equipment",
+    name: "PranaMats — Yoga Equipment",
+    category: "fitness",
+    niche: "yoga",
+    description: "Earthy, calming eco-friendly yoga mat landing page. Focuses on grip technology, natural rubber materials, and alignment lines.",
+    icon: "🧘‍♀️",
+    gradient: "linear-gradient(135deg, #3F6212, #F4F1EA)",
+    sectionCount: 6,
+    tags: ["Fitness", "Yoga", "Eco-Friendly", "Mindful"],
+    data: yogaData,
+  },
+  {
+    id: "ergonomic-chair",
+    name: "ErgoFlex — Office Chair",
+    category: "home",
+    niche: "furniture",
+    description: "Modern dark-mode office furniture landing page with neon blue accents. Focuses on lumbar support tech, posture correction, and work-from-home ergonomics.",
+    icon: "💺",
+    gradient: "linear-gradient(135deg, #38BDF8, #1E293B)",
+    sectionCount: 6,
+    tags: ["Home Office", "Furniture", "Ergonomic", "WFH"],
+    data: chairData,
+  },
+  {
+    id: "vegan-snacks",
+    name: "CrunchBite — Vegan Protein Bars",
+    category: "food",
+    niche: "snacks",
+    description: "Playful, energetic snack bar landing page using vibrant bold colors, macro ingredient photography placeholders, and a subscribe & save focus.",
+    icon: "💥",
+    gradient: "linear-gradient(135deg, #E11D48, #FECDD3)",
+    sectionCount: 6,
+    tags: ["Food", "Snacks", "Vegan", "High Protein"],
+    data: snacksData,
+  }
 ];
 
 // ── Helpers ──

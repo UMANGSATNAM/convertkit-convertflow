@@ -16,9 +16,11 @@ import { useNavigate } from "@remix-run/react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { TEMPLATES, TEMPLATE_CATEGORIES } from "../data/template-registry";
 
+import { json } from "@remix-run/node";
+
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
-  return null;
+  return json({ ok: true });
 };
 
 // ── Iframe with loading/error fallback ──
@@ -208,5 +210,117 @@ function PreviewPanel({ template, onClose, onUseTemplate }) {
         @keyframes ckSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
       `}</style>
     </>
+  );
+}
+
+export default function TemplateLibrary() {
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [activePreview, setActivePreview] = useState(null);
+
+  const activeCategory = TEMPLATE_CATEGORIES[selectedCategory];
+  
+  const filteredTemplates = TEMPLATES.filter(
+    (t) => activeCategory.id === "all" || t.category === activeCategory.id
+  );
+
+  const tabs = TEMPLATE_CATEGORIES.map((cat, index) => ({
+    id: cat.id,
+    content: cat.label,
+    accessibilityLabel: cat.label,
+    panelID: `${cat.id}-panel`,
+  }));
+
+  const handleUseTemplate = (templateId) => {
+    navigate(`/app/builder/new?templateId=${templateId}`);
+  };
+
+  return (
+    <Page fullWidth>
+      <TitleBar title="Template Library" />
+      <BlockStack gap="500">
+        <div style={{ padding: "0 10px" }}>
+          <Text as="h1" variant="headingLg">PageCraft Template Library</Text>
+          <Text as="p" tone="subdued">Select from our collection of high-converting, fully responsive landing page templates.</Text>
+        </div>
+
+        <Tabs tabs={tabs} selected={selectedCategory} onSelect={setSelectedCategory}>
+          <div style={{ paddingTop: "20px" }}>
+            {filteredTemplates.length === 0 ? (
+              <div style={{ padding: "40px", textAlign: "center", background: "#f9fafb", borderRadius: "12px", border: "1px dashed #d1d5db" }}>
+                <Text as="p" tone="subdued">No templates found in this category yet. Check back soon!</Text>
+              </div>
+            ) : (
+              <Grid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }}>
+                {filteredTemplates.map((template) => (
+                  <Grid.Cell key={template.id}>
+                    <div 
+                      onClick={() => setActivePreview(template)}
+                      style={{ 
+                        cursor: "pointer", 
+                        background: "#fff",
+                        borderRadius: "12px",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        border: "1px solid #e5e7eb",
+                        overflow: "hidden",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "none";
+                        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    >
+                      {/* Visual Header */}
+                      <div style={{ 
+                        height: "140px", 
+                        background: template.gradient || "#f3f4f6", 
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "center",
+                        fontSize: "48px"
+                      }}>
+                        {template.icon}
+                      </div>
+
+                      {/* Content */}
+                      <div style={{ padding: "16px", display: "flex", flexDirection: "column", flexGrow: 1, gap: "10px" }}>
+                        <div>
+                          <Text as="h3" variant="headingMd" fontWeight="bold">
+                            {template.name}
+                          </Text>
+                          <Text as="p" tone="subdued" variant="bodySm">
+                            {template.description.slice(0, 80)}...
+                          </Text>
+                        </div>
+                        
+                        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Badge tone="success">{template.sectionCount} Sections</Badge>
+                          <Text as="span" variant="bodySm" tone="subdued" fontWeight="medium">
+                            {template.niche.toUpperCase()}
+                          </Text>
+                        </div>
+                      </div>
+                    </div>
+                  </Grid.Cell>
+                ))}
+              </Grid>
+            )}
+          </div>
+        </Tabs>
+      </BlockStack>
+
+      <PreviewPanel 
+        template={activePreview} 
+        onClose={() => setActivePreview(null)}
+        onUseTemplate={handleUseTemplate}
+      />
+    </Page>
   );
 }
