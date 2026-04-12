@@ -19,13 +19,31 @@ export function blockToHtml(sections, globalStyles = {}) {
   return `${fontLink}
 <style>
   :root { ${cssVars} }
-  .pb-page { font-family: var(--pb-font-body, 'Inter', sans-serif); color: var(--pb-text, #1E1E1E); line-height: 1.6; margin: 0; }
+  .pb-page { font-family: var(--pb-font-body, 'Inter', sans-serif); color: var(--pb-text, #1E1E1E); line-height: 1.6; margin: 0; overflow-x: hidden; }
   .pb-page * { box-sizing: border-box; margin: 0; padding: 0; }
   .pb-page img { max-width: 100%; height: auto; }
   .pb-page a { text-decoration: none; color: inherit; }
   .pb-heading { font-family: var(--pb-font-heading, 'Inter', serif); }
-  .pb-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
   @keyframes pb-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Responsive Utilities */
+  .pb-section { padding: 80px 6% !important; }
+  .pb-section-sm { padding: 20px 6% !important; }
+  .pb-split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .pb-grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .pb-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 52px; }
+  .pb-flex-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+
+  @media (max-width: 768px) {
+    .pb-section { padding: 50px 20px !important; }
+    .pb-section-sm { padding: 20px 20px !important; }
+    .pb-split { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .pb-footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .pb-mobile-col { flex-direction: column !important; align-items: flex-start !important; }
+    .pb-mobile-col > div { text-align: left !important; }
+    .pb-mobile-align-center { align-items: center !important; text-align: center !important; }
+    .pb-responsive-hero { min-height: auto !important; }
+  }
 </style>
 <div class="pb-page">
 ${sectionHtml}
@@ -130,22 +148,22 @@ function renderHero(s, fonts) {
     ${s.price_badge ? `<span style="background:var(--pb-secondary,#8FA68B);color:#fff;padding:4px 12px;font-size:12px;font-weight:600;">${esc(s.price_badge)}</span>` : ""}
   </div>` : "";
 
-  return `<section style="display:grid;grid-template-columns:1fr 1fr;min-height:88vh;background:${bg};color:${textCol};">
-  <div style="display:flex;flex-direction:column;justify-content:center;padding:80px 60px;">
+  return `<section class="pb-split pb-responsive-hero" style="min-height:88vh;background:${bg};color:${textCol};">
+  <div class="pb-section pb-mobile-align-center" style="display:flex;flex-direction:column;justify-content:center;">
     ${s.badge_text ? `<div style="display:inline-flex;align-items:center;gap:8px;background:var(--pb-accent,#F5D5C8);color:var(--pb-primary);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;width:fit-content;">${esc(s.badge_text)}</div>` : ""}
     <h1 class="pb-heading" style="font-family:'${headlineFont}',serif;font-size:clamp(44px,5vw,68px);line-height:1.05;font-weight:700;margin-bottom:20px;">${headline}</h1>
     ${s.subtext ? `<p style="font-size:15px;color:var(--pb-muted);line-height:1.8;max-width:420px;margin-bottom:32px;">${esc(s.subtext)}</p>` : ""}
-    ${features ? `<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;">${features}</div>` : ""}
+    ${features ? `<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;text-align:left;">${features}</div>` : ""}
     ${priceHtml}
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      ${s.cta_text ? `<a href="#shop" style="display:inline-block;background:${ctaColor};color:${ctaColor === "#1E1E1E" || ctaColor === "#111111" || ctaColor === "#080808" ? "#fff" : "#000"};padding:16px 44px;font-size:14px;font-weight:500;border:2px solid ${ctaColor};">${esc(s.cta_text)}</a>` : ""}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:inherit;">
+      ${s.cta_text ? `<a href="#shop" style="display:inline-block;background:${ctaColor};color:${ctaColor === "#1E1E1E" || ctaColor === "#111111" || ctaColor === "#080808" || ctaColor === "#020617" || ctaColor === "#4C1D95" || ctaColor === "#1E3A8A" || ctaColor === "#14532D" || ctaColor === "#4C0519" ? "#fff" : "#000"};padding:16px 44px;font-size:14px;font-weight:500;border:2px solid ${ctaColor};">${esc(s.cta_text)}</a>` : ""}
       ${s.cta_secondary_text ? `<a href="#info" style="display:inline-block;background:transparent;color:${textCol};padding:16px 44px;font-size:14px;font-weight:500;border:2px solid var(--pb-border,#E0E0E0);">${esc(s.cta_secondary_text)}</a>` : ""}
     </div>
   </div>
-  <div style="background:${s.image_bg_gradient || s.image_bg_color || 'var(--pb-surface)'};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+  <div style="background:${s.image_bg_gradient || s.image_bg_color || 'var(--pb-surface)'};min-height:350px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
     <div style="text-align:center;padding:40px;">
-      ${s.image_label ? `<div class="pb-heading" style="font-size:24px;color:var(--pb-primary);">${esc(s.image_label)}</div>` : ""}
-      ${s.image_sublabel ? `<div style="font-size:12px;letter-spacing:.12em;color:var(--pb-muted);text-transform:uppercase;margin-top:6px;">${esc(s.image_sublabel)}</div>` : ""}
+      ${s.image_label ? `<div class="pb-heading" style="font-size:48px;color:var(--pb-primary);">${esc(s.image_label)}</div>` : ""}
+      ${s.image_sublabel ? `<div style="font-size:12px;letter-spacing:.12em;color:var(--pb-muted);text-transform:uppercase;margin-top:6px;font-weight:bold;">${esc(s.image_sublabel)}</div>` : ""}
     </div>
   </div>
 </section>`;
@@ -156,11 +174,11 @@ function renderTrustBadges(s) {
   const bg = s.background_color || "#1E1E1E";
   const textCol = s.text_color || "#FFFFFF";
   const badges = s.badges || [];
-  const items = badges.map((b) => `<div style="padding:0 40px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.1);">
+  const items = badges.map((b) => `<div style="padding:10px 20px;display:flex;align-items:center;gap:10px;">
     <span style="font-size:18px;">${esc(b.icon)}</span>
     <span style="font-size:13px;color:rgba(255,255,255,.75);"><strong style="color:#fff;">${esc(b.number || "")}</strong> ${esc(b.label)}</span>
   </div>`).join("");
-  return `<div style="background:${bg};color:${textCol};padding:20px 60px;display:flex;justify-content:center;">${items}</div>`;
+  return `<div class="pb-section-sm pb-flex-wrap" style="background:${bg};color:${textCol};">${items}</div>`;
 }
 
 // ── Product Showcase ──
@@ -185,11 +203,11 @@ function renderProductShowcase(s, fonts) {
     </div>
   </div>`).join("");
 
-  return `<section style="padding:${s.padding_y || 80}px 60px;background:${s.background_color || "#FFFFFF"};">
-  ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;">${esc(s.kicker)}</div>` : ""}
-  <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;">${esc(s.headline || "")}</h2>
-  ${s.subtext ? `<p style="font-size:15px;color:var(--pb-muted);max-width:460px;line-height:1.8;margin-bottom:52px;">${esc(s.subtext)}</p>` : ""}
-  <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:24px;">${cards}</div>
+  return `<section class="pb-section" style="background:${s.background_color || "#FFFFFF"};">
+  ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;text-align:center;">${esc(s.kicker)}</div>` : ""}
+  <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;text-align:center;">${esc(s.headline || "")}</h2>
+  ${s.subtext ? `<p style="font-size:15px;color:var(--pb-muted);max-width:460px;line-height:1.8;margin:0 auto 52px;text-align:center;">${esc(s.subtext)}</p>` : ""}
+  <div class="pb-grid-auto">${cards}</div>
 </section>`;
 }
 
@@ -206,16 +224,16 @@ function renderImageWithText(s, fonts) {
     <div style="font-size:12px;color:var(--pb-muted);">${esc(f.text)}</div>
   </div>`).join("");
 
-  return `<section style="padding:${s.padding_y || 80}px 60px;background:${s.background_color || "var(--pb-surface)"};">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
-    <div>
+  return `<section class="pb-section" style="background:${s.background_color || "var(--pb-surface)"};">
+  <div class="pb-split" style="align-items:center;">
+    <div style="order:${s.image_position === 'right' ? 1 : 2};">
       ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;">${esc(s.kicker)}</div>` : ""}
       <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;">${headline}</h2>
       ${s.text ? `<p style="font-size:15px;color:var(--pb-muted);max-width:460px;line-height:1.8;margin-bottom:52px;">${esc(s.text)}</p>` : ""}
-      ${features ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">${features}</div>` : ""}
+      ${features ? `<div class="pb-grid-auto" style="gap:16px;">${features}</div>` : ""}
     </div>
-    <div style="background:${s.image_bg_gradient || "var(--pb-surface)"};aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-      ${s.image_label ? `<div class="pb-heading" style="font-size:36px;color:var(--pb-primary);">${esc(s.image_label)}</div>` : ""}
+    <div style="order:${s.image_position === 'right' ? 2 : 1};background:${s.image_bg_gradient || "var(--pb-surface)"};aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+      ${s.image_label ? `<div class="pb-heading" style="font-size:48px;color:var(--pb-primary);">${esc(s.image_label)}</div>` : ""}
     </div>
   </div>
 </section>`;
@@ -235,14 +253,14 @@ function renderSocialProof(s, fonts) {
     ${r.tag ? `<span style="display:inline-block;background:var(--pb-accent,#F5D5C8);color:var(--pb-primary);font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;">${esc(r.tag)}</span>` : ""}
   </div>`).join("");
 
-  return `<section style="padding:${s.padding_y || 80}px 60px;background:${s.background_color || "#FFFFFF"};">
-  ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;">${esc(s.kicker)}</div>` : ""}
-  <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;">${esc(s.headline || "")}</h2>
-  ${s.overall_rating ? `<div style="display:flex;align-items:center;gap:16px;margin-bottom:40px;">
+  return `<section class="pb-section" style="background:${s.background_color || "#FFFFFF"};">
+  ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;text-align:center;">${esc(s.kicker)}</div>` : ""}
+  <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;text-align:center;">${esc(s.headline || "")}</h2>
+  ${s.overall_rating ? `<div class="pb-mobile-col" style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:40px;">
     <div class="pb-heading" style="font-size:56px;font-weight:700;line-height:1;">${esc(s.overall_rating)}</div>
     <div><div style="color:var(--pb-primary);font-size:20px;letter-spacing:2px;">★★★★★</div><div style="font-size:13px;color:var(--pb-muted);margin-top:4px;">Based on ${esc(s.total_reviews || "")} reviews</div></div>
   </div>` : ""}
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">${cards}</div>
+  <div class="pb-grid-auto">${cards}</div>
 </section>`;
 }
 
@@ -261,10 +279,10 @@ function renderFaq(s, fonts) {
     </div>
   </div>`).join("");
 
-  return `<section style="padding:${s.padding_y || 80}px 60px;background:${s.background_color || "#FFFFFF"};${align}">
+  return `<section class="pb-section" style="background:${s.background_color || "#FFFFFF"};${align}">
   ${s.kicker ? `<div style="font-size:12px;letter-spacing:.14em;color:var(--pb-primary);text-transform:uppercase;font-weight:600;margin-bottom:12px;">${esc(s.kicker)}</div>` : ""}
   <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:48px;max-width:${align ? "100%" : "560px"};">${esc(s.headline || "")}</h2>
-  <div style="max-width:800px;${align ? "margin:0 auto;" : ""}">${faqItems}</div>
+  <div style="max-width:800px;${align || s.alignment==='center' ? "margin:0 auto;" : ""}">${faqItems}</div>
 </section>
 <style>.pb-faq-open .pb-faq-icon{transform:rotate(45deg)!important;}.pb-faq-open .pb-faq-a{max-height:200px!important;}</style>`;
 }
@@ -272,7 +290,7 @@ function renderFaq(s, fonts) {
 // ── CTA Banner ──
 function renderCtaBanner(s, fonts) {
   const headingFont = fonts.heading || "Inter";
-  return `<section style="padding:${s.padding_y || 80}px 60px;background:${s.background_color || "var(--pb-primary)"};color:${s.text_color || "#FFFFFF"};text-align:center;">
+  return `<section class="pb-section" style="background:${s.background_color || "var(--pb-primary)"};color:${s.text_color || "#FFFFFF"};text-align:center;">
   <h2 class="pb-heading" style="font-family:'${headingFont}',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:16px;">${esc(s.headline || "")}</h2>
   ${s.subtext ? `<p style="font-size:15px;opacity:.7;max-width:480px;margin:0 auto 40px;">${esc(s.subtext)}</p>` : ""}
   ${s.cta_text ? `<a href="#shop" style="display:inline-block;background:${s.cta_color || "#FFFFFF"};color:${s.cta_text_color || "#1E1E1E"};padding:16px 44px;font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;">${esc(s.cta_text)}</a>` : ""}
@@ -281,11 +299,11 @@ function renderCtaBanner(s, fonts) {
 
 // ── Newsletter ──
 function renderNewsletter(s) {
-  return `<section style="padding:${s.padding_y || 48}px 60px;background:${s.background_color || "#0F172A"};color:${s.text_color || "#FFFFFF"};text-align:center;">
+  return `<section class="pb-section-sm" style="background:${s.background_color || "#0F172A"};color:${s.text_color || "#FFFFFF"};text-align:center;">
   <div style="font-size:24px;font-weight:700;margin-bottom:8px;">${esc(s.headline || "Stay in the Loop")}</div>
   <div style="color:rgba(255,255,255,.6);font-size:14px;margin-bottom:24px;">${esc(s.subtext || "")}</div>
   <div style="display:flex;gap:8px;max-width:400px;margin:0 auto;">
-    <input placeholder="${esc(s.placeholder || "Email")}" style="flex:1;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;font-size:14px;">
+    <input placeholder="${esc(s.placeholder || "Email")}" style="flex:1;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;font-size:14px;min-width:0;">
     <button style="background:${s.button_color || "#10B981"};color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">${esc(s.button_text || "Subscribe")}</button>
   </div>
 </section>`;
@@ -293,9 +311,9 @@ function renderNewsletter(s) {
 
 // ── Countdown ──
 function renderCountdown(s) {
-  return `<section style="padding:${s.padding_y || 48}px 60px;background:${s.background_color || "#0F172A"};color:${s.text_color || "#FFFFFF"};text-align:center;">
+  return `<section class="pb-section-sm" style="background:${s.background_color || "#0F172A"};color:${s.text_color || "#FFFFFF"};text-align:center;">
   <div style="font-size:20px;font-weight:700;margin-bottom:16px;">${esc(s.headline || "Sale Ends In")}</div>
-  <div style="display:flex;gap:16px;justify-content:center;">
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
     ${["23", "14", "52", "08"].map((v, i) => `<div style="background:rgba(255,255,255,.1);border-radius:8px;padding:12px 16px;min-width:60px;">
       <div style="font-size:28px;font-weight:800;color:${s.accent_color || "#EF4444"};">${v}</div>
       <div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;">${["HRS", "MIN", "SEC", "MS"][i]}</div>
@@ -306,7 +324,7 @@ function renderCountdown(s) {
 
 // ── Urgency Bar ──
 function renderUrgencyBar(s) {
-  return `<div style="background:${s.background_color || "#DC2626"};color:${s.text_color || "#FFFFFF"};padding:${s.padding_y || 12}px 60px;text-align:center;font-size:14px;font-weight:500;">${esc(s.message || "")}</div>`;
+  return `<div style="background:${s.background_color || "#DC2626"};color:${s.text_color || "#FFFFFF"};padding:12px 20px;text-align:center;font-size:14px;font-weight:500;">${esc(s.message || "")}</div>`;
 }
 
 // ── Footer ──
@@ -320,15 +338,15 @@ function renderFooter(s, fonts) {
     </ul>
   </div>`).join("");
 
-  return `<footer style="background:${s.background_color || "#1E1E1E"};color:rgba(255,255,255,.6);padding:${s.padding_y || 60}px 60px 28px;">
-  <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:52px;margin-bottom:48px;">
+  return `<footer class="pb-section" style="background:${s.background_color || "#1E1E1E"};color:rgba(255,255,255,.6);padding-bottom:28px !important;">
+  <div class="pb-footer-grid" style="margin-bottom:48px;">
     <div>
       <a href="#" class="pb-heading" style="font-family:'${headingFont}',serif;font-size:24px;font-weight:700;color:#fff;text-decoration:none;display:block;margin-bottom:14px;">${esc(s.logo_text || "Store")}</a>
       <p style="font-size:14px;line-height:1.75;max-width:280px;color:rgba(255,255,255,.5);">${esc(s.tagline || "")}</p>
     </div>
     ${colsHtml}
   </div>
-  <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;font-size:12px;">
+  <div class="pb-mobile-col" style="border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;font-size:12px;gap:16px;">
     <span>${esc(s.copyright || "")}</span>
     <span>${esc(s.footer_note || "")}</span>
   </div>
