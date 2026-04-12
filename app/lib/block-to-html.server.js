@@ -186,20 +186,23 @@ function renderProductShowcase(s, fonts) {
   const products = s.products || [];
   const cols = s.columns || 3;
   const headingFont = fonts.heading || "Inter";
-  const cards = products.map((p) => `<div style="cursor:pointer;">
-    <div style="aspect-ratio:.75;background:${p.gradient || "var(--pb-surface)"};border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;">
+  const cards = products.map((p) => `<div style="cursor:pointer; background:#fff; border-radius:5px; padding:12px; border:1px solid var(--pb-border,#E0E0E0); box-shadow:0 4px 12px rgba(0,0,0,0.03); transition:transform 0.2s;">
+    <div style="aspect-ratio:.85;background:${p.gradient || "var(--pb-surface)"};border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden;">
       <div style="text-align:center;padding:20px;">
         <div class="pb-heading" style="font-size:20px;color:var(--pb-primary);">${esc(p.name)}</div>
         <div style="font-size:11px;letter-spacing:.1em;color:var(--pb-muted);text-transform:uppercase;margin-top:4px;">${esc(p.variant || "")}</div>
       </div>
-      ${p.tag ? `<div style="position:absolute;top:12px;left:12px;background:var(--pb-primary);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;letter-spacing:.08em;text-transform:uppercase;">${esc(p.tag)}</div>` : ""}
+      ${p.tag ? `<div style="position:absolute;top:10px;left:10px;background:var(--pb-primary);color:#fff;font-size:10px;font-weight:700;padding:4px 8px;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;">${esc(p.tag)}</div>` : ""}
     </div>
-    <div style="font-size:15px;font-weight:500;margin-bottom:4px;">${esc(p.name)}</div>
-    ${p.variant ? `<div style="font-size:12px;color:var(--pb-muted);margin-bottom:10px;">${esc(p.variant)}</div>` : ""}
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:18px;font-weight:600;">${esc(p.price)}</span>
-      ${p.original_price ? `<span style="font-size:13px;text-decoration:line-through;color:var(--pb-muted);">${esc(p.original_price)}</span>` : ""}
-      ${p.discount ? `<span style="font-size:11px;color:var(--pb-secondary);font-weight:600;">${esc(p.discount)}</span>` : ""}
+    <div style="padding:0 4px;">
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px;">${esc(p.name)}</div>
+      ${p.variant ? `<div style="font-size:12px;color:var(--pb-muted);margin-bottom:12px;">${esc(p.variant)}</div>` : ""}
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;font-weight:700;">${esc(p.price)}</span>
+        ${p.original_price ? `<span style="font-size:13px;text-decoration:line-through;color:var(--pb-muted);">${esc(p.original_price)}</span>` : ""}
+        ${p.discount ? `<span style="font-size:11px;color:var(--pb-secondary);font-weight:700;">${esc(p.discount)}</span>` : ""}
+      </div>
+      <div style="margin-top:16px;width:100%;text-align:center;padding:10px;background:var(--pb-primary);color:#fff;border-radius:5px;font-size:13px;font-weight:600;">Add to Cart</div>
     </div>
   </div>`).join("");
 
@@ -218,7 +221,7 @@ function renderImageWithText(s, fonts) {
   if (s.headline_italic) {
     headline = headline.replace(esc(s.headline_italic), `<em style="color:var(--pb-primary);font-style:italic;">${esc(s.headline_italic)}</em>`);
   }
-  const features = (s.features_grid || []).map((f) => `<div style="padding:20px;background:#fff;border:1px solid var(--pb-border,#E0E0E0);">
+  const features = (s.features_grid || []).map((f) => `<div style="padding:20px;background:#fff;border:1px solid var(--pb-border,#E0E0E0);border-radius:5px;">
     <div style="font-size:22px;margin-bottom:8px;">${esc(f.icon)}</div>
     <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${esc(f.title)}</div>
     <div style="font-size:12px;color:var(--pb-muted);">${esc(f.text)}</div>
@@ -232,7 +235,7 @@ function renderImageWithText(s, fonts) {
       ${s.text ? `<p style="font-size:15px;color:var(--pb-muted);max-width:460px;line-height:1.8;margin-bottom:52px;">${esc(s.text)}</p>` : ""}
       ${features ? `<div class="pb-grid-auto" style="gap:16px;">${features}</div>` : ""}
     </div>
-    <div style="order:${s.image_position === 'right' ? 2 : 1};background:${s.image_bg_gradient || "var(--pb-surface)"};aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+    <div style="order:${s.image_position === 'right' ? 2 : 1};background:${s.image_bg_gradient || "var(--pb-surface)"};aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;">
       ${s.image_label ? `<div class="pb-heading" style="font-size:48px;color:var(--pb-primary);">${esc(s.image_label)}</div>` : ""}
     </div>
   </div>
@@ -243,7 +246,7 @@ function renderImageWithText(s, fonts) {
 function renderSocialProof(s, fonts) {
   const headingFont = fonts.heading || "Inter";
   const reviews = s.reviews || [];
-  const cards = reviews.map((r) => `<div style="background:${s.background_color === "#FAF3EC" || s.background_color === "#FAF8F4" ? "#fff" : "#F8FAFC"};padding:28px;border-radius:4px;border:1px solid var(--pb-border,#E0E0E0);">
+  const cards = reviews.map((r) => `<div style="background:${s.background_color === "#FAF3EC" || s.background_color === "#FAF8F4" ? "#fff" : "#F8FAFC"};padding:28px;border-radius:5px;border:1px solid var(--pb-border,#E0E0E0);">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <div style="width:40px;height:40px;background:var(--pb-accent,#F5D5C8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${esc(r.avatar || r.name?.charAt(0) || "★")}</div>
       <div><div style="font-size:14px;font-weight:600;">${esc(r.name)}</div><div style="font-size:12px;color:var(--pb-muted);">${esc(r.location || "")}</div></div>
