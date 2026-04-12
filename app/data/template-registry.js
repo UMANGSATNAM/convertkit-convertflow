@@ -23,6 +23,8 @@ import serumData from "./templates/lp-haircare-serum.json";
 import yogaData from "./templates/lp-yoga-equipment.json";
 import chairData from "./templates/lp-ergonomic-chair.json";
 import snacksData from "./templates/lp-vegan-snacks.json";
+import wakefitOriginalData from "./templates/lp-wakefit-clone.json";
+import tmcoOriginalData from "./templates/lp-themancompany-clone.json";
 import { generateId } from "../components/pagecraft/sectionRegistry";
 
 // ── Template Metadata ──
@@ -325,6 +327,30 @@ export const TEMPLATES = [
     sectionCount: 6,
     tags: ["Food", "Snacks", "Vegan", "High Protein"],
     data: snacksData,
+  },
+  {
+    id: "wakefit-clone",
+    name: "Wakefit Original Clone",
+    category: "home",
+    niche: "mattress",
+    description: "An exact structural replica of the Wakefit homepage, featuring bold orange CTA buttons, category icon grids, trust banner strips, and orthopedic foam.",
+    icon: "🛏️",
+    gradient: "linear-gradient(135deg, #FF7A00, #F8F9FA)",
+    sectionCount: 8,
+    tags: ["Home", "Mattress", "Clone", "D2C"],
+    data: wakefitOriginalData,
+  },
+  {
+    id: "themancompany-clone",
+    name: "The Man Company Clone",
+    category: "beauty",
+    niche: "grooming",
+    description: "A premium men's grooming template inspired by The Man Company. Features dark, masculine aesthetics with gold accents, focusing on charcoal products and fragrances.",
+    icon: "🧔",
+    gradient: "linear-gradient(135deg, #000000, #B8860B)",
+    sectionCount: 8,
+    tags: ["Beauty", "Men", "Grooming", "Clone", "D2C"],
+    data: tmcoOriginalData,
   }
 ];
 
