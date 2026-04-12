@@ -21,11 +21,34 @@ export const loader = async ({ params }) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: ${template.name}</title>
   <style>
-    body { background: ${template.data.colors?.background || '#fff'}; margin: 0; padding: 0; }
+    body { background: ${template.data.colors?.background || '#fff'}; margin: 0; padding: 0; scroll-behavior: smooth; }
   </style>
 </head>
 <body>
   ${htmlContent}
+  <script>
+    window.addEventListener('load', () => {
+      // Auto-scrolling feature for live preview interaction
+      const SCROLL_SPEED = 1; // Pixels per interval
+      const INTERVAL_MS = 25; // Milliseconds between scrolls
+      const START_DELAY_MS = 1500; // Wait before scrolling starts
+      
+      setTimeout(() => {
+        let scroller = setInterval(() => {
+          // If we reached the bottom of the page, stop scrolling.
+          if ((window.innerHeight + Math.ceil(window.scrollY)) >= (document.body.offsetHeight - 5)) {
+             clearInterval(scroller);
+          } else {
+             window.scrollBy(0, SCROLL_SPEED);
+          }
+        }, INTERVAL_MS);
+
+        // Pause scrolling if user manually hovers or scrolls
+        window.addEventListener('wheel', () => clearInterval(scroller));
+        window.addEventListener('touchstart', () => clearInterval(scroller));
+      }, START_DELAY_MS);
+    });
+  </script>
 </body>
 </html>`;
 
