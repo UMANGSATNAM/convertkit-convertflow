@@ -8,6 +8,11 @@ import appleData from "./templates/lp-apple-product.json";
 import gymsharkData from "./templates/lp-gymshark-fitness.json";
 import skimsData from "./templates/lp-skims-body.json";
 import boatData from "./templates/lp-boat-electronics.json";
+import jewelryData from "./templates/lp-jewelry-luxe.json";
+import proteinData from "./templates/lp-protein-supplement.json";
+import skincareData from "./templates/lp-korean-skincare.json";
+import petData from "./templates/lp-pet-supplies.json";
+import coffeeData from "./templates/lp-coffee-brand.json";
 import { generateId } from "../components/pagecraft/sectionRegistry";
 
 // ── Template Metadata ──
@@ -130,6 +135,66 @@ export const TEMPLATES = [
     sectionCount: 10,
     tags: ["Audio", "Gen-Z", "Budget", "India"],
     data: boatData,
+  },
+  {
+    id: "jewelry-luxe",
+    name: "Lumière — Luxury Jewelry",
+    category: "fashion",
+    niche: "jewelry",
+    description: "Ultra-premium luxury jewelry page with gold serif typography, craftsmanship storytelling, and aspirational lifestyle positioning",
+    icon: "💎",
+    gradient: "linear-gradient(135deg, #B8860B, #FFFCF5)",
+    sectionCount: 9,
+    tags: ["Jewelry", "Luxury", "Gold", "Bridal"],
+    data: jewelryData,
+  },
+  {
+    id: "protein-supplement",
+    name: "FuelX — Protein & Supplements",
+    category: "fitness",
+    niche: "supplements",
+    description: "High-energy protein supplement page with neon green accents, lab-tested trust signals, and athlete endorsements",
+    icon: "💪",
+    gradient: "linear-gradient(135deg, #84CC16, #0A0A0A)",
+    sectionCount: 9,
+    tags: ["Fitness", "Supplements", "D2C", "Lab-Tested"],
+    data: proteinData,
+  },
+  {
+    id: "korean-skincare",
+    name: "GlowLab — Korean Skincare",
+    category: "beauty",
+    niche: "skincare",
+    description: "Minimalist Korean skincare page with soft pastels, ingredient transparency, routine builder, and dermatologist endorsements",
+    icon: "🌸",
+    gradient: "linear-gradient(135deg, #E879A8, #FFF5F8)",
+    sectionCount: 9,
+    tags: ["Beauty", "K-Beauty", "Skincare", "Vegan"],
+    data: skincareData,
+  },
+  {
+    id: "pet-supplies",
+    name: "PawPal — Premium Pet Supplies",
+    category: "general",
+    niche: "pets",
+    description: "Warm, playful pet supplies page with rounded aesthetics, vet-approved trust signals, and subscription model",
+    icon: "🐕",
+    gradient: "linear-gradient(135deg, #F97316, #FFFBF5)",
+    sectionCount: 9,
+    tags: ["Pets", "Subscription", "D2C", "Vet-Approved"],
+    data: petData,
+  },
+  {
+    id: "coffee-brand",
+    name: "BrewCraft — Specialty Coffee",
+    category: "food",
+    niche: "coffee",
+    description: "Rich specialty coffee page with deep brown tones, origin storytelling, brewing guides, and fresh-roasted subscription",
+    icon: "☕",
+    gradient: "linear-gradient(135deg, #92400E, #FAF5F0)",
+    sectionCount: 9,
+    tags: ["Coffee", "Food", "Subscription", "Specialty"],
+    data: coffeeData,
   },
 ];
 
