@@ -18,24 +18,31 @@ export const action = async ({ request }) => {
     const { session } = await authenticate.admin(request);
     const shopDomain = session.shop;
     const token = session.accessToken;
-    const { templateId, themeId } = await request.json();
+    const { templateId, themeId, customTemplate } = await request.json();
 
-    if (!templateId || !themeId) {
-      return json({ error: "templateId and themeId are required" }, { status: 400 });
+    if (!themeId) {
+      return json({ error: "themeId is required" }, { status: 400 });
     }
 
-    const template = getTemplateById(templateId);
+    let template = null;
+    if (customTemplate) {
+      template = customTemplate;
+    } else if (templateId) {
+      template = getTemplateById(templateId);
+    }
+
     if (!template) {
-      return json({ error: `Template "${templateId}" not found` }, { status: 404 });
+      return json({ error: `Template not found or custom template missing` }, { status: 404 });
     }
 
     // Generate unique filename
     const timestamp = Date.now();
-    const sectionFilename = `${template.category}-ck-${timestamp}`;
+    const category = template.category || "custom";
+    const sectionFilename = `${category.replace(/\s+/g, '-')}-pc-${timestamp}`;
     const assetKey = `sections/${sectionFilename}.liquid`;
 
     // Build complete section file
-    let fileContent = template.liquidCode;
+    let fileContent = template.liquidCode || "";
     if (template.cssCode) {
       fileContent += `\n\n{% style %}\n${template.cssCode}\n{% endstyle %}`;
     }

@@ -14,6 +14,7 @@ export const loader = async ({ request }) => {
   const url = new URL(request.url);
   const themeId = url.searchParams.get("themeId");
   const sectionId = url.searchParams.get("sectionId");
+  const fetchSchema = url.searchParams.get("fetchSchema") === "true";
 
   if (!themeId) return json({ error: "themeId required" }, { status: 400 });
 
@@ -29,13 +30,30 @@ export const loader = async ({ request }) => {
     if (!resp.ok) throw new Error(`Failed: ${resp.status}`);
     const body = await resp.json();
     const settingsData = JSON.parse(body.asset?.value || "{}");
+    
+    let schemaArray = null;
+    if (fetchSchema) {
+      const schemaResp = await shopifyFetchWithRetry(
+        `https://${shopDomain}/admin/api/2025-01/themes/${themeId}/assets.json?asset[key]=${encodeURIComponent("config/settings_schema.json")}`,
+        { headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" } }
+      );
+      if (schemaResp.ok) {
+        const schemaBody = await schemaResp.json();
+        schemaArray = JSON.parse(schemaBody.asset?.value || "[]");
+      }
+    }
 
     if (sectionId) {
       const sectionSettings = settingsData?.current?.sections?.[sectionId] || {};
-      return json({ success: true, sectionId, settings: sectionSettings });
+      return json({ success: true, sectionId, settings: sectionSettings, schema: schemaArray });
     }
 
-    return json({ success: true, settings: settingsData?.current?.sections || {} });
+    return json({ 
+      success: true, 
+      settings: settingsData?.current?.sections || {},
+      globalData: settingsData?.current || {},
+      schema: schemaArray
+    });
   } catch (error) {
     console.error("Settings GET error:", error);
     return json({ error: error.message }, { status: 500 });

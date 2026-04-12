@@ -3,6 +3,11 @@ import activewearData from "./templates/lp-activewear.json";
 import mensFashionData from "./templates/lp-mens-fashion.json";
 import personalCareData from "./templates/lp-personal-care.json";
 import streetwearData from "./templates/lp-streetwear.json";
+import wakefitData from "./templates/lp-wakefit-mattress.json";
+import appleData from "./templates/lp-apple-product.json";
+import gymsharkData from "./templates/lp-gymshark-fitness.json";
+import skimsData from "./templates/lp-skims-body.json";
+import boatData from "./templates/lp-boat-electronics.json";
 import { generateId } from "../components/pagecraft/sectionRegistry";
 
 // ── Template Metadata ──
@@ -12,6 +17,7 @@ export const TEMPLATE_CATEGORIES = [
   { id: "beauty", label: "Beauty & Personal Care" },
   { id: "fitness", label: "Fitness & Health" },
   { id: "electronics", label: "Electronics" },
+  { id: "home", label: "Home & Living" },
   { id: "food", label: "Food & Beverage" },
   { id: "general", label: "General Store" },
 ];
@@ -64,6 +70,66 @@ export const TEMPLATES = [
     sectionCount: 7,
     tags: ["Streetwear", "Dark", "Bold", "Urban"],
     data: streetwearData,
+  },
+  {
+    id: "wakefit-mattress",
+    name: "SleepWell — Mattress & Home",
+    category: "home",
+    niche: "mattress",
+    description: "Wakefit-style mattress landing page with 7-zone tech breakdown, 100-night trial, CoolGel feature sections, and trust-heavy social proof",
+    icon: "🛏️",
+    gradient: "linear-gradient(135deg, #2563EB, #DBEAFE)",
+    sectionCount: 12,
+    tags: ["Home", "Mattress", "Sleep", "D2C"],
+    data: wakefitData,
+  },
+  {
+    id: "apple-product-launch",
+    name: "TechLux — Apple-Style Product Launch",
+    category: "electronics",
+    niche: "electronics",
+    description: "Ultra-minimal Apple-inspired product launch page with typography-driven design, massive whitespace, and precision spec breakdowns",
+    icon: "🎧",
+    gradient: "linear-gradient(135deg, #1D1D1F, #F5F5F7)",
+    sectionCount: 10,
+    tags: ["Electronics", "Minimal", "Premium", "Tech"],
+    data: appleData,
+  },
+  {
+    id: "gymshark-fitness",
+    name: "IronPulse — Gymshark-Style Fitness",
+    category: "fitness",
+    niche: "fitness",
+    description: "Bold, dark, high-energy fitness apparel page with aggressive typography, athlete endorsements, and performance fabric breakdown",
+    icon: "💪",
+    gradient: "linear-gradient(135deg, #E11D48, #0A0A0A)",
+    sectionCount: 10,
+    tags: ["Fitness", "Dark", "Bold", "Athletic"],
+    data: gymsharkData,
+  },
+  {
+    id: "skims-body",
+    name: "VelvetSkin — Skims-Style Intimates",
+    category: "fashion",
+    niche: "intimates",
+    description: "Elegant, warm-toned intimates page with soft typography, inclusivity messaging, CloudSilk fabric tech, and lifestyle positioning",
+    icon: "🌸",
+    gradient: "linear-gradient(135deg, #8B6F5D, #FAF7F4)",
+    sectionCount: 9,
+    tags: ["Fashion", "Body", "Inclusive", "Elegant"],
+    data: skimsData,
+  },
+  {
+    id: "boat-electronics",
+    name: "SonicWave — boAt-Style Audio",
+    category: "electronics",
+    niche: "audio",
+    description: "Gen-Z audio electronics page with neon accents, aggressive pricing, heavy bass marketing, and influencer-driven social proof",
+    icon: "🔊",
+    gradient: "linear-gradient(135deg, #7C3AED, #00E5FF)",
+    sectionCount: 10,
+    tags: ["Audio", "Gen-Z", "Budget", "India"],
+    data: boatData,
   },
 ];
 
