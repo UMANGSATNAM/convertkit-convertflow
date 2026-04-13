@@ -1,0 +1,558 @@
+{% comment %}
+  ConvertFlow — Pilgrim-Style Premium Cart Page
+  Self-contained, injects into templates/cart.json
+{% endcomment %}
+
+{% style %}
+  .cf-cart * { margin: 0; padding: 0; box-sizing: border-box; }
+  .cf-cart {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    min-height: 60vh;
+  }
+
+  /* ── Cart Layout ── */
+  .cf-cart-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+  .cf-cart-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .cf-cart-subtitle { font-size: 14px; color: #888; margin-bottom: 40px; }
+  .cf-cart-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── Cart Items ── */
+  .cf-cart-items {}
+  .cf-cart-header {
+    display: grid;
+    grid-template-columns: 1fr 120px 140px 80px;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #1a1a1a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #555;
+  }
+  .cf-cart-item {
+    display: grid;
+    grid-template-columns: 1fr 120px 140px 80px;
+    gap: 16px;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid #f0ebe5;
+  }
+  .cf-cart-item-left {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .cf-cart-item-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #faf7f2;
+    flex-shrink: 0;
+  }
+  .cf-cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cf-cart-item-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .cf-cart-item-variant { font-size: 12px; color: #888; margin-bottom: 8px; }
+  .cf-cart-item-remove {
+    font-size: 12px;
+    color: #E74C3C;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+  .cf-cart-item-price {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .cf-cart-item-price-original {
+    font-size: 12px;
+    color: #aaa;
+    text-decoration: line-through;
+  }
+
+  /* Quantity */
+  .cf-cart-qty {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .cf-cart-qty button {
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+    transition: background 0.2s;
+  }
+  .cf-cart-qty button:hover { background: #faf7f2; }
+  .cf-cart-qty span {
+    width: 40px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    border-left: 1.5px solid #e5e7eb;
+    border-right: 1.5px solid #e5e7eb;
+    line-height: 36px;
+  }
+  .cf-cart-item-total { font-size: 16px; font-weight: 800; }
+
+  /* ── Empty Cart ── */
+  .cf-cart-empty {
+    text-align: center;
+    padding: 80px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .cf-cart-empty-icon { color: #ddd; }
+  .cf-cart-empty h3 { font-size: 22px; font-weight: 700; }
+  .cf-cart-empty p { font-size: 14px; color: #888; }
+  .cf-cart-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* ── Cart Summary ── */
+  .cf-cart-summary {
+    background: #faf7f2;
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid #f0ebe5;
+    position: sticky;
+    top: 20px;
+  }
+  .cf-cart-summary h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0ebe5;
+  }
+  .cf-cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #555;
+  }
+  .cf-cart-summary-row.total {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a1a;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  .cf-cart-checkout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    text-align: center;
+  }
+  .cf-cart-checkout:hover {
+    background: #333;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+  .cf-cart-continue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: #555;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+  }
+  .cf-cart-continue:hover { border-color: #C17F5E; color: #C17F5E; }
+
+  /* Promo */
+  .cf-promo-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .cf-promo-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cf-promo-input:focus { border-color: #C17F5E; }
+  .cf-promo-btn {
+    padding: 12px 20px;
+    background: #fff;
+    border: 1.5px solid #1a1a1a;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .cf-promo-btn:hover { background: #1a1a1a; color: #fff; }
+
+  /* Trust strip */
+  .cf-cart-trust {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 0 0;
+    border-top: 1px solid #f0ebe5;
+  }
+  .cf-cart-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #666;
+  }
+  .cf-cart-trust-icon { color: #C17F5E; flex-shrink: 0; }
+
+  /* ── You May Also Like ── */
+  .cf-cart-upsell {
+    padding: 60px 40px;
+    border-top: 1px solid #f0ebe5;
+    background: #fff;
+  }
+  .cf-cart-upsell-inner { max-width: 1280px; margin: 0 auto; }
+  .cf-cart-upsell h2 { font-size: 24px; font-weight: 800; margin-bottom: 24px; }
+  .cf-cart-upsell-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .cf-upsell-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f0ebe5;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #1a1a1a;
+    display: block;
+  }
+  .cf-upsell-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.07); }
+  .cf-upsell-img {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #faf7f2;
+  }
+  .cf-upsell-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cf-upsell-info { padding: 16px; }
+  .cf-upsell-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .cf-upsell-price { font-size: 15px; font-weight: 800; color: #C17F5E; }
+  .cf-upsell-atc {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .cf-cart-wrap { padding: 24px 16px; }
+    .cf-cart-grid { grid-template-columns: 1fr; }
+    .cf-cart-header { display: none; }
+    .cf-cart-item { grid-template-columns: 1fr; gap: 12px; }
+    .cf-cart-upsell-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .cf-cart-upsell { padding: 40px 16px; }
+    .cf-cart-summary { position: static; }
+  }
+{% endstyle %}
+
+<div class="cf-cart">
+  <div class="cf-cart-wrap">
+    <h1 class="cf-cart-title">Your Cart</h1>
+
+    {%- if cart.item_count == 0 -%}
+      <div class="cf-cart-empty">
+        <svg class="cf-cart-empty-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <h3>Your cart is empty</h3>
+        <p>Looks like you haven't added anything yet. Let's fix that!</p>
+        <a href="/collections/all" class="cf-cart-empty-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Shop Now
+        </a>
+      </div>
+    {%- else -%}
+      <p class="cf-cart-subtitle">{{ cart.item_count }} item{% if cart.item_count > 1 %}s{% endif %} in your cart</p>
+
+      <div class="cf-cart-grid">
+        <!-- Items -->
+        <div class="cf-cart-items">
+          <div class="cf-cart-header">
+            <span>Product</span>
+            <span>Price</span>
+            <span>Quantity</span>
+            <span>Total</span>
+          </div>
+
+          {%- form 'cart', cart, id: 'cf-cart-form' -%}
+            {%- for item in cart.items -%}
+              <div class="cf-cart-item">
+                <div class="cf-cart-item-left">
+                  <div class="cf-cart-item-img">
+                    <a href="{{ item.url }}">
+                      {%- if item.image -%}
+                        <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.title }}" loading="lazy">
+                      {%- else -%}
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#faf7f2;">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a574" stroke-width="1.5"><path d="M9 2h6l1 7H8l1-7Z"/></svg>
+                        </div>
+                      {%- endif -%}
+                    </a>
+                  </div>
+                  <div>
+                    <a href="{{ item.url }}" style="text-decoration:none;color:#1a1a1a;">
+                      <div class="cf-cart-item-name">{{ item.product.title }}</div>
+                    </a>
+                    {%- unless item.variant.title == 'Default Title' -%}
+                      <div class="cf-cart-item-variant">{{ item.variant.title }}</div>
+                    {%- endunless -%}
+                    <a href="{{ routes.cart_change_url }}?id={{ item.key }}&quantity=0" class="cf-cart-item-remove" data-remove="{{ item.key }}">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                      Remove
+                    </a>
+                  </div>
+                </div>
+
+                <div class="cf-cart-item-price">
+                  {{ item.price | money }}
+                  {%- if item.original_price > item.price -%}
+                    <div class="cf-cart-item-price-original">{{ item.original_price | money }}</div>
+                  {%- endif -%}
+                </div>
+
+                <div class="cf-cart-qty">
+                  <button type="button" onclick="cfCartQty('{{ item.key }}', {{ item.quantity }}, -1)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <span id="qty-{{ item.key }}">{{ item.quantity }}</span>
+                  <button type="button" onclick="cfCartQty('{{ item.key }}', {{ item.quantity }}, 1)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+
+                <div class="cf-cart-item-total">{{ item.line_price | money }}</div>
+              </div>
+            {%- endfor -%}
+          {%- endform -%}
+        </div>
+
+        <!-- Summary -->
+        <div class="cf-cart-summary">
+          <h3>Order Summary</h3>
+
+          <div class="cf-cart-summary-row">
+            <span>Subtotal</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          <div class="cf-cart-summary-row">
+            <span>Shipping</span>
+            <span style="color:#27ae60;font-weight:700;">
+              {%- if cart.total_price >= 49900 -%}FREE{%- else -%}Calculated at checkout{%- endif -%}
+            </span>
+          </div>
+          {%- if cart.total_discount > 0 -%}
+            <div class="cf-cart-summary-row" style="color:#27ae60;">
+              <span>Discount</span>
+              <span>- {{ cart.total_discount | money }}</span>
+            </div>
+          {%- endif -%}
+          <div class="cf-cart-summary-row total">
+            <span>Total</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+
+          <!-- Promo Code -->
+          <div class="cf-promo-row">
+            <input type="text" class="cf-promo-input" placeholder="Promo code" id="cf-promo-code">
+            <button class="cf-promo-btn" onclick="cfApplyPromo()">Apply</button>
+          </div>
+
+          <a href="/checkout" class="cf-cart-checkout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Proceed to Checkout
+          </a>
+          <a href="/collections/all" class="cf-cart-continue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/></svg>
+            Continue Shopping
+          </a>
+
+          <!-- Trust -->
+          <div class="cf-cart-trust">
+            <div class="cf-cart-trust-item">
+              <svg class="cf-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              Free Shipping on orders above {{ section.settings.free_shipping_threshold | default: '₹499' }}
+            </div>
+            <div class="cf-cart-trust-item">
+              <svg class="cf-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              100% Secure Checkout
+            </div>
+            <div class="cf-cart-trust-item">
+              <svg class="cf-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              Easy 30-Day Returns
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <!-- You May Also Like -->
+  {%- if section.settings.show_upsell and cart.item_count > 0 -%}
+    <div class="cf-cart-upsell">
+      <div class="cf-cart-upsell-inner">
+        <h2>{{ section.settings.upsell_title | default: 'You May Also Like' }}</h2>
+        <div class="cf-cart-upsell-grid">
+          {%- assign upsell_col = collections[section.settings.upsell_collection] -%}
+          {%- for product in upsell_col.products limit: 4 -%}
+            <a href="{{ product.url }}" class="cf-upsell-card">
+              <div class="cf-upsell-img">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}" loading="lazy">
+                {%- endif -%}
+              </div>
+              <div class="cf-upsell-info">
+                <div class="cf-upsell-name">{{ product.title }}</div>
+                <div class="cf-upsell-price">{{ product.price | money }}</div>
+                <button class="cf-upsell-atc" onclick="cfAddUpsell(event, {{ product.variants.first.id }})">QUICK ADD</button>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  // Quantity update via AJAX
+  function cfCartQty(key, currentQty, delta) {
+    var newQty = Math.max(0, currentQty + delta);
+    var el = document.getElementById('qty-' + key);
+    if (el) el.textContent = newQty;
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: newQty })
+    }).then(function() { location.reload(); });
+  }
+
+  // Add upsell product
+  function cfAddUpsell(e, variantId) {
+    e.preventDefault();
+    e.stopPropagation();
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: 1 })
+    }).then(function() { location.reload(); });
+  }
+
+  // Promo stub
+  function cfApplyPromo() {
+    var code = document.getElementById('cf-promo-code').value;
+    if (code) {
+      window.location.href = '/checkout?discount=' + encodeURIComponent(code);
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "CF: Pilgrim Cart Page",
+  "tag": "section",
+  "class": "convertflow-cart",
+  "settings": [
+    { "type": "header", "content": "Shipping" },
+    { "type": "text", "id": "free_shipping_threshold", "label": "Free Shipping Threshold Label", "default": "₹499" },
+    { "type": "header", "content": "Upsell Section" },
+    { "type": "checkbox", "id": "show_upsell", "label": "Show You May Also Like", "default": true },
+    { "type": "text", "id": "upsell_title", "label": "Upsell Section Title", "default": "You May Also Like" },
+    { "type": "collection", "id": "upsell_collection", "label": "Upsell Products Collection" }
+  ],
+  "presets": [
+    { "name": "CF: Pilgrim Cart Page" }
+  ]
+}
+{% endschema %}

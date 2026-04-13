@@ -401,17 +401,29 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
         {/* Result Toast */}
         {injectResult?.success && (
           <div style={{
-            background: "#065F46", color: "#fff", padding: "16px 24px",
-            borderRadius: 12, marginBottom: 20, display: "flex",
-            justifyContent: "space-between", alignItems: "center", fontSize: 14, fontWeight: 600,
+            background: "#065F46", color: "#fff", padding: "20px 24px",
+            borderRadius: 12, marginBottom: 20, fontSize: 14,
           }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {icon("check")} Section injected into "{injectResult.themeName}"!
+            <div style={{ fontWeight: 700, marginBottom: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
+              {icon("check")} 3 Pages injected into &quot;{injectResult.themeName}&quot; successfully!
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              {(injectResult.pages || []).map((p) => (
+                <span key={p} style={{ background: "rgba(255,255,255,0.15)", padding: "4px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+                  {p}
+                </span>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 16, marginTop: 14, flexWrap: "wrap" }}>
               <a href={injectResult.editorUrl} target="_blank" rel="noreferrer"
-                style={{ color: "#A7F3D0", textDecoration: "underline", marginLeft: 8 }}>
+                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>
                 Open Theme Editor →
               </a>
-            </span>
+              <a href={injectResult.previewUrl} target="_blank" rel="noreferrer"
+                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>
+                Preview Store →
+              </a>
+            </div>
           </div>
         )}
         {injectResult && !injectResult.success && (
