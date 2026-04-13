@@ -81,7 +81,7 @@ export const action = async ({ request }) => {
     const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/(^-|-$)/g, "") + "-" + Math.random().toString(36).slice(2, 6);
 
     let content = null;
     let globalStyles = null;
