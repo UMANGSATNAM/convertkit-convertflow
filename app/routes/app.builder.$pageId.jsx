@@ -697,9 +697,9 @@ function SectionPreview({ section, globalStyles }) {
               <strong>To see interactive features like parallax, video backgrounds, and responsive snapping, hit Publish and view it live on your storefront!</strong>
             </div>
             <div style={{ marginTop: 24, fontSize: 13, textAlign: "left", background: "#f1f5f9", padding: 16, borderRadius: 8 }}>
-              {s.columns?.map((col, i) => (
+              {(s.columns || []).map((col, i) => (
                 <div key={i} style={{ marginBottom: 8 }}>
-                  <strong>Col {i+1}:</strong> {col.blocks?.map(b => b.type).join(", ") || "Empty"}
+                  <strong>Col {i+1}:</strong> {(col.blocks || []).map(b => b.type).join(", ") || "Empty"}
                 </div>
               ))}
             </div>
