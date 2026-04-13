@@ -25,6 +25,8 @@ import chairData from "./templates/lp-ergonomic-chair.json";
 import snacksData from "./templates/lp-vegan-snacks.json";
 import wakefitOriginalData from "./templates/lp-wakefit-clone.json";
 import tmcoOriginalData from "./templates/lp-themancompany-clone.json";
+import gymsharkPremiumData from "./templates/lp-gymshark-premium.json";
+import souledStoreData from "./templates/lp-souled-store.json";
 import { generateId } from "../components/pagecraft/sectionRegistry";
 
 // ── Template Metadata ──
@@ -351,6 +353,30 @@ export const TEMPLATES = [
     sectionCount: 8,
     tags: ["Beauty", "Men", "Grooming", "Clone", "D2C"],
     data: tmcoOriginalData,
+  },
+  {
+    id: "gymshark-premium-100x",
+    name: "Gymshark Premium (Theme Ext)",
+    category: "fitness",
+    niche: "fitness",
+    description: "The 100x better ultra-premium template with native Theme App Extension support for Parallax, Video backgrounds, and Sticky Mobile Carts.",
+    icon: "🥇",
+    gradient: "linear-gradient(135deg, #0A0A0A, #111111)",
+    sectionCount: 5,
+    tags: ["Premium", "Fitness", "Native UI", "100x"],
+    data: gymsharkPremiumData,
+  },
+  {
+    id: "souled-store-popculture",
+    name: "Pop-Culture Merchandise (Theme Ext)",
+    category: "fashion",
+    niche: "pop-culture",
+    description: "Vibrant Pop-Culture Neu-Brutalism aesthetic template featuring hard shadows, bold grids, and mobile-first category navigation.",
+    icon: "💥",
+    gradient: "linear-gradient(135deg, #FFD700, #FF4500)",
+    sectionCount: 4,
+    tags: ["Premium", "Pop-Culture", "Native UI", "100x"],
+    data: souledStoreData,
   }
 ];
 

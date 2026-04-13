@@ -29,6 +29,10 @@ export const action = async ({ request }) => {
     const bodyHtml = blockToHtml(sections, globalStyles);
 
     // Shopify API — create or update page
+    const fullSchemaPayload = { sections, globalStyles, version: "2.0" };
+    // Basic minification by stringifying without formatting
+    const minifiedSchema = JSON.stringify(fullSchemaPayload);
+    
     const shopifyPayload = {
       page: {
         title: page.seoTitle || page.title,
@@ -42,6 +46,12 @@ export const action = async ({ request }) => {
             value: page.id,
             type: "single_line_text_field",
           },
+          {
+            namespace: "pagebuilder",
+            key: "schema",
+            value: minifiedSchema,
+            type: "json"
+          }
         ],
       },
     };
