@@ -70,6 +70,10 @@ export const SECTION_TYPES = {
     icon: "📋", label: "Footer", category: "footer",
     desc: "Links, copyright, socials",
   },
+  section: {
+    icon: "⚡", label: "Native Theme Block", category: "content",
+    desc: "Advanced nested liquid block structure",
+  },
 };
 
 export function getSectionMeta(type) {

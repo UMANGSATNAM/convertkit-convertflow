@@ -684,6 +684,29 @@ function SectionPreview({ section, globalStyles }) {
         </div>
       );
 
+    case "section":
+      // Fallback preview for advanced Native Theme schemas
+      return (
+        <div style={{ padding: "40px 20px", background: s.settings?.background_color || "#f8fafc", color: "#111" }}>
+          <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", border: "2px dashed #cbd5e1", padding: 40, borderRadius: 12, background: "#ffffff" }}>
+            <div style={{ fontSize: 36, marginBottom: 16 }}>⚡</div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Native Theme Section</div>
+            <div style={{ fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
+              This section is highly optimized and powered by dynamic Shopify liquid. It contains {s.columns?.length || 0} column(s) with nested blocks.
+              <br/><br/>
+              <strong>To see interactive features like parallax, video backgrounds, and responsive snapping, hit Publish and view it live on your storefront!</strong>
+            </div>
+            <div style={{ marginTop: 24, fontSize: 13, textAlign: "left", background: "#f1f5f9", padding: 16, borderRadius: 8 }}>
+              {s.columns?.map((col, i) => (
+                <div key={i} style={{ marginBottom: 8 }}>
+                  <strong>Col {i+1}:</strong> {col.blocks?.map(b => b.type).join(", ") || "Empty"}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+
     default:
       return (
         <div style={{ padding: 32, textAlign: "center", color: "#9CA3AF", background: "#F9FAFB" }}>
@@ -770,6 +793,13 @@ function SectionSettings({ section, onUpdate }) {
         {s.type === "footer" && field("Tagline", "tagline", "textarea")}
         {s.type === "footer" && field("Copyright", "copyright")}
         {s.type === "footer" && field("Footer Note", "footer_note")}
+
+        {s.type === "section" && (
+          <div style={{ padding: 16, background: "#EFF6FF", borderRadius: 8, fontSize: 13, lineHeight: 1.6, border: "1px solid #BFDBFE", color: "#1E3A8A" }}>
+            <p><strong>Heads Up! ⚡</strong> This is an advanced Native Theme block.</p>
+            <p style={{ marginTop: 8 }}>Because it relies on Shopify liquid APIs (for parallax, styling, intersection observers, etc.), its properties and blocks must be edited directly through the <strong>Shopify Theme Editor</strong> after you publish this page.</p>
+          </div>
+        )}
 
         {s.type === "image_with_text" && field("Kicker", "kicker")}
         {s.type === "image_with_text" && field("Body Text", "text", "textarea")}
