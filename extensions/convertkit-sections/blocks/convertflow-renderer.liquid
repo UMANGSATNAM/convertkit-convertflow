@@ -1,0 +1,312 @@
+{% comment %}
+  ConvertFlow — Master Page Renderer
+  This block reads the ConvertFlow JSON layout from page metafields
+  and renders the 100x better ultra-premium landing pages.
+{% endcomment %}
+
+<div id="cf-app-root_{{ section.id }}" class="cf-master-renderer">
+  {%- assign page_schema = page.metafields.pagebuilder.schema.value -%}
+  
+  {% if page_schema != blank %}
+    <!-- Server-Side Payload -->
+    <script type="application/json" id="cf-schema-payload_{{ section.id }}">
+      {{ page_schema | json }}
+    </script>
+  {% else %}
+    <!-- Fallback if no metafield exists - mostly for theme editor preview -->
+    <div style="padding: 40px; text-align: center; border: 2px dashed #ccc; border-radius: 8px;">
+      <h2 style="font-family: sans-serif; font-size: 24px; color: #333;">ConvertFlow Master Template Active</h2>
+      <p style="font-family: sans-serif; color: #666;">This page will automatically render the assigned ConvertFlow premium landing page schema.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "ConvertFlow Renderer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Ultra-Premium Settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "This block automatically injects your ConvertFlow JSON schema into this theme. Do not add multiple renderers to one page."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "label": "Enable Parallax Effects",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_cart",
+      "label": "Enable Mobile Sticky Cart",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "ConvertFlow Renderer"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+/* CF Master Engine Styles */
+.cf-master-renderer {
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: hidden;
+  --cf-radius: 5px; /* Global 5px radius requirement */
+  --cf-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Blocks */
+.cf-section { position: relative; width: 100%; }
+.cf-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.cf-full-width { width: 100%; padding: 0; }
+.cf-row { display: flex; flex-wrap: wrap; }
+.cf-col { flex: 1; min-width: 0; box-sizing: border-box; }
+
+/* Parallax Utility */
+.cf-parallax-wrapper { overflow: hidden; position: relative; }
+.cf-parallax-bg {
+  position: absolute; top: -10%; left: 0; width: 100%; height: 120%;
+  background-size: cover; background-position: center; pointer-events: none;
+  transform: translateY(0); /* Handled by JS */
+  will-change: transform;
+}
+
+/* Video Background */
+.cf-video-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: -1; pointer-events: none;
+}
+
+/* Mobile Sticky Cart */
+.cf-sticky-cart {
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  padding: 12px 20px; box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 999; transform: translateY(100%); transition: var(--cf-transition);
+}
+.cf-sticky-cart.is-visible { transform: translateY(0); }
+
+/* Dynamic Slider / Carousel */
+.cf-slider-container {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 16px;
+}
+.cf-slider-container::-webkit-scrollbar { display: none; }
+.cf-slider-item { scroll-snap-align: start; flex: 0 0 calc(80% - 16px); }
+@media (min-width: 768px) { .cf-slider-item { flex: 0 0 calc(33.333% - 16px); } }
+
+/* Ultimate Button Styles */
+.cf-btn-premium {
+  background: #111; color: #fff; padding: 14px 28px;
+  border-radius: var(--cf-radius); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; border: none; cursor: pointer;
+  transition: var(--cf-transition); display: inline-flex; justify-content: center; align-items: center;
+  position: relative; overflow: hidden;
+}
+.cf-btn-premium::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: var(--cf-transition);
+}
+.cf-btn-premium:hover::after { left: 100%; transition: 0.6s ease-in-out; }
+</style>
+
+<script>
+(function() {
+  const sectionId = '{{ section.id }}';
+  const root = document.getElementById('cf-app-root_' + sectionId);
+  if (!root) return;
+
+  const payloadScript = document.getElementById('cf-schema-payload_' + sectionId);
+  if (!payloadScript) return;
+
+  let schema;
+  try {
+    schema = JSON.parse(payloadScript.textContent);
+  } catch(e) {
+    console.error('ConvertFlow: Invalid JSON Schema', e);
+    return;
+  }
+
+  // --- 1. VANILLA JS RENDERER ENGINE ---
+  function renderSchema(data) {
+    let html = `<div class="cf-rendered-page">`;
+    if (data.sections) {
+      data.sections.forEach(sec => { html += renderSection(sec); });
+    }
+    html += `</div>`;
+    
+    // Inject mobile sticky if needed (mockup)
+    if ('{{ section.settings.enable_sticky_cart }}' === 'true') {
+       html += `
+         <div class="cf-sticky-cart hidden" id="cf-sticky-cart-${sectionId}">
+           <div style="display:flex; flex-direction:column;">
+             <span style="font-weight:700; font-size:14px;">Total Price</span>
+             <span style="color:#d32f2f; font-weight:800; font-size:18px;">Rs. 2499</span>
+           </div>
+           <button class="cf-btn-premium" style="padding: 12px 24px; font-size:14px;">Add to Cart</button>
+         </div>
+       `;
+    }
+    root.innerHTML = html;
+  }
+
+  function renderSection(sec) {
+    const s = sec.settings || {};
+    let customStyles = \`
+      padding: \${s.padding_top || 0}px 0 \${s.padding_bottom || 0}px;
+      margin: \${s.margin_top || 0}px 0 \${s.margin_bottom || 0}px;
+      background-color: \${s.background_color || 'transparent'};
+    \`;
+
+    let html = \`<section class="cf-section \${s.parallax ? 'cf-parallax-wrapper' : ''}" style="\${customStyles}">\`;
+    
+    // Parallax background map
+    if (s.parallax && s.background_image) {
+      html += \`<div class="cf-parallax-bg" style="background-image: url('\${s.background_image}');"></div>\`;
+    }
+    
+    // Video Map
+    if (s.background_video) {
+       html += \`<video class="cf-video-bg" autoplay loop muted playsinline src="\${s.background_video}"></video>\`;
+    }
+    
+    if (s.background_overlay) {
+       html += \`<div style="position:absolute; inset:0; background:\${s.background_overlay}; z-index:0;"></div>\`;
+    }
+
+    html += \`<div class="\${s.fullWidth ? 'cf-full-width' : 'cf-container'}" style="position:relative; z-index:1;">\`;
+    html += \`<div class="cf-row">\`;
+    
+    if (sec.columns) {
+      sec.columns.forEach(col => { html += renderColumn(col); });
+    }
+
+    html += \`</div></div></section>\`;
+    return html;
+  }
+
+  function renderColumn(col) {
+    const s = col.settings || {};
+    const widthDesktop = s.width || 100;
+    const padding = s.padding || '0px';
+
+    let html = \`<div class="cf-col" style="flex: 0 0 \${widthDesktop}%; padding: \${padding};">\`;
+    if (col.blocks) {
+      col.blocks.forEach(block => { html += renderBlock(block); });
+    }
+    html += \`</div>\`;
+    return html;
+  }
+
+  function renderBlock(block) {
+    const type = block.type;
+    const s = block.settings || {};
+
+    if (type === 'heading') {
+      const tag = s.tag || 'h2';
+      return \`<\${tag} style="font-size:\${s.fontSize || '32px'}; font-weight:\${s.fontWeight || '800'}; color:\${s.color || '#111'}; margin-bottom: 16px; \${s.customCss || ''}">\${s.text}</\${tag}>\`;
+    }
+    if (type === 'paragraph') {
+      return \`<p style="font-size:16px; line-height:1.6; color:\${s.color || '#555'}; margin-bottom:24px;">\${s.text}</p>\`;
+    }
+    if (type === 'button') {
+      return \`<a href="\${s.url || '#'}" class="cf-btn-premium \${s.trigger_sticky ? 'cf-main-atc' : ''}" style="border-radius: var(--cf-radius); background: \${s.bgColor || '#111'}; color: \${s.textColor || '#fff'}">\${s.text || 'Shop Now'}</a>\`;
+    }
+    if (type === 'marquee') {
+      return \`
+        <div style="overflow:hidden; white-space:nowrap; background:\${s.bgColor || '#000'}; color:\${s.textColor || '#fff'}; padding: 12px 0;">
+          <div style="display:inline-block; animation: cfMarquee 20s linear infinite;">
+             \${(s.text + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').repeat(10)}
+          </div>
+        </div>
+        <style>@keyframes cfMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }</style>
+      \`;
+    }
+    if (type === 'image') {
+      return \`<img src="\${s.src}" alt="img" style="width:100%; border-radius:var(--cf-radius); display:block; object-fit:cover; \${s.customCss || ''}" />\`;
+    }
+    if (type === 'product_slider') {
+      let sliderHtml = \`<div class="cf-slider-container">\`;
+      s.products.forEach(p => {
+        sliderHtml += \`
+          <div class="cf-slider-item" style="border: 1px solid #efefef; border-radius: var(--cf-radius); overflow:hidden; background:#fff; text-align:left; position:relative;">
+             <img src="\${p.image}" style="width:100%; aspect-ratio:4/5; object-fit:cover; display:block;" />
+             <div style="padding:16px;">
+               <h4 style="margin:0 0 8px; font-size:16px; font-weight:700;">\${p.title}</h4>
+               <p style="margin:0 0 16px; font-size:14px; color:#555;">\${p.meta || ''}</p>
+               <div style="display:flex; justify-content:space-between; align-items:center;">
+                 <span style="font-weight:800; font-size:16px;">\${p.price}</span>
+                 <button class="cf-btn-premium" style="padding:8px 16px; font-size:12px;">Add</button>
+               </div>
+             </div>
+          </div>
+        \`;
+      });
+      sliderHtml += \`</div>\`;
+      return sliderHtml;
+    }
+    return '';
+  }
+
+  // Go!
+  renderSchema(schema);
+
+  // --- 2. ADVANCED INTERACTIONS (Vanilla JS) ---
+
+  // Parallax Engine
+  if ('{{ section.settings.enable_parallax }}' === 'true') {
+    const parallaxBgs = root.querySelectorAll('.cf-parallax-bg');
+    if (parallaxBgs.length > 0) {
+      window.addEventListener('scroll', () => {
+        requestAnimationFrame(() => {
+          const scrollY = window.pageYOffset;
+          parallaxBgs.forEach(bg => {
+            const wrapper = bg.parentElement;
+            const rect = wrapper.getBoundingClientRect();
+            // simple parallax calculation if visible
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+              const speed = 0.3;
+              const yPos = -(rect.top * speed);
+              bg.style.transform = `translateY(${yPos}px)`;
+            }
+          });
+        });
+      }, { passive: true });
+    }
+  }
+
+  // Sticky Add-to-Cart Engine
+  if ('{{ section.settings.enable_sticky_cart }}' === 'true') {
+     const stickyCart = document.getElementById('cf-sticky-cart-' + sectionId);
+     const mainAtc = root.querySelector('.cf-main-atc');
+     
+     if (stickyCart && mainAtc) {
+       const observer = new IntersectionObserver((entries) => {
+         entries.forEach(entry => {
+           if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+             // Main ATC scrolled completely OUT OF VIEW at the top
+             stickyCart.classList.add('is-visible');
+           } else {
+             stickyCart.classList.remove('is-visible');
+           }
+         });
+       }, { threshold: 0 });
+       observer.observe(mainAtc);
+     }
+  }
+
+})();
+</script>
