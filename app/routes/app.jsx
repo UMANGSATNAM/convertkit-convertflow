@@ -23,15 +23,6 @@ export default function App() {
           Overview
         </Link>
         <Link to="/app/builder">Page Builder</Link>
-        <Link to="/app/pagecraft">PageCraft Builder</Link>
-        <Link to="/app/sections">Sections</Link>
-        <Link to="/app/pages">Pages</Link>
-        <Link to="/app/themes">Themes</Link>
-        <Link to="/app/urgency">Urgency Tools</Link>
-        <Link to="/app/reviews">Reviews</Link>
-        <Link to="/app/upsells">Upsells</Link>
-        <Link to="/app/analytics">Analytics</Link>
-        <Link to="/app/convertflow">PageCraft Editor</Link>
         <Link to="/app/settings">Settings</Link>
       </NavMenu>
       <Outlet />
