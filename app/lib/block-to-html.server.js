@@ -109,9 +109,39 @@ function renderSection(section, colors, fonts) {
       return renderUrgencyBar(s);
     case "footer":
       return renderFooter(s, fonts);
+    case "section":
+      return renderNativeThemePlaceholder(s);
     default:
       return `<!-- Unknown section: ${esc(s.type)} -->`;
   }
+}
+
+// ── Native Theme Placeholder (For Web Preview) ──
+function renderNativeThemePlaceholder(s) {
+  const bg = s.background_color || s.settings?.background_color || "#f8fafc";
+  const columns = s.columns || [];
+  
+  const structureHtml = columns.map((col, i) => {
+    const blocksText = (col.blocks || []).map(b => b.type).join(', ') || 'empty';
+    return `<div><strong style="color:#0f172a;">Column ${i+1}:</strong> <span style="color:#64748b;">[${esc(blocksText)}]</span></div>`;
+  }).join('');
+
+  return `<section class="pb-section" style="background:${bg}; text-align:center; min-height: 80vh; display: flex; align-items:center; justify-content: center;">
+  <div style="max-width: 800px; width: 100%; margin: 0 auto; background: #ffffff; padding: 60px 40px; border: 2px dashed #cbd5e1; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+    <div style="font-size: 64px; margin-bottom: 24px;">⚡️</div>
+    <h2 class="pb-heading" style="font-size: clamp(28px, 4vw, 36px); font-weight: 700; margin-bottom: 16px; color: #0f172a;">Native Shopify Theme Module</h2>
+    <p style="font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 32px; max-width: 600px; margin-inline: auto;">
+      This premium layout is built entirely with dynamic Liquid and relies on your Shopify theme's native CSS/JS engine. Features like math-based Parallax, native Intersection Oberservers, and direct CSS Snapping cannot be previewed outside of Shopify.
+    </p>
+    <div style="background: #f1f5f9; padding: 24px; border-radius: 12px; text-align: left; font-size: 14px; font-family: monospace; border: 1px solid #e2e8f0; display: inline-block; min-width: 300px;">
+      <div style="font-weight: 700; margin-bottom: 12px; color: #334155; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px;">Detected Architecture</div>
+      ${structureHtml || '<div style="color:#94a3b8;">No blocks found</div>'}
+    </div>
+    <div style="margin-top: 32px; font-weight: 700; color: #2563eb; font-size: 15px; background: #eff6ff; display: inline-block; padding: 12px 24px; border-radius: 30px;">
+      🚀 Hit Publish to view this live on your storefront!
+    </div>
+  </div>
+</section>`;
 }
 
 // ── Announcement Bar ──
