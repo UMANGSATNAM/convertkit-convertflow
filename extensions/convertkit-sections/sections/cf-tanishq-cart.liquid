@@ -1,0 +1,724 @@
+{% comment %}
+  ConvertFlow — Tanishq-Style Premium Jewellery Cart Page
+  Self-contained luxury cart with upsells, trust badges, order summary
+  Injects into templates/cart.json
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  .cfj-cart * { margin: 0; padding: 0; box-sizing: border-box; }
+  .cfj-cart {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    color: #2C1810;
+    -webkit-font-smoothing: antialiased;
+    min-height: 60vh;
+    background: #FFFCF5;
+  }
+  .cfj-cart h1, .cfj-cart h2, .cfj-cart h3 {
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+
+  /* ── Cart Layout ── */
+  .cfj-cart-wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 56px 48px;
+  }
+  .cfj-cart-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .cfj-cart-title {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: #2C1810;
+  }
+  .cfj-cart-continue-top {
+    font-size: 13px;
+    color: #D4AF37;
+    text-decoration: none;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .cfj-cart-continue-top:hover { opacity: 0.7; }
+  .cfj-cart-subtitle { font-size: 14px; color: #8B7355; margin-bottom: 40px; }
+  .cfj-cart-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── Cart Items ── */
+  .cfj-cart-items {}
+  .cfj-cart-header {
+    display: grid;
+    grid-template-columns: 1fr 120px 140px 100px;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #2C1810;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8B7355;
+  }
+  .cfj-cart-item {
+    display: grid;
+    grid-template-columns: 1fr 120px 140px 100px;
+    gap: 16px;
+    align-items: center;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(212,175,55,0.1);
+  }
+  .cfj-cart-item-left {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .cfj-cart-item-img {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    background: #FAF5ED;
+    flex-shrink: 0;
+    border: 1px solid rgba(212,175,55,0.1);
+  }
+  .cfj-cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cfj-cart-item-type {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin-bottom: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-cart-item-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    font-family: 'Playfair Display', serif;
+    color: #2C1810;
+  }
+  .cfj-cart-item-variant { font-size: 12px; color: #8B7355; margin-bottom: 10px; }
+  .cfj-cart-item-remove {
+    font-size: 11px;
+    color: #8B2252;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-cart-item-price {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+  .cfj-cart-item-price-original {
+    font-size: 12px;
+    color: #bbb;
+    text-decoration: line-through;
+    margin-top: 4px;
+  }
+
+  /* Quantity */
+  .cfj-cart-qty {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #e0d5c9;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .cfj-cart-qty button {
+    width: 38px;
+    height: 38px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2C1810;
+    transition: background 0.2s;
+  }
+  .cfj-cart-qty button:hover { background: #FAF5ED; }
+  .cfj-cart-qty span {
+    width: 44px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    border-left: 1.5px solid #e0d5c9;
+    border-right: 1.5px solid #e0d5c9;
+    line-height: 38px;
+  }
+  .cfj-cart-item-total {
+    font-size: 18px;
+    font-weight: 800;
+    font-family: 'Playfair Display', serif;
+    color: #2C1810;
+  }
+
+  /* ── Empty Cart ── */
+  .cfj-cart-empty {
+    text-align: center;
+    padding: 100px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .cfj-cart-empty-icon { color: #e0d5c9; }
+  .cfj-cart-empty h3 { font-size: 26px; font-weight: 700; color: #2C1810; }
+  .cfj-cart-empty p { font-size: 15px; color: #8B7355; max-width: 400px; line-height: 1.7; }
+  .cfj-cart-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 40px;
+    background: linear-gradient(135deg, #D4AF37, #C5A028);
+    color: #2C1810;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .cfj-cart-empty-btn:hover { box-shadow: 0 8px 30px rgba(212,175,55,0.3); transform: translateY(-2px); }
+
+  /* ── Cart Summary ── */
+  .cfj-cart-summary {
+    background: #FAF5ED;
+    padding: 36px;
+    border: 1px solid rgba(212,175,55,0.1);
+    position: sticky;
+    top: 20px;
+  }
+  .cfj-cart-summary h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(212,175,55,0.15);
+    color: #2C1810;
+  }
+  .cfj-cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #5a4a3c;
+  }
+  .cfj-cart-summary-row span:last-child { font-weight: 600; }
+  .cfj-cart-summary-row.total {
+    font-size: 20px;
+    font-weight: 800;
+    color: #2C1810;
+    border-top: 2px solid #2C1810;
+    padding-top: 18px;
+    margin-top: 18px;
+    margin-bottom: 28px;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Buttons */
+  .cfj-cart-checkout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 20px;
+    background: #2C1810;
+    color: #D4AF37;
+    border: none;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    text-decoration: none;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-cart-checkout:hover {
+    background: #1a0f0a;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(44,24,16,0.2);
+  }
+  .cfj-cart-continue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    color: #2C1810;
+    border: 1.5px solid #e0d5c9;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    margin-bottom: 28px;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-cart-continue:hover { border-color: #D4AF37; color: #D4AF37; }
+
+  /* Promo */
+  .cfj-promo-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+  .cfj-promo-input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1.5px solid #e0d5c9;
+    border-right: none;
+    font-size: 13px;
+    outline: none;
+    background: #FFFCF5;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+  }
+  .cfj-promo-input:focus { border-color: #D4AF37; }
+  .cfj-promo-btn {
+    padding: 14px 22px;
+    background: #FFFCF5;
+    border: 1.5px solid #2C1810;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-promo-btn:hover { background: #2C1810; color: #D4AF37; }
+
+  /* Trust strip */
+  .cfj-cart-trust {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 0 0;
+    border-top: 1px solid rgba(212,175,55,0.1);
+  }
+  .cfj-cart-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #5a4a3c;
+    font-weight: 600;
+  }
+  .cfj-cart-trust-icon { color: #D4AF37; flex-shrink: 0; }
+
+  /* Payments */
+  .cfj-cart-payments {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(212,175,55,0.1);
+    justify-content: center;
+  }
+  .cfj-cart-pay-icon {
+    width: 44px;
+    height: 28px;
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 800;
+    color: #D4AF37;
+    letter-spacing: 0.5px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── You May Also Like ── */
+  .cfj-cart-upsell {
+    padding: 70px 48px;
+    border-top: 1px solid rgba(212,175,55,0.1);
+    background: #FAF5ED;
+  }
+  .cfj-cart-upsell-inner { max-width: 1320px; margin: 0 auto; }
+  .cfj-cart-upsell-head {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .cfj-cart-upsell-overline {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-cart-upsell-overline::before,
+  .cfj-cart-upsell-overline::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: #D4AF37;
+  }
+  .cfj-cart-upsell h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2C1810;
+  }
+  .cfj-cart-upsell-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .cfj-upsell-card {
+    background: #FFFCF5;
+    overflow: hidden;
+    border: 1px solid rgba(212,175,55,0.1);
+    transition: all 0.4s ease;
+    text-decoration: none;
+    color: #2C1810;
+    display: block;
+  }
+  .cfj-upsell-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(44,24,16,0.08); }
+  .cfj-upsell-img {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #FAF5ED;
+  }
+  .cfj-upsell-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .cfj-upsell-card:hover .cfj-upsell-img img { transform: scale(1.05); }
+  .cfj-upsell-info { padding: 18px; text-align: center; }
+  .cfj-upsell-type {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin-bottom: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cfj-upsell-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .cfj-upsell-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #2C1810;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 14px;
+  }
+  .cfj-upsell-atc {
+    width: 100%;
+    padding: 12px;
+    background: #2C1810;
+    color: #D4AF37;
+    border: none;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .cfj-upsell-atc:hover { background: #D4AF37; color: #2C1810; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .cfj-cart-wrap { padding: 24px 20px; }
+    .cfj-cart-title { font-size: 26px; }
+    .cfj-cart-grid { grid-template-columns: 1fr; }
+    .cfj-cart-header { display: none; }
+    .cfj-cart-item { grid-template-columns: 1fr; gap: 12px; }
+    .cfj-cart-upsell-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .cfj-cart-upsell { padding: 48px 20px; }
+    .cfj-cart-summary { position: static; }
+    .cfj-cart-continue-top { display: none; }
+  }
+{% endstyle %}
+
+<div class="cfj-cart">
+  <div class="cfj-cart-wrap">
+    <div class="cfj-cart-title-row">
+      <h1 class="cfj-cart-title">Shopping Bag</h1>
+      <a href="/collections/all" class="cfj-cart-continue-top">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/></svg>
+        Continue Shopping
+      </a>
+    </div>
+
+    {%- if cart.item_count == 0 -%}
+      <div class="cfj-cart-empty">
+        <svg class="cfj-cart-empty-icon" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+          <path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <h3>Your Shopping Bag is Empty</h3>
+        <p>It seems you haven't discovered the perfect piece yet. Explore our curated collections to find jewellery that speaks to you.</p>
+        <a href="/collections/all" class="cfj-cart-empty-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Explore Collections
+        </a>
+      </div>
+    {%- else -%}
+      <p class="cfj-cart-subtitle">{{ cart.item_count }} piece{% if cart.item_count > 1 %}s{% endif %} in your bag</p>
+
+      <div class="cfj-cart-grid">
+        <!-- Items -->
+        <div class="cfj-cart-items">
+          <div class="cfj-cart-header">
+            <span>Product</span>
+            <span>Price</span>
+            <span>Quantity</span>
+            <span>Total</span>
+          </div>
+
+          {%- form 'cart', cart, id: 'cfj-cart-form' -%}
+            {%- for item in cart.items -%}
+              <div class="cfj-cart-item">
+                <div class="cfj-cart-item-left">
+                  <div class="cfj-cart-item-img">
+                    <a href="{{ item.url }}">
+                      {%- if item.image -%}
+                        <img src="{{ item.image | image_url: width: 220 }}" alt="{{ item.title }}" loading="lazy">
+                      {%- else -%}
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#FAF5ED;">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5Z"/></svg>
+                        </div>
+                      {%- endif -%}
+                    </a>
+                  </div>
+                  <div>
+                    <div class="cfj-cart-item-type">{{ item.product.type | default: 'Jewellery' }}</div>
+                    <a href="{{ item.url }}" style="text-decoration:none;color:#2C1810;">
+                      <div class="cfj-cart-item-name">{{ item.product.title }}</div>
+                    </a>
+                    {%- unless item.variant.title == 'Default Title' -%}
+                      <div class="cfj-cart-item-variant">{{ item.variant.title }}</div>
+                    {%- endunless -%}
+                    <a href="{{ routes.cart_change_url }}?id={{ item.key }}&quantity=0" class="cfj-cart-item-remove" data-remove="{{ item.key }}">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                      Remove
+                    </a>
+                  </div>
+                </div>
+
+                <div class="cfj-cart-item-price">
+                  {{ item.price | money }}
+                  {%- if item.original_price > item.price -%}
+                    <div class="cfj-cart-item-price-original">{{ item.original_price | money }}</div>
+                  {%- endif -%}
+                </div>
+
+                <div class="cfj-cart-qty">
+                  <button type="button" onclick="cfjCartQty('{{ item.key }}', {{ item.quantity }}, -1)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <span id="cfj-qty-{{ item.key }}">{{ item.quantity }}</span>
+                  <button type="button" onclick="cfjCartQty('{{ item.key }}', {{ item.quantity }}, 1)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+
+                <div class="cfj-cart-item-total">{{ item.line_price | money }}</div>
+              </div>
+            {%- endfor -%}
+          {%- endform -%}
+        </div>
+
+        <!-- Summary -->
+        <div class="cfj-cart-summary">
+          <h3>Order Summary</h3>
+
+          <div class="cfj-cart-summary-row">
+            <span>Subtotal</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          <div class="cfj-cart-summary-row">
+            <span>Making Charges</span>
+            <span style="color:#D4AF37;font-weight:700;">WAIVED</span>
+          </div>
+          <div class="cfj-cart-summary-row">
+            <span>Shipping</span>
+            <span style="color:#D4AF37;font-weight:700;">
+              {%- if cart.total_price >= 99900 -%}FREE INSURED{%- else -%}Calculated at checkout{%- endif -%}
+            </span>
+          </div>
+          {%- if cart.total_discount > 0 -%}
+            <div class="cfj-cart-summary-row" style="color:#D4AF37;">
+              <span>Discount</span>
+              <span>- {{ cart.total_discount | money }}</span>
+            </div>
+          {%- endif -%}
+          <div class="cfj-cart-summary-row total">
+            <span>Total</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+
+          <!-- Promo Code -->
+          <div class="cfj-promo-row">
+            <input type="text" class="cfj-promo-input" placeholder="Gift card or promo code" id="cfj-promo-code">
+            <button class="cfj-promo-btn" onclick="cfjApplyPromo()">Apply</button>
+          </div>
+
+          <a href="/checkout" class="cfj-cart-checkout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure Checkout
+          </a>
+          <a href="/collections/all" class="cfj-cart-continue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/></svg>
+            Continue Shopping
+          </a>
+
+          <!-- Trust -->
+          <div class="cfj-cart-trust">
+            <div class="cfj-cart-trust-item">
+              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              100% BIS Hallmarked Jewellery
+            </div>
+            <div class="cfj-cart-trust-item">
+              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              Free Insured Delivery
+            </div>
+            <div class="cfj-cart-trust-item">
+              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Lifetime Exchange Guarantee
+            </div>
+            <div class="cfj-cart-trust-item">
+              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Transparent Gold Rate Pricing
+            </div>
+          </div>
+
+          <!-- Payments -->
+          <div class="cfj-cart-payments">
+            <div class="cfj-cart-pay-icon">VISA</div>
+            <div class="cfj-cart-pay-icon">MC</div>
+            <div class="cfj-cart-pay-icon">UPI</div>
+            <div class="cfj-cart-pay-icon">EMI</div>
+            <div class="cfj-cart-pay-icon">COD</div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <!-- You May Also Like -->
+  {%- if section.settings.show_upsell and cart.item_count > 0 -%}
+    <div class="cfj-cart-upsell">
+      <div class="cfj-cart-upsell-inner">
+        <div class="cfj-cart-upsell-head">
+          <span class="cfj-cart-upsell-overline">Complete Your Look</span>
+          <h2>{{ section.settings.upsell_title | default: 'You May Also Love' }}</h2>
+        </div>
+        <div class="cfj-cart-upsell-grid">
+          {%- assign upsell_col = collections[section.settings.upsell_collection] -%}
+          {%- for product in upsell_col.products limit: 4 -%}
+            <a href="{{ product.url }}" class="cfj-upsell-card">
+              <div class="cfj-upsell-img">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}" loading="lazy">
+                {%- endif -%}
+              </div>
+              <div class="cfj-upsell-info">
+                <div class="cfj-upsell-type">{{ product.type | default: 'Jewellery' }}</div>
+                <div class="cfj-upsell-name">{{ product.title }}</div>
+                <div class="cfj-upsell-price">{{ product.price | money }}</div>
+                <button class="cfj-upsell-atc" onclick="cfjAddUpsell(event, {{ product.variants.first.id }})">Quick Add</button>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  // Quantity update via AJAX
+  function cfjCartQty(key, currentQty, delta) {
+    var newQty = Math.max(0, currentQty + delta);
+    var el = document.getElementById('cfj-qty-' + key);
+    if (el) el.textContent = newQty;
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: newQty })
+    }).then(function() { location.reload(); });
+  }
+
+  // Add upsell product
+  function cfjAddUpsell(e, variantId) {
+    e.preventDefault();
+    e.stopPropagation();
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: 1 })
+    }).then(function() { location.reload(); });
+  }
+
+  // Promo redirect
+  function cfjApplyPromo() {
+    var code = document.getElementById('cfj-promo-code').value;
+    if (code) {
+      window.location.href = '/checkout?discount=' + encodeURIComponent(code);
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "CF: Jewellery Cart Page",
+  "tag": "section",
+  "class": "convertflow-jewellery-cart",
+  "settings": [
+    { "type": "header", "content": "Upsell Section" },
+    { "type": "checkbox", "id": "show_upsell", "label": "Show You May Also Love", "default": true },
+    { "type": "text", "id": "upsell_title", "label": "Upsell Section Title", "default": "You May Also Love" },
+    { "type": "collection", "id": "upsell_collection", "label": "Upsell Products Collection" }
+  ],
+  "presets": [
+    { "name": "CF: Jewellery Cart Page" }
+  ]
+}
+{% endschema %}

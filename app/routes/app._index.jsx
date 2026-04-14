@@ -8,300 +8,311 @@ export const loader = async ({ request }) => {
   return json({ ok: true });
 };
 
-/* ── Premium SVG Icon Library ── */
+/* ── Templates Config ── */
+const TEMPLATES = [
+  {
+    id: "pilgrim",
+    name: "Pilgrim Beauty",
+    niche: "BEAUTY & SKINCARE",
+    nicheColor: "#C17F5E",
+    nicheBg: "#FFF0E5",
+    accent: "#C17F5E",
+    desc: "Premium beauty landing page with hero, trust badges, categories, bestsellers, ingredients, brand story, testimonials & newsletter.",
+    icon: "leaf",
+  },
+  {
+    id: "tanishq",
+    name: "Tanishq Jewellery",
+    niche: "LUXURY JEWELLERY",
+    nicheColor: "#D4AF37",
+    nicheBg: "#FFF8E1",
+    accent: "#D4AF37",
+    desc: "Luxurious jewellery storefront with gold accents, serif typography, BIS hallmark trust, collection grids, craftsmanship story & elegant reviews.",
+    icon: "diamond",
+  },
+];
+
+/* ── SVG Icons ── */
 const SVG = {
-  truck: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
-  heart: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
-  leaf: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>`,
-  shield: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>`,
-  microscope: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>`,
-  star: `<svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  sparkle: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
-  droplet: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>`,
-  flask: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16.5h10"/></svg>`,
-  sun: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
-  eye: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>`,
-  shieldCheck: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>`,
-  globe: `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
-  package: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
-  users: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
-  skincare: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2h6l1 7H8l1-7Z"/><path d="M8 9v10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9"/><line x1="8" y1="13" x2="16" y2="13"/></svg>`,
-  haircare: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.5 2 2 6.5 2 12c0 .7.1 1.4.2 2"/><path d="M20 16.5c1.3-1.8 2-3.9 2-6.5 0-5.5-4.5-10-10-10"/><path d="M9 22c1.6 0 3-1.3 3-3v-2c0-1.7-1.4-3-3-3s-3 1.3-3 3v2c0 1.7 1.4 3 3 3Z"/></svg>`,
-  makeup: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2Z"/><path d="M9 2h6"/><path d="M12 2v5"/><path d="M8 7h8l-1 13H9L8 7Z"/></svg>`,
-  fragrance: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 5h4"/><path d="M11 2h2v3h-2z"/><path d="M7 5h10l1 17H6L7 5Z"/><path d="M6 10h12"/><path d="M9 10v7"/><path d="M12 10v7"/><path d="M15 10v7"/></svg>`,
-  rocket: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`,
+  zap: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  rocket: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`,
+  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`,
   desktop: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
   tablet: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>`,
   mobile: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>`,
-  zap: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  leaf: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>`,
+  diamond: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
 };
 
-const icon = (name, size) => {
+const icon = (name) => {
   const s = SVG[name] || "";
   return <span dangerouslySetInnerHTML={{ __html: s }} style={{ display: "inline-flex", alignItems: "center" }} />;
 };
 
-/* ── Star Rating Component ── */
-const Stars = ({ count = 5 }) => (
-  <span style={{ display: "inline-flex", gap: 1 }}>
-    {Array.from({ length: count }).map((_, i) => (
-      <span key={i} dangerouslySetInnerHTML={{ __html: SVG.star }} />
-    ))}
-  </span>
-);
+/* ── Tanishq Jewellery Preview HTML ── */
+const tanishqPreviewHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; color: #2C1810; line-height: 1.6; -webkit-font-smoothing: antialiased; background: #FFFCF5; }
+h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+
+/* Info Strip */
+.cfj-strip { background: #2C1810; color: #D4AF37; display: flex; justify-content: center; align-items: center; gap: 32px; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+.cfj-strip-item { display: flex; align-items: center; gap: 8px; }
+.cfj-strip-div { width: 1px; height: 14px; background: rgba(212,175,55,0.3); }
+
+/* Announce */
+.cfj-ann { background: linear-gradient(90deg, #D4AF37 0%, #F5D060 50%, #D4AF37 100%); color: #2C1810; text-align: center; padding: 10px 16px; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; }
+.cfj-ann a { color: #2C1810; text-decoration: underline; font-weight: 800; }
+
+/* Hero */
+.cfj-hero { position: relative; min-height: 560px; background: linear-gradient(135deg, #1a0f0a 0%, #2C1810 40%, #3d2317 100%); display: flex; align-items: center; overflow: hidden; }
+.cfj-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 50%, rgba(212,175,55,0.08) 0%, transparent 60%); }
+.cfj-hero-inner { max-width: 1320px; margin: 0 auto; padding: 80px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; width: 100%; position: relative; z-index: 1; }
+.cfj-hero-overline { display: inline-flex; align-items: center; gap: 12px; color: #D4AF37; font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; font-family: 'DM Sans', sans-serif; }
+.cfj-hero-overline::before, .cfj-hero-overline::after { content: ''; width: 32px; height: 1px; background: #D4AF37; }
+.cfj-hero h1 { font-size: 52px; font-weight: 700; line-height: 1.15; color: #FFFCF5; margin-bottom: 20px; }
+.cfj-hero h1 em { color: #D4AF37; font-style: italic; }
+.cfj-hero-sub { font-size: 16px; color: rgba(255,252,245,0.65); margin-bottom: 36px; max-width: 440px; line-height: 1.8; }
+.cfj-hero-ctas { display: flex; gap: 16px; }
+.cfj-cta-gold { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #D4AF37, #C5A028); color: #2C1810; padding: 18px 40px; font-size: 13px; font-weight: 800; text-decoration: none; border: none; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; transition: all 0.3s; }
+.cfj-cta-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.3); }
+.cfj-cta-outline { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #D4AF37; padding: 17px 40px; border: 1.5px solid #D4AF37; font-size: 13px; font-weight: 700; text-decoration: none; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+.cfj-hero-visual { width: 100%; max-width: 460px; aspect-ratio: 4/5; background: linear-gradient(135deg, #3d2317, #5a3828); display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+.cfj-hero-float { position: absolute; background: rgba(255,252,245,0.95); backdrop-filter: blur(10px); padding: 16px 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 14px; animation: cfj-f 4s ease-in-out infinite; border: 1px solid rgba(212,175,55,0.15); }
+.cfj-hero-float.tr { top: 30px; right: -20px; }
+.cfj-hero-float.bl { bottom: 40px; left: -20px; animation-delay: 2s; }
+.cfj-float-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #D4AF37, #F5D060); display: flex; align-items: center; justify-content: center; color: #2C1810; }
+.cfj-float-label { font-size: 11px; color: #999; }
+.cfj-float-val { font-weight: 800; color: #2C1810; font-size: 15px; }
+@keyframes cfj-f { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+/* Trust */
+.cfj-trust { background: #FFFCF5; border-top: 1px solid rgba(212,175,55,0.15); border-bottom: 1px solid rgba(212,175,55,0.15); padding: 20px 24px; }
+.cfj-trust-inner { max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px; }
+.cfj-trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #2C1810; }
+.cfj-trust-icon { color: #D4AF37; display: flex; }
+
+/* Section Head */
+.cfj-sh { text-align: center; margin-bottom: 56px; }
+.cfj-overline { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: #D4AF37; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 16px; font-family: 'DM Sans', sans-serif; }
+.cfj-overline::before, .cfj-overline::after { content: ''; width: 40px; height: 1px; background: #D4AF37; }
+.cfj-sh h2 { font-size: 38px; font-weight: 700; color: #2C1810; margin-bottom: 14px; }
+.cfj-sh p { font-size: 15px; color: #8B7355; max-width: 560px; margin: 0 auto; }
+
+/* Collections */
+.cfj-coll { padding: 90px 48px; max-width: 1320px; margin: 0 auto; }
+.cfj-coll-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfj-coll-card { position: relative; overflow: hidden; aspect-ratio: 3/4; text-decoration: none; color: #fff; display: block; }
+.cfj-coll-visual { width: 100%; height: 100%; transition: transform 0.8s ease; }
+.cfj-coll-card:hover .cfj-coll-visual { transform: scale(1.06); }
+.cfj-coll-ov { position: absolute; inset: 0; background: linear-gradient(to top, rgba(44,24,16,0.75) 0%, transparent 50%); display: flex; flex-direction: column; justify-content: flex-end; padding: 28px; }
+.cfj-coll-ov h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.cfj-coll-ov span { font-size: 11px; opacity: 0.8; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+
+/* Products */
+.cfj-prod { padding: 90px 48px; background: #FAF5ED; }
+.cfj-prod-inner { max-width: 1320px; margin: 0 auto; }
+.cfj-prod-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfj-prod-card { background: #FFFCF5; overflow: hidden; border: 1px solid rgba(212,175,55,0.1); transition: all 0.4s; text-decoration: none; color: #2C1810; display: block; }
+.cfj-prod-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(44,24,16,0.1); }
+.cfj-prod-img { position: relative; aspect-ratio: 1; overflow: hidden; background: #f5efe6; display: flex; align-items: center; justify-content: center; color: #d4af37; }
+.cfj-prod-badge { position: absolute; top: 14px; left: 14px; color: #2C1810; background: #D4AF37; padding: 5px 14px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+.cfj-prod-badge.exc { background: #8B2252; color: #fff; }
+.cfj-prod-badge.new { background: #2C1810; color: #D4AF37; }
+.cfj-prod-info { padding: 22px; text-align: center; }
+.cfj-prod-type { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #D4AF37; margin-bottom: 6px; font-family: 'DM Sans', sans-serif; }
+.cfj-prod-name { font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 10px; }
+.cfj-prod-price { font-size: 18px; font-weight: 800; color: #2C1810; font-family: 'Playfair Display', serif; }
+.cfj-prod-atc { display: block; width: 100%; margin-top: 16px; padding: 13px; background: #2C1810; color: #D4AF37; border: none; font-size: 10px; font-weight: 700; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+
+/* Story */
+.cfj-story { padding: 100px 48px; background: linear-gradient(135deg, #2C1810, #1a0f0a); color: #FFFCF5; }
+.cfj-story-inner { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+.cfj-story-overline { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: #D4AF37; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-family: 'DM Sans', sans-serif; }
+.cfj-story-overline::after { content: ''; width: 40px; height: 1px; background: #D4AF37; }
+.cfj-story h2 { font-size: 40px; font-weight: 700; margin-bottom: 24px; line-height: 1.2; }
+.cfj-story h2 em { color: #D4AF37; font-style: italic; }
+.cfj-story p { font-size: 15px; line-height: 1.9; color: rgba(255,252,245,0.65); margin-bottom: 36px; }
+.cfj-story-stats { display: flex; gap: 48px; }
+.cfj-story-stat h3 { font-size: 34px; font-weight: 800; color: #D4AF37; font-family: 'Playfair Display', serif; }
+.cfj-story-stat span { font-size: 11px; color: rgba(255,252,245,0.5); text-transform: uppercase; letter-spacing: 1px; }
+.cfj-story-vis { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, #3d2317, #5a3828); display: flex; align-items: center; justify-content: center; color: rgba(212,175,55,0.3); position: relative; }
+.cfj-story-accent { position: absolute; bottom: -20px; right: -20px; width: 100px; height: 100px; border: 2px solid rgba(212,175,55,0.2); }
+
+/* Reviews */
+.cfj-rev { padding: 90px 48px; background: #FFFCF5; }
+.cfj-rev-inner { max-width: 1320px; margin: 0 auto; }
+.cfj-rev-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.cfj-rev-card { background: #FAF5ED; padding: 36px; border: 1px solid rgba(212,175,55,0.1); position: relative; }
+.cfj-rev-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #D4AF37, #F5D060, #D4AF37); }
+.cfj-rev-q { color: #D4AF37; font-size: 40px; font-family: 'Playfair Display', serif; line-height: 1; margin-bottom: 14px; }
+.cfj-rev-stars { color: #D4AF37; margin-bottom: 14px; display: flex; gap: 3px; }
+.cfj-rev-text { font-size: 14px; color: #5a4a3c; line-height: 1.8; margin-bottom: 22px; font-style: italic; }
+.cfj-rev-author { display: flex; align-items: center; gap: 14px; }
+.cfj-rev-av { width: 44px; height: 44px; background: #D4AF37; display: flex; align-items: center; justify-content: center; color: #2C1810; font-weight: 800; font-size: 17px; font-family: 'Playfair Display', serif; }
+.cfj-rev-name { font-size: 13px; font-weight: 700; color: #2C1810; }
+.cfj-rev-loc { font-size: 11px; color: #8B7355; }
+
+/* Newsletter */
+.cfj-nl { padding: 90px 48px; background: linear-gradient(135deg, #2C1810, #3d2317); text-align: center; position: relative; overflow: hidden; }
+.cfj-nl::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.06) 0%, transparent 60%); }
+.cfj-nl-inner { max-width: 520px; margin: 0 auto; position: relative; z-index: 1; }
+.cfj-nl h2 { font-size: 32px; font-weight: 700; color: #FFFCF5; margin-bottom: 12px; }
+.cfj-nl p { font-size: 14px; color: rgba(255,252,245,0.6); margin-bottom: 30px; }
+.cfj-nl-form { display: flex; gap: 0; }
+.cfj-nl-input { flex: 1; padding: 16px 20px; border: 1px solid rgba(212,175,55,0.3); border-right: none; font-size: 13px; outline: none; background: rgba(255,252,245,0.05); color: #FFFCF5; }
+.cfj-nl-btn { padding: 16px 28px; background: #D4AF37; color: #2C1810; border: 1px solid #D4AF37; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+
+/* Footer */
+.cfj-ft { background: #1a0f0a; color: #bbb; padding: 60px 48px 24px; }
+.cfj-ft-inner { max-width: 1320px; margin: 0 auto; }
+.cfj-ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.cfj-ft-brand h3 { font-size: 24px; font-weight: 700; color: #D4AF37; margin-bottom: 12px; font-family: 'Playfair Display', serif; }
+.cfj-ft-brand p { font-size: 12px; line-height: 1.8; color: #8B7355; }
+.cfj-ft h4 { font-size: 11px; font-weight: 700; color: #D4AF37; margin-bottom: 16px; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
+.cfj-ft ul { list-style: none; }
+.cfj-ft li { margin-bottom: 8px; }
+.cfj-ft a { color: #8B7355; text-decoration: none; font-size: 12px; }
+.cfj-ft-bottom { border-top: 1px solid rgba(212,175,55,0.1); padding-top: 20px; display: flex; justify-content: space-between; font-size: 11px; color: #5a4a3c; }
+
+.star-s { display: inline-block; }
+@media (max-width: 768px) {
+  .cfj-hero-inner { grid-template-columns: 1fr; padding: 40px 20px; }
+  .cfj-hero h1 { font-size: 30px; }
+  .cfj-hero-visual { display: none; }
+  .cfj-coll-grid, .cfj-prod-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cfj-story-inner { grid-template-columns: 1fr; gap: 40px; }
+  .cfj-rev-grid { grid-template-columns: 1fr; }
+  .cfj-ft-grid { grid-template-columns: 1fr 1fr; }
+  .cfj-nl-form { flex-direction: column; }
+  .cfj-coll, .cfj-prod, .cfj-story, .cfj-rev, .cfj-nl { padding: 50px 20px; }
+}
+</style>
+</head>
+<body>
+  <div class="cfj-strip">
+    <div class="cfj-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> BIS Hallmarked</div>
+    <div class="cfj-strip-div"></div>
+    <div class="cfj-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Certified Diamonds</div>
+    <div class="cfj-strip-div"></div>
+    <div class="cfj-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Free Insured Shipping</div>
+    <div class="cfj-strip-div"></div>
+    <div class="cfj-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Lifetime Exchange</div>
+  </div>
+
+  <div class="cfj-ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Making Charges Waived — Limited Period Offer <a href="#">Shop Now →</a></div>
+
+  <div class="cfj-hero">
+    <div class="cfj-hero-inner">
+      <div>
+        <span class="cfj-hero-overline">New Arrivals</span>
+        <h1>Timeless<br><em>Elegance</em> Redefined</h1>
+        <p class="cfj-hero-sub">Handcrafted jewellery that celebrates the art of Indian craftsmanship. Every piece tells a story of heritage, precision, and timeless beauty.</p>
+        <div class="cfj-hero-ctas">
+          <a href="#" class="cfj-cta-gold">Explore Collection <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a href="#" class="cfj-cta-outline">Our Heritage</a>
+        </div>
+      </div>
+      <div style="position:relative;display:flex;justify-content:center;">
+        <div class="cfj-hero-visual"><svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,55,0.25)" stroke-width="0.6"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <div class="cfj-hero-float tr">
+          <div class="cfj-float-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="cfj-float-label">Rating</div><div class="cfj-float-val">4.9 / 5.0</div></div>
+        </div>
+        <div class="cfj-hero-float bl">
+          <div class="cfj-float-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div><div class="cfj-float-label">Loved by</div><div class="cfj-float-val">10L+ Customers</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfj-trust"><div class="cfj-trust-inner">
+    <div class="cfj-trust-item"><span class="cfj-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span> 100% BIS Hallmarked</div>
+    <div class="cfj-trust-item"><span class="cfj-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span> Lifetime Exchange</div>
+    <div class="cfj-trust-item"><span class="cfj-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Free Insured Delivery</div>
+    <div class="cfj-trust-item"><span class="cfj-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span> Certified Diamonds</div>
+  </div></div>
+
+  <div class="cfj-coll">
+    <div class="cfj-sh"><span class="cfj-overline">Collections</span><h2>Shop by Collection</h2><p>Discover curated collections for every occasion</p></div>
+    <div class="cfj-coll-grid">
+      <a href="#" class="cfj-coll-card"><div class="cfj-coll-visual" style="background:linear-gradient(135deg,#FADADD,#e8c8b8)"></div><div class="cfj-coll-ov"><h3>Gold Necklaces</h3><span>Shop Collection</span></div></a>
+      <a href="#" class="cfj-coll-card"><div class="cfj-coll-visual" style="background:linear-gradient(135deg,#E8D5B7,#c9a96e)"></div><div class="cfj-coll-ov"><h3>Diamond Rings</h3><span>Shop Collection</span></div></a>
+      <a href="#" class="cfj-coll-card"><div class="cfj-coll-visual" style="background:linear-gradient(135deg,#FFD1DC,#d4a574)"></div><div class="cfj-coll-ov"><h3>Bangles</h3><span>Shop Collection</span></div></a>
+      <a href="#" class="cfj-coll-card"><div class="cfj-coll-visual" style="background:linear-gradient(135deg,#f5efe6,#d4af37)"></div><div class="cfj-coll-ov"><h3>Earrings</h3><span>Shop Collection</span></div></a>
+    </div>
+  </div>
+
+  <div class="cfj-prod"><div class="cfj-prod-inner">
+    <div class="cfj-sh"><span class="cfj-overline">Most Loved</span><h2>Bestselling Jewellery</h2><p>Loved by millions, our most coveted designs</p></div>
+    <div class="cfj-prod-grid">
+      <a href="#" class="cfj-prod-card"><div class="cfj-prod-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span class="cfj-prod-badge">BESTSELLER</span></div><div class="cfj-prod-info"><div class="cfj-prod-type">Gold Necklace</div><div class="cfj-prod-name">Celestial Gold Necklace Set</div><div class="cfj-prod-price">&#8377;1,24,999</div><button class="cfj-prod-atc">Add to Cart</button></div></a>
+      <a href="#" class="cfj-prod-card"><div class="cfj-prod-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span class="cfj-prod-badge exc">EXCLUSIVE</span></div><div class="cfj-prod-info"><div class="cfj-prod-type">Diamond Ring</div><div class="cfj-prod-name">Diamond Solitaire Ring</div><div class="cfj-prod-price">&#8377;89,999</div><button class="cfj-prod-atc">Add to Cart</button></div></a>
+      <a href="#" class="cfj-prod-card"><div class="cfj-prod-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span class="cfj-prod-badge new">NEW</span></div><div class="cfj-prod-info"><div class="cfj-prod-type">Gold Earrings</div><div class="cfj-prod-name">Heritage Kundan Jhumkas</div><div class="cfj-prod-price">&#8377;45,999</div><button class="cfj-prod-atc">Add to Cart</button></div></a>
+      <a href="#" class="cfj-prod-card"><div class="cfj-prod-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="cfj-prod-info"><div class="cfj-prod-type">Platinum Bracelet</div><div class="cfj-prod-name">Platinum Love Bracelet</div><div class="cfj-prod-price">&#8377;67,500</div><button class="cfj-prod-atc">Add to Cart</button></div></a>
+    </div>
+  </div></div>
+
+  <div class="cfj-story"><div class="cfj-story-inner">
+    <div>
+      <span class="cfj-story-overline">Our Legacy</span>
+      <h2>Crafted with <em>Passion</em><br>& Precision</h2>
+      <p>For over eight decades, our master artisans have perfected the art of jewellery making. Each piece passes through 68 quality checks before reaching you.</p>
+      <div class="cfj-story-stats">
+        <div class="cfj-story-stat"><h3>85+</h3><span>Years of Heritage</span></div>
+        <div class="cfj-story-stat"><h3>5000+</h3><span>Unique Designs</span></div>
+        <div class="cfj-story-stat"><h3>68</h3><span>Quality Checks</span></div>
+      </div>
+    </div>
+    <div class="cfj-story-vis"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><div class="cfj-story-accent"></div></div>
+  </div></div>
+
+  <div class="cfj-rev"><div class="cfj-rev-inner">
+    <div class="cfj-sh"><span class="cfj-overline">Testimonials</span><h2>What Our Customers Say</h2></div>
+    <div class="cfj-rev-grid">
+      <div class="cfj-rev-card"><div class="cfj-rev-q">&ldquo;</div><div class="cfj-rev-stars"><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cfj-rev-text">"The craftsmanship is exceptional. Every detail is perfect and the gold purity is exactly as promised."</p><div class="cfj-rev-author"><div class="cfj-rev-av">A</div><div><div class="cfj-rev-name">Ananya S.</div><div class="cfj-rev-loc">Mumbai</div></div></div></div>
+      <div class="cfj-rev-card"><div class="cfj-rev-q">&ldquo;</div><div class="cfj-rev-stars"><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cfj-rev-text">"The diamond quality is outstanding and the packaging was incredibly luxurious. Bought my entire wedding set."</p><div class="cfj-rev-author"><div class="cfj-rev-av">P</div><div><div class="cfj-rev-name">Priya M.</div><div class="cfj-rev-loc">Delhi</div></div></div></div>
+      <div class="cfj-rev-card"><div class="cfj-rev-q">&ldquo;</div><div class="cfj-rev-stars"><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="#D4AF37"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cfj-rev-text">"Beautiful gold necklace with impeccable finishing. The hallmark certificate gives complete confidence."</p><div class="cfj-rev-author"><div class="cfj-rev-av">K</div><div><div class="cfj-rev-name">Kavitha R.</div><div class="cfj-rev-loc">Bangalore</div></div></div></div>
+    </div>
+  </div></div>
+
+  <div class="cfj-nl"><div class="cfj-nl-inner">
+    <h2>Be the First to Know</h2>
+    <p>Subscribe for exclusive previews, early access to new collections, and members-only offers.</p>
+    <div class="cfj-nl-form"><input type="email" class="cfj-nl-input" placeholder="Enter your email address"><button class="cfj-nl-btn">Subscribe</button></div>
+  </div></div>
+
+  <div class="cfj-ft"><div class="cfj-ft-inner"><div class="cfj-ft-grid"><div class="cfj-ft-brand"><h3>Your Brand</h3><p>A legacy of trust, craftsmanship, and timeless beauty. Every piece celebrates Indian artistry and modern elegance.</p></div><div><h4>Collections</h4><ul><li><a href="#">Gold</a></li><li><a href="#">Diamonds</a></li><li><a href="#">Wedding</a></li><li><a href="#">Daily Wear</a></li></ul></div><div><h4>Help</h4><ul><li><a href="#">Track Order</a></li><li><a href="#">Returns</a></li><li><a href="#">Store Locator</a></li><li><a href="#">FAQs</a></li></ul></div><div><h4>About</h4><ul><li><a href="#">Heritage</a></li><li><a href="#">Craftsmanship</a></li><li><a href="#">Certifications</a></li><li><a href="#">Careers</a></li></ul></div></div><div class="cfj-ft-bottom"><span>&copy; 2026 Your Brand. All rights reserved.</span><span>Powered by ConvertFlow</span></div></div></div>
+</body></html>`;
+
+/* ── Pilgrim Preview (reused from existing) ── */
+const pilgrimPreviewHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;color:#1a1a1a;line-height:1.6;-webkit-font-smoothing:antialiased}.cf-a{background:#2D2D2D;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:500;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:8px}.cf-a a{color:#FFD700;text-decoration:underline;font-weight:600}.cf-h{position:relative;min-height:520px;background:linear-gradient(135deg,#FFF5EE 0%,#FAEBD7 50%,#FFE4C4 100%);display:flex;align-items:center}.cf-hi{max-width:1280px;margin:0 auto;padding:60px 40px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;width:100%}.cf-hb{display:inline-block;background:#D4A574;color:#fff;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}.cf-h h1{font-size:44px;font-weight:800;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px}.cf-h h1 span{color:#C17F5E}.cf-hs{font-size:16px;color:#555;margin-bottom:28px;max-width:440px;line-height:1.7}.cf-hc{display:inline-flex;align-items:center;gap:10px;background:#1a1a1a;color:#fff;padding:16px 36px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;letter-spacing:.5px}.cf-tb{background:#FAF7F2;border-top:1px solid rgba(0,0,0,.05);border-bottom:1px solid rgba(0,0,0,.05);padding:18px 20px}.cf-ti{max-width:1280px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:12px}.cf-tt{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#333}.cf-ic{color:#C17F5E;display:flex}.cf-sh{text-align:center;margin-bottom:48px}.cf-ol{font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C17F5E;margin-bottom:12px;display:block}.cf-sh h2{font-size:34px;font-weight:800;margin-bottom:12px;letter-spacing:-.3px}.cf-sh p{font-size:15px;color:#777;max-width:560px;margin:0 auto}.cf-s{padding:70px 40px;max-width:1280px;margin:0 auto}.cf-sg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cf-sc{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/4;text-decoration:none;color:#fff;display:block}.cf-sv{width:100%;height:100%;transition:transform .6s}.cf-sc:hover .cf-sv{transform:scale(1.05)}.cf-so{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px}.cf-so h3{font-size:20px;font-weight:700;margin-bottom:2px}.cf-so span{font-size:12px;opacity:.85}.cf-p{padding:70px 40px;background:#fff}.cf-pi{max-width:1280px;margin:0 auto}.cf-pg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cf-pc{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0ebe5;transition:all .3s;text-decoration:none;color:#1a1a1a;display:block}.cf-pc:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}.cf-pm{position:relative;aspect-ratio:1;overflow:hidden;background:#faf7f2;display:flex;align-items:center;justify-content:center;color:#d4a574}.cf-pb{position:absolute;top:12px;left:12px;background:#E67E22;color:#fff;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}.cf-pb.n{background:#2ECC71}.cf-pb.h{background:#E74C3C}.cf-pf{padding:18px}.cf-pn{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:6px}.cf-pr{display:flex;align-items:center;gap:4px;margin-bottom:8px;font-size:12px;color:#999}.cf-pp{display:flex;align-items:center;gap:8px}.cf-cp{font-size:18px;font-weight:800}.cf-op{font-size:14px;color:#aaa;text-decoration:line-through}.cf-dp{font-size:12px;font-weight:700;color:#27ae60}.cf-pa{display:block;width:100%;margin-top:14px;padding:11px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px}.cf-ft{background:#1a1a1a;color:#bbb;padding:50px 40px 24px}.cf-fi{max-width:1280px;margin:0 auto}.cf-fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px}.cf-fb h3{font-size:22px;font-weight:800;color:#fff;margin-bottom:10px}.cf-fb p{font-size:12px;line-height:1.7;color:#888}.cf-ft h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:14px}.cf-ft ul{list-style:none}.cf-ft li{margin-bottom:8px}.cf-ft a{color:#888;text-decoration:none;font-size:12px}.cf-fx{border-top:1px solid rgba(255,255,255,.08);padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#666}@media(max-width:768px){.cf-hi{grid-template-columns:1fr;padding:30px 16px}.cf-h h1{font-size:28px}.cf-sg,.cf-pg{grid-template-columns:repeat(2,1fr);gap:10px}.cf-fg{grid-template-columns:1fr 1fr}}</style></head><body><div class="cf-a"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> FLAT 20% OFF on your first order <a href="#">Shop Now →</a></div><div class="cf-h"><div class="cf-hi"><div><span class="cf-hb">NEW COLLECTION</span><h1>Discover Your<br><span>Natural Glow</span></h1><p class="cf-hs">Premium skincare powered by ancient beauty secrets. Vegan, cruelty-free, and FDA approved.</p><a href="#" class="cf-hc">Explore Collection →</a></div><div style="display:flex;justify-content:center"><div style="width:100%;max-width:460px;aspect-ratio:4/5;background:linear-gradient(135deg,#f0e6da,#e8d5c4);border-radius:20px;display:flex;align-items:center;justify-content:center"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div></div></div></div><div class="cf-tb"><div class="cf-ti"><div class="cf-tt"><span class="cf-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Free Shipping</div><div class="cf-tt"><span class="cf-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span> Cruelty Free</div><div class="cf-tt"><span class="cf-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span> FDA Approved</div></div></div><div class="cf-s"><div class="cf-sh"><span class="cf-ol">Explore</span><h2>Shop by Category</h2><p>Find the perfect products for your beauty routine</p></div><div class="cf-sg"><a href="#" class="cf-sc"><div class="cf-sv" style="background:linear-gradient(135deg,#FADADD,#F8C8DC)"></div><div class="cf-so"><h3>Skin Care</h3><span>45+ Products</span></div></a><a href="#" class="cf-sc"><div class="cf-sv" style="background:linear-gradient(135deg,#E8D5B7,#C9A96E)"></div><div class="cf-so"><h3>Hair Care</h3><span>35+ Products</span></div></a><a href="#" class="cf-sc"><div class="cf-sv" style="background:linear-gradient(135deg,#FFD1DC,#FF9EBA)"></div><div class="cf-so"><h3>Makeup</h3><span>30+ Products</span></div></a><a href="#" class="cf-sc"><div class="cf-sv" style="background:linear-gradient(135deg,#E6E0F8,#D4C5F9)"></div><div class="cf-so"><h3>Fragrances</h3><span>20+ Products</span></div></a></div></div><div class="cf-p"><div class="cf-pi"><div class="cf-sh"><span class="cf-ol">Most Loved</span><h2>Bestselling Products</h2><p>Trusted by 5 million+ customers</p></div><div class="cf-pg"><a href="#" class="cf-pc"><div class="cf-pm"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2h6l1 7H8l1-7Z"/><path d="M8 9v10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9"/></svg><span class="cf-pb">BESTSELLER</span></div><div class="cf-pf"><div class="cf-pn">10% Vitamin C Face Serum</div><div class="cf-pp"><span class="cf-cp">&#8377;599</span><span class="cf-op">&#8377;799</span><span class="cf-dp">25% OFF</span></div><button class="cf-pa">ADD TO CART</button></div></a><a href="#" class="cf-pc"><div class="cf-pm"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg><span class="cf-pb n">TRENDING</span></div><div class="cf-pf"><div class="cf-pn">Korean Rice Water Moisturizer</div><div class="cf-pp"><span class="cf-cp">&#8377;499</span><span class="cf-op">&#8377;699</span><span class="cf-dp">29% OFF</span></div><button class="cf-pa">ADD TO CART</button></div></a><a href="#" class="cf-pc"><div class="cf-pm"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.5 2 2 6.5 2 12c0 .7.1 1.4.2 2"/><path d="M20 16.5c1.3-1.8 2-3.9 2-6.5 0-5.5-4.5-10-10-10"/><path d="M9 22c1.6 0 3-1.3 3-3v-2c0-1.7-1.4-3-3-3s-3 1.3-3 3v2c0 1.7 1.4 3 3 3Z"/></svg><span class="cf-pb">BESTSELLER</span></div><div class="cf-pf"><div class="cf-pn">Redensyl Hair Growth Serum</div><div class="cf-pp"><span class="cf-cp">&#8377;699</span><span class="cf-op">&#8377;899</span><span class="cf-dp">22% OFF</span></div><button class="cf-pa">ADD TO CART</button></div></a><a href="#" class="cf-pc"><div class="cf-pm"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg><span class="cf-pb h">HOT</span></div><div class="cf-pf"><div class="cf-pn">25% AHA BHA Peeling Solution</div><div class="cf-pp"><span class="cf-cp">&#8377;549</span><span class="cf-op">&#8377;749</span><span class="cf-dp">27% OFF</span></div><button class="cf-pa">ADD TO CART</button></div></a></div></div></div><div class="cf-ft"><div class="cf-fi"><div class="cf-fg"><div class="cf-fb"><h3>Your Brand</h3><p>Premium beauty bringing the best of global beauty secrets. Cruelty-free, vegan, and FDA approved.</p></div><div><h4>Quick Links</h4><ul><li><a href="#">All Products</a></li><li><a href="#">Bestsellers</a></li><li><a href="#">About Us</a></li></ul></div><div><h4>Help</h4><ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">FAQs</a></li></ul></div><div><h4>Connect</h4><ul><li><a href="#">Instagram</a></li><li><a href="#">Facebook</a></li><li><a href="#">YouTube</a></li></ul></div></div><div class="cf-fx"><span>&copy; 2026 Your Brand.</span><span>Powered by ConvertFlow</span></div></div></div></body></html>`;
+
+const PREVIEW_MAP = {
+  pilgrim: pilgrimPreviewHTML,
+  tanishq: tanishqPreviewHTML,
+};
 
 export default function Index() {
+  const [selectedTemplate, setSelectedTemplate] = useState("tanishq");
   const [previewMode, setPreviewMode] = useState("desktop");
   const fetcher = useFetcher();
   const isInjecting = fetcher.state === "submitting";
   const injectResult = fetcher.data;
 
   const viewportWidth = { desktop: "100%", tablet: "768px", mobile: "375px" }[previewMode];
+  const currentTpl = TEMPLATES.find((t) => t.id === selectedTemplate);
 
   const handleInject = () => {
-    fetcher.submit({}, { method: "POST", action: "/api/inject-template" });
+    fetcher.submit({ template: selectedTemplate }, { method: "POST", action: "/api/inject-template" });
   };
-
-  // Premium SVG-based preview HTML (no emojis)
-  const previewHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-.icon { display: inline-flex; align-items: center; justify-content: center; }
-
-/* Announcement */
-.cf-announce { background: #2D2D2D; color: #fff; text-align: center; padding: 10px 16px; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.cf-announce a { color: #FFD700; text-decoration: underline; font-weight: 600; }
-
-/* Hero */
-.cf-hero { position: relative; width: 100%; min-height: 520px; background: linear-gradient(135deg, #FFF5EE 0%, #FAEBD7 50%, #FFE4C4 100%); display: flex; align-items: center; }
-.cf-hero-inner { max-width: 1280px; margin: 0 auto; padding: 60px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; width: 100%; }
-.cf-hero-badge { display: inline-block; background: #D4A574; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
-.cf-hero h1 { font-size: 44px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
-.cf-hero h1 span { color: #C17F5E; }
-.cf-hero-sub { font-size: 16px; color: #555; margin-bottom: 28px; max-width: 440px; line-height: 1.7; }
-.cf-hero-cta { display: inline-flex; align-items: center; gap: 10px; background: #1a1a1a; color: #fff; padding: 16px 36px; border-radius: 50px; font-size: 15px; font-weight: 700; text-decoration: none; transition: all 0.3s ease; cursor: pointer; letter-spacing: 0.5px; }
-.cf-hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-.cf-hero-img-wrap { position: relative; display: flex; justify-content: center; align-items: center; }
-.cf-hero-visual { width: 100%; max-width: 460px; aspect-ratio: 4/5; background: linear-gradient(135deg, #f0e6da, #e8d5c4); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
-.cf-hero-float { position: absolute; background: #fff; border-radius: 16px; padding: 14px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: cf-float 3s ease-in-out infinite; }
-.cf-hero-float.top-right { top: 20px; right: -10px; }
-.cf-hero-float.bottom-left { bottom: 30px; left: -10px; }
-.cf-label { font-size: 11px; color: #999; }
-.cf-val { font-weight: 800; }
-@keyframes cf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-/* Trust */
-.cf-trust-bar { background: #FAF7F2; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); padding: 18px 20px; }
-.cf-trust-inner { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 12px; }
-.cf-trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #333; }
-.cf-trust-icon { color: #C17F5E; display: flex; align-items: center; }
-
-/* Section heads */
-.cf-section-head { text-align: center; margin-bottom: 48px; }
-.cf-overline { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C17F5E; margin-bottom: 12px; display: block; }
-.cf-section-head h2 { font-size: 34px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.3px; }
-.cf-section-head p { font-size: 15px; color: #777; max-width: 560px; margin: 0 auto; }
-
-/* Categories */
-.cf-categories { padding: 70px 40px; max-width: 1280px; margin: 0 auto; }
-.cf-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.cf-cat-card { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3/4; cursor: pointer; text-decoration: none; color: #fff; display: block; }
-.cf-cat-visual { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.6s ease; color: rgba(255,255,255,0.5); }
-.cf-cat-card:hover .cf-cat-visual { transform: scale(1.05); }
-.cf-cat-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; }
-.cf-cat-overlay h3 { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
-.cf-cat-overlay span { font-size: 12px; opacity: 0.85; }
-
-/* Products */
-.cf-products { padding: 70px 40px; background: #fff; }
-.cf-products-inner { max-width: 1280px; margin: 0 auto; }
-.cf-prod-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.cf-prod-card { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #f0ebe5; transition: all 0.3s ease; text-decoration: none; color: #1a1a1a; display: block; }
-.cf-prod-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
-.cf-prod-img { position: relative; aspect-ratio: 1; overflow: hidden; background: #faf7f2; display: flex; align-items: center; justify-content: center; color: #d4a574; }
-.cf-prod-badge { position: absolute; top: 12px; left: 12px; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-.cf-prod-badge.best { background: #E67E22; }
-.cf-prod-badge.new { background: #2ECC71; }
-.cf-prod-badge.hot { background: #E74C3C; }
-.cf-prod-info { padding: 18px; }
-.cf-prod-name { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; }
-.cf-prod-rating { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; font-size: 12px; color: #999; }
-.cf-star-row { display:flex; gap:1px; }
-.cf-star { color: #F5A623; }
-.cf-prod-price { display: flex; align-items: center; gap: 8px; }
-.cf-current { font-size: 18px; font-weight: 800; }
-.cf-original { font-size: 14px; color: #aaa; text-decoration: line-through; }
-.cf-discount { font-size: 12px; font-weight: 700; color: #27ae60; }
-.cf-prod-atc { display: block; width: 100%; margin-top: 14px; padding: 11px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; }
-
-/* Ingredients */
-.cf-ingredients { padding: 70px 40px; background: #FFF9F4; }
-.cf-ingredients-inner { max-width: 1280px; margin: 0 auto; }
-.cf-ingr-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
-.cf-ingr-card { text-align: center; padding: 24px 12px; background: #fff; border-radius: 16px; border: 1px solid #f0ebe5; transition: all 0.3s ease; cursor: pointer; }
-.cf-ingr-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #C17F5E; }
-.cf-ingr-icon { width: 56px; height: 56px; border-radius: 50%; background: #FFF0E5; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: #C17F5E; }
-.cf-ingr-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-.cf-ingr-card p { font-size: 11px; color: #888; }
-
-/* Story */
-.cf-story { padding: 90px 40px; background: linear-gradient(135deg, #1a1a1a, #2d2d2d); color: #fff; }
-.cf-story-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.cf-story-overline { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C17F5E; margin-bottom: 16px; display: block; }
-.cf-story h2 { font-size: 36px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
-.cf-story p { font-size: 15px; line-height: 1.8; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-.cf-story-stats { display: flex; gap: 40px; }
-.cf-story-stat h3 { font-size: 30px; font-weight: 800; color: #C17F5E; }
-.cf-story-stat span { font-size: 12px; color: rgba(255,255,255,0.5); }
-.cf-story-visual { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, #3a3a3a, #555); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); }
-
-/* Reviews */
-.cf-reviews { padding: 70px 40px; background: #fff; }
-.cf-reviews-inner { max-width: 1280px; margin: 0 auto; }
-.cf-rev-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.cf-rev-card { background: #FAF7F2; border-radius: 16px; padding: 28px; border: 1px solid #f0ebe5; }
-.cf-rev-stars { color: #F5A623; font-size: 15px; margin-bottom: 14px; display: flex; gap: 2px; }
-.cf-rev-text { font-size: 14px; color: #444; line-height: 1.7; margin-bottom: 18px; font-style: italic; }
-.cf-rev-author { display: flex; align-items: center; gap: 12px; }
-.cf-rev-avatar { width: 40px; height: 40px; border-radius: 50%; background: #C17F5E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 15px; }
-.cf-rev-name { font-size: 13px; font-weight: 700; }
-.cf-rev-verified { font-size: 11px; color: #27ae60; display: flex; align-items: center; gap: 4px; }
-
-/* Newsletter */
-.cf-newsletter { padding: 70px 40px; background: #FFF5EE; text-align: center; }
-.cf-newsletter-inner { max-width: 520px; margin: 0 auto; }
-.cf-newsletter h2 { font-size: 30px; font-weight: 800; margin-bottom: 10px; }
-.cf-newsletter p { font-size: 14px; color: #777; margin-bottom: 24px; }
-.cf-newsletter-form { display: flex; gap: 10px; }
-.cf-newsletter-input { flex: 1; padding: 14px 18px; border: 2px solid #e0d5c9; border-radius: 50px; font-size: 13px; outline: none; background: #fff; }
-.cf-newsletter-btn { padding: 14px 28px; background: #1a1a1a; color: #fff; border: none; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-/* Footer */
-.cf-footer { background: #1a1a1a; color: #bbb; padding: 50px 40px 24px; }
-.cf-footer-inner { max-width: 1280px; margin: 0 auto; }
-.cf-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 32px; }
-.cf-footer-brand h3 { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-.cf-footer-brand p { font-size: 12px; line-height: 1.7; color: #888; }
-.cf-footer h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 14px; }
-.cf-footer ul { list-style: none; }
-.cf-footer li { margin-bottom: 8px; }
-.cf-footer a { color: #888; text-decoration: none; font-size: 12px; }
-.cf-footer a:hover { color: #C17F5E; }
-.cf-footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; display: flex; justify-content: space-between; font-size: 11px; color: #666; }
-
-.star-svg { display: inline-block; }
-
-@media (max-width: 768px) {
-  .cf-hero-inner { grid-template-columns: 1fr; padding: 30px 16px; }
-  .cf-hero h1 { font-size: 28px; }
-  .cf-hero-img-wrap { display: none; }
-  .cf-cat-grid, .cf-prod-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .cf-ingr-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .cf-story-inner { grid-template-columns: 1fr; gap: 30px; }
-  .cf-rev-grid { grid-template-columns: 1fr; }
-  .cf-footer-grid { grid-template-columns: 1fr 1fr; }
-  .cf-newsletter-form { flex-direction: column; }
-  .cf-categories, .cf-products, .cf-ingredients, .cf-story, .cf-reviews, .cf-newsletter { padding: 40px 16px; }
-}
-</style>
-</head>
-<body>
-  <div class="cf-announce">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-    <span>FLAT 20% OFF on your first order</span>
-    <a href="#">Shop Now →</a>
-  </div>
-
-  <div class="cf-hero">
-    <div class="cf-hero-inner">
-      <div>
-        <span class="cf-hero-badge">NEW COLLECTION</span>
-        <h1>Discover Your<br><span>Natural Glow</span></h1>
-        <p class="cf-hero-sub">Premium skincare powered by ancient beauty secrets from around the world. Vegan, cruelty-free, and FDA approved.</p>
-        <a href="#" class="cf-hero-cta">Explore Collection <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-      </div>
-      <div class="cf-hero-img-wrap">
-        <div class="cf-hero-visual"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div>
-        <div class="cf-hero-float top-right">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C17F5E" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-          <div><div class="cf-label">Rating</div><div class="cf-val">4.9 / 5.0</div></div>
-        </div>
-        <div class="cf-hero-float bottom-left">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C17F5E" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          <div><div class="cf-label">Products</div><div class="cf-val">200+ SKUs</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="cf-trust-bar">
-    <div class="cf-trust-inner">
-      <div class="cf-trust-item"><span class="cf-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Free Shipping above ₹499</div>
-      <div class="cf-trust-item"><span class="cf-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span> Cruelty Free</div>
-      <div class="cf-trust-item"><span class="cf-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></span> 100% Vegan</div>
-      <div class="cf-trust-item"><span class="cf-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span> FDA Approved</div>
-      <div class="cf-trust-item"><span class="cf-trust-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg></span> Dermat Tested</div>
-    </div>
-  </div>
-
-  <div class="cf-categories">
-    <div class="cf-section-head"><span class="cf-overline">Explore</span><h2>Shop by Category</h2><p>Find the perfect products for your beauty routine</p></div>
-    <div class="cf-cat-grid">
-      <a href="#" class="cf-cat-card"><div class="cf-cat-visual" style="background:linear-gradient(135deg,#FADADD,#F8C8DC)"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 2h6l1 7H8l1-7Z"/><path d="M8 9v10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9"/><line x1="8" y1="13" x2="16" y2="13"/></svg></div><div class="cf-cat-overlay"><h3>Skin Care</h3><span>45+ Products</span></div></a>
-      <a href="#" class="cf-cat-card"><div class="cf-cat-visual" style="background:linear-gradient(135deg,#E8D5B7,#C9A96E)"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2C6.5 2 2 6.5 2 12c0 .7.1 1.4.2 2"/><path d="M20 16.5c1.3-1.8 2-3.9 2-6.5 0-5.5-4.5-10-10-10"/><path d="M9 22c1.6 0 3-1.3 3-3v-2c0-1.7-1.4-3-3-3s-3 1.3-3 3v2c0 1.7 1.4 3 3 3Z"/></svg></div><div class="cf-cat-overlay"><h3>Hair Care</h3><span>35+ Products</span></div></a>
-      <a href="#" class="cf-cat-card"><div class="cf-cat-visual" style="background:linear-gradient(135deg,#FFD1DC,#FF9EBA)"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2Z"/><path d="M9 2h6"/><path d="M12 2v5"/><path d="M8 7h8l-1 13H9L8 7Z"/></svg></div><div class="cf-cat-overlay"><h3>Makeup</h3><span>30+ Products</span></div></a>
-      <a href="#" class="cf-cat-card"><div class="cf-cat-visual" style="background:linear-gradient(135deg,#E6E0F8,#D4C5F9)"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M10 5h4"/><path d="M11 2h2v3h-2z"/><path d="M7 5h10l1 17H6L7 5Z"/><path d="M6 10h12"/></svg></div><div class="cf-cat-overlay"><h3>Fragrances</h3><span>20+ Products</span></div></a>
-    </div>
-  </div>
-
-  <div class="cf-products"><div class="cf-products-inner">
-    <div class="cf-section-head"><span class="cf-overline">Most Loved</span><h2>Bestselling Products</h2><p>Trusted by 5 million+ customers across India</p></div>
-    <div class="cf-prod-grid">
-      <a href="#" class="cf-prod-card"><div class="cf-prod-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2h6l1 7H8l1-7Z"/><path d="M8 9v10a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9"/></svg><span class="cf-prod-badge best">BESTSELLER</span></div><div class="cf-prod-info"><div class="cf-prod-name">10% Vitamin C Face Serum</div><div class="cf-prod-rating"><span class="cf-star-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>4,523</span></div><div class="cf-prod-price"><span class="cf-current">₹599</span><span class="cf-original">₹799</span><span class="cf-discount">25% OFF</span></div><button class="cf-prod-atc">ADD TO CART</button></div></a>
-      <a href="#" class="cf-prod-card"><div class="cf-prod-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg><span class="cf-prod-badge new">TRENDING</span></div><div class="cf-prod-info"><div class="cf-prod-name">Korean Rice Water Moisturizer</div><div class="cf-prod-rating"><span class="cf-star-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>3,182</span></div><div class="cf-prod-price"><span class="cf-current">₹499</span><span class="cf-original">₹699</span><span class="cf-discount">29% OFF</span></div><button class="cf-prod-atc">ADD TO CART</button></div></a>
-      <a href="#" class="cf-prod-card"><div class="cf-prod-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.5 2 2 6.5 2 12c0 .7.1 1.4.2 2"/><path d="M20 16.5c1.3-1.8 2-3.9 2-6.5 0-5.5-4.5-10-10-10"/><path d="M9 22c1.6 0 3-1.3 3-3v-2c0-1.7-1.4-3-3-3s-3 1.3-3 3v2c0 1.7 1.4 3 3 3Z"/></svg><span class="cf-prod-badge best">BESTSELLER</span></div><div class="cf-prod-info"><div class="cf-prod-name">Redensyl Hair Growth Serum</div><div class="cf-prod-rating"><span class="cf-star-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>5,847</span></div><div class="cf-prod-price"><span class="cf-current">₹699</span><span class="cf-original">₹899</span><span class="cf-discount">22% OFF</span></div><button class="cf-prod-atc">ADD TO CART</button></div></a>
-      <a href="#" class="cf-prod-card"><div class="cf-prod-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg><span class="cf-prod-badge hot">HOT</span></div><div class="cf-prod-info"><div class="cf-prod-name">25% AHA BHA Peeling Solution</div><div class="cf-prod-rating"><span class="cf-star-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="#F5A623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>2,156</span></div><div class="cf-prod-price"><span class="cf-current">₹549</span><span class="cf-original">₹749</span><span class="cf-discount">27% OFF</span></div><button class="cf-prod-atc">ADD TO CART</button></div></a>
-    </div>
-  </div></div>
-
-  <div class="cf-ingredients"><div class="cf-ingredients-inner">
-    <div class="cf-section-head"><span class="cf-overline">Powered By Science</span><h2>Shop by Ingredients</h2><p>Clinically proven ingredients for visible results</p></div>
-    <div class="cf-ingr-grid">
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></div><h4>Vitamin C</h4><p>Brightening & Glow</p></div>
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></div><h4>Hyaluronic Acid</h4><p>Deep Hydration</p></div>
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div><h4>Niacinamide</h4><p>Acne & Oil Control</p></div>
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg></div><h4>Retinol</h4><p>Anti-Ageing</p></div>
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg></div><h4>Salicylic Acid</h4><p>Pore Cleansing</p></div>
-      <div class="cf-ingr-card"><div class="cf-ingr-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><h4>Ceramides</h4><p>Skin Barrier</p></div>
-    </div>
-  </div></div>
-
-  <div class="cf-story"><div class="cf-story-inner">
-    <div><span class="cf-story-overline">Our Story</span><h2>Beauty Secrets From Around The World</h2><p>We travel the globe to discover the most powerful natural ingredients and bring them to you in beautifully crafted formulations. No harmful chemicals, no animal testing — just pure, effective skincare.</p>
-    <div class="cf-story-stats"><div class="cf-story-stat"><h3>5M+</h3><span>Happy Customers</span></div><div class="cf-story-stat"><h3>200+</h3><span>Products</span></div><div class="cf-story-stat"><h3>50+</h3><span>Active Ingredients</span></div></div></div>
-    <div class="cf-story-visual"><svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
-  </div></div>
-
-  <div class="cf-reviews"><div class="cf-reviews-inner">
-    <div class="cf-section-head"><span class="cf-overline">Real Results</span><h2>What Our Customers Say</h2></div>
-    <div class="cf-rev-grid">
-      <div class="cf-rev-card"><div class="cf-rev-stars"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cf-rev-text">"The Vitamin C serum gave me visible results in just 2 weeks. My skin looks so much brighter and smoother now!"</p><div class="cf-rev-author"><div class="cf-rev-avatar">P</div><div><div class="cf-rev-name">Priya S.</div><div class="cf-rev-verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified Purchase</div></div></div></div>
-      <div class="cf-rev-card"><div class="cf-rev-stars"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cf-rev-text">"Been using the Rice Water Moisturizer for a month. My dry patches are completely gone. Best moisturizer ever!"</p><div class="cf-rev-author"><div class="cf-rev-avatar">A</div><div><div class="cf-rev-name">Ananya K.</div><div class="cf-rev-verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified Purchase</div></div></div></div>
-      <div class="cf-rev-card"><div class="cf-rev-stars"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="#F5A623"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p class="cf-rev-text">"The Hair Growth Serum actually works! I noticed reduced hair fall within 3 weeks. Highly recommend!"</p><div class="cf-rev-author"><div class="cf-rev-avatar">M</div><div><div class="cf-rev-name">Meera R.</div><div class="cf-rev-verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified Purchase</div></div></div></div>
-    </div>
-  </div></div>
-
-  <div class="cf-newsletter"><div class="cf-newsletter-inner"><h2>Join the Glow Club</h2><p>Get 15% OFF your first order + exclusive access to new launches and member-only offers.</p><div class="cf-newsletter-form"><input type="email" class="cf-newsletter-input" placeholder="Enter your email address"><button class="cf-newsletter-btn">Subscribe</button></div></div></div>
-
-  <div class="cf-footer"><div class="cf-footer-inner"><div class="cf-footer-grid"><div class="cf-footer-brand"><h3>Your Brand</h3><p>Premium beauty brand bringing the best of global beauty secrets to your doorstep. Cruelty-free, vegan, and FDA approved.</p></div><div><h4>Quick Links</h4><ul><li><a href="#">All Products</a></li><li><a href="#">Bestsellers</a></li><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li></ul></div><div><h4>Help</h4><ul><li><a href="#">Shipping Info</a></li><li><a href="#">Returns</a></li><li><a href="#">FAQs</a></li><li><a href="#">Track Order</a></li></ul></div><div><h4>Connect</h4><ul><li><a href="#">Instagram</a></li><li><a href="#">Facebook</a></li><li><a href="#">YouTube</a></li><li><a href="#">Twitter</a></li></ul></div></div><div class="cf-footer-bottom"><span>© 2026 Your Brand. All rights reserved.</span><span>Powered by ConvertFlow</span></div></div></div>
-</body></html>`;
 
   return (
     <div style={{ minHeight: "100vh", background: "#f4f5f7" }}>
@@ -320,7 +331,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             <span style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a" }}>ConvertFlow</span>
           </div>
           <span style={{ fontSize: 13, color: "#888", borderLeft: "1px solid #ddd", paddingLeft: 16 }}>
-            Landing Page Templates
+            Template Library
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -348,13 +359,47 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
         </div>
       </div>
 
-      {/* Content */}
       <div style={{ padding: "24px", maxWidth: 1400, margin: "0 auto" }}>
-        {/* Template Card */}
+        {/* Template Selector */}
+        <div style={{
+          display: "flex",
+          gap: 16,
+          marginBottom: 20,
+        }}>
+          {TEMPLATES.map((tpl) => (
+            <button
+              key={tpl.id}
+              onClick={() => setSelectedTemplate(tpl.id)}
+              style={{
+                flex: 1,
+                padding: "20px 24px",
+                background: selectedTemplate === tpl.id ? "#fff" : "#fafafa",
+                border: selectedTemplate === tpl.id ? `2px solid ${tpl.accent}` : "1px solid #e5e7eb",
+                borderRadius: 16,
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 0.2s ease",
+                boxShadow: selectedTemplate === tpl.id ? `0 4px 20px ${tpl.accent}20` : "none",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                {icon(tpl.icon)}
+                <span style={{ fontSize: 17, fontWeight: 800, color: "#1a1a1a" }}>{tpl.name}</span>
+                <span style={{
+                  background: tpl.nicheBg, color: tpl.nicheColor, padding: "3px 10px",
+                  borderRadius: 20, fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
+                }}>{tpl.niche}</span>
+              </div>
+              <p style={{ fontSize: 13, color: "#777", lineHeight: 1.5 }}>{tpl.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Inject Button */}
         <div style={{
           background: "#fff",
           borderRadius: 16,
-          padding: "24px 28px",
+          padding: "20px 28px",
           marginBottom: 20,
           border: "1px solid #e5e7eb",
           display: "flex",
@@ -362,25 +407,19 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
           alignItems: "center",
         }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-              {icon("leaf")}
-              <span style={{ fontSize: 20, fontWeight: 800, color: "#1a1a1a" }}>Pilgrim-Style Beauty Landing Page</span>
-              <span style={{
-                background: "#FFF0E5", color: "#C17F5E", padding: "4px 12px",
-                borderRadius: 20, fontSize: 11, fontWeight: 700,
-              }}>BEAUTY & SKINCARE</span>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
+              Ready to inject <span style={{ color: currentTpl?.accent }}>{currentTpl?.name}</span> template
             </div>
-            <p style={{ fontSize: 14, color: "#777", maxWidth: 600 }}>
-              Premium beauty landing page with hero, trust badges, categories, bestsellers,
-              ingredients, brand story, testimonials & newsletter. All SVG icons, zero emojis.
+            <p style={{ fontSize: 13, color: "#888" }}>
+              This will push Landing Page + Product Page + Cart Page into your active Shopify theme.
             </p>
           </div>
           <button
             onClick={handleInject}
             disabled={isInjecting}
             style={{
-              background: isInjecting ? "#999" : "linear-gradient(135deg, #C17F5E, #A0634B)",
-              color: "#fff",
+              background: isInjecting ? "#999" : `linear-gradient(135deg, ${currentTpl?.accent}, ${currentTpl?.accent}cc)`,
+              color: currentTpl?.id === "tanishq" ? "#2C1810" : "#fff",
               border: "none",
               padding: "16px 36px",
               borderRadius: 12,
@@ -388,7 +427,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
               fontWeight: 700,
               cursor: isInjecting ? "not-allowed" : "pointer",
               whiteSpace: "nowrap",
-              boxShadow: "0 4px 15px rgba(193,127,94,0.3)",
+              boxShadow: `0 4px 15px ${currentTpl?.accent}40`,
               display: "flex",
               alignItems: "center",
               gap: 8,
@@ -405,7 +444,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             borderRadius: 12, marginBottom: 20, fontSize: 14,
           }}>
             <div style={{ fontWeight: 700, marginBottom: 12, display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
-              {icon("check")} 3 Pages injected into &quot;{injectResult.themeName}&quot; successfully!
+              {icon("check")} {injectResult.templateLabel} — 3 pages injected into &quot;{injectResult.themeName}&quot;!
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               {(injectResult.pages || []).map((p) => (
@@ -416,13 +455,9 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             </div>
             <div style={{ display: "flex", gap: 16, marginTop: 14, flexWrap: "wrap" }}>
               <a href={injectResult.editorUrl} target="_blank" rel="noreferrer"
-                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>
-                Open Theme Editor →
-              </a>
+                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>Open Theme Editor →</a>
               <a href={injectResult.previewUrl} target="_blank" rel="noreferrer"
-                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>
-                Preview Store →
-              </a>
+                style={{ color: "#A7F3D0", textDecoration: "underline", fontSize: 13 }}>Preview Store →</a>
             </div>
           </div>
         )}
@@ -431,7 +466,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             background: "#991B1B", color: "#fff", padding: "16px 24px",
             borderRadius: 12, marginBottom: 20, fontSize: 14, fontWeight: 600,
           }}>
-            Error: {injectResult.error || "Failed to inject. Please try again."}
+            Error: {injectResult.error || "Failed to inject."}
           </div>
         )}
 
@@ -447,7 +482,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F56" }} />
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FFBD2E" }} />
             <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#27C93F" }} />
-            <span style={{ marginLeft: 16, fontSize: 12, color: "#999" }}>Live Preview — All Premium SVG Icons</span>
+            <span style={{ marginLeft: 16, fontSize: 12, color: "#999" }}>Live Preview — {currentTpl?.name}</span>
           </div>
           <div style={{
             display: "flex", justifyContent: "center",
@@ -456,7 +491,7 @@ body { font-family: 'DM Sans', sans-serif; color: #1a1a1a; line-height: 1.6; -we
             transition: "all 0.3s ease",
           }}>
             <iframe
-              srcDoc={previewHTML}
+              srcDoc={PREVIEW_MAP[selectedTemplate]}
               style={{
                 width: viewportWidth, maxWidth: "100%", height: "80vh",
                 border: "none", borderRadius: previewMode !== "desktop" ? "12px" : 0,
