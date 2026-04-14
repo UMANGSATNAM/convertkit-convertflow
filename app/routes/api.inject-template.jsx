@@ -92,24 +92,32 @@ export const action = async ({ request }) => {
       try { return JSON.parse(node?.body?.content ?? "{}"); } catch { return defaultVal; }
     };
 
-    // ── Step 4: Update each template JSON ────────────────────────────────
-    const indexTpl = parseTemplate("templates/index.json", { sections: {}, order: [] });
-    if (!indexTpl.sections) indexTpl.sections = {};
-    if (!indexTpl.order) indexTpl.order = Object.keys(indexTpl.sections);
-    indexTpl.sections[tplConfig.landing.key] = { type: tplConfig.landing.type, settings: {} };
-    if (!indexTpl.order.includes(tplConfig.landing.key)) indexTpl.order.unshift(tplConfig.landing.key);
+    // ── Step 4: Build FULL replacement templates (only our section, no theme header/footer) ──
+    const buildFullTemplate = (sectionKey, sectionType, layout = "convertflow") => ({
+      layout,
+      sections: { [sectionKey]: { type: sectionType, settings: {} } },
+      order: [sectionKey],
+    });
 
-    const productTpl = parseTemplate("templates/product.json", { sections: {}, order: [] });
-    if (!productTpl.sections) productTpl.sections = {};
-    if (!productTpl.order) productTpl.order = Object.keys(productTpl.sections);
-    productTpl.sections[tplConfig.product.key] = { type: tplConfig.product.type, settings: {} };
-    if (!productTpl.order.includes(tplConfig.product.key)) productTpl.order.unshift(tplConfig.product.key);
+    const indexTpl   = buildFullTemplate(tplConfig.landing.key, tplConfig.landing.type);
+    const productTpl = buildFullTemplate(tplConfig.product.key, tplConfig.product.type);
+    const cartTpl    = buildFullTemplate(tplConfig.cart.key,    tplConfig.cart.type);
 
-    const cartTpl = parseTemplate("templates/cart.json", { sections: {}, order: [] });
-    if (!cartTpl.sections) cartTpl.sections = {};
-    if (!cartTpl.order) cartTpl.order = Object.keys(cartTpl.sections);
-    cartTpl.sections[tplConfig.cart.key] = { type: tplConfig.cart.type, settings: {} };
-    if (!cartTpl.order.includes(tplConfig.cart.key)) cartTpl.order.unshift(tplConfig.cart.key);
+    // ── Step 4b: Custom layout — minimal Shopify shell without theme header/footer ──
+    const convertflowLayout = `<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0">
+  <title>{{ page_title }}{% if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}</title>
+  {{ content_for_header }}
+  <style>body{margin:0;padding:0;}</style>
+</head>
+<body>
+  {{ content_for_layout }}
+</body>
+</html>`;
 
     // ── Step 5: Upload everything in one batch ────────────────────────────
     const upsertRes = await admin.graphql(`
@@ -123,9 +131,13 @@ export const action = async ({ request }) => {
       variables: {
         themeId: mainTheme.id,
         files: [
+          // Custom layout (no theme header/footer)
+          { filename: "layout/convertflow.liquid", body: { type: "TEXT", value: convertflowLayout } },
+          // Liquid section files
           { filename: `sections/${tplConfig.landing.file}`, body: { type: "TEXT", value: liquidLanding } },
           { filename: `sections/${tplConfig.product.file}`, body: { type: "TEXT", value: liquidProduct } },
           { filename: `sections/${tplConfig.cart.file}`,    body: { type: "TEXT", value: liquidCart } },
+          // Template JSON files (full replacement)
           { filename: "templates/index.json",   body: { type: "TEXT", value: JSON.stringify(indexTpl, null, 2) } },
           { filename: "templates/product.json", body: { type: "TEXT", value: JSON.stringify(productTpl, null, 2) } },
           { filename: "templates/cart.json",    body: { type: "TEXT", value: JSON.stringify(cartTpl, null, 2) } },
