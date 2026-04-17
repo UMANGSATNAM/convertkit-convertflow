@@ -4,35 +4,42 @@ import fs from "node:fs";
 import path from "node:path";
 
 /**
+ * Application dynamic page mappings.
+ * These align with the Shopify standardized template JSON routes.
+ */
+const PAGE_MAPPINGS = [
+  { id: "404", filename: "404.json", name: "404 Error Page" },
+  { id: "account", filename: "customers/account.json", name: "Customer Account" },
+  { id: "article", filename: "article.json", name: "Article Page" },
+  { id: "blog", filename: "blog.json", name: "Blog Page" },
+  { id: "cart", filename: "cart.json", name: "Cart Page" },
+  { id: "collection", filename: "collection.json", name: "Collection Page" },
+  { id: "landing", filename: "index.json", name: "Landing/Home Page" },
+  { id: "list-collections", filename: "list-collections.json", name: "List Collections" },
+  { id: "login", filename: "customers/login.json", name: "Customer Login" },
+  { id: "order", filename: "customers/order.json", name: "Customer Order" },
+  { id: "page", filename: "page.json", name: "Standard Page" },
+  { id: "product", filename: "product.json", name: "Product Page" },
+  { id: "register", filename: "customers/register.json", name: "Customer Register" },
+  { id: "search", filename: "search.json", name: "Search Results" }
+];
+
+/**
  * Template configuration map.
- * Each template set defines which Liquid section files to inject
- * and the section type keys used inside the template JSONs.
  */
 const TEMPLATES = {
-  pilgrim: {
-    label: "Pilgrim Beauty",
-    landing:  { file: "cf-pilgrim-landing.liquid",  type: "cf-pilgrim-landing",  key: "convertflow_pilgrim" },
-    product:  { file: "cf-pilgrim-product.liquid",  type: "cf-pilgrim-product",  key: "convertflow_product" },
-    cart:     { file: "cf-pilgrim-cart.liquid",     type: "cf-pilgrim-cart",     key: "convertflow_cart" },
-  },
-  tanishq: {
-    label: "Tanishq Jewellery",
-    landing:  { file: "cf-tanishq-landing.liquid",  type: "cf-tanishq-landing",  key: "convertflow_tanishq" },
-    product:  { file: "cf-tanishq-product.liquid",  type: "cf-tanishq-product",  key: "convertflow_tanishq_product" },
-    cart:     { file: "cf-tanishq-cart.liquid",     type: "cf-tanishq-cart",     key: "convertflow_tanishq_cart" },
-  },
+  pilgrim: { label: "Pilgrim Beauty" },
+  tanishq: { label: "Tanishq Jewellery" },
+  caratlane: { label: "CaratLane Clone" }
 };
 
 /**
  * API Route: Inject ConvertFlow template pages into the active Shopify theme
  *
  * Accepts a `template` form field to select which template set to inject.
- * Defaults to "pilgrim" for backward compatibility.
+ * Defaults to "caratlane".
  *
- * Injects:
- *  - Landing Page  → sections/{template}-landing.liquid + templates/index.json
- *  - Product Page  → sections/{template}-product.liquid + templates/product.json
- *  - Cart Page     → sections/{template}-cart.liquid    + templates/cart.json
+ * Injects layout and 14 full page templates natively.
  */
 export const action = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
@@ -40,7 +47,7 @@ export const action = async ({ request }) => {
   try {
     // Parse template selection from form data
     const formData = await request.formData();
-    const templateId = formData.get("template") || "pilgrim";
+    const templateId = formData.get("template") || "caratlane";
     const tplConfig = TEMPLATES[templateId];
 
     if (!tplConfig) {
@@ -53,12 +60,13 @@ export const action = async ({ request }) => {
     `);
     const { data: themesData } = await themesRes.json();
     const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
+    
     if (!mainTheme) {
       const availableThemes = themesData.themes.nodes.map(t => `${t.name} (${t.role})`).join(', ');
       console.error("[inject-template] No MAIN theme. Available:", availableThemes);
       return json({ 
         success: false, 
-        error: `No active theme found. Available themes: ${availableThemes || 'None'}` 
+        error: `No active theme found. Available: ${availableThemes || 'None'}` 
       }, { status: 400 });
     }
 
@@ -67,48 +75,7 @@ export const action = async ({ request }) => {
       "extensions/convertkit-sections/sections"
     );
 
-    // ── Step 2: Read all three Liquid files ──────────────────────────────
-    const liquidLanding = fs.readFileSync(path.join(sectionsDir, tplConfig.landing.file), "utf-8");
-    const liquidProduct = fs.readFileSync(path.join(sectionsDir, tplConfig.product.file), "utf-8");
-    const liquidCart    = fs.readFileSync(path.join(sectionsDir, tplConfig.cart.file),    "utf-8");
-
-    // ── Step 3: Read current templates ───────────────────────────────────
-    const tplRes = await admin.graphql(`
-      query($id: ID!) {
-        theme(id: $id) {
-          files(
-            filenames: ["templates/index.json", "templates/product.json", "templates/cart.json"]
-            first: 3
-          ) {
-            nodes {
-              filename
-              body { ... on OnlineStoreThemeFileBodyText { content } }
-            }
-          }
-        }
-      }
-    `, { variables: { id: mainTheme.id } });
-
-    const { data: tplData } = await tplRes.json();
-    const fileNodes = tplData?.theme?.files?.nodes ?? [];
-
-    const parseTemplate = (filename, defaultVal) => {
-      const node = fileNodes.find((n) => n.filename === filename);
-      try { return JSON.parse(node?.body?.content ?? "{}"); } catch { return defaultVal; }
-    };
-
-    // ── Step 4: Build FULL replacement templates (only our section, no theme header/footer) ──
-    const buildFullTemplate = (sectionKey, sectionType, layout = "convertflow") => ({
-      layout,
-      sections: { [sectionKey]: { type: sectionType, settings: {} } },
-      order: [sectionKey],
-    });
-
-    const indexTpl   = buildFullTemplate(tplConfig.landing.key, tplConfig.landing.type);
-    const productTpl = buildFullTemplate(tplConfig.product.key, tplConfig.product.type);
-    const cartTpl    = buildFullTemplate(tplConfig.cart.key,    tplConfig.cart.type);
-
-    // ── Step 4b: Custom layout — minimal Shopify shell without theme header/footer ──
+    // ── Step 2: Custom layout — minimal Shopify shell without theme header/footer ──
     const convertflowLayout = `<!doctype html>
 <html lang="{{ request.locale.iso_code }}">
 <head>
@@ -124,7 +91,55 @@ export const action = async ({ request }) => {
 </body>
 </html>`;
 
-    // ── Step 5: Upload everything in one batch ────────────────────────────
+    // Initialize filesToUpsert with the custom layout file
+    const filesToUpsert = [
+      { filename: "layout/convertflow.liquid", body: { type: "TEXT", value: convertflowLayout } }
+    ];
+    
+    const injectedPageNames = [];
+
+    // ── Step 3: Iterate through 14 pages and read liquid & build templates ──
+    for (const page of PAGE_MAPPINGS) {
+      const liquidFileName = `cf-${templateId}-${page.id}.liquid`;
+      const liquidFilePath = path.join(sectionsDir, liquidFileName);
+      
+      let liquidContent;
+      try {
+        liquidContent = fs.readFileSync(liquidFilePath, "utf-8");
+      } catch (err) {
+        // Skip silently to allow progressive generation if a template is not built yet
+        continue;
+      }
+      
+      // Push liquid chunk to sections/
+      filesToUpsert.push({
+        filename: `sections/${liquidFileName}`,
+        body: { type: "TEXT", value: liquidContent }
+      });
+      
+      // Push compiled schema to templates/*.json
+      const sectionKey = `convertflow_${templateId}_${page.id.replace(/-/g, '_')}`;
+      const sectionType = `cf-${templateId}-${page.id}`;
+      
+      const tplJson = {
+        layout: "convertflow",
+        sections: { [sectionKey]: { type: sectionType, settings: {} } },
+        order: [sectionKey],
+      };
+      
+      filesToUpsert.push({
+        filename: `templates/${page.filename}`,
+        body: { type: "TEXT", value: JSON.stringify(tplJson, null, 2) }
+      });
+
+      injectedPageNames.push(page.name);
+    }
+
+    // ── Step 4: Upload everything in one batch ────────────────────────────
+    if (filesToUpsert.length <= 1) { // Only Layout exists
+        return json({ success: false, error: "No section files found to inject! Wait for development." }, { status: 400 });
+    }
+
     const upsertRes = await admin.graphql(`
       mutation Upsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
         themeFilesUpsert(themeId: $themeId, files: $files) {
@@ -135,18 +150,7 @@ export const action = async ({ request }) => {
     `, {
       variables: {
         themeId: mainTheme.id,
-        files: [
-          // Custom layout (no theme header/footer)
-          { filename: "layout/convertflow.liquid", body: { type: "TEXT", value: convertflowLayout } },
-          // Liquid section files
-          { filename: `sections/${tplConfig.landing.file}`, body: { type: "TEXT", value: liquidLanding } },
-          { filename: `sections/${tplConfig.product.file}`, body: { type: "TEXT", value: liquidProduct } },
-          { filename: `sections/${tplConfig.cart.file}`,    body: { type: "TEXT", value: liquidCart } },
-          // Template JSON files (full replacement)
-          { filename: "templates/index.json",   body: { type: "TEXT", value: JSON.stringify(indexTpl, null, 2) } },
-          { filename: "templates/product.json", body: { type: "TEXT", value: JSON.stringify(productTpl, null, 2) } },
-          { filename: "templates/cart.json",    body: { type: "TEXT", value: JSON.stringify(cartTpl, null, 2) } },
-        ],
+        files: filesToUpsert,
       },
     });
 
@@ -154,13 +158,14 @@ export const action = async ({ request }) => {
     const errors = upsertData?.themeFilesUpsert?.userErrors ?? [];
 
     if (errors.length > 0) {
+      console.error("[inject-template] GraphQL themeFilesUpsert Errors:", errors);
       return json(
         { success: false, error: errors.map((e) => e.message).join(", ") },
         { status: 400 }
       );
     }
 
-    // ── Step 6: Return success with links ────────────────────────────────
+    // ── Step 5: Return success with links ────────────────────────────────
     const shopRes = await admin.graphql(`query { shop { myshopifyDomain } }`);
     const { data: shopData } = await shopRes.json();
     const domain = shopData.shop.myshopifyDomain;
@@ -170,7 +175,7 @@ export const action = async ({ request }) => {
       success: true,
       templateLabel: tplConfig.label,
       themeName: mainTheme.name,
-      pages: ["Landing Page", "Product Page", "Cart Page"],
+      pages: injectedPageNames,
       editorUrl: `https://${domain}/admin/themes/${numericId}/editor`,
       previewUrl: `https://${domain}/?preview_theme_id=${numericId}`,
       cartUrl:    `https://${domain}/cart`,

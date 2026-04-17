@@ -1,0 +1,730 @@
+{% comment %}
+  ConvertFlow — CaratLane Clone Landing Page
+  Fully customizable via Shopify Theme Editor sidepanel.
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --cf-primary: {{ section.settings.color_primary }};
+    --cf-accent: {{ section.settings.color_accent }};
+    --cf-bg: {{ section.settings.color_bg }};
+    --cf-text: {{ section.settings.color_text }};
+    --cf-text-light: #666666;
+    --cf-border-radius: {{ section.settings.border_radius }}px;
+    --cf-font-heading: 'Playfair Display', serif;
+    --cf-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-cl * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-cl {
+    font-family: var(--cf-font-body);
+    color: var(--cf-text);
+    background: var(--cf-bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .cf-cl h1, .cf-cl h2, .cf-cl h3 {
+    font-family: var(--cf-font-heading);
+    color: var(--cf-primary);
+  }
+
+  /* ── Header ── */
+  .cf-cl-header {
+    background: #ffffff;
+    border-bottom: 1px solid #ebebeb;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .cf-cl-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    gap: 20px;
+  }
+  .cf-cl-logo {
+    font-family: var(--cf-font-heading);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cf-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  .cf-cl-logo img { max-height: 40px; }
+  .cf-cl-search {
+    flex: 1;
+    max-width: 600px;
+    position: relative;
+  }
+  .cf-cl-search input {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: var(--cf-border-radius);
+    border: 1px solid #e0e0e0;
+    background: #f8f8f8;
+    font-size: 14px;
+    outline: none;
+    font-family: var(--cf-font-body);
+  }
+  .cf-cl-search input:focus { border-color: var(--cf-primary); background: #fff; }
+  .cf-cl-icons {
+    display: flex;
+    gap: 24px;
+  }
+  .cf-cl-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: var(--cf-primary);
+    text-decoration: none;
+    font-weight: 500;
+    gap: 4px;
+  }
+  .cf-cl-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .cf-cl-nav {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 12px 20px;
+    background: var(--cf-primary);
+  }
+  .cf-cl-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── Hero ── */
+  .cf-cl-hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21/9;
+    background: #fdf5f5;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .cf-cl-hero img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cf-cl-hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 0 5%;
+    max-width: 600px;
+  }
+  .cf-cl-hero-content h1 {
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: {{ section.settings.hero_text_color }};
+  }
+  .cf-cl-hero-content p {
+    font-size: 16px;
+    margin-bottom: 24px;
+    color: {{ section.settings.hero_text_color }};
+    opacity: 0.9;
+  }
+  .cf-cl-btn {
+    display: inline-block;
+    background: var(--cf-accent);
+    color: #ffffff;
+    padding: 14px 32px;
+    border-radius: var(--cf-border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .cf-cl-btn:hover { transform: translateY(-2px); }
+
+  /* ── Features Strip ── */
+  .cf-cl-features {
+    display: flex;
+    justify-content: space-around;
+    padding: 24px 40px;
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+  }
+  .cf-cl-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cf-primary);
+  }
+  .cf-cl-feature svg { width: 28px; height: 28px; color: var(--cf-accent); }
+
+  /* ── Collections Grid ── */
+  .cf-cl-section {
+    padding: 60px 40px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .cf-cl-section-head {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .cf-cl-section-head h2 {
+    font-size: 32px;
+    position: relative;
+    display: inline-block;
+  }
+  .cf-cl-section-head h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--cf-accent);
+  }
+
+  .cf-cl-circles {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+  .cf-cl-circle-item { text-decoration: none; color: inherit; display: block; }
+  .cf-cl-circle-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #F6EFFB;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid #eee;
+    transition: box-shadow 0.3s;
+  }
+  .cf-cl-circle-item:hover .cf-cl-circle-img {
+    box-shadow: 0 8px 16px rgba(73, 49, 97, 0.15);
+  }
+  .cf-cl-circle-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cf-cl-circle-item span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cf-primary);
+  }
+
+  /* ── Product Carousel ── */
+  .cf-cl-products {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .cf-cl-product-card {
+    background: #fff;
+    border-radius: var(--cf-border-radius);
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+    transition: box-shadow 0.3s;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+  }
+  .cf-cl-product-card:hover { box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+  .cf-cl-badge {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: var(--cf-accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    z-index: 2;
+  }
+  .cf-cl-product-img {
+    aspect-ratio: 1;
+    margin-bottom: 16px;
+    position: relative;
+    border-radius: calc(var(--cf-border-radius) - 4px);
+    overflow: hidden;
+  }
+  .cf-cl-product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cf-cl-product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cf-primary);
+    margin-bottom: 8px;
+  }
+  .cf-cl-product-title {
+    font-size: 13px;
+    color: var(--cf-text-light);
+    line-height: 1.4;
+    height: 36px;
+    overflow: hidden;
+  }
+  
+  /* ── Banners ── */
+  .cf-cl-banner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .cf-cl-banner {
+    border-radius: var(--cf-border-radius);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 16/7;
+  }
+  .cf-cl-banner img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── Footer ── */
+  .cf-cl-footer {
+    background: #fcfcfc;
+    border-top: 1px solid #eee;
+    padding: 60px 40px 20px;
+    margin-top: 40px;
+  }
+  .cf-cl-footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1440px;
+    margin: 0 auto 40px;
+  }
+  .cf-cl-footer h4 { margin-bottom: 20px; font-size: 16px; }
+  .cf-cl-footer-links a {
+    display: block;
+    color: var(--cf-text-light);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .cf-cl-footer-links a:hover { color: var(--cf-primary); }
+  .cf-cl-footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+    color: var(--cf-text-light);
+  }
+{% endstyle %}
+
+<div class="cf-cl">
+  
+  <!-- HEADER -->
+  <div class="cf-cl-header">
+    <div class="cf-cl-header-top">
+      <a href="/" class="cf-cl-logo">
+        {% if section.settings.logo_image %}
+          <img src="{{ section.settings.logo_image | img_url: '400x' }}" alt="{{ section.settings.logo_text }}">
+        {% else %}
+          {{ section.settings.logo_text }}
+        {% endif %}
+      </a>
+      
+      <div class="cf-cl-search">
+        <input type="text" placeholder="{{ section.settings.search_placeholder }}">
+      </div>
+
+      <div class="cf-cl-icons">
+        <a href="/account" class="cf-cl-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span style="font-family: var(--cf-font-body)">Profile</span>
+        </a>
+        <a href="/cart" class="cf-cl-icon">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span style="font-family: var(--cf-font-body)">Cart</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="cf-cl-nav">
+      {% for block in section.blocks %}
+        {% if block.type == 'nav_link' %}
+          <a href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="cf-cl-hero">
+    {% if section.settings.hero_image %}
+      <img src="{{ section.settings.hero_image | img_url: 'master' }}" alt="{{ section.settings.hero_heading }}">
+    {% else %}
+      <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png" style="opacity: 0.1">
+    {% endif %}
+    
+    <div class="cf-cl-hero-content">
+      <h1>{{ section.settings.hero_heading }}</h1>
+      <p>{{ section.settings.hero_subheading }}</p>
+      <a href="{{ section.settings.hero_btn_link }}" class="cf-cl-btn">{{ section.settings.hero_btn_text }}</a>
+    </div>
+  </div>
+
+  <!-- FEATURES STRIP -->
+  <div class="cf-cl-features">
+    <div class="cf-cl-feature">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      {{ section.settings.feature_1 }}
+    </div>
+    <div class="cf-cl-feature">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+      {{ section.settings.feature_2 }}
+    </div>
+    <div class="cf-cl-feature">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      {{ section.settings.feature_3 }}
+    </div>
+  </div>
+
+  <!-- SHOP BY CATEGORY -->
+  <div class="cf-cl-section">
+    <div class="cf-cl-section-head">
+      <h2>{{ section.settings.cat_heading }}</h2>
+    </div>
+    <div class="cf-cl-circles">
+      {% for block in section.blocks %}
+        {% if block.type == 'category' %}
+        <a href="{{ block.settings.url }}" class="cf-cl-circle-item">
+          <div class="cf-cl-circle-img">
+            {% if block.settings.image %}
+              <img src="{{ block.settings.image | img_url: '400x' }}" alt="{{ block.settings.title }}">
+            {% endif %}
+          </div>
+          <span style="font-family: var(--cf-font-body)">{{ block.settings.title }}</span>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- BESTSELLERS -->
+  <div class="cf-cl-section" style="background: #F6EFFB;">
+    <div class="cf-cl-section-head">
+      <h2>{{ section.settings.prod_heading }}</h2>
+    </div>
+    <div class="cf-cl-products">
+      {% assign prod_coll = collections[section.settings.prod_collection] %}
+      {% for product in prod_coll.products limit: 4 %}
+        <a href="{{ product.url }}" class="cf-cl-product-card">
+          <div class="cf-cl-badge">Bestseller</div>
+          <div class="cf-cl-product-img">
+            <img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}">
+          </div>
+          <div class="cf-cl-product-price" style="font-family: var(--cf-font-body)">{{ product.price | money }}</div>
+          <div class="cf-cl-product-title" style="font-family: var(--cf-font-body)">{{ product.title }}</div>
+        </a>
+      {% else %}
+        {% for i in (1..4) %}
+        <div class="cf-cl-product-card">
+          <div class="cf-cl-product-img" style="background: #fff;"></div>
+          <div class="cf-cl-product-price">₹12,500</div>
+          <div class="cf-cl-product-title">Classic Diamond Ring Sample</div>
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- BANNERS -->
+  <div class="cf-cl-section">
+    <div class="cf-cl-banner-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'banner' %}
+        <a href="{{ block.settings.url }}" class="cf-cl-banner">
+          {% if block.settings.image %}
+            <img src="{{ block.settings.image | img_url: 'master' }}" alt="Banner">
+          {% else %}
+            <div style="background: #e0e0e0; width: 100%; height: 100%;"></div>
+          {% endif %}
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="cf-cl-footer">
+    <div class="cf-cl-footer-grid">
+      <div>
+        <h4 style="font-family: var(--cf-font-heading); color: var(--cf-primary);">{{ section.settings.logo_text }}</h4>
+        <p style="font-size: 13px; color: var(--cf-text-light); margin-top: 10px;">{{ section.settings.footer_text }}</p>
+      </div>
+      <div>
+        <h4 style="font-family: var(--cf-font-body)">Shop</h4>
+        <div class="cf-cl-footer-links">
+          <a href="#" style="font-family: var(--cf-font-body)">Rings</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Earrings</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Necklaces</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Bracelets</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-family: var(--cf-font-body)">About</h4>
+        <div class="cf-cl-footer-links">
+          <a href="#" style="font-family: var(--cf-font-body)">Our Story</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Store Locator</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Careers</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Blog</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-family: var(--cf-font-body)">Support</h4>
+        <div class="cf-cl-footer-links">
+          <a href="#" style="font-family: var(--cf-font-body)">Contact Us</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Track Order</a>
+          <a href="#" style="font-family: var(--cf-font-body)">Returns</a>
+          <a href="#" style="font-family: var(--cf-font-body)">FAQs</a>
+        </div>
+      </div>
+    </div>
+    <div class="cf-cl-footer-bottom" style="font-family: var(--cf-font-body)">
+      &copy; {{ 'now' | date: '%Y' }} {{ section.settings.logo_text }}. ConvertFlow Clone.
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CaratLane Landing Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Theme Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Brand Color",
+      "default": "#493161"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#DEBB43"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Header Settings"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "default": "CaratLane Clone"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo Image"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search Placeholder",
+      "default": "Search for Rings, Earrings..."
+    },
+    {
+      "type": "header",
+      "content": "Hero Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Hero Heading",
+      "default": "Crafted for the Modern Woman"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Hero Subheading",
+      "default": "Discover beautiful, everyday jewellery that speaks your style."
+    },
+    {
+      "type": "color",
+      "id": "hero_text_color",
+      "label": "Hero Text Color",
+      "default": "#493161"
+    },
+    {
+      "type": "text",
+      "id": "hero_btn_text",
+      "label": "Hero Button Text",
+      "default": "Shop New Arrivals"
+    },
+    {
+      "type": "url",
+      "id": "hero_btn_link",
+      "label": "Hero Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Features Strip"
+    },
+    {
+      "type": "text",
+      "id": "feature_1",
+      "label": "Feature 1",
+      "default": "100% Certified Jewellery"
+    },
+    {
+      "type": "text",
+      "id": "feature_2",
+      "label": "Feature 2",
+      "default": "15 Day Money Back"
+    },
+    {
+      "type": "text",
+      "id": "feature_3",
+      "label": "Feature 3",
+      "default": "Lifetime Exchange"
+    },
+    {
+      "type": "header",
+      "content": "Categories & Products"
+    },
+    {
+      "type": "text",
+      "id": "cat_heading",
+      "label": "Categories Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "text",
+      "id": "prod_heading",
+      "label": "Products Heading",
+      "default": "Bestsellers"
+    },
+    {
+      "type": "collection",
+      "id": "prod_collection",
+      "label": "Bestseller Collection"
+    },
+    {
+      "type": "header",
+      "content": "Footer Settings"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_text",
+      "label": "Footer Description",
+      "default": "Crafting beautiful stories in gold and diamonds for everyday wear."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Navigation Link",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link Label",
+          "default": "New Arrivals"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category Circle",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "Rings"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Category Link"
+        }
+      ]
+    },
+    {
+      "type": "banner",
+      "name": "Promo Banner",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Banner Image"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Banner Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CaratLane Landing Page",
+      "blocks": [
+        { "type": "nav_link" },
+        { "type": "nav_link" },
+        { "type": "nav_link" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

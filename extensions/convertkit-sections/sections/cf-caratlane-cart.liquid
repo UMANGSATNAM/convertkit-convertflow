@@ -1,0 +1,362 @@
+{% comment %}
+  ConvertFlow — CaratLane Clone Cart Page
+  Fully customizable via Shopify Theme Editor sidepanel.
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --cf-primary: {{ section.settings.color_primary }};
+    --cf-accent: {{ section.settings.color_accent }};
+    --cf-bg: {{ section.settings.color_bg }};
+    --cf-text: {{ section.settings.color_text }};
+    --cf-text-light: #666666;
+    --cf-border-radius: {{ section.settings.border_radius }}px;
+    --cf-font-heading: 'Playfair Display', serif;
+    --cf-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-cl-c * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-cl-c {
+    font-family: var(--cf-font-body);
+    color: var(--cf-text);
+    background: var(--cf-bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 60px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 80vh;
+  }
+  
+  .cf-cl-c h1 {
+    font-family: var(--cf-font-heading);
+    color: var(--cf-primary);
+    font-size: 36px;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  /* ── Cart Layout ── */
+  .cf-cl-cart-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── Cart Items ── */
+  .cf-cl-items-wrap {
+    background: #fff;
+    border-radius: var(--cf-border-radius);
+    padding: 30px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .cf-cl-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 24px;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #eee;
+  }
+  .cf-cl-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .cf-cl-item-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: calc(var(--cf-border-radius) / 2);
+    overflow: hidden;
+    background: #f8f8f8;
+  }
+  .cf-cl-item-img img { width: 100%; height: 100%; object-fit: contain; }
+  .cf-cl-item-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cf-cl-item-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--cf-primary);
+    text-decoration: none;
+  }
+  .cf-cl-item-variant {
+    font-size: 13px;
+    color: var(--cf-text-light);
+    margin-bottom: 12px;
+  }
+  .cf-cl-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .cf-cl-qty-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: calc(var(--cf-border-radius) / 2);
+    overflow: hidden;
+  }
+  .cf-cl-qty-wrap a, .cf-cl-qty-wrap span {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: var(--cf-text);
+    text-decoration: none;
+    background: #fafafa;
+  }
+  .cf-cl-qty-wrap span { background: #fff; font-weight: 600; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+  .cf-cl-remove {
+    font-size: 12px;
+    color: #e57373;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .cf-cl-item-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cf-primary);
+    margin-top: 20px;
+  }
+
+  /* ── Summary ── */
+  .cf-cl-summary {
+    background: #fff;
+    border-radius: var(--cf-border-radius);
+    padding: 30px;
+    border: 1px solid #f0f0f0;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .cf-cl-summary h2 {
+    font-size: 18px;
+    margin-bottom: 24px;
+    font-family: var(--cf-font-body);
+    font-weight: 700;
+  }
+  .cf-cl-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--cf-text-light);
+  }
+  .cf-cl-summary-row.total {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px dashed #ddd;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cf-primary);
+  }
+  .cf-cl-checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin-top: 24px;
+    background: var(--cf-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--cf-border-radius);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .cf-cl-checkout-btn:hover {
+    background: #362447;
+    transform: translateY(-2px);
+  }
+
+  .cf-cl-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: var(--cf-border-radius);
+    border: 1px solid #eee;
+  }
+  .cf-cl-empty p { margin-bottom: 24px; font-size: 16px; color: var(--cf-text-light); }
+  .cf-cl-continue {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--cf-accent);
+    color: #fff;
+    border-radius: var(--cf-border-radius);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .cf-cl-cart-grid { grid-template-columns: 1fr; }
+    .cf-cl-item { grid-template-columns: 80px 1fr; }
+    .cf-cl-item-price { grid-column: span 2; text-align: right; margin-top: 0; }
+  }
+{% endstyle %}
+
+<div class="cf-cl-c">
+  <h1>{{ section.settings.cart_heading }}</h1>
+
+  {% if cart.item_count > 0 %}
+    <form action="/cart" method="post" novalidate class="cf-cl-cart-grid">
+      
+      <!-- ITEMS -->
+      <div class="cf-cl-items-wrap">
+        {% for item in cart.items %}
+          <div class="cf-cl-item">
+            <a href="{{ item.url }}" class="cf-cl-item-img">
+              <img src="{{ item | img_url: '200x' }}" alt="{{ item.title | escape }}">
+            </a>
+            
+            <div class="cf-cl-item-details">
+              <a href="{{ item.url }}" class="cf-cl-item-title">{{ item.product.title }}</a>
+              {% unless item.product.has_only_default_variant %}
+                <div class="cf-cl-item-variant">{{ item.variant.title }}</div>
+              {% endunless %}
+              
+              <div class="cf-cl-item-actions">
+                <div class="cf-cl-qty-wrap">
+                  <a href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}">&minus;</a>
+                  <span>{{ item.quantity }}</span>
+                  <a href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1 }}">&plus;</a>
+                </div>
+                <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="cf-cl-remove">Remove</a>
+              </div>
+            </div>
+
+            <div class="cf-cl-item-price">
+              {{ item.final_line_price | money }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="cf-cl-summary">
+        <h2>{{ section.settings.summary_heading }}</h2>
+        
+        <div class="cf-cl-summary-row">
+          <span>Subtotal</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        
+        <div class="cf-cl-summary-row">
+          <span>Shipping</span>
+          <span style="color: #4caf50;">{{ section.settings.shipping_text }}</span>
+        </div>
+        
+        <div class="cf-cl-summary-row total">
+          <span>Total</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        
+        <button type="submit" name="checkout" class="cf-cl-checkout-btn">{{ section.settings.checkout_btn_text }}</button>
+      </div>
+      
+    </form>
+  {% else %}
+    <div class="cf-cl-empty">
+      <p>{{ section.settings.empty_cart_text }}</p>
+      <a href="/" class="cf-cl-continue">{{ section.settings.continue_shopping_text }}</a>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "CaratLane Cart Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Theme Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Brand Color",
+      "default": "#493161"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#DEBB43"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Text Settings"
+    },
+    {
+      "type": "text",
+      "id": "cart_heading",
+      "label": "Cart Heading",
+      "default": "Your Shopping Bag"
+    },
+    {
+      "type": "text",
+      "id": "summary_heading",
+      "label": "Summary Heading",
+      "default": "Order Summary"
+    },
+    {
+      "type": "text",
+      "id": "shipping_text",
+      "label": "Shipping Text",
+      "default": "Calculated at checkout"
+    },
+    {
+      "type": "text",
+      "id": "checkout_btn_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout"
+    },
+    {
+      "type": "text",
+      "id": "empty_cart_text",
+      "label": "Empty Cart Text",
+      "default": "Your cart is currently empty."
+    },
+    {
+      "type": "text",
+      "id": "continue_shopping_text",
+      "label": "Continue Shopping Button",
+      "default": "Continue Shopping"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CaratLane Cart Page"
+    }
+  ]
+}
+{% endschema %}

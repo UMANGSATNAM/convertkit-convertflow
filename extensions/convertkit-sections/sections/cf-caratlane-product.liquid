@@ -1,0 +1,337 @@
+{% comment %}
+  ConvertFlow — CaratLane Clone Product Page
+  Fully customizable via Shopify Theme Editor sidepanel.
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --cf-primary: {{ section.settings.color_primary }};
+    --cf-accent: {{ section.settings.color_accent }};
+    --cf-bg: {{ section.settings.color_bg }};
+    --cf-text: {{ section.settings.color_text }};
+    --cf-text-light: #666666;
+    --cf-border-radius: {{ section.settings.border_radius }}px;
+    --cf-font-heading: 'Playfair Display', serif;
+    --cf-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-cl-p * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-cl-p {
+    font-family: var(--cf-font-body);
+    color: var(--cf-text);
+    background: var(--cf-bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  
+  .cf-cl-p h1, .cf-cl-p h2, .cf-cl-p h3 {
+    font-family: var(--cf-font-heading);
+    color: var(--cf-primary);
+  }
+
+  /* ── Product Layout ── */
+  .cf-cl-product-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 60px;
+    align-items: start;
+  }
+
+  /* ── Gallery ── */
+  .cf-cl-gallery {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 20px;
+  }
+  .cf-cl-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cf-cl-thumb {
+    width: 80px;
+    aspect-ratio: 1;
+    border-radius: calc(var(--cf-border-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: #F6EFFB;
+  }
+  .cf-cl-thumb:hover, .cf-cl-thumb.active {
+    border-color: var(--cf-primary);
+  }
+  .cf-cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .cf-cl-main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--cf-border-radius);
+    overflow: hidden;
+    background: #FFF;
+    border: 1px solid #eee;
+  }
+  .cf-cl-main-image img { width: 100%; height: 100%; object-fit: contain; }
+
+  /* ── Details ── */
+  .cf-cl-details {
+    padding: 20px 0;
+  }
+  .cf-cl-title {
+    font-size: 28px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .cf-cl-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
+  }
+  .cf-cl-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cf-primary);
+  }
+  .cf-cl-compare {
+    font-size: 16px;
+    color: var(--cf-text-light);
+    text-decoration: line-through;
+  }
+
+  .cf-cl-form { margin-bottom: 30px; }
+  .cf-cl-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--cf-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--cf-border-radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    font-family: var(--cf-font-body);
+    margin-bottom: 16px;
+  }
+  .cf-cl-btn:hover {
+    background: #ccaa38;
+    transform: translateY(-2px);
+  }
+
+  .cf-cl-trust {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #F6EFFB;
+    border-radius: var(--cf-border-radius);
+  }
+  .cf-cl-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .cf-cl-trust-item svg { width: 20px; height: 20px; color: var(--cf-primary); }
+
+  .cf-cl-desc {
+    font-size: 14px;
+    color: var(--cf-text-light);
+    line-height: 1.8;
+  }
+  .cf-cl-desc h4 {
+    font-family: var(--cf-font-body);
+    font-size: 15px;
+    color: var(--cf-primary);
+    margin: 20px 0 10px;
+  }
+
+  @media (max-width: 900px) {
+    .cf-cl-product-layout { grid-template-columns: 1fr; gap: 40px; }
+    .cf-cl-gallery { grid-template-columns: 1fr; }
+    .cf-cl-thumbnails { flex-direction: row; overflow-x: auto; order: 2; }
+    .cf-cl-main-image { order: 1; }
+  }
+{% endstyle %}
+
+<div class="cf-cl-p">
+  <div class="cf-cl-product-layout">
+    
+    <!-- GALLERY -->
+    <div class="cf-cl-gallery">
+      <div class="cf-cl-thumbnails">
+        {% for image in product.images %}
+          <div class="cf-cl-thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('cf-main-img').src='{{ image | img_url: 'master' }}'">
+            <img src="{{ image | img_url: '200x' }}" alt="{{ product.title }}">
+          </div>
+        {% else %}
+          <div class="cf-cl-thumb active"><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1.png" alt="Fallback"></div>
+          <div class="cf-cl-thumb"><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-2.png" alt="Fallback"></div>
+        {% endfor %}
+      </div>
+      <div class="cf-cl-main-image">
+        {% if product.featured_image %}
+          <img id="cf-main-img" src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
+        {% else %}
+          <img id="cf-main-img" src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1.png" alt="Fallback">
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="cf-cl-details">
+      <h1 class="cf-cl-title">{{ product.title | default: section.settings.fallback_title }}</h1>
+      
+      <div class="cf-cl-price-wrap">
+        <span class="cf-cl-price">{{ product.price | money | default: '$499.00' }}</span>
+        {% if product.compare_at_price > product.price %}
+          <span class="cf-cl-compare">{{ product.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      <div class="cf-cl-trust">
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          {{ section.settings.trust_1 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          {{ section.settings.trust_2 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          {{ section.settings.trust_3 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          {{ section.settings.trust_4 }}
+        </div>
+      </div>
+
+      {% form 'product', product, class: 'cf-cl-form' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button type="submit" class="cf-cl-btn">{{ section.settings.add_to_cart_text }}</button>
+      {% endform %}
+
+      <div class="cf-cl-desc">
+        <h4>{{ section.settings.desc_heading }}</h4>
+        {{ product.description | default: '<p>Experience the perfect blend of modern aesthetics and traditional craftsmanship with this exquisite piece.</p>' }}
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CaratLane Product Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Theme Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Brand Color",
+      "default": "#493161"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#DEBB43"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Product Settings"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Fallback Title (if no product)",
+      "default": "Elegant Diamond Solitaire"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "100% Certified"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Secure Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "15-Day Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_4",
+      "label": "Trust Badge 4",
+      "default": "Lifetime Exchange"
+    },
+    {
+      "type": "header",
+      "content": "Description Block"
+    },
+    {
+      "type": "text",
+      "id": "desc_heading",
+      "label": "Description Heading",
+      "default": "Product Details"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CaratLane Product Page"
+    }
+  ]
+}
+{% endschema %}
