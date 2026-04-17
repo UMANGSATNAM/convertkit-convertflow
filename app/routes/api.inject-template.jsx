@@ -52,9 +52,14 @@ export const action = async ({ request }) => {
       query { themes(first: 10) { nodes { id name role } } }
     `);
     const { data: themesData } = await themesRes.json();
-    const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN");
+    const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
     if (!mainTheme) {
-      return json({ success: false, error: "No active theme found" }, { status: 400 });
+      const availableThemes = themesData.themes.nodes.map(t => `${t.name} (${t.role})`).join(', ');
+      console.error("[inject-template] No MAIN theme. Available:", availableThemes);
+      return json({ 
+        success: false, 
+        error: `No active theme found. Available themes: ${availableThemes || 'None'}` 
+      }, { status: 400 });
     }
 
     const sectionsDir = path.resolve(
