@@ -30,6 +30,16 @@ const TEMPLATES = [
     desc: "Luxurious jewellery storefront with gold accents, serif typography, BIS hallmark trust, collection grids, craftsmanship story & elegant reviews.",
     icon: "diamond",
   },
+  {
+    id: "caratlane",
+    name: "CaratLane Clone",
+    niche: "EVERYDAY JEWELLERY",
+    nicheColor: "#493161",
+    nicheBg: "#F6EFFB",
+    accent: "#DEBB43",
+    desc: "A gorgeous modern clone of CaratLane with deep purple, warm gold, large image banners, elegant typography, and massive Theme Editor customizability.",
+    icon: "diamond",
+  },
 ];
 
 /* ── SVG Icons ── */
@@ -298,10 +308,11 @@ const pilgrimPreviewHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><me
 const PREVIEW_MAP = {
   pilgrim: pilgrimPreviewHTML,
   tanishq: tanishqPreviewHTML,
+  caratlane: `<div style="padding:40px;text-align:center;font-family:sans-serif;color:#493161;"><h2>CaratLane Clone Template</h2><p>Preview engine is rendering. Inject to see full responsive pages in Shopify Editor.</p></div>`,
 };
 
 export default function Index() {
-  const [selectedTemplate, setSelectedTemplate] = useState("tanishq");
+  const [selectedTemplate, setSelectedTemplate] = useState("caratlane");
   const [previewMode, setPreviewMode] = useState("desktop");
   const fetcher = useFetcher();
   const isInjecting = fetcher.state === "submitting";
