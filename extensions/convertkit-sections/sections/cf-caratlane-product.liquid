@@ -24,7 +24,7 @@
     background: var(--cf-bg);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    padding: 40px;
+    padding: clamp(20px, 4vw, 40px);
     max-width: 1440px;
     margin: 0 auto;
   }
@@ -37,33 +37,36 @@
   /* ── Product Layout ── */
   .cf-cl-product-layout {
     display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 60px;
+    grid-template-columns: 1fr 440px;
+    gap: clamp(30px, 5vw, 80px);
     align-items: start;
   }
 
   /* ── Gallery ── */
   .cf-cl-gallery {
     display: grid;
-    grid-template-columns: 80px 1fr;
-    gap: 20px;
+    grid-template-columns: 84px 1fr;
+    gap: clamp(16px, 3vw, 24px);
   }
   .cf-cl-thumbnails {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
   .cf-cl-thumb {
-    width: 80px;
+    width: clamp(60px, 10vw, 84px);
     aspect-ratio: 1;
     border-radius: calc(var(--cf-border-radius) / 2);
     overflow: hidden;
     cursor: pointer;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     background: #F6EFFB;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .cf-cl-thumb:hover, .cf-cl-thumb.active {
     border-color: var(--cf-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(73, 49, 97, 0.15);
   }
   .cf-cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
   
@@ -73,108 +76,139 @@
     border-radius: var(--cf-border-radius);
     overflow: hidden;
     background: #FFF;
-    border: 1px solid #eee;
+    border: 1px solid rgba(238,238,238,0.8);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: transform 0.4s ease;
   }
+  .cf-cl-main-image:hover { transform: scale(1.01); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
   .cf-cl-main-image img { width: 100%; height: 100%; object-fit: contain; }
 
   /* ── Details ── */
   .cf-cl-details {
-    padding: 20px 0;
+    padding: 0;
   }
   .cf-cl-title {
-    font-size: 28px;
+    font-size: clamp(28px, 4vw, 42px);
     margin-bottom: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
   }
   .cf-cl-price-wrap {
     display: flex;
     align-items: baseline;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 16px;
+    margin-bottom: 30px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(238,238,238,0.6);
   }
   .cf-cl-price {
-    font-size: 24px;
+    font-size: clamp(28px, 4vw, 36px);
     font-weight: 700;
     color: var(--cf-primary);
   }
   .cf-cl-compare {
-    font-size: 16px;
+    font-size: clamp(16px, 2vw, 18px);
     color: var(--cf-text-light);
     text-decoration: line-through;
   }
 
-  .cf-cl-form { margin-bottom: 30px; }
+  /* ── Buy Module ── */
+  .cf-cl-form { margin-bottom: 30px; transition: all 0.3s ease; }
   .cf-cl-btn {
     width: 100%;
-    padding: 16px;
+    padding: 18px;
     background: var(--cf-accent);
     color: #fff;
     border: none;
-    border-radius: var(--cf-border-radius);
-    font-size: 16px;
+    border-radius: 40px;
+    font-size: clamp(16px, 2vw, 18px);
     font-weight: 600;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--cf-font-body);
-    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(222, 187, 67, 0.3);
   }
   .cf-cl-btn:hover {
-    background: #ccaa38;
-    transform: translateY(-2px);
+    background: #cca72c;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(222, 187, 67, 0.4);
   }
 
   /* ── Promo Strip ── */
   .cf-cl-promo-strip {
-    background: #FDF9F1;
-    border: 1px dashed #DEBB43;
+    background: linear-gradient(90deg, #FDF9F1, #fff, #FDF9F1);
+    background-size: 200% auto;
+    animation: cfPromoGlow 6s linear infinite;
+    border: 1px dashed rgba(222, 187, 67, 0.8);
     border-radius: calc(var(--cf-border-radius) - 4px);
-    padding: 12px 16px;
-    margin-bottom: 20px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    box-shadow: 0 2px 10px rgba(222, 187, 67, 0.05);
   }
-  .cf-cl-promo-strip svg { width: 22px; height: 22px; color: #DEBB43; flex-shrink: 0; }
-  .cf-cl-promo-text { font-size: 13px; color: var(--cf-text); font-weight: 500; flex: 1; line-height: 1.4; }
-  .cf-cl-promo-code { font-weight: 700; color: var(--cf-primary); letter-spacing: 0.5px; border-bottom: 1px dashed var(--cf-primary); cursor: pointer; }
+  @keyframes cfPromoGlow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+  .cf-cl-promo-strip svg { width: 24px; height: 24px; color: #DEBB43; flex-shrink: 0; }
+  .cf-cl-promo-text { font-size: 14px; color: var(--cf-text); font-weight: 500; flex: 1; line-height: 1.5; }
+  .cf-cl-promo-code { font-weight: 700; color: var(--cf-primary); letter-spacing: 0.5px; border-bottom: 1px dashed var(--cf-primary); cursor: pointer; transition: color 0.2s; }
+  .cf-cl-promo-code:hover { color: var(--cf-accent); border-color: var(--cf-accent); }
 
+  /* ── Trust Badges ── */
   .cf-cl-trust {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 30px;
-    padding: 20px;
+    padding: 24px;
     background: #F6EFFB;
     border-radius: var(--cf-border-radius);
+    border: 1px solid rgba(73, 49, 97, 0.05);
   }
   .cf-cl-trust-item {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
   }
-  .cf-cl-trust-item svg { width: 20px; height: 20px; color: var(--cf-primary); }
+  .cf-cl-trust-item svg { width: 22px; height: 22px; color: var(--cf-primary); }
 
   .cf-cl-desc {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--cf-text-light);
     line-height: 1.8;
   }
   .cf-cl-desc h4 {
     font-family: var(--cf-font-body);
-    font-size: 15px;
+    font-size: 16px;
     color: var(--cf-primary);
-    margin: 20px 0 10px;
+    margin: 30px 0 12px;
+    font-weight: 600;
   }
 
+  /* ── Responsive Mobile Hierarchy ── */
+  @media (max-width: 1024px) {
+    .cf-cl-product-layout { grid-template-columns: 1fr 340px; gap: 40px; }
+  }
   @media (max-width: 900px) {
-    .cf-cl-product-layout { grid-template-columns: 1fr; gap: 40px; }
+    .cf-cl-product-layout { grid-template-columns: 1fr; gap: 30px; }
     .cf-cl-gallery { grid-template-columns: 1fr; }
-    .cf-cl-thumbnails { flex-direction: row; overflow-x: auto; order: 2; }
-    .cf-cl-main-image { order: 1; }
+    .cf-cl-thumbnails { flex-direction: row; overflow-x: auto; order: 2; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
+    .cf-cl-thumbnails::-webkit-scrollbar { display: none; }
+    .cf-cl-thumb { flex: 0 0 clamp(70px, 15vw, 100px); scroll-snap-align: center; }
+    .cf-cl-main-image { order: 1; border-radius: 8px; }
+  }
+  @media (max-width: 600px) {
+    .cf-cl-p { padding: 20px 16px; }
+    .cf-cl-trust { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+    .cf-cl-price-wrap { margin-bottom: 20px; padding-bottom: 16px; }
+    /* Sticky Mobile Add to Cart UI */
+    .cf-cl-form { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 16px 20px; box-shadow: 0 -4px 30px rgba(0,0,0,0.1); z-index: 1000; margin: 0; border-top: 1px solid rgba(0,0,0,0.05); }
+    .cf-cl-btn { margin-bottom: 0; padding: 16px; font-size: 16px; }
+    .cf-cl-details { padding-bottom: 100px; /* Space for sticky drawer */ }
   }
 {% endstyle %}
 
