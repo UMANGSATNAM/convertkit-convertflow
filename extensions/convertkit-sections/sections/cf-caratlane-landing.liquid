@@ -97,6 +97,19 @@
   .cf-cl-coll-logo img { max-width: 120px; object-fit: contain; }
   .cf-cl-coll-btn { display: inline-block; background: var(--cf-primary); color: #fff; padding: 14px 40px; border-radius: var(--cf-border-radius); font-weight: 600; font-size: 14px; }
 
+  /* ── Trust Badges ── */
+  .cf-cl-trust { background: #fdfafb; padding: 20px 40px; display: flex; justify-content: center; gap: 40px; border-bottom: 1px solid #f0e6ea; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .cf-cl-trust::-webkit-scrollbar { display: none; }
+  .cf-cl-trust-item { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--cf-primary); }
+  .cf-cl-trust-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; position: relative; overflow: hidden; }
+
+  /* ── Promo Slider ── */
+  .cf-cl-pslider { padding: 40px 0; background: #fff; overflow: hidden; }
+  .cf-cl-pslider-inner { display: flex; gap: 20px; padding: 0 40px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+  .cf-cl-pslider-inner::-webkit-scrollbar { display: none; }
+  .cf-cl-pslide { flex: 0 0 85%; max-width: 800px; border-radius: var(--cf-border-radius); overflow: hidden; position: relative; }
+  .cf-cl-pslide img { width: 100%; height: auto; display: block; object-fit: cover; }
+
   @media (max-width: 1024px) {
     .cf-cl-trend { grid-template-columns: 1fr; }
     .cf-cl-mosaic { grid-template-columns: 1fr; }
@@ -163,6 +176,48 @@
                 <p>{{ block.settings.subheading }}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+      {% when 'trust_badges' %}
+        <div class="cf-cl-trust" {{ block.shopify_attributes }}>
+          {% for i in (1..4) %}
+            {% assign icon_key = 'icon_' | append: i %}
+            {% assign text_key = 'text_' | append: i %}
+            {% assign color_key = 'bg_color_' | append: i %}
+            
+            {% if block.settings[text_key] != blank %}
+            <div class="cf-cl-trust-item">
+              <div class="cf-cl-trust-icon" style="background: {{ block.settings[color_key] }}; box-shadow: 0 2px 8px {{ block.settings[color_key] }}40;">
+                {% if block.settings[icon_key] != blank %}
+                  <img src="{{ block.settings[icon_key] | img_url: '60x' }}" style="width:18px; max-height:18px; object-fit:contain;">
+                {% else %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                {% endif %}
+              </div>
+              {{ block.settings[text_key] }}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        
+      {% when 'promo_slider' %}
+        <div class="cf-cl-pslider" {{ block.shopify_attributes }}>
+          <div class="cf-cl-pslider-inner">
+            {% for i in (1..4) %}
+              {% assign img_key = 'slide_img_' | append: i %}
+              {% assign url_key = 'slide_url_' | append: i %}
+              
+              {% if block.settings[img_key] != blank %}
+              <a href="{{ block.settings[url_key] }}" class="cf-cl-pslide">
+                <img src="{{ block.settings[img_key] | img_url: '1200x' }}" alt="Promo Slide">
+              </a>
+              {% endif %}
+            {% endfor %}
+            {% if block.settings.slide_img_1 == blank %}
+              <div class="cf-cl-pslide" style="background:#e0e0e0; min-height: 250px; display:flex; align-items:center; justify-content:center; color:#666;">Upload Banner in Editor</div>
+              <div class="cf-cl-pslide" style="background:#d0d0d0; min-height: 250px; display:flex; align-items:center; justify-content:center; color:#666;">Upload Banner in Editor</div>
+            {% endif %}
           </div>
         </div>
 
@@ -435,6 +490,43 @@
       ]
     },
     {
+      "type": "trust_badges",
+      "name": "Trust Badges Strip",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "icon_1", "label": "Icon 1" },
+        { "type": "text", "id": "text_1", "label": "Text 1", "default": "100% Certified" },
+        { "type": "color", "id": "bg_color_1", "label": "Icon 1 BG", "default": "#EAF2FE" },
+        
+        { "type": "image_picker", "id": "icon_2", "label": "Icon 2" },
+        { "type": "text", "id": "text_2", "label": "Text 2", "default": "15 Day Exchange" },
+        { "type": "color", "id": "bg_color_2", "label": "Icon 2 BG", "default": "#FCECEC" },
+        
+        { "type": "image_picker", "id": "icon_3", "label": "Icon 3" },
+        { "type": "text", "id": "text_3", "label": "Text 3", "default": "Lifetime Exchange" },
+        { "type": "color", "id": "bg_color_3", "label": "Icon 3 BG", "default": "#F1F8E9" },
+        
+        { "type": "image_picker", "id": "icon_4", "label": "Icon 4" },
+        { "type": "text", "id": "text_4", "label": "Text 4", "default": "One Year Warranty" },
+        { "type": "color", "id": "bg_color_4", "label": "Icon 4 BG", "default": "#FFFDE7" }
+      ]
+    },
+    {
+      "type": "promo_slider",
+      "name": "Promo Slider (Wide)",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "slide_img_1", "label": "Slide 1 Image" },
+        { "type": "url", "id": "slide_url_1", "label": "Slide 1 Link" },
+        { "type": "image_picker", "id": "slide_img_2", "label": "Slide 2 Image" },
+        { "type": "url", "id": "slide_url_2", "label": "Slide 2 Link" },
+        { "type": "image_picker", "id": "slide_img_3", "label": "Slide 3 Image" },
+        { "type": "url", "id": "slide_url_3", "label": "Slide 3 Link" },
+        { "type": "image_picker", "id": "slide_img_4", "label": "Slide 4 Image" },
+        { "type": "url", "id": "slide_url_4", "label": "Slide 4 Link" }
+      ]
+    },
+    {
       "type": "promo_mosaic",
       "name": "Promo Mosaic Grid",
       "limit": 1,
@@ -495,7 +587,9 @@
     {
       "name": "CaratLane Landing Pro",
       "blocks": [
+        { "type": "trust_badges" },
         { "type": "hero_slide" },
+        { "type": "promo_slider" },
         { "type": "trendsetters" },
         { "type": "wrapped_categories" },
         { "type": "promo_mosaic" },
