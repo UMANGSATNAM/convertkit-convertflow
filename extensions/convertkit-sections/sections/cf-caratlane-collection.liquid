@@ -334,30 +334,119 @@
   /* ── Result Count ── */
   .cf-cl-result-count { font-size: 13px; color: #999; font-weight: 500; margin-bottom: 6px; }
 
+  /* ── Filter Toggle Button (Mobile) ── */
+  .cf-cl-filter-btn {
+    display: none;
+    align-items: center; gap: 8px;
+    padding: 10px 20px;
+    background: var(--cf-primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--cf-font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .cf-cl-filter-btn svg { width: 18px; height: 18px; }
+  .cf-cl-filter-btn:hover { background: #3a2750; }
+
+  /* ── Filter Drawer Overlay (Mobile) ── */
+  .cf-cl-filter-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .cf-cl-filter-overlay.open { opacity: 1; }
+
+  .cf-cl-filter-drawer {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 80vh;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+  }
+  .cf-cl-filter-drawer.open { transform: translateY(0); }
+
+  .cf-cl-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(238,238,238,0.7);
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+    border-radius: 20px 20px 0 0;
+  }
+  .cf-cl-drawer-title { font-size: 18px; font-weight: 700; color: var(--cf-primary); font-family: var(--cf-font-heading); }
+  .cf-cl-drawer-close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    color: #666;
+  }
+  .cf-cl-drawer-close:hover { background: var(--cf-primary); color: #fff; }
+
+  .cf-cl-drawer-body { padding: 20px 24px 100px; }
+  .cf-cl-drawer-body .cf-cl-filter-group { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(238,238,238,0.5); }
+  .cf-cl-drawer-body .cf-cl-filter-group:last-child { border-bottom: none; }
+  .cf-cl-drawer-body .cf-cl-filter-item { font-size: 14px; padding: 4px 0; }
+
+  .cf-cl-drawer-apply {
+    position: sticky;
+    bottom: 0;
+    padding: 16px 24px;
+    background: #fff;
+    border-top: 1px solid rgba(238,238,238,0.7);
+    display: flex; gap: 12px;
+  }
+  .cf-cl-drawer-apply-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--cf-font-body);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .cf-cl-drawer-apply-btn.primary { background: var(--cf-primary); color: #fff; }
+  .cf-cl-drawer-apply-btn.primary:hover { background: #3a2750; }
+  .cf-cl-drawer-apply-btn.secondary { background: #f5f5f5; color: var(--cf-text); }
+  .cf-cl-drawer-apply-btn.secondary:hover { background: #eee; }
+
   /* ── Responsive ── */
   @media (max-width: 1200px) {
     .cf-cl-grid { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 900px) {
     .cf-cl-layout { grid-template-columns: 1fr; gap: 20px; }
-    .cf-cl-sidebar {
-      padding-right: 0;
-      display: flex; gap: 14px; overflow-x: auto;
-      padding-bottom: 16px; scrollbar-width: none;
-      border-bottom: 1px solid rgba(238,238,238,0.8);
-      margin-bottom: 16px;
-      scroll-snap-type: x mandatory;
-    }
-    .cf-cl-sidebar::-webkit-scrollbar { display: none; }
-    .cf-cl-filter-group {
-      flex: 0 0 280px;
-      background: #fafafa; padding: 18px; border-radius: 12px;
-      margin-bottom: 0; scroll-snap-align: start;
-      border-bottom: none;
-    }
-    .cf-cl-filter-list { max-height: none; overflow-y: visible; }
-    .cf-cl-filter-item { font-size: 13px; line-height: 1.4; white-space: normal; word-wrap: break-word; }
-    .cf-cl-top { flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; }
+    .cf-cl-sidebar { display: none !important; }
+    .cf-cl-filter-btn { display: flex; }
+    .cf-cl-filter-overlay { display: block; pointer-events: none; }
+    .cf-cl-filter-overlay.open { pointer-events: auto; }
+    .cf-cl-filter-drawer { display: block; }
+    .cf-cl-top { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; }
     .cf-cl-grid { grid-template-columns: repeat(3, 1fr); }
     .cf-cl-hero { border-radius: 12px; }
   }
@@ -372,13 +461,8 @@
     .cf-cl-heart { width: 32px; height: 32px; top: 8px; right: 8px; }
     .cf-cl-heart svg { width: 16px; height: 16px; }
     .cf-cl-img-nav { display: none; }
-    .cf-cl-filter-group { flex: 0 0 270px; padding: 16px; }
-    .cf-cl-filter-title { font-size: 13px; margin-bottom: 12px; }
-    .cf-cl-filter-item { font-size: 12px; gap: 8px; }
-    .cf-cl-filter-item input[type="checkbox"] { width: 16px; height: 16px; }
-    .cf-cl-filter-count { font-size: 11px; }
-    .cf-cl-active-tags { flex-wrap: wrap; gap: 8px; }
-    .cf-cl-tag { padding: 6px 12px; font-size: 12px; }
+    .cf-cl-active-tags { display: none; }
+    .cf-cl-top { gap: 10px; padding-bottom: 12px; margin-bottom: 16px; }
     .cf-cl-hero { padding: 24px 16px; margin-bottom: 16px; }
     .cf-cl-card-title { font-size: 12px; min-height: 32px; }
     .cf-cl-card-price { font-size: 15px; }
@@ -386,6 +470,7 @@
     .cf-cl-card-rating { margin-bottom: 0; }
     .cf-cl-card-stars svg { width: 12px; height: 12px; }
     .cf-cl-card-reviews { font-size: 11px; }
+    .cf-cl-sort select { font-size: 13px; padding: 6px 28px 6px 10px; }
   }
 {% endstyle %}
 
@@ -409,6 +494,12 @@
       </div>
     </div>
 
+    <!-- Filter Icon Button (visible on mobile only) -->
+    <button class="cf-cl-filter-btn" onclick="document.getElementById('cfFilterOverlay').classList.add('open');document.getElementById('cfFilterDrawer').classList.add('open');document.body.style.overflow='hidden';">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="16" y2="12"></line><line x1="4" y1="18" x2="12" y2="18"></line></svg>
+      Filters
+    </button>
+
     <div class="cf-cl-sort">
       Sort By:
       <select>
@@ -418,6 +509,48 @@
         <option>Newest Arrivals</option>
         <option>Best Selling</option>
       </select>
+    </div>
+  </div>
+
+  <!-- Filter Drawer (Mobile Slide-Up) -->
+  <div class="cf-cl-filter-overlay" id="cfFilterOverlay" onclick="this.classList.remove('open');document.getElementById('cfFilterDrawer').classList.remove('open');document.body.style.overflow='';"></div>
+  <div class="cf-cl-filter-drawer" id="cfFilterDrawer">
+    <div class="cf-cl-drawer-header">
+      <span class="cf-cl-drawer-title">Filters</span>
+      <button class="cf-cl-drawer-close" onclick="document.getElementById('cfFilterOverlay').classList.remove('open');document.getElementById('cfFilterDrawer').classList.remove('open');document.body.style.overflow='';">✕</button>
+    </div>
+    <div class="cf-cl-drawer-body">
+      <div class="cf-cl-filter-group">
+        <div class="cf-cl-filter-title">Price</div>
+        <div class="cf-cl-filter-list">
+          <label class="cf-cl-filter-item"><input type="checkbox"> ₹10,001 - ₹15,000 <span class="cf-cl-filter-count">(298)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> ₹20,001 - ₹30,000 <span class="cf-cl-filter-count">(379)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Under ₹5,000 <span class="cf-cl-filter-count">(1)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> ₹5,001 - ₹10,000 <span class="cf-cl-filter-count">(119)</span></label>
+        </div>
+      </div>
+      <div class="cf-cl-filter-group">
+        <div class="cf-cl-filter-title">Discounts</div>
+        <div class="cf-cl-filter-list">
+          <label class="cf-cl-filter-item"><input type="checkbox"> Flat 25% off on Making Charges <span class="cf-cl-filter-count">(402)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> 50% Off Making + 15% Diamond <span class="cf-cl-filter-count">(2533)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Flat 10% off on Making Charges <span class="cf-cl-filter-count">(426)</span></label>
+        </div>
+      </div>
+      <div class="cf-cl-filter-group">
+        <div class="cf-cl-filter-title">Product Type</div>
+        <div class="cf-cl-filter-list">
+          <label class="cf-cl-filter-item"><input type="checkbox" checked> Earrings <span class="cf-cl-filter-count">(3464)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Rings <span class="cf-cl-filter-count">(2937)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Necklaces <span class="cf-cl-filter-count">(1014)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Bangles <span class="cf-cl-filter-count">(847)</span></label>
+          <label class="cf-cl-filter-item"><input type="checkbox"> Pendants <span class="cf-cl-filter-count">(692)</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="cf-cl-drawer-apply">
+      <button class="cf-cl-drawer-apply-btn secondary" onclick="document.getElementById('cfFilterOverlay').classList.remove('open');document.getElementById('cfFilterDrawer').classList.remove('open');document.body.style.overflow='';">Clear All</button>
+      <button class="cf-cl-drawer-apply-btn primary" onclick="document.getElementById('cfFilterOverlay').classList.remove('open');document.getElementById('cfFilterDrawer').classList.remove('open');document.body.style.overflow='';">Apply Filters</button>
     </div>
   </div>
 
