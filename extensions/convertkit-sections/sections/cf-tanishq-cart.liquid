@@ -1,830 +1,326 @@
 {% comment %}
-  ConvertFlow — Tanishq-Style Premium Jewellery Cart Page
-  Self-contained luxury cart with upsells, trust badges, order summary
-  Injects into templates/cart.json
+  ConvertFlow — Tanishq Cart Page (Redesigned)
+  Authentic tanishq.co.in cart/shopping bag experience
 {% endcomment %}
 
 {% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
-
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
   .cfj-cart * { margin: 0; padding: 0; box-sizing: border-box; }
   .cfj-cart {
-    font-family: 'DM Sans', 'Segoe UI', sans-serif;
-    color: #2C1810;
-    -webkit-font-smoothing: antialiased;
-    min-height: 60vh;
-    background: #FFFCF5;
+    font-family: 'DM Sans', sans-serif; color: #404040;
+    background: #FFFCF5; line-height: 1.6; -webkit-font-smoothing: antialiased;
   }
-  .cfj-cart h1, .cfj-cart h2, .cfj-cart h3 {
-    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  }
+  .cfj-cart a { text-decoration: none; color: inherit; }
 
-  /* ── Cart Layout ── */
-  .cfj-cart-wrap {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 56px 48px;
+  /* ── Header ── */
+  .cfj-cart-header {
+    background: #2C1810; padding: 36px 40px; text-align: center;
   }
-  .cfj-cart-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+  .cfj-cart-header h1 {
+    font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700; color: #FFFCF5;
   }
-  .cfj-cart-title {
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    color: #2C1810;
-  }
-  .cfj-cart-continue-top {
-    font-size: 13px;
-    color: #D4AF37;
-    text-decoration: none;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-    transition: opacity 0.2s;
-  }
-  .cfj-cart-continue-top:hover { opacity: 0.7; }
-  .cfj-cart-subtitle { font-size: 14px; color: #8B7355; margin-bottom: 40px; }
-  .cfj-cart-grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 40px;
-    align-items: start;
+  .cfj-cart-header p { font-size: 14px; color: rgba(255,252,245,0.5); margin-top: 6px; }
+
+  /* ── Layout ── */
+  .cfj-cart-layout {
+    max-width: 1320px; margin: 0 auto; padding: 40px;
+    display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start;
   }
 
   /* ── Cart Items ── */
   .cfj-cart-items {}
-  .cfj-cart-header {
-    display: grid;
-    grid-template-columns: 1fr 120px 140px 100px;
-    gap: 16px;
-    padding-bottom: 14px;
-    border-bottom: 2px solid #2C1810;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #8B7355;
-  }
   .cfj-cart-item {
-    display: grid;
-    grid-template-columns: 1fr 120px 140px 100px;
-    gap: 16px;
-    align-items: center;
-    padding: 28px 0;
-    border-bottom: 1px solid rgba(212,175,55,0.1);
+    display: grid; grid-template-columns: 100px 1fr auto; gap: 20px;
+    padding: 24px 0; border-bottom: 1px solid rgba(44,24,16,0.06);
+    align-items: start;
   }
-  .cfj-cart-item-left {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-  }
+  .cfj-cart-item:first-child { padding-top: 0; }
   .cfj-cart-item-img {
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    background: #FAF5ED;
-    flex-shrink: 0;
-    border: 1px solid rgba(212,175,55,0.1);
+    width: 100px; height: 100px; background: #FAF5ED;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
-  .cfj-cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
-  .cfj-cart-item-type {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #D4AF37;
-    margin-bottom: 4px;
-    font-family: 'DM Sans', sans-serif;
+  .cfj-cart-item-img img { max-width: 85%; max-height: 85%; object-fit: contain; }
+  .cfj-cart-item-details {}
+  .cfj-cart-item-title {
+    font-size: 15px; font-weight: 600; color: #2C1810; margin-bottom: 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .cfj-cart-item-name {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    line-height: 1.4;
-    font-family: 'Playfair Display', serif;
-    color: #2C1810;
-  }
-  .cfj-cart-item-variant { font-size: 12px; color: #8B7355; margin-bottom: 10px; }
-  .cfj-cart-item-remove {
-    font-size: 11px;
-    color: #8B2252;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .cfj-cart-item-price {
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Playfair Display', serif;
-  }
-  .cfj-cart-item-price-original {
-    font-size: 12px;
-    color: #bbb;
-    text-decoration: line-through;
-    margin-top: 4px;
-  }
-
-  /* Quantity */
+  .cfj-cart-item-meta { font-size: 12px; color: #8B7355; margin-bottom: 10px; }
+  .cfj-cart-item-meta span { margin-right: 12px; }
   .cfj-cart-qty {
-    display: flex;
-    align-items: center;
-    border: 1.5px solid #e0d5c9;
-    overflow: hidden;
-    width: fit-content;
+    display: inline-flex; align-items: center; border: 1px solid rgba(44,24,16,0.1);
   }
   .cfj-cart-qty button {
-    width: 38px;
-    height: 38px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #2C1810;
-    transition: background 0.2s;
+    width: 32px; height: 32px; background: #fff; border: none;
+    font-size: 16px; cursor: pointer; color: #2C1810; transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
   }
   .cfj-cart-qty button:hover { background: #FAF5ED; }
   .cfj-cart-qty span {
-    width: 44px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 700;
-    border-left: 1.5px solid #e0d5c9;
-    border-right: 1.5px solid #e0d5c9;
-    line-height: 38px;
+    width: 36px; height: 32px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: #2C1810;
+    border-left: 1px solid rgba(44,24,16,0.1); border-right: 1px solid rgba(44,24,16,0.1);
   }
-  .cfj-cart-item-total {
-    font-size: 18px;
-    font-weight: 800;
-    font-family: 'Playfair Display', serif;
-    color: #2C1810;
+  .cfj-cart-item-actions { display: flex; gap: 12px; margin-top: 10px; }
+  .cfj-cart-item-action {
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: color 0.2s;
+    display: flex; align-items: center; gap: 4px; background: none; border: none;
+    font-family: 'DM Sans'; color: #8B7355;
   }
+  .cfj-cart-item-action:hover { color: #D4AF37; }
+  .cfj-cart-item-action svg { width: 14px; height: 14px; }
+  .cfj-cart-item-price-col { text-align: right; }
+  .cfj-cart-item-price { font-size: 17px; font-weight: 700; color: #2C1810; }
+  .cfj-cart-item-compare { font-size: 12px; color: #bbb; text-decoration: line-through; display: block; }
 
-  /* ── Empty Cart ── */
   .cfj-cart-empty {
-    text-align: center;
-    padding: 100px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    text-align: center; padding: 60px 20px;
   }
-  .cfj-cart-empty-icon { color: #e0d5c9; }
-  .cfj-cart-empty h3 { font-size: 26px; font-weight: 700; color: #2C1810; }
-  .cfj-cart-empty p { font-size: 15px; color: #8B7355; max-width: 400px; line-height: 1.7; }
-  .cfj-cart-empty-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 18px 40px;
-    background: linear-gradient(135deg, #D4AF37, #C5A028);
-    color: #2C1810;
-    text-decoration: none;
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.3s;
+  .cfj-cart-empty svg { width: 60px; height: 60px; color: #ddd; margin-bottom: 20px; }
+  .cfj-cart-empty h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: #2C1810; margin-bottom: 10px; }
+  .cfj-cart-empty p { font-size: 14px; color: #8B7355; margin-bottom: 24px; }
+  .cfj-cart-empty a {
+    display: inline-block; padding: 14px 36px; background: #D4AF37;
+    color: #2C1810; font-size: 12px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s;
   }
-  .cfj-cart-empty-btn:hover { box-shadow: 0 8px 30px rgba(212,175,55,0.3); transform: translateY(-2px); }
+  .cfj-cart-empty a:hover { background: #F5D060; }
 
-  /* ── Cart Summary ── */
+  /* ── Order Summary ── */
   .cfj-cart-summary {
-    background: #FAF5ED;
-    padding: 36px;
-    border: 1px solid rgba(212,175,55,0.1);
-    position: sticky;
-    top: 20px;
+    background: #fff; border: 1px solid rgba(44,24,16,0.06);
+    padding: 28px; position: sticky; top: 80px;
   }
   .cfj-cart-summary h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 28px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid rgba(212,175,55,0.15);
-    color: #2C1810;
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+    color: #2C1810; margin-bottom: 24px; padding-bottom: 16px;
+    border-bottom: 1px solid rgba(44,24,16,0.06);
   }
   .cfj-cart-summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    font-size: 14px;
-    color: #5a4a3c;
+    display: flex; justify-content: space-between; font-size: 14px;
+    color: #666; margin-bottom: 12px;
   }
-  .cfj-cart-summary-row span:last-child { font-weight: 600; }
-  .cfj-cart-summary-row.total {
-    font-size: 20px;
-    font-weight: 800;
-    color: #2C1810;
+  .cfj-cart-summary-row span:last-child { font-weight: 600; color: #2C1810; }
+  .cfj-cart-summary-row.discount span:last-child { color: #16a34a; }
+  .cfj-cart-summary-total {
+    display: flex; justify-content: space-between;
+    font-size: 18px; font-weight: 700; color: #2C1810;
+    padding-top: 16px; margin-top: 16px;
     border-top: 2px solid #2C1810;
-    padding-top: 18px;
-    margin-top: 18px;
-    margin-bottom: 28px;
-    font-family: 'Playfair Display', serif;
   }
 
-  /* Buttons */
+  /* Promo */
+  .cfj-cart-promo {
+    margin: 20px 0; display: flex; border: 1px solid rgba(44,24,16,0.1);
+  }
+  .cfj-cart-promo input {
+    flex: 1; padding: 12px 16px; border: none; font-family: inherit;
+    font-size: 13px; outline: none; color: #404040; background: transparent;
+  }
+  .cfj-cart-promo input::placeholder { color: #bbb; }
+  .cfj-cart-promo button {
+    padding: 12px 20px; background: #2C1810; color: #FFFCF5;
+    border: none; font-family: 'DM Sans'; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.3s;
+  }
+  .cfj-cart-promo button:hover { background: #D4AF37; color: #2C1810; }
+
+  /* Checkout CTA */
   .cfj-cart-checkout {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 20px;
-    background: #2C1810;
-    color: #D4AF37;
-    border: none;
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    text-decoration: none;
-    text-align: center;
-    font-family: 'DM Sans', sans-serif;
+    display: block; width: 100%; padding: 16px; margin-top: 20px;
+    background: linear-gradient(135deg, #D4AF37, #C5A028);
+    color: #2C1810; border: none; font-family: 'DM Sans'; font-size: 13px;
+    font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase;
+    text-align: center; cursor: pointer; transition: all 0.3s;
   }
-  .cfj-cart-checkout:hover {
-    background: #1a0f0a;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(44,24,16,0.2);
-  }
+  .cfj-cart-checkout:hover { background: #F5D060; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,55,0.3); }
+
   .cfj-cart-continue {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 16px;
-    background: transparent;
-    color: #2C1810;
-    border: 1.5px solid #e0d5c9;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-    margin-bottom: 28px;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-    font-family: 'DM Sans', sans-serif;
+    display: block; width: 100%; padding: 14px; margin-top: 10px;
+    background: transparent; color: #2C1810; border: 1px solid rgba(44,24,16,0.1);
+    font-family: 'DM Sans'; font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; text-align: center;
+    cursor: pointer; transition: all 0.3s;
   }
   .cfj-cart-continue:hover { border-color: #D4AF37; color: #D4AF37; }
 
-  /* Promo */
-  .cfj-promo-row {
-    display: flex;
-    gap: 0;
-    margin-bottom: 28px;
-  }
-  .cfj-promo-input {
-    flex: 1;
-    padding: 14px 18px;
-    border: 1.5px solid #e0d5c9;
-    border-right: none;
-    font-size: 13px;
-    outline: none;
-    background: #FFFCF5;
-    font-family: 'DM Sans', sans-serif;
-    transition: border-color 0.2s;
-  }
-  .cfj-promo-input:focus { border-color: #D4AF37; }
-  .cfj-promo-btn {
-    padding: 14px 22px;
-    background: #FFFCF5;
-    border: 1.5px solid #2C1810;
-    font-size: 11px;
-    font-weight: 800;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .cfj-promo-btn:hover { background: #2C1810; color: #D4AF37; }
-
-  /* Trust strip */
+  /* Trust */
   .cfj-cart-trust {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px 0 0;
-    border-top: 1px solid rgba(212,175,55,0.1);
+    display: flex; justify-content: center; gap: 20px; margin-top: 20px;
+    padding-top: 20px; border-top: 1px solid rgba(44,24,16,0.06);
   }
   .cfj-cart-trust-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 12px;
-    color: #5a4a3c;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 6px; font-size: 11px;
+    font-weight: 600; color: #8B7355;
   }
-  .cfj-cart-trust-icon { color: #D4AF37; flex-shrink: 0; }
+  .cfj-cart-trust-item svg { width: 16px; height: 16px; color: #D4AF37; }
 
-  /* Payments */
-  .cfj-cart-payments {
-    display: flex;
-    gap: 8px;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(212,175,55,0.1);
-    justify-content: center;
+  /* ── Mobile Sticky ── */
+  .cfj-cart-mobile-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #fff; border-top: 1px solid rgba(44,24,16,0.08);
+    padding: 12px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
   }
-  .cfj-cart-pay-icon {
-    width: 44px;
-    height: 28px;
-    background: rgba(212,175,55,0.06);
-    border: 1px solid rgba(212,175,55,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 8px;
-    font-weight: 800;
-    color: #D4AF37;
-    letter-spacing: 0.5px;
-    font-family: 'DM Sans', sans-serif;
+  .cfj-cart-mobile-bar-inner {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .cfj-cart-mobile-total { font-size: 18px; font-weight: 700; color: #2C1810; }
+  .cfj-cart-mobile-total span { display: block; font-size: 11px; font-weight: 400; color: #8B7355; }
+  .cfj-cart-mobile-btn {
+    padding: 14px 32px; background: #D4AF37; color: #2C1810; border: none;
+    font-family: 'DM Sans'; font-size: 12px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
   }
 
-  /* ── You May Also Like ── */
-  .cfj-cart-upsell {
-    padding: 70px 48px;
-    border-top: 1px solid rgba(212,175,55,0.1);
-    background: #FAF5ED;
-  }
-  .cfj-cart-upsell-inner { max-width: 1320px; margin: 0 auto; }
-  .cfj-cart-upsell-head {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  .cfj-cart-upsell-overline {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #D4AF37;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .cfj-cart-upsell-overline::before,
-  .cfj-cart-upsell-overline::after {
-    content: '';
-    width: 40px;
-    height: 1px;
-    background: #D4AF37;
-  }
-  .cfj-cart-upsell h2 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2C1810;
-  }
-  .cfj-cart-upsell-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-  }
-  .cfj-upsell-card {
-    background: #FFFCF5;
-    overflow: hidden;
-    border: 1px solid rgba(212,175,55,0.1);
-    transition: all 0.4s ease;
-    text-decoration: none;
-    color: #2C1810;
-    display: block;
-  }
-  .cfj-upsell-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(44,24,16,0.08); }
-  .cfj-upsell-img {
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: #FAF5ED;
-  }
-  .cfj-upsell-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-  .cfj-upsell-card:hover .cfj-upsell-img img { transform: scale(1.05); }
-  .cfj-upsell-info { padding: 18px; text-align: center; }
-  .cfj-upsell-type {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #D4AF37;
-    margin-bottom: 4px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .cfj-upsell-name {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    line-height: 1.4;
-  }
-  .cfj-upsell-price {
-    font-size: 16px;
-    font-weight: 800;
-    color: #2C1810;
-    font-family: 'Playfair Display', serif;
-    margin-bottom: 14px;
-  }
-  .cfj-upsell-atc {
-    width: 100%;
-    padding: 12px;
-    background: #2C1810;
-    color: #D4AF37;
-    border: none;
-    font-size: 10px;
-    font-weight: 800;
-    cursor: pointer;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.3s;
-  }
-  .cfj-upsell-atc:hover { background: #D4AF37; color: #2C1810; }
+  /* ── Footer ── */
+  .cfj-cart-footer { background: #1a0f0a; color: rgba(255,252,245,0.7); margin-top: 60px; }
+  .cfj-cart-footer-inner { max-width: 1320px; margin: 0 auto; padding: 40px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+  .cfj-cart-footer h4 { font-size: 12px; font-weight: 700; color: #D4AF37; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-family: 'DM Sans'; }
+  .cfj-cart-footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .cfj-cart-footer li a { font-size: 13px; color: rgba(255,252,245,0.5); transition: color 0.2s; }
+  .cfj-cart-footer li a:hover { color: #D4AF37; }
+  .cfj-cart-footer-copy { text-align: center; padding: 20px; border-top: 1px solid rgba(212,175,55,0.08); font-size: 12px; color: rgba(255,252,245,0.3); }
 
-  /* ── Shared Header ── */
-  .cfj-cart-strip { background: #2C1810; color: #D4AF37; display: flex; justify-content: center; align-items: center; gap: 32px; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-  .cfj-cart-strip-item { display: flex; align-items: center; gap: 8px; }
-  .cfj-cart-strip-div { width: 1px; height: 14px; background: rgba(212,175,55,0.3); }
-  .cfj-cart-ann { background: linear-gradient(90deg, #D4AF37, #F5D060, #D4AF37); color: #2C1810; text-align: center; padding: 10px 16px; font-size: 13px; font-weight: 700; }
-  .cfj-cart-ann a { color: #2C1810; text-decoration: underline; font-weight: 800; }
-  .cfj-cart-nav { background: #FFFCF5; padding: 0 48px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(212,175,55,0.12); }
-  .cfj-cart-nav-inner { max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px; }
-  .cfj-cart-nav-logo { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #2C1810; text-decoration: none; }
-  .cfj-cart-nav-links { display: flex; gap: 28px; }
-  .cfj-cart-nav-links a { font-size: 12px; font-weight: 600; color: #2C1810; text-decoration: none; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 0; position: relative; transition: color 0.2s; font-family: 'DM Sans', sans-serif; }
-  .cfj-cart-nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #D4AF37; transform: scaleX(0); transition: transform 0.3s; }
-  .cfj-cart-nav-links a:hover { color: #D4AF37; }
-  .cfj-cart-nav-links a:hover::after { transform: scaleX(1); }
-  .cfj-cart-nav-icons { display: flex; align-items: center; gap: 20px; }
-  .cfj-cart-nav-icon { color: #2C1810; text-decoration: none; display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; transition: color 0.2s; position: relative; }
-  .cfj-cart-nav-icon:hover { color: #D4AF37; }
-  .cfj-cart-nav-ct { background: #D4AF37; color: #2C1810; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; position: absolute; top: -8px; right: -10px; }
-
-  /* ── Shared Footer ── */
-  .cfj-cart-footer { background: #1a0f0a; color: #bbb; padding: 60px 48px 24px; }
-  .cfj-cart-footer-inner { max-width: 1320px; margin: 0 auto; }
-  .cfj-cart-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-  .cfj-cart-footer-brand h3 { font-size: 24px; font-weight: 700; color: #D4AF37; margin-bottom: 12px; font-family: 'Playfair Display', serif; }
-  .cfj-cart-footer-brand p { font-size: 12px; line-height: 1.8; color: #8B7355; }
-  .cfj-cart-footer h4 { font-size: 11px; font-weight: 700; color: #D4AF37; margin-bottom: 16px; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Sans', sans-serif; }
-  .cfj-cart-footer ul { list-style: none; }
-  .cfj-cart-footer li { margin-bottom: 8px; }
-  .cfj-cart-footer a { color: #8B7355; text-decoration: none; font-size: 12px; transition: color 0.2s; }
-  .cfj-cart-footer a:hover { color: #D4AF37; }
-  .cfj-cart-footer-bottom { border-top: 1px solid rgba(212,175,55,0.1); padding-top: 20px; display: flex; justify-content: space-between; font-size: 11px; color: #5a4a3c; }
-
-  /* Mobile */
-  @media (max-width: 768px) {
-    .cfj-cart-strip { flex-wrap: wrap; gap: 10px; }
-    .cfj-cart-strip-div { display: none; }
-    .cfj-cart-nav { padding: 0 20px; }
-    .cfj-cart-nav-inner { height: 56px; }
-    .cfj-cart-nav-logo { font-size: 20px; }
-    .cfj-cart-nav-links { display: none; }
-    .cfj-cart-wrap { padding: 24px 20px; }
-    .cfj-cart-title { font-size: 26px; }
-    .cfj-cart-grid { grid-template-columns: 1fr; }
-    .cfj-cart-header { display: none; }
-    .cfj-cart-item { grid-template-columns: 1fr; gap: 12px; }
-    .cfj-cart-upsell-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .cfj-cart-upsell { padding: 48px 20px; }
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .cfj-cart-layout { grid-template-columns: 1fr; padding: 20px 16px 100px; gap: 24px; }
     .cfj-cart-summary { position: static; }
-    .cfj-cart-continue-top { display: none; }
-    .cfj-cart-footer { padding: 40px 20px 20px; }
-    .cfj-cart-footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .cfj-cart-mobile-bar { display: block; }
+    .cfj-cart-checkout { display: none; }
+    .cfj-cart-header { padding: 24px 16px; }
+    .cfj-cart-item { grid-template-columns: 80px 1fr auto; gap: 12px; }
+    .cfj-cart-item-img { width: 80px; height: 80px; }
+    .cfj-cart-footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; padding: 30px 16px; }
+  }
+  @media (max-width: 600px) {
+    .cfj-cart-item { grid-template-columns: 70px 1fr; gap: 12px; }
+    .cfj-cart-item-price-col { grid-column: 2; text-align: left; }
+    .cfj-cart-item-img { width: 70px; height: 70px; }
+    .cfj-cart-trust { flex-direction: column; align-items: center; gap: 8px; }
+    .cfj-cart-footer-inner { grid-template-columns: 1fr; }
   }
 {% endstyle %}
 
 <div class="cfj-cart">
-  <!-- ── Info Strip ── -->
-  <div class="cfj-cart-strip">
-    <div class="cfj-cart-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> BIS Hallmarked</div>
-    <div class="cfj-cart-strip-div"></div>
-    <div class="cfj-cart-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Certified Diamonds</div>
-    <div class="cfj-cart-strip-div"></div>
-    <div class="cfj-cart-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Free Insured Shipping</div>
-    <div class="cfj-cart-strip-div"></div>
-    <div class="cfj-cart-strip-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Lifetime Exchange</div>
+  <!-- Header -->
+  <div class="cfj-cart-header">
+    <h1>Shopping Bag</h1>
+    <p>{{ cart.item_count | default: '3' }} items in your bag</p>
   </div>
 
-  <!-- ── Announcement Bar ── -->
-  <div class="cfj-cart-ann">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    Making Charges Waived — Limited Period Offer
-    <a href="/collections/all">Shop Now →</a>
+  <!-- Layout -->
+  <div class="cfj-cart-layout">
+    <!-- Items -->
+    <div class="cfj-cart-items">
+      {% for item in cart.items %}
+      <div class="cfj-cart-item">
+        <div class="cfj-cart-item-img">
+          <a href="{{ item.url }}"><img src="{{ item.image | img_url: '200x' }}" alt="{{ item.product.title }}"></a>
+        </div>
+        <div class="cfj-cart-item-details">
+          <a href="{{ item.url }}" class="cfj-cart-item-title">{{ item.product.title }}</a>
+          <div class="cfj-cart-item-meta">
+            {% if item.variant.title != 'Default Title' %}<span>{{ item.variant.title }}</span>{% endif %}
+            <span>Qty: {{ item.quantity }}</span>
+          </div>
+          <div class="cfj-cart-qty">
+            <button>−</button>
+            <span>{{ item.quantity }}</span>
+            <button>+</button>
+          </div>
+          <div class="cfj-cart-item-actions">
+            <button class="cfj-cart-item-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Save</button>
+            <button class="cfj-cart-item-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Remove</button>
+          </div>
+        </div>
+        <div class="cfj-cart-item-price-col">
+          <span class="cfj-cart-item-price">{{ item.final_line_price | money }}</span>
+          {% if item.original_line_price > item.final_line_price %}
+            <span class="cfj-cart-item-compare">{{ item.original_line_price | money }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+        <!-- Fallback items -->
+        {% assign fb_titles = "Sparkling Diamond Ring,Gold Jhumka Earrings,Kundan Necklace" | split: "," %}
+        {% assign fb_prices = "24999,14999,38999" | split: "," %}
+        {% assign fb_metals = "18K Gold • 2.4g,22K Gold • 6.8g,22K Gold • 12.3g" | split: "," %}
+        {% for i in (0..2) %}
+        <div class="cfj-cart-item">
+          <div class="cfj-cart-item-img">
+            <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-{{ forloop.index }}.png" alt="{{ fb_titles[i] }}">
+          </div>
+          <div class="cfj-cart-item-details">
+            <span class="cfj-cart-item-title">{{ fb_titles[i] }}</span>
+            <div class="cfj-cart-item-meta"><span>{{ fb_metals[i] }}</span></div>
+            <div class="cfj-cart-qty"><button>−</button><span>1</span><button>+</button></div>
+            <div class="cfj-cart-item-actions">
+              <button class="cfj-cart-item-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Save</button>
+              <button class="cfj-cart-item-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Remove</button>
+            </div>
+          </div>
+          <div class="cfj-cart-item-price-col">
+            <span class="cfj-cart-item-price">₹{{ fb_prices[i] }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+    <!-- Summary -->
+    <div class="cfj-cart-summary">
+      <h3>Order Summary</h3>
+      <div class="cfj-cart-summary-row"><span>Subtotal</span><span>{{ cart.total_price | money | default: '₹78,997' }}</span></div>
+      <div class="cfj-cart-summary-row"><span>Making Charges</span><span>₹8,200</span></div>
+      <div class="cfj-cart-summary-row discount"><span>Discount (25% off MC)</span><span>-₹2,050</span></div>
+      <div class="cfj-cart-summary-row"><span>GST (3%)</span><span>₹2,554</span></div>
+      <div class="cfj-cart-summary-row"><span>Shipping</span><span style="color:#16a34a;">FREE</span></div>
+      <div class="cfj-cart-summary-total"><span>Total</span><span>{{ cart.total_price | money | default: '₹87,701' }}</span></div>
+
+      <div class="cfj-cart-promo">
+        <input type="text" placeholder="Have a promo code?">
+        <button style="color:#FFFCF5 !important;-webkit-text-fill-color:#FFFCF5 !important;">Apply</button>
+      </div>
+
+      <button class="cfj-cart-checkout" style="color:#2C1810 !important;-webkit-text-fill-color:#2C1810 !important;">Proceed to Checkout</button>
+      <a href="/collections/all" class="cfj-cart-continue">Continue Shopping</a>
+
+      <div class="cfj-cart-trust">
+        <span class="cfj-cart-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Secure Payment</span>
+        <span class="cfj-cart-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Free Shipping</span>
+        <span class="cfj-cart-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> Easy Returns</span>
+      </div>
+    </div>
   </div>
 
-  <!-- ── Navigation Bar ── -->
-  <nav class="cfj-cart-nav">
-    <div class="cfj-cart-nav-inner">
-      <a href="/" class="cfj-cart-nav-logo">{{ shop.name }}</a>
-      <div class="cfj-cart-nav-links">
-        <a href="/collections/all">Collections</a>
-        <a href="/collections">Gold</a>
-        <a href="/collections">Diamonds</a>
-        <a href="/collections">Wedding</a>
-        <a href="/pages/about">Heritage</a>
+  <!-- Mobile Sticky -->
+  <div class="cfj-cart-mobile-bar">
+    <div class="cfj-cart-mobile-bar-inner">
+      <div class="cfj-cart-mobile-total">
+        <span>Incl. all taxes</span>
+        {{ cart.total_price | money | default: '₹87,701' }}
       </div>
-      <div class="cfj-cart-nav-icons">
-        <button class="cfj-cart-nav-icon" aria-label="Search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-        <a href="/account" class="cfj-cart-nav-icon" aria-label="Account"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
-        <a href="/cart" class="cfj-cart-nav-icon" aria-label="Cart"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cfj-cart-nav-ct">{{ cart.item_count }}</span></a>
-      </div>
+      <button class="cfj-cart-mobile-btn" style="color:#2C1810 !important;-webkit-text-fill-color:#2C1810 !important;">Checkout</button>
     </div>
-  </nav>
-
-  <div class="cfj-cart-wrap">
-    <div class="cfj-cart-title-row">
-      <h1 class="cfj-cart-title">Shopping Bag</h1>
-      <a href="/collections/all" class="cfj-cart-continue-top">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/></svg>
-        Continue Shopping
-      </a>
-    </div>
-
-    {%- if cart.item_count == 0 -%}
-      <div class="cfj-cart-empty">
-        <svg class="cfj-cart-empty-icon" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
-          <path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
-        <h3>Your Shopping Bag is Empty</h3>
-        <p>It seems you haven't discovered the perfect piece yet. Explore our curated collections to find jewellery that speaks to you.</p>
-        <a href="/collections/all" class="cfj-cart-empty-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          Explore Collections
-        </a>
-      </div>
-    {%- else -%}
-      <p class="cfj-cart-subtitle">{{ cart.item_count }} piece{% if cart.item_count > 1 %}s{% endif %} in your bag</p>
-
-      <div class="cfj-cart-grid">
-        <!-- Items -->
-        <div class="cfj-cart-items">
-          <div class="cfj-cart-header">
-            <span>Product</span>
-            <span>Price</span>
-            <span>Quantity</span>
-            <span>Total</span>
-          </div>
-
-          {%- form 'cart', cart, id: 'cfj-cart-form' -%}
-            {%- for item in cart.items -%}
-              <div class="cfj-cart-item">
-                <div class="cfj-cart-item-left">
-                  <div class="cfj-cart-item-img">
-                    <a href="{{ item.url }}">
-                      {%- if item.image -%}
-                        <img src="{{ item.image | image_url: width: 220 }}" alt="{{ item.title }}" loading="lazy">
-                      {%- else -%}
-                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#FAF5ED;">
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5Z"/></svg>
-                        </div>
-                      {%- endif -%}
-                    </a>
-                  </div>
-                  <div>
-                    <div class="cfj-cart-item-type">{{ item.product.type | default: 'Jewellery' }}</div>
-                    <a href="{{ item.url }}" style="text-decoration:none;color:#2C1810;">
-                      <div class="cfj-cart-item-name">{{ item.product.title }}</div>
-                    </a>
-                    {%- unless item.variant.title == 'Default Title' -%}
-                      <div class="cfj-cart-item-variant">{{ item.variant.title }}</div>
-                    {%- endunless -%}
-                    <a href="{{ routes.cart_change_url }}?id={{ item.key }}&quantity=0" class="cfj-cart-item-remove" data-remove="{{ item.key }}">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-                      Remove
-                    </a>
-                  </div>
-                </div>
-
-                <div class="cfj-cart-item-price">
-                  {{ item.price | money }}
-                  {%- if item.original_price > item.price -%}
-                    <div class="cfj-cart-item-price-original">{{ item.original_price | money }}</div>
-                  {%- endif -%}
-                </div>
-
-                <div class="cfj-cart-qty">
-                  <button type="button" onclick="cfjCartQty('{{ item.key }}', {{ item.quantity }}, -1)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </button>
-                  <span id="cfj-qty-{{ item.key }}">{{ item.quantity }}</span>
-                  <button type="button" onclick="cfjCartQty('{{ item.key }}', {{ item.quantity }}, 1)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </button>
-                </div>
-
-                <div class="cfj-cart-item-total">{{ item.line_price | money }}</div>
-              </div>
-            {%- endfor -%}
-          {%- endform -%}
-        </div>
-
-        <!-- Summary -->
-        <div class="cfj-cart-summary">
-          <h3>Order Summary</h3>
-
-          <div class="cfj-cart-summary-row">
-            <span>Subtotal</span>
-            <span>{{ cart.total_price | money }}</span>
-          </div>
-          <div class="cfj-cart-summary-row">
-            <span>Making Charges</span>
-            <span style="color:#D4AF37;font-weight:700;">WAIVED</span>
-          </div>
-          <div class="cfj-cart-summary-row">
-            <span>Shipping</span>
-            <span style="color:#D4AF37;font-weight:700;">
-              {%- if cart.total_price >= 99900 -%}FREE INSURED{%- else -%}Calculated at checkout{%- endif -%}
-            </span>
-          </div>
-          {%- if cart.total_discount > 0 -%}
-            <div class="cfj-cart-summary-row" style="color:#D4AF37;">
-              <span>Discount</span>
-              <span>- {{ cart.total_discount | money }}</span>
-            </div>
-          {%- endif -%}
-          <div class="cfj-cart-summary-row total">
-            <span>Total</span>
-            <span>{{ cart.total_price | money }}</span>
-          </div>
-
-          <!-- Promo Code -->
-          <div class="cfj-promo-row">
-            <input type="text" class="cfj-promo-input" placeholder="Gift card or promo code" id="cfj-promo-code">
-            <button class="cfj-promo-btn" onclick="cfjApplyPromo()">Apply</button>
-          </div>
-
-          <a href="/checkout" class="cfj-cart-checkout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Secure Checkout
-          </a>
-          <a href="/collections/all" class="cfj-cart-continue">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 5 12"/><polyline points="12 5 5 12 12 19"/></svg>
-            Continue Shopping
-          </a>
-
-          <!-- Trust -->
-          <div class="cfj-cart-trust">
-            <div class="cfj-cart-trust-item">
-              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-              100% BIS Hallmarked Jewellery
-            </div>
-            <div class="cfj-cart-trust-item">
-              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-              Free Insured Delivery
-            </div>
-            <div class="cfj-cart-trust-item">
-              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              Lifetime Exchange Guarantee
-            </div>
-            <div class="cfj-cart-trust-item">
-              <svg class="cfj-cart-trust-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              Transparent Gold Rate Pricing
-            </div>
-          </div>
-
-          <!-- Payments -->
-          <div class="cfj-cart-payments">
-            <div class="cfj-cart-pay-icon">VISA</div>
-            <div class="cfj-cart-pay-icon">MC</div>
-            <div class="cfj-cart-pay-icon">UPI</div>
-            <div class="cfj-cart-pay-icon">EMI</div>
-            <div class="cfj-cart-pay-icon">COD</div>
-          </div>
-        </div>
-      </div>
-    {%- endif -%}
   </div>
 
-  <!-- You May Also Like -->
-  {%- if section.settings.show_upsell and cart.item_count > 0 -%}
-    <div class="cfj-cart-upsell">
-      <div class="cfj-cart-upsell-inner">
-        <div class="cfj-cart-upsell-head">
-          <span class="cfj-cart-upsell-overline">Complete Your Look</span>
-          <h2>{{ section.settings.upsell_title | default: 'You May Also Love' }}</h2>
-        </div>
-        <div class="cfj-cart-upsell-grid">
-          {%- assign upsell_col = collections[section.settings.upsell_collection] -%}
-          {%- for product in upsell_col.products limit: 4 -%}
-            <a href="{{ product.url }}" class="cfj-upsell-card">
-              <div class="cfj-upsell-img">
-                {%- if product.featured_image -%}
-                  <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}" loading="lazy">
-                {%- endif -%}
-              </div>
-              <div class="cfj-upsell-info">
-                <div class="cfj-upsell-type">{{ product.type | default: 'Jewellery' }}</div>
-                <div class="cfj-upsell-name">{{ product.title }}</div>
-                <div class="cfj-upsell-price">{{ product.price | money }}</div>
-                <button class="cfj-upsell-atc" onclick="cfjAddUpsell(event, {{ product.variants.first.id }})">Quick Add</button>
-              </div>
-            </a>
-          {%- endfor -%}
-        </div>
-      </div>
-    </div>
-  {%- endif -%}
-
-  <!-- ── Footer ── -->
-  <div class="cfj-cart-footer">
+  <!-- Footer -->
+  <footer class="cfj-cart-footer">
     <div class="cfj-cart-footer-inner">
-      <div class="cfj-cart-footer-grid">
-        <div class="cfj-cart-footer-brand">
-          <h3>{{ shop.name }}</h3>
-          <p>A legacy of trust, craftsmanship, and timeless beauty. Every piece celebrates Indian artistry and modern elegance.</p>
-        </div>
-        <div>
-          <h4>Collections</h4>
-          <ul><li><a href="#">Gold</a></li><li><a href="#">Diamonds</a></li><li><a href="#">Wedding</a></li><li><a href="#">Daily Wear</a></li></ul>
-        </div>
-        <div>
-          <h4>Help</h4>
-          <ul><li><a href="#">Track Order</a></li><li><a href="#">Returns</a></li><li><a href="#">Store Locator</a></li><li><a href="#">FAQs</a></li></ul>
-        </div>
-        <div>
-          <h4>About</h4>
-          <ul><li><a href="#">Heritage</a></li><li><a href="#">Craftsmanship</a></li><li><a href="#">Certifications</a></li><li><a href="#">Careers</a></li></ul>
-        </div>
-      </div>
-      <div class="cfj-cart-footer-bottom">
-        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
-        <span>Powered by ConvertFlow</span>
-      </div>
+      <div><h4>Shop</h4><ul><li><a href="/collections/all">All Jewellery</a></li><li><a href="#">Rings</a></li><li><a href="#">Earrings</a></li><li><a href="#">Necklaces</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Track Order</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping</a></li><li><a href="#">FAQs</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Stores</a></li><li><a href="#">Privacy</a></li></ul></div>
+      <div><h4>Connect</h4><ul><li><a href="#">Facebook</a></li><li><a href="#">Instagram</a></li><li><a href="#">Twitter</a></li><li><a href="#">YouTube</a></li></ul></div>
     </div>
-  </div>
-
+    <div class="cfj-cart-footer-copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | default: 'Tanishq' }}. All rights reserved. A TATA Product.</div>
+  </footer>
 </div>
-
-<script>
-  // Quantity update via AJAX
-  function cfjCartQty(key, currentQty, delta) {
-    var newQty = Math.max(0, currentQty + delta);
-    var el = document.getElementById('cfj-qty-' + key);
-    if (el) el.textContent = newQty;
-    fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: key, quantity: newQty })
-    }).then(function() { location.reload(); });
-  }
-
-  // Add upsell product
-  function cfjAddUpsell(e, variantId) {
-    e.preventDefault();
-    e.stopPropagation();
-    fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: variantId, quantity: 1 })
-    }).then(function() { location.reload(); });
-  }
-
-  // Promo redirect
-  function cfjApplyPromo() {
-    var code = document.getElementById('cfj-promo-code').value;
-    if (code) {
-      window.location.href = '/checkout?discount=' + encodeURIComponent(code);
-    }
-  }
-</script>
 
 {% schema %}
 {
-  "name": "CF: Jewellery Cart Page",
-  "tag": "section",
-  "class": "convertflow-jewellery-cart",
-  "settings": [
-    { "type": "header", "content": "Upsell Section" },
-    { "type": "checkbox", "id": "show_upsell", "label": "Show You May Also Love", "default": true },
-    { "type": "text", "id": "upsell_title", "label": "Upsell Section Title", "default": "You May Also Love" },
-    { "type": "collection", "id": "upsell_collection", "label": "Upsell Products Collection" }
-  ],
-  "presets": [
-    { "name": "CF: Jewellery Cart Page" }
-  ]
+  "name": "Tanishq Cart",
+  "settings": [],
+  "presets": [{ "name": "Tanishq Cart" }]
 }
 {% endschema %}
