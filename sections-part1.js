@@ -1,11 +1,44 @@
-{% comment %}ConvertFlow: Haven Furniture Ã¢â‚¬â€ Product Page{% endcomment %}
+// buildProductSection — full settings-driven
+export function buildProductSection(tpl) {
+  const schema = {
+    name: `CF ${tpl.label} PDP`.substring(0,25).trimEnd(),
+    settings: [
+      {type:"header",content:"Brand Colors"},
+      {type:"color",id:"color_accent",label:"Accent Color",default:tpl.accent},
+      {type:"color",id:"color_bg",label:"Background",default:tpl.bg},
+      {type:"color",id:"color_text",label:"Text Color",default:"#1a1a1a"},
+      {type:"header",content:"Product Page"},
+      {type:"checkbox",id:"show_breadcrumb",label:"Show Breadcrumb",default:true},
+      {type:"checkbox",id:"show_vendor",label:"Show Vendor",default:true},
+      {type:"checkbox",id:"show_rating",label:"Show Rating",default:true},
+      {type:"text",id:"review_count",label:"Review Count Text",default:"2,148 reviews"},
+      {type:"checkbox",id:"show_wishlist",label:"Show Wishlist Button",default:true},
+      {type:"header",content:"Buttons"},
+      {type:"text",id:"atc_text",label:"Add to Cart Text",default:"Add to Cart"},
+      {type:"checkbox",id:"show_buy_now",label:"Show Buy Now",default:true},
+      {type:"text",id:"buy_now_text",label:"Buy Now Text",default:"Buy Now"},
+      {type:"header",content:"Trust Badges"},
+      {type:"text",id:"trust_1",label:"Badge 1",default:"Authentic & Certified"},
+      {type:"text",id:"trust_2",label:"Badge 2",default:"Free Delivery"},
+      {type:"text",id:"trust_3",label:"Badge 3",default:"Easy 30-Day Returns"},
+      {type:"text",id:"trust_4",label:"Badge 4",default:"Secure Checkout"},
+      {type:"header",content:"Related Products"},
+      {type:"checkbox",id:"show_related",label:"Show Related Products",default:true},
+      {type:"text",id:"related_heading",label:"Heading",default:"You May Also Like"},
+      {type:"collection",id:"related_collection",label:"Related Collection"},
+      {type:"range",id:"related_count",label:"Products to Show",min:2,max:8,step:2,default:4}
+    ],
+    presets:[{name:`CF ${tpl.label} PDP`.substring(0,25).trimEnd()}]
+  };
+
+  return `{% comment %}ConvertFlow: ${tpl.label} — Product Page{% endcomment %}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --cf-accent: {{ section.settings.color_accent | default: '#B5834A' }};
-  --cf-bg: {{ section.settings.color_bg | default: '#F5EFE6' }};
+  --cf-accent: {{ section.settings.color_accent | default: '${tpl.accent}' }};
+  --cf-bg: {{ section.settings.color_bg | default: '${tpl.bg}' }};
   --cf-text: {{ section.settings.color_text | default: '#1a1a1a' }};
-  --cf-font: 'Libre Baskerville', serif;
+  --cf-font: ${tpl.font};
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color:var(--cf-text);-webkit-font-smoothing:antialiased}
@@ -13,6 +46,7 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
 .cfp-crumb a{color:#888;text-decoration:none}
 .cfp-crumb span{margin:0 8px}
 .cfp-wrap{max-width:1300px;margin:0 auto;padding:60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.cfp-gallery{}
 .cfp-main-img{background:#f0ece6;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border-radius:4px;overflow:hidden}
 .cfp-main-img img{width:100%;height:100%;object-fit:cover}
 .cfp-main-img svg{width:30%;color:var(--cf-accent);opacity:.3}
@@ -47,7 +81,7 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
 .cfp-trust-icon{color:var(--cf-accent)}
 .cfp-tabs{background:#fff;border-top:1px solid #eee;padding:60px}
 .cfp-tabs-inner{max-width:1300px;margin:0 auto}
-.cfp-tab-nav{display:flex;border-bottom:2px solid #eee;margin-bottom:40px}
+.cfp-tab-nav{display:flex;border-bottom:2px solid #eee;margin-bottom:40px;gap:0}
 .cfp-tab-btn{padding:14px 28px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
 .cfp-tab-btn.active{color:var(--cf-accent);border-bottom-color:var(--cf-accent)}
 .cfp-tab-content{display:none;font-size:15px;color:#555;line-height:1.9}
@@ -73,8 +107,8 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
 
 {% if section.settings.show_breadcrumb %}
 <div class="cfp-crumb">
-  <a href="/">Home</a><span>Ã¢â‚¬Âº</span>
-  <a href="/collections/{{ product.type | handleize }}">{{ product.type | default: 'Products' }}</a><span>Ã¢â‚¬Âº</span>
+  <a href="/">Home</a><span>›</span>
+  <a href="/collections/{{ product.type | handleize }}">{{ product.type | default: 'Products' }}</a><span>›</span>
   {{ product.title }}
 </div>
 {% endif %}
@@ -103,7 +137,7 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
     {% if section.settings.show_vendor %}<span class="cfp-vendor">{{ product.vendor }}</span>{% endif %}
     <h1 class="cfp-name">{{ product.title }}</h1>
     {% if section.settings.show_rating %}
-    <div class="cfp-rating"><span class="cfp-stars">Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦</span> 4.9 Ã‚Â· {{ section.settings.review_count }}</div>
+    <div class="cfp-rating"><span class="cfp-stars">★★★★★</span> 4.9 · {{ section.settings.review_count }}</div>
     {% endif %}
     <div class="cfp-price-row">
       <div class="cfp-price">{{ product.price | money }}</div>
@@ -128,7 +162,7 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
 
     <div class="cfp-qty-row">
       <div class="cfp-qty">
-        <button onclick="var s=this.nextElementSibling;s.textContent=Math.max(1,+s.textContent-1)">Ã¢Ë†â€™</button>
+        <button onclick="var s=this.nextElementSibling;s.textContent=Math.max(1,+s.textContent-1)">−</button>
         <span>1</span>
         <button onclick="var s=this.previousElementSibling;s.textContent=+s.textContent+1">+</button>
       </div>
@@ -156,23 +190,23 @@ body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color
 <div class="cfp-tabs">
   <div class="cfp-tabs-inner">
     <div class="cfp-tab-nav">
-      <button class="cfp-tab-btn active" onclick="cfpTab(this,'Desc')">Description</button>
-      <button class="cfp-tab-btn" onclick="cfpTab(this,'Specs')">Specifications</button>
-      <button class="cfp-tab-btn" onclick="cfpTab(this,'Shipping')">Shipping &amp; Returns</button>
+      <button class="cfp-tab-btn active" onclick="cfpTab(this,'desc')">Description</button>
+      <button class="cfp-tab-btn" onclick="cfpTab(this,'specs')">Specifications</button>
+      <button class="cfp-tab-btn" onclick="cfpTab(this,'shipping')">Shipping & Returns</button>
     </div>
     <div id="cfpDesc" class="cfp-tab-content active">{{ product.description }}</div>
     <div id="cfpSpecs" class="cfp-tab-content">
       <table class="cfp-specs-table">
-        <tr><td>Type</td><td>{{ product.type | default: 'Ã¢â‚¬â€' }}</td></tr>
-        <tr><td>Vendor</td><td>{{ product.vendor | default: 'Ã¢â‚¬â€' }}</td></tr>
-        <tr><td>SKU</td><td>{{ product.selected_or_first_available_variant.sku | default: 'Ã¢â‚¬â€' }}</td></tr>
-        <tr><td>Barcode</td><td>{{ product.selected_or_first_available_variant.barcode | default: 'Ã¢â‚¬â€' }}</td></tr>
+        <tr><td>Type</td><td>{{ product.type | default: '—' }}</td></tr>
+        <tr><td>Vendor</td><td>{{ product.vendor | default: '—' }}</td></tr>
+        <tr><td>SKU</td><td>{{ product.selected_or_first_available_variant.sku | default: '—' }}</td></tr>
+        <tr><td>Barcode</td><td>{{ product.selected_or_first_available_variant.barcode | default: '—' }}</td></tr>
         <tr><td>Availability</td><td>{% if product.available %}In Stock{% else %}Out of Stock{% endif %}</td></tr>
         {% for tag in product.tags %}<tr><td>Tag</td><td>{{ tag }}</td></tr>{% endfor %}
       </table>
     </div>
     <div id="cfpShipping" class="cfp-tab-content">
-      <p>Free standard delivery on orders above Ã¢â€šÂ¹999. Express delivery available at checkout. Easy 30-day returns on all products.</p>
+      <p>Free standard delivery on orders above ₹999. Express delivery available at checkout. Easy 30-day returns on all products.</p>
     </div>
   </div>
 </div>
@@ -205,155 +239,11 @@ function cfpTab(btn, id) {
   document.querySelectorAll('.cfp-tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.cfp-tab-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('cfp'+id).classList.add('active');
+  document.getElementById('cfp'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active');
 }
 </script>
 
 {% schema %}
-{
-  "name": "CF Haven Furniture PDP",
-  "settings": [
-    {
-      "type": "header",
-      "content": "Brand Colors"
-    },
-    {
-      "type": "color",
-      "id": "color_accent",
-      "label": "Accent Color",
-      "default": "#B5834A"
-    },
-    {
-      "type": "color",
-      "id": "color_bg",
-      "label": "Background",
-      "default": "#F5EFE6"
-    },
-    {
-      "type": "color",
-      "id": "color_text",
-      "label": "Text Color",
-      "default": "#1a1a1a"
-    },
-    {
-      "type": "header",
-      "content": "Product Page"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_breadcrumb",
-      "label": "Show Breadcrumb",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "Show Vendor",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_rating",
-      "label": "Show Rating",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "review_count",
-      "label": "Review Count Text",
-      "default": "2,148 reviews"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Show Wishlist Button",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Buttons"
-    },
-    {
-      "type": "text",
-      "id": "atc_text",
-      "label": "Add to Cart Text",
-      "default": "Add to Cart"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_buy_now",
-      "label": "Show Buy Now",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "buy_now_text",
-      "label": "Buy Now Text",
-      "default": "Buy Now"
-    },
-    {
-      "type": "header",
-      "content": "Trust Badges"
-    },
-    {
-      "type": "text",
-      "id": "trust_1",
-      "label": "Badge 1",
-      "default": "Authentic & Certified"
-    },
-    {
-      "type": "text",
-      "id": "trust_2",
-      "label": "Badge 2",
-      "default": "Free Delivery"
-    },
-    {
-      "type": "text",
-      "id": "trust_3",
-      "label": "Badge 3",
-      "default": "Easy 30-Day Returns"
-    },
-    {
-      "type": "text",
-      "id": "trust_4",
-      "label": "Badge 4",
-      "default": "Secure Checkout"
-    },
-    {
-      "type": "header",
-      "content": "Related Products"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_related",
-      "label": "Show Related Products",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "related_heading",
-      "label": "Heading",
-      "default": "You May Also Like"
-    },
-    {
-      "type": "collection",
-      "id": "related_collection",
-      "label": "Related Collection"
-    },
-    {
-      "type": "range",
-      "id": "related_count",
-      "label": "Products to Show",
-      "min": 2,
-      "max": 8,
-      "step": 2,
-      "default": 4
-    }
-  ],
-  "presets": [
-    {
-      "name": "CF Haven Furniture PDP"
-    }
-  ]
+${JSON.stringify(schema, null, 2)}
+{% endschema %}`;
 }
-{% endschema %}

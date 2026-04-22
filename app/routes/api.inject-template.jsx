@@ -62,34 +62,34 @@ const TEMPLATES = {
   // ── Food Delivery ────────────────────────────────────────────────────────
   "food-delivery":      { label: "Veda Eats" },
 
-  // ── Electronics (placeholder — template pending) ─────────────────────────
+  // ── Electronics ──────────────────────────────────────────────────────────
   electronics:          { label: "Tech & Electronics" },
 
-  // ── Home Décor (placeholder) ──────────────────────────────────────────────
+  // ── Home Décor ───────────────────────────────────────────────────────────
   "home-decor":         { label: "Home Décor" },
 
-  // ── Pet Supplies (placeholder) ────────────────────────────────────────────
+  // ── Pet Supplies ─────────────────────────────────────────────────────────
   "pet-supplies":       { label: "Pet Supplies" },
 
-  // ── Luxury Watches (placeholder) ─────────────────────────────────────────
+  // ── Luxury Watches ───────────────────────────────────────────────────────
   "luxury-watches":     { label: "Luxury Watches" },
 
-  // ── Outdoor Gear (placeholder) ───────────────────────────────────────────
+  // ── Outdoor Gear ─────────────────────────────────────────────────────────
   "outdoor-gear":       { label: "Outdoor Gear" },
 
-  // ── Organic Food (placeholder) ───────────────────────────────────────────
+  // ── Organic Food ─────────────────────────────────────────────────────────
   "organic-food":       { label: "Organic Food" },
 
-  // ── Fitness Supplements (placeholder) ────────────────────────────────────
+  // ── Fitness Supplements ───────────────────────────────────────────────────
   "fitness-supplements":{ label: "Fitness Supplements" },
 
-  // ── Baby Apparel (placeholder) ───────────────────────────────────────────
+  // ── Baby Apparel ─────────────────────────────────────────────────────────
   "baby-apparel":       { label: "Baby Apparel" },
 
-  // ── Coffee Roasters (placeholder) ────────────────────────────────────────
+  // ── Coffee Roasters ──────────────────────────────────────────────────────
   "coffee-roasters":    { label: "Coffee Roasters" },
 
-  // ── Beauty & Cosmetics (placeholder) ─────────────────────────────────────
+  // ── Beauty & Cosmetics ────────────────────────────────────────────────────
   "beauty-cosmetics":   { label: "Beauty & Cosmetics" },
 };
 

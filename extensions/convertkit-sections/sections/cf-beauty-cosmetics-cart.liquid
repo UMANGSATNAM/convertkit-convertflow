@@ -1,7 +1,7 @@
-{% comment %}ConvertFlow: Clean Cosmetics — Cart Page{% endcomment %}
+{% comment %}ConvertFlow: Clean Cosmetics â€” Cart Page{% endcomment %}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root { --cf-accent: #D4BBA5; --cf-bg: #f8f3f0; }
+:root { --cf-accent: {{ section.settings.color_accent | default: '#D4BBA5' }}; --cf-bg: {{ section.settings.color_bg | default: '#f8f3f0' }}; }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
 .cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
@@ -67,7 +67,7 @@ body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:10
               <div class="cfc-item-name">{{ item.product_title }}</div>
               <div class="cfc-item-props">{{ item.variant_title }}</div>
               <div class="cfc-item-qty">
-                <button>−</button><span>{{ item.quantity }}</span><button>+</button>
+                <button>Ã¢Ë†â€™</button><span>{{ item.quantity }}</span><button>+</button>
                 <span class="cfc-item-remove">Remove</span>
               </div>
             </div>
@@ -83,26 +83,120 @@ body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:10
     <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
     <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
     {% if cart.total_discount > 0 %}
-      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>−{{ cart.total_discount | money }}</span></div>
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>Ã¢Ë†â€™{{ cart.total_discount | money }}</span></div>
     {% endif %}
     <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
     <div class="cfc-promo">
       <input type="text" placeholder="Discount code">
       <button>Apply</button>
     </div>
-    <a href="/checkout" class="cfc-checkout">Proceed to Checkout →</a>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
     <div class="cfc-trust">
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Secure SSL Checkout</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> Free Returns</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Money-Back Guarantee</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
     </div>
+    {% endif %}
   </div>
 </div>
 
 {% schema %}
 {
   "name": "CF Clean Cosmetics Cart",
-  "settings": [],
-  "presets": [{ "name": "CF Clean Cosmetics Cart" }]
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#D4BBA5"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#f8f3f0"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout â†’"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF Clean Cosmetics Cart"
+    }
+  ]
 }
 {% endschema %}
