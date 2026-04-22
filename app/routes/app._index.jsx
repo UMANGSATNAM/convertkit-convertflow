@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
 import { useState } from "react";
 import { authenticate } from "../shopify.server";
+import { TEMPLATE_HTMLS } from "../templatesHtml.js";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
@@ -39,6 +40,116 @@ const TEMPLATES = [
     accent: "#DEBB43",
     desc: "A gorgeous modern clone of CaratLane with deep purple, warm gold, large image banners, elegant typography, and massive Theme Editor customizability.",
     icon: "diamond",
+  },
+  {
+    id: "jewellery-heritage",
+    name: "Meenakshi Jewellers",
+    niche: "BRIDAL JEWELLERY",
+    nicheColor: "#8B1A2C",
+    nicheBg: "#F9EEF0",
+    accent: "#C89B72",
+    desc: "Festive crimson & rose-gold heritage template. Split hero, occasion filter strip, Cinzel serif typography — completely distinct from Tanishq & CaratLane.",
+    icon: "diamond",
+  },
+  {
+    id: "electronics",
+    name: "Tech & Electronics",
+    niche: "ELECTRONICS",
+    nicheColor: "#5735db",
+    nicheBg: "#e9e5f5",
+    accent: "#5735db",
+    desc: "Minimalist dark-mode template designed for tech products with detailed specification grids and mega-menu navigation.",
+    icon: "desktop",
+  },
+  {
+    id: "home-decor",
+    name: "Home Decor",
+    niche: "INTERIOR DESIGN",
+    nicheColor: "#8B7355",
+    nicheBg: "#FAF5ED",
+    accent: "#8B7355",
+    desc: "Elegant, editorial template utilizing masonry layout for lifestyle driven products with serif typography.",
+    icon: "diamond",
+  },
+  {
+    id: "pet-supplies",
+    name: "Pet Supplies",
+    niche: "PETS",
+    nicheColor: "#D35400",
+    nicheBg: "#f9e0d1",
+    accent: "#D35400",
+    desc: "Friendly, colorful UI featuring 'Subscribe & Save' widget patterns and premium branding.",
+    icon: "leaf",
+  },
+  {
+    id: "luxury-watches",
+    name: "Luxury Watches",
+    niche: "LUXURY",
+    nicheColor: "#C5A028",
+    nicheBg: "#fbf6e2",
+    accent: "#C5A028",
+    desc: "High-end horology template featuring deep black and gold styling with glassmorphic depth.",
+    icon: "diamond",
+  },
+  {
+    id: "outdoor-gear",
+    name: "Outdoor Gear",
+    niche: "OUTDOORS",
+    nicheColor: "#2A4B2A",
+    nicheBg: "#dbe8db",
+    accent: "#2A4B2A",
+    desc: "Rugged and brutalist design for survival/outdoor gear with quick-access product spec icons.",
+    icon: "leaf",
+  },
+  {
+    id: "organic-food",
+    name: "Organic Food",
+    niche: "GROCERY",
+    nicheColor: "#4A7c59",
+    nicheBg: "#e5f1e8",
+    accent: "#4A7c59",
+    desc: "Fresh, airy template tailored for FMCG and organic produce with inline quantity selectors.",
+    icon: "leaf",
+  },
+  {
+    id: "fitness-supplements",
+    name: "Fitness Supplements",
+    niche: "FITNESS",
+    nicheColor: "#050505",
+    nicheBg: "#ebfb61",
+    accent: "#E2FE16",
+    desc: "Aggressive duotone styling built for high-energy brands, featuring large strike-through retail pricing.",
+    icon: "zap",
+  },
+  {
+    id: "baby-apparel",
+    name: "Baby Apparel",
+    niche: "BABY & KIDS",
+    nicheColor: "#F6A8B6",
+    nicheBg: "#fcedef",
+    accent: "#F6A8B6",
+    desc: "Soft pastel, heavily rounded design system with age-range taggings and gentle typography.",
+    icon: "desktop",
+  },
+  {
+    id: "coffee-roasters",
+    name: "Coffee Roasters",
+    niche: "FOOD & BEV",
+    nicheColor: "#3E2723",
+    nicheBg: "#efebe9",
+    accent: "#3E2723",
+    desc: "Warm artisanal roastery template matching coffee origins with built-in tasting note tags.",
+    icon: "check",
+  },
+  {
+    id: "beauty-cosmetics",
+    name: "Clean Cosmetics",
+    niche: "BEAUTY",
+    nicheColor: "#D4BBA5",
+    nicheBg: "#f8f3f0",
+    accent: "#D4BBA5",
+    desc: "Conscious beauty template with subtle gradients, nude palettes, and a sticky 'add to bag' scroll interaction.",
+    icon: "leaf",
   },
 ];
 
@@ -312,6 +423,7 @@ const PREVIEW_MAP = {
   pilgrim: pilgrimPreviewHTML,
   tanishq: tanishqPreviewHTML,
   caratlane: caratlanePreviewHTML,
+  ...TEMPLATE_HTMLS,
 };
 
 export default function Index() {
