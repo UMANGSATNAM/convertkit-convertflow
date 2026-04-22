@@ -1,12 +1,80 @@
-{% comment %}ConvertFlow: Baby Apparel — Landing Page{% endcomment %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+﻿// build-landing-section.js — Full settings-driven landing section builder
+export function buildLandingSection(tpl, html) {
+  const fontMatches = [...html.matchAll(/<link[^>]*fonts\.googleapis[^>]*>/gi)];
+  const fonts = fontMatches.map(m => m[0]).join('\n');
 
+  const schema = {
+    name: `CF ${tpl.label} LP`.substring(0,25).trimEnd(),
+    settings: [
+      {type:"header",content:"Brand & Colors"},
+      {type:"color",id:"accent",label:"Accent Color",default:tpl.accent},
+      {type:"color",id:"bg",label:"Page Background",default:tpl.bg},
+      {type:"color",id:"text_col",label:"Text Color",default:"#1a1a1a"},
+      {type:"header",content:"Announcement Bar"},
+      {type:"checkbox",id:"show_ann",label:"Show Bar",default:true},
+      {type:"text",id:"ann_text",label:"Announcement Text",default:"Free shipping on orders above \u20b9999 \uD83C\uDF89"},
+      {type:"color",id:"ann_bg",label:"Bar Background",default:tpl.accent},
+      {type:"color",id:"ann_color",label:"Bar Text Color",default:"#ffffff"},
+      {type:"header",content:"Hero Section"},
+      {type:"image_picker",id:"hero_img",label:"Hero Image"},
+      {type:"text",id:"hero_tag",label:"Eyebrow Tag",default:"New Collection"},
+      {type:"text",id:"hero_h1",label:"Main Heading",default:tpl.label},
+      {type:"textarea",id:"hero_sub",label:"Subheading",default:"Discover our curated collection \u2014 crafted with quality you can feel."},
+      {type:"text",id:"hero_cta",label:"Primary CTA Text",default:"Shop Now"},
+      {type:"url",id:"hero_url",label:"Primary CTA URL"},
+      {type:"text",id:"hero_cta2",label:"Secondary CTA Text",default:"View Lookbook"},
+      {type:"url",id:"hero_url2",label:"Secondary CTA URL"},
+      {type:"header",content:"Social Proof Stats"},
+      {type:"checkbox",id:"show_stats",label:"Show Stats Bar",default:true},
+      {type:"text",id:"stat1_n",label:"Stat 1 Number",default:"50,000+"},
+      {type:"text",id:"stat1_l",label:"Stat 1 Label",default:"Happy Customers"},
+      {type:"text",id:"stat2_n",label:"Stat 2 Number",default:"4.9 \u2605"},
+      {type:"text",id:"stat2_l",label:"Stat 2 Label",default:"Average Rating"},
+      {type:"text",id:"stat3_n",label:"Stat 3 Number",default:"100%"},
+      {type:"text",id:"stat3_l",label:"Stat 3 Label",default:"Authentic Products"},
+      {type:"text",id:"stat4_n",label:"Stat 4 Number",default:"30-Day"},
+      {type:"text",id:"stat4_l",label:"Stat 4 Label",default:"Easy Returns"},
+      {type:"header",content:"Featured Products"},
+      {type:"checkbox",id:"show_products",label:"Show Products Section",default:true},
+      {type:"text",id:"prod_heading",label:"Section Heading",default:"Featured Products"},
+      {type:"text",id:"prod_sub",label:"Section Subheading",default:"Handpicked for you"},
+      {type:"collection",id:"prod_col",label:"Collection to Display"},
+      {type:"range",id:"prod_count",label:"Number of Products",min:3,max:12,step:1,default:6},
+      {type:"header",content:"Features / USP Bar"},
+      {type:"checkbox",id:"show_feats",label:"Show Features Bar",default:true},
+      {type:"text",id:"feat1_t",label:"Feature 1 Title",default:"Free Delivery"},
+      {type:"text",id:"feat1_s",label:"Feature 1 Subtitle",default:"On orders above \u20b9999"},
+      {type:"text",id:"feat2_t",label:"Feature 2 Title",default:"Easy Returns"},
+      {type:"text",id:"feat2_s",label:"Feature 2 Subtitle",default:"30-day hassle-free"},
+      {type:"text",id:"feat3_t",label:"Feature 3 Title",default:"100% Authentic"},
+      {type:"text",id:"feat3_s",label:"Feature 3 Subtitle",default:"Certified genuine products"},
+      {type:"text",id:"feat4_t",label:"Feature 4 Title",default:"Secure Checkout"},
+      {type:"text",id:"feat4_s",label:"Feature 4 Subtitle",default:"SSL encrypted payment"},
+      {type:"header",content:"Testimonials"},
+      {type:"checkbox",id:"show_testi",label:"Show Testimonials",default:true},
+      {type:"text",id:"testi_h",label:"Section Heading",default:"What Our Customers Say"},
+      {type:"textarea",id:"t1_text",label:"Testimonial 1",default:"Absolutely love the quality! Will definitely order again."},
+      {type:"text",id:"t1_auth",label:"Author 1",default:"Priya S. \u2605\u2605\u2605\u2605\u2605"},
+      {type:"textarea",id:"t2_text",label:"Testimonial 2",default:"Fast shipping and beautiful packaging. Exceeded expectations!"},
+      {type:"text",id:"t2_auth",label:"Author 2",default:"Rahul M. \u2605\u2605\u2605\u2605\u2605"},
+      {type:"textarea",id:"t3_text",label:"Testimonial 3",default:"Best purchase I have made this year. Highly recommended!"},
+      {type:"text",id:"t3_auth",label:"Author 3",default:"Ananya K. \u2605\u2605\u2605\u2605\u2605"},
+      {type:"header",content:"Newsletter Section"},
+      {type:"checkbox",id:"show_nl",label:"Show Newsletter",default:true},
+      {type:"text",id:"nl_h",label:"Heading",default:"Join Our Community"},
+      {type:"text",id:"nl_sub",label:"Subtext",default:"Subscribe for exclusive offers, new arrivals & insider updates."},
+      {type:"text",id:"nl_btn",label:"Button Text",default:"Subscribe"},
+      {type:"text",id:"nl_placeholder",label:"Input Placeholder",default:"Enter your email"}
+    ],
+    presets: [{name:`CF ${tpl.label} LP`.substring(0,25).trimEnd()}]
+  };
+
+  const CSS = `
 <style>
-:root{--cf-a:{{ section.settings.accent | default: '#F6A8B6' }};--cf-bg:{{ section.settings.bg | default: '#fcedef' }};--cf-t:{{ section.settings.text_col | default: '#1a1a1a' }};--cf-f:'Nunito', sans-serif;}
+:root{--cf-a:{{ section.settings.accent | default: '${tpl.accent}' }};--cf-bg:{{ section.settings.bg | default: '${tpl.bg}' }};--cf-t:{{ section.settings.text_col | default: '#1a1a1a' }};--cf-f:${tpl.font};}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--cf-f),'Inter',sans-serif;background:var(--cf-bg);color:var(--cf-t);-webkit-font-smoothing:antialiased}
-.cf-ann{background:{{ section.settings.ann_bg | default: '#F6A8B6' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px}
+.cf-ann{background:{{ section.settings.ann_bg | default: '${tpl.accent}' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px}
 .cf-nav{background:#fff;padding:16px 60px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100}
 .cf-logo{font-size:22px;font-weight:800;color:var(--cf-t);text-decoration:none}
 .cf-nav-links{display:flex;gap:28px;list-style:none}
@@ -93,8 +161,9 @@ body{font-family:var(--cf-f),'Inter',sans-serif;background:var(--cf-bg);color:va
   .cf-footer{flex-direction:column;gap:20px;text-align:center;padding:40px 24px}
   .cf-nav{padding:16px 24px}
 }
-</style>
+</style>`;
 
+  const HTML = `
 {% if section.settings.show_ann %}<div class="cf-ann">{{ section.settings.ann_text }}</div>{% endif %}
 <nav class="cf-nav">
   <a href="/" class="cf-logo">{{ shop.name }}</a>
@@ -195,353 +264,13 @@ body{font-family:var(--cf-f),'Inter',sans-serif;background:var(--cf-bg);color:va
     <li><a href="/pages/contact">Contact</a></li>
   </ul>
   <div class="cf-footer-copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}</div>
-</footer>
+</footer>`;
+
+  return `{% comment %}ConvertFlow: ${tpl.label} \u2014 Landing Page{% endcomment %}
+${fonts}
+${CSS}
+${HTML}
 {% schema %}
-{
-  "name": "CF Baby Apparel LP",
-  "settings": [
-    {
-      "type": "header",
-      "content": "Brand & Colors"
-    },
-    {
-      "type": "color",
-      "id": "accent",
-      "label": "Accent Color",
-      "default": "#F6A8B6"
-    },
-    {
-      "type": "color",
-      "id": "bg",
-      "label": "Page Background",
-      "default": "#fcedef"
-    },
-    {
-      "type": "color",
-      "id": "text_col",
-      "label": "Text Color",
-      "default": "#1a1a1a"
-    },
-    {
-      "type": "header",
-      "content": "Announcement Bar"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_ann",
-      "label": "Show Bar",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "ann_text",
-      "label": "Announcement Text",
-      "default": "Free shipping on orders above ₹999 🎉"
-    },
-    {
-      "type": "color",
-      "id": "ann_bg",
-      "label": "Bar Background",
-      "default": "#F6A8B6"
-    },
-    {
-      "type": "color",
-      "id": "ann_color",
-      "label": "Bar Text Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "header",
-      "content": "Hero Section"
-    },
-    {
-      "type": "image_picker",
-      "id": "hero_img",
-      "label": "Hero Image"
-    },
-    {
-      "type": "text",
-      "id": "hero_tag",
-      "label": "Eyebrow Tag",
-      "default": "New Collection"
-    },
-    {
-      "type": "text",
-      "id": "hero_h1",
-      "label": "Main Heading",
-      "default": "Baby Apparel"
-    },
-    {
-      "type": "textarea",
-      "id": "hero_sub",
-      "label": "Subheading",
-      "default": "Discover our curated collection — crafted with quality you can feel."
-    },
-    {
-      "type": "text",
-      "id": "hero_cta",
-      "label": "Primary CTA Text",
-      "default": "Shop Now"
-    },
-    {
-      "type": "url",
-      "id": "hero_url",
-      "label": "Primary CTA URL"
-    },
-    {
-      "type": "text",
-      "id": "hero_cta2",
-      "label": "Secondary CTA Text",
-      "default": "View Lookbook"
-    },
-    {
-      "type": "url",
-      "id": "hero_url2",
-      "label": "Secondary CTA URL"
-    },
-    {
-      "type": "header",
-      "content": "Social Proof Stats"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_stats",
-      "label": "Show Stats Bar",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "stat1_n",
-      "label": "Stat 1 Number",
-      "default": "50,000+"
-    },
-    {
-      "type": "text",
-      "id": "stat1_l",
-      "label": "Stat 1 Label",
-      "default": "Happy Customers"
-    },
-    {
-      "type": "text",
-      "id": "stat2_n",
-      "label": "Stat 2 Number",
-      "default": "4.9 ★"
-    },
-    {
-      "type": "text",
-      "id": "stat2_l",
-      "label": "Stat 2 Label",
-      "default": "Average Rating"
-    },
-    {
-      "type": "text",
-      "id": "stat3_n",
-      "label": "Stat 3 Number",
-      "default": "100%"
-    },
-    {
-      "type": "text",
-      "id": "stat3_l",
-      "label": "Stat 3 Label",
-      "default": "Authentic Products"
-    },
-    {
-      "type": "text",
-      "id": "stat4_n",
-      "label": "Stat 4 Number",
-      "default": "30-Day"
-    },
-    {
-      "type": "text",
-      "id": "stat4_l",
-      "label": "Stat 4 Label",
-      "default": "Easy Returns"
-    },
-    {
-      "type": "header",
-      "content": "Featured Products"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_products",
-      "label": "Show Products Section",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "prod_heading",
-      "label": "Section Heading",
-      "default": "Featured Products"
-    },
-    {
-      "type": "text",
-      "id": "prod_sub",
-      "label": "Section Subheading",
-      "default": "Handpicked for you"
-    },
-    {
-      "type": "collection",
-      "id": "prod_col",
-      "label": "Collection to Display"
-    },
-    {
-      "type": "range",
-      "id": "prod_count",
-      "label": "Number of Products",
-      "min": 3,
-      "max": 12,
-      "step": 1,
-      "default": 6
-    },
-    {
-      "type": "header",
-      "content": "Features / USP Bar"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_feats",
-      "label": "Show Features Bar",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "feat1_t",
-      "label": "Feature 1 Title",
-      "default": "Free Delivery"
-    },
-    {
-      "type": "text",
-      "id": "feat1_s",
-      "label": "Feature 1 Subtitle",
-      "default": "On orders above ₹999"
-    },
-    {
-      "type": "text",
-      "id": "feat2_t",
-      "label": "Feature 2 Title",
-      "default": "Easy Returns"
-    },
-    {
-      "type": "text",
-      "id": "feat2_s",
-      "label": "Feature 2 Subtitle",
-      "default": "30-day hassle-free"
-    },
-    {
-      "type": "text",
-      "id": "feat3_t",
-      "label": "Feature 3 Title",
-      "default": "100% Authentic"
-    },
-    {
-      "type": "text",
-      "id": "feat3_s",
-      "label": "Feature 3 Subtitle",
-      "default": "Certified genuine products"
-    },
-    {
-      "type": "text",
-      "id": "feat4_t",
-      "label": "Feature 4 Title",
-      "default": "Secure Checkout"
-    },
-    {
-      "type": "text",
-      "id": "feat4_s",
-      "label": "Feature 4 Subtitle",
-      "default": "SSL encrypted payment"
-    },
-    {
-      "type": "header",
-      "content": "Testimonials"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_testi",
-      "label": "Show Testimonials",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "testi_h",
-      "label": "Section Heading",
-      "default": "What Our Customers Say"
-    },
-    {
-      "type": "textarea",
-      "id": "t1_text",
-      "label": "Testimonial 1",
-      "default": "Absolutely love the quality! Will definitely order again."
-    },
-    {
-      "type": "text",
-      "id": "t1_auth",
-      "label": "Author 1",
-      "default": "Priya S. ★★★★★"
-    },
-    {
-      "type": "textarea",
-      "id": "t2_text",
-      "label": "Testimonial 2",
-      "default": "Fast shipping and beautiful packaging. Exceeded expectations!"
-    },
-    {
-      "type": "text",
-      "id": "t2_auth",
-      "label": "Author 2",
-      "default": "Rahul M. ★★★★★"
-    },
-    {
-      "type": "textarea",
-      "id": "t3_text",
-      "label": "Testimonial 3",
-      "default": "Best purchase I have made this year. Highly recommended!"
-    },
-    {
-      "type": "text",
-      "id": "t3_auth",
-      "label": "Author 3",
-      "default": "Ananya K. ★★★★★"
-    },
-    {
-      "type": "header",
-      "content": "Newsletter Section"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_nl",
-      "label": "Show Newsletter",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "nl_h",
-      "label": "Heading",
-      "default": "Join Our Community"
-    },
-    {
-      "type": "text",
-      "id": "nl_sub",
-      "label": "Subtext",
-      "default": "Subscribe for exclusive offers, new arrivals & insider updates."
-    },
-    {
-      "type": "text",
-      "id": "nl_btn",
-      "label": "Button Text",
-      "default": "Subscribe"
-    },
-    {
-      "type": "text",
-      "id": "nl_placeholder",
-      "label": "Input Placeholder",
-      "default": "Enter your email"
-    }
-  ],
-  "presets": [
-    {
-      "name": "CF Baby Apparel LP"
-    }
-  ]
+${JSON.stringify(schema, null, 2)}
+{% endschema %}`;
 }
-{% endschema %}
