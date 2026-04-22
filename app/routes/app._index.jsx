@@ -556,40 +556,112 @@ export default function Index() {
       </div>
 
       <div style={{ padding: "24px", maxWidth: 1400, margin: "0 auto" }}>
-        {/* Template Selector */}
-        <div style={{
-          display: "flex",
-          gap: 16,
-          marginBottom: 20,
-        }}>
-          {TEMPLATES.map((tpl) => (
-            <button
-              key={tpl.id}
-              onClick={() => setSelectedTemplate(tpl.id)}
-              style={{
-                flex: 1,
-                padding: "20px 24px",
-                background: selectedTemplate === tpl.id ? "#fff" : "#fafafa",
-                border: selectedTemplate === tpl.id ? `2px solid ${tpl.accent}` : "1px solid #e5e7eb",
-                borderRadius: 16,
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "all 0.2s ease",
-                boxShadow: selectedTemplate === tpl.id ? `0 4px 20px ${tpl.accent}20` : "none",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                {icon(tpl.icon)}
-                <span style={{ fontSize: 17, fontWeight: 800, color: "#1a1a1a" }}>{tpl.name}</span>
-                <span style={{
-                  background: tpl.nicheBg, color: tpl.nicheColor, padding: "3px 10px",
-                  borderRadius: 20, fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
-                }}>{tpl.niche}</span>
-              </div>
-              <p style={{ fontSize: 13, color: "#777", lineHeight: 1.5 }}>{tpl.desc}</p>
-            </button>
-          ))}
+        {/* Template Selector — Grid Layout */}
+        <div style={{ marginBottom: 20 }}>
+          {/* Header row */}
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            marginBottom: 14,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: "#1a1a1a" }}>
+                All Templates
+              </span>
+              <span style={{
+                background: "#1a1a1a", color: "#fff", fontSize: 11, fontWeight: 700,
+                padding: "3px 10px", borderRadius: 20,
+              }}>
+                {TEMPLATES.length}
+              </span>
+            </div>
+            <span style={{ fontSize: 12, color: "#aaa" }}>
+              Click any template to preview it below ↓
+            </span>
+          </div>
+
+          {/* Grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 12,
+          }}>
+            {TEMPLATES.map((tpl) => {
+              const isSelected = selectedTemplate === tpl.id;
+              return (
+                <button
+                  key={tpl.id}
+                  onClick={() => setSelectedTemplate(tpl.id)}
+                  style={{
+                    padding: "16px 18px",
+                    background: isSelected ? "#fff" : "#fafafa",
+                    border: isSelected ? `2px solid ${tpl.accent}` : "1.5px solid #e5e7eb",
+                    borderRadius: 12,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 0.18s ease",
+                    boxShadow: isSelected ? `0 4px 20px ${tpl.accent}25` : "none",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Color accent strip at top */}
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                    background: tpl.accent, borderRadius: "12px 12px 0 0",
+                    opacity: isSelected ? 1 : 0.3,
+                  }} />
+
+                  {/* Niche badge */}
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{
+                      background: tpl.nicheBg,
+                      color: tpl.nicheColor,
+                      padding: "3px 10px",
+                      borderRadius: 20,
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: 0.5,
+                      textTransform: "uppercase",
+                    }}>{tpl.niche}</span>
+                  </div>
+
+                  {/* Template name */}
+                  <div style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: "#1a1a1a",
+                    marginBottom: 5,
+                    lineHeight: 1.3,
+                  }}>{tpl.name}</div>
+
+                  {/* Description — shortened */}
+                  <p style={{
+                    fontSize: 11,
+                    color: "#888",
+                    lineHeight: 1.5,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}>{tpl.desc}</p>
+
+                  {/* Selected checkmark */}
+                  {isSelected && (
+                    <div style={{
+                      position: "absolute", top: 10, right: 10,
+                      width: 20, height: 20, borderRadius: "50%",
+                      background: tpl.accent,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {icon("check")}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
 
         {/* Inject Button */}
         <div style={{
