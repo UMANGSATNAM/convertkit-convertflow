@@ -1,6 +1,12 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { LIQUID_SECTIONS } from "../liquidSections.js";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+// Resolve sections dir relative to THIS file — works in Railway, local, and Docker
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SECTIONS_DIR = path.resolve(__dirname, "../../extensions/convertkit-sections/sections");
 
 /**
  * Application dynamic page mappings.
@@ -147,12 +153,15 @@ export const action = async ({ request }) => {
     
     const injectedPageNames = [];
 
-    // ── Step 3: Iterate through page types and look up bundled liquid content ──
+    // ── Step 3: Iterate through page types and look up liquid section files ──
     for (const page of PAGE_MAPPINGS) {
-      const sectionKey = `cf-${templateId}-${page.id}`;
-      const liquidContent = LIQUID_SECTIONS[sectionKey];
+      const liquidFileName = `cf-${templateId}-${page.id}.liquid`;
+      const liquidFilePath = path.join(SECTIONS_DIR, liquidFileName);
 
-      if (!liquidContent) {
+      let liquidContent;
+      try {
+        liquidContent = fs.readFileSync(liquidFilePath, "utf-8");
+      } catch {
         // Section not yet built for this page type — skip silently
         continue;
       }
