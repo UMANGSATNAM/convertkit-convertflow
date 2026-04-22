@@ -1,0 +1,144 @@
+{% comment %}
+  ConvertKit — Testimonials Grid Block
+  Up to 6 testimonials via blocks.
+  Responsive: masonry-like grid on desktop, single column on mobile.
+{% endcomment %}
+
+<div class="ck-testimonials"
+  data-ck-feature="testimonials"
+  style="
+    max-width:{{ section.settings.max_width | default: 1200 }}px;
+    margin:{{ section.settings.margin_y | default: 32 }}px auto;
+    padding:0 {{ section.settings.padding_x | default: 16 }}px;
+    font-family:var(--font-body-family,-apple-system,sans-serif);
+  ">
+
+  {% if section.settings.heading != blank %}
+    <h2 style="
+      text-align:center;
+      font-size:{{ section.settings.heading_size | default: 24 }}px;
+      color:{{ section.settings.heading_color | default: '#111827' }};
+      margin:0 0 24px;
+      font-family:var(--font-heading-family,sans-serif);
+    ">{{ section.settings.heading }}</h2>
+  {% endif %}
+
+  <div class="ck-testimonials__grid" style="
+    display:grid;
+    grid-template-columns:repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap:{{ section.settings.gap | default: 20 }}px;
+  ">
+    {%- for block in section.blocks -%}
+    <div class="ck-testimonials__card" {{ block.shopify_attributes }} style="
+      background:{{ section.settings.card_bg | default: '#ffffff' }};
+      border:1px solid {{ section.settings.card_border | default: '#e5e7eb' }};
+      border-radius:{{ section.settings.card_radius | default: 12 }}px;
+      padding:20px;
+    ">
+      {% if section.settings.show_stars and block.settings.rating > 0 %}
+      <div style="display:flex;gap:2px;margin-bottom:12px">
+        {%- assign star_color = section.settings.star_color | default: '#FBBF24' -%}
+        {%- for i in (1..5) -%}
+          {%- if i <= block.settings.rating -%}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ star_color }}" stroke="{{ star_color }}" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          {%- else -%}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#e5e7eb" stroke="#e5e7eb" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {% endif %}
+
+      {% if block.settings.quote != blank %}
+      <blockquote style="
+        margin:0 0 16px;font-size:{{ section.settings.quote_size | default: 14 }}px;
+        color:{{ section.settings.quote_color | default: '#374151' }};
+        line-height:1.6;font-style:italic;
+      ">
+        "{{ block.settings.quote }}"
+      </blockquote>
+      {% endif %}
+
+      <div style="display:flex;align-items:center;gap:10px">
+        {% if block.settings.photo != blank %}
+          <img src="{{ block.settings.photo | image_url: width: 80 }}" alt="{{ block.settings.author_name }}" width="40" height="40" loading="lazy" style="border-radius:50%;object-fit:cover">
+        {% else %}
+          <div style="
+            width:40px;height:40px;border-radius:50%;
+            background:{{ section.settings.avatar_bg | default: '#E5E7EB' }};
+            display:flex;align-items:center;justify-content:center;
+            font-weight:600;font-size:16px;color:{{ section.settings.heading_color | default: '#374151' }};
+            flex-shrink:0;
+          ">
+            {{ block.settings.author_name | slice: 0 }}
+          </div>
+        {% endif %}
+        <div>
+          {% if block.settings.author_name != blank %}
+            <p style="margin:0;font-weight:600;font-size:13px;color:{{ section.settings.heading_color | default: '#111827' }}">
+              {{ block.settings.author_name }}
+            </p>
+          {% endif %}
+          {% if block.settings.author_location != blank %}
+            <p style="margin:2px 0 0;font-size:12px;color:{{ section.settings.muted_color | default: '#9ca3af' }}">
+              {{ block.settings.author_location }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<style>
+  @media(max-width:767px) {
+    .ck-testimonials__grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "CK Testimonials",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What Our Customers Say" },
+    { "type": "range", "id": "columns_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "checkbox", "id": "show_stars", "label": "Show Star Ratings", "default": true },
+    { "type": "color", "id": "star_color", "label": "Star Color", "default": "#FBBF24" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#111827" },
+    { "type": "color", "id": "quote_color", "label": "Quote Color", "default": "#374151" },
+    { "type": "color", "id": "muted_color", "label": "Muted Text Color", "default": "#9ca3af" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#ffffff" },
+    { "type": "color", "id": "card_border", "label": "Card Border", "default": "#e5e7eb" },
+    { "type": "color", "id": "avatar_bg", "label": "Avatar Fallback BG", "default": "#E5E7EB" },
+    { "type": "range", "id": "card_radius", "label": "Card Radius", "min": 0, "max": 24, "step": 2, "default": 12 },
+    { "type": "range", "id": "heading_size", "label": "Heading Size", "min": 16, "max": 36, "step": 2, "default": 24 },
+    { "type": "range", "id": "quote_size", "label": "Quote Size", "min": 12, "max": 18, "step": 1, "default": 14 },
+    { "type": "range", "id": "gap", "label": "Grid Gap", "min": 8, "max": 32, "step": 4, "default": 20 },
+    { "type": "range", "id": "max_width", "label": "Max Width", "min": 600, "max": 1400, "step": 50, "default": 1200 },
+    { "type": "range", "id": "margin_y", "label": "Vertical Margin", "min": 0, "max": 64, "step": 4, "default": 32 },
+    { "type": "range", "id": "padding_x", "label": "Side Padding", "min": 0, "max": 48, "step": 4, "default": 16 }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "author_name", "label": "Author Name" },
+        { "type": "text", "id": "author_location", "label": "Author Location" },
+        { "type": "range", "id": "rating", "label": "Star Rating", "min": 0, "max": 5, "step": 1, "default": 5 },
+        { "type": "image_picker", "id": "photo", "label": "Author Photo (optional)" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "CK Testimonials",
+    "blocks": [
+      { "type": "testimonial", "settings": { "quote": "This product changed my life! Absolutely love the quality.", "author_name": "Sarah M.", "author_location": "New York, NY", "rating": 5 }},
+      { "type": "testimonial", "settings": { "quote": "Fast shipping and excellent customer service. Will buy again.", "author_name": "James R.", "author_location": "Austin, TX", "rating": 5 }},
+      { "type": "testimonial", "settings": { "quote": "Best purchase I've made this year. Highly recommend!", "author_name": "Emily K.", "author_location": "Seattle, WA", "rating": 4 }}
+    ]
+  }]
+}
+{% endschema %}

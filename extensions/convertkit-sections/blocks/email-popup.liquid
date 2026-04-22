@@ -1,0 +1,155 @@
+{% comment %}
+  ConvertKit — Email Popup Block
+  Triggers: exit_intent, scroll_percent, time_delay
+  Shows once per session. Collects email for marketing.
+{% endcomment %}
+
+<div id="ck-popup-{{ section.id }}"
+  class="ck-email-popup"
+  data-ck-feature="email_popup"
+  data-trigger="{{ section.settings.trigger | default: 'time_delay' }}"
+  data-delay="{{ section.settings.delay_seconds | default: 8 }}"
+  data-scroll="{{ section.settings.scroll_percent | default: 50 }}"
+  style="display:none;position:fixed;inset:0;z-index:100001;align-items:center;justify-content:center;background:rgba(0,0,0,0.5)"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ section.settings.heading | default: 'Sign up for our newsletter' }}"
+>
+  <div class="ck-email-popup__modal" style="
+    background:{{ section.settings.bg_color | default: '#ffffff' }};
+    border-radius:{{ section.settings.radius | default: 16 }}px;
+    padding:32px;width:90%;max-width:420px;position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    font-family:var(--font-body-family,-apple-system,sans-serif);
+    animation:ck-popup-in 300ms ease;
+  ">
+    <button class="ck-email-popup__close" aria-label="Close" style="
+      position:absolute;top:12px;right:16px;background:none;border:none;
+      font-size:24px;color:{{ section.settings.text_color | default: '#6b7280' }};cursor:pointer;line-height:1;
+    ">&times;</button>
+
+    {% if section.settings.heading != blank %}
+      <h3 style="margin:0 0 8px;font-size:22px;font-weight:700;color:{{ section.settings.heading_color | default: '#111827' }}">
+        {{ section.settings.heading }}
+      </h3>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p style="margin:0 0 20px;font-size:14px;color:{{ section.settings.text_color | default: '#6b7280' }};line-height:1.5">
+        {{ section.settings.subheading }}
+      </p>
+    {% endif %}
+
+    <form class="ck-email-popup__form" style="display:flex;flex-direction:column;gap:12px" onsubmit="return false;">
+      <input type="email" placeholder="{{ section.settings.placeholder | default: 'Enter your email' }}" required style="
+        padding:12px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;
+        width:100%;box-sizing:border-box;
+      " aria-label="Email address">
+      <button type="submit" style="
+        padding:12px;border:none;border-radius:8px;font-size:15px;font-weight:600;
+        background:{{ section.settings.btn_color | default: '#4F46E5' }};
+        color:{{ section.settings.btn_text_color | default: '#ffffff' }};
+        cursor:pointer;transition:opacity 150ms;
+      ">{{ section.settings.btn_text | default: 'Get My Discount' }}</button>
+    </form>
+
+    {% if section.settings.footer_text != blank %}
+      <p style="margin:12px 0 0;font-size:11px;color:{{ section.settings.text_color | default: '#9ca3af' }};text-align:center">
+        {{ section.settings.footer_text }}
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  @keyframes ck-popup-in { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+</style>
+
+<script>
+(function() {
+  if (sessionStorage.getItem('ck-popup-shown-{{ section.id }}')) return;
+
+  var popup = document.getElementById('ck-popup-{{ section.id }}');
+  if (!popup) return;
+  var trigger = popup.dataset.trigger;
+  var shown = false;
+
+  function show() {
+    if (shown) return;
+    shown = true;
+    popup.style.display = 'flex';
+    sessionStorage.setItem('ck-popup-shown-{{ section.id }}', '1');
+  }
+
+  // Close handlers
+  popup.querySelector('.ck-email-popup__close').addEventListener('click', function() { popup.style.display = 'none'; });
+  popup.addEventListener('click', function(e) { if (e.target === popup) popup.style.display = 'none'; });
+
+  // Form submission
+  popup.querySelector('.ck-email-popup__form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email = this.querySelector('input[type="email"]').value.trim();
+    if (!email) return;
+    var btn = this.querySelector('button');
+    btn.textContent = 'Subscribed!';
+    btn.disabled = true;
+    setTimeout(function() { popup.style.display = 'none'; }, 1500);
+  });
+
+  // Trigger logic
+  if (trigger === 'exit_intent') {
+    document.addEventListener('mouseleave', function(e) {
+      if (e.clientY <= 0) show();
+    });
+    // Mobile fallback: show after 15 seconds
+    if ('ontouchstart' in window) {
+      setTimeout(show, 15000);
+    }
+  } else if (trigger === 'scroll_percent') {
+    var scrollPct = parseInt(popup.dataset.scroll, 10) || 50;
+    var sentinelEl = document.createElement('div');
+    sentinelEl.style.cssText = 'position:absolute;left:0;width:1px;height:1px;pointer-events:none';
+    sentinelEl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(sentinelEl);
+    function updateSentinel() {
+      var docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      sentinelEl.style.top = (docHeight * scrollPct / 100) + 'px';
+    }
+    updateSentinel();
+    var io = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { show(); io.disconnect(); }
+    });
+    io.observe(sentinelEl);
+  } else {
+    var delay = parseInt(popup.dataset.delay, 10) || 8;
+    setTimeout(show, delay * 1000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "CK Email Popup",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get 10% Off" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Join our newsletter and get an exclusive discount on your first order." },
+    { "type": "text", "id": "placeholder", "label": "Input Placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Get My Discount" },
+    { "type": "text", "id": "footer_text", "label": "Footer Text", "default": "We respect your privacy. Unsubscribe at any time." },
+    { "type": "select", "id": "trigger", "label": "Trigger", "default": "time_delay", "options": [
+      {"value":"exit_intent","label":"Exit Intent"},
+      {"value":"scroll_percent","label":"Scroll Percentage"},
+      {"value":"time_delay","label":"Time Delay"}
+    ]},
+    { "type": "range", "id": "delay_seconds", "label": "Delay (seconds)", "min": 1, "max": 30, "step": 1, "default": 8, "info": "For time delay trigger" },
+    { "type": "range", "id": "scroll_percent", "label": "Scroll %", "min": 10, "max": 90, "step": 5, "default": 50, "info": "For scroll trigger" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#111827" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#6b7280" },
+    { "type": "color", "id": "btn_color", "label": "Button Color", "default": "#4F46E5" },
+    { "type": "color", "id": "btn_text_color", "label": "Button Text Color", "default": "#ffffff" },
+    { "type": "range", "id": "radius", "label": "Border Radius", "min": 0, "max": 24, "step": 2, "default": 16 }
+  ]
+}
+{% endschema %}

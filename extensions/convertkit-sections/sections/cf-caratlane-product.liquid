@@ -1,0 +1,923 @@
+{% comment %}
+  ConvertFlow — CaratLane Product Page (Phase 2)
+  Dual CTA, Urgency Timers, Offer Banners, Full Details, Responsive.
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --cf-primary: {{ section.settings.color_primary }};
+    --cf-accent: {{ section.settings.color_accent }};
+    --cf-bg: {{ section.settings.color_bg }};
+    --cf-text: {{ section.settings.color_text }};
+    --cf-text-light: #666666;
+    --cf-border-radius: {{ section.settings.border_radius }}px;
+    --cf-font-heading: 'Playfair Display', serif;
+    --cf-font-body: 'Inter', sans-serif;
+    --cf-success: #16a34a;
+    --cf-danger: #dc2626;
+    --cf-warning: #f59e0b;
+  }
+
+  .cf-cl-p * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-cl-p {
+    font-family: var(--cf-font-body);
+    color: var(--cf-text);
+    background: var(--cf-bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(20px, 4vw, 40px);
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .cf-cl-p h1, .cf-cl-p h2, .cf-cl-p h3 {
+    font-family: var(--cf-font-heading);
+    color: var(--cf-primary);
+  }
+
+  /* ── Product Layout ── */
+  .cf-cl-product-layout {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: clamp(30px, 5vw, 80px);
+    align-items: start;
+  }
+
+  /* ── Gallery ── */
+  .cf-cl-gallery {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: clamp(16px, 3vw, 24px);
+    position: sticky;
+    top: 20px;
+  }
+  .cf-cl-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .cf-cl-thumb {
+    width: clamp(60px, 10vw, 84px);
+    aspect-ratio: 1;
+    border-radius: calc(var(--cf-border-radius) / 2);
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: #F6EFFB;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cf-cl-thumb:hover, .cf-cl-thumb.active {
+    border-color: var(--cf-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(73, 49, 97, 0.15);
+  }
+  .cf-cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .cf-cl-main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--cf-border-radius);
+    overflow: hidden;
+    background: #FFF;
+    border: 1px solid rgba(238,238,238,0.8);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: transform 0.4s ease;
+    position: relative;
+  }
+  .cf-cl-main-image:hover { transform: scale(1.01); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+  .cf-cl-main-image img { width: 100%; height: 100%; object-fit: contain; }
+
+  /* ── Wishlist Heart ── */
+  .cf-cl-wishlist {
+    position: absolute; top: 16px; right: 16px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+  .cf-cl-wishlist:hover { background: #fff; transform: scale(1.1); }
+  .cf-cl-wishlist svg { width: 22px; height: 22px; color: var(--cf-danger); }
+
+  /* ── Details ── */
+  .cf-cl-details { padding: 0; }
+  .cf-cl-breadcrumb { font-size: 12px; color: var(--cf-text-light); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+  .cf-cl-breadcrumb a { color: var(--cf-primary); text-decoration: none; font-weight: 500; }
+  .cf-cl-breadcrumb a:hover { text-decoration: underline; }
+  .cf-cl-breadcrumb span { opacity: 0.5; }
+
+  .cf-cl-title {
+    font-size: clamp(24px, 3.5vw, 36px);
+    margin-bottom: 8px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .cf-cl-subtitle {
+    font-size: 14px;
+    color: var(--cf-text-light);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+  .cf-cl-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .cf-cl-stars { display: flex; gap: 2px; }
+  .cf-cl-stars svg { width: 16px; height: 16px; fill: var(--cf-warning); color: var(--cf-warning); }
+  .cf-cl-rating-text { font-size: 13px; color: var(--cf-text-light); font-weight: 500; }
+  .cf-cl-rating-count { font-size: 13px; color: var(--cf-primary); font-weight: 600; cursor: pointer; }
+  .cf-cl-rating-count:hover { text-decoration: underline; }
+
+  /* ── Price Block ── */
+  .cf-cl-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(238,238,238,0.6);
+  }
+  .cf-cl-price {
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    color: var(--cf-primary);
+  }
+  .cf-cl-compare {
+    font-size: clamp(16px, 2vw, 18px);
+    color: var(--cf-text-light);
+    text-decoration: line-through;
+  }
+  .cf-cl-discount-badge {
+    background: linear-gradient(135deg, var(--cf-success), #22c55e);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+  .cf-cl-tax-label {
+    font-size: 12px;
+    color: var(--cf-text-light);
+    margin-top: -14px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Urgency Bar ── */
+  .cf-cl-urgency {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, #FEF2F2, #fff, #FEF2F2);
+    background-size: 200% auto;
+    animation: cfUrgencyPulse 3s ease infinite;
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    border-radius: calc(var(--cf-border-radius) - 4px);
+    margin-bottom: 16px;
+  }
+  @keyframes cfUrgencyPulse { 0%, 100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+  .cf-cl-urgency-icon { font-size: 18px; flex-shrink: 0; animation: cfFirePulse 1s ease infinite; }
+  @keyframes cfFirePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .cf-cl-urgency-text { font-size: 13px; font-weight: 600; color: var(--cf-danger); }
+  .cf-cl-urgency-text strong { font-weight: 800; }
+
+  /* ── Dispatch Timer ── */
+  .cf-cl-dispatch {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: #F0FDF4;
+    border: 1px solid rgba(22, 163, 74, 0.15);
+    border-radius: calc(var(--cf-border-radius) - 4px);
+    margin-bottom: 20px;
+  }
+  .cf-cl-dispatch svg { width: 20px; height: 20px; color: var(--cf-success); flex-shrink: 0; }
+  .cf-cl-dispatch-text { font-size: 13px; color: #15803d; font-weight: 500; }
+  .cf-cl-dispatch-text strong { font-weight: 700; color: var(--cf-success); }
+  .cf-cl-dispatch-timer { font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 700; color: var(--cf-success); background: rgba(22,163,74,0.08); padding: 2px 8px; border-radius: 6px; letter-spacing: 1px; }
+
+  /* ── Offer Banner ── */
+  .cf-cl-offers {
+    background: linear-gradient(135deg, #493161 0%, #5e3d7a 100%);
+    border-radius: var(--cf-border-radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .cf-cl-offers-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px; }
+  .cf-cl-offers-title svg { width: 18px; height: 18px; color: var(--cf-accent); }
+  .cf-cl-offer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .cf-cl-offer-item:first-of-type { border-top: none; }
+  .cf-cl-offer-icon { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+  .cf-cl-offer-detail { flex: 1; }
+  .cf-cl-offer-detail strong { color: var(--cf-accent); }
+
+  /* ── Promo Strip ── */
+  .cf-cl-promo-strip {
+    background: linear-gradient(90deg, #FDF9F1, #fff, #FDF9F1);
+    background-size: 200% auto;
+    animation: cfPromoGlow 6s linear infinite;
+    border: 1px dashed rgba(222, 187, 67, 0.8);
+    border-radius: calc(var(--cf-border-radius) - 4px);
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 10px rgba(222, 187, 67, 0.05);
+  }
+  @keyframes cfPromoGlow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+  .cf-cl-promo-strip svg { width: 24px; height: 24px; color: #DEBB43; flex-shrink: 0; }
+  .cf-cl-promo-text { font-size: 14px; color: var(--cf-text); font-weight: 500; flex: 1; line-height: 1.5; }
+  .cf-cl-promo-code { font-weight: 700; color: var(--cf-primary); letter-spacing: 0.5px; border-bottom: 1px dashed var(--cf-primary); cursor: pointer; transition: color 0.2s; }
+  .cf-cl-promo-code:hover { color: var(--cf-accent); border-color: var(--cf-accent); }
+
+  /* ── Buy Module ── */
+  .cf-cl-form { margin-bottom: 24px; transition: all 0.3s ease; }
+  .cf-cl-btn-group { display: flex; gap: 14px; margin-bottom: 16px; }
+  .cf-cl-btn-atc {
+    flex: 1;
+    padding: 16px 20px;
+    background: transparent;
+    color: var(--cf-primary);
+    border: 2px solid var(--cf-primary);
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--cf-font-body);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .cf-cl-btn-atc:hover {
+    background: var(--cf-primary);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(73, 49, 97, 0.25);
+  }
+  .cf-cl-btn-atc svg { width: 18px; height: 18px; }
+  .cf-cl-btn-buy {
+    flex: 1;
+    padding: 16px 20px;
+    background: var(--cf-accent);
+    color: #fff;
+    border: 2px solid var(--cf-accent);
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--cf-font-body);
+    box-shadow: 0 4px 15px rgba(222, 187, 67, 0.3);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .cf-cl-btn-buy:hover {
+    background: #cca72c;
+    border-color: #cca72c;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(222, 187, 67, 0.4);
+  }
+  .cf-cl-btn-buy svg { width: 18px; height: 18px; }
+
+  /* ── Trust Badges ── */
+  .cf-cl-trust {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding: 24px;
+    background: #F6EFFB;
+    border-radius: var(--cf-border-radius);
+    border: 1px solid rgba(73, 49, 97, 0.05);
+  }
+  .cf-cl-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .cf-cl-trust-item svg { width: 22px; height: 22px; color: var(--cf-primary); }
+
+  /* ── Product Details Accordion ── */
+  .cf-cl-accordion { margin-bottom: 24px; border-top: 1px solid rgba(238,238,238,0.6); }
+  .cf-cl-accordion-item { border-bottom: 1px solid rgba(238,238,238,0.6); }
+  .cf-cl-accordion-btn {
+    width: 100%; background: none; border: none;
+    padding: 18px 0; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--cf-font-body);
+    font-size: 15px; font-weight: 600; color: var(--cf-text);
+    transition: color 0.2s;
+  }
+  .cf-cl-accordion-btn:hover { color: var(--cf-primary); }
+  .cf-cl-accordion-btn svg { width: 18px; height: 18px; color: var(--cf-text-light); transition: transform 0.3s ease; }
+  .cf-cl-accordion-item.open .cf-cl-accordion-btn svg { transform: rotate(180deg); }
+  .cf-cl-accordion-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s;
+    padding: 0 0;
+  }
+  .cf-cl-accordion-item.open .cf-cl-accordion-body { max-height: 500px; padding-bottom: 20px; }
+  .cf-cl-accordion-body p, .cf-cl-accordion-body ul { font-size: 14px; color: var(--cf-text-light); line-height: 1.8; }
+  .cf-cl-accordion-body ul { padding-left: 20px; }
+  .cf-cl-accordion-body li { margin-bottom: 6px; }
+  .cf-cl-spec-grid { display: grid; grid-template-columns: 140px 1fr; gap: 10px 20px; font-size: 14px; }
+  .cf-cl-spec-label { font-weight: 600; color: var(--cf-text); }
+  .cf-cl-spec-value { color: var(--cf-text-light); }
+
+  /* ── Share Row ── */
+  .cf-cl-share { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding-top: 20px; border-top: 1px solid rgba(238,238,238,0.5); }
+  .cf-cl-share-label { font-size: 13px; font-weight: 600; color: var(--cf-text); }
+  .cf-cl-share-icon { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(238,238,238,0.8); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+  .cf-cl-share-icon:hover { border-color: var(--cf-primary); background: var(--cf-primary); color: #fff; }
+  .cf-cl-share-icon svg { width: 16px; height: 16px; }
+
+  /* ── Responsive Mobile Hierarchy ── */
+  @media (max-width: 1024px) {
+    .cf-cl-product-layout { grid-template-columns: 1fr 380px; gap: 40px; }
+  }
+  @media (max-width: 900px) {
+    .cf-cl-product-layout { grid-template-columns: 1fr; gap: 30px; }
+    .cf-cl-gallery { grid-template-columns: 1fr; position: static; }
+    .cf-cl-thumbnails { flex-direction: row; overflow-x: auto; order: 2; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
+    .cf-cl-thumbnails::-webkit-scrollbar { display: none; }
+    .cf-cl-thumb { flex: 0 0 clamp(70px, 15vw, 100px); scroll-snap-align: center; }
+    .cf-cl-main-image { order: 1; border-radius: 8px; }
+    .cf-cl-offers { margin-bottom: 16px; }
+  }
+  @media (max-width: 600px) {
+    .cf-cl-p { padding: 16px; }
+    .cf-cl-trust { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+    .cf-cl-price-wrap { margin-bottom: 16px; padding-bottom: 14px; }
+    .cf-cl-btn-group { flex-direction: column; gap: 10px; }
+    /* Sticky Mobile CTA */
+    .cf-cl-form { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); padding: 14px 16px; box-shadow: 0 -4px 30px rgba(0,0,0,0.12); z-index: 1000; margin: 0; border-top: 1px solid rgba(0,0,0,0.05); border-radius: 16px 16px 0 0; }
+    .cf-cl-btn-group { flex-direction: row; margin-bottom: 0; }
+    .cf-cl-btn-atc, .cf-cl-btn-buy { padding: 14px 10px; font-size: 14px; border-radius: 12px; }
+    .cf-cl-details { padding-bottom: 110px; }
+    .cf-cl-spec-grid { grid-template-columns: 120px 1fr; gap: 8px 12px; font-size: 13px; }
+    .cf-cl-offers { padding: 16px; }
+  }
+{% endstyle %}
+
+<div class="cf-cl-p">
+  <div class="cf-cl-product-layout">
+
+    <!-- GALLERY -->
+    <div class="cf-cl-gallery">
+      <div class="cf-cl-thumbnails">
+        {% for image in product.images %}
+          <div class="cf-cl-thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('cf-main-img').src='{{ image | img_url: 'master' }}'; this.parentNode.querySelectorAll('.cf-cl-thumb').forEach(t=>t.classList.remove('active')); this.classList.add('active');">
+            <img src="{{ image | img_url: '200x' }}" alt="{{ product.title }}">
+          </div>
+        {% else %}
+          <div class="cf-cl-thumb active"><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1.png" alt="Fallback"></div>
+          <div class="cf-cl-thumb"><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-2.png" alt="Fallback"></div>
+          <div class="cf-cl-thumb"><img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-3.png" alt="Fallback"></div>
+        {% endfor %}
+      </div>
+      <div class="cf-cl-main-image">
+        {% if product.featured_image %}
+          <img id="cf-main-img" src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
+        {% else %}
+          <img id="cf-main-img" src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1.png" alt="Fallback">
+        {% endif %}
+        <button class="cf-cl-wishlist" aria-label="Add to Wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="cf-cl-details">
+      <!-- Breadcrumb -->
+      <div class="cf-cl-breadcrumb">
+        <a href="/">Home</a>
+        <span>›</span>
+        <a href="{{ collection.url | default: '/collections/all' }}">{{ collection.title | default: 'Shop' }}</a>
+        <span>›</span>
+        {{ product.title | default: section.settings.fallback_title | truncate: 30 }}
+      </div>
+
+      <h1 class="cf-cl-title">{{ product.title | default: section.settings.fallback_title }}</h1>
+      <p class="cf-cl-subtitle">{{ section.settings.subtitle_text }}</p>
+
+      <!-- Rating -->
+      <div class="cf-cl-rating">
+        <div class="cf-cl-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24" style="opacity:0.3"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </div>
+        <span class="cf-cl-rating-text">4.2</span>
+        <span class="cf-cl-rating-count">({{ section.settings.review_count }} Reviews)</span>
+      </div>
+
+      <!-- Price -->
+      <div class="cf-cl-price-wrap">
+        <span class="cf-cl-price">{{ product.price | money | default: '₹14,999' }}</span>
+        {% if product.compare_at_price > product.price %}
+          <span class="cf-cl-compare">{{ product.compare_at_price | money }}</span>
+          <span class="cf-cl-discount-badge">{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}% OFF</span>
+        {% else %}
+          <span class="cf-cl-compare">₹19,999</span>
+          <span class="cf-cl-discount-badge">25% OFF</span>
+        {% endif %}
+      </div>
+      <p class="cf-cl-tax-label">Inclusive of all taxes. Free shipping on orders above ₹999.</p>
+
+      <!-- Urgency -->
+      {% if section.settings.show_urgency %}
+      <div class="cf-cl-urgency">
+        <span class="cf-cl-urgency-icon">🔥</span>
+        <span class="cf-cl-urgency-text">{{ section.settings.urgency_text }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Dispatch Timer -->
+      {% if section.settings.show_dispatch %}
+      <div class="cf-cl-dispatch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        <span class="cf-cl-dispatch-text">Order within <span class="cf-cl-dispatch-timer" id="cf-dispatch-timer">02:14:33</span> to get it <strong>dispatched today</strong>.</span>
+      </div>
+      {% endif %}
+
+      <!-- Offer Banner -->
+      {% if section.settings.show_offers %}
+      <div class="cf-cl-offers">
+        <div class="cf-cl-offers-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          Available Offers
+        </div>
+        <div class="cf-cl-offer-item">
+          <span class="cf-cl-offer-icon">🏦</span>
+          <span class="cf-cl-offer-detail">{{ section.settings.offer_1 }}</span>
+        </div>
+        <div class="cf-cl-offer-item">
+          <span class="cf-cl-offer-icon">💳</span>
+          <span class="cf-cl-offer-detail">{{ section.settings.offer_2 }}</span>
+        </div>
+        <div class="cf-cl-offer-item">
+          <span class="cf-cl-offer-icon">🎁</span>
+          <span class="cf-cl-offer-detail">{{ section.settings.offer_3 }}</span>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Promo Strip -->
+      {% if section.settings.show_promo_strip %}
+      <div class="cf-cl-promo-strip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+        <div class="cf-cl-promo-text">{{ section.settings.promo_text }} <span class="cf-cl-promo-code">{{ section.settings.promo_code }}</span></div>
+      </div>
+      {% endif %}
+
+      <!-- Buy Module: Dual CTA -->
+      {% form 'product', product, class: 'cf-cl-form' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <div class="cf-cl-btn-group">
+          <button type="submit" class="cf-cl-btn-atc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            {{ section.settings.add_to_cart_text }}
+          </button>
+          <button type="submit" name="checkout" class="cf-cl-btn-buy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            {{ section.settings.buy_now_text }}
+          </button>
+        </div>
+      {% endform %}
+
+      <!-- Trust Badges -->
+      <div class="cf-cl-trust">
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          {{ section.settings.trust_1 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          {{ section.settings.trust_2 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          {{ section.settings.trust_3 }}
+        </div>
+        <div class="cf-cl-trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          {{ section.settings.trust_4 }}
+        </div>
+      </div>
+
+      <!-- Product Details Accordion -->
+      <div class="cf-cl-accordion">
+        <div class="cf-cl-accordion-item open">
+          <button class="cf-cl-accordion-btn" onclick="this.parentElement.classList.toggle('open')">
+            {{ section.settings.desc_heading }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="cf-cl-accordion-body">
+            {{ product.description | default: '<p>Experience the perfect blend of modern aesthetics and traditional craftsmanship with this exquisite piece. Designed with precision and adorned with the finest materials, this product is a must-have for discerning tastes.</p>' }}
+          </div>
+        </div>
+        <div class="cf-cl-accordion-item">
+          <button class="cf-cl-accordion-btn" onclick="this.parentElement.classList.toggle('open')">
+            Specifications
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="cf-cl-accordion-body">
+            <div class="cf-cl-spec-grid">
+              <span class="cf-cl-spec-label">Material</span>
+              <span class="cf-cl-spec-value">{{ section.settings.spec_material }}</span>
+              <span class="cf-cl-spec-label">Weight</span>
+              <span class="cf-cl-spec-value">{{ section.settings.spec_weight }}</span>
+              <span class="cf-cl-spec-label">Purity</span>
+              <span class="cf-cl-spec-value">{{ section.settings.spec_purity }}</span>
+              <span class="cf-cl-spec-label">Stone</span>
+              <span class="cf-cl-spec-value">{{ section.settings.spec_stone }}</span>
+              <span class="cf-cl-spec-label">Occasion</span>
+              <span class="cf-cl-spec-value">{{ section.settings.spec_occasion }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="cf-cl-accordion-item">
+          <button class="cf-cl-accordion-btn" onclick="this.parentElement.classList.toggle('open')">
+            Shipping & Returns
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="cf-cl-accordion-body">
+            <ul>
+              <li>Free standard shipping on all orders above ₹999</li>
+              <li>Express delivery within 2-3 business days</li>
+              <li>15-day hassle-free returns</li>
+              <li>Lifetime exchange on all products</li>
+              <li>100% certified and hallmarked</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share -->
+      <div class="cf-cl-share">
+        <span class="cf-cl-share-label">Share:</span>
+        <span class="cf-cl-share-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></span>
+        <span class="cf-cl-share-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></span>
+        <span class="cf-cl-share-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
+        <span class="cf-cl-share-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Dispatch Countdown Timer Script -->
+<script>
+(function(){
+  var el = document.getElementById('cf-dispatch-timer');
+  if (!el) return;
+  var deadline = new Date();
+  deadline.setHours(23,59,59,0);
+  function tick(){
+    var now = new Date();
+    var diff = deadline - now;
+    if(diff <= 0) { el.textContent = '00:00:00'; return; }
+    var h = Math.floor(diff/3600000);
+    var m = Math.floor((diff%3600000)/60000);
+    var s = Math.floor((diff%60000)/1000);
+    el.textContent = (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+<!-- ── FOOTER ── -->
+<style>
+  .cf-cl-footer {
+    background: linear-gradient(180deg, #2d1b3d 0%, #1a0f24 100%);
+    color: rgba(255,255,255,0.8);
+    font-family: var(--cf-font-body, 'Inter', sans-serif);
+    padding: 0; margin-top: 60px;
+  }
+  .cf-cl-footer * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-cl-footer a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.2s; }
+  .cf-cl-footer a:hover { color: #DEBB43; }
+  .cf-cl-footer-newsletter {
+    background: linear-gradient(90deg, #493161, #5e3d7a);
+    padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap;
+  }
+  .cf-cl-footer-nl-text { flex: 1; min-width: 280px; }
+  .cf-cl-footer-nl-text h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .cf-cl-footer-nl-text p { font-size: 14px; color: rgba(255,255,255,0.75); }
+  .cf-cl-footer-nl-form { display: flex; gap: 10px; flex: 1; max-width: 460px; min-width: 280px; }
+  .cf-cl-footer-nl-form input { flex: 1; padding: 14px 20px; border: none; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; background: rgba(255,255,255,0.15); color: #fff; }
+  .cf-cl-footer-nl-form input::placeholder { color: rgba(255,255,255,0.5); }
+  .cf-cl-footer-nl-form button { padding: 14px 28px; border: none; border-radius: 10px; background: #DEBB43; color: #1a0f24; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; transition: all 0.3s; white-space: nowrap; }
+  .cf-cl-footer-nl-form button:hover { background: #cca72c; }
+  .cf-cl-footer-main { max-width: 1440px; margin: 0 auto; padding: 50px 40px 30px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
+  .cf-cl-footer-brand h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 14px; }
+  .cf-cl-footer-brand p { font-size: 14px; line-height: 1.7; margin-bottom: 20px; color: rgba(255,255,255,0.6); }
+  .cf-cl-footer-socials { display: flex; gap: 12px; }
+  .cf-cl-footer-social { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; transition: all 0.3s; cursor: pointer; }
+  .cf-cl-footer-social:hover { background: #DEBB43; transform: scale(1.1); }
+  .cf-cl-footer-social svg { width: 18px; height: 18px; color: rgba(255,255,255,0.8); }
+  .cf-cl-footer-social:hover svg { color: #1a0f24; }
+  .cf-cl-footer-col h4 { font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .cf-cl-footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .cf-cl-footer-col li a { font-size: 14px; }
+  .cf-cl-footer-bottom { max-width: 1440px; margin: 0 auto; padding: 24px 40px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .cf-cl-footer-copy { font-size: 13px; color: rgba(255,255,255,0.4); }
+  .cf-cl-footer-payments { display: flex; gap: 10px; }
+  .cf-cl-footer-pay-icon { width: 44px; height: 28px; border-radius: 4px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); }
+  @media (max-width: 900px) { .cf-cl-footer-main { grid-template-columns: 1fr 1fr; gap: 30px; padding: 40px 24px 24px; } .cf-cl-footer-newsletter { padding: 28px 24px; } .cf-cl-footer-bottom { padding: 20px 24px; } }
+  @media (max-width: 600px) { .cf-cl-footer-main { grid-template-columns: 1fr; gap: 28px; padding: 30px 16px 20px; } .cf-cl-footer-newsletter { flex-direction: column; padding: 24px 16px; gap: 16px; } .cf-cl-footer-nl-form { flex-direction: column; max-width: 100%; } .cf-cl-footer-nl-form button { width: 100%; } .cf-cl-footer-bottom { flex-direction: column; text-align: center; padding: 16px; } }
+</style>
+
+<footer class="cf-cl-footer">
+  <div class="cf-cl-footer-newsletter">
+    <div class="cf-cl-footer-nl-text">
+      <h3>Stay in the Loop</h3>
+      <p>Subscribe for exclusive offers, new arrivals & styling tips.</p>
+    </div>
+    <div class="cf-cl-footer-nl-form">
+      <input type="email" placeholder="Enter your email address…">
+      <button>Subscribe</button>
+    </div>
+  </div>
+  <div class="cf-cl-footer-main">
+    <div class="cf-cl-footer-brand">
+      <h2>{{ shop.name | default: 'CaratLane' }}</h2>
+      <p>Bringing you the finest handcrafted jewellery since 2008. BIS Hallmarked. Certified. Trusted.</p>
+      <div class="cf-cl-footer-socials">
+        <a class="cf-cl-footer-social" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+        <a class="cf-cl-footer-social" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+        <a class="cf-cl-footer-social" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a>
+        <a class="cf-cl-footer-social" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
+      </div>
+    </div>
+    <div class="cf-cl-footer-col">
+      <h4>Shop</h4>
+      <ul><li><a href="/collections/all">All Jewellery</a></li><li><a href="#">Rings</a></li><li><a href="#">Earrings</a></li><li><a href="#">Necklaces</a></li><li><a href="#">Bangles</a></li></ul>
+    </div>
+    <div class="cf-cl-footer-col">
+      <h4>Help</h4>
+      <ul><li><a href="#">Track Order</a></li><li><a href="#">Returns & Exchange</a></li><li><a href="#">Shipping Info</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li></ul>
+    </div>
+    <div class="cf-cl-footer-col">
+      <h4>Company</h4>
+      <ul><li><a href="#">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Store Locator</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul>
+    </div>
+  </div>
+  <div class="cf-cl-footer-bottom">
+    <span class="cf-cl-footer-copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | default: 'CaratLane' }}. All rights reserved.</span>
+    <div class="cf-cl-footer-payments">
+      <span class="cf-cl-footer-pay-icon">VISA</span><span class="cf-cl-footer-pay-icon">MC</span><span class="cf-cl-footer-pay-icon">AMEX</span><span class="cf-cl-footer-pay-icon">UPI</span><span class="cf-cl-footer-pay-icon">EMI</span><span class="cf-cl-footer-pay-icon">COD</span>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "CaratLane Product Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Theme Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Brand Color",
+      "default": "#493161"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#DEBB43"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Product Settings"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Fallback Title (if no product)",
+      "default": "Elegant Diamond Solitaire Ring"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_text",
+      "label": "Product Subtitle",
+      "default": "Handcrafted 18K Rose Gold • BIS Hallmarked"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review Count",
+      "default": "1,247"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "buy_now_text",
+      "label": "Buy Now Button Text",
+      "default": "Buy Now"
+    },
+    {
+      "type": "header",
+      "content": "Urgency & Scarcity"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Urgency Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "urgency_text",
+      "label": "Urgency Text",
+      "default": "Selling Fast! Only <strong>3 left</strong> in stock — 27 people are viewing this right now."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dispatch",
+      "label": "Show Dispatch Timer",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Offer Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_offers",
+      "label": "Show Offers Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "offer_1",
+      "label": "Offer 1",
+      "default": "Get <strong>Flat 10% OFF</strong> on HDFC Bank Credit Card. Min order ₹5,000."
+    },
+    {
+      "type": "text",
+      "id": "offer_2",
+      "label": "Offer 2",
+      "default": "No Cost <strong>EMI starting ₹1,250/month</strong> on select banks."
+    },
+    {
+      "type": "text",
+      "id": "offer_3",
+      "label": "Offer 3",
+      "default": "Free <strong>Gift Wrapping</strong> + complimentary cleaning kit on this item."
+    },
+    {
+      "type": "header",
+      "content": "Promo Strip"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_strip",
+      "label": "Show Promo Strip",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Promo Text",
+      "default": "Get Flat 10% OFF on making charges. Use Code:"
+    },
+    {
+      "type": "text",
+      "id": "promo_code",
+      "label": "Promo Code",
+      "default": "CARATEST"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "100% Certified"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Secure Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "15-Day Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_4",
+      "label": "Trust Badge 4",
+      "default": "Lifetime Exchange"
+    },
+    {
+      "type": "header",
+      "content": "Product Details"
+    },
+    {
+      "type": "text",
+      "id": "desc_heading",
+      "label": "Description Heading",
+      "default": "Product Description"
+    },
+    {
+      "type": "text",
+      "id": "spec_material",
+      "label": "Spec: Material",
+      "default": "18K Rose Gold"
+    },
+    {
+      "type": "text",
+      "id": "spec_weight",
+      "label": "Spec: Weight",
+      "default": "2.45 grams"
+    },
+    {
+      "type": "text",
+      "id": "spec_purity",
+      "label": "Spec: Purity",
+      "default": "750 (18K)"
+    },
+    {
+      "type": "text",
+      "id": "spec_stone",
+      "label": "Spec: Stone",
+      "default": "SI IJ Diamond, 0.15 Carat"
+    },
+    {
+      "type": "text",
+      "id": "spec_occasion",
+      "label": "Spec: Occasion",
+      "default": "Everyday, Office, Party"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CaratLane Product Page"
+    }
+  ]
+}
+{% endschema %}

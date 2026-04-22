@@ -1,0 +1,1084 @@
+# 🏗️ MASTER TECHNICAL PROMPT — SHOPIFY PAGE BUILDER APP
+### (PageFly / GemPages / EComposer Clone — Full Technical Spec)
+
+---
+
+## 🎯 PROJECT OVERVIEW
+
+Build a **production-ready Shopify Embedded App** — a drag-and-drop landing page builder that allows Shopify merchants to visually create, customize, and publish high-converting pages (landing pages, product pages, collection pages, homepages, blog pages, 404 pages, coming soon pages) — without writing any code.
+
+The app must work exactly like **PageFly**, **GemPages**, and **EComposer**, with a full visual editor embedded inside the Shopify admin, and a **storefront renderer** that displays those pages on the live store at blazing speed.
+
+---
+
+## ⚙️ FULL TECHNICAL ARCHITECTURE
+
+### Architecture Pattern: 3-Layer System
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  LAYER 1: ADMIN EDITOR (Embedded Shopify App)            │
+│  React + Shopify App Bridge + Polaris + DnD             │
+│  Runs inside Shopify Admin iframe                        │
+├─────────────────────────────────────────────────────────┤
+│  LAYER 2: BACKEND API (Node.js / Remix)                  │
+│  Handles OAuth, page storage, Shopify GraphQL calls     │
+│  Stores page JSON schemas in DB, writes Liquid to store  │
+├─────────────────────────────────────────────────────────┤
+│  LAYER 3: STOREFRONT RENDERER                            │
+│  Theme App Extension OR ScriptTag API                   │
+│  Reads page JSON → renders HTML on storefront           │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ FULL TECH STACK
+
+### Backend
+- **Runtime**: Node.js 20+ / Remix v2 (Shopify's official recommended framework)
+- **Framework**: `@shopify/shopify-app-remix` (handles OAuth, webhooks, session management)
+- **Database**: PostgreSQL via Prisma ORM (stores page schemas, templates, user plans)
+- **Session Storage**: Prisma Session Storage (SQLite for dev, Postgres for prod)
+- **File Hosting**: AWS S3 / Cloudflare R2 (stores uploaded images, custom fonts)
+- **CDN**: Cloudflare CDN (serves storefront renderer JS bundle)
+- **Queue**: Bull + Redis (for async publish jobs, image optimization)
+- **Cache**: Redis (page JSON cache, Shopify API rate limit buffer)
+
+### Frontend (Admin Editor)
+- **Framework**: React 18 + TypeScript
+- **Shopify UI**: `@shopify/polaris` (Shopify's design system)
+- **App Bridge**: `@shopify/app-bridge` CDN version (embedded app auth, Resource Picker)
+- **Drag & Drop**: `@dnd-kit/core` + `@dnd-kit/sortable` (best performance, accessible)
+- **State Management**: Zustand (editor state) + React Query (server state)
+- **Canvas/Preview**: `iframe` with postMessage communication
+- **Rich Text**: TipTap editor (for text blocks)
+- **Color Picker**: `react-colorful`
+- **Icons**: Lucide React + custom SVG icon set
+- **Animations**: Framer Motion (editor micro-interactions)
+
+### Storefront Renderer
+- **Method**: Shopify **Theme App Extension** (primary, OS 2.0 compatible)
+- **Fallback**: ScriptTag API + `window.__PAGEBUILDER__` hydration
+- **Render Strategy**: Server-side Liquid + client-side JS hydration for interactive blocks
+- **Bundle Size Target**: < 30kb gzipped for storefront JS
+- **Performance**: Vanilla JS only on storefront (NO React/Vue — too heavy)
+
+---
+
+## 🗄️ DATABASE SCHEMA (Prisma)
+
+```prisma
+model Session {
+  id          String   @id
+  shop        String
+  state       String
+  isOnline    Boolean  @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      BigInt?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  shop        String
+  title       String
+  handle      String                        // URL handle (e.g., "summer-sale")
+  pageType    PageType                      // LANDING | PRODUCT | COLLECTION | HOME | BLOG | FAQ | COMING_SOON | 404
+  status      PageStatus @default(DRAFT)   // DRAFT | PUBLISHED | SCHEDULED
+  schema      Json                          // The full page JSON schema (blocks tree)
+  cssOverride String?  @db.Text            // Custom CSS injected for this page
+  jsCustom    String?  @db.Text            // Custom JS for this page
+  seoTitle    String?
+  seoDesc     String?
+  ogImage     String?
+  publishedAt DateTime?
+  scheduledAt DateTime?
+  shopifyPageId String?                    // Shopify's page/product/collection ID if linked
+  templateId  String?
+  views       Int      @default(0)
+  conversions Int      @default(0)
+  abTests     ABTest[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([shop, handle])
+  @@index([shop, pageType])
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  category    String                        // "landing", "product", "sale", "fashion", etc.
+  thumbnail   String
+  schema      Json                          // Pre-built block tree
+  isPremium   Boolean  @default(false)
+  tags        String[]
+  previewUrl  String?
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model GlobalStyle {
+  id          String   @id @default(cuid())
+  shop        String   @unique
+  primaryColor    String  @default("#000000")
+  secondaryColor  String  @default("#ffffff")
+  accentColor     String  @default("#e63946")
+  headingFont     String  @default("Inter")
+  bodyFont        String  @default("Inter")
+  fontScale       Float   @default(1.0)
+  borderRadius    String  @default("4px")
+  buttonStyle     Json                      // global button defaults
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SavedSection {
+  id       String  @id @default(cuid())
+  shop     String
+  name     String
+  schema   Json    // single section's block JSON
+  thumbnail String?
+  createdAt DateTime @default(now())
+}
+
+model MerchantPlan {
+  id            String    @id @default(cuid())
+  shop          String    @unique
+  plan          PlanTier  @default(FREE)   // FREE | STARTER | PRO | UNLIMITED
+  publishedPages Int      @default(0)
+  maxPages      Int       @default(1)
+  billingId     String?
+  trialEnds     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ABTest {
+  id         String  @id @default(cuid())
+  pageId     String
+  page       Page    @relation(fields: [pageId], references: [id])
+  variantSchema Json
+  variantName   String
+  trafficSplit  Int  @default(50)  // percentage
+  isWinner   Boolean @default(false)
+  views      Int     @default(0)
+  conversions Int    @default(0)
+  createdAt  DateTime @default(now())
+}
+
+enum PageType {
+  LANDING
+  PRODUCT
+  COLLECTION
+  HOME
+  BLOG
+  FAQ
+  COMING_SOON
+  PAGE_404
+  CART
+  CUSTOM
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum PlanTier {
+  FREE
+  STARTER
+  PRO
+  UNLIMITED
+}
+```
+
+---
+
+## 📐 PAGE SCHEMA — JSON BLOCK TREE
+
+Every page is stored as a **JSON tree of blocks**. This is the core data structure.
+
+```typescript
+// Root Page Schema
+interface PageSchema {
+  version: "1.0";
+  id: string;
+  pageType: string;
+  globalStyles: {
+    fontFamily: string;
+    primaryColor: string;
+    secondaryColor: string;
+    maxWidth: string;            // e.g., "1200px"
+    containerPadding: string;   // e.g., "0 20px"
+  };
+  sections: Section[];         // Top-level sections (rows)
+}
+
+// A Section = full-width row container
+interface Section {
+  id: string;                  // unique block ID
+  type: "section";
+  settings: {
+    background: BackgroundSettings;
+    padding: SpacingSettings;
+    margin: SpacingSettings;
+    fullWidth: boolean;
+    minHeight: string;
+    htmlId: string;            // for anchor links
+    htmlClass: string;
+    hideOnMobile: boolean;
+    hideOnDesktop: boolean;
+    parallax: boolean;
+    customCss: string;
+  };
+  columns: Column[];
+}
+
+// A Column = flex/grid column inside a section
+interface Column {
+  id: string;
+  type: "column";
+  settings: {
+    width: number;             // 1-12 grid units
+    widthMobile: number;
+    padding: SpacingSettings;
+    verticalAlign: "top" | "middle" | "bottom";
+    background: BackgroundSettings;
+    border: BorderSettings;
+    borderRadius: string;
+    sticky: boolean;
+    order: number;
+    orderMobile: number;
+  };
+  blocks: Block[];             // Leaf elements
+}
+
+// A Block = actual UI element
+interface Block {
+  id: string;
+  type: BlockType;             // see full list below
+  settings: Record<string, any>;  // per-block settings
+  responsiveOverrides?: {     // mobile-specific overrides
+    mobile?: Partial<Record<string, any>>;
+    tablet?: Partial<Record<string, any>>;
+  };
+  animations?: AnimationSettings;
+  visibility?: {
+    hideOnMobile: boolean;
+    hideOnTablet: boolean;
+    hideOnDesktop: boolean;
+    loggedInOnly: boolean;
+    guestOnly: boolean;
+  };
+}
+```
+
+---
+
+## 🧱 ALL ELEMENTS / BLOCKS (50+ Elements)
+
+### 📝 Basic Elements
+| Block Type | Settings |
+|---|---|
+| `heading` | text, tag (h1-h6), font, size, weight, color, align, lineHeight |
+| `paragraph` | richText (TipTap JSON), font, size, color, align, lineHeight, maxWidth |
+| `button` | text, url, target, style (filled/outline/ghost/text), bgColor, textColor, border, borderRadius, size, iconLeft, iconRight, hoverEffect |
+| `image` | src, alt, width, height, objectFit, lazyLoad, linkTo, caption, overlay |
+| `video` | source (upload/youtube/vimeo), autoplay, muted, loop, controls, thumbnail, aspectRatio |
+| `divider` | style (solid/dashed/dotted), color, thickness, width, icon |
+| `spacer` | height (desktop/tablet/mobile) |
+| `icon` | library (lucide/feather/fa), name, size, color, animation |
+| `raw_html` | html, css (sandboxed) |
+
+### 🛒 Shopify Product Elements
+| Block Type | Settings |
+|---|---|
+| `product_title` | productId (dynamic), font, size, color, tag |
+| `product_price` | productId, showCompare, showSavings, priceColor, compareColor, format |
+| `product_description` | productId, maxLines, expandable |
+| `product_images` | productId, layout (gallery/carousel/thumbnails), aspectRatio, zoom, mainImageIndex |
+| `product_variants` | productId, style (dropdown/swatches/buttons), showInventory, soldOutBehavior |
+| `add_to_cart_button` | productId, text, soldOutText, style, quantity (show/hide), redirectAfter |
+| `buy_now_button` | productId, text, style |
+| `product_rating` | productId, source (judgeme/loox/stamped), starColor, showCount |
+| `product_badge` | text, condition (sale/new/bestseller/custom), bgColor, textColor, position |
+| `stock_counter` | productId, threshold, text, showBar, barColor, urgencyColor |
+| `product_tabs` | productId, tabs (description/specs/reviews/shipping), tabStyle |
+| `related_products` | collection, productId, count, layout (grid/carousel), cardStyle |
+| `upsell_block` | productIds, layout, title, showPrice |
+| `bundle_builder` | productIds, discountType, discountValue |
+
+### 📋 Collection Elements
+| Block Type | Description |
+|---|---|
+| `collection_grid` | products from collection, filter/sort, pagination, card layout |
+| `collection_filter` | sidebar/top filter bar with tags, price range, variants |
+| `collection_heading` | dynamic collection title, description |
+| `collection_banner` | collection image, title overlay |
+| `product_card` | reusable card component for grids (image, title, price, ATC button) |
+
+### 🏆 Conversion / CRO Elements
+| Block Type | Description |
+|---|---|
+| `countdown_timer` | date-based or evergreen, clock style, action on end (hide/redirect/custom text) |
+| `trust_badges` | icon + text, layouts (row/grid), customizable |
+| `testimonial` | text, name, photo, rating, layout |
+| `testimonials_carousel` | multiple testimonials, autoplay, dots/arrows |
+| `before_after_slider` | two images with drag handle |
+| `social_proof_popup` | "Rahul from Mumbai just bought..." style popup |
+| `announcement_bar` | scrolling or static, dismissable, bg/text color |
+| `sticky_atc_bar` | mobile-first sticky add-to-cart, shows on scroll |
+| `exit_intent_popup` | triggers on cursor leaving viewport, discount code |
+| `progress_bar` | goal-based (e.g., "Free shipping at ₹999"), fill color |
+| `icon_with_text` | icon + heading + paragraph (3-4 in a row, for features/USPs) |
+| `comparison_table` | product vs competitor, checkmarks, custom rows |
+| `faq_accordion` | question/answer pairs, open/close animation, schema markup |
+| `size_chart` | popup or inline table |
+| `shipping_estimator` | pincode-based (Indian D2C ready) |
+| `free_gift_meter` | progress bar to unlock free gift |
+
+### 📐 Layout Elements
+| Block Type | Description |
+|---|---|
+| `tabs_block` | custom tabs with any content inside each tab |
+| `accordion` | general collapsible content |
+| `slider` | multi-item carousel (products/images/content) |
+| `popup` | triggered popup with any content inside |
+| `sticky_section` | makes a section sticky on scroll |
+| `map_embed` | Google Maps iframe |
+| `instagram_feed` | grid of latest Instagram posts |
+
+### 📧 Form Elements
+| Block Type | Description |
+|---|---|
+| `email_form` | name, email, integration (Klaviyo/Mailchimp/Omnisend), success message |
+| `contact_form` | name, email, message, phone, submit button |
+| `newsletter_popup` | email capture with cookie-based frequency control |
+| `spin_wheel` | gamified email capture (spin to win discount) |
+
+### 📊 Analytics / Dynamic
+| Block Type | Description |
+|---|---|
+| `liquid_block` | raw Shopify Liquid code (advanced users) |
+| `app_embed` | embed any Shopify app's snippet |
+| `dynamic_content` | show/hide based on customer tag, cart value, etc. |
+
+---
+
+## 🖥️ EDITOR UI ARCHITECTURE
+
+### Editor Layout (3-Panel)
+
+```
+┌──────────────┬──────────────────────────────────┬───────────────┐
+│  LEFT PANEL  │         CENTER CANVAS            │  RIGHT PANEL  │
+│              │                                  │               │
+│  Elements    │   ┌─────────────────────────┐   │  Inspector    │
+│  Tabs:       │   │  LIVE PREVIEW IFRAME    │   │               │
+│  - Elements  │   │                         │   │  When nothing │
+│  - Sections  │   │  (Renders actual HTML)  │   │  selected:    │
+│  - Templates │   │                         │   │  Page Settings│
+│  - Apps      │   │  Drag blocks here       │   │               │
+│  - Saved     │   │  Click to select        │   │  When block   │
+│              │   │  Drag handles to reorder│   │  selected:    │
+│  Search box  │   │                         │   │  Block Props  │
+│              │   └─────────────────────────┘   │  Style Panel  │
+│              │                                  │  Animation    │
+│              │   Device Preview Toolbar:        │  Advanced     │
+│              │   [Desktop] [Tablet] [Mobile]    │               │
+│              │   [Undo] [Redo] [Save] [Publish] │               │
+└──────────────┴──────────────────────────────────┴───────────────┘
+```
+
+### Editor State (Zustand Store)
+
+```typescript
+interface EditorStore {
+  // Page data
+  pageSchema: PageSchema;
+  originalSchema: PageSchema;      // for dirty detection
+  isDirty: boolean;
+  isSaving: boolean;
+  isPublishing: boolean;
+
+  // Selection
+  selectedBlockId: string | null;
+  selectedSectionId: string | null;
+  hoveredBlockId: string | null;
+
+  // Device preview
+  activeDevice: "desktop" | "tablet" | "mobile";
+
+  // History
+  history: PageSchema[];           // undo stack
+  historyIndex: number;
+
+  // UI state
+  leftPanelTab: "elements" | "sections" | "templates" | "saved" | "apps";
+  rightPanelTab: "settings" | "style" | "advanced" | "animation";
+  showGridGuides: boolean;
+  zoomLevel: number;               // 50-150%
+  copiedBlock: Block | null;
+
+  // Actions
+  selectBlock: (id: string | null) => void;
+  updateBlock: (id: string, settings: Partial<Block['settings']>) => void;
+  addBlock: (sectionId: string, columnId: string, blockType: BlockType, position: number) => void;
+  deleteBlock: (id: string) => void;
+  duplicateBlock: (id: string) => void;
+  moveBlock: (activeId: string, overId: string) => void;
+  addSection: (template?: SectionTemplate) => void;
+  deleteSection: (id: string) => void;
+  duplicateSection: (id: string) => void;
+  moveSectionUp: (id: string) => void;
+  moveSectionDown: (id: string) => void;
+  undo: () => void;
+  redo: () => void;
+  savePage: () => Promise<void>;
+  publishPage: () => Promise<void>;
+}
+```
+
+### Editor ↔ Preview Communication
+
+The editor uses an **iframe preview** that communicates via `postMessage`:
+
+```typescript
+// Editor sends to iframe:
+iframe.contentWindow.postMessage({
+  type: "UPDATE_SCHEMA",
+  schema: editorStore.pageSchema
+}, "*");
+
+// Editor sends selection highlight:
+iframe.contentWindow.postMessage({
+  type: "HIGHLIGHT_BLOCK",
+  blockId: "block_abc123"
+}, "*");
+
+// iframe sends back to editor:
+window.parent.postMessage({
+  type: "BLOCK_CLICKED",
+  blockId: "block_abc123"
+}, "*");
+
+window.parent.postMessage({
+  type: "BLOCK_HOVERED",
+  blockId: "block_abc123"
+}, "*");
+```
+
+---
+
+## 🔌 SHOPIFY INTEGRATION LAYER
+
+### 1. App Installation (OAuth Flow)
+
+```
+Merchant installs app →
+  Shopify redirects to /auth?shop=xyz.myshopify.com →
+  App redirects to Shopify OAuth page →
+  Merchant approves scopes →
+  Shopify redirects to /auth/callback?code=xxx →
+  App exchanges code for access_token →
+  App stores access_token in DB →
+  App installs ScriptTag + Theme App Extension →
+  Merchant redirected to App inside Admin
+```
+
+**Required OAuth Scopes:**
+```
+read_products, write_products
+read_content, write_content        (for saving pages)
+read_themes, write_themes          (for theme app extensions)
+read_script_tags, write_script_tags
+read_files, write_files
+read_analytics
+read_customers
+```
+
+### 2. How Pages Are Saved to Shopify
+
+There are **two rendering strategies** — implement BOTH with automatic selection:
+
+#### Strategy A: Theme App Extension (PREFERRED — OS 2.0)
+1. App creates a Shopify `Page` resource via Admin API with a custom template name
+2. A `page.builder.liquid` template is injected into the theme via Theme API
+3. This template reads from `page.metafields.pagebuilder.schema` 
+4. A Liquid + JS renderer in the theme app extension reads the JSON and outputs HTML
+5. Result: **zero ScriptTag overhead**, pages are fully server-rendered
+
+```liquid
+{%- comment -%} templates/page.builder.liquid {%- endcomment -%}
+{% assign pb_schema = page.metafields.pagebuilder.schema.value %}
+{% if pb_schema %}
+  <div id="pb-page-root" data-page-id="{{ page.id }}">
+    {% render 'pb-renderer', schema: pb_schema %}
+  </div>
+{% endif %}
+```
+
+#### Strategy B: ScriptTag (Fallback for older themes)
+1. App injects a `<script src="https://cdn.yourdomain.com/renderer.js">` via ScriptTag API
+2. The renderer JS fetches page schema from app API using shop domain
+3. Hydrates and renders into `<div id="pb-app-root">` which is injected via Liquid snippet
+
+```javascript
+// renderer.js (< 30kb gzipped)
+(function() {
+  const ROOT = document.getElementById('pb-app-root');
+  if (!ROOT) return;
+  const pageId = ROOT.dataset.pageId;
+  
+  fetch(`https://api.yourdomain.com/render/${pageId}?shop=${Shopify.shop}`)
+    .then(r => r.json())
+    .then(({ html, css }) => {
+      const style = document.createElement('style');
+      style.textContent = css;
+      document.head.appendChild(style);
+      ROOT.innerHTML = html;
+      initInteractiveBlocks(); // countdown timers, carousels, etc.
+    });
+})();
+```
+
+### 3. Shopify Admin GraphQL API Calls
+
+```typescript
+// Fetch products for Product Picker
+const GET_PRODUCTS = `
+  query GetProducts($first: Int!, $query: String) {
+    products(first: $first, query: $query) {
+      edges {
+        node {
+          id title handle
+          featuredImage { url altText }
+          variants(first: 100) {
+            edges {
+              node { id title price compareAtPrice availableForSale }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Save page content as Shopify Page + Metafield
+const CREATE_PAGE_WITH_METAFIELD = `
+  mutation CreatePage($title: String!, $handle: String!, $schema: String!) {
+    pageCreate(page: {
+      title: $title
+      handle: $handle
+      templateSuffix: "builder"
+    }) {
+      page {
+        id
+        handle
+        onlineStoreUrl
+      }
+    }
+  }
+`;
+
+const SET_METAFIELD = `
+  mutation SetMetafield($ownerId: ID!, $schema: String!) {
+    metafieldsSet(metafields: [{
+      ownerId: $ownerId
+      namespace: "pagebuilder"
+      key: "schema"
+      value: $schema
+      type: "json"
+    }]) {
+      metafields { id }
+    }
+  }
+`;
+```
+
+---
+
+## 🎨 STOREFRONT RENDERER (Vanilla JS)
+
+The storefront renderer must be **extremely lightweight**. It's a pure function: JSON Schema → HTML string.
+
+```javascript
+// Core render function (runs client-side or server-side)
+function renderSchema(schema) {
+  let html = `<div class="pb-page" style="${getCSSVars(schema.globalStyles)}">`;
+  
+  for (const section of schema.sections) {
+    html += renderSection(section);
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+function renderSection(section) {
+  const { settings, columns } = section;
+  const bg = renderBackground(settings.background);
+  const padding = `padding: ${settings.padding.top}px ${settings.padding.right}px ${settings.padding.bottom}px ${settings.padding.left}px`;
+  
+  let html = `<section id="${settings.htmlId || ''}" class="pb-section ${settings.htmlClass || ''}" 
+    style="${bg};${padding}" data-block-id="${section.id}">`;
+  html += `<div class="pb-section-inner ${settings.fullWidth ? 'pb-full-width' : 'pb-container'}">`;
+  html += `<div class="pb-row">`;
+  
+  for (const column of columns) {
+    html += renderColumn(column);
+  }
+  
+  html += `</div></div></section>`;
+  return html;
+}
+
+function renderBlock(block) {
+  const renderers = {
+    heading: renderHeading,
+    paragraph: renderParagraph,
+    button: renderButton,
+    image: renderImage,
+    video: renderVideo,
+    countdown_timer: renderCountdown,
+    product_title: renderProductTitle,
+    product_price: renderProductPrice,
+    add_to_cart_button: renderATC,
+    product_images: renderProductImages,
+    // ... all 50+ block types
+  };
+  
+  const renderer = renderers[block.type];
+  if (!renderer) return `<!-- unknown block: ${block.type} -->`;
+  
+  const blockHtml = renderer(block.settings);
+  return wrapWithAnimations(blockHtml, block.animations, block.id);
+}
+```
+
+---
+
+## 🔧 BACKEND API ROUTES
+
+```
+POST   /api/auth/callback          - OAuth callback
+GET    /api/pages                  - List all pages for shop
+POST   /api/pages                  - Create new page
+GET    /api/pages/:id              - Get single page with schema
+PUT    /api/pages/:id              - Update page schema
+DELETE /api/pages/:id              - Delete page
+POST   /api/pages/:id/publish      - Publish page to Shopify
+POST   /api/pages/:id/unpublish    - Unpublish page
+POST   /api/pages/:id/duplicate    - Duplicate page
+
+GET    /api/templates              - List all templates
+GET    /api/templates/:id          - Get template schema
+
+GET    /api/saved-sections         - List saved sections
+POST   /api/saved-sections         - Save a section
+DELETE /api/saved-sections/:id     - Delete saved section
+
+GET    /api/global-styles          - Get shop global styles
+PUT    /api/global-styles          - Update global styles
+
+GET    /api/shopify/products       - Proxy: fetch products from Shopify
+GET    /api/shopify/collections    - Proxy: fetch collections
+GET    /api/shopify/metafields     - Proxy: get page metafields
+
+POST   /api/render/:pageId         - Server-render page to HTML (for ScriptTag method)
+
+GET    /api/analytics/:pageId      - Page analytics (views, conversions)
+POST   /api/analytics/event        - Track event from storefront
+
+POST   /api/billing/create         - Create Shopify billing subscription
+GET    /api/billing/status         - Get current plan
+POST   /webhooks/app/uninstalled   - Clean up on uninstall
+POST   /webhooks/shop/update       - Sync shop data
+```
+
+---
+
+## 📱 RESPONSIVE / DEVICE PREVIEW SYSTEM
+
+The editor has a **3-device preview mode**: Desktop (1200px), Tablet (768px), Mobile (375px).
+
+Every block's settings object supports per-device overrides:
+
+```typescript
+// In the Inspector panel, user can toggle "Responsive" mode
+// This writes to responsiveOverrides in the block schema
+
+interface BlockResponsiveOverrides {
+  mobile?: {
+    fontSize?: string;
+    padding?: SpacingSettings;
+    display?: "block" | "none" | "flex";
+    textAlign?: string;
+    width?: string;
+    // any setting that can vary per device
+  };
+  tablet?: {
+    // same...
+  };
+}
+
+// Generated CSS:
+// .pb-block-{id} { /* desktop styles */ }
+// @media (max-width: 768px) { .pb-block-{id} { /* tablet overrides */ } }
+// @media (max-width: 480px) { .pb-block-{id} { /* mobile overrides */ } }
+```
+
+---
+
+## 🎭 ANIMATION SYSTEM
+
+Every block supports entrance animations:
+
+```typescript
+interface AnimationSettings {
+  type: "fadeIn" | "slideUp" | "slideLeft" | "slideRight" | "zoomIn" | "bounce" | "none";
+  trigger: "onLoad" | "onScroll" | "onHover";
+  duration: number;          // ms (200-2000)
+  delay: number;             // ms (0-2000)
+  easing: string;            // "ease", "ease-in-out", "cubic-bezier(...)"
+  repeat: boolean;
+}
+
+// Generated via Intersection Observer API on storefront:
+// data-pb-animate="fadeIn" data-pb-delay="200" data-pb-duration="600"
+```
+
+---
+
+## 🌐 GLOBAL STYLE SYSTEM
+
+Global styles apply across ALL pages of the shop. Individual blocks can override these.
+
+```typescript
+interface GlobalStyleToken {
+  // Colors
+  "--pb-color-primary": string;
+  "--pb-color-secondary": string;
+  "--pb-color-accent": string;
+  "--pb-color-text": string;
+  "--pb-color-text-muted": string;
+  "--pb-color-bg": string;
+
+  // Typography
+  "--pb-font-heading": string;
+  "--pb-font-body": string;
+  "--pb-font-size-base": string;    // "16px"
+  "--pb-font-size-scale": string;  // "1.25" (modular scale)
+
+  // Spacing
+  "--pb-spacing-xs": string;
+  "--pb-spacing-sm": string;
+  "--pb-spacing-md": string;
+  "--pb-spacing-lg": string;
+  "--pb-spacing-xl": string;
+
+  // Layout
+  "--pb-container-max-width": string;  // "1200px"
+  "--pb-container-padding": string;    // "0 20px"
+
+  // Border
+  "--pb-border-radius": string;
+  "--pb-border-color": string;
+
+  // Button defaults
+  "--pb-btn-bg": string;
+  "--pb-btn-color": string;
+  "--pb-btn-border-radius": string;
+  "--pb-btn-padding": string;
+  "--pb-btn-font-weight": string;
+}
+```
+
+---
+
+## 🏷️ TEMPLATE SYSTEM
+
+Templates are **pre-built page schemas** that users can start from. Build 50+ templates:
+
+### Template Categories
+- 🛍️ Product Page (Minimalist, Luxury, Bold, Skincare, Fashion)
+- 🏠 Homepage (Brand Story, Hero Video, Bestsellers)
+- 🎯 Landing Page (Sales, Launch, Campaign, Lead Gen)
+- 🎉 Promotional (Sale, Flash Sale, BOGO, Bundle)
+- 📣 Coming Soon (Email Capture, Countdown, Waitlist)
+- 🇮🇳 Indian D2C Specific (COD focused, Vernacular, Festival Sale)
+
+Each template is a full `PageSchema` JSON stored in DB or as static JSON files.
+
+---
+
+## 💰 BILLING / PLANS
+
+Use **Shopify Billing API** (not Stripe — required for App Store):
+
+```typescript
+const PLANS = {
+  FREE: {
+    name: "Free",
+    price: 0,
+    maxPublishedPages: 1,
+    features: ["1 published page", "All elements", "Basic templates", "24/7 chat support"]
+  },
+  STARTER: {
+    name: "Starter",
+    price: 19,  // USD/month
+    maxPublishedPages: 15,
+    features: ["15 published pages", "All elements", "All templates", "A/B testing (basic)", "Analytics"]
+  },
+  PRO: {
+    name: "Pro",
+    price: 39,
+    maxPublishedPages: 50,
+    features: ["50 published pages", "Custom code blocks", "A/B testing", "Advanced analytics", "Global styles", "Saved sections"]
+  },
+  UNLIMITED: {
+    name: "Unlimited",
+    price: 99,
+    maxPublishedPages: Infinity,
+    features: ["Unlimited pages", "All Pro features", "White label", "Priority support"]
+  }
+};
+
+// Create subscription via Shopify Billing API
+const CREATE_SUBSCRIPTION = `
+  mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean) {
+    appSubscriptionCreate(name: $name, lineItems: $lineItems, returnUrl: $returnUrl, test: $test) {
+      appSubscription { id status }
+      confirmationUrl
+    }
+  }
+`;
+```
+
+---
+
+## 🔒 SECURITY
+
+- **OAuth token storage**: Encrypted at rest in DB, never exposed to frontend
+- **Session validation**: Every API request validates Shopify session token (JWT)
+- **HMAC verification**: All webhook payloads verified with `SHOPIFY_API_SECRET`
+- **Rate limiting**: Redis-based rate limiter on all API routes (100 req/min per shop)
+- **Content Security Policy**: Strict CSP headers on embedded app
+- **ScriptTag integrity**: SRI hashes on CDN-hosted renderer files
+- **XSS prevention**: All user HTML in `raw_html` blocks sandboxed in an `<iframe srcdoc>`
+- **Input sanitization**: DOMPurify on any HTML output from user content
+
+---
+
+## 📊 ANALYTICS SYSTEM
+
+Track page performance natively (replace need for apps):
+
+```typescript
+// Storefront tracking pixel (injected by ScriptTag or TAE)
+window.__PB_ANALYTICS__ = {
+  pageId: "xxx",
+  shop: "xxx.myshopify.com",
+  
+  track: function(event, data) {
+    // event: "view" | "atc" | "purchase" | "scroll_depth" | "element_click"
+    navigator.sendBeacon('/api/analytics/event', JSON.stringify({
+      event, data,
+      pageId: this.pageId,
+      shop: this.shop,
+      timestamp: Date.now(),
+      sessionId: this.getSessionId()
+    }));
+  }
+};
+
+// Auto-track page view
+document.addEventListener('DOMContentLoaded', () => {
+  window.__PB_ANALYTICS__.track('view', {
+    url: window.location.href,
+    referrer: document.referrer,
+    userAgent: navigator.userAgent
+  });
+});
+
+// Track scroll depth
+// Track ATC button clicks
+// Track form submissions
+```
+
+---
+
+## 🚀 PERFORMANCE REQUIREMENTS
+
+| Metric | Target |
+|---|---|
+| Lighthouse Mobile Score | > 90 |
+| LCP (Largest Contentful Paint) | < 2.5s |
+| CLS | < 0.1 |
+| Storefront JS Bundle | < 30kb gzip |
+| Editor Load Time | < 3s |
+| Page Schema Save | < 500ms |
+| Template Load | < 200ms |
+
+**Optimizations:**
+- Lazy load all images with IntersectionObserver
+- CSS-in-JSON approach: generate minimal critical CSS per page
+- Font subsetting for custom fonts
+- Image CDN with auto WebP/AVIF conversion
+- Schema stored in Redis with 5-min TTL
+- Edge caching of rendered HTML (Cloudflare Workers optional)
+
+---
+
+## 🇮🇳 INDIAN D2C SPECIFIC FEATURES
+
+Since this is for Indian merchants, add these natively:
+
+1. **COD (Cash on Delivery) Block** — COD available badge, COD toggle in ATC flow
+2. **Pincode Checker Block** — delivery date estimator by pincode (India Post API)
+3. **EMI Block** — show EMI options (No Cost EMI via Razorpay/PayU)
+4. **Indian Payment Logos Block** — UPI, Paytm, GPay, PhonePe, NetBanking trust badges
+5. **Hindi/Regional Text Support** — font stack that supports Devanagari
+6. **Festival Templates** — Diwali, Holi, Navratri, Republic Day themed templates
+7. **WhatsApp CTA Block** — "Buy on WhatsApp" button with phone number config
+8. **Social Proof Block** — "X people from [city] bought this today" with Indian city names
+
+---
+
+## 📁 FOLDER STRUCTURE
+
+```
+shopify-pagebuilder/
+├── app/                          # Remix app
+│   ├── routes/
+│   │   ├── app.jsx               # App layout with Polaris + App Bridge
+│   │   ├── app._index.jsx        # Dashboard (pages list)
+│   │   ├── app.pages.$id.jsx     # Editor route
+│   │   ├── app.templates.jsx     # Template library
+│   │   ├── app.analytics.jsx     # Analytics dashboard
+│   │   ├── app.settings.jsx      # Global styles + billing
+│   │   ├── auth.$.jsx            # OAuth handler
+│   │   └── webhooks.jsx          # Webhook handler
+│   ├── components/
+│   │   ├── editor/
+│   │   │   ├── EditorLayout.jsx
+│   │   │   ├── LeftPanel/
+│   │   │   │   ├── ElementsList.jsx
+│   │   │   │   ├── SectionTemplates.jsx
+│   │   │   │   ├── TemplateLibrary.jsx
+│   │   │   │   └── SavedSections.jsx
+│   │   │   ├── Canvas/
+│   │   │   │   ├── EditorCanvas.jsx
+│   │   │   │   ├── PreviewFrame.jsx
+│   │   │   │   ├── BlockWrapper.jsx
+│   │   │   │   ├── SectionWrapper.jsx
+│   │   │   │   └── DeviceToolbar.jsx
+│   │   │   ├── RightPanel/
+│   │   │   │   ├── Inspector.jsx
+│   │   │   │   ├── BlockSettings/
+│   │   │   │   │   ├── HeadingSettings.jsx
+│   │   │   │   │   ├── ButtonSettings.jsx
+│   │   │   │   │   ├── ProductSettings.jsx
+│   │   │   │   │   ├── CountdownSettings.jsx
+│   │   │   │   │   └── ... (one per block type)
+│   │   │   │   ├── StylePanel.jsx
+│   │   │   │   ├── AnimationPanel.jsx
+│   │   │   │   └── AdvancedPanel.jsx
+│   │   │   └── Toolbar/
+│   │   │       ├── EditorTopBar.jsx
+│   │   │       └── UndoRedo.jsx
+│   │   ├── blocks/               # Block React components (editor preview)
+│   │   │   ├── HeadingBlock.jsx
+│   │   │   ├── ButtonBlock.jsx
+│   │   │   ├── ProductBlock.jsx
+│   │   │   └── ...
+│   │   └── ui/                   # Shared Polaris-based UI components
+│   ├── store/
+│   │   ├── editorStore.js        # Zustand editor state
+│   │   └── uiStore.js
+│   ├── lib/
+│   │   ├── shopify.server.js     # Shopify client
+│   │   ├── db.server.js          # Prisma client
+│   │   ├── renderer.server.js    # SSR page renderer
+│   │   └── billing.server.js     # Billing helpers
+│   └── templates/                # 50+ pre-built page templates (JSON)
+│       ├── product-minimal.json
+│       ├── homepage-hero.json
+│       └── ...
+├── extensions/
+│   └── theme-app-extension/
+│       └── assets/
+│           ├── pb-renderer.js    # Storefront renderer bundle
+│           └── pb-styles.css     # Base storefront styles
+├── prisma/
+│   └── schema.prisma
+├── public/
+├── shopify.app.toml
+└── package.json
+```
+
+---
+
+## 🏁 BUILD ORDER / PHASED ROADMAP
+
+### Phase 1 — MVP (6-8 weeks)
+- [ ] Shopify OAuth + session management (Remix template)
+- [ ] Basic editor UI (3-panel layout, Polaris)
+- [ ] 15 core blocks (heading, text, image, button, video, divider, spacer, product title/price/images/ATC/variants, countdown, trust badges)
+- [ ] Section + Column drag-and-drop (dnd-kit)
+- [ ] Basic Inspector panel (settings for each block)
+- [ ] Device preview (desktop/tablet/mobile)
+- [ ] Save page to DB + publish to Shopify Page with ScriptTag renderer
+- [ ] 10 starter templates
+- [ ] Free plan billing
+
+### Phase 2 — Growth (4-6 weeks)
+- [ ] All 50+ blocks
+- [ ] Global styles system
+- [ ] Saved sections
+- [ ] Undo/redo history
+- [ ] Template library (50+ templates)
+- [ ] Indian D2C features (COD, pincode, WhatsApp CTA)
+- [ ] Built-in analytics
+- [ ] Pro/Unlimited billing
+- [ ] Theme App Extension migration
+
+### Phase 3 — Advanced (4-6 weeks)
+- [ ] A/B testing
+- [ ] AI page generation (GPT-4o prompt → full page schema)
+- [ ] Image-to-layout (upload screenshot → generate matching layout)
+- [ ] Klaviyo / Mailchimp / Omnisend integrations
+- [ ] Judge.me / Loox / Stamped review block
+- [ ] Advanced animations
+- [ ] Custom CSS/JS per page
+- [ ] Export page as Shopify theme section
+
+---
+
+## 🤖 AI FEATURES (Phase 3)
+
+```typescript
+// AI page generation endpoint
+POST /api/ai/generate-page
+Body: {
+  prompt: "Create a product page for an anti-aging skincare serum, luxury brand, dark theme",
+  pageType: "PRODUCT",
+  productId: "gid://shopify/Product/xxx",
+  style: "luxury" // "minimal" | "bold" | "playful" | "luxury"
+}
+Response: { schema: PageSchema }
+
+// Uses Claude API or GPT-4o with a detailed system prompt
+// that knows the full block schema and generates valid JSON
+```
+
+---
+
+*This document is a complete technical blueprint. Every section maps to real implementation. Build in phases, starting from Phase 1 MVP. The core innovation is the JSON schema system — everything else is a UI wrapper around it.*

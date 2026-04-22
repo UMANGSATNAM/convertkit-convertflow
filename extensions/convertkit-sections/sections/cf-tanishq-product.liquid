@@ -1,0 +1,361 @@
+{% comment %}
+  ConvertFlow — Tanishq Product Page (Redesigned)
+  Authentic tanishq.co.in product detail page
+{% endcomment %}
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap');
+  .cfj-pdp * { margin: 0; padding: 0; box-sizing: border-box; }
+  .cfj-pdp {
+    font-family: 'DM Sans', sans-serif; color: #404040;
+    background: #FFFCF5; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .cfj-pdp a { text-decoration: none; color: inherit; }
+  .cfj-pdp h1,.cfj-pdp h2,.cfj-pdp h3 { font-family: 'Playfair Display', serif; color: #2C1810; }
+
+  /* ── Breadcrumb ── */
+  .cfj-pdp-bread {
+    max-width: 1320px; margin: 0 auto; padding: 20px 40px;
+    font-size: 13px; color: #8B7355; display: flex; align-items: center; gap: 8px;
+  }
+  .cfj-pdp-bread a { color: #8B7355; transition: color 0.2s; }
+  .cfj-pdp-bread a:hover { color: #D4AF37; }
+  .cfj-pdp-bread span { color: #ccc; }
+
+  /* ── Main Layout ── */
+  .cfj-pdp-main {
+    max-width: 1320px; margin: 0 auto; padding: 0 40px 60px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
+  }
+
+  /* ── Gallery ── */
+  .cfj-pdp-gallery { position: sticky; top: 80px; }
+  .cfj-pdp-gallery-main {
+    width: 100%; aspect-ratio: 1; background: #FAF5ED; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; position: relative;
+    border: 1px solid rgba(44,24,16,0.06);
+  }
+  .cfj-pdp-gallery-main img { max-width: 85%; max-height: 85%; object-fit: contain; transition: transform 0.5s; }
+  .cfj-pdp-gallery-main:hover img { transform: scale(1.1); }
+  .cfj-pdp-gallery-wish {
+    position: absolute; top: 16px; right: 16px; width: 44px; height: 44px;
+    background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .cfj-pdp-gallery-wish:hover { background: #fff; }
+  .cfj-pdp-gallery-wish svg { width: 22px; height: 22px; color: #8B7355; }
+  .cfj-pdp-gallery-wish:hover svg { color: #D4AF37; }
+  .cfj-pdp-thumbs {
+    display: flex; gap: 10px; margin-top: 14px; overflow-x: auto; scrollbar-width: none;
+  }
+  .cfj-pdp-thumbs::-webkit-scrollbar { display: none; }
+  .cfj-pdp-thumb {
+    width: 72px; height: 72px; flex-shrink: 0; border: 2px solid transparent;
+    background: #FAF5ED; cursor: pointer; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
+  }
+  .cfj-pdp-thumb:first-child { border-color: #D4AF37; }
+  .cfj-pdp-thumb:hover { border-color: #D4AF37; }
+  .cfj-pdp-thumb img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+  /* ── Details ── */
+  .cfj-pdp-details { padding-top: 10px; }
+  .cfj-pdp-title { font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .cfj-pdp-subtitle { font-size: 14px; color: #8B7355; margin-bottom: 20px; }
+
+  /* Rating */
+  .cfj-pdp-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .cfj-pdp-stars { display: flex; gap: 2px; }
+  .cfj-pdp-stars svg { width: 16px; height: 16px; fill: #D4AF37; color: #D4AF37; }
+  .cfj-pdp-stars svg.empty { fill: none; color: #ddd; }
+  .cfj-pdp-reviews { font-size: 13px; color: #8B7355; }
+
+  /* Price */
+  .cfj-pdp-price-block {
+    background: #FAF5ED; padding: 20px 24px; margin-bottom: 24px;
+    border-left: 3px solid #D4AF37;
+  }
+  .cfj-pdp-price { font-size: 28px; font-weight: 700; color: #2C1810; }
+  .cfj-pdp-compare { font-size: 16px; color: #bbb; text-decoration: line-through; margin-left: 12px; }
+  .cfj-pdp-price-note { font-size: 12px; color: #8B7355; margin-top: 6px; }
+  .cfj-pdp-price-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-top: 8px; }
+  .cfj-pdp-price-row span:last-child { font-weight: 600; color: #2C1810; }
+
+  /* Purity Badge */
+  .cfj-pdp-purity {
+    display: flex; gap: 16px; margin-bottom: 24px;
+  }
+  .cfj-pdp-purity-badge {
+    flex: 1; text-align: center; padding: 14px; border: 1px solid rgba(44,24,16,0.06);
+    background: #fff;
+  }
+  .cfj-pdp-purity-badge strong { display: block; font-size: 16px; color: #2C1810; margin-bottom: 2px; }
+  .cfj-pdp-purity-badge span { font-size: 11px; color: #8B7355; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Size Selector */
+  .cfj-pdp-size { margin-bottom: 24px; }
+  .cfj-pdp-size-label { font-size: 13px; font-weight: 600; color: #2C1810; margin-bottom: 10px; display: flex; justify-content: space-between; }
+  .cfj-pdp-size-label a { color: #D4AF37; font-size: 12px; }
+  .cfj-pdp-sizes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cfj-pdp-size-opt {
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(44,24,16,0.12); font-size: 13px; font-weight: 600; color: #404040;
+    cursor: pointer; transition: all 0.2s; background: #fff;
+  }
+  .cfj-pdp-size-opt:hover, .cfj-pdp-size-opt.active { border-color: #D4AF37; color: #D4AF37; background: rgba(212,175,55,0.04); }
+
+  /* CTAs */
+  .cfj-pdp-ctas { display: flex; gap: 12px; margin-bottom: 24px; }
+  .cfj-pdp-atc {
+    flex: 1; padding: 16px; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .cfj-pdp-atc.gold { background: linear-gradient(135deg, #D4AF37, #C5A028); color: #2C1810; }
+  .cfj-pdp-atc.gold:hover { background: #F5D060; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,55,0.3); }
+  .cfj-pdp-atc.dark { background: #2C1810; color: #FFFCF5; }
+  .cfj-pdp-atc.dark:hover { background: #1a0f0a; transform: translateY(-2px); }
+  .cfj-pdp-atc svg { width: 18px; height: 18px; }
+
+  /* Delivery Check */
+  .cfj-pdp-delivery {
+    border: 1px solid rgba(44,24,16,0.06); padding: 16px 20px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cfj-pdp-delivery svg { width: 20px; height: 20px; color: #D4AF37; flex-shrink: 0; }
+  .cfj-pdp-delivery input {
+    flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px;
+    color: #404040; background: transparent;
+  }
+  .cfj-pdp-delivery button {
+    background: none; border: none; color: #D4AF37; font-weight: 700; font-size: 13px;
+    cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Assurance */
+  .cfj-pdp-assurance {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;
+  }
+  .cfj-pdp-assure-item {
+    text-align: center; padding: 16px 8px; border: 1px solid rgba(44,24,16,0.06); background: #fff;
+  }
+  .cfj-pdp-assure-item svg { width: 24px; height: 24px; color: #D4AF37; margin-bottom: 8px; }
+  .cfj-pdp-assure-item span { display: block; font-size: 11px; font-weight: 600; color: #2C1810; line-height: 1.3; }
+
+  /* Accordion */
+  .cfj-pdp-accordion { border-top: 1px solid rgba(44,24,16,0.06); }
+  .cfj-pdp-acc-item { border-bottom: 1px solid rgba(44,24,16,0.06); }
+  .cfj-pdp-acc-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 0; cursor: pointer; font-size: 14px; font-weight: 600; color: #2C1810;
+  }
+  .cfj-pdp-acc-head svg { width: 18px; height: 18px; color: #8B7355; transition: transform 0.3s; }
+  .cfj-pdp-acc-body { padding: 0 0 18px; font-size: 14px; color: #666; line-height: 1.8; display: none; }
+  .cfj-pdp-acc-item.open .cfj-pdp-acc-body { display: block; }
+  .cfj-pdp-acc-item.open .cfj-pdp-acc-head svg { transform: rotate(180deg); }
+
+  /* ── Mobile Sticky CTA ── */
+  .cfj-pdp-mobile-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #fff; border-top: 1px solid rgba(44,24,16,0.08);
+    padding: 12px 16px; gap: 10px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+  .cfj-pdp-mobile-bar .cfj-pdp-atc { flex: 1; padding: 14px; font-size: 11px; }
+
+  /* ── Footer (reuse) ── */
+  .cfj-pdp-footer { background: #1a0f0a; color: rgba(255,252,245,0.7); margin-top: 60px; }
+  .cfj-pdp-footer-inner {
+    max-width: 1320px; margin: 0 auto; padding: 40px; display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+  }
+  .cfj-pdp-footer h4 { font-size: 12px; font-weight: 700; color: #D4AF37; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-family: 'DM Sans'; }
+  .cfj-pdp-footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .cfj-pdp-footer li a { font-size: 13px; color: rgba(255,252,245,0.5); transition: color 0.2s; }
+  .cfj-pdp-footer li a:hover { color: #D4AF37; }
+  .cfj-pdp-footer-copy { text-align: center; padding: 20px 40px; border-top: 1px solid rgba(212,175,55,0.08); font-size: 12px; color: rgba(255,252,245,0.3); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .cfj-pdp-main { grid-template-columns: 1fr; gap: 30px; padding: 0 16px 40px; }
+    .cfj-pdp-gallery { position: static; }
+    .cfj-pdp-bread { padding: 16px; }
+    .cfj-pdp-mobile-bar { display: flex; }
+    .cfj-pdp-ctas { display: none; }
+    .cfj-pdp-footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; padding: 30px 16px; }
+  }
+  @media (max-width: 600px) {
+    .cfj-pdp-purity { flex-direction: column; gap: 8px; }
+    .cfj-pdp-assurance { grid-template-columns: 1fr; }
+    .cfj-pdp-footer-inner { grid-template-columns: 1fr; }
+    .cfj-pdp-gallery-main { aspect-ratio: 4/3; }
+    .cfj-pdp-thumb { width: 56px; height: 56px; }
+  }
+{% endstyle %}
+
+<div class="cfj-pdp">
+  <!-- Breadcrumb -->
+  <div class="cfj-pdp-bread">
+    <a href="/">Home</a><span>›</span>
+    <a href="{{ collection.url | default: '/collections/all' }}">{{ collection.title | default: 'Jewellery' }}</a><span>›</span>
+    {{ product.title | default: 'Diamond Ring' | truncate: 40 }}
+  </div>
+
+  <!-- Main -->
+  <div class="cfj-pdp-main">
+    <!-- Gallery -->
+    <div class="cfj-pdp-gallery">
+      <div class="cfj-pdp-gallery-main">
+        <button class="cfj-pdp-gallery-wish" aria-label="Wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        </button>
+        {% if product.featured_image %}
+          <img id="cfj-main-img" src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
+        {% else %}
+          <img id="cfj-main-img" src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1.png" alt="Product">
+        {% endif %}
+      </div>
+      <div class="cfj-pdp-thumbs">
+        {% for image in product.images limit: 5 %}
+          <div class="cfj-pdp-thumb" onclick="document.getElementById('cfj-main-img').src='{{ image | img_url: 'master' }}'">
+            <img src="{{ image | img_url: '100x' }}" alt="Thumb">
+          </div>
+        {% else %}
+          {% for i in (1..4) %}
+          <div class="cfj-pdp-thumb">
+            <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-{{ i }}.png" alt="Thumb">
+          </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="cfj-pdp-details">
+      <h1 class="cfj-pdp-title">{{ product.title | default: 'Sparkling Diamond Solitaire Ring' }}</h1>
+      <p class="cfj-pdp-subtitle">{{ product.vendor | default: 'Tanishq' }} • {{ product.type | default: 'Gold Ring' }}</p>
+
+      <div class="cfj-pdp-rating">
+        <div class="cfj-pdp-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg viewBox="0 0 24 24" class="empty"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </div>
+        <span class="cfj-pdp-reviews">4.2 (312 Reviews)</span>
+      </div>
+
+      <div class="cfj-pdp-price-block">
+        <div>
+          <span class="cfj-pdp-price">{{ product.price | money | default: '₹24,999' }}</span>
+          {% if product.compare_at_price > product.price %}
+            <span class="cfj-pdp-compare">{{ product.compare_at_price | money }}</span>
+          {% endif %}
+        </div>
+        <p class="cfj-pdp-price-note">Inclusive of all taxes. EMI starts at ₹2,083/mo</p>
+        <div class="cfj-pdp-price-row"><span>Metal Price</span><span>₹18,400</span></div>
+        <div class="cfj-pdp-price-row"><span>Making Charges</span><span>₹4,200</span></div>
+        <div class="cfj-pdp-price-row"><span>GST (3%)</span><span>₹678</span></div>
+      </div>
+
+      <div class="cfj-pdp-purity">
+        <div class="cfj-pdp-purity-badge"><strong>18K</strong><span>Gold Purity</span></div>
+        <div class="cfj-pdp-purity-badge"><strong>2.4g</strong><span>Net Weight</span></div>
+        <div class="cfj-pdp-purity-badge"><strong>VVS1</strong><span>Diamond Clarity</span></div>
+      </div>
+
+      <div class="cfj-pdp-size">
+        <div class="cfj-pdp-size-label"><span>Select Size</span><a href="#">Size Guide</a></div>
+        <div class="cfj-pdp-sizes">
+          {% for i in (5..14) %}
+            <div class="cfj-pdp-size-opt {% if i == 7 %}active{% endif %}">{{ i }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="cfj-pdp-ctas">
+        <button class="cfj-pdp-atc gold" style="color:#2C1810 !important;-webkit-text-fill-color:#2C1810 !important;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Add to Cart
+        </button>
+        <button class="cfj-pdp-atc dark" style="color:#FFFCF5 !important;-webkit-text-fill-color:#FFFCF5 !important;">Buy Now</button>
+      </div>
+
+      <div class="cfj-pdp-delivery">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        <input type="text" placeholder="Enter pincode for delivery details">
+        <button>CHECK</button>
+      </div>
+
+      <div class="cfj-pdp-assurance">
+        <div class="cfj-pdp-assure-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Purity Guaranteed</span>
+        </div>
+        <div class="cfj-pdp-assure-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Lifetime Exchange</span>
+        </div>
+        <div class="cfj-pdp-assure-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <span>Certificate Included</span>
+        </div>
+      </div>
+
+      <div class="cfj-pdp-accordion">
+        <div class="cfj-pdp-acc-item open">
+          <div class="cfj-pdp-acc-head" onclick="this.parentElement.classList.toggle('open')">
+            Product Description
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="cfj-pdp-acc-body">
+            {{ product.description | default: 'This exquisitely crafted piece features BIS Hallmarked gold with ethically sourced diamonds. The intricate design is perfect for both everyday wear and special occasions, reflecting the Tanishq legacy of craftsmanship and trust.' }}
+          </div>
+        </div>
+        <div class="cfj-pdp-acc-item">
+          <div class="cfj-pdp-acc-head" onclick="this.parentElement.classList.toggle('open')">
+            Specifications
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="cfj-pdp-acc-body">Metal: 18K Yellow Gold • Weight: 2.4g • Diamond: 0.15ct, VVS1, F-G Color • Setting: Prong • BIS Hallmark: Yes • Certificate: IGI Certified</div>
+        </div>
+        <div class="cfj-pdp-acc-item">
+          <div class="cfj-pdp-acc-head" onclick="this.parentElement.classList.toggle('open')">
+            Shipping & Returns
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="cfj-pdp-acc-body">Free insured shipping on all orders. 15-day easy returns with full refund. Lifetime exchange at any Tanishq store. Free resizing within 30 days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Sticky Bar -->
+  <div class="cfj-pdp-mobile-bar">
+    <button class="cfj-pdp-atc gold" style="color:#2C1810 !important;-webkit-text-fill-color:#2C1810 !important;">Add to Cart</button>
+    <button class="cfj-pdp-atc dark" style="color:#FFFCF5 !important;-webkit-text-fill-color:#FFFCF5 !important;">Buy Now</button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="cfj-pdp-footer">
+    <div class="cfj-pdp-footer-inner">
+      <div><h4>Shop</h4><ul><li><a href="/collections/all">All Jewellery</a></li><li><a href="#">Rings</a></li><li><a href="#">Earrings</a></li><li><a href="#">Necklaces</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Track Order</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping</a></li><li><a href="#">FAQs</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Store Locator</a></li><li><a href="#">Privacy</a></li></ul></div>
+      <div><h4>Connect</h4><ul><li><a href="#">Facebook</a></li><li><a href="#">Instagram</a></li><li><a href="#">Twitter</a></li><li><a href="#">YouTube</a></li></ul></div>
+    </div>
+    <div class="cfj-pdp-footer-copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | default: 'Tanishq' }}. All rights reserved. A TATA Product.</div>
+  </footer>
+</div>
+
+{% schema %}
+{
+  "name": "Tanishq Product",
+  "settings": [],
+  "presets": [{ "name": "Tanishq Product" }]
+}
+{% endschema %}

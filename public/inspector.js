@@ -1,0 +1,360 @@
+/**
+ * ConvertKit ConvertFlow — Visual Section Inspector
+ * Injected inline into the proxied store page.
+ * Self-contained vanilla JS — no imports, no dependencies, no build step.
+ */
+(function () {
+  "use strict";
+
+  var inspectorEnabled = true;
+  var activeSection = null;
+  var overlay = null;
+  var tooltip = null;
+
+  // ── Create overlay ──
+  function createOverlay() {
+    overlay = document.createElement("div");
+    overlay.id = "__ck_overlay";
+    overlay.style.cssText =
+      "position:fixed;pointer-events:none;border:2px solid #4F46E5;border-radius:4px;" +
+      "background:rgba(79,70,229,0.06);z-index:2147483646;display:none;" +
+      "transition:top 0.12s ease,left 0.12s ease,width 0.12s ease,height 0.12s ease;" +
+      "box-shadow:0 0 0 1px rgba(79,70,229,0.3);";
+    document.body.appendChild(overlay);
+  }
+
+  // ── Create tooltip ──
+  function createTooltip() {
+    tooltip = document.createElement("div");
+    tooltip.id = "__ck_tooltip";
+    tooltip.style.cssText =
+      "position:fixed;background:#4F46E5;color:#fff;padding:4px 10px;border-radius:4px;" +
+      "font-size:11px;font-family:system-ui,-apple-system,sans-serif;font-weight:600;" +
+      "pointer-events:none;z-index:2147483647;display:none;white-space:nowrap;" +
+      "box-shadow:0 2px 8px rgba(0,0,0,0.15);";
+    document.body.appendChild(tooltip);
+  }
+
+  // ── Section detection ──
+  function getSectionForElement(el) {
+    var node = el;
+    var maxDepth = 30;
+    while (node && node !== document.body && maxDepth-- > 0) {
+      if (node.dataset && node.dataset.sectionId) {
+        return {
+          sectionId: node.dataset.sectionId,
+          sectionType: node.dataset.sectionType || "",
+          element: node,
+        };
+      }
+      if (node.id && node.id.indexOf("shopify-section-") === 0) {
+        var id = node.id.replace("shopify-section-", "");
+        return {
+          sectionId: id,
+          sectionType: node.dataset ? node.dataset.sectionType || "" : "",
+          element: node,
+        };
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  // ── Position overlay over element ──
+  function positionOverlay(rect) {
+    if (!overlay) return;
+    overlay.style.top = rect.top + "px";
+    overlay.style.left = rect.left + "px";
+    overlay.style.width = rect.width + "px";
+    overlay.style.height = rect.height + "px";
+    overlay.style.display = "block";
+  }
+
+  // ── Position tooltip above element ──
+  function positionTooltip(rect, label) {
+    if (!tooltip) return;
+    tooltip.textContent = label;
+    tooltip.style.display = "block";
+    var tooltipTop = rect.top - 28;
+    if (tooltipTop < 4) tooltipTop = rect.bottom + 6;
+    tooltip.style.top = tooltipTop + "px";
+    tooltip.style.left = Math.max(4, rect.left) + "px";
+  }
+
+  function hideOverlay() {
+    if (overlay) overlay.style.display = "none";
+    if (tooltip) tooltip.style.display = "none";
+    activeSection = null;
+  }
+
+  // ── Mousemove: highlight sections ──
+  document.addEventListener(
+    "mousemove",
+    function (e) {
+      if (!inspectorEnabled) return;
+
+      // Temporarily hide overlay so elementFromPoint works
+      if (overlay) overlay.style.display = "none";
+      if (tooltip) tooltip.style.display = "none";
+
+      var target = document.elementFromPoint(e.clientX, e.clientY);
+      if (!target) {
+        hideOverlay();
+        return;
+      }
+
+      var section = getSectionForElement(target);
+      if (section) {
+        activeSection = section;
+        var rect = section.element.getBoundingClientRect();
+        positionOverlay(rect);
+        var label = section.sectionType
+          ? section.sectionId + " (" + section.sectionType + ")"
+          : section.sectionId;
+        positionTooltip(rect, label);
+      } else {
+        hideOverlay();
+      }
+    },
+    { passive: true }
+  );
+
+  // ── Mouseleave: hide everything ──
+  document.addEventListener("mouseleave", function () {
+    hideOverlay();
+  });
+
+  // ── Click: select section (capture phase) ──
+  document.addEventListener(
+    "click",
+    function (e) {
+      if (!inspectorEnabled) return;
+      if (!activeSection) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      // Flash overlay green for feedback
+      if (overlay) {
+        overlay.style.borderColor = "#059669";
+        overlay.style.background = "rgba(5,150,105,0.08)";
+        setTimeout(function () {
+          overlay.style.borderColor = "#4F46E5";
+          overlay.style.background = "rgba(79,70,229,0.06)";
+        }, 300);
+      }
+
+      window.parent.postMessage(
+        {
+          type: "CK_SECTION_CLICKED",
+          sectionId: activeSection.sectionId,
+          sectionType: activeSection.sectionType,
+        },
+        "*"
+      );
+    },
+    true // capture phase
+  );
+
+  // ── Message handler ──
+  window.addEventListener("message", function (e) {
+    if (!e.data || typeof e.data.type !== "string") return;
+    if (e.data.type.indexOf("CK_") !== 0) return;
+
+    switch (e.data.type) {
+      case "CK_INJECT_CSS":
+        var styleEl = document.getElementById("__ck_injected_css");
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = "__ck_injected_css";
+          document.head.appendChild(styleEl);
+        }
+        // Support both full CSS string and settingId+value pair
+        if (e.data.css) {
+          styleEl.textContent = e.data.css;
+        } else if (e.data.settingId && e.data.value !== undefined) {
+          // Build a CSS variable override for the setting
+          var cssVar = "--ck-" + e.data.settingId.replace(/[^a-zA-Z0-9_-]/g, "-");
+          document.documentElement.style.setProperty(cssVar, String(e.data.value));
+        }
+        break;
+
+      case "CK_RELOAD_PAGE":
+        window.location.reload();
+        break;
+
+      case "CK_INJECT_HTML":
+        if (e.data.sectionId && e.data.html) {
+          var sectionEl = document.getElementById(
+            "shopify-section-" + e.data.sectionId
+          );
+          if (sectionEl) {
+            sectionEl.innerHTML = e.data.html;
+          }
+        }
+        break;
+
+      case "CK_HIDE_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.style.display = e.data.hidden ? "none" : "";
+            if (activeSection && activeSection.sectionId === e.data.sectionId && e.data.hidden) {
+              hideOverlay();
+            }
+          }
+        }
+        break;
+
+      case "CK_MOVE_SECTION":
+        if (e.data.fromId && e.data.toId) {
+          var fromNode = document.getElementById("shopify-section-" + e.data.fromId);
+          var toNode = document.getElementById("shopify-section-" + e.data.toId);
+          
+          if (!fromNode || !toNode) {
+            var allS = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var m = 0; m < allS.length; m++) {
+              if (allS[m].id.indexOf(e.data.fromId) > -1) fromNode = allS[m];
+              if (allS[m].id.indexOf(e.data.toId) > -1) toNode = allS[m];
+            }
+          }
+
+          if (fromNode && toNode && fromNode !== toNode) {
+            fromNode.parentNode.removeChild(fromNode);
+            if (e.data.appendAfter) {
+              toNode.insertAdjacentElement('afterend', fromNode);
+            } else {
+              toNode.insertAdjacentElement('beforebegin', fromNode);
+            }
+            if (activeSection && activeSection.sectionId === e.data.fromId) {
+               positionOverlay(fromNode.getBoundingClientRect());
+            }
+          }
+        }
+        break;
+
+      case "CK_RELOAD_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          // Fuzzy match if exact ID not found (e.g. generic schema name used)
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.style.opacity = "0.5";
+            secNode.style.transition = "opacity 200ms";
+            
+            var fetchUrl = window.location.pathname + window.location.search;
+            if (fetchUrl.indexOf("section_id=") === -1) {
+              fetchUrl += (fetchUrl.indexOf("?") > -1 ? "&" : "?") + "section_id=" + e.data.sectionId;
+            } else {
+              fetchUrl = fetchUrl.replace(/section_id=[^&]+/, "section_id=" + e.data.sectionId);
+            }
+            
+            fetch(fetchUrl)
+              .then(function(res) { return res.text(); })
+              .then(function(html) {
+                secNode.innerHTML = html;
+                secNode.style.opacity = "1";
+                if (activeSection && activeSection.sectionId === e.data.sectionId) {
+                  positionOverlay(secNode.getBoundingClientRect());
+                }
+              })
+              .catch(function(err) {
+                console.error("Section reload failed:", err);
+                secNode.style.opacity = "1";
+              });
+          }
+        }
+        break;
+
+      case "CK_GET_SECTIONS":
+        var nodes = document.querySelectorAll("[data-section-id]");
+        var sections = [];
+        for (var i = 0; i < nodes.length; i++) {
+          var n = nodes[i];
+          sections.push({
+            sectionId: n.dataset.sectionId,
+            sectionType: n.dataset.sectionType || "",
+            rect: n.getBoundingClientRect(),
+          });
+        }
+        // Also check by shopify-section- prefix
+        var byId = document.querySelectorAll('[id^="shopify-section-"]');
+        for (var j = 0; j < byId.length; j++) {
+          var node = byId[j];
+          var sid = node.id.replace("shopify-section-", "");
+          var exists = false;
+          for (var k = 0; k < sections.length; k++) {
+            if (sections[k].sectionId === sid) { exists = true; break; }
+          }
+          if (!exists) {
+            sections.push({
+              sectionId: sid,
+              sectionType: node.dataset.sectionType || "",
+              rect: node.getBoundingClientRect(),
+            });
+          }
+        }
+        window.parent.postMessage(
+          { type: "CK_SECTIONS_LIST", sections: sections },
+          "*"
+        );
+        break;
+
+      case "CK_SELECT_SECTION":
+        if (e.data.sectionId) {
+          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          if (!secNode) {
+            var all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+              if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
+                secNode = all[matchIdx];
+                break;
+              }
+            }
+          }
+          if (secNode) {
+            secNode.scrollIntoView({ behavior: "smooth", block: "center" });
+            positionOverlay(secNode.getBoundingClientRect());
+            activeSection = getSectionForElement(secNode.children[0] || secNode);
+          }
+        }
+        break;
+
+      case "CK_TOGGLE_INSPECTOR":
+        inspectorEnabled = !!e.data.enabled;
+        if (!inspectorEnabled) hideOverlay();
+        break;
+    }
+  });
+
+  // ── Init ──
+  function init() {
+    createOverlay();
+    createTooltip();
+    window.parent.postMessage({ type: "CK_INSPECTOR_READY" }, "*");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
