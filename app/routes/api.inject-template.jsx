@@ -1,7 +1,6 @@
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import fs from "node:fs";
-import path from "node:path";
+import { LIQUID_SECTIONS } from "../liquidSections.js";
 
 /**
  * Application dynamic page mappings.
@@ -125,11 +124,6 @@ export const action = async ({ request }) => {
       }, { status: 400 });
     }
 
-    const sectionsDir = path.resolve(
-      process.cwd(),
-      "extensions/convertkit-sections/sections"
-    );
-
     // ── Step 2: Custom layout — minimal Shopify shell without theme header/footer ──
     const convertflowLayout = `<!doctype html>
 <html lang="{{ request.locale.iso_code }}">
@@ -153,16 +147,13 @@ export const action = async ({ request }) => {
     
     const injectedPageNames = [];
 
-    // ── Step 3: Iterate through 14 pages and read liquid & build templates ──
+    // ── Step 3: Iterate through page types and look up bundled liquid content ──
     for (const page of PAGE_MAPPINGS) {
-      const liquidFileName = `cf-${templateId}-${page.id}.liquid`;
-      const liquidFilePath = path.join(sectionsDir, liquidFileName);
-      
-      let liquidContent;
-      try {
-        liquidContent = fs.readFileSync(liquidFilePath, "utf-8");
-      } catch (err) {
-        // Skip silently to allow progressive generation if a template is not built yet
+      const sectionKey = `cf-${templateId}-${page.id}`;
+      const liquidContent = LIQUID_SECTIONS[sectionKey];
+
+      if (!liquidContent) {
+        // Section not yet built for this page type — skip silently
         continue;
       }
       
