@@ -10,8 +10,17 @@ const files = [
   'lp-fitness-supplements.html',
   'lp-baby-apparel.html',
   'lp-coffee-roasters.html',
-  'lp-beauty-cosmetics.html'
+  'lp-beauty-cosmetics.html',
+  'lp-jewellery-heritage.html',
+  'lp-fashion-clothing.html',
+  'lp-footwear.html',
+  'lp-ayurveda-wellness.html',
+  'lp-mobile-accessories.html',
+  'lp-kids-toys.html',
+  'lp-home-furniture.html',
+  'lp-food-delivery.html'
 ];
+
 
 let out = 'export const TEMPLATE_HTMLS = {\n';
 for (let f of files) {

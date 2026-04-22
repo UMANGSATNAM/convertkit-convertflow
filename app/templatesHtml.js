@@ -1,571 +1,4 @@
 export const TEMPLATE_HTMLS = {
-  "jewellery-heritage": `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meenakshi Jewels | Bridal & Heritage Collection</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --crimson: #8B1A2C;
-  --rose-gold: #C89B72;
-  --deep-red: #5C0E1A;
-  --cream: #FDF8F2;
-  --ivory: #F5ECD9;
-  --text: #2A1A1A;
-  --text-muted: #7A6060;
-  --border: rgba(200, 155, 114, 0.25);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { background: var(--cream); color: var(--text); font-family: 'Raleway', sans-serif; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
-h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.5px; }
-
-/* ── UTILITY ── */
-.container { max-width: 1380px; margin: 0 auto; padding: 0 48px; }
-.ornament { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
-.ornament::before, .ornament::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--rose-gold), transparent); max-width: 80px; }
-.ornament span { font-size: 18px; color: var(--rose-gold); }
-
-/* ── TOP BAND ── */
-.top-band { background: var(--crimson); color: var(--rose-gold); text-align: center; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; }
-
-/* ── HEADER ── */
-header { background: var(--cream); padding: 0 48px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
-.header-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 20px 0; }
-.brand { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; color: var(--crimson); text-decoration: none; text-align: center; letter-spacing: 3px; line-height: 1; }
-.brand small { display: block; font-size: 9px; letter-spacing: 6px; color: var(--rose-gold); font-weight: 400; margin-top: 4px; text-transform: uppercase; }
-
-.header-left { display: flex; align-items: center; gap: 8px; }
-.h-badge { background: var(--ivory); border: 1px solid var(--border); padding: 5px 14px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--crimson); cursor: pointer; transition: all 0.2s; }
-.h-badge:hover { background: var(--crimson); color: #fff; }
-.header-right { display: flex; align-items: center; gap: 20px; justify-content: flex-end; }
-.icon-link { color: var(--text); text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; gap: 4px; font-weight: 600; transition: color 0.2s; }
-.icon-link:hover { color: var(--crimson); }
-.icon-link svg { width: 20px; height: 20px; stroke-width: 1.5; }
-
-.header-nav { display: flex; justify-content: center; gap: 40px; padding: 12px 0; border-top: 1px solid var(--border); }
-.header-nav a { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: var(--text); transition: color 0.3s; position: relative; }
-.header-nav a::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 1.5px; background: var(--rose-gold); transition: width 0.3s; }
-.header-nav a:hover { color: var(--crimson); }
-.header-nav a:hover::after { width: 100%; }
-
-/* ── HERO: SPLIT ── */
-.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; }
-.hero-left { position: relative; background: var(--deep-red); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.hero-left::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C89B72' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
-.hero-img-placeholder { width: 70%; aspect-ratio: 2/3; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; }
-.hero-img-placeholder svg { width: 60%; color: rgba(200, 155, 114, 0.2); }
-.hero-frame { position: absolute; inset: 30px; border: 1px solid rgba(200, 155, 114, 0.2); pointer-events: none; z-index: 2; }
-.hero-frame::before, .hero-frame::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--rose-gold); border-style: solid; opacity: 0.8; }
-.hero-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-.hero-frame::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-
-.hero-right { background: var(--ivory); padding: 80px 80px 80px 70px; display: flex; flex-direction: column; justify-content: center; position: relative; }
-.hero-right::before { content: ''; position: absolute; top: 40px; left: 40px; width: 80%; height: 80%; border: 1px solid var(--border); pointer-events: none; }
-.hero-tag { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 20px; }
-.hero-right h1 { font-size: 56px; line-height: 1.1; color: var(--crimson); margin-bottom: 24px; }
-.hero-right h1 span { color: var(--rose-gold); display: block; font-style: italic; }
-.hero-right p { font-size: 16px; color: var(--text-muted); line-height: 1.9; margin-bottom: 40px; max-width: 420px; font-weight: 400; }
-.hero-ctas { display: flex; flex-direction: column; gap: 16px; max-width: 240px; }
-.btn-primary { background: var(--crimson); color: #fff; padding: 18px 32px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--crimson); text-decoration: none; text-align: center; transition: all 0.3s; }
-.btn-primary:hover { background: var(--deep-red); }
-.btn-secondary { background: transparent; color: var(--crimson); padding: 17px 32px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--rose-gold); text-decoration: none; text-align: center; transition: all 0.3s; font-family: 'Raleway', sans-serif; }
-.btn-secondary:hover { background: var(--rose-gold); color: #fff; }
-
-/* HERO BADGES */
-.hero-badges { display: flex; gap: 24px; margin-top: 40px; padding-top: 32px; border-top: 1px dashed var(--border); }
-.h-badge-item { text-align: center; }
-.h-badge-item strong { display: block; font-family: 'Cinzel', serif; font-size: 22px; color: var(--crimson); }
-.h-badge-item span { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); }
-
-/* ── OCCASION STRIP ── */
-.occasion-strip { padding: 60px 0; background: var(--deep-red); overflow: hidden; }
-.occasion-strip .container { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.occ-btn { background: transparent; border: 1px solid rgba(200, 155, 114, 0.4); color: var(--rose-gold); padding: 12px 28px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; text-decoration: none; }
-.occ-btn:hover, .occ-btn.active { background: var(--rose-gold); color: var(--deep-red); border-color: var(--rose-gold); }
-.occ-title { text-align: center; margin-bottom: 32px; }
-.occ-title h2 { font-size: 28px; color: #fff; margin-bottom: 8px; }
-.occ-title p { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(200, 155, 114, 0.7); }
-
-/* ── FEATURED COLLECTION: HORIZONTAL SCROLLABLE ── */
-.featured { padding: 100px 0; background: var(--cream); }
-.featured .container > .sec-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
-.sec-header h2 { font-size: 32px; color: var(--crimson); }
-.sec-header a { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rose-gold); text-decoration: none; border-bottom: 1px solid var(--rose-gold); padding-bottom: 4px; transition: color 0.2s; }
-.sec-header a:hover { color: var(--crimson); }
-
-/* Unique horizontal product cards */
-.prod-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-.prod-card { position: relative; background: #fff; border: 1px solid var(--border); display: flex; flex-direction: column; transition: all 0.4s ease; }
-.prod-card:hover { box-shadow: 0 20px 60px rgba(139, 26, 44, 0.08); transform: translateY(-6px); }
-
-.pc-img { aspect-ratio: 3/4; background: var(--ivory); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.pc-img svg { width: 35%; color: var(--rose-gold); opacity: 0.7; transition: transform 0.6s ease, opacity 0.4s; }
-.prod-card:hover .pc-img svg { transform: scale(1.08); opacity: 1; }
-.pc-badge { position: absolute; top: 0; right: 0; background: var(--crimson); color: #fff; padding: 6px 14px; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-.pc-badge.new { background: var(--rose-gold); }
-
-.pc-info { padding: 24px; border-top: 1px solid var(--border); }
-.pc-type { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 6px; }
-.pc-name { font-family: 'Cinzel', serif; font-size: 16px; margin-bottom: 12px; color: var(--text); line-height: 1.4; }
-.pc-material { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; font-style: italic; }
-.pc-footer { display: flex; justify-content: space-between; align-items: center; }
-.pc-price { font-family: 'Cinzel', serif; font-size: 18px; color: var(--crimson); }
-.pc-price small { font-size: 12px; color: var(--text-muted); text-decoration: line-through; font-family: 'Raleway', sans-serif; margin-left: 8px; font-weight: 400; }
-.pc-wish { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted); }
-.pc-wish:hover { border-color: var(--crimson); color: var(--crimson); }
-.pc-atc { display: block; width: 100%; padding: 14px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; background: var(--ivory); border: none; border-top: 1px solid var(--border); font-family: 'Raleway', sans-serif; cursor: pointer; color: var(--text); transition: all 0.3s; }
-.pc-atc:hover { background: var(--crimson); color: #fff; }
-
-/* ── THE CRAFT SECTION ── */
-.craft { padding: 120px 0; background: var(--ivory); }
-.craft-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; align-items: center; }
-.craft-text { grid-column: 1 / 2; }
-.craft-text .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 24px; display: block; }
-.craft-text h2 { font-size: 38px; color: var(--crimson); line-height: 1.2; margin-bottom: 24px; }
-.craft-text p { font-size: 15px; color: var(--text-muted); line-height: 1.9; margin-bottom: 32px; }
-.craft-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
-.craft-stat strong { display: block; font-family: 'Cinzel', serif; font-size: 32px; color: var(--crimson); }
-.craft-stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
-
-.craft-visual { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.craft-img { background: #E8D5C0; display: flex; align-items: center; justify-content: center; position: relative; }
-.craft-img:first-child { aspect-ratio: 3/4; }
-.craft-img:last-child { aspect-ratio: 3/4; margin-top: 60px; background: #D4C0A8; }
-.craft-img svg { width: 40%; color: #a08060; opacity: 0.5; }
-
-/* ── BRIDAL SHOWCASE ── */
-.bridal { padding: 100px 0; background: var(--deep-red); }
-.bridal .container { text-align: center; }
-.bridal h2 { font-size: 40px; color: #fff; margin-bottom: 16px; }
-.bridal-sub { font-size: 13px; color: rgba(200, 155, 114, 0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 70px; }
-.bridal-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 30px; align-items: center; }
-.b-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(200, 155, 114, 0.2); padding: 30px; text-align: center; position: relative; }
-.b-card-center { background: rgba(255,255,255,0.08); border: 1px solid rgba(200, 155, 114, 0.4); }
-.b-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-.b-img svg { width: 40%; color: var(--rose-gold); opacity: 0.6; }
-.b-card h3 { font-family: 'Cinzel', serif; font-size: 18px; color: #fff; margin-bottom: 8px; }
-.b-card p { font-size: 13px; color: rgba(200, 155, 114, 0.7); }
-.b-card-center h3 { font-size: 24px; }
-.b-price { font-family: 'Cinzel', serif; font-size: 20px; color: var(--rose-gold); margin-top: 16px; }
-.b-cta { display: inline-block; margin-top: 50px; background: var(--rose-gold); color: var(--deep-red); padding: 18px 60px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; font-family: 'Raleway', sans-serif; transition: all 0.3s; }
-.b-cta:hover { background: #fff; }
-
-/* ── TESTIMONIALS ── */
-.testimonials { padding: 100px 0; }
-.test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
-.t-card { padding: 40px; border: 1px solid var(--border); position: relative; }
-.t-card::before { content: '"'; position: absolute; top: 20px; left: 28px; font-family: 'Cinzel', serif; font-size: 80px; color: var(--rose-gold); opacity: 0.15; line-height: 1; }
-.t-stars { display: flex; gap: 4px; margin-bottom: 20px; }
-.t-stars svg { width: 14px; fill: var(--rose-gold); }
-.t-text { font-size: 14px; color: var(--text-muted); line-height: 1.9; font-style: italic; margin-bottom: 24px; }
-.t-author { display: flex; align-items: center; gap: 14px; padding-top: 20px; border-top: 1px solid var(--border); }
-.t-av { width: 44px; height: 44px; border-radius: 50%; background: var(--ivory); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 16px; color: var(--crimson); }
-.t-name { font-family: 'Cinzel', serif; font-size: 14px; color: var(--text); }
-.t-city { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
-
-/* ── FOOTER ── */
-footer { background: #160A0A; padding: 80px 0 0; color: rgba(255,255,255,0.6); }
-.f-top { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(200, 155, 114, 0.15); }
-.f-brand .brand { text-align: left; display: inline-block; }
-.f-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.9; margin: 20px 0 30px; max-width: 280px; }
-.f-socials { display: flex; gap: 12px; }
-.f-social { width: 36px; height: 36px; border: 1px solid rgba(200, 155, 114, 0.3); display: flex; align-items: center; justify-content: center; color: var(--rose-gold); transition: all 0.2s; }
-.f-social:hover { border-color: var(--rose-gold); background: rgba(200, 155, 114, 0.1); }
-.f-social svg { width: 16px; fill: currentColor; }
-
-.f-col h4 { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: var(--rose-gold); margin-bottom: 24px; text-transform: uppercase; }
-.f-col ul { list-style: none; }
-.f-col li { margin-bottom: 12px; }
-.f-col a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 13px; transition: color 0.3s; }
-.f-col a:hover { color: var(--rose-gold); }
-
-.f-bottom { display: flex; justify-content: space-between; padding: 24px 0; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.25); }
-.f-bottom-links { display: flex; gap: 32px; }
-.f-bottom-links a { color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.3s; }
-.f-bottom-links a:hover { color: var(--rose-gold); }
-
-/* ── RESPONSIVE ── */
-@media(max-width: 1200px) {
-  .prod-scroll { grid-template-columns: repeat(2, 1fr); }
-  .bridal-grid { grid-template-columns: 1fr 1fr; }
-  .f-top { grid-template-columns: 1fr 1fr; }
-}
-@media(max-width: 1024px) {
-  .hero { grid-template-columns: 1fr; min-height: auto; }
-  .hero-left { aspect-ratio: 4/3; }
-  .hero-right { padding: 60px 48px; }
-  .hero-right h1 { font-size: 40px; }
-  .craft-inner { grid-template-columns: 1fr; }
-  .craft-visual { grid-column: 1 / 2; }
-  .bridal-grid { grid-template-columns: 1fr; }
-  .test-grid { grid-template-columns: 1fr; }
-}
-@media(max-width: 768px) {
-  .container { padding: 0 20px; }
-  header { padding: 0 20px; }
-  .header-top { grid-template-columns: auto 1fr; gap: 0; }
-  .header-left { display: none; }
-  .header-nav { gap: 20px; overflow-x: auto; }
-  .hero-right { padding: 40px 20px; }
-  .prod-scroll { grid-template-columns: 1fr; }
-  .craft-stats { grid-template-columns: 1fr 1fr; }
-  .f-top { grid-template-columns: 1fr; gap: 40px; }
-  .f-bottom { flex-direction: column; gap: 16px; }
-}
-</style>
-</head>
-<body>
-
-<div class="top-band">✦ Make charges waived on bridal sets this season ✦ BIS Hallmarked ✦ Free insured shipping across India ✦</div>
-
-<header>
-  <div class="header-top">
-    <div class="header-left">
-      <a href="#" class="h-badge">Book Visit</a>
-      <a href="#" class="h-badge">Bridal Lookbook</a>
-    </div>
-    <a href="#" class="brand">
-      MEENAKSHI
-      <small>Heritage Jewellers Est. 1966</small>
-    </a>
-    <div class="header-right">
-      <a href="#" class="icon-link">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        Search
-      </a>
-      <a href="#" class="icon-link">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-        Wishlist
-      </a>
-      <a href="#" class="icon-link">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-        Bag (0)
-      </a>
-    </div>
-  </div>
-  <nav class="header-nav">
-    <a href="#">New Arrivals</a>
-    <a href="#">Necklaces</a>
-    <a href="#">Rings</a>
-    <a href="#">Earrings</a>
-    <a href="#">Bangles & Kadas</a>
-    <a href="#">Bridal Sets</a>
-    <a href="#">Men's</a>
-    <a href="#">Our Story</a>
-  </nav>
-</header>
-
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-frame"></div>
-    <div class="hero-img-placeholder">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    </div>
-  </div>
-  <div class="hero-right">
-    <span class="hero-tag">✦ The Grand Wedding Edit</span>
-    <h1>Where Heritage<br>Meets <span>Modern Grace</span></h1>
-    <p>Each piece in our collection is handcrafted by third-generation artisans from Jaipur. Exquisite workmanship, ethically sourced gemstones, and stories passed through time.</p>
-    <div class="hero-ctas">
-      <a href="#" class="btn-primary">Explore Bridal</a>
-      <a href="#" class="btn-secondary">Book a Consultation</a>
-    </div>
-    <div class="hero-badges">
-      <div class="h-badge-item">
-        <strong>58+</strong>
-        <span>Years of Legacy</span>
-      </div>
-      <div class="h-badge-item">
-        <strong>12,000+</strong>
-        <span>Unique Designs</span>
-      </div>
-      <div class="h-badge-item">
-        <strong>4.9★</strong>
-        <span>Customer Rating</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="occasion-strip">
-  <div class="container">
-    <div class="occ-title">
-      <h2>Shop by Occasion</h2>
-      <p>Find the perfect jewellery for every milestone</p>
-    </div>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a href="#" class="occ-btn active">Bridal</a>
-      <a href="#" class="occ-btn">Engagement</a>
-      <a href="#" class="occ-btn">Anniversary</a>
-      <a href="#" class="occ-btn">Festive</a>
-      <a href="#" class="occ-btn">Office Wear</a>
-      <a href="#" class="occ-btn">Gifts</a>
-    </div>
-  </div>
-</section>
-
-<section class="featured" id="collection">
-  <div class="container">
-    <div class="sec-header">
-      <div>
-        <div class="ornament"><span>✦</span></div>
-        <h2>Bestselling Collections</h2>
-      </div>
-      <a href="#">View All Designs →</a>
-    </div>
-    <div class="prod-scroll">
-
-      <div class="prod-card">
-        <div class="pc-img">
-          <span class="pc-badge">Bestseller</span>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <div class="pc-info">
-          <div class="pc-type">Necklace Set</div>
-          <div class="pc-name">Rani Haar Polki Set</div>
-          <div class="pc-material">22KT Gold · Uncut Diamonds · Enamel</div>
-          <div class="pc-footer">
-            <div class="pc-price">₹4,85,000 <small>₹5,40,000</small></div>
-            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
-          </div>
-        </div>
-        <button class="pc-atc">Add to Wishlist</button>
-      </div>
-
-      <div class="prod-card">
-        <div class="pc-img" style="background:#EDE0D0;">
-          <span class="pc-badge new">New</span>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-        </div>
-        <div class="pc-info">
-          <div class="pc-type">Ring</div>
-          <div class="pc-name">Solitaire Kundan Cocktail Ring</div>
-          <div class="pc-material">18KT Rose Gold · Certified Diamond</div>
-          <div class="pc-footer">
-            <div class="pc-price">₹1,28,000</div>
-            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
-          </div>
-        </div>
-        <button class="pc-atc">Add to Wishlist</button>
-      </div>
-
-      <div class="prod-card">
-        <div class="pc-img" style="background:#E8D8C8;">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
-        </div>
-        <div class="pc-info">
-          <div class="pc-type">Earrings</div>
-          <div class="pc-name">Chandelier Jhumki Set</div>
-          <div class="pc-material">22KT Gold · Pearl & Ruby</div>
-          <div class="pc-footer">
-            <div class="pc-price">₹92,500 <small>₹1,04,000</small></div>
-            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
-          </div>
-        </div>
-        <button class="pc-atc">Add to Wishlist</button>
-      </div>
-
-      <div class="prod-card">
-        <div class="pc-img" style="background:#EAE0CE;">
-          <span class="pc-badge">Wedding</span>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </div>
-        <div class="pc-info">
-          <div class="pc-type">Bangle Set</div>
-          <div class="pc-name">Meenakari Bangle Set of 4</div>
-          <div class="pc-material">22KT Gold · Enamel Work · 92g</div>
-          <div class="pc-footer">
-            <div class="pc-price">₹3,10,000</div>
-            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
-          </div>
-        </div>
-        <button class="pc-atc">Add to Wishlist</button>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="craft">
-  <div class="container">
-    <div class="craft-inner">
-      <div class="craft-text">
-        <span class="sec-label">Our Heritage</span>
-        <h2>58 Years of Handcrafted Mastery</h2>
-        <p>What begins as a rough sketch transforms into a wearable heirloom through 200 hours of meticulous work. Our artisans in Jaipur have kept alive the traditions of Kundan, Meenakari, and temple jewellery making that were perfected centuries ago.</p>
-        <a href="#" class="btn-primary" style="max-width:200px;display:block;">Our Story →</a>
-        <div class="craft-stats">
-          <div class="craft-stat"><strong>200+</strong><span>Hours per piece</span></div>
-          <div class="craft-stat"><strong>3rd Gen</strong><span>Artisan families</span></div>
-          <div class="craft-stat"><strong>BIS</strong><span>Hallmarked</span></div>
-          <div class="craft-stat"><strong>GIA</strong><span>Certified Gems</span></div>
-        </div>
-      </div>
-      <div class="craft-visual">
-        <div class="craft-img">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <div class="craft-img">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="bridal">
-  <div class="container">
-    <h2>The Bridal Suite</h2>
-    <p class="bridal-sub">Complete sets curated by our master artisans for your most precious day</p>
-    <div class="bridal-grid">
-      <div class="b-card">
-        <div class="b-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1" style="width:50%;color:var(--rose-gold);opacity:0.5;"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
-        <h3>Kangan Collection</h3>
-        <p>Traditional bangles for the bride's wrist ritual</p>
-        <div class="b-price">From ₹85,000</div>
-      </div>
-      <div class="b-card b-card-center">
-        <div class="b-img" style="aspect-ratio:3/4;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8" style="width:50%;color:var(--rose-gold);opacity:0.6;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-        <h3>Grand Bridal Set</h3>
-        <p>Necklace · Jhumki · Maang Tikka · Haath Phool · 4 Bangles</p>
-        <div class="b-price">From ₹8,50,000</div>
-      </div>
-      <div class="b-card">
-        <div class="b-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1" style="width:50%;color:var(--rose-gold);opacity:0.5;"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div>
-        <h3>Maang Tikka</h3>
-        <p>Statement headpiece for the crown of your look</p>
-        <div class="b-price">From ₹42,000</div>
-      </div>
-    </div>
-    <a href="#" class="b-cta">Explore The Bridal Suite</a>
-  </div>
-</section>
-
-<section class="testimonials">
-  <div class="container">
-    <div class="ornament"><span>✦</span></div>
-    <h2 style="text-align:center;font-size:32px;color:var(--crimson);">Stories from Our Brides</h2>
-    <div class="test-grid">
-      <div class="t-card">
-        <div class="t-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="t-text">"The Rani Haar they crafted for my wedding was beyond anything I had imagined. Three months after the ceremony, guests still ask where it came from."</p>
-        <div class="t-author">
-          <div class="t-av">S</div>
-          <div>
-            <div class="t-name">Shreya Kapoor</div>
-            <div class="t-city">Delhi NCR</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="t-card">
-        <div class="t-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="t-text">"The artisan consultation experience was extraordinary. They listened to every detail and delivered a set that told the story of our families."</p>
-        <div class="t-author">
-          <div class="t-av">P</div>
-          <div>
-            <div class="t-name">Preethi Nair</div>
-            <div class="t-city">Chennai</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="t-card">
-        <div class="t-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="t-text">"The GIA certificate gave my mother-in-law complete confidence. The Meenakari bangles are heirloom quality. My daughter will wear them someday."</p>
-        <div class="t-author">
-          <div class="t-av">A</div>
-          <div>
-            <div class="t-name">Anita Mehta</div>
-            <div class="t-city">Mumbai</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="container">
-    <div class="f-top">
-      <div class="f-brand">
-        <div class="brand" style="text-align:left;">MEENAKSHI<small>Heritage Jewellers Est. 1966</small></div>
-        <p class="f-desc">Three generations of artisan excellence from the heart of Jaipur. Every piece is a living heirloom, handcrafted with devotion and precision.</p>
-        <div class="f-socials">
-          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M24 4.557a9.83 9.83 0 01-2.828.775 4.932 4.932 0 002.165-2.724 9.864 9.864 0 01-3.127 1.195 4.916 4.916 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.902 4.902 0 001.523 6.574 4.903 4.903 0 01-2.229-.616c-.054 2.281 1.581 4.415 3.949 4.89a4.935 4.935 0 01-2.224.084 4.928 4.928 0 004.6 3.419A9.9 9.9 0 010 19.54a13.94 13.94 0 007.548 2.212c9.057 0 14.01-7.502 14.01-14.01 0-.213-.005-.425-.014-.636A10.025 10.025 0 0024 4.557z"/></svg></a>
-          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
-          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.85a8.24 8.24 0 004.82 1.55V6.93a4.85 4.85 0 01-1.05-.24z"/></svg></a>
-        </div>
-      </div>
-      <div class="f-col">
-        <h4>Collections</h4>
-        <ul>
-          <li><a href="#">Bridal Sets</a></li>
-          <li><a href="#">Gold Necklaces</a></li>
-          <li><a href="#">Diamond Rings</a></li>
-          <li><a href="#">Earrings</a></li>
-          <li><a href="#">Bangles & Kadas</a></li>
-          <li><a href="#">Men's Jewellery</a></li>
-        </ul>
-      </div>
-      <div class="f-col">
-        <h4>The House</h4>
-        <ul>
-          <li><a href="#">Our Story</a></li>
-          <li><a href="#">Artisans</a></li>
-          <li><a href="#">Craftsmanship</a></li>
-          <li><a href="#">Certifications</a></li>
-          <li><a href="#">Store Locator</a></li>
-        </ul>
-      </div>
-      <div class="f-col">
-        <h4>Help & Support</h4>
-        <ul>
-          <li><a href="#">Book Consultation</a></li>
-          <li><a href="#">Track Order</a></li>
-          <li><a href="#">Shipping Policy</a></li>
-          <li><a href="#">Returns & Exchange</a></li>
-          <li><a href="#">Care Guide</a></li>
-          <li><a href="#">EMI Options</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="f-bottom">
-      <span>© 2025 Meenakshi Heritage Jewellers. All rights reserved.</span>
-      <div class="f-bottom-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Use</a>
-        <a href="#">Hallmark Policy</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-</body>
-</html>
-`,
   "electronics": `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3895,6 +3328,1983 @@ footer { padding: 80px 6vw 40px; background: var(--surface); border-top: 1px sol
   });
 </script>
 
+</body>
+</html>
+`,
+  "jewellery-heritage": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meenakshi Jewels | Bridal & Heritage Collection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --crimson: #8B1A2C;
+  --rose-gold: #C89B72;
+  --deep-red: #5C0E1A;
+  --cream: #FDF8F2;
+  --ivory: #F5ECD9;
+  --text: #2A1A1A;
+  --text-muted: #7A6060;
+  --border: rgba(200, 155, 114, 0.25);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--text); font-family: 'Raleway', sans-serif; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.5px; }
+
+/* ── UTILITY ── */
+.container { max-width: 1380px; margin: 0 auto; padding: 0 48px; }
+.ornament { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+.ornament::before, .ornament::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--rose-gold), transparent); max-width: 80px; }
+.ornament span { font-size: 18px; color: var(--rose-gold); }
+
+/* ── TOP BAND ── */
+.top-band { background: var(--crimson); color: var(--rose-gold); text-align: center; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; }
+
+/* ── HEADER ── */
+header { background: var(--cream); padding: 0 48px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+.header-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 20px 0; }
+.brand { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; color: var(--crimson); text-decoration: none; text-align: center; letter-spacing: 3px; line-height: 1; }
+.brand small { display: block; font-size: 9px; letter-spacing: 6px; color: var(--rose-gold); font-weight: 400; margin-top: 4px; text-transform: uppercase; }
+
+.header-left { display: flex; align-items: center; gap: 8px; }
+.h-badge { background: var(--ivory); border: 1px solid var(--border); padding: 5px 14px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--crimson); cursor: pointer; transition: all 0.2s; }
+.h-badge:hover { background: var(--crimson); color: #fff; }
+.header-right { display: flex; align-items: center; gap: 20px; justify-content: flex-end; }
+.icon-link { color: var(--text); text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; gap: 4px; font-weight: 600; transition: color 0.2s; }
+.icon-link:hover { color: var(--crimson); }
+.icon-link svg { width: 20px; height: 20px; stroke-width: 1.5; }
+
+.header-nav { display: flex; justify-content: center; gap: 40px; padding: 12px 0; border-top: 1px solid var(--border); }
+.header-nav a { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: var(--text); transition: color 0.3s; position: relative; }
+.header-nav a::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 1.5px; background: var(--rose-gold); transition: width 0.3s; }
+.header-nav a:hover { color: var(--crimson); }
+.header-nav a:hover::after { width: 100%; }
+
+/* ── HERO: SPLIT ── */
+.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; }
+.hero-left { position: relative; background: var(--deep-red); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.hero-left::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C89B72' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.hero-img-placeholder { width: 70%; aspect-ratio: 2/3; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; }
+.hero-img-placeholder svg { width: 60%; color: rgba(200, 155, 114, 0.2); }
+.hero-frame { position: absolute; inset: 30px; border: 1px solid rgba(200, 155, 114, 0.2); pointer-events: none; z-index: 2; }
+.hero-frame::before, .hero-frame::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--rose-gold); border-style: solid; opacity: 0.8; }
+.hero-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.hero-frame::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+.hero-right { background: var(--ivory); padding: 80px 80px 80px 70px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.hero-right::before { content: ''; position: absolute; top: 40px; left: 40px; width: 80%; height: 80%; border: 1px solid var(--border); pointer-events: none; }
+.hero-tag { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 20px; }
+.hero-right h1 { font-size: 56px; line-height: 1.1; color: var(--crimson); margin-bottom: 24px; }
+.hero-right h1 span { color: var(--rose-gold); display: block; font-style: italic; }
+.hero-right p { font-size: 16px; color: var(--text-muted); line-height: 1.9; margin-bottom: 40px; max-width: 420px; font-weight: 400; }
+.hero-ctas { display: flex; flex-direction: column; gap: 16px; max-width: 240px; }
+.btn-primary { background: var(--crimson); color: #fff; padding: 18px 32px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--crimson); text-decoration: none; text-align: center; transition: all 0.3s; }
+.btn-primary:hover { background: var(--deep-red); }
+.btn-secondary { background: transparent; color: var(--crimson); padding: 17px 32px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--rose-gold); text-decoration: none; text-align: center; transition: all 0.3s; font-family: 'Raleway', sans-serif; }
+.btn-secondary:hover { background: var(--rose-gold); color: #fff; }
+
+/* HERO BADGES */
+.hero-badges { display: flex; gap: 24px; margin-top: 40px; padding-top: 32px; border-top: 1px dashed var(--border); }
+.h-badge-item { text-align: center; }
+.h-badge-item strong { display: block; font-family: 'Cinzel', serif; font-size: 22px; color: var(--crimson); }
+.h-badge-item span { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); }
+
+/* ── OCCASION STRIP ── */
+.occasion-strip { padding: 60px 0; background: var(--deep-red); overflow: hidden; }
+.occasion-strip .container { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.occ-btn { background: transparent; border: 1px solid rgba(200, 155, 114, 0.4); color: var(--rose-gold); padding: 12px 28px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+.occ-btn:hover, .occ-btn.active { background: var(--rose-gold); color: var(--deep-red); border-color: var(--rose-gold); }
+.occ-title { text-align: center; margin-bottom: 32px; }
+.occ-title h2 { font-size: 28px; color: #fff; margin-bottom: 8px; }
+.occ-title p { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(200, 155, 114, 0.7); }
+
+/* ── FEATURED COLLECTION: HORIZONTAL SCROLLABLE ── */
+.featured { padding: 100px 0; background: var(--cream); }
+.featured .container > .sec-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
+.sec-header h2 { font-size: 32px; color: var(--crimson); }
+.sec-header a { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rose-gold); text-decoration: none; border-bottom: 1px solid var(--rose-gold); padding-bottom: 4px; transition: color 0.2s; }
+.sec-header a:hover { color: var(--crimson); }
+
+/* Unique horizontal product cards */
+.prod-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.prod-card { position: relative; background: #fff; border: 1px solid var(--border); display: flex; flex-direction: column; transition: all 0.4s ease; }
+.prod-card:hover { box-shadow: 0 20px 60px rgba(139, 26, 44, 0.08); transform: translateY(-6px); }
+
+.pc-img { aspect-ratio: 3/4; background: var(--ivory); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.pc-img svg { width: 35%; color: var(--rose-gold); opacity: 0.7; transition: transform 0.6s ease, opacity 0.4s; }
+.prod-card:hover .pc-img svg { transform: scale(1.08); opacity: 1; }
+.pc-badge { position: absolute; top: 0; right: 0; background: var(--crimson); color: #fff; padding: 6px 14px; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.pc-badge.new { background: var(--rose-gold); }
+
+.pc-info { padding: 24px; border-top: 1px solid var(--border); }
+.pc-type { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 6px; }
+.pc-name { font-family: 'Cinzel', serif; font-size: 16px; margin-bottom: 12px; color: var(--text); line-height: 1.4; }
+.pc-material { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; font-style: italic; }
+.pc-footer { display: flex; justify-content: space-between; align-items: center; }
+.pc-price { font-family: 'Cinzel', serif; font-size: 18px; color: var(--crimson); }
+.pc-price small { font-size: 12px; color: var(--text-muted); text-decoration: line-through; font-family: 'Raleway', sans-serif; margin-left: 8px; font-weight: 400; }
+.pc-wish { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted); }
+.pc-wish:hover { border-color: var(--crimson); color: var(--crimson); }
+.pc-atc { display: block; width: 100%; padding: 14px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; background: var(--ivory); border: none; border-top: 1px solid var(--border); font-family: 'Raleway', sans-serif; cursor: pointer; color: var(--text); transition: all 0.3s; }
+.pc-atc:hover { background: var(--crimson); color: #fff; }
+
+/* ── THE CRAFT SECTION ── */
+.craft { padding: 120px 0; background: var(--ivory); }
+.craft-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; align-items: center; }
+.craft-text { grid-column: 1 / 2; }
+.craft-text .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 24px; display: block; }
+.craft-text h2 { font-size: 38px; color: var(--crimson); line-height: 1.2; margin-bottom: 24px; }
+.craft-text p { font-size: 15px; color: var(--text-muted); line-height: 1.9; margin-bottom: 32px; }
+.craft-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
+.craft-stat strong { display: block; font-family: 'Cinzel', serif; font-size: 32px; color: var(--crimson); }
+.craft-stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
+
+.craft-visual { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.craft-img { background: #E8D5C0; display: flex; align-items: center; justify-content: center; position: relative; }
+.craft-img:first-child { aspect-ratio: 3/4; }
+.craft-img:last-child { aspect-ratio: 3/4; margin-top: 60px; background: #D4C0A8; }
+.craft-img svg { width: 40%; color: #a08060; opacity: 0.5; }
+
+/* ── BRIDAL SHOWCASE ── */
+.bridal { padding: 100px 0; background: var(--deep-red); }
+.bridal .container { text-align: center; }
+.bridal h2 { font-size: 40px; color: #fff; margin-bottom: 16px; }
+.bridal-sub { font-size: 13px; color: rgba(200, 155, 114, 0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 70px; }
+.bridal-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 30px; align-items: center; }
+.b-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(200, 155, 114, 0.2); padding: 30px; text-align: center; position: relative; }
+.b-card-center { background: rgba(255,255,255,0.08); border: 1px solid rgba(200, 155, 114, 0.4); }
+.b-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.b-img svg { width: 40%; color: var(--rose-gold); opacity: 0.6; }
+.b-card h3 { font-family: 'Cinzel', serif; font-size: 18px; color: #fff; margin-bottom: 8px; }
+.b-card p { font-size: 13px; color: rgba(200, 155, 114, 0.7); }
+.b-card-center h3 { font-size: 24px; }
+.b-price { font-family: 'Cinzel', serif; font-size: 20px; color: var(--rose-gold); margin-top: 16px; }
+.b-cta { display: inline-block; margin-top: 50px; background: var(--rose-gold); color: var(--deep-red); padding: 18px 60px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; font-family: 'Raleway', sans-serif; transition: all 0.3s; }
+.b-cta:hover { background: #fff; }
+
+/* ── TESTIMONIALS ── */
+.testimonials { padding: 100px 0; }
+.test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
+.t-card { padding: 40px; border: 1px solid var(--border); position: relative; }
+.t-card::before { content: '"'; position: absolute; top: 20px; left: 28px; font-family: 'Cinzel', serif; font-size: 80px; color: var(--rose-gold); opacity: 0.15; line-height: 1; }
+.t-stars { display: flex; gap: 4px; margin-bottom: 20px; }
+.t-stars svg { width: 14px; fill: var(--rose-gold); }
+.t-text { font-size: 14px; color: var(--text-muted); line-height: 1.9; font-style: italic; margin-bottom: 24px; }
+.t-author { display: flex; align-items: center; gap: 14px; padding-top: 20px; border-top: 1px solid var(--border); }
+.t-av { width: 44px; height: 44px; border-radius: 50%; background: var(--ivory); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 16px; color: var(--crimson); }
+.t-name { font-family: 'Cinzel', serif; font-size: 14px; color: var(--text); }
+.t-city { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
+
+/* ── FOOTER ── */
+footer { background: #160A0A; padding: 80px 0 0; color: rgba(255,255,255,0.6); }
+.f-top { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(200, 155, 114, 0.15); }
+.f-brand .brand { text-align: left; display: inline-block; }
+.f-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.9; margin: 20px 0 30px; max-width: 280px; }
+.f-socials { display: flex; gap: 12px; }
+.f-social { width: 36px; height: 36px; border: 1px solid rgba(200, 155, 114, 0.3); display: flex; align-items: center; justify-content: center; color: var(--rose-gold); transition: all 0.2s; }
+.f-social:hover { border-color: var(--rose-gold); background: rgba(200, 155, 114, 0.1); }
+.f-social svg { width: 16px; fill: currentColor; }
+
+.f-col h4 { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: var(--rose-gold); margin-bottom: 24px; text-transform: uppercase; }
+.f-col ul { list-style: none; }
+.f-col li { margin-bottom: 12px; }
+.f-col a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 13px; transition: color 0.3s; }
+.f-col a:hover { color: var(--rose-gold); }
+
+.f-bottom { display: flex; justify-content: space-between; padding: 24px 0; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.25); }
+.f-bottom-links { display: flex; gap: 32px; }
+.f-bottom-links a { color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.3s; }
+.f-bottom-links a:hover { color: var(--rose-gold); }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 1200px) {
+  .prod-scroll { grid-template-columns: repeat(2, 1fr); }
+  .bridal-grid { grid-template-columns: 1fr 1fr; }
+  .f-top { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-left { aspect-ratio: 4/3; }
+  .hero-right { padding: 60px 48px; }
+  .hero-right h1 { font-size: 40px; }
+  .craft-inner { grid-template-columns: 1fr; }
+  .craft-visual { grid-column: 1 / 2; }
+  .bridal-grid { grid-template-columns: 1fr; }
+  .test-grid { grid-template-columns: 1fr; }
+}
+@media(max-width: 768px) {
+  .container { padding: 0 20px; }
+  header { padding: 0 20px; }
+  .header-top { grid-template-columns: auto 1fr; gap: 0; }
+  .header-left { display: none; }
+  .header-nav { gap: 20px; overflow-x: auto; }
+  .hero-right { padding: 40px 20px; }
+  .prod-scroll { grid-template-columns: 1fr; }
+  .craft-stats { grid-template-columns: 1fr 1fr; }
+  .f-top { grid-template-columns: 1fr; gap: 40px; }
+  .f-bottom { flex-direction: column; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-band">✦ Make charges waived on bridal sets this season ✦ BIS Hallmarked ✦ Free insured shipping across India ✦</div>
+
+<header>
+  <div class="header-top">
+    <div class="header-left">
+      <a href="#" class="h-badge">Book Visit</a>
+      <a href="#" class="h-badge">Bridal Lookbook</a>
+    </div>
+    <a href="#" class="brand">
+      MEENAKSHI
+      <small>Heritage Jewellers Est. 1966</small>
+    </a>
+    <div class="header-right">
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Search
+      </a>
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        Wishlist
+      </a>
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        Bag (0)
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a href="#">New Arrivals</a>
+    <a href="#">Necklaces</a>
+    <a href="#">Rings</a>
+    <a href="#">Earrings</a>
+    <a href="#">Bangles & Kadas</a>
+    <a href="#">Bridal Sets</a>
+    <a href="#">Men's</a>
+    <a href="#">Our Story</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-frame"></div>
+    <div class="hero-img-placeholder">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+  </div>
+  <div class="hero-right">
+    <span class="hero-tag">✦ The Grand Wedding Edit</span>
+    <h1>Where Heritage<br>Meets <span>Modern Grace</span></h1>
+    <p>Each piece in our collection is handcrafted by third-generation artisans from Jaipur. Exquisite workmanship, ethically sourced gemstones, and stories passed through time.</p>
+    <div class="hero-ctas">
+      <a href="#" class="btn-primary">Explore Bridal</a>
+      <a href="#" class="btn-secondary">Book a Consultation</a>
+    </div>
+    <div class="hero-badges">
+      <div class="h-badge-item">
+        <strong>58+</strong>
+        <span>Years of Legacy</span>
+      </div>
+      <div class="h-badge-item">
+        <strong>12,000+</strong>
+        <span>Unique Designs</span>
+      </div>
+      <div class="h-badge-item">
+        <strong>4.9★</strong>
+        <span>Customer Rating</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="occasion-strip">
+  <div class="container">
+    <div class="occ-title">
+      <h2>Shop by Occasion</h2>
+      <p>Find the perfect jewellery for every milestone</p>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="#" class="occ-btn active">Bridal</a>
+      <a href="#" class="occ-btn">Engagement</a>
+      <a href="#" class="occ-btn">Anniversary</a>
+      <a href="#" class="occ-btn">Festive</a>
+      <a href="#" class="occ-btn">Office Wear</a>
+      <a href="#" class="occ-btn">Gifts</a>
+    </div>
+  </div>
+</section>
+
+<section class="featured" id="collection">
+  <div class="container">
+    <div class="sec-header">
+      <div>
+        <div class="ornament"><span>✦</span></div>
+        <h2>Bestselling Collections</h2>
+      </div>
+      <a href="#">View All Designs →</a>
+    </div>
+    <div class="prod-scroll">
+
+      <div class="prod-card">
+        <div class="pc-img">
+          <span class="pc-badge">Bestseller</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="pc-info">
+          <div class="pc-type">Necklace Set</div>
+          <div class="pc-name">Rani Haar Polki Set</div>
+          <div class="pc-material">22KT Gold · Uncut Diamonds · Enamel</div>
+          <div class="pc-footer">
+            <div class="pc-price">₹4,85,000 <small>₹5,40,000</small></div>
+            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+          </div>
+        </div>
+        <button class="pc-atc">Add to Wishlist</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="pc-img" style="background:#EDE0D0;">
+          <span class="pc-badge new">New</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        </div>
+        <div class="pc-info">
+          <div class="pc-type">Ring</div>
+          <div class="pc-name">Solitaire Kundan Cocktail Ring</div>
+          <div class="pc-material">18KT Rose Gold · Certified Diamond</div>
+          <div class="pc-footer">
+            <div class="pc-price">₹1,28,000</div>
+            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+          </div>
+        </div>
+        <button class="pc-atc">Add to Wishlist</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="pc-img" style="background:#E8D8C8;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
+        </div>
+        <div class="pc-info">
+          <div class="pc-type">Earrings</div>
+          <div class="pc-name">Chandelier Jhumki Set</div>
+          <div class="pc-material">22KT Gold · Pearl & Ruby</div>
+          <div class="pc-footer">
+            <div class="pc-price">₹92,500 <small>₹1,04,000</small></div>
+            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+          </div>
+        </div>
+        <button class="pc-atc">Add to Wishlist</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="pc-img" style="background:#EAE0CE;">
+          <span class="pc-badge">Wedding</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="pc-info">
+          <div class="pc-type">Bangle Set</div>
+          <div class="pc-name">Meenakari Bangle Set of 4</div>
+          <div class="pc-material">22KT Gold · Enamel Work · 92g</div>
+          <div class="pc-footer">
+            <div class="pc-price">₹3,10,000</div>
+            <button class="pc-wish"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+          </div>
+        </div>
+        <button class="pc-atc">Add to Wishlist</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="craft">
+  <div class="container">
+    <div class="craft-inner">
+      <div class="craft-text">
+        <span class="sec-label">Our Heritage</span>
+        <h2>58 Years of Handcrafted Mastery</h2>
+        <p>What begins as a rough sketch transforms into a wearable heirloom through 200 hours of meticulous work. Our artisans in Jaipur have kept alive the traditions of Kundan, Meenakari, and temple jewellery making that were perfected centuries ago.</p>
+        <a href="#" class="btn-primary" style="max-width:200px;display:block;">Our Story →</a>
+        <div class="craft-stats">
+          <div class="craft-stat"><strong>200+</strong><span>Hours per piece</span></div>
+          <div class="craft-stat"><strong>3rd Gen</strong><span>Artisan families</span></div>
+          <div class="craft-stat"><strong>BIS</strong><span>Hallmarked</span></div>
+          <div class="craft-stat"><strong>GIA</strong><span>Certified Gems</span></div>
+        </div>
+      </div>
+      <div class="craft-visual">
+        <div class="craft-img">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="craft-img">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bridal">
+  <div class="container">
+    <h2>The Bridal Suite</h2>
+    <p class="bridal-sub">Complete sets curated by our master artisans for your most precious day</p>
+    <div class="bridal-grid">
+      <div class="b-card">
+        <div class="b-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1" style="width:50%;color:var(--rose-gold);opacity:0.5;"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
+        <h3>Kangan Collection</h3>
+        <p>Traditional bangles for the bride's wrist ritual</p>
+        <div class="b-price">From ₹85,000</div>
+      </div>
+      <div class="b-card b-card-center">
+        <div class="b-img" style="aspect-ratio:3/4;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8" style="width:50%;color:var(--rose-gold);opacity:0.6;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Grand Bridal Set</h3>
+        <p>Necklace · Jhumki · Maang Tikka · Haath Phool · 4 Bangles</p>
+        <div class="b-price">From ₹8,50,000</div>
+      </div>
+      <div class="b-card">
+        <div class="b-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1" style="width:50%;color:var(--rose-gold);opacity:0.5;"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div>
+        <h3>Maang Tikka</h3>
+        <p>Statement headpiece for the crown of your look</p>
+        <div class="b-price">From ₹42,000</div>
+      </div>
+    </div>
+    <a href="#" class="b-cta">Explore The Bridal Suite</a>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="container">
+    <div class="ornament"><span>✦</span></div>
+    <h2 style="text-align:center;font-size:32px;color:var(--crimson);">Stories from Our Brides</h2>
+    <div class="test-grid">
+      <div class="t-card">
+        <div class="t-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="t-text">"The Rani Haar they crafted for my wedding was beyond anything I had imagined. Three months after the ceremony, guests still ask where it came from."</p>
+        <div class="t-author">
+          <div class="t-av">S</div>
+          <div>
+            <div class="t-name">Shreya Kapoor</div>
+            <div class="t-city">Delhi NCR</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="t-text">"The artisan consultation experience was extraordinary. They listened to every detail and delivered a set that told the story of our families."</p>
+        <div class="t-author">
+          <div class="t-av">P</div>
+          <div>
+            <div class="t-name">Preethi Nair</div>
+            <div class="t-city">Chennai</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="t-text">"The GIA certificate gave my mother-in-law complete confidence. The Meenakari bangles are heirloom quality. My daughter will wear them someday."</p>
+        <div class="t-author">
+          <div class="t-av">A</div>
+          <div>
+            <div class="t-name">Anita Mehta</div>
+            <div class="t-city">Mumbai</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="f-top">
+      <div class="f-brand">
+        <div class="brand" style="text-align:left;">MEENAKSHI<small>Heritage Jewellers Est. 1966</small></div>
+        <p class="f-desc">Three generations of artisan excellence from the heart of Jaipur. Every piece is a living heirloom, handcrafted with devotion and precision.</p>
+        <div class="f-socials">
+          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M24 4.557a9.83 9.83 0 01-2.828.775 4.932 4.932 0 002.165-2.724 9.864 9.864 0 01-3.127 1.195 4.916 4.916 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.902 4.902 0 001.523 6.574 4.903 4.903 0 01-2.229-.616c-.054 2.281 1.581 4.415 3.949 4.89a4.935 4.935 0 01-2.224.084 4.928 4.928 0 004.6 3.419A9.9 9.9 0 010 19.54a13.94 13.94 0 007.548 2.212c9.057 0 14.01-7.502 14.01-14.01 0-.213-.005-.425-.014-.636A10.025 10.025 0 0024 4.557z"/></svg></a>
+          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+          <a href="#" class="f-social"><svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.85a8.24 8.24 0 004.82 1.55V6.93a4.85 4.85 0 01-1.05-.24z"/></svg></a>
+        </div>
+      </div>
+      <div class="f-col">
+        <h4>Collections</h4>
+        <ul>
+          <li><a href="#">Bridal Sets</a></li>
+          <li><a href="#">Gold Necklaces</a></li>
+          <li><a href="#">Diamond Rings</a></li>
+          <li><a href="#">Earrings</a></li>
+          <li><a href="#">Bangles & Kadas</a></li>
+          <li><a href="#">Men's Jewellery</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>The House</h4>
+        <ul>
+          <li><a href="#">Our Story</a></li>
+          <li><a href="#">Artisans</a></li>
+          <li><a href="#">Craftsmanship</a></li>
+          <li><a href="#">Certifications</a></li>
+          <li><a href="#">Store Locator</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Help & Support</h4>
+        <ul>
+          <li><a href="#">Book Consultation</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns & Exchange</a></li>
+          <li><a href="#">Care Guide</a></li>
+          <li><a href="#">EMI Options</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2025 Meenakshi Heritage Jewellers. All rights reserved.</span>
+      <div class="f-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Hallmark Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
+`,
+  "fashion-clothing": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VŌLT | Premium Fashion</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0A0A0A;--paper:#F5F3EF;--accent:#E8D5B0;--mid:#888;--border:#E0DDD8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.bebas{font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:2px;}
+
+/* PROMO */
+.promo{background:var(--ink);color:#fff;text-align:center;padding:11px;font-size:12px;letter-spacing:3px;text-transform:uppercase;}
+.promo a{color:var(--accent);text-decoration:none;}
+
+/* HEADER */
+header{background:var(--paper);padding:20px 60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:6px;color:var(--ink);text-decoration:none;}
+nav{display:flex;gap:36px;list-style:none;}
+nav a{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--mid);}
+.h-actions{display:flex;align-items:center;gap:20px;}
+.h-btn{background:var(--ink);color:#fff;padding:10px 24px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.h-btn:hover{opacity:.8;}
+
+/* HERO — full viewport editorial */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;height:92vh;border-bottom:1px solid var(--border);}
+.hero-visual{background:#1A1A1A;display:flex;align-items:flex-end;padding:60px;position:relative;overflow:hidden;}
+.hero-visual::before{content:'COLLECTION';position:absolute;top:50%;left:-80px;transform:translateY(-50%) rotate(-90deg);font-family:'Bebas Neue',sans-serif;font-size:200px;color:rgba(255,255,255,.04);letter-spacing:10px;white-space:nowrap;}
+.hero-tag{display:inline-flex;align-items:center;gap:12px;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--accent);}
+
+.hero-content{padding:80px 80px 80px 70px;display:flex;flex-direction:column;justify-content:center;position:relative;}
+.hero-content h1{font-size:110px;line-height:.92;margin:20px 0 30px;color:var(--ink);}
+.hero-content p{font-size:17px;color:var(--mid);line-height:1.8;max-width:380px;margin-bottom:48px;font-weight:300;}
+.hero-cta-group{display:flex;gap:16px;}
+.btn-dark{background:var(--ink);color:#fff;padding:18px 40px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:opacity .2s;}
+.btn-dark:hover{opacity:.8;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:17px 40px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+.btn-outline:hover{background:var(--ink);color:#fff;}
+.hero-scroll{position:absolute;bottom:40px;right:60px;display:flex;align-items:center;gap:12px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mid);}
+.hero-scroll::after{content:'';width:40px;height:1px;background:var(--mid);}
+
+/* CATEGORIES */
+.cats{display:flex;border-bottom:1px solid var(--border);}
+.cat{flex:1;padding:32px;text-align:center;border-right:1px solid var(--border);text-decoration:none;color:var(--ink);transition:background .2s;position:relative;overflow:hidden;}
+.cat:last-child{border-right:none;}
+.cat:hover{background:var(--ink);}
+.cat:hover .cat-label,.cat:hover .cat-count{color:#fff;}
+.cat-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;display:block;margin-bottom:4px;transition:color .2s;}
+.cat-count{font-size:11px;color:var(--mid);letter-spacing:2px;text-transform:uppercase;transition:color .2s;}
+
+/* PRODUCTS */
+.shop{padding:100px 60px;max-width:1400px;margin:0 auto;}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;}
+.sec-head h2{font-size:64px;color:var(--ink);}
+.view-all{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mid);text-decoration:none;border-bottom:1px solid var(--mid);padding-bottom:4px;}
+.view-all:hover{color:var(--ink);border-color:var(--ink);}
+
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{position:relative;cursor:pointer;}
+.prod-card:hover .pc-overlay{opacity:1;}
+.pc-img{aspect-ratio:3/4;background:#E8E4DC;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:18px;}
+.pc-img:nth-child(odd){background:#1A1A1A;}
+.pc-img svg{width:35%;color:rgba(0,0,0,.15);transition:transform .6s;}
+.prod-card:hover .pc-img svg{transform:scale(1.05);}
+.pc-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
+.pc-overlay-btn{background:#fff;color:var(--ink);padding:12px 28px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;}
+.pc-badge{position:absolute;top:16px;left:16px;background:var(--ink);color:#fff;padding:5px 12px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;z-index:2;}
+.pc-badge.sale{background:#C0392B;}
+.pc-name{font-weight:700;font-size:14px;margin-bottom:4px;}
+.pc-type{font-size:12px;color:var(--mid);margin-bottom:8px;letter-spacing:1px;}
+.pc-prices{display:flex;gap:10px;align-items:center;}
+.pc-price{font-size:15px;font-weight:700;}
+.pc-old{font-size:13px;color:var(--mid);text-decoration:line-through;}
+
+/* EDITORIAL STRIP */
+.editorial{display:grid;grid-template-columns:1fr 1fr;height:600px;margin:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.ed-left{background:#1a1a1a;display:flex;flex-direction:column;justify-content:flex-end;padding:60px;position:relative;overflow:hidden;}
+.ed-left::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);}
+.ed-left-content{position:relative;z-index:1;}
+.ed-left h2{font-size:72px;color:#fff;margin-bottom:16px;}
+.ed-left p{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:30px;max-width:360px;line-height:1.8;}
+.ed-right{display:grid;grid-template-rows:1fr 1fr;}
+.ed-item{background:#2A2A2A;display:flex;flex-direction:column;justify-content:flex-end;padding:40px;border-bottom:1px solid rgba(255,255,255,.05);position:relative;}
+.ed-item:last-child{border-bottom:none;background:#F0EBE0;}
+.ed-item h3{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;letter-spacing:2px;margin-bottom:8px;}
+.ed-item:last-child h3{color:var(--ink);}
+.ed-item p{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:1px;}
+.ed-item:last-child p{color:var(--mid);}
+
+/* SIZE GUIDE BAND */
+.size-band{background:var(--ink);color:#fff;padding:40px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;}
+.sb-text h3{font-size:32px;margin-bottom:8px;}
+.sb-text p{font-size:14px;color:rgba(255,255,255,.5);}
+.sb-sizes{display:flex;gap:16px;}
+.sz{width:52px;height:52px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.sz:hover,.sz.active{background:#fff;color:var(--ink);}
+.sb-btn{background:#fff;color:var(--ink);padding:16px 32px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.sb-btn:hover{opacity:.85;}
+
+/* FOOTER */
+footer{background:var(--ink);padding:80px 60px 40px;}
+.f-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.1);}
+.f-brand a{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:6px;color:#fff;text-decoration:none;display:block;margin-bottom:20px;}
+.f-brand p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.9;max-width:280px;}
+.f-col h4{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:24px;}
+.f-col ul{list-style:none;}
+.f-col li{margin-bottom:12px;}
+.f-col a{color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;transition:color .2s;}
+.f-col a:hover{color:#fff;}
+.f-bottom{display:flex;justify-content:space-between;padding-top:30px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;height:auto}.hero-content{padding:60px 40px}.hero-content h1{font-size:72px}.prod-grid{grid-template-columns:repeat(2,1fr)}.editorial{grid-template-columns:1fr;height:auto}.f-top{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.shop{padding:60px 20px}.cats{flex-wrap:wrap}.cat{min-width:50%}.size-band{flex-direction:column;padding:40px 20px}.f-top{grid-template-columns:1fr;gap:40px}}
+</style>
+</head>
+<body>
+<div class="promo">New Season Drop — Extra 15% off with code VOLT15 &nbsp;<a href="#">Shop Now →</a></div>
+<header>
+  <a href="#" class="brand">VŌLT</a>
+  <nav>
+    <li><a href="#">New In</a></li>
+    <li><a href="#">Women</a></li>
+    <li><a href="#">Men</a></li>
+    <li><a href="#">Denim</a></li>
+    <li><a href="#">Sale</a></li>
+  </nav>
+  <div class="h-actions">
+    <a href="#" class="h-btn">Bag (0)</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-visual">
+    <div class="hero-tag">SS 2025 Collection</div>
+  </div>
+  <div class="hero-content">
+    <h1>DRESSED FOR THE FUTURE</h1>
+    <p>Premium essentials engineered for people who move with intention. Every stitch, deliberate. Every fabric, chosen for life.</p>
+    <div class="hero-cta-group">
+      <a href="#" class="btn-dark">Shop Women</a>
+      <a href="#" class="btn-outline">Shop Men</a>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </div>
+</section>
+
+<div class="cats">
+  <a href="#" class="cat"><span class="cat-label">Outerwear</span><span class="cat-count">48 Styles</span></a>
+  <a href="#" class="cat"><span class="cat-label">Denim</span><span class="cat-count">36 Styles</span></a>
+  <a href="#" class="cat"><span class="cat-label">Knitwear</span><span class="cat-count">52 Styles</span></a>
+  <a href="#" class="cat"><span class="cat-label">Accessories</span><span class="cat-count">24 Styles</span></a>
+</div>
+
+<section class="shop">
+  <div class="sec-head"><h2>NEW IN</h2><a href="#" class="view-all">View All →</a></div>
+  <div class="prod-grid">
+    <div class="prod-card">
+      <div class="pc-img"><span class="pc-badge">New</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><div class="pc-overlay"><button class="pc-overlay-btn">Quick View</button></div></div>
+      <div class="pc-name">Oversized Wool Blazer</div><div class="pc-type">Women's Outerwear</div>
+      <div class="pc-prices"><span class="pc-price">₹8,999</span></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#1A1A1A;"><span class="pc-badge sale">Sale</span><svg fill="none" stroke="rgba(255,255,255,.2)" viewBox="0 0 24 24" stroke-width="1"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><div class="pc-overlay"><button class="pc-overlay-btn">Quick View</button></div></div>
+      <div class="pc-name">Classic Slim Denim</div><div class="pc-type">Men's Bottoms</div>
+      <div class="pc-prices"><span class="pc-price">₹3,499</span><span class="pc-old">₹4,999</span></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#D4CFC6;"><svg fill="none" stroke="rgba(0,0,0,.2)" viewBox="0 0 24 24" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="pc-overlay"><button class="pc-overlay-btn">Quick View</button></div></div>
+      <div class="pc-name">Fine Knit Crew Neck</div><div class="pc-type">Women's Knitwear</div>
+      <div class="pc-prices"><span class="pc-price">₹5,499</span></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#2C2C2C;"><span class="pc-badge">Trending</span><svg fill="none" stroke="rgba(255,255,255,.15)" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><div class="pc-overlay"><button class="pc-overlay-btn">Quick View</button></div></div>
+      <div class="pc-name">Structured Tote Bag</div><div class="pc-type">Accessories</div>
+      <div class="pc-prices"><span class="pc-price">₹6,299</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="editorial">
+  <div class="ed-left">
+    <div class="ed-left-content">
+      <h2>THE DENIM STORY</h2>
+      <p>Raw, tumbled, and washed to perfection. Our denim is built to break in beautifully and last a lifetime.</p>
+      <a href="#" class="btn-dark">Shop Denim</a>
+    </div>
+  </div>
+  <div class="ed-right">
+    <div class="ed-item"><h3>New Arrivals Daily</h3><p>Fresh styles every Monday & Thursday</p></div>
+    <div class="ed-item"><h3>The Essentials Edit</h3><p>Build a wardrobe that works forever</p></div>
+  </div>
+</div>
+
+<div class="size-band">
+  <div class="sb-text"><h3>FIND YOUR FIT</h3><p>Our extended size range covers XS to 4XL across all categories.</p></div>
+  <div class="sb-sizes">
+    <div class="sz">XS</div><div class="sz active">S</div><div class="sz">M</div><div class="sz">L</div><div class="sz">XL</div><div class="sz">2XL</div>
+  </div>
+  <button class="sb-btn">Size Guide</button>
+</div>
+
+<footer>
+  <div class="f-top">
+    <div class="f-brand"><a href="#">VŌLT</a><p>Premium fashion engineered for modern life. Thoughtfully designed, responsibly made, built to last.</p></div>
+    <div class="f-col"><h4>Shop</h4><ul><li><a href="#">Women</a></li><li><a href="#">Men</a></li><li><a href="#">Accessories</a></li><li><a href="#">Sale</a></li></ul></div>
+    <div class="f-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Sustainability</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+    <div class="f-col"><h4>Support</h4><ul><li><a href="#">Size Guide</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="f-bottom"><span>© 2025 VŌLT Fashion. All rights reserved.</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "footwear": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLERA | Premium Footwear</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--rust:#C65D2A;--sand:#F0E6D3;--dark:#1C1510;--text:#2A2018;--muted:#8A7A6A;--border:#E0D4C0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Syne',sans-serif;}
+
+/* HEADER */
+.top-bar{background:var(--rust);color:#fff;text-align:center;padding:10px;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+header{padding:24px 60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.brand{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--dark);text-decoration:none;letter-spacing:4px;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-size:13px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:.5px;transition:color .2s;}
+.nav-links a:hover{color:var(--rust);}
+.h-icons{display:flex;gap:16px;}
+.h-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);position:relative;transition:color .2s;}
+.h-icon:hover{color:var(--rust);}
+.h-icon svg{width:20px;stroke-width:1.5;}
+.cart-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--rust);}
+
+/* HERO — dynamic full-width */
+.hero{min-height:92vh;background:var(--sand);display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
+.hero-l{padding:100px 80px;display:flex;flex-direction:column;justify-content:center;}
+.hero-l .overline{font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--rust);margin-bottom:24px;}
+.hero-l h1{font-size:80px;line-height:1;font-weight:800;color:var(--dark);margin-bottom:28px;}
+.hero-l h1 em{font-style:italic;color:var(--rust);}
+.hero-l p{font-size:17px;color:var(--muted);line-height:1.8;max-width:420px;margin-bottom:48px;font-weight:300;}
+.hero-btns{display:flex;gap:16px;}
+.btn-rust{background:var(--rust);color:#fff;padding:18px 44px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:opacity .2s;display:inline-block;}
+.btn-rust:hover{opacity:.9;}
+.btn-ghost{background:transparent;color:var(--dark);border:1.5px solid var(--dark);padding:17px 44px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:all .2s;display:inline-block;}
+.btn-ghost:hover{background:var(--dark);color:#fff;}
+.hero-r{background:var(--dark);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.hero-r::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;border:1px solid rgba(255,255,255,.05);top:50%;left:50%;transform:translate(-50%,-50%);}
+.hero-shoe-icon{width:60%;color:rgba(198,93,42,.3);}
+
+/* FILTER TABS */
+.tabs{display:flex;gap:4px;padding:24px 60px;border-bottom:1px solid var(--border);background:#fafaf8;}
+.tab{padding:10px 24px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:all .2s;color:var(--muted);}
+.tab.active,.tab:hover{background:var(--dark);color:#fff;border-color:var(--dark);}
+
+/* PRODUCTS — unique card with size selector built-in */
+.shop{padding:80px 60px;max-width:1400px;margin:0 auto;}
+.shop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:50px;}
+.shop-head h2{font-size:48px;font-weight:800;color:var(--dark);}
+.sort-select{font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--border);padding:10px 20px;background:transparent;color:var(--text);outline:none;cursor:pointer;}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+.card{position:relative;border:1px solid var(--border);transition:all .35s;overflow:hidden;}
+.card:hover{box-shadow:0 16px 40px rgba(198,93,42,.08);transform:translateY(-4px);}
+.card-img{aspect-ratio:1;background:var(--sand);display:flex;align-items:center;justify-content:center;position:relative;}
+.card-img svg{width:40%;color:var(--muted);opacity:.5;transition:transform .4s;}
+.card:hover .card-img svg{transform:scale(1.06);color:var(--rust);opacity:.8;}
+.c-badge{position:absolute;top:18px;left:18px;background:var(--rust);color:#fff;padding:5px 14px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;}
+.card-body{padding:24px;}
+.c-cat{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--rust);margin-bottom:8px;}
+.c-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;color:var(--dark);}
+.c-desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.c-sizes{display:flex;gap:6px;margin-bottom:18px;}
+.cs{width:32px;height:32px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+.cs:hover{border-color:var(--rust);color:var(--rust);}
+.card-foot{display:flex;justify-content:space-between;align-items:center;}
+.c-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);}
+.c-old{font-size:14px;color:var(--muted);text-decoration:line-through;margin-left:8px;font-weight:400;}
+.c-atc{background:var(--dark);color:#fff;border:none;padding:12px 24px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background .2s;}
+.c-atc:hover{background:var(--rust);}
+
+/* SUSTAINABILITY */
+.sustain{background:var(--dark);padding:100px 60px;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;}
+.s-text .overline{font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--rust);margin-bottom:20px;display:block;}
+.s-text h2{font-size:52px;font-weight:800;color:#fff;margin-bottom:24px;line-height:1.1;}
+.s-text p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.9;margin-bottom:36px;}
+.s-pillars{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.s-pillar{border:1px solid rgba(255,255,255,.1);padding:24px;}
+.s-pillar h4{font-family:'Syne',sans-serif;font-size:16px;color:#fff;margin-bottom:8px;}
+.s-pillar p{font-size:13px;color:rgba(255,255,255,.4);}
+
+/* FOOTER */
+footer{background:var(--sand);padding:80px 60px 40px;}
+.f-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid var(--border);}
+.f-brand-name{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--dark);letter-spacing:4px;margin-bottom:16px;}
+.f-brand p{font-size:14px;color:var(--muted);line-height:1.8;max-width:260px;}
+.f-col h4{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
+.f-col ul{list-style:none;}
+.f-col li{margin-bottom:10px;}
+.f-col a{color:var(--text);text-decoration:none;font-size:14px;transition:color .2s;}
+.f-col a:hover{color:var(--rust);}
+.f-bottom{display:flex;justify-content:space-between;padding-top:30px;font-size:12px;color:var(--muted);}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto}.hero-r{display:none}.grid{grid-template-columns:repeat(2,1fr)}.sustain{grid-template-columns:1fr}.s-pillars{grid-template-columns:1fr}.f-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}.nav-links{display:none}.hero-l{padding:60px 20px}.hero-l h1{font-size:52px}.shop{padding:60px 20px}.grid{grid-template-columns:1fr}.tabs{padding:16px 20px;overflow-x:auto;flex-wrap:nowrap}.f-grid{grid-template-columns:1fr;gap:40px}}
+</style>
+</head>
+<body>
+<div class="top-bar">Free shipping on orders above ₹2,999 | Easy 30-day returns</div>
+<header>
+  <a href="#" class="brand">SOLERA</a>
+  <ul class="nav-links">
+    <li><a href="#">New Drops</a></li>
+    <li><a href="#">Sneakers</a></li>
+    <li><a href="#">Formal</a></li>
+    <li><a href="#">Sandals</a></li>
+    <li><a href="#">Boots</a></li>
+  </ul>
+  <div class="h-icons">
+    <div class="h-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+    <div class="h-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    <div class="h-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="cart-dot"></div></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-l">
+    <span class="overline">SS 2025 — The Ground Collection</span>
+    <h1>Walk with <em>Purpose</em></h1>
+    <p>Footwear built for the unscripted journey. Premium leather, handcrafted soles, and silhouettes that age beautifully.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-rust">Shop Collection</a>
+      <a href="#" class="btn-ghost">Find Your Size</a>
+    </div>
+  </div>
+  <div class="hero-r">
+    <svg class="hero-shoe-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width=".8"><path d="M21.5 15.5c-1.1 1.1-3.1 1.5-5.5 1.5H4a2 2 0 01-2-2v-1c0-.6.1-1.2.4-1.7L6 7.5V7a2 2 0 012-2h2.5L14 9l2-1.5 2.5 1 1.5 3.5-1 1.5 2.5 2z"/></svg>
+  </div>
+</section>
+
+<div class="tabs">
+  <button class="tab active">All</button>
+  <button class="tab">Sneakers</button>
+  <button class="tab">Formal</button>
+  <button class="tab">Sandals</button>
+  <button class="tab">Boots</button>
+  <button class="tab">Sport</button>
+</div>
+
+<section class="shop">
+  <div class="shop-head">
+    <h2>Our Collection</h2>
+    <select class="sort-select"><option>Sort: Featured</option><option>Price: Low-High</option><option>Newest</option></select>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-img"><span class="c-badge">Bestseller</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M21.5 15.5c-1.1 1.1-3.1 1.5-5.5 1.5H4a2 2 0 01-2-2v-1c0-.6.1-1.2.4-1.7L6 7.5V7a2 2 0 012-2h2.5L14 9l2-1.5 2.5 1 1.5 3.5-1 1.5 2.5 2z"/></svg></div>
+      <div class="card-body">
+        <div class="c-cat">Sneakers</div>
+        <div class="c-name">Terra Runner Pro</div>
+        <div class="c-desc">Full-grain leather upper with memory foam insole.</div>
+        <div class="c-sizes"><div class="cs">6</div><div class="cs">7</div><div class="cs">8</div><div class="cs">9</div><div class="cs">10</div></div>
+        <div class="card-foot"><div class="c-price">₹7,499</div><button class="c-atc">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img" style="background:#E8E0D5;"><span class="c-badge">New</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="9"/><path d="M4.22 4.22l15.56 15.56"/></svg></div>
+      <div class="card-body">
+        <div class="c-cat">Formal</div>
+        <div class="c-name">Oxford Classic II</div>
+        <div class="c-desc">Italian leather brogue with Goodyear welted construction.</div>
+        <div class="c-sizes"><div class="cs">7</div><div class="cs">8</div><div class="cs">9</div><div class="cs">10</div><div class="cs">11</div></div>
+        <div class="card-foot"><div class="c-price">₹12,999 <span class="c-old">₹15,999</span></div><button class="c-atc">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img" style="background:#D4C4A8;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="card-body">
+        <div class="c-cat">Boots</div>
+        <div class="c-name">Canyon Chelsea Boot</div>
+        <div class="c-desc">Chelsea silhouette in burnished calfskin with elastic gussets.</div>
+        <div class="c-sizes"><div class="cs">7</div><div class="cs">8</div><div class="cs">9</div><div class="cs">10</div></div>
+        <div class="card-foot"><div class="c-price">₹9,999</div><button class="c-atc">Add to Cart</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sustain">
+  <div class="s-text">
+    <span class="overline">Our Commitment</span>
+    <h2>Crafted to Last, Not to Waste</h2>
+    <p>Every pair is built with materials that improve with age and processes that respect the planet. We are pursuing full supply chain transparency by 2026.</p>
+    <a href="#" class="btn-rust">Our Story</a>
+  </div>
+  <div class="s-pillars">
+    <div class="s-pillar"><h4>Vegetable Tanned Leather</h4><p>Using traditional tanneries in Kanpur, free from heavy metals.</p></div>
+    <div class="s-pillar"><h4>Recycled Packaging</h4><p>100% recycled & FSC-certified shoe boxes and tissue paper.</p></div>
+    <div class="s-pillar"><h4>Resoleable Design</h4><p>All formal range can be resoled, extending life by years.</p></div>
+    <div class="s-pillar"><h4>Fair Wages</h4><p>Living wages guaranteed across our entire artisan network.</p></div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-grid">
+    <div class="f-brand"><div class="f-brand-name">SOLERA</div><p>Footwear designed for the discerning walker. Handcrafted in India with ethically sourced leathers.</p></div>
+    <div class="f-col"><h4>Shop</h4><ul><li><a href="#">Sneakers</a></li><li><a href="#">Formal</a></li><li><a href="#">Boots</a></li><li><a href="#">Sandals</a></li></ul></div>
+    <div class="f-col"><h4>About</h4><ul><li><a href="#">Our Story</a></li><li><a href="#">Sustainability</a></li><li><a href="#">Artisans</a></li></ul></div>
+    <div class="f-col"><h4>Help</h4><ul><li><a href="#">Size Chart</a></li><li><a href="#">Care Guide</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="f-bottom"><span>© 2025 Solera Footwear</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "ayurveda-wellness": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYURVA | Wellness & Ayurveda</title>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Hind:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--saffron:#E07B2A;--forest:#2E4B35;--cream:#FBF6EF;--gold:#C9A84C;--text:#2A2018;--muted:#7A6A58;--border:#E8DDD0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--cream);color:var(--text);font-family:'Hind',sans-serif;font-size:16px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Yatra One',cursive;font-weight:400;}
+
+/* HEADER */
+.announce{background:var(--forest);color:#fff;text-align:center;padding:10px;font-size:12px;letter-spacing:2px;}
+header{background:var(--cream);padding:20px 60px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--border);}
+.brand{font-family:'Yatra One',cursive;font-size:32px;color:var(--forest);text-decoration:none;display:flex;align-items:center;gap:10px;}
+.brand-sub{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-family:'Hind',sans-serif;font-weight:500;}
+nav ul{display:flex;gap:32px;list-style:none;}
+nav a{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--saffron);}
+.hdr-cta{background:var(--forest);color:#fff;padding:12px 28px;font-size:12px;font-weight:600;letter-spacing:1px;text-decoration:none;transition:background .2s;}
+.hdr-cta:hover{background:var(--saffron);}
+
+/* HERO — mandala decorative */
+.hero{min-height:90vh;background:linear-gradient(135deg,#FDF8F0 0%,#F5EDE0 100%);display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-100px;top:50%;transform:translateY(-50%);width:700px;height:700px;border-radius:50%;border:1px solid rgba(201,168,76,.15);pointer-events:none;}
+.hero::after{content:'';position:absolute;right:-130px;top:50%;transform:translateY(-50%);width:800px;height:800px;border-radius:50%;border:1px solid rgba(201,168,76,.08);pointer-events:none;}
+.hero-text .label{font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--saffron);margin-bottom:20px;display:block;}
+.hero-text h1{font-size:72px;line-height:1.05;color:var(--forest);margin-bottom:24px;}
+.hero-text p{font-size:17px;color:var(--muted);line-height:1.9;max-width:440px;margin-bottom:40px;}
+.hero-btns{display:flex;gap:16px;}
+.btn-forest{background:var(--forest);color:#fff;padding:16px 40px;font-family:'Hind',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-decoration:none;transition:background .2s;display:inline-block;}
+.btn-forest:hover{background:var(--saffron);}
+.btn-gold{background:transparent;border:1.5px solid var(--gold);color:var(--gold);padding:15px 40px;font-family:'Hind',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-decoration:none;transition:all .2s;display:inline-block;}
+.btn-gold:hover{background:var(--gold);color:#fff;}
+.hero-img{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.mandala-ring{position:absolute;width:500px;height:500px;border-radius:50%;border:1px dashed rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;}
+.hero-img-content{width:60%;aspect-ratio:1;background:radial-gradient(circle,rgba(201,168,76,.15),transparent 70%);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.hero-img svg{width:50%;color:var(--forest);opacity:.3;}
+
+/* BENEFITS */
+.benefits{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--border);border-bottom:2px solid var(--border);}
+.benefit{padding:40px 32px;text-align:center;border-right:1px solid var(--border);}
+.benefit:last-child{border-right:none;}
+.b-icon{width:52px;height:52px;border-radius:50%;background:rgba(46,75,53,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--forest);}
+.b-icon svg{width:26px;stroke-width:1.5;}
+.b-title{font-family:'Yatra One',cursive;font-size:18px;color:var(--forest);margin-bottom:8px;}
+.b-text{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* PRODUCTS */
+.shop{padding:100px 60px;max-width:1400px;margin:0 auto;}
+.sec-label{text-align:center;margin-bottom:60px;}
+.sec-label span{font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--saffron);display:block;margin-bottom:12px;}
+.sec-label h2{font-size:48px;color:var(--forest);}
+.sec-label p{font-size:16px;color:var(--muted);max-width:500px;margin:12px auto 0;}
+
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;}
+.prod-card{background:#fff;border:1px solid var(--border);overflow:hidden;transition:all .3s;}
+.prod-card:hover{box-shadow:0 12px 40px rgba(46,75,53,.08);transform:translateY(-4px);}
+.pc-img{aspect-ratio:1;background:linear-gradient(135deg,#FDF8F0,#F0E8D8);display:flex;align-items:center;justify-content:center;position:relative;}
+.pc-img svg{width:40%;color:var(--forest);opacity:.4;transition:opacity .3s;}
+.prod-card:hover .pc-img svg{opacity:.7;}
+.pc-badge-forest{position:absolute;top:14px;right:14px;background:var(--forest);color:#fff;padding:4px 12px;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.pc-body{padding:20px;}
+.pc-concern{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--saffron);margin-bottom:6px;}
+.pc-name{font-family:'Yatra One',cursive;font-size:20px;color:var(--forest);margin-bottom:8px;line-height:1.2;}
+.pc-ing{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:16px;}
+.pc-qty{font-size:11px;color:var(--muted);margin-bottom:14px;}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;}
+.pc-price-wrap strong{font-size:20px;font-weight:700;color:var(--forest);}
+.pc-price-wrap small{font-size:12px;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.btn-add-forest{background:var(--forest);color:#fff;border:none;padding:10px 20px;font-family:'Hind',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:background .2s;}
+.btn-add-forest:hover{background:var(--saffron);}
+
+/* INGREDIENTS */
+.ingredients{padding:100px 60px;background:var(--forest);text-align:center;}
+.ing-title{font-size:48px;color:#fff;margin-bottom:16px;}
+.ing-sub{font-size:15px;color:rgba(255,255,255,.5);max-width:500px;margin:0 auto 60px;}
+.ing-grid{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;max-width:1000px;margin:0 auto;}
+.ing-item{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.ing-circle{width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;position:relative;}
+.ing-circle::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px dashed rgba(201,168,76,.2);}
+.ing-circle svg{width:40%;color:var(--gold);stroke-width:1;}
+.ing-name{font-family:'Yatra One',cursive;font-size:16px;color:#fff;}
+.ing-bene{font-size:11px;color:rgba(255,255,255,.4);text-align:center;max-width:80px;line-height:1.5;}
+
+/* FOOTER */
+footer{background:#1E2E21;padding:80px 60px 40px;}
+.f-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.1);}
+.fb-brand{font-family:'Yatra One',cursive;font-size:28px;color:var(--gold);margin-bottom:16px;}
+.fb-text{font-size:13px;color:rgba(255,255,255,.35);line-height:1.9;max-width:280px;}
+.f-col h4{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.f-col ul{list-style:none;}
+.f-col li{margin-bottom:10px;}
+.f-col a{color:rgba(255,255,255,.4);text-decoration:none;font-size:14px;transition:color .2s;}
+.f-col a:hover{color:var(--gold);}
+.f-bottom{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-img{display:none}.prod-grid{grid-template-columns:repeat(2,1fr)}.benefits{grid-template-columns:1fr 1fr}.f-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.shop{padding:60px 20px}.ingredients{padding:60px 20px}.f-grid{grid-template-columns:1fr}footer{padding:60px 20px 30px}}
+</style>
+</head>
+<body>
+<div class="announce">Ancient Wisdom. Modern Science. Free consultation with every order above ₹999.</div>
+<header>
+  <a href="#" class="brand">
+    AYURVA
+    <span class="brand-sub">Pure Ayurveda</span>
+  </a>
+  <nav><ul>
+    <li><a href="#">Skincare</a></li>
+    <li><a href="#">Hair Care</a></li>
+    <li><a href="#">Wellness</a></li>
+    <li><a href="#">Nutrition</a></li>
+    <li><a href="#">Consult</a></li>
+  </ul></nav>
+  <a href="#" class="hdr-cta">Shop Now</a>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="label">5000 Years of Healing Wisdom</span>
+    <h1>Heal from the Root</h1>
+    <p>Formulated with authentic Ayurvedic herbs, cold-pressed oils, and sustainably sourced botanicals. Every product is Ayush-certified and DCCL-approved.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-forest">Explore Products</a>
+      <a href="#" class="btn-gold">Free Quiz: Find Your Dosha</a>
+    </div>
+  </div>
+  <div class="hero-img">
+    <div class="mandala-ring">
+      <div class="hero-img-content">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="benefits">
+  <div class="benefit"><div class="b-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="b-title">Ayush Certified</div><div class="b-text">Government-licensed AYUSH formulations</div></div>
+  <div class="benefit"><div class="b-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div><div class="b-title">100% Natural</div><div class="b-text">No parabens, sulphates or mineral oils</div></div>
+  <div class="benefit"><div class="b-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><div class="b-title">Cruelty Free</div><div class="b-text">Vegan & never tested on animals</div></div>
+  <div class="benefit"><div class="b-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="b-title">Seen Results in 21 Days</div><div class="b-text">Clinically tested with measurable outcomes</div></div>
+</div>
+
+<section class="shop">
+  <div class="sec-label">
+    <span>Bestsellers</span>
+    <h2>Most Loved Formulas</h2>
+    <p>Trusted by over 2 lakh customers across India for daily wellness rituals.</p>
+  </div>
+  <div class="prod-grid">
+    <div class="prod-card">
+      <div class="pc-img"><span class="pc-badge-forest">Top Seller</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div>
+      <div class="pc-body"><div class="pc-concern">Hair Care</div><div class="pc-name">Brahmi Bhringraj Hair Oil</div><div class="pc-ing">Brahmi · Bhringraj · Coconut · Neem</div><div class="pc-qty">200ml | 60-day supply</div><div class="pc-foot"><div class="pc-price-wrap"><strong>₹599</strong><small>₹799</small></div><button class="btn-add-forest">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:linear-gradient(135deg,#EEF3EC,#DDE8D9);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+      <div class="pc-body"><div class="pc-concern">Skincare</div><div class="pc-name">Kumkumadi Face Oil</div><div class="pc-ing">Kumkumadi · Saffron · Sandalwood</div><div class="pc-qty">15ml | 45-day supply</div><div class="pc-foot"><div class="pc-price-wrap"><strong>₹899</strong></div><button class="btn-add-forest">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:linear-gradient(135deg,#F5F0E8,#EDE5D5);"><span class="pc-badge-forest">New</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <div class="pc-body"><div class="pc-concern">Wellness</div><div class="pc-name">Ashwagandha Shilajit Gummies</div><div class="pc-ing">Ashwagandha KSM-66 · Pure Shilajit</div><div class="pc-qty">60 gummies | 30-day supply</div><div class="pc-foot"><div class="pc-price-wrap"><strong>₹799</strong><small>₹999</small></div><button class="btn-add-forest">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:linear-gradient(135deg,#F8F2E8,#EEE0C8);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+      <div class="pc-body"><div class="pc-concern">Body Care</div><div class="pc-name">Nalpamaradi Ubtan Scrub</div><div class="pc-ing">Turmeric · Neem · Chickpea · Rose</div><div class="pc-qty">150g | 45-day supply</div><div class="pc-foot"><div class="pc-price-wrap"><strong>₹449</strong></div><button class="btn-add-forest">Add to Cart</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="ingredients">
+  <h2 class="ing-title">Sacred Botanicals</h2>
+  <p class="ing-sub">We source our herbs directly from Himalayan farms and Kerala spice estates — traceable and certified.</p>
+  <div class="ing-grid">
+    <div class="ing-item"><div class="ing-circle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3"/></svg></div><div class="ing-name">Brahmi</div><div class="ing-bene">Memory & Clarity</div></div>
+    <div class="ing-item"><div class="ing-circle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 22a7 7 0 007-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 007 7z"/></svg></div><div class="ing-name">Ashwagandha</div><div class="ing-bene">Stress Relief</div></div>
+    <div class="ing-item"><div class="ing-circle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="ing-name">Saffron</div><div class="ing-bene">Radiance & Glow</div></div>
+    <div class="ing-item"><div class="ing-circle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="ing-name">Turmeric</div><div class="ing-bene">Anti-Inflammatory</div></div>
+    <div class="ing-item"><div class="ing-circle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M11 20A7 7 0 014.07 7.96l8.04-8.04A7 7 0 0120 12H11V20z"/></svg></div><div class="ing-name">Neem</div><div class="ing-bene">Purifying Detox</div></div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-grid">
+    <div><div class="fb-brand">AYURVA</div><p class="fb-text">Bridging 5000 years of Ayurvedic wisdom with modern formulation science. Certified, tested, and loved.</p></div>
+    <div class="f-col"><h4>Products</h4><ul><li><a href="#">Skincare</a></li><li><a href="#">Hair Care</a></li><li><a href="#">Wellness</a></li><li><a href="#">Nutrition</a></li></ul></div>
+    <div class="f-col"><h4>Know More</h4><ul><li><a href="#">Dosha Quiz</a></li><li><a href="#">Ingredient Glossary</a></li><li><a href="#">Blog</a></li><li><a href="#">Consult Vaidya</a></li></ul></div>
+    <div class="f-col"><h4>Support</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="f-bottom"><span>© 2025 Ayurva Wellness Pvt. Ltd. | FSSAI Lic.</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "mobile-accessories": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACKD | Phone Cases & Accessories</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#00F0C8;--dark:#0D0D12;--mid:#1A1A22;--text:#E8E8F0;--muted:#666670;--border:rgba(255,255,255,.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;}
+
+/* HEADER */
+.top{background:var(--neon);color:#000;text-align:center;padding:9px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+header{padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(13,13,18,.95);backdrop-filter:blur(10px);z-index:100;}
+.brand{font-size:24px;font-weight:700;color:var(--text);letter-spacing:2px;}
+.brand span{color:var(--neon);}
+nav ul{display:flex;gap:28px;list-style:none;}
+nav a{font-size:13px;font-weight:500;color:var(--muted);transition:color .2s;}
+nav a:hover{color:var(--text);}
+.h-right{display:flex;gap:12px;align-items:center;}
+.h-badge{background:var(--neon);color:#000;padding:10px 20px;font-size:12px;font-weight:700;letter-spacing:1px;transition:opacity .2s;}
+.h-badge:hover{opacity:.85;}
+.h-cart{background:var(--border);width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--text);}
+.h-cart svg{width:18px;stroke-width:1.5;}
+
+/* HERO */
+.hero{min-height:90vh;display:grid;grid-template-columns:1fr 1fr;padding:0 60px;align-items:center;gap:60px;border-bottom:1px solid var(--border);}
+.hero-text .tag{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--neon);margin-bottom:20px;display:inline-flex;align-items:center;gap:10px;}
+.hero-text .tag::before{content:'';width:24px;height:1px;background:var(--neon);}
+.hero-text h1{font-size:84px;font-weight:700;line-height:.95;margin-bottom:28px;color:#fff;}
+.hero-text h1 span{color:var(--neon);}
+.hero-text p{font-size:16px;color:var(--muted);line-height:1.8;max-width:420px;margin-bottom:40px;}
+.hero-ctas{display:flex;gap:12px;}
+.btn-neon{background:var(--neon);color:#000;padding:16px 36px;font-size:13px;font-weight:700;letter-spacing:1px;display:inline-block;transition:opacity .2s;}
+.btn-neon:hover{opacity:.85;}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);padding:15px 36px;font-size:13px;font-weight:600;letter-spacing:1px;display:inline-block;transition:border-color .2s;}
+.btn-ghost:hover{border-color:var(--neon);color:var(--neon);}
+.hero-visual{height:500px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;}
+.hv-card{border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.hv-card:first-child{grid-row:1/3;background:radial-gradient(circle at 30% 70%,rgba(0,240,200,.08),transparent 60%);}
+.hv-card svg{width:40%;color:var(--neon);opacity:.3;}
+.hv-label{position:absolute;bottom:16px;left:16px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--neon);}
+
+/* DEVICE SELECTOR */
+.device-select{padding:24px 60px;border-bottom:1px solid var(--border);background:var(--mid);display:flex;align-items:center;gap:16px;}
+.ds-label{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.ds-btns{display:flex;gap:8px;}
+.ds-btn{padding:8px 20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;}
+.ds-btn.active,.ds-btn:hover{border-color:var(--neon);color:var(--neon);}
+
+/* PRODUCTS */
+.products{padding:80px 60px;max-width:1400px;margin:0 auto;}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:48px;}
+.ph h2{font-size:48px;font-weight:700;color:#fff;}
+.ph a{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--neon);}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.card{background:var(--mid);border:1px solid var(--border);transition:all .3s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,240,200,.05),transparent);opacity:0;transition:opacity .3s;}
+.card:hover::before{opacity:1;}
+.card:hover{border-color:rgba(0,240,200,.3);transform:translateY(-4px);}
+.c-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1A1A22,#12121A);}
+.c-img svg{width:40%;color:var(--neon);opacity:.3;transition:opacity .3s,transform .4s;}
+.card:hover .c-img svg{opacity:.6;transform:scale(1.06);}
+.c-pill{position:absolute;top:14px;right:14px;background:var(--neon);color:#000;padding:4px 12px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.c-pill.limited{background:#FF4B6E;}
+.c-body{padding:20px;}
+.c-compat{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--neon);margin-bottom:6px;}
+.c-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;}
+.c-feat{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.c-foot{display:flex;justify-content:space-between;align-items:center;}
+.c-price{font-size:20px;font-weight:700;color:#fff;}
+.c-price small{font-size:12px;font-weight:400;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.c-atc{background:var(--neon);color:#000;border:none;padding:10px 16px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.c-atc:hover{opacity:.85;}
+
+/* TRUST */
+.trust{padding:60px;display:flex;justify-content:center;gap:80px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.trust-item{text-align:center;}
+.ti-num{font-size:40px;font-weight:700;color:var(--neon);}
+.ti-label{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+/* FOOTER */
+footer{background:#080810;padding:70px 60px 36px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid var(--border);}
+.fb .brand{display:block;margin-bottom:16px;font-size:20px;}
+.fb p{font-size:13px;color:var(--muted);line-height:1.9;max-width:260px;}
+.fc h4{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--neon);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:var(--muted);font-size:14px;transition:color .2s;}
+.fc a:hover{color:#fff;}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:var(--muted);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;gap:40px}.hero-visual{display:none}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:0 20px;min-height:auto;padding-top:60px;padding-bottom:60px}.hero-text h1{font-size:52px}.products{padding:60px 20px}.trust{flex-wrap:wrap;gap:40px;padding:40px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+</style>
+</head>
+<body>
+<div class="top">🔥 SALE — Up to 40% off MagSafe Collection. Ends Sunday.</div>
+<header>
+  <div class="brand">STACK<span>D</span></div>
+  <nav><ul>
+    <li><a href="#">iPhone Cases</a></li>
+    <li><a href="#">Android Cases</a></li>
+    <li><a href="#">MagSafe</a></li>
+    <li><a href="#">Chargers</a></li>
+    <li><a href="#">Bundles</a></li>
+  </ul></nav>
+  <div class="h-right">
+    <a href="#" class="h-badge">Shop Now</a>
+    <div class="h-cart"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="tag">Drop 07 - 2025</span>
+    <h1>STACK<br><span>YOUR</span><br>STYLE.</h1>
+    <p>MagSafe-compatible cases crafted from aircraft-grade materials. Drop protection that doesn't compromise millimeter precision.</p>
+    <div class="hero-ctas">
+      <a href="#" class="btn-neon">Shop iPhone 16</a>
+      <a href="#" class="btn-ghost">View All Devices</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hv-card"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg><span class="hv-label">Cases</span></div>
+    <div class="hv-card"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg><span class="hv-label">Chargers</span></div>
+    <div class="hv-card"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M8 18V8l8 5z"/></svg><span class="hv-label">Bundles</span></div>
+  </div>
+</section>
+
+<div class="device-select">
+  <span class="ds-label">Your Device:</span>
+  <div class="ds-btns">
+    <button class="ds-btn active">iPhone 16 Pro</button>
+    <button class="ds-btn">iPhone 16</button>
+    <button class="ds-btn">iPhone 15 Pro</button>
+    <button class="ds-btn">Samsung S25</button>
+    <button class="ds-btn">Pixel 9</button>
+  </div>
+</div>
+
+<section class="products">
+  <div class="ph"><h2>Top Picks</h2><a href="#">View all →</a></div>
+  <div class="grid">
+    <div class="card">
+      <div class="c-img"><span class="c-pill">Bestseller</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+      <div class="c-body"><div class="c-compat">iPhone 16 Pro</div><div class="c-name">ArmorCore Ultra Case</div><div class="c-feat">Military-grade drop protection · MagSafe · Camera lens guard</div><div class="c-foot"><div class="c-price">₹3,499<small>₹4,299</small></div><button class="c-atc">Add</button></div></div>
+    </div>
+    <div class="card">
+      <div class="c-img"><span class="c-pill limited">Limited</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="9"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></div>
+      <div class="c-body"><div class="c-compat">iPhone 16 Pro</div><div class="c-name">ClearShell Magsafe</div><div class="c-feat">Crystal clear · Yellowing resistant · 6m drop tested</div><div class="c-foot"><div class="c-price">₹2,199</div><button class="c-atc">Add</button></div></div>
+    </div>
+    <div class="card">
+      <div class="c-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M5 12.55a11 11 0 0014.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
+      <div class="c-body"><div class="c-compat">Universal</div><div class="c-name">MagCharge Pad 15W</div><div class="c-feat">15W fast charge · Qi2 · LED charge indicator · Sleek aluminum</div><div class="c-foot"><div class="c-price">₹4,999<small>₹5,999</small></div><button class="c-atc">Add</button></div></div>
+    </div>
+    <div class="card">
+      <div class="c-img"><span class="c-pill">Popular</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div>
+      <div class="c-body"><div class="c-compat">MagSafe Bundle</div><div class="c-name">The Complete Setup</div><div class="c-feat">Case + Pad + Wallet + Stand — Save ₹1,500 when bundled</div><div class="c-foot"><div class="c-price">₹8,999<small>₹10,499</small></div><button class="c-atc">Add</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust">
+  <div class="trust-item"><div class="ti-num">500K+</div><div class="ti-label">Cases Sold</div></div>
+  <div class="trust-item"><div class="ti-num">4.8★</div><div class="ti-label">Avg Rating</div></div>
+  <div class="trust-item"><div class="ti-num">6m</div><div class="ti-label">Drop Tested</div></div>
+  <div class="trust-item"><div class="ti-num">2 Year</div><div class="ti-label">Warranty</div></div>
+</div>
+
+<footer>
+  <div class="fg">
+    <div class="fb"><div class="brand">STACK<span style="color:var(--neon)">D</span></div><p>Built different. Protect everything you care about with gear engineered to outlast the phone itself.</p></div>
+    <div class="fc"><h4>Shop</h4><ul><li><a href="#">iPhone Cases</a></li><li><a href="#">Android Cases</a></li><li><a href="#">Chargers</a></li><li><a href="#">Bundles</a></li></ul></div>
+    <div class="fc"><h4>Info</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Affiliate</a></li></ul></div>
+    <div class="fc"><h4>Help</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2025 STACKD Technologies</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "kids-toys": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAYBOX | Kids Toys & Educational Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--yellow:#F9C22E;--blue:#2D6BE4;--red:#E83A3A;--teal:#1ABFA1;--bg:#FFFEF8;--surface:#fff;--text:#1A1A2E;--muted:#6B6B80;--border:#EAE8F0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.baloo{font-family:'Baloo 2',cursive;}
+
+/* WAVY TOP */
+.top-wave{background:var(--yellow);color:#000;text-align:center;padding:10px;font-size:13px;font-weight:700;letter-spacing:.5px;}
+
+/* HEADER */
+header{padding:16px 60px;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.04);}
+.brand{font-family:'Baloo 2',cursive;font-size:30px;font-weight:800;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;}
+.brand .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--yellow);margin-bottom:8px;}
+nav ul{display:flex;gap:28px;list-style:none;}
+nav a{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--blue);}
+.hdr-right{display:flex;gap:12px;align-items:center;}
+.hdr-btn{background:var(--blue);color:#fff;padding:12px 24px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .2s;}
+.hdr-btn:hover{opacity:.88;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#EEF4FF 0%,#FFF8E8 100%);display:grid;grid-template-columns:1fr 1fr;min-height:88vh;padding:0 60px;align-items:center;gap:60px;overflow:hidden;position:relative;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(249,194,46,.15);}
+.hero::after{content:'';position:absolute;bottom:-40px;left:40px;width:200px;height:200px;border-radius:50%;background:rgba(45,107,228,.08);}
+.hero-text .badge{display:inline-flex;align-items:center;gap:8px;background:var(--yellow);color:#000;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;margin-bottom:20px;}
+.hero-text h1{font-size:64px;font-weight:800;line-height:1.1;color:var(--text);margin-bottom:20px;}
+.hero-text h1 span{color:var(--blue);}
+.hero-text p{font-size:17px;color:var(--muted);line-height:1.8;max-width:440px;margin-bottom:36px;}
+.hero-btns{display:flex;gap:12px;}
+.btn-blue{background:var(--blue);color:#fff;padding:16px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;box-shadow:0 6px 20px rgba(45,107,228,.3);}
+.btn-blue:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,107,228,.35);}
+.btn-outline-b{background:transparent;color:var(--blue);border:2px solid var(--blue);padding:14px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-outline-b:hover{background:var(--blue);color:#fff;}
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.toy-float{width:100%;max-width:460px;aspect-ratio:1;border-radius:40% 60% 60% 40% / 60% 40% 60% 40%;background:linear-gradient(135deg,#FFE8A3,#FFD166);display:flex;align-items:center;justify-content:center;animation:blob 6s ease-in-out infinite;}
+.toy-float svg{width:55%;color:#2D6BE4;opacity:.5;}
+@keyframes blob{0%,100%{border-radius:40% 60% 60% 40% / 60% 40% 60% 40%}50%{border-radius:60% 40% 40% 60% / 40% 60% 40% 60%}}
+.age-badges{display:flex;gap:8px;margin-top:32px;}
+.age-b{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+.ab1{background:#FFE8E8;color:#E83A3A;}
+.ab2{background:#E8F0FF;color:#2D6BE4;}
+.ab3{background:#E8FAF7;color:#1ABFA1;}
+
+/* CATEGORIES */
+.categories{padding:70px 60px;max-width:1400px;margin:0 auto;}
+.sec-head{text-align:center;margin-bottom:50px;}
+.sec-head h2{font-size:44px;font-weight:800;color:var(--text);}
+.sec-head p{font-size:16px;color:var(--muted);margin-top:8px;}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.cat-card{border-radius:24px;padding:28px 20px;text-align:center;text-decoration:none;color:var(--text);transition:all .3s;position:relative;overflow:hidden;}
+.cat-card:hover{transform:translateY(-6px);}
+.cat-card:nth-child(1){background:#FFF0E0;}
+.cat-card:nth-child(2){background:#E8F0FF;}
+.cat-card:nth-child(3){background:#E8FAF7;}
+.cat-card:nth-child(4){background:#FFF0F0;}
+.cat-card:nth-child(5){background:#F0EAFF;}
+.cat-icon{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;}
+.cat-icon svg{width:36px;stroke-width:2;}
+.cat-name{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;margin-bottom:4px;}
+.cat-count{font-size:12px;color:var(--muted);}
+
+/* PRODUCTS */
+.products{padding:0 60px 80px;max-width:1400px;margin:0 auto;}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+.ph h2{font-size:40px;font-weight:800;}
+.ph a{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{background:#fff;border-radius:24px;overflow:hidden;border:2px solid var(--border);transition:all .3s;}
+.prod-card:hover{border-color:var(--yellow);box-shadow:0 12px 40px rgba(0,0,0,.07);transform:translateY(-4px);}
+.pc-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;}
+.pc-img svg{width:45%;opacity:.5;transition:transform .4s,opacity .3s;}
+.prod-card:hover .pc-img svg{transform:scale(1.08);opacity:.8;}
+.pc-age{position:absolute;top:14px;left:14px;background:var(--yellow);color:#000;padding:5px 12px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:1px;}
+.pc-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);cursor:pointer;}
+.pc-wish svg{width:16px;color:var(--muted);stroke-width:2;}
+.pc-body{padding:20px;}
+.pc-type{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.pc-name{font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+.pc-skills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.skill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;}
+.sk-green{background:#E8FAF7;color:#1ABFA1;}
+.sk-blue{background:#E8F0FF;color:#2D6BE4;}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;}
+.pc-price{font-size:20px;font-weight:800;color:var(--text);}
+.pc-old{font-size:13px;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.btn-add{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:100px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-add:hover{background:#1d54c4;}
+
+/* SAFETY BANNER */
+.safety{background:var(--blue);padding:70px 60px;display:flex;align-items:center;justify-content:center;gap:80px;flex-wrap:wrap;}
+.safety-item{display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff;}
+.s-icon{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;}
+.s-icon svg{width:28px;color:#fff;stroke-width:1.5;}
+.safety-item strong{font-family:'Baloo 2',cursive;font-size:16px;}
+.safety-item span{font-size:12px;color:rgba(255,255,255,.6);text-align:center;max-width:120px;}
+
+/* FOOTER */
+footer{background:var(--text);padding:80px 60px 40px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.08);}
+.fb a{font-family:'Baloo 2',cursive;font-size:26px;font-weight:800;color:var(--yellow);text-decoration:none;display:block;margin-bottom:16px;}
+.fb p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.9;max-width:260px;}
+.fc h4{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.fc a:hover{color:var(--yellow);}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-visual{display:none}.cat-grid{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.categories{padding:60px 20px}.cat-grid{grid-template-columns:repeat(2,1fr)}.products{padding:0 20px 60px}.safety{gap:40px;padding:60px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+</style>
+</head>
+<body>
+<div class="top-wave">🎁 Free gift-wrapping on all orders! Use code GIFTED at checkout.</div>
+<header>
+  <a href="#" class="brand">PLAY<div class="dot"></div>BOX</a>
+  <nav><ul>
+    <li><a href="#">Toys</a></li>
+    <li><a href="#">Learning</a></li>
+    <li><a href="#">Outdoor</a></li>
+    <li><a href="#">Arts & Crafts</a></li>
+    <li><a href="#">Gift Sets</a></li>
+  </ul></nav>
+  <div class="hdr-right">
+    <a href="#" class="hdr-btn">🛒 Cart (0)</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <div class="badge">⭐ 4.9 — Trusted by 1L+ Families</div>
+    <h1>Play. <span>Learn.</span><br>Grow Together.</h1>
+    <p>Award-winning educational toys and games that spark curiosity, develop skills, and create lifelong memories. BIS-certified and BPA-free.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-blue">Shop by Age</a>
+      <a href="#" class="btn-outline-b">Gift Guide →</a>
+    </div>
+    <div class="age-badges">
+      <span class="age-b ab1">0–2 Years</span>
+      <span class="age-b ab2">3–6 Years</span>
+      <span class="age-b ab3">7–12 Years</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="toy-float">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    </div>
+  </div>
+</section>
+
+<section class="categories">
+  <div class="sec-head"><h2>Shop by Category</h2><p>Curated for every age, interest, and milestone.</p></div>
+  <div class="cat-grid">
+    <a href="#" class="cat-card"><div class="cat-icon"><svg fill="none" stroke="#E07B2A" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="cat-name">Building & STEM</div><div class="cat-count">120+ toys</div></a>
+    <a href="#" class="cat-card"><div class="cat-icon"><svg fill="none" stroke="#2D6BE4" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 015 0 2.5 2.5 0 015 0"/></svg></div><div class="cat-name">Board Games</div><div class="cat-count">80+ games</div></a>
+    <a href="#" class="cat-card"><div class="cat-icon"><svg fill="none" stroke="#1ABFA1" viewBox="0 0 24 24"><path d="M2 12h20M12 2a10 10 0 0010 10 10 10 0 01-10 10A10 10 0 012 12 10 10 0 0112 2z"/></svg></div><div class="cat-name">Outdoor Play</div><div class="cat-count">60+ items</div></a>
+    <a href="#" class="cat-card"><div class="cat-icon"><svg fill="none" stroke="#E83A3A" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="cat-name">Arts & Crafts</div><div class="cat-count">95+ kits</div></a>
+    <a href="#" class="cat-card"><div class="cat-icon"><svg fill="none" stroke="#9B59B6" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="cat-name">Gift Sets</div><div class="cat-count">45+ sets</div></a>
+  </div>
+</section>
+
+<section class="products">
+  <div class="ph"><h2>🔥 Trending Picks</h2><a href="#">See all →</a></div>
+  <div class="grid">
+    <div class="prod-card">
+      <div class="pc-img" style="background:#FFF0E0;"><span class="pc-age">Ages 5–10</span><button class="pc-wish"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button><svg fill="none" stroke="#E07B2A" viewBox="0 0 24 24" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+      <div class="pc-body"><div class="pc-type">STEM Toys</div><div class="pc-name">GearBot Jr. Robot Builder Kit</div><div class="pc-skills"><span class="skill sk-green">Logic</span><span class="skill sk-blue">Engineering</span></div><div class="pc-foot"><div class="pc-price">₹1,299<span class="pc-old">₹1,699</span></div><button class="btn-add">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#E8F0FF;"><span class="pc-age">Ages 3–8</span><button class="pc-wish"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button><svg fill="none" stroke="#2D6BE4" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/></svg></div>
+      <div class="pc-body"><div class="pc-type">Board Games</div><div class="pc-name">Colour & Shape Family Game</div><div class="pc-skills"><span class="skill sk-blue">Creativity</span><span class="skill sk-green">Social</span></div><div class="pc-foot"><div class="pc-price">₹899</div><button class="btn-add">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#E8FAF7;"><span class="pc-age">Ages 2–5</span><button class="pc-wish"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button><svg fill="none" stroke="#1ABFA1" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+      <div class="pc-body"><div class="pc-type">Soft Toys</div><div class="pc-name">Cuddly Zoo Animal Set (6pc)</div><div class="pc-skills"><span class="skill sk-green">Sensory</span></div><div class="pc-foot"><div class="pc-price">₹1,499<span class="pc-old">₹1,799</span></div><button class="btn-add">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#FFF0F0;"><span class="pc-age">Ages 6–12</span><button class="pc-wish"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button><svg fill="none" stroke="#E83A3A" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="pc-body"><div class="pc-type">Arts & Crafts</div><div class="pc-name">SuperArtist Deluxe Kit (180pc)</div><div class="pc-skills"><span class="skill sk-blue">Creativity</span><span class="skill sk-green">Fine Motor</span></div><div class="pc-foot"><div class="pc-price">₹2,199</div><button class="btn-add">Add to Cart</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="safety">
+  <div class="safety-item"><div class="s-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><strong>BIS Certified</strong><span>All toys meet Indian safety standards</span></div>
+  <div class="safety-item"><div class="s-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><strong>BPA-Free</strong><span>Non-toxic, child-friendly materials</span></div>
+  <div class="safety-item"><div class="s-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></div><strong>Eco-Friendly</strong><span>Sustainable wood & recycled materials</span></div>
+  <div class="safety-item"><div class="s-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><strong>Free Delivery</strong><span>On all orders above ₹499</span></div>
+</div>
+
+<footer>
+  <div class="fg">
+    <div class="fb"><a href="#">PLAYBOX 🎲</a><p>Making childhood magical through play that educates, inspires, and connects families.</p></div>
+    <div class="fc"><h4>Shop</h4><ul><li><a href="#">0-2 Years</a></li><li><a href="#">3-6 Years</a></li><li><a href="#">7-12 Years</a></li><li><a href="#">Gift Sets</a></li></ul></div>
+    <div class="fc"><h4>Learn</h4><ul><li><a href="#">Blog</a></li><li><a href="#">Age Guide</a></li><li><a href="#">Reviews</a></li></ul></div>
+    <div class="fc"><h4>Support</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2025 Playbox. All rights reserved.</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "home-furniture": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAVEN | Premium Home Furniture</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--oak:#B5834A;--smoke:#F0EDE8;--dark:#1E1A16;--text:#2D2720;--muted:#7D7068;--border:#E0D8CC;--light:#FAF8F5;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--light);color:var(--text);font-family:'Manrope',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Libre Baskerville',serif;}
+
+/* HEADER */
+.top{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:10px;font-size:12px;letter-spacing:2px;text-transform:uppercase;}
+header{padding:24px 60px;background:var(--light);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.brand{font-family:'Libre Baskerville',serif;font-size:26px;color:var(--dark);text-decoration:none;letter-spacing:1px;display:flex;flex-direction:column;}
+.brand-tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--oak);font-family:'Manrope',sans-serif;font-weight:600;}
+nav ul{display:flex;gap:32px;list-style:none;}
+nav a{font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--oak);}
+.h-right{display:flex;gap:16px;align-items:center;}
+.h-link{font-size:12px;font-weight:600;letter-spacing:1px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.h-link:hover{color:var(--text);}
+.h-cta{background:var(--dark);color:#fff;padding:12px 28px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-decoration:none;transition:background .2s;}
+.h-cta:hover{background:var(--oak);}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:90vh;border-bottom:1px solid var(--border);}
+.hero-left{padding:100px 80px;display:flex;flex-direction:column;justify-content:center;background:var(--light);}
+.hero-left .overline{font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--oak);margin-bottom:24px;}
+.hero-left h1{font-size:68px;line-height:1.05;margin-bottom:28px;color:var(--dark);}
+.hero-left h1 em{font-style:italic;color:var(--oak);}
+.hero-left p{font-size:17px;color:var(--muted);line-height:1.9;max-width:420px;margin-bottom:44px;font-weight:400;}
+.hero-actions{display:flex;flex-direction:column;gap:16px;max-width:260px;}
+.btn-dark{background:var(--dark);color:#fff;padding:18px 40px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;text-align:center;transition:background .2s;font-family:'Manrope',sans-serif;}
+.btn-dark:hover{background:var(--oak);}
+.btn-oak{background:transparent;color:var(--oak);border:1.5px solid var(--oak);padding:16px 40px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;text-align:center;transition:all .2s;font-family:'Manrope',sans-serif;}
+.btn-oak:hover{background:var(--oak);color:#fff;}
+.hero-stats{display:flex;gap:40px;margin-top:60px;padding-top:40px;border-top:1px solid var(--border);}
+.hs strong{display:block;font-family:'Libre Baskerville',serif;font-size:28px;color:var(--dark);}
+.hs span{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+
+.hero-right{background:var(--smoke);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.hero-right::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;border:1px solid rgba(181,131,74,.15);top:50%;left:50%;transform:translate(-50%,-50%);}
+.hero-img{width:70%;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;position:relative;}
+.hero-img svg{width:60%;color:var(--oak);opacity:.25;}
+
+/* ROOM IDEAS */
+.rooms{padding:100px 60px;max-width:1400px;margin:0 auto;}
+.sh{text-align:center;margin-bottom:60px;}
+.sh h2{font-size:44px;color:var(--dark);margin-bottom:12px;}
+.sh p{font-size:16px;color:var(--muted);max-width:480px;margin:0 auto;}
+.room-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.room-card{position:relative;aspect-ratio:4/5;overflow:hidden;text-decoration:none;color:#fff;display:block;}
+.room-card:nth-child(1){grid-column:span 2;aspect-ratio:16/9;}
+.room-card:nth-child(n+3){aspect-ratio:1;}
+.rc-bg{width:100%;height:100%;transition:transform .8s ease;display:flex;align-items:center;justify-content:center;}
+.room-card:hover .rc-bg{transform:scale(1.04);}
+.rc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:28px;}
+.rc-label{font-family:'Libre Baskerville',serif;font-size:20px;margin-bottom:4px;}
+.rc-cta{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.7);}
+.rc-bg svg{width:30%;color:rgba(255,255,255,.15);}
+
+/* PRODUCTS */
+.products{padding:0 60px 100px;max-width:1400px;margin:0 auto;}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:50px;}
+.ph h2{font-size:44px;color:var(--dark);}
+.ph a{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--oak);text-decoration:none;border-bottom:1px solid var(--oak);padding-bottom:3px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
+.prod-card{background:#fff;border:1px solid var(--border);transition:all .35s;overflow:hidden;}
+.prod-card:hover{box-shadow:0 16px 48px rgba(30,26,22,.06);transform:translateY(-6px);}
+.pc-img{aspect-ratio:1;background:var(--smoke);display:flex;align-items:center;justify-content:center;position:relative;}
+.pc-img svg{width:35%;color:var(--oak);opacity:.4;transition:transform .5s;}
+.prod-card:hover .pc-img svg{transform:scale(1.06);opacity:.7;}
+.pc-badge{position:absolute;top:16px;left:16px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;}
+.pc-badge.new{background:var(--dark);color:#fff;}
+.pc-badge.sale{background:var(--oak);color:#fff;}
+.pc-info{padding:24px;}
+.pc-category{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--oak);margin-bottom:8px;}
+.pc-name{font-family:'Libre Baskerville',serif;font-size:20px;margin-bottom:6px;color:var(--dark);}
+.pc-material{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:16px;}
+.pc-footer{display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border);}
+.pc-price{font-family:'Libre Baskerville',serif;font-size:22px;color:var(--dark);}
+.pc-old{font-size:13px;color:var(--muted);text-decoration:line-through;margin-left:8px;font-family:'Manrope',sans-serif;font-weight:400;}
+.pc-atc{background:transparent;color:var(--dark);border:1px solid var(--dark);padding:10px 20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .2s;}
+.pc-atc:hover{background:var(--dark);color:#fff;}
+
+/* HOW IT WORKS */
+.hiw{background:var(--dark);padding:100px 60px;}
+.hiw-inner{max-width:1000px;margin:0 auto;text-align:center;}
+.hiw h2{font-size:44px;color:#fff;margin-bottom:16px;}
+.hiw p{font-size:16px;color:rgba(255,255,255,.4);margin-bottom:70px;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:60px;position:relative;}
+.steps::before{content:'';position:absolute;top:40px;left:16%;width:68%;height:1px;background:rgba(255,255,255,.08);}
+.step{text-align:center;}
+.step-num{width:80px;height:80px;border-radius:50%;border:1px solid rgba(181,131,74,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Libre Baskerville',serif;font-size:28px;color:var(--oak);}
+.step h4{font-family:'Libre Baskerville',serif;font-size:18px;color:#fff;margin-bottom:10px;}
+.step p{font-size:14px;color:rgba(255,255,255,.4);line-height:1.8;}
+
+/* FOOTER */
+footer{padding:80px 60px 40px;background:var(--light);border-top:1px solid var(--border);}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid var(--border);}
+.fb .brand{font-size:22px;display:flex;flex-direction:column;margin-bottom:16px;}
+.fb p{font-size:13px;color:var(--muted);line-height:1.9;max-width:270px;}
+.fc h4{font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:var(--text);text-decoration:none;font-size:14px;transition:color .2s;}
+.fc a:hover{color:var(--oak);}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:var(--muted);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto}.hero-right{display:none}.room-grid{grid-template-columns:1fr 1fr}.room-card:nth-child(1){grid-column:span 2}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero-left{padding:60px 20px}.hero-left h1{font-size:44px}.rooms{padding:60px 20px}.room-grid{grid-template-columns:1fr}.room-card:nth-child(1){grid-column:span 1}.products{padding:0 20px 60px}.grid{grid-template-columns:1fr}.hiw{padding:60px 20px}.steps{grid-template-columns:1fr;gap:40px}.steps::before{display:none}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+</style>
+</head>
+<body>
+<div class="top">Complimentary white-glove delivery and assembly on all furniture orders.</div>
+<header>
+  <a href="#" class="brand">
+    HAVEN
+    <span class="brand-tagline">Premium Furniture &amp; Living</span>
+  </a>
+  <nav><ul>
+    <li><a href="#">Living Room</a></li>
+    <li><a href="#">Bedroom</a></li>
+    <li><a href="#">Dining</a></li>
+    <li><a href="#">Home Office</a></li>
+    <li><a href="#">Outdoor</a></li>
+  </ul></nav>
+  <div class="h-right">
+    <a href="#" class="h-link">Wishlist</a>
+    <a href="#" class="h-link">Account</a>
+    <a href="#" class="h-cta">View Cart</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-left">
+    <span class="overline">2025 — The Natural Edit</span>
+    <h1>Rooms That<br>Feel Like <em>Home</em></h1>
+    <p>Solid wood furniture crafted by eighth-generation artisans in Jodhpur. Designed to age gracefully and tell a story with every scratch.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-dark">Explore Collections</a>
+      <a href="#" class="btn-oak">Book Free Design Call</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><strong>18+</strong><span>Year Legacy</span></div>
+      <div class="hs"><strong>40K+</strong><span>Happy Homes</span></div>
+      <div class="hs"><strong>100%</strong><span>Solid Wood</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+  </div>
+</section>
+
+<section class="rooms">
+  <div class="sh"><h2>Shop the Look</h2><p>Curated room aesthetics to inspire your next transformation.</p></div>
+  <div class="room-grid">
+    <div class="room-card"><div class="rc-bg" style="background:linear-gradient(135deg,#2D2720,#4A3828);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="rc-overlay"><div class="rc-label">The Walnut Living Room</div><div class="rc-cta">Shop This Look →</div></div></div>
+    <div class="room-card"><div class="rc-bg" style="background:linear-gradient(135deg,#3D3028,#5A4030);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div><div class="rc-overlay"><div class="rc-label">Calm Bedroom</div><div class="rc-cta">Shop This Look →</div></div></div>
+    <div class="room-card"><div class="rc-bg" style="background:linear-gradient(135deg,#28302D,#3A4A40);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div class="rc-overlay"><div class="rc-label">Home Office</div><div class="rc-cta">Shop This Look →</div></div></div>
+  </div>
+</section>
+
+<section class="products">
+  <div class="ph"><h2>Featured Pieces</h2><a href="#">View All →</a></div>
+  <div class="grid">
+    <div class="prod-card">
+      <div class="pc-img"><span class="pc-badge new">New</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="pc-info"><div class="pc-category">Sofas &amp; Seating</div><div class="pc-name">Ashwood Three-Seater</div><div class="pc-material">Solid Ash wood · Organic linen · Brass legs</div><div class="pc-footer"><div class="pc-price">₹89,000<span class="pc-old">₹1,05,000</span></div><button class="pc-atc">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#E8E2D5;"><span class="pc-badge sale">Sale</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/></svg></div>
+      <div class="pc-info"><div class="pc-category">Dining</div><div class="pc-name">Mango Wood Dining Set</div><div class="pc-material">Recycled Mango wood · 6-seat · Hand-carved</div><div class="pc-footer"><div class="pc-price">₹1,24,000<span class="pc-old">₹1,45,000</span></div><button class="pc-atc">Add to Cart</button></div></div>
+    </div>
+    <div class="prod-card">
+      <div class="pc-img" style="background:#EDE8E0;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 9H4l1 12h14z"/><path d="M8 9V6a4 4 0 018 0v3"/></svg></div>
+      <div class="pc-info"><div class="pc-category">Storage</div><div class="pc-name">Heritage Teak Wardrobe</div><div class="pc-material">Grade-A Teak · Soft-close hinges · 4-door</div><div class="pc-footer"><div class="pc-price">₹2,10,000</div><button class="pc-atc">Add to Cart</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="hiw">
+  <div class="hiw-inner">
+    <h2>Your Journey to a Beautiful Home</h2>
+    <p>Simple, personal, and delivered to your doorstep.</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">01</div><h4>Design Consultation</h4><p>Book a free 30-minute call with our in-house interior designer to discuss your vision and space.</p></div>
+      <div class="step"><div class="step-num">02</div><h4>Custom Crafting</h4><p>Your piece is handcrafted to order by our master carpenters in Jodhpur, India — delivered in 4-6 weeks.</p></div>
+      <div class="step"><div class="step-num">03</div><h4>White-Glove Delivery</h4><p>We handle delivery, assembly, and removal of packaging. You just sit back and enjoy your beautiful new home.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="fg">
+    <div class="fb"><a href="#" class="brand">HAVEN<span class="brand-tagline">Premium Furniture &amp; Living</span></a><p>Premium Indian craftsmanship meeting global design standards. Heirloom furniture for the modern family.</p></div>
+    <div class="fc"><h4>Collections</h4><ul><li><a href="#">Living Room</a></li><li><a href="#">Bedroom</a></li><li><a href="#">Dining</a></li><li><a href="#">Home Office</a></li></ul></div>
+    <div class="fc"><h4>Services</h4><ul><li><a href="#">Design Consultation</a></li><li><a href="#">Customisation</a></li><li><a href="#">Assembly</a></li></ul></div>
+    <div class="fc"><h4>Support</h4><ul><li><a href="#">Care Guide</a></li><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2025 Haven Furniture Pvt. Ltd.</span><span>Privacy · Terms</span></div>
+</footer>
+</body>
+</html>
+`,
+  "food-delivery": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEDA EATS | Cloud Kitchen & Food Delivery</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#FF5722;--yellow:#FFC107;--dark:#1A0A00;--bg:#FFF7F0;--surface:#fff;--text:#2A1A0E;--muted:#8A7060;--border:#F0E4D8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.top{background:var(--orange);color:#fff;text-align:center;padding:9px;font-size:12px;font-weight:600;letter-spacing:.5px;}
+header{padding:18px 60px;background:#fff;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 20px rgba(0,0,0,.05);position:sticky;top:0;z-index:100;}
+.brand{font-size:24px;font-weight:800;color:var(--dark);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.brand-icon{width:36px;height:36px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+nav ul{display:flex;gap:28px;list-style:none;}
+nav a{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--orange);}
+.hdr-btns{display:flex;gap:10px;}
+.hdr-login{background:transparent;border:1.5px solid var(--orange);color:var(--orange);padding:10px 20px;border-radius:100px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.hdr-login:hover{background:var(--orange);color:#fff;}
+.hdr-order{background:var(--orange);color:#fff;border:none;padding:10px 20px;border-radius:100px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.hdr-order:hover{opacity:.88;}
+
+/* HERO */
+.hero{background:linear-gradient(120deg,#1A0A00 0%,#3A1A00 60%,#2A0E00 100%);min-height:88vh;display:grid;grid-template-columns:1fr 1fr;padding:0 60px;align-items:center;gap:60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:rgba(255,87,34,.08);}
+.hero::after{content:'';position:absolute;bottom:-100px;left:20%;width:400px;height:400px;border-radius:50%;background:rgba(255,193,7,.05);}
+.hero-text .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,87,34,.2);border:1px solid rgba(255,87,34,.3);color:var(--orange);padding:8px 18px;border-radius:100px;font-size:12px;font-weight:600;margin-bottom:20px;}
+.hero-text h1{font-size:68px;font-weight:800;line-height:1.05;color:#fff;margin-bottom:20px;}
+.hero-text h1 span{color:var(--orange);}
+.hero-text p{font-size:17px;color:rgba(255,255,255,.5);line-height:1.8;max-width:440px;margin-bottom:40px;}
+/* Location input */
+.loc-input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;max-width:500px;margin-bottom:14px;}
+.loc-input svg{width:20px;color:var(--orange);flex-shrink:0;}
+.loc-input input{background:transparent;border:none;outline:none;font-family:'Poppins',sans-serif;font-size:15px;color:#fff;flex:1;}
+.loc-input input::placeholder{color:rgba(255,255,255,.3);}
+.loc-btn{background:var(--orange);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.loc-btn:hover{opacity:.88;}
+.delivery-info{font-size:13px;color:rgba(255,255,255,.35);font-weight:500;}
+.hero-visual{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;}
+.food-float{width:100%;max-width:420px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,87,34,.15),rgba(255,87,34,.03));display:flex;align-items:center;justify-content:center;border:1px dashed rgba(255,87,34,.2);}
+.food-float svg{width:50%;color:var(--orange);opacity:.3;}
+
+/* CUISINE TABS */
+.cuisine{background:#fff;padding:30px 60px;border-bottom:1px solid var(--border);}
+.cuisine-inner{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;}
+.c-chip{display:flex;align-items:center;gap:8px;padding:12px 20px;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;color:var(--text);}
+.c-chip:hover,.c-chip.active{border-color:var(--orange);color:var(--orange);background:rgba(255,87,34,.06);}
+.c-chip-icon{font-size:18px;}
+
+/* MENU */
+.menu{padding:80px 60px;max-width:1400px;margin:0 auto;}
+.menu-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:48px;}
+.menu-head h2{font-size:36px;font-weight:800;color:var(--text);}
+.menu-head a{font-size:13px;font-weight:600;color:var(--orange);text-decoration:none;}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.menu-card{background:#fff;border-radius:20px;overflow:hidden;border:1px solid var(--border);transition:all .3s;cursor:pointer;}
+.menu-card:hover{box-shadow:0 12px 40px rgba(255,87,34,.08);transform:translateY(-4px);}
+.mc-img{aspect-ratio:16/9;background:linear-gradient(135deg,#FFF0E0,#FFE0C0);display:flex;align-items:center;justify-content:center;position:relative;}
+.mc-img svg{width:35%;color:var(--orange);opacity:.4;transition:opacity .3s,transform .4s;}
+.menu-card:hover .mc-img svg{opacity:.7;transform:scale(1.06);}
+.mc-badge{position:absolute;top:14px;left:14px;background:var(--orange);color:#fff;padding:5px 14px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.5px;}
+.mc-badge.veg{background:#27AE60;}
+.mc-time{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.5);color:#fff;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;}
+.mc-body{padding:20px;}
+.mc-kitchen{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.mc-name{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.mc-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.mc-foot{display:flex;justify-content:space-between;align-items:center;}
+.mc-price-w strong{font-size:22px;font-weight:800;color:var(--text);}
+.mc-off{font-size:12px;color:#27AE60;font-weight:700;margin-left:6px;}
+.mc-atc{background:var(--orange);color:#fff;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;font-weight:700;transition:opacity .2s;flex-shrink:0;}
+.mc-atc:hover{opacity:.85;}
+
+/* TRUST */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.t-item{padding:40px 32px;text-align:center;border-right:1px solid var(--border);}
+.t-item:last-child{border-right:none;}
+.t-icon{font-size:36px;margin-bottom:12px;}
+.t-num{font-size:28px;font-weight:800;color:var(--orange);margin-bottom:4px;}
+.t-label{font-size:12px;color:var(--muted);font-weight:500;}
+
+/* FOOTER */
+footer{background:var(--dark);padding:70px 60px 36px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.08);}
+.fb .brand{display:flex;font-size:22px;margin-bottom:16px;color:#fff;}
+.fb p{font-size:13px;color:rgba(255,255,255,.35);line-height:1.9;max-width:260px;}
+.fc h4{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:rgba(255,255,255,.4);text-decoration:none;font-size:14px;transition:color .2s;}
+.fc a:hover{color:#fff;}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:rgba(255,255,255,.2);}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;padding:60px 40px;min-height:auto}.hero-visual{display:none}.menu-grid{grid-template-columns:repeat(2,1fr)}.trust{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:14px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.cuisine{padding:20px}.menu{padding:60px 20px}.menu-grid{grid-template-columns:1fr}.trust{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+</style>
+</head>
+<body>
+<div class="top">🛵 30-minute delivery guaranteed or your next order is FREE!</div>
+<header>
+  <a href="#" class="brand"><div class="brand-icon">🍛</div>VEDA EATS</a>
+  <nav><ul>
+    <li><a href="#">Menu</a></li>
+    <li><a href="#">Cuisines</a></li>
+    <li><a href="#">Offers</a></li>
+    <li><a href="#">Track Order</a></li>
+  </ul></nav>
+  <div class="hdr-btns">
+    <button class="hdr-login">Login</button>
+    <button class="hdr-order">Order Now</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <div class="badge">🔥 400+ Daily Orders — 4.8★ Rating</div>
+    <h1>Restaurant<br><span>Quality</span><br>At Home.</h1>
+    <p>Chef-crafted meals from top cloud kitchens, delivered fresh to your door in under 30 minutes.</p>
+    <div class="loc-input">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <input type="text" placeholder="Enter your delivery address...">
+      <button class="loc-btn">Find Food →</button>
+    </div>
+    <div class="delivery-info">📍 Currently delivering in Bangalore, Mumbai &amp; Delhi</div>
+  </div>
+  <div class="hero-visual">
+    <div class="food-float">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="cuisine">
+  <div class="cuisine-inner">
+    <button class="c-chip active"><span class="c-chip-icon">🍽️</span>All</button>
+    <button class="c-chip"><span class="c-chip-icon">🍜</span>North Indian</button>
+    <button class="c-chip"><span class="c-chip-icon">🥘</span>South Indian</button>
+    <button class="c-chip"><span class="c-chip-icon">🍕</span>Italian</button>
+    <button class="c-chip"><span class="c-chip-icon">🍣</span>Asian</button>
+    <button class="c-chip"><span class="c-chip-icon">🥗</span>Healthy</button>
+    <button class="c-chip"><span class="c-chip-icon">🍔</span>Burgers</button>
+    <button class="c-chip"><span class="c-chip-icon">🧁</span>Desserts</button>
+    <button class="c-chip"><span class="c-chip-icon">☕</span>Beverages</button>
+  </div>
+</div>
+
+<section class="menu">
+  <div class="menu-head"><h2>🔥 Popular Right Now</h2><a href="#">See full menu →</a></div>
+  <div class="menu-grid">
+    <div class="menu-card">
+      <div class="mc-img"><span class="mc-badge">Bestseller</span><span class="mc-time">⏱ 22 min</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M16 11l-4-8-4 8a7.07 7.07 0 000 2c.75 3.86 3.07 7 4 7s3.25-3.14 4-7a7.07 7.07 0 000-2z"/></svg></div>
+      <div class="mc-body"><div class="mc-kitchen">Punjabi Kitchen</div><div class="mc-name">Dal Makhani + Naan Combo</div><div class="mc-desc">Slow-cooked black lentils in a rich tomato &amp; cream gravy. Served with 2 butter naan.</div><div class="mc-foot"><div class="mc-price-w"><strong>₹199</strong><span class="mc-off">20% OFF</span></div><button class="mc-atc">+</button></div></div>
+    </div>
+    <div class="menu-card">
+      <div class="mc-img" style="background:linear-gradient(135deg,#FFF8D0,#FFF0A0);"><span class="mc-badge veg">Veg</span><span class="mc-time">⏱ 18 min</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+      <div class="mc-body"><div class="mc-kitchen">South Bites</div><div class="mc-name">Masala Dosa &amp; Filter Coffee</div><div class="mc-desc">Crispy golden dosa with spiced potato filling. Served with sambar, 2 chutneys, and aromatic filter coffee.</div><div class="mc-foot"><div class="mc-price-w"><strong>₹149</strong></div><button class="mc-atc">+</button></div></div>
+    </div>
+    <div class="menu-card">
+      <div class="mc-img" style="background:linear-gradient(135deg,#F0F8FF,#D0E8FF);"><span class="mc-badge">Chef's Pick</span><span class="mc-time">⏱ 25 min</span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></div>
+      <div class="mc-body"><div class="mc-kitchen">Fusion Fire</div><div class="mc-name">Butter Chicken Pasta</div><div class="mc-desc">A fusion of creamy butter chicken sauce tossed with penne pasta. Topped with fresh cream and herbs.</div><div class="mc-foot"><div class="mc-price-w"><strong>₹259</strong><span class="mc-off">10% OFF</span></div><button class="mc-atc">+</button></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust">
+  <div class="t-item"><div class="t-icon">⏱</div><div class="t-num">28 min</div><div class="t-label">Avg Delivery Time</div></div>
+  <div class="t-item"><div class="t-icon">🍽️</div><div class="t-num">50+</div><div class="t-label">Cloud Kitchens</div></div>
+  <div class="t-item"><div class="t-icon">⭐</div><div class="t-num">4.8</div><div class="t-label">Average Rating</div></div>
+  <div class="t-item"><div class="t-icon">😊</div><div class="t-num">2L+</div><div class="t-label">Happy Customers</div></div>
+</div>
+
+<footer>
+  <div class="fg">
+    <div class="fb"><div class="brand"><div class="brand-icon">🍛</div>VEDA EATS</div><p>Bringing chef-quality meals from the best cloud kitchens to your doorstep, every single day.</p></div>
+    <div class="fc"><h4>Explore</h4><ul><li><a href="#">Full Menu</a></li><li><a href="#">Cuisines</a></li><li><a href="#">Offers</a></li><li><a href="#">Combos</a></li></ul></div>
+    <div class="fc"><h4>Company</h4><ul><li><a href="#">About Us</a></li><li><a href="#">List Your Kitchen</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li></ul></div>
+    <div class="fc"><h4>Help</h4><ul><li><a href="#">Track Order</a></li><li><a href="#">Refund Policy</a></li><li><a href="#">FAQ</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2025 Veda Eats. FSSAI Lic. No. 12345678.</span><span>Privacy · Terms</span></div>
+</footer>
 </body>
 </html>
 `,
