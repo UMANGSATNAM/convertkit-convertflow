@@ -28,9 +28,64 @@ const PAGE_MAPPINGS = [
  * Template configuration map.
  */
 const TEMPLATES = {
-  pilgrim: { label: "Pilgrim Beauty" },
-  tanishq: { label: "Tanishq Jewellery" },
-  caratlane: { label: "CaratLane Clone" }
+  // ── Original 3 ──────────────────────────────────────────────────────────
+  pilgrim:              { label: "Pilgrim Beauty" },
+  tanishq:              { label: "Tanishq Jewellery" },
+  caratlane:            { label: "CaratLane Clone" },
+
+  // ── Jewellery ────────────────────────────────────────────────────────────
+  "jewellery-heritage": { label: "Meenakshi Heritage Jewellers" },
+
+  // ── Fashion & Apparel ────────────────────────────────────────────────────
+  "fashion-clothing":   { label: "VŌLT Fashion" },
+
+  // ── Footwear ─────────────────────────────────────────────────────────────
+  footwear:             { label: "Solera Footwear" },
+
+  // ── Ayurveda / Health ────────────────────────────────────────────────────
+  "ayurveda-wellness":  { label: "Ayurva Wellness" },
+
+  // ── Tech Accessories ─────────────────────────────────────────────────────
+  "mobile-accessories": { label: "STACKD Accessories" },
+
+  // ── Kids Toys ────────────────────────────────────────────────────────────
+  "kids-toys":          { label: "PlayBox Kids" },
+
+  // ── Home Furniture ───────────────────────────────────────────────────────
+  "home-furniture":     { label: "Haven Furniture" },
+
+  // ── Food Delivery ────────────────────────────────────────────────────────
+  "food-delivery":      { label: "Veda Eats" },
+
+  // ── Electronics (placeholder — template pending) ─────────────────────────
+  electronics:          { label: "Tech & Electronics" },
+
+  // ── Home Décor (placeholder) ──────────────────────────────────────────────
+  "home-decor":         { label: "Home Décor" },
+
+  // ── Pet Supplies (placeholder) ────────────────────────────────────────────
+  "pet-supplies":       { label: "Pet Supplies" },
+
+  // ── Luxury Watches (placeholder) ─────────────────────────────────────────
+  "luxury-watches":     { label: "Luxury Watches" },
+
+  // ── Outdoor Gear (placeholder) ───────────────────────────────────────────
+  "outdoor-gear":       { label: "Outdoor Gear" },
+
+  // ── Organic Food (placeholder) ───────────────────────────────────────────
+  "organic-food":       { label: "Organic Food" },
+
+  // ── Fitness Supplements (placeholder) ────────────────────────────────────
+  "fitness-supplements":{ label: "Fitness Supplements" },
+
+  // ── Baby Apparel (placeholder) ───────────────────────────────────────────
+  "baby-apparel":       { label: "Baby Apparel" },
+
+  // ── Coffee Roasters (placeholder) ────────────────────────────────────────
+  "coffee-roasters":    { label: "Coffee Roasters" },
+
+  // ── Beauty & Cosmetics (placeholder) ─────────────────────────────────────
+  "beauty-cosmetics":   { label: "Beauty & Cosmetics" },
 };
 
 /**
