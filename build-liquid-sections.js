@@ -57,6 +57,12 @@ function extractFonts(html) {
   return matches.map(m => m[0]).join('\n');
 }
 
+// ─── Helper: Shopify schema names max 25 chars ────────────────────────────────
+// Format: "CF {label} {suffix}" truncated to 25
+function sn(label, suffix) {
+  return `CF ${label} ${suffix}`.substring(0, 25).trimEnd();
+}
+
 // ─── Build the LANDING section from full HTML ─────────────────────────────────
 function buildLandingSection(tpl, html) {
   const fonts  = extractFonts(html);
@@ -71,9 +77,9 @@ ${styles}
 ${body}
 {% schema %}
 {
-  "name": "CF ${tpl.label} Landing",
+  "name": "${sn(tpl.label, 'LP')}",
   "settings": [],
-  "presets": [{ "name": "CF ${tpl.label} Landing" }]
+  "presets": [{ "name": "${sn(tpl.label, 'LP')}" }]
 }
 {% endschema %}`;
 }
@@ -250,9 +256,9 @@ body { font-family: var(--cf-font), 'Inter', sans-serif; background: var(--cf-bg
 
 {% schema %}
 {
-  "name": "CF ${tpl.label} Product",
+  "name": "${sn(tpl.label, 'PDP')}",
   "settings": [],
-  "presets": [{ "name": "CF ${tpl.label} Product" }]
+  "presets": [{ "name": "${sn(tpl.label, 'PDP')}" }]
 }
 {% endschema %}`;
 }
@@ -362,9 +368,9 @@ body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:10
 
 {% schema %}
 {
-  "name": "CF ${tpl.label} Cart",
+  "name": "${sn(tpl.label, 'Cart')}",
   "settings": [],
-  "presets": [{ "name": "CF ${tpl.label} Cart" }]
+  "presets": [{ "name": "${sn(tpl.label, 'Cart')}" }]
 }
 {% endschema %}`;
 }
@@ -483,9 +489,9 @@ body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-
 
 {% schema %}
 {
-  "name": "CF ${tpl.label} Collection",
+  "name": "${sn(tpl.label, 'Collection')}",
   "settings": [],
-  "presets": [{ "name": "CF ${tpl.label} Collection" }]
+  "presets": [{ "name": "${sn(tpl.label, 'Collection')}" }]
 }
 {% endschema %}`;
 }
@@ -513,14 +519,10 @@ for (const tpl of TEMPLATES) {
   ];
 
   for (const page of pages) {
-    // Skip if liquid section already exists (don't overwrite manual edits)
+    // Always overwrite — ensures schema names stay within 25-char Shopify limit
     const dest = path.join(SECTIONS_DIR, `cf-${tpl.id}-${page.id}.liquid`);
-    if (fs.existsSync(dest)) {
-      console.log(`   exists  cf-${tpl.id}-${page.id}.liquid`);
-      continue;
-    }
     fs.writeFileSync(dest, page.content, 'utf-8');
-    console.log(`✓ created  cf-${tpl.id}-${page.id}.liquid`);
+    console.log(`✓ wrote  cf-${tpl.id}-${page.id}.liquid`);
     created++;
   }
 }
