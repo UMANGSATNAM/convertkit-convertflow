@@ -18,14 +18,25 @@ const SECTIONS_DIR = path.resolve('./extensions/convertkit-sections/sections');
 
 // All HTML-based templates needing Liquid section generation
 const TEMPLATES = [
-  { id: 'jewellery-heritage',  file: 'lp-jewellery-heritage.html',  label: 'Meenakshi Heritage Jewellers', accent: '#8B1A2C', bg: '#FAF0F0', font: "'Cinzel', serif" },
-  { id: 'fashion-clothing',    file: 'lp-fashion-clothing.html',    label: 'VŌLT Fashion',                 accent: '#0A0A0A', bg: '#F5F3EF', font: "'Bebas Neue', cursive" },
-  { id: 'footwear',            file: 'lp-footwear.html',            label: 'Solera Footwear',              accent: '#C65D2A', bg: '#FBF0E8', font: "'Syne', sans-serif" },
-  { id: 'ayurveda-wellness',   file: 'lp-ayurveda-wellness.html',   label: 'Ayurva Wellness',              accent: '#2E4B35', bg: '#F5FCF5', font: "'Hind', sans-serif" },
-  { id: 'mobile-accessories',  file: 'lp-mobile-accessories.html',  label: 'STACKD Accessories',           accent: '#00F0C8', bg: '#0D0D12', font: "'Space Grotesk', sans-serif" },
-  { id: 'kids-toys',           file: 'lp-kids-toys.html',           label: 'PlayBox Kids',                 accent: '#2D6BE4', bg: '#EFF4FF', font: "'Baloo 2', cursive" },
-  { id: 'home-furniture',      file: 'lp-home-furniture.html',      label: 'Haven Furniture',              accent: '#B5834A', bg: '#F5EFE6', font: "'Libre Baskerville', serif" },
-  { id: 'food-delivery',       file: 'lp-food-delivery.html',       label: 'Veda Eats',                    accent: '#FF5722', bg: '#FFF0E8', font: "'Poppins', sans-serif" },
+  { id: 'jewellery-heritage',  file: 'lp-jewellery-heritage.html',  label: 'Meenakshi Heritage Jewellers', accent: '#8B1A2C', bg: '#FAF0F0',  font: "'Cinzel', serif" },
+  { id: 'fashion-clothing',    file: 'lp-fashion-clothing.html',    label: 'VŌLT Fashion',                 accent: '#0A0A0A', bg: '#F5F3EF',  font: "'Bebas Neue', cursive" },
+  { id: 'footwear',            file: 'lp-footwear.html',            label: 'Solera Footwear',              accent: '#C65D2A', bg: '#FBF0E8',  font: "'Syne', sans-serif" },
+  { id: 'ayurveda-wellness',   file: 'lp-ayurveda-wellness.html',   label: 'Ayurva Wellness',              accent: '#E07B2A', bg: '#F5FCF5',  font: "'Hind', sans-serif" },
+  { id: 'mobile-accessories',  file: 'lp-mobile-accessories.html',  label: 'STACKD Accessories',           accent: '#00F0C8', bg: '#0D0D12',  font: "'Space Grotesk', sans-serif" },
+  { id: 'kids-toys',           file: 'lp-kids-toys.html',           label: 'PlayBox Kids',                 accent: '#F9C22E', bg: '#EFF4FF',  font: "'Baloo 2', cursive" },
+  { id: 'home-furniture',      file: 'lp-home-furniture.html',      label: 'Haven Furniture',              accent: '#B5834A', bg: '#F5EFE6',  font: "'Libre Baskerville', serif" },
+  { id: 'food-delivery',       file: 'lp-food-delivery.html',       label: 'Veda Eats',                    accent: '#FF5722', bg: '#FFF0E8',  font: "'Poppins', sans-serif" },
+  // ── Previously "placeholder" templates — now fully generated ──────────────
+  { id: 'electronics',         file: 'lp-electronics.html',         label: 'Tech & Electronics',           accent: '#5735db', bg: '#e9e5f5',  font: "'Inter', sans-serif" },
+  { id: 'home-decor',          file: 'lp-home-decor.html',          label: 'Home Decor',                   accent: '#8B7355', bg: '#FAF5ED',  font: "'Playfair Display', serif" },
+  { id: 'pet-supplies',        file: 'lp-pet-supplies.html',        label: 'Pet Supplies',                 accent: '#D35400', bg: '#f9e0d1',  font: "'Nunito', sans-serif" },
+  { id: 'luxury-watches',      file: 'lp-luxury-watches.html',      label: 'Luxury Watches',               accent: '#C5A028', bg: '#0a0a0a',  font: "'Cormorant Garamond', serif" },
+  { id: 'outdoor-gear',        file: 'lp-outdoor-gear.html',        label: 'Outdoor Gear',                 accent: '#2A4B2A', bg: '#dbe8db',  font: "'Oswald', sans-serif" },
+  { id: 'organic-food',        file: 'lp-organic-food.html',        label: 'Organic Food',                 accent: '#4A7C59', bg: '#e5f1e8',  font: "'DM Sans', sans-serif" },
+  { id: 'fitness-supplements', file: 'lp-fitness-supplements.html', label: 'Fitness Supplements',          accent: '#E2FE16', bg: '#050505',  font: "'Barlow Condensed', sans-serif" },
+  { id: 'baby-apparel',        file: 'lp-baby-apparel.html',        label: 'Baby Apparel',                 accent: '#F6A8B6', bg: '#fcedef',  font: "'Nunito', sans-serif" },
+  { id: 'coffee-roasters',     file: 'lp-coffee-roasters.html',     label: 'Coffee Roasters',              accent: '#3E2723', bg: '#efebe9',  font: "'Playfair Display', serif" },
+  { id: 'beauty-cosmetics',    file: 'lp-beauty-cosmetics.html',    label: 'Clean Cosmetics',              accent: '#D4BBA5', bg: '#f8f3f0',  font: "'Cormorant Garamond', serif" },
 ];
 
 // ─── Helper: extract <style> content ─────────────────────────────────────────
