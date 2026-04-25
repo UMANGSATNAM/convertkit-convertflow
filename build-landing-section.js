@@ -49,7 +49,7 @@ export function buildLandingSection(tpl, html) {
       { type: "textarea", id: "hero_sub", label: "Hero Subheading", default: "Discover our curated collection — crafted with quality you can feel." },
       { type: "text", id: "hero_cta", label: "Primary Button Text", default: "Shop Now" },
       { type: "url", id: "hero_url", label: "Primary Button URL" },
-      { type: "text", id: "hero_cta2", label: "Secondary Button Text (leave blank to hide)", default: "" },
+      { type: "text", id: "hero_cta2", label: "Secondary Button Text (leave blank to hide)", default: "View Collection" },
       { type: "url", id: "hero_url2", label: "Secondary Button URL" },
 
       // ── Stats / Trust Bar ──
@@ -280,7 +280,20 @@ body { background: var(--cf-bg); color: var(--cf-text); }
 
   const liquidCustom = `{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}`;
 
-  // ── 8. Assemble the final Liquid section ───────────────────────────────────
+  // ── 8. Sanitize schema: remove any setting with default: "" (Shopify rejects blank defaults) ──
+  function sanitizeSchema(schemaObj) {
+    schemaObj.settings = schemaObj.settings.map(s => {
+      if (s.default === "") {
+        const copy = { ...s };
+        delete copy.default;
+        return copy;
+      }
+      return s;
+    });
+    return schemaObj;
+  }
+
+  // ── 9. Assemble the final Liquid section ───────────────────────────────────
   return `{% comment %}ConvertFlow: ${tpl.label} — Landing Page (Faithful HTML Design + Liquid Settings){% endcomment %}
 ${fonts}
 <style>
@@ -300,6 +313,6 @@ ${rawScripts}
 ${liquidCustom}
 
 {% schema %}
-${JSON.stringify(schema, null, 2)}
+${JSON.stringify(sanitizeSchema(schema), null, 2)}
 {% endschema %}`;
 }
