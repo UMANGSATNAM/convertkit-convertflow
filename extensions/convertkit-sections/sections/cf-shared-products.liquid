@@ -1,0 +1,81 @@
+// sections/cf-shared-products.liquid
+// Shared Products Grid Section — used by all CF templates
+// Shows real Shopify products from a collection picker
+// Supports blocks for collection tabs
+
+<style>
+.cf-prod-sec { padding: 80px 60px; }
+.cf-prod-sec-hd { text-align: center; margin-bottom: 48px; }
+.cf-prod-sec-hd h2 { font-size: 36px; font-weight: 800; margin: 0 0 10px; }
+.cf-prod-sec-hd p { font-size: 15px; color: #888; margin: 0; }
+.cf-prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; max-width: 1400px; margin: 0 auto; }
+.cf-prod-card { background: #fff; border: 1px solid rgba(0,0,0,.08); text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; overflow: hidden; position: relative; }
+.cf-prod-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+.cf-prod-img { aspect-ratio: 1; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; position: relative; }
+.cf-prod-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.cf-prod-card:hover .cf-prod-img img { transform: scale(1.05); }
+.cf-prod-badge { position: absolute; top: 10px; left: 10px; background: var(--cf-accent, #000); color: #fff; font-size: 9px; font-weight: 700; padding: 4px 10px; letter-spacing: 1px; text-transform: uppercase; }
+.cf-prod-body { padding: 16px; }
+.cf-prod-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent, #000); margin-bottom: 4px; }
+.cf-prod-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cf-prod-price { font-size: 18px; font-weight: 800; }
+.cf-prod-price del { font-size: 13px; color: #aaa; font-weight: 400; margin-left: 6px; }
+.cf-prod-atc { display: block; width: 100%; margin-top: 12px; padding: 12px; background: var(--cf-accent, #000); color: #fff; border: none; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; text-transform: uppercase; font-family: inherit; transition: opacity .2s; }
+.cf-prod-atc:hover { opacity: .85; }
+@media(max-width:768px) { .cf-prod-sec { padding: 50px 20px; } .cf-prod-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<div class="cf-prod-sec" style="background:{{ section.settings.bg_color | default: '#ffffff' }}">
+  <div class="cf-prod-sec-hd">
+    <h2 style="color:{{ section.settings.heading_color | default: '#1a1a1a' }}">{{ section.settings.heading | default: 'Featured Products' }}</h2>
+    <p>{{ section.settings.subheading | default: 'Handpicked for you' }}</p>
+  </div>
+  {% if section.settings.collection != blank %}
+  <div class="cf-prod-grid">
+    {% for product in section.settings.collection.products limit: section.settings.products_count %}
+    <a href="{{ product.url }}" class="cf-prod-card">
+      <div class="cf-prod-img">
+        {% if product.featured_image %}
+          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+        {% else %}
+          <svg width="40" height="40" fill="none" stroke="#ccc" viewBox="0 0 24 24"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+        {% endif %}
+        {% if product.available == false %}
+          <span class="cf-prod-badge">Sold Out</span>
+        {% elsif product.compare_at_price > product.price %}
+          <span class="cf-prod-badge">Sale</span>
+        {% endif %}
+      </div>
+      <div class="cf-prod-body">
+        <div class="cf-prod-vendor">{{ product.vendor }}</div>
+        <div class="cf-prod-title">{{ product.title | truncate: 55 }}</div>
+        <div class="cf-prod-price">
+          {{ product.price | money }}
+          {% if product.compare_at_price > product.price %}
+            <del>{{ product.compare_at_price | money }}</del>
+          {% endif %}
+        </div>
+        <button class="cf-prod-atc">Add to Cart</button>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="text-align:center;color:#aaa;padding:40px">Select a collection in the Theme Editor to display products here.</p>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "CF Products",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#1a1a1a" },
+    { "type": "text", "id": "heading", "label": "Section Heading", "default": "Featured Products" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Handpicked for you" },
+    { "type": "collection", "id": "collection", "label": "Collection to Display" },
+    { "type": "range", "id": "products_count", "label": "Number of Products", "min": 2, "max": 12, "step": 1, "default": 4 }
+  ],
+  "presets": [{ "name": "CF Products" }]
+}
+{% endschema %}

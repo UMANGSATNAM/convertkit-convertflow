@@ -1,0 +1,92 @@
+// sections/cf-shared-footer.liquid
+// Footer Section — with blocks for link columns
+
+<style>
+.cf-foot { background: #1a1a1a; color: #bbb; padding: 60px; }
+.cf-foot-inner { max-width: 1400px; margin: 0 auto; display: grid; gap: 40px; margin-bottom: 40px; }
+.cf-foot-brand h3 { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 12px; }
+.cf-foot-brand p { font-size: 12px; line-height: 1.8; color: #888; margin: 0; }
+.cf-foot-col h4 { font-size: 11px; font-weight: 700; color: var(--cf-accent, #888); margin: 0 0 16px; letter-spacing: 2px; text-transform: uppercase; }
+.cf-foot-col ul { list-style: none; padding: 0; margin: 0; }
+.cf-foot-col li { margin-bottom: 8px; }
+.cf-foot-col a { color: #888; text-decoration: none; font-size: 12px; transition: color .2s; }
+.cf-foot-col a:hover { color: #fff; }
+.cf-foot-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #555; flex-wrap: wrap; gap: 8px; }
+@media(max-width:768px) { .cf-foot { padding: 40px 20px; } .cf-foot-inner { grid-template-columns: 1fr 1fr !important; } .cf-foot-bottom { flex-direction: column; text-align: center; } }
+</style>
+
+<footer class="cf-foot">
+  <div class="cf-foot-inner" style="grid-template-columns: 2fr {% for block in section.blocks %}{% if block.type == 'link_column' %}1fr {% endif %}{% endfor %}">
+    <div class="cf-foot-brand">
+      <h3>{{ shop.name }}</h3>
+      <p>{{ section.settings.about_text | default: 'Premium products. Quality you can trust.' }}</p>
+      {% if section.settings.show_social %}
+      <div style="display:flex;gap:12px;margin-top:20px">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" style="color:#888;font-size:12px;text-decoration:none" target="_blank">Instagram</a>{% endif %}
+        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" style="color:#888;font-size:12px;text-decoration:none" target="_blank">Facebook</a>{% endif %}
+        {% if section.settings.twitter != blank %}<a href="{{ section.settings.twitter }}" style="color:#888;font-size:12px;text-decoration:none" target="_blank">Twitter</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% for block in section.blocks %}
+      {% if block.type == 'link_column' %}
+      <div class="cf-foot-col" {{ block.shopify_attributes }}>
+        <h4>{{ block.settings.heading }}</h4>
+        <ul>
+          {% if block.settings.link1_text != blank %}<li><a href="{{ block.settings.link1_url | default: '#' }}">{{ block.settings.link1_text }}</a></li>{% endif %}
+          {% if block.settings.link2_text != blank %}<li><a href="{{ block.settings.link2_url | default: '#' }}">{{ block.settings.link2_text }}</a></li>{% endif %}
+          {% if block.settings.link3_text != blank %}<li><a href="{{ block.settings.link3_url | default: '#' }}">{{ block.settings.link3_text }}</a></li>{% endif %}
+          {% if block.settings.link4_text != blank %}<li><a href="{{ block.settings.link4_url | default: '#' }}">{{ block.settings.link4_text }}</a></li>{% endif %}
+        </ul>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="cf-foot-bottom">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>{{ section.settings.tagline | default: 'Powered by ConvertFlow' }}</span>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "CF Footer",
+  "settings": [
+    { "type": "textarea", "id": "about_text", "label": "Brand About Text", "default": "Premium products. Quality you can trust." },
+    { "type": "text", "id": "tagline", "label": "Footer Tagline", "default": "Powered by ConvertFlow" },
+    { "type": "header", "content": "Social Links" },
+    { "type": "checkbox", "id": "show_social", "label": "Show Social Links", "default": true },
+    { "type": "url", "id": "instagram", "label": "Instagram URL" },
+    { "type": "url", "id": "facebook", "label": "Facebook URL" },
+    { "type": "url", "id": "twitter", "label": "Twitter / X URL" }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "link_column",
+      "name": "Link Column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Column Heading", "default": "Shop" },
+        { "type": "text", "id": "link1_text", "label": "Link 1 Text", "default": "All Products" },
+        { "type": "url", "id": "link1_url", "label": "Link 1 URL" },
+        { "type": "text", "id": "link2_text", "label": "Link 2 Text", "default": "Collections" },
+        { "type": "url", "id": "link2_url", "label": "Link 2 URL" },
+        { "type": "text", "id": "link3_text", "label": "Link 3 Text" },
+        { "type": "url", "id": "link3_url", "label": "Link 3 URL" },
+        { "type": "text", "id": "link4_text", "label": "Link 4 Text" },
+        { "type": "url", "id": "link4_url", "label": "Link 4 URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF Footer",
+      "blocks": [
+        { "type": "link_column", "settings": { "heading": "Shop", "link1_text": "All Products", "link2_text": "Collections", "link3_text": "New Arrivals" } },
+        { "type": "link_column", "settings": { "heading": "Help", "link1_text": "Shipping Policy", "link2_text": "Returns", "link3_text": "Contact Us" } },
+        { "type": "link_column", "settings": { "heading": "Legal", "link1_text": "Privacy Policy", "link2_text": "Terms of Service" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
