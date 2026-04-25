@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { authenticate } from "../shopify.server";
 import { TEMPLATE_HTMLS } from "../templatesHtml.js";
 
@@ -496,9 +496,25 @@ const PREVIEW_MAP = {
   ...TEMPLATE_HTMLS,
 };
 
+/* ── Default settings per template ── */
+const DEFAULT_SETTINGS = {
+  ann_text: "Free shipping on orders above ₹999 🎉",
+  hero_tag: "New Arrival",
+  hero_h1: "",
+  hero_sub: "Discover our curated collection — crafted with quality you can feel.",
+  hero_cta: "Shop Now",
+  hero_cta2: "",
+  prod_heading: "Featured Products",
+  prod_sub: "Handpicked for you",
+  nl_h: "Join Our Community",
+  nl_sub: "Subscribe for exclusive offers, new arrivals & insider updates.",
+};
+
 export default function Index() {
   const [selectedTemplate, setSelectedTemplate] = useState("caratlane");
   const [previewMode, setPreviewMode] = useState("desktop");
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const fetcher = useFetcher();
   const isInjecting = fetcher.state === "submitting";
   const injectResult = fetcher.data;
@@ -506,8 +522,15 @@ export default function Index() {
   const viewportWidth = { desktop: "100%", tablet: "768px", mobile: "375px" }[previewMode];
   const currentTpl = TEMPLATES.find((t) => t.id === selectedTemplate);
 
+  const setSetting = useCallback((key, value) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  }, []);
+
   const handleInject = () => {
-    fetcher.submit({ template: selectedTemplate }, { method: "POST", action: "/api/inject-template" });
+    fetcher.submit(
+      { template: selectedTemplate, ...settings },
+      { method: "POST", action: "/api/inject-template" }
+    );
   };
 
   return (
@@ -663,6 +686,126 @@ export default function Index() {
         </div>
 
 
+        {/* Settings Panel */}
+        <div style={{
+          background: "#fff",
+          borderRadius: 16,
+          marginBottom: 20,
+          border: "1px solid #e5e7eb",
+          overflow: "hidden",
+        }}>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            style={{
+              width: "100%",
+              padding: "18px 28px",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+              </svg>
+              <span style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a" }}>Template Settings</span>
+              <span style={{ fontSize: 12, color: "#888", fontWeight: 400 }}>Customize text, colors & content before injecting</span>
+            </div>
+            <span style={{ fontSize: 20, color: "#888", transform: showSettings ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>⌄</span>
+          </button>
+
+          {showSettings && (
+            <div style={{ padding: "0 28px 28px", borderTop: "1px solid #f0f0f0" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, paddingTop: 24 }}>
+
+                {/* Announcement */}
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📢 Announcement Bar Text</label>
+                  <input
+                    type="text"
+                    value={settings.ann_text}
+                    onChange={e => setSetting("ann_text", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Free shipping on orders above ₹999 🎉"
+                  />
+                </div>
+
+                {/* Hero */}
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>🏷️ Hero Eyebrow Tag</label>
+                  <input type="text" value={settings.hero_tag} onChange={e => setSetting("hero_tag", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="New Arrival" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>🦸 Hero Headline</label>
+                  <input type="text" value={settings.hero_h1} onChange={e => setSetting("hero_h1", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder={currentTpl?.name} />
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📝 Hero Subheading</label>
+                  <textarea value={settings.hero_sub} onChange={e => setSetting("hero_sub", e.target.value)}
+                    rows={2}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit", resize: "vertical" }}
+                    placeholder="Discover our curated collection..." />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>🔘 Primary CTA Text</label>
+                  <input type="text" value={settings.hero_cta} onChange={e => setSetting("hero_cta", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Shop Now" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>🔘 Secondary CTA Text</label>
+                  <input type="text" value={settings.hero_cta2} onChange={e => setSetting("hero_cta2", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="View Lookbook (leave blank to hide)" />
+                </div>
+
+                {/* Products */}
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📦 Products Section Heading</label>
+                  <input type="text" value={settings.prod_heading} onChange={e => setSetting("prod_heading", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Featured Products" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📦 Products Subheading</label>
+                  <input type="text" value={settings.prod_sub} onChange={e => setSetting("prod_sub", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Handpicked for you" />
+                </div>
+
+                {/* Newsletter */}
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📧 Newsletter Heading</label>
+                  <input type="text" value={settings.nl_h} onChange={e => setSetting("nl_h", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Join Our Community" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: "#555", textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 6 }}>📧 Newsletter Subtext</label>
+                  <input type="text" value={settings.nl_sub} onChange={e => setSetting("nl_sub", e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit" }}
+                    placeholder="Subscribe for exclusive offers..." />
+                </div>
+
+                {/* Info tip */}
+                <div style={{ gridColumn: "1 / -1", background: "#f0f9ff", borderRadius: 10, padding: "12px 16px", fontSize: 12, color: "#0369a1", display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>These settings will be pre-filled in the Shopify Theme Editor after injection. You can change any value there too — including colors, images, and product collections.</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Inject Button */}
         <div style={{
           background: "#fff",
@@ -679,7 +822,7 @@ export default function Index() {
               Ready to inject <span style={{ color: currentTpl?.accent }}>{currentTpl?.name}</span> template
             </div>
             <p style={{ fontSize: 13, color: "#888" }}>
-              This will push Landing Page + Product Page + Cart Page into your active Shopify theme.
+              This will push Landing Page + Product Page + Cart Page + Collection Page into your active Shopify theme.
             </p>
           </div>
           <button

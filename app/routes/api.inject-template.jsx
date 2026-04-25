@@ -110,6 +110,19 @@ export const action = async ({ request }) => {
     const templateId = formData.get("template") || "caratlane";
     const tplConfig = TEMPLATES[templateId];
 
+    // Extract all user-customized settings from the form
+    const userSettings = {};
+    const SETTING_KEYS = [
+      "ann_text", "hero_tag", "hero_h1", "hero_sub", "hero_cta", "hero_cta2",
+      "prod_heading", "prod_sub", "nl_h", "nl_sub",
+    ];
+    for (const key of SETTING_KEYS) {
+      const val = formData.get(key);
+      if (val !== null && val !== undefined && val !== "") {
+        userSettings[key] = val;
+      }
+    }
+
     if (!tplConfig) {
       return json({ success: false, error: `Unknown template: ${templateId}` }, { status: 400 });
     }
@@ -178,7 +191,7 @@ export const action = async ({ request }) => {
       
       const tplJson = {
         layout: "convertflow",
-        sections: { [sectionKey]: { type: sectionType, settings: {} } },
+        sections: { [sectionKey]: { type: sectionType, settings: userSettings } },
         order: [sectionKey],
       };
       
