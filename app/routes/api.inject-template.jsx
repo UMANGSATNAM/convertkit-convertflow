@@ -187,27 +187,94 @@ export const action = async ({ request }) => {
       } catch { /* skip if missing */ }
     }
 
-    // ── Step 3: Build landing page with 6 sidebar sections ────────────────
-    const landingLiquidFile = `cf-${templateId}-landing.liquid`;
-    const landingFilePath = path.join(SECTIONS_DIR, landingLiquidFile);
-    let landingContent;
-    try {
-      landingContent = fs.readFileSync(landingFilePath, 'utf-8');
-    } catch {
-      return json({ success: false, error: `Landing section not found for template: ${templateId}` }, { status: 400 });
-    }
+    // ── Step 3: Build landing page with sidebar sections ────────────────
+    
+    // Check if this is the fully rebuilt organic-food template
+    const isOrganicFood = templateId === 'organic-food';
+    
+    let landingJson = { layout: 'convertflow', sections: {}, order: [] };
+    
+    if (isOrganicFood) {
+      // 1. Upload custom organic food sections
+      const orgSections = ['cf-organic-food-hero', 'cf-organic-food-categories', 'cf-organic-food-products', 'cf-organic-food-banner', 'cf-organic-food-footer'];
+      for (const name of orgSections) {
+        try {
+          const content = fs.readFileSync(path.join(SECTIONS_DIR, `${name}.liquid`), 'utf-8');
+          filesToUpsert.push({ filename: `sections/${name}.liquid`, body: { type: 'TEXT', value: content } });
+        } catch (e) { console.warn("Missing organic section:", name); }
+      }
+      
+      // 2. Build index.json exactly tailored for organic-food
+      landingJson.sections = {
+        hero: {
+          type: 'cf-organic-food-hero',
+          settings: {
+            headline_start: userSettings.hero_h1 || 'Eat Better.',
+            subheading: userSettings.hero_sub || '100% certified organic produce and groceries delivered to your door within 12 hours of harvest. Pure, unadulterated nature.'
+          }
+        },
+        categories: {
+          type: 'cf-organic-food-categories',
+          settings: {},
+          blocks: {
+            c1: { type: 'category', settings: { title: 'Vegetables' } },
+            c2: { type: 'category', settings: { title: 'Fruits' } },
+            c3: { type: 'category', settings: { title: 'Dairy & Eggs' } },
+            c4: { type: 'category', settings: { title: 'Bakery' } },
+            c5: { type: 'category', settings: { title: 'Vegan' } }
+          },
+          blocks_order: ['c1', 'c2', 'c3', 'c4', 'c5']
+        },
+        products: {
+          type: 'cf-organic-food-products',
+          settings: {
+            heading: userSettings.prod_heading || 'Bestsellers This Week'
+          }
+        },
+        banner: {
+          type: 'cf-organic-food-banner',
+          settings: {},
+          blocks: {
+            b1: { type: 'certification', settings: { title: 'USDA Organic' } },
+            b2: { type: 'certification', settings: { title: 'Non-GMO Project' } },
+            b3: { type: 'certification', settings: { title: 'Fair Trade' } }
+          },
+          blocks_order: ['b1', 'b2', 'b3']
+        },
+        footer: {
+          type: 'cf-organic-food-footer',
+          settings: {},
+          blocks: {
+            f1: { type: 'link_list', settings: { title: 'Dietary Paths' } },
+            f2: { type: 'link_list', settings: { title: 'Our Farms' } },
+            f3: { type: 'link_list', settings: { title: 'Support' } }
+          },
+          blocks_order: ['f1', 'f2', 'f3']
+        }
+      };
+      landingJson.order = ['hero', 'categories', 'products', 'banner', 'footer'];
+      injectedPageNames.push('Landing / Home Page (5 Custom Sections)');
+      
+    } else {
+      // DEFAULT BEHAVIOR FOR OTHER TEMPLATES
+      const landingLiquidFile = `cf-${templateId}-landing.liquid`;
+      const landingFilePath = path.join(SECTIONS_DIR, landingLiquidFile);
+      let landingContent;
+      try {
+        landingContent = fs.readFileSync(landingFilePath, 'utf-8');
+      } catch {
+        return json({ success: false, error: `Landing section not found for template: ${templateId}` }, { status: 400 });
+      }
 
-    // Upload landing (hero) section
-    filesToUpsert.push({
-      filename: `sections/${landingLiquidFile}`,
-      body: { type: 'TEXT', value: landingContent },
-    });
+      // Upload landing (hero) section
+      filesToUpsert.push({
+        filename: `sections/${landingLiquidFile}`,
+        body: { type: 'TEXT', value: landingContent },
+      });
 
-    // Build the multi-section index.json for the home page
-    const heroKey = `cf_${templateId}_hero`.replace(/-/g, '_');
-    const landingJson = {
-      layout: 'convertflow',
-      sections: {
+      // Build the multi-section index.json for the home page
+      const heroKey = `cf_${templateId}_hero`.replace(/-/g, '_');
+      landingJson.sections = {
         [heroKey]: {
           type: `cf-${templateId}-landing`,
           settings: userSettings,
@@ -257,15 +324,15 @@ export const action = async ({ request }) => {
           },
           blocks_order: ['f1', 'f2', 'f3'],
         },
-      },
-      order: [heroKey, 'cf_features', 'cf_products', 'cf_testimonials', 'cf_newsletter', 'cf_footer'],
-    };
+      };
+      landingJson.order = [heroKey, 'cf_features', 'cf_products', 'cf_testimonials', 'cf_newsletter', 'cf_footer'];
+      injectedPageNames.push('Landing / Home Page (6 sections)');
+    }
 
     filesToUpsert.push({
       filename: 'templates/index.json',
       body: { type: 'TEXT', value: JSON.stringify(landingJson, null, 2) },
     });
-    injectedPageNames.push('Landing / Home Page (6 sections)');
 
     // ── Step 4: Product, Cart, Collection pages (single section each) ──────
     const OTHER_PAGES = [
