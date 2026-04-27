@@ -91,6 +91,9 @@ const TEMPLATES = {
 
   // ── Beauty & Cosmetics ────────────────────────────────────────────────────
   "beauty-cosmetics":   { label: "Beauty & Cosmetics" },
+
+  // ── Men's Grooming ────────────────────────────────────────────────────────
+  "mens-grooming":      { label: "Men's Grooming" },
 };
 
 /**
@@ -192,196 +195,191 @@ export const action = async ({ request }) => {
     // Auto-generated configuration defining the specific perfectly-split HTML modular sections per template
     const customTemplateConfigs = {
   "jewellery-heritage": [
-    { "key": "promo-bar", "filename": "cf-jewellery-heritage-promo-bar", "type": "cf-jewellery-heritage-promo-bar" },
-    { "key": "header", "filename": "cf-jewellery-heritage-header", "type": "cf-jewellery-heritage-header" },
-    { "key": "hero", "filename": "cf-jewellery-heritage-hero", "type": "cf-jewellery-heritage-hero" },
-    { "key": "collections", "filename": "cf-jewellery-heritage-collections", "type": "cf-jewellery-heritage-collections" },
-    { "key": "collection", "filename": "cf-jewellery-heritage-collection", "type": "cf-jewellery-heritage-collection" },
-    { "key": "section", "filename": "cf-jewellery-heritage-section", "type": "cf-jewellery-heritage-section" },
-    { "key": "feature", "filename": "cf-jewellery-heritage-feature", "type": "cf-jewellery-heritage-feature" },
-    { "key": "newsletter", "filename": "cf-jewellery-heritage-newsletter", "type": "cf-jewellery-heritage-newsletter" },
-    { "key": "footer", "filename": "cf-jewellery-heritage-footer", "type": "cf-jewellery-heritage-footer" }
+    { key: "bridal", filename: "cf-jewellery-heritage-bridal", type: "cf-jewellery-heritage-bridal" },
+    { key: "craft", filename: "cf-jewellery-heritage-craft", type: "cf-jewellery-heritage-craft" },
+    { key: "featured", filename: "cf-jewellery-heritage-featured", type: "cf-jewellery-heritage-featured" },
+    { key: "footer", filename: "cf-jewellery-heritage-footer", type: "cf-jewellery-heritage-footer" },
+    { key: "header", filename: "cf-jewellery-heritage-header", type: "cf-jewellery-heritage-header" },
+    { key: "hero", filename: "cf-jewellery-heritage-hero", type: "cf-jewellery-heritage-hero" },
+    { key: "occasion-strip", filename: "cf-jewellery-heritage-occasion-strip", type: "cf-jewellery-heritage-occasion-strip" },
+    { key: "testimonials", filename: "cf-jewellery-heritage-testimonials", type: "cf-jewellery-heritage-testimonials" },
+    { key: "top-band", filename: "cf-jewellery-heritage-top-band", type: "cf-jewellery-heritage-top-band" },
   ],
   "fashion-clothing": [
-    { "key": "promo", "filename": "cf-fashion-clothing-promo", "type": "cf-fashion-clothing-promo" },
-    { "key": "header", "filename": "cf-fashion-clothing-header", "type": "cf-fashion-clothing-header" },
-    { "key": "hero", "filename": "cf-fashion-clothing-hero", "type": "cf-fashion-clothing-hero" },
-    { "key": "marquee", "filename": "cf-fashion-clothing-marquee", "type": "cf-fashion-clothing-marquee" },
-    { "key": "shop", "filename": "cf-fashion-clothing-shop", "type": "cf-fashion-clothing-shop" },
-    { "key": "editorial", "filename": "cf-fashion-clothing-editorial", "type": "cf-fashion-clothing-editorial" },
-    { "key": "grid", "filename": "cf-fashion-clothing-grid", "type": "cf-fashion-clothing-grid" },
-    { "key": "footer", "filename": "cf-fashion-clothing-footer", "type": "cf-fashion-clothing-footer" }
+    { key: "cats", filename: "cf-fashion-clothing-cats", type: "cf-fashion-clothing-cats" },
+    { key: "editorial", filename: "cf-fashion-clothing-editorial", type: "cf-fashion-clothing-editorial" },
+    { key: "footer", filename: "cf-fashion-clothing-footer", type: "cf-fashion-clothing-footer" },
+    { key: "header", filename: "cf-fashion-clothing-header", type: "cf-fashion-clothing-header" },
+    { key: "hero", filename: "cf-fashion-clothing-hero", type: "cf-fashion-clothing-hero" },
+    { key: "promo", filename: "cf-fashion-clothing-promo", type: "cf-fashion-clothing-promo" },
+    { key: "shop", filename: "cf-fashion-clothing-shop", type: "cf-fashion-clothing-shop" },
+    { key: "size-band", filename: "cf-fashion-clothing-size-band", type: "cf-fashion-clothing-size-band" },
   ],
   "footwear": [
-    { "key": "announcement", "filename": "cf-footwear-announcement", "type": "cf-footwear-announcement" },
-    { "key": "header", "filename": "cf-footwear-header", "type": "cf-footwear-header" },
-    { "key": "hero", "filename": "cf-footwear-hero", "type": "cf-footwear-hero" },
-    { "key": "logos", "filename": "cf-footwear-logos", "type": "cf-footwear-logos" },
-    { "key": "section", "filename": "cf-footwear-section", "type": "cf-footwear-section" },
-    { "key": "collection", "filename": "cf-footwear-collection", "type": "cf-footwear-collection" },
-    { "key": "footer", "filename": "cf-footwear-footer", "type": "cf-footwear-footer" }
+    { key: "footer", filename: "cf-footwear-footer", type: "cf-footwear-footer" },
+    { key: "header", filename: "cf-footwear-header", type: "cf-footwear-header" },
+    { key: "hero", filename: "cf-footwear-hero", type: "cf-footwear-hero" },
+    { key: "shop", filename: "cf-footwear-shop", type: "cf-footwear-shop" },
+    { key: "sustain", filename: "cf-footwear-sustain", type: "cf-footwear-sustain" },
+    { key: "tabs", filename: "cf-footwear-tabs", type: "cf-footwear-tabs" },
+    { key: "top-bar", filename: "cf-footwear-top-bar", type: "cf-footwear-top-bar" },
   ],
   "ayurveda-wellness": [
-    { "key": "nav", "filename": "cf-ayurveda-wellness-nav", "type": "cf-ayurveda-wellness-nav" },
-    { "key": "hero", "filename": "cf-ayurveda-wellness-hero", "type": "cf-ayurveda-wellness-hero" },
-    { "key": "usp", "filename": "cf-ayurveda-wellness-usp", "type": "cf-ayurveda-wellness-usp" },
-    { "key": "products", "filename": "cf-ayurveda-wellness-products", "type": "cf-ayurveda-wellness-products" },
-    { "key": "ingredients", "filename": "cf-ayurveda-wellness-ingredients", "type": "cf-ayurveda-wellness-ingredients" },
-    { "key": "testi", "filename": "cf-ayurveda-wellness-testi", "type": "cf-ayurveda-wellness-testi" },
-    { "key": "footer", "filename": "cf-ayurveda-wellness-footer", "type": "cf-ayurveda-wellness-footer" }
+    { key: "announce", filename: "cf-ayurveda-wellness-announce", type: "cf-ayurveda-wellness-announce" },
+    { key: "benefits", filename: "cf-ayurveda-wellness-benefits", type: "cf-ayurveda-wellness-benefits" },
+    { key: "footer", filename: "cf-ayurveda-wellness-footer", type: "cf-ayurveda-wellness-footer" },
+    { key: "header", filename: "cf-ayurveda-wellness-header", type: "cf-ayurveda-wellness-header" },
+    { key: "hero", filename: "cf-ayurveda-wellness-hero", type: "cf-ayurveda-wellness-hero" },
+    { key: "ingredients", filename: "cf-ayurveda-wellness-ingredients", type: "cf-ayurveda-wellness-ingredients" },
+    { key: "shop", filename: "cf-ayurveda-wellness-shop", type: "cf-ayurveda-wellness-shop" },
   ],
   "mobile-accessories": [
-    { "key": "header", "filename": "cf-mobile-accessories-header", "type": "cf-mobile-accessories-header" },
-    { "key": "hero", "filename": "cf-mobile-accessories-hero", "type": "cf-mobile-accessories-hero" },
-    { "key": "section", "filename": "cf-mobile-accessories-section", "type": "cf-mobile-accessories-section" },
-    { "key": "marquee", "filename": "cf-mobile-accessories-marquee", "type": "cf-mobile-accessories-marquee" },
-    { "key": "pdp", "filename": "cf-mobile-accessories-pdp", "type": "cf-mobile-accessories-pdp" },
-    { "key": "footer", "filename": "cf-mobile-accessories-footer", "type": "cf-mobile-accessories-footer" },
-    { "key": "script", "filename": "cf-mobile-accessories-script", "type": "cf-mobile-accessories-script" }
+    { key: "device-select", filename: "cf-mobile-accessories-device-select", type: "cf-mobile-accessories-device-select" },
+    { key: "footer", filename: "cf-mobile-accessories-footer", type: "cf-mobile-accessories-footer" },
+    { key: "header", filename: "cf-mobile-accessories-header", type: "cf-mobile-accessories-header" },
+    { key: "hero", filename: "cf-mobile-accessories-hero", type: "cf-mobile-accessories-hero" },
+    { key: "products", filename: "cf-mobile-accessories-products", type: "cf-mobile-accessories-products" },
+    { key: "top", filename: "cf-mobile-accessories-top", type: "cf-mobile-accessories-top" },
+    { key: "trust", filename: "cf-mobile-accessories-trust", type: "cf-mobile-accessories-trust" },
   ],
   "kids-toys": [
-    { "key": "top-bar", "filename": "cf-kids-toys-top-bar", "type": "cf-kids-toys-top-bar" },
-    { "key": "header", "filename": "cf-kids-toys-header", "type": "cf-kids-toys-header" },
-    { "key": "hero", "filename": "cf-kids-toys-hero", "type": "cf-kids-toys-hero" },
-    { "key": "age-groups", "filename": "cf-kids-toys-age-groups", "type": "cf-kids-toys-age-groups" },
-    { "key": "shop", "filename": "cf-kids-toys-shop", "type": "cf-kids-toys-shop" },
-    { "key": "values", "filename": "cf-kids-toys-values", "type": "cf-kids-toys-values" },
-    { "key": "footer", "filename": "cf-kids-toys-footer", "type": "cf-kids-toys-footer" }
+    { key: "categories", filename: "cf-kids-toys-categories", type: "cf-kids-toys-categories" },
+    { key: "footer", filename: "cf-kids-toys-footer", type: "cf-kids-toys-footer" },
+    { key: "header", filename: "cf-kids-toys-header", type: "cf-kids-toys-header" },
+    { key: "hero", filename: "cf-kids-toys-hero", type: "cf-kids-toys-hero" },
+    { key: "products", filename: "cf-kids-toys-products", type: "cf-kids-toys-products" },
+    { key: "safety", filename: "cf-kids-toys-safety", type: "cf-kids-toys-safety" },
+    { key: "top-wave", filename: "cf-kids-toys-top-wave", type: "cf-kids-toys-top-wave" },
   ],
   "home-furniture": [
-    { "key": "top", "filename": "cf-home-furniture-top", "type": "cf-home-furniture-top" },
-    { "key": "header", "filename": "cf-home-furniture-header", "type": "cf-home-furniture-header" },
-    { "key": "hero", "filename": "cf-home-furniture-hero", "type": "cf-home-furniture-hero" },
-    { "key": "features", "filename": "cf-home-furniture-features", "type": "cf-home-furniture-features" },
-    { "key": "collections", "filename": "cf-home-furniture-collections", "type": "cf-home-furniture-collections" },
-    { "key": "about", "filename": "cf-home-furniture-about", "type": "cf-home-furniture-about" },
-    { "key": "footer", "filename": "cf-home-furniture-footer", "type": "cf-home-furniture-footer" }
+    { key: "footer", filename: "cf-home-furniture-footer", type: "cf-home-furniture-footer" },
+    { key: "header", filename: "cf-home-furniture-header", type: "cf-home-furniture-header" },
+    { key: "hero", filename: "cf-home-furniture-hero", type: "cf-home-furniture-hero" },
+    { key: "hiw", filename: "cf-home-furniture-hiw", type: "cf-home-furniture-hiw" },
+    { key: "products", filename: "cf-home-furniture-products", type: "cf-home-furniture-products" },
+    { key: "rooms", filename: "cf-home-furniture-rooms", type: "cf-home-furniture-rooms" },
+    { key: "top", filename: "cf-home-furniture-top", type: "cf-home-furniture-top" },
   ],
   "food-delivery": [
-    { "key": "top", "filename": "cf-food-delivery-top", "type": "cf-food-delivery-top" },
-    { "key": "header", "filename": "cf-food-delivery-header", "type": "cf-food-delivery-header" },
-    { "key": "hero", "filename": "cf-food-delivery-hero", "type": "cf-food-delivery-hero" },
-    { "key": "cuisine", "filename": "cf-food-delivery-cuisine", "type": "cf-food-delivery-cuisine" },
-    { "key": "menu", "filename": "cf-food-delivery-menu", "type": "cf-food-delivery-menu" },
-    { "key": "trust", "filename": "cf-food-delivery-trust", "type": "cf-food-delivery-trust" },
-    { "key": "footer", "filename": "cf-food-delivery-footer", "type": "cf-food-delivery-footer" }
+    { key: "cuisine", filename: "cf-food-delivery-cuisine", type: "cf-food-delivery-cuisine" },
+    { key: "footer", filename: "cf-food-delivery-footer", type: "cf-food-delivery-footer" },
+    { key: "header", filename: "cf-food-delivery-header", type: "cf-food-delivery-header" },
+    { key: "hero", filename: "cf-food-delivery-hero", type: "cf-food-delivery-hero" },
+    { key: "menu", filename: "cf-food-delivery-menu", type: "cf-food-delivery-menu" },
+    { key: "top", filename: "cf-food-delivery-top", type: "cf-food-delivery-top" },
+    { key: "trust", filename: "cf-food-delivery-trust", type: "cf-food-delivery-trust" },
   ],
   "electronics": [
-    { "key": "top", "filename": "cf-electronics-top", "type": "cf-electronics-top" },
-    { "key": "header", "filename": "cf-electronics-header", "type": "cf-electronics-header" },
-    { "key": "nav", "filename": "cf-electronics-nav", "type": "cf-electronics-nav" },
-    { "key": "hero", "filename": "cf-electronics-hero", "type": "cf-electronics-hero" },
-    { "key": "categories", "filename": "cf-electronics-categories", "type": "cf-electronics-categories" },
-    { "key": "deals", "filename": "cf-electronics-deals", "type": "cf-electronics-deals" },
-    { "key": "features", "filename": "cf-electronics-features", "type": "cf-electronics-features" },
-    { "key": "footer", "filename": "cf-electronics-footer", "type": "cf-electronics-footer" }
+    { key: "footer", filename: "cf-electronics-footer", type: "cf-electronics-footer" },
+    { key: "header", filename: "cf-electronics-header", type: "cf-electronics-header" },
+    { key: "hero", filename: "cf-electronics-hero", type: "cf-electronics-hero" },
+    { key: "promo-bar", filename: "cf-electronics-promo-bar", type: "cf-electronics-promo-bar" },
+    { key: "script", filename: "cf-electronics-script", type: "cf-electronics-script" },
+    { key: "section", filename: "cf-electronics-section", type: "cf-electronics-section" },
+    { key: "sticky-atc", filename: "cf-electronics-sticky-atc", type: "cf-electronics-sticky-atc" },
   ],
   "home-decor": [
-    { "key": "top", "filename": "cf-home-decor-top", "type": "cf-home-decor-top" },
-    { "key": "header", "filename": "cf-home-decor-header", "type": "cf-home-decor-header" },
-    { "key": "hero", "filename": "cf-home-decor-hero", "type": "cf-home-decor-hero" },
-    { "key": "section", "filename": "cf-home-decor-section", "type": "cf-home-decor-section" },
-    { "key": "room", "filename": "cf-home-decor-room", "type": "cf-home-decor-room" },
-    { "key": "footer", "filename": "cf-home-decor-footer", "type": "cf-home-decor-footer" },
-    { "key": "script", "filename": "cf-home-decor-script", "type": "cf-home-decor-script" }
+    { key: "collection", filename: "cf-home-decor-collection", type: "cf-home-decor-collection" },
+    { key: "features-band", filename: "cf-home-decor-features-band", type: "cf-home-decor-features-band" },
+    { key: "footer", filename: "cf-home-decor-footer", type: "cf-home-decor-footer" },
+    { key: "header", filename: "cf-home-decor-header", type: "cf-home-decor-header" },
+    { key: "hero", filename: "cf-home-decor-hero", type: "cf-home-decor-hero" },
+    { key: "lookbook", filename: "cf-home-decor-lookbook", type: "cf-home-decor-lookbook" },
+    { key: "script", filename: "cf-home-decor-script", type: "cf-home-decor-script" },
   ],
   "pet-supplies": [
-    { "key": "top-bar", "filename": "cf-pet-supplies-top-bar", "type": "cf-pet-supplies-top-bar" },
-    { "key": "header", "filename": "cf-pet-supplies-header", "type": "cf-pet-supplies-header" },
-    { "key": "nav", "filename": "cf-pet-supplies-nav", "type": "cf-pet-supplies-nav" },
-    { "key": "hero", "filename": "cf-pet-supplies-hero", "type": "cf-pet-supplies-hero" },
-    { "key": "pets", "filename": "cf-pet-supplies-pets", "type": "cf-pet-supplies-pets" },
-    { "key": "section", "filename": "cf-pet-supplies-section", "type": "cf-pet-supplies-section" },
-    { "key": "footer", "filename": "cf-pet-supplies-footer", "type": "cf-pet-supplies-footer" },
-    { "key": "script", "filename": "cf-pet-supplies-script", "type": "cf-pet-supplies-script" }
+    { key: "categories", filename: "cf-pet-supplies-categories", type: "cf-pet-supplies-categories" },
+    { key: "footer", filename: "cf-pet-supplies-footer", type: "cf-pet-supplies-footer" },
+    { key: "header", filename: "cf-pet-supplies-header", type: "cf-pet-supplies-header" },
+    { key: "hero", filename: "cf-pet-supplies-hero", type: "cf-pet-supplies-hero" },
+    { key: "products-section", filename: "cf-pet-supplies-products-section", type: "cf-pet-supplies-products-section" },
+    { key: "promo", filename: "cf-pet-supplies-promo", type: "cf-pet-supplies-promo" },
+    { key: "script", filename: "cf-pet-supplies-script", type: "cf-pet-supplies-script" },
+    { key: "value-banner", filename: "cf-pet-supplies-value-banner", type: "cf-pet-supplies-value-banner" },
   ],
   "luxury-watches": [
-    { "key": "header", "filename": "cf-luxury-watches-header", "type": "cf-luxury-watches-header" },
-    { "key": "hero", "filename": "cf-luxury-watches-hero", "type": "cf-luxury-watches-hero" },
-    { "key": "collections", "filename": "cf-luxury-watches-collections", "type": "cf-luxury-watches-collections" },
-    { "key": "horology", "filename": "cf-luxury-watches-horology", "type": "cf-luxury-watches-horology" },
-    { "key": "footer", "filename": "cf-luxury-watches-footer", "type": "cf-luxury-watches-footer" }
+    { key: "collections", filename: "cf-luxury-watches-collections", type: "cf-luxury-watches-collections" },
+    { key: "footer", filename: "cf-luxury-watches-footer", type: "cf-luxury-watches-footer" },
+    { key: "header", filename: "cf-luxury-watches-header", type: "cf-luxury-watches-header" },
+    { key: "hero", filename: "cf-luxury-watches-hero", type: "cf-luxury-watches-hero" },
+    { key: "horology", filename: "cf-luxury-watches-horology", type: "cf-luxury-watches-horology" },
   ],
   "outdoor-gear": [
-    { "key": "top-bar", "filename": "cf-outdoor-gear-top-bar", "type": "cf-outdoor-gear-top-bar" },
-    { "key": "header", "filename": "cf-outdoor-gear-header", "type": "cf-outdoor-gear-header" },
-    { "key": "sub-nav", "filename": "cf-outdoor-gear-sub-nav", "type": "cf-outdoor-gear-sub-nav" },
-    { "key": "hero", "filename": "cf-outdoor-gear-hero", "type": "cf-outdoor-gear-hero" },
-    { "key": "section", "filename": "cf-outdoor-gear-section", "type": "cf-outdoor-gear-section" },
-    { "key": "impact-banner", "filename": "cf-outdoor-gear-impact-banner", "type": "cf-outdoor-gear-impact-banner" },
-    { "key": "footer", "filename": "cf-outdoor-gear-footer", "type": "cf-outdoor-gear-footer" }
+    { key: "footer", filename: "cf-outdoor-gear-footer", type: "cf-outdoor-gear-footer" },
+    { key: "header", filename: "cf-outdoor-gear-header", type: "cf-outdoor-gear-header" },
+    { key: "hero", filename: "cf-outdoor-gear-hero", type: "cf-outdoor-gear-hero" },
+    { key: "impact-banner", filename: "cf-outdoor-gear-impact-banner", type: "cf-outdoor-gear-impact-banner" },
+    { key: "section", filename: "cf-outdoor-gear-section", type: "cf-outdoor-gear-section" },
+    { key: "sub-nav", filename: "cf-outdoor-gear-sub-nav", type: "cf-outdoor-gear-sub-nav" },
+    { key: "top-bar", filename: "cf-outdoor-gear-top-bar", type: "cf-outdoor-gear-top-bar" },
+  ],
+  "organic-food": [
+    { key: "banner", filename: "cf-organic-food-banner", type: "cf-organic-food-banner" },
+    { key: "categories", filename: "cf-organic-food-categories", type: "cf-organic-food-categories" },
+    { key: "footer", filename: "cf-organic-food-footer", type: "cf-organic-food-footer" },
+    { key: "hero", filename: "cf-organic-food-hero", type: "cf-organic-food-hero" },
+    { key: "products", filename: "cf-organic-food-products", type: "cf-organic-food-products" },
   ],
   "fitness-supplements": [
-    { "key": "promo-bar", "filename": "cf-fitness-supplements-promo-bar", "type": "cf-fitness-supplements-promo-bar" },
-    { "key": "header", "filename": "cf-fitness-supplements-header", "type": "cf-fitness-supplements-header" },
-    { "key": "hero", "filename": "cf-fitness-supplements-hero", "type": "cf-fitness-supplements-hero" },
-    { "key": "ticker", "filename": "cf-fitness-supplements-ticker", "type": "cf-fitness-supplements-ticker" },
-    { "key": "section", "filename": "cf-fitness-supplements-section", "type": "cf-fitness-supplements-section" },
-    { "key": "stats", "filename": "cf-fitness-supplements-stats", "type": "cf-fitness-supplements-stats" },
-    { "key": "footer", "filename": "cf-fitness-supplements-footer", "type": "cf-fitness-supplements-footer" }
+    { key: "footer", filename: "cf-fitness-supplements-footer", type: "cf-fitness-supplements-footer" },
+    { key: "header", filename: "cf-fitness-supplements-header", type: "cf-fitness-supplements-header" },
+    { key: "hero", filename: "cf-fitness-supplements-hero", type: "cf-fitness-supplements-hero" },
+    { key: "promo-bar", filename: "cf-fitness-supplements-promo-bar", type: "cf-fitness-supplements-promo-bar" },
+    { key: "section", filename: "cf-fitness-supplements-section", type: "cf-fitness-supplements-section" },
+    { key: "stats", filename: "cf-fitness-supplements-stats", type: "cf-fitness-supplements-stats" },
+    { key: "ticker", filename: "cf-fitness-supplements-ticker", type: "cf-fitness-supplements-ticker" },
   ],
   "baby-apparel": [
-    { "key": "top-notice", "filename": "cf-baby-apparel-top-notice", "type": "cf-baby-apparel-top-notice" },
-    { "key": "header", "filename": "cf-baby-apparel-header", "type": "cf-baby-apparel-header" },
-    { "key": "hero", "filename": "cf-baby-apparel-hero", "type": "cf-baby-apparel-hero" },
-    { "key": "quick-shop", "filename": "cf-baby-apparel-quick-shop", "type": "cf-baby-apparel-quick-shop" },
-    { "key": "shop-section", "filename": "cf-baby-apparel-shop-section", "type": "cf-baby-apparel-shop-section" },
-    { "key": "gift-banner", "filename": "cf-baby-apparel-gift-banner", "type": "cf-baby-apparel-gift-banner" },
-    { "key": "footer", "filename": "cf-baby-apparel-footer", "type": "cf-baby-apparel-footer" }
+    { key: "footer", filename: "cf-baby-apparel-footer", type: "cf-baby-apparel-footer" },
+    { key: "gift-banner", filename: "cf-baby-apparel-gift-banner", type: "cf-baby-apparel-gift-banner" },
+    { key: "header", filename: "cf-baby-apparel-header", type: "cf-baby-apparel-header" },
+    { key: "hero", filename: "cf-baby-apparel-hero", type: "cf-baby-apparel-hero" },
+    { key: "quick-shop", filename: "cf-baby-apparel-quick-shop", type: "cf-baby-apparel-quick-shop" },
+    { key: "shop-section", filename: "cf-baby-apparel-shop-section", type: "cf-baby-apparel-shop-section" },
+    { key: "top-notice", filename: "cf-baby-apparel-top-notice", type: "cf-baby-apparel-top-notice" },
   ],
   "coffee-roasters": [
-    { "key": "promo", "filename": "cf-coffee-roasters-promo", "type": "cf-coffee-roasters-promo" },
-    { "key": "header", "filename": "cf-coffee-roasters-header", "type": "cf-coffee-roasters-header" },
-    { "key": "hero", "filename": "cf-coffee-roasters-hero", "type": "cf-coffee-roasters-hero" },
-    { "key": "taste-band", "filename": "cf-coffee-roasters-taste-band", "type": "cf-coffee-roasters-taste-band" },
-    { "key": "shop", "filename": "cf-coffee-roasters-shop", "type": "cf-coffee-roasters-shop" },
-    { "key": "roastery", "filename": "cf-coffee-roasters-roastery", "type": "cf-coffee-roasters-roastery" },
-    { "key": "club", "filename": "cf-coffee-roasters-club", "type": "cf-coffee-roasters-club" },
-    { "key": "footer", "filename": "cf-coffee-roasters-footer", "type": "cf-coffee-roasters-footer" }
+    { key: "club", filename: "cf-coffee-roasters-club", type: "cf-coffee-roasters-club" },
+    { key: "footer", filename: "cf-coffee-roasters-footer", type: "cf-coffee-roasters-footer" },
+    { key: "header", filename: "cf-coffee-roasters-header", type: "cf-coffee-roasters-header" },
+    { key: "hero", filename: "cf-coffee-roasters-hero", type: "cf-coffee-roasters-hero" },
+    { key: "promo", filename: "cf-coffee-roasters-promo", type: "cf-coffee-roasters-promo" },
+    { key: "roastery", filename: "cf-coffee-roasters-roastery", type: "cf-coffee-roasters-roastery" },
+    { key: "shop", filename: "cf-coffee-roasters-shop", type: "cf-coffee-roasters-shop" },
+    { key: "taste-band", filename: "cf-coffee-roasters-taste-band", type: "cf-coffee-roasters-taste-band" },
   ],
   "beauty-cosmetics": [
-    { "key": "promo", "filename": "cf-beauty-cosmetics-promo", "type": "cf-beauty-cosmetics-promo" },
-    { "key": "header", "filename": "cf-beauty-cosmetics-header", "type": "cf-beauty-cosmetics-header" },
-    { "key": "hero", "filename": "cf-beauty-cosmetics-hero", "type": "cf-beauty-cosmetics-hero" },
-    { "key": "shop", "filename": "cf-beauty-cosmetics-shop", "type": "cf-beauty-cosmetics-shop" },
-    { "key": "ingredients", "filename": "cf-beauty-cosmetics-ingredients", "type": "cf-beauty-cosmetics-ingredients" },
-    { "key": "footer", "filename": "cf-beauty-cosmetics-footer", "type": "cf-beauty-cosmetics-footer" },
-    { "key": "sticky-atc", "filename": "cf-beauty-cosmetics-sticky-atc", "type": "cf-beauty-cosmetics-sticky-atc" },
-    { "key": "script", "filename": "cf-beauty-cosmetics-script", "type": "cf-beauty-cosmetics-script" }
+    { key: "footer", filename: "cf-beauty-cosmetics-footer", type: "cf-beauty-cosmetics-footer" },
+    { key: "header", filename: "cf-beauty-cosmetics-header", type: "cf-beauty-cosmetics-header" },
+    { key: "hero", filename: "cf-beauty-cosmetics-hero", type: "cf-beauty-cosmetics-hero" },
+    { key: "ingredients", filename: "cf-beauty-cosmetics-ingredients", type: "cf-beauty-cosmetics-ingredients" },
+    { key: "promo", filename: "cf-beauty-cosmetics-promo", type: "cf-beauty-cosmetics-promo" },
+    { key: "script", filename: "cf-beauty-cosmetics-script", type: "cf-beauty-cosmetics-script" },
+    { key: "shop", filename: "cf-beauty-cosmetics-shop", type: "cf-beauty-cosmetics-shop" },
+    { key: "sticky-atc", filename: "cf-beauty-cosmetics-sticky-atc", type: "cf-beauty-cosmetics-sticky-atc" },
   ],
   "mens-grooming": [
-    { "key": "nav", "filename": "cf-mens-grooming-nav", "type": "cf-mens-grooming-nav" },
-    { "key": "hero", "filename": "cf-mens-grooming-hero", "type": "cf-mens-grooming-hero" },
-    { "key": "marquee", "filename": "cf-mens-grooming-marquee", "type": "cf-mens-grooming-marquee" },
-    { "key": "bento", "filename": "cf-mens-grooming-bento", "type": "cf-mens-grooming-bento" },
-    { "key": "features", "filename": "cf-mens-grooming-features", "type": "cf-mens-grooming-features" },
-    { "key": "pdp-section", "filename": "cf-mens-grooming-pdp-section", "type": "cf-mens-grooming-pdp-section" },
-    { "key": "testi", "filename": "cf-mens-grooming-testi", "type": "cf-mens-grooming-testi" },
-    { "key": "extra-feats", "filename": "cf-mens-grooming-extra-feats", "type": "cf-mens-grooming-extra-feats" },
-    { "key": "tech-strip", "filename": "cf-mens-grooming-tech-strip", "type": "cf-mens-grooming-tech-strip" },
-    { "key": "cta-banner", "filename": "cf-mens-grooming-cta-banner", "type": "cf-mens-grooming-cta-banner" },
-    { "key": "final-strip", "filename": "cf-mens-grooming-final-strip", "type": "cf-mens-grooming-final-strip" },
-    { "key": "footer", "filename": "cf-mens-grooming-footer", "type": "cf-mens-grooming-footer" }
-  ]
-};
+    { key: "bento", filename: "cf-mens-grooming-bento", type: "cf-mens-grooming-bento" },
+    { key: "cta-banner", filename: "cf-mens-grooming-cta-banner", type: "cf-mens-grooming-cta-banner" },
+    { key: "extra-feats", filename: "cf-mens-grooming-extra-feats", type: "cf-mens-grooming-extra-feats" },
+    { key: "features", filename: "cf-mens-grooming-features", type: "cf-mens-grooming-features" },
+    { key: "final-strip", filename: "cf-mens-grooming-final-strip", type: "cf-mens-grooming-final-strip" },
+    { key: "footer", filename: "cf-mens-grooming-footer", type: "cf-mens-grooming-footer" },
+    { key: "hero", filename: "cf-mens-grooming-hero", type: "cf-mens-grooming-hero" },
+    { key: "marquee", filename: "cf-mens-grooming-marquee", type: "cf-mens-grooming-marquee" },
+    { key: "nav", filename: "cf-mens-grooming-nav", type: "cf-mens-grooming-nav" },
+    { key: "pdp-section", filename: "cf-mens-grooming-pdp-section", type: "cf-mens-grooming-pdp-section" },
+    { key: "tech-strip", filename: "cf-mens-grooming-tech-strip", type: "cf-mens-grooming-tech-strip" },
+    { key: "testi", filename: "cf-mens-grooming-testi", type: "cf-mens-grooming-testi" },
+  ],
+    };
 
     let landingJson = { layout: 'convertflow', sections: {}, order: [] };
     
     // If we have custom perfectly-split sections for this template (which we now do for almost all)
-    if (customTemplateConfigs[templateId] || templateId === 'organic-food') {
+    if (customTemplateConfigs[templateId]) {
       
-      let sectionsConfig = customTemplateConfigs[templateId];
-      
-      // Fallback manual organic food mapping (since we made it manually)
-      if (templateId === 'organic-food') {
-        sectionsConfig = [
-          { "key": "hero", "filename": "cf-organic-food-hero", "type": "cf-organic-food-hero" },
-          { "key": "categories", "filename": "cf-organic-food-categories", "type": "cf-organic-food-categories" },
-          { "key": "products", "filename": "cf-organic-food-products", "type": "cf-organic-food-products" },
-          { "key": "banner", "filename": "cf-organic-food-banner", "type": "cf-organic-food-banner" },
-          { "key": "footer", "filename": "cf-organic-food-footer", "type": "cf-organic-food-footer" }
-        ];
-      }
+      const sectionsConfig = customTemplateConfigs[templateId];
       
       for (const sec of sectionsConfig) {
         try {
