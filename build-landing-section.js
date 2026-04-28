@@ -19,13 +19,45 @@ export function buildLandingSection(tpl, html) {
   body = body.replace(/<h1([^>]*)>[\s\S]*?<\/h1>/i,
     `<h1$1>{{ section.settings.hero_h1 | default: '${tpl.label}' }}</h1>`);
 
-  // 6. Replace hero image containers with Liquid image picker
-  const heroImgPattern = /(<div[^>]*class="[^"]*(?:hero-img|hero-image|hero-visual|hero-right|hero-media|p-image|hero-photo)[^"]*"[^>]*>)([\s\S]*?)(<\/div>)/gi;
-  body = body.replace(heroImgPattern, (m, open, inner, close) => {
-    return open
-      + `{% if section.settings.hero_img != blank %}<img src="{{ section.settings.hero_img | image_url: width: 1400 }}" alt="{{ section.settings.hero_h1 }}" style="width:100%;height:100%;object-fit:cover">{% else %}${inner}{% endif %}`
-      + close;
-  });
+  // 6. Replace hero image containers with Liquid image picker using tag balancing
+  const heroImgRegex = /<div[^>]*class="[^"]*(?:hero-img|hero-image|hero-visual|hero-right|hero-media|p-image|hero-photo)[^"]*"[^>]*>/i;
+  const heroMatch = body.match(heroImgRegex);
+  if (heroMatch) {
+    const startIndex = heroMatch.index;
+    const openTag = heroMatch[0];
+    const innerStart = startIndex + openTag.length;
+    
+    // Balance tags to find the correct closing </div>
+    let openCount = 1;
+    let i = innerStart;
+    while (i < body.length && openCount > 0) {
+      if (body.startsWith('<div', i)) {
+        openCount++;
+        i += 4;
+      } else if (body.startsWith('</div', i)) {
+        openCount--;
+        if (openCount === 0) {
+          break;
+        }
+        i += 5;
+      } else {
+        i++;
+      }
+    }
+    
+    if (openCount === 0) {
+      const innerHtml = body.substring(innerStart, i);
+      const closeTag = body.substring(i, i + 6); // </div>
+      
+      const replacement = openTag 
+        + `{% if section.settings.hero_img != blank %}\n<img src="{{ section.settings.hero_img | image_url: width: 1400 }}" alt="{{ section.settings.hero_h1 }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">\n{% else %}` 
+        + innerHtml 
+        + `{% endif %}` 
+        + closeTag;
+        
+      body = body.substring(0, startIndex) + replacement + body.substring(i + 6);
+    }
+  }
 
   // 7. Replace first two CTA button texts with Liquid
   let ctaCount = 0;
