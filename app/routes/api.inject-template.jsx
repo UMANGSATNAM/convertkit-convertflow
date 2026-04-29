@@ -94,6 +94,15 @@ const TEMPLATES = {
 
   // ── Men's Grooming ────────────────────────────────────────────────────────
   "mens-grooming":      { label: "Men's Grooming" },
+
+  // ── Activewear ───────────────────────────────────────────────────────────
+  "activewear":         { label: "BloomFit Activewear" },
+
+  // ── Streetwear ───────────────────────────────────────────────────────────
+  "streetwear":         { label: "URBNCO Streetwear" },
+
+  // ── Personal Care ────────────────────────────────────────────────────────
+  "personal-care":      { label: "PureBody Personal Care" },
 };
 
 /**
@@ -372,6 +381,7 @@ export const action = async ({ request }) => {
     { key: "tech-strip", filename: "cf-mens-grooming-tech-strip", type: "cf-mens-grooming-tech-strip" },
     { key: "testi", filename: "cf-mens-grooming-testi", type: "cf-mens-grooming-testi" },
   ],
+  // activewear, streetwear, personal-care use the monolithic landing section (no sub-sections)
     };
 
     let landingJson = { layout: 'convertflow', sections: {}, order: [] };

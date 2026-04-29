@@ -1,0 +1,104 @@
+{% comment %}ConvertFlow — URBNCO Streetwear · Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--cf-accent:{{ section.settings.color_accent | default: '#E63946' }};--cf-bg:{{ section.settings.color_bg | default: '#0A0A0A' }};--cf-mid:#141414;--cf-border:#2a2a2a;--cf-txt:#FAFAFA;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Barlow',sans-serif;background:var(--cf-bg);color:var(--cf-txt);-webkit-font-smoothing:antialiased}
+.cfc-wrap{max-width:1200px;margin:0 auto;padding:60px;display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:start}
+.cfc-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;margin-bottom:32px}
+.cfc-empty{text-align:center;padding:80px 20px;color:#666}
+.cfc-empty a{display:inline-block;margin-top:24px;background:var(--cf-accent);color:#fff;padding:14px 36px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;text-decoration:none}
+.cfc-items{display:flex;flex-direction:column;background:var(--cf-mid);border:1px solid var(--cf-border)}
+.cfc-item{display:grid;grid-template-columns:90px 1fr auto;gap:20px;padding:24px;align-items:center;border-bottom:1px solid var(--cf-border)}
+.cfc-item:last-child{border-bottom:none}
+.cfc-item-img{width:90px;height:90px;background:#1e1e1e;overflow:hidden}
+.cfc-item-img img{width:100%;height:100%;object-fit:cover}
+.cfc-item-vendor{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cf-accent);margin-bottom:4px}
+.cfc-item-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.cfc-item-props{font-size:12px;color:#666;margin-bottom:12px}
+.cfc-item-qty{display:flex;align-items:center;gap:12px}
+.cfc-item-qty button{width:28px;height:28px;border:1px solid var(--cf-border);background:#1e1e1e;font-size:16px;cursor:pointer;color:var(--cf-txt)}
+.cfc-item-qty span{font-size:14px;font-weight:600;min-width:20px;text-align:center}
+.cfc-item-remove{font-size:11px;color:#555;text-decoration:underline;cursor:pointer}
+.cfc-item-remove:hover{color:var(--cf-accent)}
+.cfc-item-price{font-size:18px;font-weight:700;white-space:nowrap}
+.cfc-summary{background:var(--cf-mid);border:1px solid var(--cf-border);padding:32px;position:sticky;top:24px}
+.cfc-summary h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:24px}
+.cfc-row{display:flex;justify-content:space-between;font-size:14px;color:#888;margin-bottom:12px}
+.cfc-row.total{font-size:18px;font-weight:700;color:var(--cf-txt);padding-top:16px;margin-top:8px;border-top:1px solid var(--cf-border)}
+.cfc-promo{display:flex;border:1px solid var(--cf-border);overflow:hidden;margin:20px 0}
+.cfc-promo input{flex:1;border:none;padding:12px 16px;font-size:14px;outline:none;font-family:inherit;background:#1e1e1e;color:var(--cf-txt)}
+.cfc-promo button{background:var(--cf-accent);color:#fff;border:none;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer}
+.cfc-checkout{display:block;width:100%;background:var(--cf-accent);color:#fff;border:none;padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;text-align:center;transition:opacity .2s;text-decoration:none}
+.cfc-checkout:hover{opacity:.9}
+.cfc-trust{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.cfc-trust-i{display:flex;align-items:center;gap:8px;font-size:11px;color:#666}
+.cfc-trust-i svg{flex-shrink:0;color:var(--cf-accent)}
+@media(max-width:1024px){.cfc-wrap{grid-template-columns:1fr;padding:30px 20px;gap:30px}}
+</style>
+
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
+    {% if cart.item_count == 0 %}
+      <div class="cfc-empty">
+        <p style="color:#aaa;font-size:18px;font-weight:600;margin-bottom:8px">Your cart is empty</p>
+        <span style="color:#666">Looks like you haven't copped anything yet.</span>
+        <a href="/collections/all">Browse Drops</a>
+      </div>
+    {% else %}
+      <div class="cfc-items">
+        {% for item in cart.items %}
+          <div class="cfc-item">
+            <div class="cfc-item-img">
+              {% if item.image %}<img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">{% endif %}
+            </div>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>−</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
+              </div>
+            </div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}<div class="cfc-row" style="color:#4ade80"><span>Discount</span><span>−{{ cart.total_discount | money }}</span></div>{% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo"><input type="text" placeholder="Promo code"><button>Apply</button></div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>{{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ section.settings.trust_2 }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF URBNCO Cart",
+  "settings": [
+    {"type":"header","content":"Brand Colors"},
+    {"type":"color","id":"color_accent","label":"Accent Color","default":"#E63946"},
+    {"type":"color","id":"color_bg","label":"Background","default":"#0A0A0A"},
+    {"type":"header","content":"Cart Settings"},
+    {"type":"text","id":"checkout_text","label":"Checkout Button Text","default":"Checkout Now"},
+    {"type":"header","content":"Trust Signals"},
+    {"type":"checkbox","id":"show_trust","label":"Show Trust Badges","default":true},
+    {"type":"text","id":"trust_1","label":"Trust Badge 1","default":"Secure SSL Checkout"},
+    {"type":"text","id":"trust_2","label":"Trust Badge 2","default":"Authentic Products Only"}
+  ],
+  "presets":[{"name":"CF URBNCO Cart"}]
+}
+{% endschema %}
