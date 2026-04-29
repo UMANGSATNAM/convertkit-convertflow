@@ -469,35 +469,56 @@ export const action = async ({ request }) => {
       injectedPageNames.push(page.name);
     }
 
-    // ── Step 4: Upload everything in one batch ────────────────────────────
-    if (filesToUpsert.length <= 1) { // Only Layout exists
-        return json({ success: false, error: "No section files found to inject! Wait for development." }, { status: 400 });
+    // ── Step 4: Two-phase upload — sections first, JSON templates second ──
+    // This guarantees JSON templates are NEVER written before their section
+    // files are confirmed uploaded, preventing 'does not refer to an existing
+    // section file' errors permanently.
+    if (filesToUpsert.length <= 1) {
+      return json({ success: false, error: "No section files found to inject! Wait for development." }, { status: 400 });
     }
 
-    const upsertRes = await admin.graphql(`
-      mutation Upsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
-        themeFilesUpsert(themeId: $themeId, files: $files) {
-          upsertedThemeFiles { filename }
-          userErrors { field message }
+    // Helper: upload files in chunks and throw on any userError
+    const upsertChunked = async (files, label) => {
+      const CHUNK_SIZE = 50; // well under Shopify's 100-file limit
+      for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+        const chunk = files.slice(i, i + CHUNK_SIZE);
+        const res = await admin.graphql(`
+          mutation Upsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
+            themeFilesUpsert(themeId: $themeId, files: $files) {
+              upsertedThemeFiles { filename }
+              userErrors { field message }
+            }
+          }
+        `, { variables: { themeId: mainTheme.id, files: chunk } });
+
+        const { data } = await res.json();
+        const errs = data?.themeFilesUpsert?.userErrors ?? [];
+        if (errs.length > 0) {
+          const msg = errs.map(e => e.message).join(', ');
+          console.error(`[inject-template] ${label} batch ${i}-${i+chunk.length} errors:`, errs);
+          throw new Error(`${label} upload failed: ${msg}`);
         }
+
+        const uploaded = data?.themeFilesUpsert?.upsertedThemeFiles?.map(f => f.filename) ?? [];
+        console.log(`[inject-template] ${label} chunk ${i}-${i+chunk.length}: uploaded ${uploaded.length} files`);
       }
-    `, {
-      variables: {
-        themeId: mainTheme.id,
-        files: filesToUpsert,
-      },
-    });
+    };
 
-    const { data: upsertData } = await upsertRes.json();
-    const errors = upsertData?.themeFilesUpsert?.userErrors ?? [];
+    // Phase 1 — Upload .liquid section files (layout + sections)
+    const sectionFiles = filesToUpsert.filter(f =>
+      f.filename.startsWith('layout/') || f.filename.startsWith('sections/')
+    );
 
-    if (errors.length > 0) {
-      console.error("[inject-template] GraphQL themeFilesUpsert Errors:", errors);
-      return json(
-        { success: false, error: errors.map((e) => e.message).join(", ") },
-        { status: 400 }
-      );
-    }
+    // Phase 2 — JSON template files (index.json, cart.json, product.json, collection.json)
+    const templateJsonFiles = filesToUpsert.filter(f => f.filename.startsWith('templates/'));
+
+    // Upload sections first — must succeed before any JSON is written
+    await upsertChunked(sectionFiles, 'Sections');
+    console.log(`[inject-template] Phase 1 complete: ${sectionFiles.length} section files uploaded`);
+
+    // Upload JSON templates only after sections are confirmed
+    await upsertChunked(templateJsonFiles, 'Templates');
+    console.log(`[inject-template] Phase 2 complete: ${templateJsonFiles.length} template JSON files uploaded`);
 
     // ── Step 5: Return success with links ────────────────────────────────
     const shopRes = await admin.graphql(`query { shop { myshopifyDomain } }`);
