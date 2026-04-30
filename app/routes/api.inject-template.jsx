@@ -92,13 +92,13 @@ export const action = async ({ request }) => {
     const appUrl = process.env.SHOPIFY_APP_URL || process.env.HOST || '';
     const blankZipUrl = `${appUrl}/blank-theme.zip`;
     const createRes = await admin.graphql(`
-      mutation ThemeCreate($name: String!, $src: URL!) {
-        themeCreate(name: $name, src: $src) {
+      mutation ThemeCreate($name: String!, $source: URL!) {
+        themeCreate(name: $name, source: $source) {
           theme { id name role }
           userErrors { field message }
         }
       }
-    `, { variables: { name: themeName, src: blankZipUrl } });
+    `, { variables: { name: themeName, source: blankZipUrl } });
 
     const { data: createData } = await createRes.json();
     const createErrors = createData?.themeCreate?.userErrors ?? [];
