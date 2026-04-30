@@ -1,0 +1,82 @@
+{% assign main_menu = section.settings.menu | default: 'main-menu' %}
+<style>
+.mobile-menu{position:fixed;top:0;left:0;width:280px;height:100vh;background:var(--c-bg);z-index:250;transform:translateX(-100%);transition:transform .3s;overflow-y:auto;padding:24px;box-shadow:4px 0 24px rgba(0,0,0,.1)}
+.mobile-menu.open{transform:translateX(0)}
+.mega-menu{position:absolute;top:100%;left:0;right:0;background:var(--c-bg);border-top:1px solid var(--c-border);border-bottom:1px solid var(--c-border);padding:32px;display:none;grid-template-columns:repeat(4,1fr);gap:24px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.has-mega:hover .mega-menu{display:grid}
+</style>
+<header class="site-header" id="SiteHeader">
+  <div class="site-header__inner">
+    <button class="mobile-menu-toggle" data-mobile-menu-toggle aria-label="Menu" style="display:none;background:none;border:none;cursor:pointer;padding:4px">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="/" class="site-header__logo">
+      {%- if section.settings.logo -%}
+        <img src="{{ section.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}" width="{{ section.settings.logo_width }}" height="auto" loading="eager">
+      {%- else -%}
+        <span style="font-family:var(--f-heading);font-size:22px;font-weight:700">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+    <nav class="site-header__nav-wrap" aria-label="Main navigation">
+      <ul class="site-header__nav">
+        {%- for link in linklists[main_menu].links -%}
+          <li class="site-header__nav-item {% if link.links.size > 0 %}has-mega{% endif %}">
+            <a href="{{ link.url }}" {% if link.active %}aria-current="page"{% endif %}>{{ link.title }}</a>
+            {%- if link.links.size > 0 -%}
+              <div class="mega-menu">
+                {%- for child in link.links -%}
+                  <div>
+                    <a href="{{ child.url }}" style="font-weight:600;font-size:14px;margin-bottom:12px;display:block">{{ child.title }}</a>
+                    {%- if child.links.size > 0 -%}
+                      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
+                        {%- for grandchild in child.links -%}
+                          <li><a href="{{ grandchild.url }}" style="font-size:13px;color:var(--c-subtle)">{{ grandchild.title }}</a></li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+    <div class="site-header__actions">
+      {%- if settings.enable_search -%}
+        <button data-open-search aria-label="{{ 'general.search.title' | t }}" style="background:none;border:none;cursor:pointer;padding:4px">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      {%- endif -%}
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" aria-label="Account" style="padding:4px">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {%- endif -%}
+      <button data-open-cart class="cart-count" aria-label="Cart" style="background:none;border:none;cursor:pointer;padding:4px;position:relative">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-count__badge" {% if cart.item_count == 0 %}style="display:none"{% endif %}>{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-menu" id="MobileMenu" aria-label="Mobile navigation">
+  <button data-mobile-menu-toggle style="margin-bottom:24px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--c-subtle)">✕ Close</button>
+  <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
+    {%- for link in linklists[main_menu].links -%}
+      <li><a href="{{ link.url }}" style="display:block;padding:10px 0;font-size:16px;font-weight:500;border-bottom:1px solid var(--c-border)">{{ link.title }}</a></li>
+    {%- endfor -%}
+  </ul>
+</nav>
+
+{% schema %}
+{
+  "name":"Header",
+  "settings":[
+    {"type":"link_list","id":"menu","label":"Main Menu","default":"main-menu"},
+    {"type":"image_picker","id":"logo","label":"Logo"},
+    {"type":"range","id":"logo_width","label":"Logo Width","min":60,"max":300,"step":10,"unit":"px","default":140}
+  ]
+}
+{% endschema %}

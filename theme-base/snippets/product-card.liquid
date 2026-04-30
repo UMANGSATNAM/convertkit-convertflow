@@ -1,0 +1,44 @@
+<div class="product-card" style="border-radius:var(--radius);overflow:hidden;{% if settings.card_style == 'border' %}border:1px solid var(--c-border);{% elsif settings.card_style == 'shadow' %}box-shadow:0 2px 12px rgba(0,0,0,.08);{% endif %}">
+  <div class="product-card__img" style="position:relative">
+    <a href="{{ product.url }}">
+      {%- if product.featured_image -%}
+        <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+      {%- else -%}
+        <div style="background:var(--c-border);aspect-ratio:1"></div>
+      {%- endif -%}
+      {%- if product.images[1] and settings.enable_image_zoom == false -%}
+        <img src="{{ product.images[1] | image_url: width: 600 }}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" class="rollover-img">
+      {%- endif -%}
+    </a>
+    {%- if product.available == false -%}
+      <span class="product-badge" style="background:#6b7280">Sold Out</span>
+    {%- elsif product.compare_at_price > product.price -%}
+      <span class="product-badge">Sale</span>
+    {%- elsif product.created_at > 'now' | date: '%s' | minus: 2592000 | date: '%Y-%m-%dT%H:%M:%SZ' -%}
+      <span class="product-badge" style="background:#16A34A">New</span>
+    {%- endif -%}
+    {%- if settings.enable_quick_view -%}
+      <button class="quick-view-btn" data-quick-view="{{ product.url }}" aria-label="Quick view {{ product.title }}">Quick View</button>
+    {%- endif -%}
+  </div>
+  <div class="product-card__info" style="padding:14px">
+    {%- if settings.show_vendor -%}
+      <div style="font-size:11px;color:var(--c-subtle);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">{{ product.vendor }}</div>
+    {%- endif -%}
+    <a href="{{ product.url }}" class="product-card__title" style="display:block;font-size:14px;font-weight:500;margin-bottom:8px;color:var(--c-text)">{{ product.title }}</a>
+    <div class="product-card__price">
+      <span style="font-size:16px;font-weight:700;color:var(--c-accent)">{{ product.price | money }}</span>
+      {%- if product.compare_at_price > product.price -%}
+        <del style="font-size:13px;color:var(--c-subtle);margin-left:6px">{{ product.compare_at_price | money }}</del>
+      {%- endif -%}
+    </div>
+    {%- if product.variants.size > 1 -%}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">
+        {%- for variant in product.variants limit: 4 -%}
+          <span style="width:20px;height:20px;border-radius:50%;background:{{ variant.option1 | downcase }};border:1.5px solid var(--c-border);display:inline-block" title="{{ variant.option1 }}"></span>
+        {%- endfor -%}
+        {%- if product.variants.size > 4 -%}<span style="font-size:11px;color:var(--c-subtle)">+{{ product.variants.size | minus: 4 }}</span>{%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
