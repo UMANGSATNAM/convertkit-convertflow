@@ -1,0 +1,56 @@
+{%- if section.settings.enable_popup -%}
+<div id="PromoPopup" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(0,0,0,.6)" aria-hidden="true">
+  <div style="background:var(--c-bg);border-radius:calc(var(--radius)*2);max-width:480px;width:90%;padding:48px 40px;position:relative;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.2)">
+    <button id="PromoPopupClose" aria-label="Close" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;padding:4px;color:var(--c-subtle)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    {%- if section.settings.popup_image != blank -%}
+    <img src="{{ section.settings.popup_image | image_url: width: 200 }}" alt="" width="80" height="80" style="width:80px;height:80px;object-fit:cover;border-radius:50%;margin:0 auto 20px">
+    {%- endif -%}
+    <h2 style="font-family:var(--f-heading);font-size:clamp(20px,3vw,28px);margin-bottom:8px">{{ section.settings.popup_title }}</h2>
+    <p style="color:var(--c-subtle);font-size:15px;line-height:1.6;margin-bottom:24px">{{ section.settings.popup_text }}</p>
+    {%- form 'customer' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter,popup">
+      {%- if form.posted_successfully? -%}
+      <p style="color:green;font-weight:600;font-size:16px">🎉 {{ section.settings.success_text }}</p>
+      {%- else -%}
+      <div style="display:flex;gap:0;max-width:360px;margin:0 auto">
+        <input type="email" name="contact[email]" placeholder="{{ section.settings.placeholder }}" required style="flex:1;padding:12px 16px;border:1px solid var(--c-border);border-right:none;border-radius:var(--radius) 0 0 var(--radius);font-family:var(--f-body);font-size:14px;background:var(--c-bg);color:var(--c-text)">
+        <button type="submit" style="padding:12px 20px;background:var(--c-accent);color:var(--c-accent-text);border:none;border-radius:0 var(--radius) var(--radius) 0;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap">{{ section.settings.btn_label }}</button>
+      </div>
+      {%- endif -%}
+    {%- endform -%}
+    <button id="PromoPopupSkip" style="display:block;margin:16px auto 0;background:none;border:none;font-size:13px;color:var(--c-subtle);cursor:pointer;text-decoration:underline">{{ section.settings.skip_label }}</button>
+  </div>
+</div>
+<script>
+(function(){
+  var key='cf_popup_{{ section.id }}';
+  var delay={{ section.settings.delay | times: 1000 }};
+  if(localStorage.getItem(key)) return;
+  setTimeout(function(){
+    var p=document.getElementById('PromoPopup');
+    if(p){p.style.display='flex';}
+    document.getElementById('PromoPopupClose').onclick=function(){p.style.display='none';localStorage.setItem(key,'1');};
+    document.getElementById('PromoPopupSkip').onclick=function(){p.style.display='none';localStorage.setItem(key,'1');};
+  },delay);
+})();
+</script>
+{%- endif -%}
+{% schema %}
+{
+  "name": "Promo Popup",
+  "settings": [
+    { "type": "checkbox", "id": "enable_popup", "label": "Enable Popup", "default": false },
+    { "type": "image_picker", "id": "popup_image", "label": "Image" },
+    { "type": "text", "id": "popup_title", "label": "Title", "default": "Get 10% Off Your First Order" },
+    { "type": "textarea", "id": "popup_text", "label": "Text", "default": "Subscribe to our newsletter and get an exclusive discount." },
+    { "type": "text", "id": "placeholder", "label": "Email placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "btn_label", "label": "Button label", "default": "Get Discount" },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "You're in! Check your inbox." },
+    { "type": "text", "id": "skip_label", "label": "Skip link text", "default": "No thanks" },
+    { "type": "range", "id": "delay", "label": "Delay (seconds)", "min": 2, "max": 30, "step": 1, "default": 5 }
+  ],
+  "presets": [{ "name": "Promo Popup" }]
+}
+{% endschema %}

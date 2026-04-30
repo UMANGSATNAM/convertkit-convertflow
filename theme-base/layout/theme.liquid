@@ -4,31 +4,29 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="{{ settings.color_accent }}">
+  <meta name="theme-color" content="{{ settings.color_accent | default: '#2563EB' }}">
   <link rel="canonical" href="{{ canonical_url }}">
-  {% if settings.favicon %}<link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">{% endif %}
+  {%- if settings.favicon -%}<link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">{%- endif -%}
 
-  {%- assign formatted_title = page_title -%}
-  {%- if current_tags -%}{%- assign formatted_title = formatted_title | append: ' – ' | append: current_tags | join: ', ' -%}{%- endif -%}
-  {%- if current_page != 1 -%}{%- assign formatted_title = formatted_title | append: ' – Page ' | append: current_page -%}{%- endif -%}
-  {%- unless page_title contains shop.name -%}{%- assign formatted_title = formatted_title | append: ' – ' | append: shop.name -%}{%- endunless -%}
-  <title>{{ formatted_title }}</title>
-
-  {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
-
-  <!-- Open Graph -->
+  {%- assign page_seo_title = page_title -%}
+  {%- if current_tags -%}{%- assign page_seo_title = page_seo_title | append: ' – ' | append: current_tags | join: ', ' -%}{%- endif -%}
+  {%- if current_page != 1 -%}{%- assign page_seo_title = page_seo_title | append: ' – Page ' | append: current_page -%}{%- endif -%}
+  {%- unless page_title contains shop.name -%}{%- assign page_seo_title = page_seo_title | append: ' – ' | append: shop.name -%}{%- endunless -%}
+  <title>{{ page_seo_title }}</title>
+  {%- if page_description -%}<meta name="description" content="{{ page_description | escape }}">{%- endif -%}
   <meta property="og:site_name" content="{{ shop.name }}">
   <meta property="og:url" content="{{ canonical_url }}">
-  <meta property="og:title" content="{{ formatted_title | escape }}">
-  {% if page_description %}<meta property="og:description" content="{{ page_description | escape }}">{% endif %}
-  {% if page_image %}<meta property="og:image" content="{{ page_image | image_url: width: 1200 }}">{% endif %}
+  <meta property="og:title" content="{{ page_seo_title | escape }}">
+  {%- if page_description -%}<meta property="og:description" content="{{ page_description | escape }}">{%- endif -%}
+  {%- if page_image -%}<meta property="og:image" content="{{ page_image | image_url: width: 1200 }}">{%- endif -%}
 
   {{ content_for_header }}
 
-  {% render 'css-variables' %}
+  {%- render 'css-variables' -%}
 
   {{ 'theme.css' | asset_url | stylesheet_tag }}
-  {% if settings.custom_css != blank %}<style>{{ settings.custom_css }}</style>{% endif %}
+
+  {%- if settings.custom_css != blank -%}<style>{{ settings.custom_css }}</style>{%- endif -%}
 
   <script>
     window.CF = {
@@ -43,65 +41,62 @@
       currencyCode: {{ cart.currency.iso_code | json }},
       cartCount: {{ cart.item_count }},
       settings: {
-        slideOutCart: {{ settings.enable_slide_cart | json }},
-        quickView: {{ settings.enable_quick_view | json }},
-        animationsEnabled: {{ settings.enable_animations | json }}
+        slideOutCart: {{ settings.enable_slide_cart | default: true | json }},
+        quickView: {{ settings.enable_quick_view | default: true | json }},
+        animationsEnabled: {{ settings.enable_animations | default: true | json }}
       }
     };
     document.documentElement.classList.add('js');
   </script>
 </head>
 
-<body class="template-{{ template.name }} {% if settings.enable_animations %}animations-on{% endif %}" id="top">
+<body class="template-{{ template.name }}{% if settings.enable_animations %} animations-on{% endif %}" id="top">
 
-  <!-- Skip to content -->
-  <a class="skip-to-content visually-hidden" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
+  <a class="skip-link" href="#MainContent" style="position:absolute;top:-100px;left:16px;background:var(--c-accent);color:var(--c-accent-text);padding:8px 16px;border-radius:4px;font-weight:700;z-index:9999;transition:top .2s;text-decoration:none" onfocus="this.style.top='8px'" onblur="this.style.top='-100px'">Skip to content</a>
 
-  {%- if settings.show_announcement_bar -%}
-    {%- section 'announcement-bar' -%}
-  {%- endif -%}
-
+  {%- section 'announcement-bar' -%}
   {%- section 'header' -%}
+  {%- section 'cart-drawer' -%}
+  {%- section 'promo-popup' -%}
+  {%- section 'age-verifier' -%}
 
-  <!-- Cart Drawer (slide-out) -->
-  {%- if settings.enable_slide_cart -%}
-    {%- section 'cart-drawer' -%}
-  {%- endif -%}
-
-  <!-- Search Overlay -->
-  <div id="SearchOverlay" class="search-overlay" aria-hidden="true" role="dialog">
-    <div class="search-overlay__inner">
-      <button class="search-overlay__close" aria-label="{{ 'accessibility.close' | t }}" id="SearchClose">
-        {% render 'icon-close' %}
+  <!-- Search overlay -->
+  <div id="SearchOverlay" role="dialog" aria-modal="true" aria-label="Search" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);align-items:flex-start;justify-content:center;padding-top:80px">
+    <div style="width:100%;max-width:680px;background:var(--c-bg);border-radius:var(--radius);padding:24px;margin:0 20px;position:relative">
+      <button id="SearchClose" aria-label="Close search" style="position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;padding:4px;color:var(--c-text)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <form action="{{ routes.search_url }}" method="get" role="search" class="search-overlay__form">
+      <form action="{{ routes.search_url }}" method="get" role="search">
         <input type="hidden" name="type" value="product">
-        <input type="search" name="q" class="search-overlay__input" placeholder="{{ 'general.search.placeholder' | t }}" autocomplete="off" id="SearchInput">
-        <button type="submit" class="search-overlay__submit">{% render 'icon-search' %}</button>
+        <div style="display:flex;border:2px solid var(--c-border);border-radius:var(--radius);overflow:hidden">
+          <input type="search" name="q" id="SearchInput" placeholder="Search products…" autocomplete="off" style="flex:1;padding:14px 20px;border:none;font-family:var(--f-body);font-size:16px;background:transparent;color:var(--c-text);outline:none">
+          <button type="submit" style="padding:14px 20px;background:var(--c-accent);border:none;cursor:pointer;color:var(--c-accent-text)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
       </form>
-      <div class="search-overlay__results" id="SearchResults"></div>
+      <div id="SearchResults" style="margin-top:16px"></div>
     </div>
   </div>
-  <div class="overlay-bg" id="OverlayBg"></div>
 
   <!-- Quick View Modal -->
-  <div id="QuickViewModal" class="quick-view-modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="quick-view-modal__overlay" id="QuickViewOverlay"></div>
-    <div class="quick-view-modal__content" id="QuickViewContent">
-      <button class="quick-view-modal__close" id="QuickViewClose" aria-label="{{ 'accessibility.close' | t }}">{% render 'icon-close' %}</button>
-      <div class="quick-view-modal__body" id="QuickViewBody">
-        <div class="quick-view-modal__loading">{% render 'icon-spinner' %}</div>
+  <div id="QuickViewModal" role="dialog" aria-modal="true" aria-label="Quick view" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);align-items:center;justify-content:center">
+    <div style="background:var(--c-bg);border-radius:calc(var(--radius)*2);width:90%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative">
+      <button id="QuickViewClose" aria-label="Close" style="position:absolute;top:16px;right:16px;z-index:1;background:var(--c-bg);border:1px solid var(--c-border);border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--c-text)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="QuickViewBody" style="padding:40px">
+        <div style="display:flex;justify-content:center;padding:40px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:cf-spin 1s linear infinite;opacity:.4"><circle cx="12" cy="12" r="10" opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Age Verifier -->
-  {%- if settings.enable_age_verifier -%}
-    {%- section 'age-verifier' -%}
-  {%- endif -%}
+  <div id="OverlayBg" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5)" aria-hidden="true"></div>
 
-  <!-- Promo Popup -->
-  {%- section 'promo-popup' -%}
+  <!-- Toast -->
+  <div id="Toast" role="status" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);z-index:700;background:var(--c-text);color:var(--c-bg);padding:12px 24px;border-radius:99px;font-size:14px;font-weight:600;opacity:0;transition:transform .3s,opacity .3s;pointer-events:none;white-space:nowrap"></div>
 
   <main id="MainContent" role="main" tabindex="-1">
     {{ content_for_layout }}
@@ -110,18 +105,61 @@
   {%- section 'footer' -%}
 
   <!-- Back to top -->
-  {%- if settings.show_back_to_top -%}
-  <button class="back-to-top" id="BackToTop" aria-label="{{ 'accessibility.back_to_top' | t }}" hidden>
-    {% render 'icon-arrow-up' %}
+  <button id="BackToTop" aria-label="Back to top" style="position:fixed;bottom:24px;right:24px;z-index:100;width:44px;height:44px;border-radius:50%;background:var(--c-accent);color:var(--c-accent-text);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .2s,transform .2s">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
   </button>
-  {%- endif -%}
 
-  <!-- Toast notification -->
-  <div id="Toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+  <style>
+    @keyframes cf-spin { to { transform: rotate(360deg); } }
+  </style>
 
   {{ 'theme.js' | asset_url | script_tag }}
 
-  {% if settings.custom_js != blank %}<script>{{ settings.custom_js }}</script>{% endif %}
+  <script>
+    // Back to top
+    var btn = document.getElementById('BackToTop');
+    window.addEventListener('scroll', function() {
+      if (btn) btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+    }, { passive: true });
+    if (btn) btn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
+    // Search overlay
+    var so = document.getElementById('SearchOverlay');
+    var sc = document.getElementById('SearchClose');
+    var ob = document.getElementById('OverlayBg');
+    document.querySelectorAll('[data-search-toggle]').forEach(function(el) {
+      el.addEventListener('click', function(e) { e.preventDefault(); if(so){so.style.display='flex';} setTimeout(function(){var i=document.getElementById('SearchInput');if(i)i.focus();},50); });
+    });
+    if (sc) sc.addEventListener('click', function() { so.style.display='none'; });
+
+    // Quick View
+    var qvm = document.getElementById('QuickViewModal');
+    var qvc = document.getElementById('QuickViewClose');
+    if (qvc) qvc.addEventListener('click', function() { qvm.style.display='none'; });
+    window.openQuickView = function(url) {
+      if (!qvm) return;
+      var body = document.getElementById('QuickViewBody');
+      qvm.style.display = 'flex';
+      body.innerHTML = '<div style="display:flex;justify-content:center;padding:60px"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:cf-spin 1s linear infinite;opacity:.4"><circle cx="12" cy="12" r="10" opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></div>';
+      fetch(url + '?section_id=product-main').then(function(r){return r.text();}).then(function(html){
+        body.innerHTML = html;
+      }).catch(function(){ body.innerHTML = '<p style="padding:40px;text-align:center;color:var(--c-subtle)">Could not load product details.</p>'; });
+    };
+
+    // Toast helper
+    window.showToast = function(msg, dur) {
+      var t = document.getElementById('Toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(function(){
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(-50%) translateY(100px)';
+      }, dur || 3000);
+    };
+  </script>
+
+  {%- if settings.custom_js != blank -%}<script>{{ settings.custom_js }}</script>{%- endif -%}
 </body>
 </html>
