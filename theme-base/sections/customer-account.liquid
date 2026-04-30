@@ -1,0 +1,40 @@
+<div class="page-width" style="padding:60px 20px 80px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;flex-wrap:wrap;gap:16px">
+  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,36px)">My Account</h1>
+  <a href="{{ routes.account_logout_url }}" class="btn-outline" style="font-size:14px;padding:10px 20px">Sign Out</a>
+</div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:40px;align-items:flex-start">
+  <div style="background:var(--c-border,#f3f4f6);border-radius:calc(var(--radius)*2);padding:28px">
+    <p style="font-family:var(--f-heading);font-size:18px;font-weight:700;margin-bottom:4px">{{ customer.first_name }} {{ customer.last_name }}</p>
+    <p style="font-size:14px;color:var(--c-subtle);margin-bottom:20px">{{ customer.email }}</p>
+    <a href="{{ routes.account_addresses_url }}" style="display:block;padding:10px 0;font-size:14px;border-bottom:1px solid var(--c-border);color:var(--c-text)">Manage Addresses</a>
+    <a href="{{ routes.account_logout_url }}" style="display:block;padding:10px 0;font-size:14px;color:#dc2626">Sign Out</a>
+  </div>
+  <div>
+    <h2 style="font-family:var(--f-heading);font-size:20px;margin-bottom:24px">Order History</h2>
+    {%- if customer.orders.size == 0 -%}
+    <p style="color:var(--c-subtle)">You haven't placed any orders yet. <a href="/collections/all" style="color:var(--c-accent);font-weight:600">Start shopping</a></p>
+    {%- else -%}
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="border-bottom:2px solid var(--c-border)">
+        {%- for h in 'Order,Date,Items,Total,Status' | split: ',' -%}<th style="text-align:left;padding:10px 12px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--c-subtle)">{{h}}</th>{%- endfor -%}
+      </tr></thead>
+      <tbody>
+        {%- for order in customer.orders -%}
+        <tr style="border-bottom:1px solid var(--c-border)">
+          <td style="padding:14px 12px"><a href="{{ order.customer_url }}" style="color:var(--c-accent);font-weight:600">{{ order.name }}</a></td>
+          <td style="padding:14px 12px;color:var(--c-subtle)">{{ order.created_at | date: "%b %d, %Y" }}</td>
+          <td style="padding:14px 12px">{{ order.line_items.size }}</td>
+          <td style="padding:14px 12px;font-weight:700">{{ order.total_price | money }}</td>
+          <td style="padding:14px 12px"><span style="padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a">{{ order.financial_status | capitalize }}</span></td>
+        </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+    {%- endif -%}
+  </div>
+</div>
+</div>
+{%- schema -%}
+{"name":"Customer Account","settings":[],"presets":[{"name":"Customer Account"}]}
+{%- endschema -%}

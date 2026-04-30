@@ -1,0 +1,25 @@
+<div class="page-width" style="padding:60px 20px 80px;max-width:900px;margin:0 auto">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:40px;flex-wrap:wrap">
+  <a href="{{ routes.account_url }}" style="color:var(--c-subtle);font-size:14px">← Back to Account</a>
+  <h1 style="font-family:var(--f-heading);font-size:clamp(20px,3vw,32px)">Order {{ order.name }}</h1>
+  <span style="padding:6px 14px;border-radius:99px;font-size:13px;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;margin-left:auto">{{ order.financial_status | capitalize }}</span>
+</div>
+{%- for item in order.line_items -%}
+<div style="display:grid;grid-template-columns:80px 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--c-border)">
+  {%- if item.image -%}<img src="{{ item.image | image_url: width: 160 }}" alt="{{ item.title | escape }}" width="80" height="80" style="border-radius:var(--radius);object-fit:cover;width:80px;height:80px">{%- else -%}<div style="width:80px;height:80px;background:var(--c-border);border-radius:var(--radius)"></div>{%- endif -%}
+  <div>
+    <p style="font-weight:600;margin-bottom:4px">{{ item.title }}</p>
+    {%- unless item.variant.title == 'Default Title' -%}<p style="font-size:13px;color:var(--c-subtle);margin-bottom:4px">{{ item.variant.title }}</p>{%- endunless -%}
+    <p style="font-size:14px;color:var(--c-subtle)">Qty: {{ item.quantity }} × {{ item.price | money }}</p>
+  </div>
+</div>
+{%- endfor -%}
+<div style="margin-top:32px;max-width:320px;margin-left:auto">
+  <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:15px"><span>Subtotal</span><span>{{ order.subtotal_price | money }}</span></div>
+  {%- for shipping in order.shipping_methods -%}<div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:15px;color:var(--c-subtle)"><span>{{ shipping.title }}</span><span>{{ shipping.price | money }}</span></div>{%- endfor -%}
+  <div style="display:flex;justify-content:space-between;padding-top:16px;border-top:2px solid var(--c-border);font-weight:700;font-size:18px"><span>Total</span><span>{{ order.total_price | money }}</span></div>
+</div>
+</div>
+{%- schema -%}
+{"name":"Customer Order","settings":[],"presets":[{"name":"Customer Order"}]}
+{%- endschema -%}
