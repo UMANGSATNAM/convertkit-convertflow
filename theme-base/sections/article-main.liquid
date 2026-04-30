@@ -1,0 +1,42 @@
+<div class="page-width" style="padding:60px 20px 80px;max-width:800px;margin:0 auto">
+  <nav style="font-size:13px;color:var(--c-subtle);margin-bottom:24px">
+    <a href="/" style="color:var(--c-subtle)">Home</a> /
+    <a href="{{ blog.url }}" style="color:var(--c-subtle)">{{ blog.title }}</a> /
+    <span>{{ article.title }}</span>
+  </nav>
+  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,44px);margin-bottom:16px;line-height:1.2">{{ article.title }}</h1>
+  <p style="font-size:14px;color:var(--c-subtle);margin-bottom:32px">{{ article.published_at | date: "%B %d, %Y" }} · {{ article.author }}</p>
+  {%- if article.image -%}
+  <img src="{{ article.image | image_url: width: 1200 }}" alt="{{ article.title | escape }}" width="1200" height="628" style="width:100%;height:auto;border-radius:calc(var(--radius)*2);margin-bottom:40px;object-fit:cover;max-height:480px">
+  {%- endif -%}
+  <div style="font-size:16px;line-height:1.8;color:var(--c-text)" class="rte">{{ article.content }}</div>
+  {%- if blog.comments_enabled? -%}
+  <div style="margin-top:60px;border-top:1px solid var(--c-border);padding-top:40px">
+    <h2 style="font-family:var(--f-heading);font-size:24px;margin-bottom:24px">{{ article.comments_count }} Comments</h2>
+    {%- paginate article.comments by 10 -%}
+    {%- for comment in article.comments -%}
+    <div style="padding:20px 0;border-bottom:1px solid var(--c-border)">
+      <p style="font-weight:600;margin-bottom:4px">{{ comment.author }} <span style="font-weight:400;font-size:13px;color:var(--c-subtle)">· {{ comment.created_at | date: "%B %d, %Y" }}</span></p>
+      <p style="font-size:15px;line-height:1.6">{{ comment.content }}</p>
+    </div>
+    {%- endfor -%}
+    {%- endpaginate -%}
+    <form action="/blogs/{{ blog.handle }}/{{ article.handle }}/comments" method="post" style="margin-top:40px">
+      <h3 style="font-family:var(--f-heading);font-size:20px;margin-bottom:20px">Leave a comment</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <input name="comment[author]" type="text" placeholder="Name" required style="padding:12px 16px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);background:var(--c-bg);color:var(--c-text)">
+        <input name="comment[email]" type="email" placeholder="Email" required style="padding:12px 16px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);background:var(--c-bg);color:var(--c-text)">
+      </div>
+      <textarea name="comment[body]" rows="5" placeholder="Your comment..." required style="width:100%;padding:12px 16px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);font-size:15px;margin-bottom:16px;resize:vertical;background:var(--c-bg);color:var(--c-text)"></textarea>
+      <button type="submit" class="btn-primary">Post Comment</button>
+    </form>
+  </div>
+  {%- endif -%}
+</div>
+{% schema %}
+{
+  "name": "Article",
+  "settings": [],
+  "presets": [{ "name": "Article" }]
+}
+{% endschema %}

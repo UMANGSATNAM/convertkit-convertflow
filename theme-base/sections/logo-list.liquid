@@ -1,0 +1,40 @@
+<div class="page-width" style="padding:40px 20px">
+  <div style="text-align:center;margin-bottom:32px">
+    {%- if section.settings.title != blank -%}
+    <p style="font-size:13px;font-weight:600;color:var(--c-subtle);text-transform:uppercase;letter-spacing:.08em">{{ section.settings.title }}</p>
+    {%- endif -%}
+  </div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:32px 48px">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'logo' -%}
+      <a href="{{ block.settings.url }}" style="opacity:.5;transition:opacity .2s;display:flex;align-items:center" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.5'" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+        <img src="{{ block.settings.image | image_url: height: 48 }}" alt="{{ block.settings.alt | escape }}" height="48" style="height:40px;width:auto;object-fit:contain">
+        {%- else -%}
+        <span style="font-family:var(--f-heading);font-size:20px;font-weight:700;color:var(--c-subtle)">{{ block.settings.alt | default: 'Brand' }}</span>
+        {%- endif -%}
+      </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Logo List",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Label", "default": "As seen in" }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo image" },
+        { "type": "text", "id": "alt", "label": "Alt text / brand name" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Logo List" }]
+}
+{% endschema %}

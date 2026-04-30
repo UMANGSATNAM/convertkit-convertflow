@@ -1,0 +1,42 @@
+<div class="page-width" style="padding:40px 20px">
+  <h2 style="font-family:var(--f-heading);font-size:clamp(18px,2.5vw,26px);margin-bottom:24px">{{ section.settings.title }}</h2>
+  <div id="recently-viewed-{{ section.id }}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px"></div>
+</div>
+<script>
+(function(){
+  var handle="{{ product.handle }}";
+  var maxItems={{ section.settings.products_count }};
+  var storageKey='cf_recently_viewed';
+  var recent=JSON.parse(localStorage.getItem(storageKey)||'[]');
+  if(!recent.includes(handle)){recent.unshift(handle);}
+  recent=recent.slice(0,20);
+  localStorage.setItem(storageKey,JSON.stringify(recent));
+
+  var toShow=recent.filter(h=>h!==handle).slice(0,maxItems);
+  if(toShow.length===0) return;
+
+  var container=document.getElementById('recently-viewed-{{ section.id }}');
+  Promise.all(toShow.map(h=>
+    fetch('/products/'+h+'.js').then(r=>r.ok?r.json():null).catch(()=>null)
+  )).then(function(products){
+    products.filter(Boolean).forEach(function(p){
+      var price=new Intl.NumberFormat('en-IN',{style:'currency',currency:'{{ cart.currency.iso_code }}'}).format(p.price/100);
+      var card=document.createElement('a');
+      card.href='/products/'+p.handle;
+      card.style.cssText='display:block;text-decoration:none;color:var(--c-text)';
+      card.innerHTML='<img src="'+p.featured_image+'" alt="'+p.title+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius);margin-bottom:10px"><p style="font-size:13px;font-weight:600;margin-bottom:4px">'+p.title+'</p><p style="font-size:13px;color:var(--c-accent);font-weight:700">'+price+'</p>';
+      container.appendChild(card);
+    });
+  });
+})();
+</script>
+{% schema %}
+{
+  "name": "Recently Viewed",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Recently Viewed" },
+    { "type": "range", "id": "products_count", "label": "Products", "min": 2, "max": 8, "step": 2, "default": 4 }
+  ],
+  "presets": [{ "name": "Recently Viewed" }]
+}
+{% endschema %}

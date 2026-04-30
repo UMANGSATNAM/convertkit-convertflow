@@ -1,0 +1,26 @@
+<div class="page-width" style="padding:60px 20px 80px">
+  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px);margin-bottom:40px">Search Results {%- if search.performed -%} for "{{ search.terms }}" {%- endif -%}</h1>
+  <form action="/search" method="get" style="max-width:600px;display:flex;gap:12px;margin-bottom:48px">
+    <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search products..." style="flex:1;padding:14px 20px;border:2px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);font-size:15px;background:var(--c-bg);color:var(--c-text)">
+    <button type="submit" class="btn-primary" style="padding:14px 24px">Search</button>
+  </form>
+  {%- if search.performed -%}
+    {%- if search.results_count == 0 -%}
+    <p style="color:var(--c-subtle);font-size:16px">No results found for "{{ search.terms }}". Try a different search term.</p>
+    {%- else -%}
+    <p style="color:var(--c-subtle);margin-bottom:32px">{{ search.results_count }} results</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px">
+      {%- for item in search.results -%}
+        {%- render 'product-card', product: item -%}
+      {%- endfor -%}
+    </div>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+{% schema %}
+{
+  "name": "Search",
+  "settings": [],
+  "presets": [{ "name": "Search" }]
+}
+{% endschema %}

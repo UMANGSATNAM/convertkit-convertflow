@@ -1,0 +1,59 @@
+<div class="page-width" style="padding:60px 20px 80px">
+  {%- if section.settings.tabs_heading != blank -%}
+  <h2 style="font-family:var(--f-heading);font-size:clamp(20px,3vw,28px);text-align:center;margin-bottom:32px">{{ section.settings.tabs_heading }}</h2>
+  {%- endif -%}
+  <div style="border-bottom:2px solid var(--c-border);display:flex;gap:0;margin-bottom:40px;overflow-x:auto">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'tab' -%}
+      <button onclick="showTab('tab-{{ section.id }}-{{ forloop.index }}')" id="btn-{{ section.id }}-{{ forloop.index }}" style="padding:14px 24px;background:none;border:none;border-bottom:{%- if forloop.first -%}2px solid var(--c-accent);color:var(--c-accent);font-weight:700{%- else -%}2px solid transparent;color:var(--c-subtle){%- endif -%};font-family:var(--f-body);font-size:15px;cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s;margin-bottom:-2px" {{ block.shopify_attributes }}>{{ block.settings.tab_label }}</button>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'tab' -%}
+    <div id="tab-{{ section.id }}-{{ forloop.index }}" style="display:{%- if forloop.first -%}block{%- else -%}none{%- endif -%};font-size:15px;line-height:1.8;color:var(--c-subtle);max-width:800px" class="rte">
+      {{ block.settings.tab_content }}
+    </div>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+<script>
+function showTab(id) {
+  var prefix = id.split('-').slice(0,3).join('-');
+  document.querySelectorAll('[id^="tab-"]').forEach(function(el){
+    if(el.id.startsWith(prefix.replace('tab-','tab-'))){
+      el.style.display='none';
+    }
+  });
+  document.querySelectorAll('[id^="btn-"]').forEach(function(btn){
+    if(btn.id.startsWith(prefix.replace('tab-','btn-'))){
+      btn.style.borderBottomColor='transparent';
+      btn.style.color='var(--c-subtle)';
+      btn.style.fontWeight='400';
+    }
+  });
+  document.getElementById(id).style.display='block';
+  var btnId=id.replace('tab-','btn-');
+  var btn=document.getElementById(btnId);
+  if(btn){btn.style.borderBottomColor='var(--c-accent)';btn.style.color='var(--c-accent)';btn.style.fontWeight='700';}
+}
+</script>
+{% schema %}
+{
+  "name": "Product Tabs",
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "tab_label", "label": "Tab Label", "default": "Description" },
+        { "type": "richtext", "id": "tab_content", "label": "Tab Content", "default": "<p>Add product details here.</p>" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Product Tabs" }],
+  "settings": [
+    { "type": "text", "id": "tabs_heading", "label": "Section heading" }
+  ]
+}
+{% endschema %}

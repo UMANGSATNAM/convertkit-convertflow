@@ -1,0 +1,83 @@
+{%- if cart.item_count == 0 -%}
+<div class="page-width" style="text-align:center;padding:80px 20px">
+  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="opacity:.3;margin-bottom:24px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
+  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px);margin-bottom:16px">Your cart is empty</h1>
+  <p style="color:var(--c-subtle);margin-bottom:32px">Looks like you haven't added anything yet.</p>
+  <a href="/collections/all" class="btn-primary">Continue Shopping</a>
+</div>
+{%- else -%}
+<div class="page-width" style="padding:40px 20px 80px">
+  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px);margin-bottom:40px">Your Cart ({{ cart.item_count }})</h1>
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:48px" class="cart-grid">
+    <div>
+      {%- for item in cart.items -%}
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;padding:24px 0;border-bottom:1px solid var(--c-border)">
+        <a href="{{ item.url }}">
+          <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.title | escape }}" width="100" height="100" style="border-radius:var(--radius);object-fit:cover;width:100%;aspect-ratio:1">
+        </a>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+            <a href="{{ item.url }}" style="font-family:var(--f-heading);font-weight:600;font-size:16px;color:var(--c-text);text-decoration:none">{{ item.product.title }}</a>
+            <span style="font-weight:700;font-size:16px;white-space:nowrap">{{ item.final_line_price | money }}</span>
+          </div>
+          {%- unless item.variant.title == 'Default Title' -%}
+          <p style="font-size:13px;color:var(--c-subtle);margin-bottom:12px">{{ item.variant.title }}</p>
+          {%- endunless -%}
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="display:flex;align-items:center;border:1px solid var(--c-border);border-radius:var(--radius)">
+              <button onclick="updateQty('{{ item.key }}', {{ item.quantity | minus: 1 }})" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">−</button>
+              <span style="padding:0 12px;font-size:15px;font-weight:600">{{ item.quantity }}</span>
+              <button onclick="updateQty('{{ item.key }}', {{ item.quantity | plus: 1 }})" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">+</button>
+            </div>
+            <a href="{{ item.url_to_remove }}" style="font-size:13px;color:var(--c-subtle);text-decoration:underline">Remove</a>
+          </div>
+        </div>
+      </div>
+      {%- endfor -%}
+      {%- if section.settings.show_note -%}
+      <div style="margin-top:24px">
+        <label style="font-weight:600;font-size:14px;display:block;margin-bottom:8px">Order Note</label>
+        <textarea name="note" form="cart-form" rows="3" placeholder="Add a note to your order..." style="width:100%;padding:12px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);font-size:14px;resize:vertical;background:var(--c-bg);color:var(--c-text)">{{ cart.note }}</textarea>
+      </div>
+      {%- endif -%}
+    </div>
+    <div>
+      <div style="background:var(--c-subtle-bg,#f8f8f6);border-radius:calc(var(--radius)*2);padding:32px;position:sticky;top:100px">
+        <h2 style="font-family:var(--f-heading);font-size:20px;margin-bottom:24px">Order Summary</h2>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:15px">
+          <span>Subtotal</span><span style="font-weight:600">{{ cart.total_price | money }}</span>
+        </div>
+        <p style="font-size:13px;color:var(--c-subtle);margin-bottom:24px">Shipping and taxes calculated at checkout.</p>
+        {%- if section.settings.show_gift -%}
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;margin-bottom:20px;cursor:pointer">
+          <input type="checkbox" name="attributes[gift_wrap]" form="cart-form" style="width:16px;height:16px;accent-color:var(--c-accent)"> Gift wrapping (+₹99)
+        </label>
+        {%- endif -%}
+        <form id="cart-form" action="/checkout" method="post">
+          <button type="submit" class="btn-primary" style="width:100%;padding:16px;font-size:16px">Proceed to Checkout</button>
+        </form>
+        <a href="/collections/all" style="display:block;text-align:center;margin-top:16px;font-size:14px;color:var(--c-subtle);text-decoration:underline">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+@media(max-width:768px){.cart-grid{grid-template-columns:1fr!important}}
+</style>
+<script>
+function updateQty(key, qty) {
+  if (qty < 0) return;
+  fetch('/cart/change.js', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id: key, quantity: qty }) })
+    .then(() => window.location.reload());
+}
+</script>
+{% schema %}
+{
+  "name": "Cart",
+  "settings": [
+    { "type": "checkbox", "id": "show_note", "label": "Show order note", "default": true },
+    { "type": "checkbox", "id": "show_gift", "label": "Show gift wrap option", "default": false }
+  ],
+  "presets": [{ "name": "Cart" }]
+}
+{% endschema %}
