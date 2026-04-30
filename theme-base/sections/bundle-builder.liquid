@@ -1,0 +1,60 @@
+<div class="page-width" style="padding:60px 20px">
+  {%- if section.settings.heading != blank -%}
+  <div style="text-align:center;margin-bottom:48px">
+    <h2 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px)">{{ section.settings.heading }}</h2>
+  </div>
+  {%- endif -%}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px">
+    {%- for block in section.blocks -%}
+    {%- if block.type == 'bundle_item' -%}
+    {%- assign bp = all_products[block.settings.product] -%}
+    {%- if bp -%}
+    <div style="border:1px solid var(--c-border);border-radius:calc(var(--radius)*2);overflow:hidden;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 8px 30px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='none'" {{ block.shopify_attributes }}>
+      <a href="{{ bp.url }}"><img src="{{ bp.featured_image | image_url: width: 600 }}" alt="{{ bp.title | escape }}" width="600" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"></a>
+      <div style="padding:20px">
+        <p style="font-size:13px;color:var(--c-subtle);margin-bottom:4px">{{ bp.type }}</p>
+        <p style="font-weight:600;font-size:16px;margin-bottom:8px"><a href="{{ bp.url }}" style="color:var(--c-text)">{{ bp.title | truncate: 60 }}</a></p>
+        <p style="font-size:17px;font-weight:700;color:var(--c-accent);margin-bottom:16px">{{ bp.price | money }}</p>
+        <button onclick="addToCart('{{ bp.variants.first.id }}')" class="btn-primary" style="width:100%">Add to Cart</button>
+      </div>
+    </div>
+    {%- endif -%}
+    {%- endif -%}
+    {%- endfor -%}
+  </div>
+  {%- if section.settings.show_add_all -%}
+  <div style="text-align:center;margin-top:32px">
+    <button id="BundleAddAll-{{ section.id }}" onclick="addBundleToCart()" class="btn-primary" style="padding:16px 40px;font-size:16px">
+      {{ section.settings.add_all_label | default: 'Add All to Cart' }}
+      {%- if section.settings.bundle_saving != blank -%} — Save {{ section.settings.bundle_saving }}{%- endif -%}
+    </button>
+  </div>
+  {%- endif -%}
+</div>
+<script>
+function addToCart(id){
+  fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id,quantity:1})})
+    .then(r=>r.json()).then(()=>{if(window.showToast)window.showToast('Added to cart!');window.dispatchEvent(new Event('cart:refresh'));});
+}
+function addBundleToCart(){
+  var ids=[{%- for block in section.blocks -%}{%- if block.type == 'bundle_item' -%}{%- assign bp=all_products[block.settings.product] -%}{%- if bp -%}{id:{{ bp.variants.first.id }},quantity:1},{%- endif -%}{%- endif -%}{%- endfor -%}];
+  Promise.all(ids.map(item=>fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).then(r=>r.json())))
+    .then(()=>{if(window.showToast)window.showToast('Bundle added to cart!');window.dispatchEvent(new Event('cart:refresh'));});
+}
+</script>
+{% schema %}
+{
+  "name":"Bundle Builder",
+  "settings":[
+    {"type":"text","id":"heading","label":"Heading","default":"Frequently Bought Together"},
+    {"type":"checkbox","id":"show_add_all","label":"Show Add All Button","default":true},
+    {"type":"text","id":"add_all_label","label":"Add All Button Label","default":"Add Bundle to Cart"},
+    {"type":"text","id":"bundle_saving","label":"Bundle Savings Label","default":"20%"}
+  ],
+  "blocks":[{
+    "type":"bundle_item","name":"Bundle Product",
+    "settings":[{"type":"product","id":"product","label":"Product"}]
+  }],
+  "presets":[{"name":"Bundle Builder"}]
+}
+{% endschema %}
