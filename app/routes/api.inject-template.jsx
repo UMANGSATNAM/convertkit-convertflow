@@ -86,16 +86,19 @@ export const action = async ({ request }) => {
       return json({ success: false, error: `Unknown template: ${templateId}` }, { status: 400 });
     }
 
-    // ── Step 1: Create a brand-new UNPUBLISHED theme ───────────────────────
+    // ── Step 1: Create a brand-new UNPUBLISHED theme from blank ZIP ────────
     const themeName = `CF – ${tplConfig.label}`;
+    // Blank ZIP is served as a static asset from this Remix app on Railway
+    const appUrl = process.env.SHOPIFY_APP_URL || process.env.HOST || '';
+    const blankZipUrl = `${appUrl}/blank-theme.zip`;
     const createRes = await admin.graphql(`
-      mutation ThemeCreate($name: String!) {
-        themeCreate(name: $name) {
+      mutation ThemeCreate($name: String!, $src: URL!) {
+        themeCreate(name: $name, src: $src) {
           theme { id name role }
           userErrors { field message }
         }
       }
-    `, { variables: { name: themeName } });
+    `, { variables: { name: themeName, src: blankZipUrl } });
 
     const { data: createData } = await createRes.json();
     const createErrors = createData?.themeCreate?.userErrors ?? [];
