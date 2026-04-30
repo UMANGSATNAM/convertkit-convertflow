@@ -89,13 +89,13 @@ export const action = async ({ request }) => {
     // ── Step 1: Create a brand-new UNPUBLISHED theme ───────────────────────
     const themeName = `CF – ${tplConfig.label}`;
     const createRes = await admin.graphql(`
-      mutation ThemeCreate($name: String!, $role: OnlineStoreThemeRole!) {
-        themeCreate(name: $name, role: $role) {
+      mutation ThemeCreate($name: String!) {
+        themeCreate(name: $name) {
           theme { id name role }
           userErrors { field message }
         }
       }
-    `, { variables: { name: themeName, role: "UNPUBLISHED" } });
+    `, { variables: { name: themeName } });
 
     const { data: createData } = await createRes.json();
     const createErrors = createData?.themeCreate?.userErrors ?? [];
