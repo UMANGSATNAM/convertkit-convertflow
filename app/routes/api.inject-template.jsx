@@ -86,27 +86,19 @@ export const action = async ({ request }) => {
       return json({ success: false, error: `Unknown template: ${templateId}` }, { status: 400 });
     }
 
-    // ── Step 1: Create a brand-new UNPUBLISHED theme from blank ZIP ────────
-    const themeName = `CF – ${tplConfig.label}`;
-    // Blank ZIP is served as a static asset from this Remix app on Railway
-    const appUrl = process.env.SHOPIFY_APP_URL || process.env.HOST || '';
-    const blankZipUrl = `${appUrl}/blank-theme.zip`;
-    const createRes = await admin.graphql(`
-      mutation ThemeCreate($name: String!, $source: URL!) {
-        themeCreate(name: $name, source: $source) {
-          theme { id name role }
-          userErrors { field message }
-        }
-      }
-    `, { variables: { name: themeName, source: blankZipUrl } });
-
-    const { data: createData } = await createRes.json();
-    const createErrors = createData?.themeCreate?.userErrors ?? [];
-    if (createErrors.length > 0) {
-      return json({ success: false, error: createErrors.map(e => e.message).join(', ') }, { status: 400 });
+    // ── Step 1: Find the active (MAIN) theme ──────────────────────────────
+    const themesRes = await admin.graphql(`
+      query { themes(first: 10) { nodes { id name role } } }
+    `);
+    const { data: themesData } = await themesRes.json();
+    const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
+    
+    if (!mainTheme) {
+      return json({ success: false, error: "No active MAIN theme found on this store." }, { status: 400 });
     }
-    const theme = createData.themeCreate.theme;
-    console.log(`[theme-create] Created theme: ${theme.name} (${theme.id})`);
+    
+    const theme = mainTheme;
+    console.log(`[theme-inject] Injecting into MAIN theme: ${theme.name} (${theme.id})`);
 
     // ── Step 2: Collect base theme files ──────────────────────────────────
     const baseFiles = walkDir(THEME_BASE_DIR);
@@ -155,7 +147,7 @@ export const action = async ({ request }) => {
     return json({
       success: true,
       templateLabel: tplConfig.label,
-      themeName,
+      themeName: theme.name,
       themeId: numericId,
       filesUploaded: filesToUpsert.length,
       previewUrl: `https://${domain}/?preview_theme_id=${numericId}`,
