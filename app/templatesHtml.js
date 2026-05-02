@@ -377,6 +377,68 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     });
   });
 </script>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -681,6 +743,68 @@ footer { padding: 100px 60px 40px; background: var(--text); color: var(--ivory);
     }
   });
 </script>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -1067,6 +1191,68 @@ footer { background: #2D3748; color: #A0AEC0; padding: 80px 80px 40px; border-ra
     });
   });
 </script>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -1279,6 +1465,68 @@ footer { padding: 80px 60px; max-width: 1600px; margin: 0 auto; text-align: cent
   </div>
   <p class="f-legal">&copy; 2025 Chronos High Horology. Terms of Service &middot; Privacy Policy</p>
 </footer>
+
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -1592,6 +1840,68 @@ footer { background: var(--surface); padding: 80px 40px; border-top: 4px solid v
     &copy; 2025 SUMMIT OUTDOOR GEAR. ALL RIGHTS RESERVED.
   </div>
 </footer>
+
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -2000,6 +2310,68 @@ footer { background: #F2F7F4; padding: 80px 60px 40px; margin-top: 60px; }
   </div>
 </footer>
 
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -2315,6 +2687,68 @@ footer { padding: 80px 40px 40px; background: #000; border-top: 4px solid var(--
     </div>
   </div>
 </footer>
+
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -2643,6 +3077,68 @@ footer { background: #fff; padding: 80px 60px 40px; margin-top: 60px; border-top
     </div>
   </div>
 </footer>
+
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -2995,6 +3491,68 @@ footer { background: var(--surface); padding: 80px 60px 40px; border-top: 1px so
   </div>
 </footer>
 
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -3327,6 +3885,68 @@ footer { padding: 80px 6vw 40px; background: var(--surface); border-top: 1px sol
     }
   });
 </script>
+
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -3895,6 +4515,68 @@ footer { background: #160A0A; padding: 80px 0 0; color: rgba(255,255,255,0.6); }
   </div>
 </footer>
 
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -4112,6 +4794,68 @@ footer{background:var(--ink);padding:80px 60px 40px;}
   </div>
   <div class="f-bottom"><span>© 2025 VŌLT Fashion. All rights reserved.</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -4319,6 +5063,68 @@ footer{background:var(--sand);padding:80px 60px 40px;}
   </div>
   <div class="f-bottom"><span>© 2025 Solera Footwear</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -4515,6 +5321,68 @@ footer{background:#1E2E21;padding:80px 60px 40px;}
   </div>
   <div class="f-bottom"><span>© 2025 Ayurva Wellness Pvt. Ltd. | FSSAI Lic.</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -4701,6 +5569,68 @@ footer{background:#080810;padding:70px 60px 36px;}
   </div>
   <div class="fbot"><span>© 2025 STACKD Technologies</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -4910,6 +5840,68 @@ footer{background:var(--text);padding:80px 60px 40px;}
   </div>
   <div class="fbot"><span>© 2025 Playbox. All rights reserved.</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -5118,6 +6110,68 @@ footer{padding:80px 60px 40px;background:var(--light);border-top:1px solid var(-
   </div>
   <div class="fbot"><span>© 2025 Haven Furniture Pvt. Ltd.</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
@@ -5305,6 +6359,68 @@ footer{background:var(--dark);padding:70px 60px 36px;}
   </div>
   <div class="fbot"><span>© 2025 Veda Eats. FSSAI Lic. No. 12345678.</span><span>Privacy · Terms</span></div>
 </footer>
+
+
+<!-- SUPER THEME SECTIONS PREVIEW -->
+<div style="font-family: sans-serif; background: #fff; padding: 40px 0; border-top: 1px solid #eee;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <span style="background: #000; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Super Theme Sections</span>
+  </div>
+
+  <!-- COUNTDOWN BANNER -->
+  <div style="background:#111; color:#fff; text-align:center; padding:24px; margin: 40px 0;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px;">Flash Sale Ending Soon</h2>
+    <div style="display:inline-flex; gap:16px;">
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">02</span><br><span style="font-size:11px; text-transform:uppercase;">Days</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">14</span><br><span style="font-size:11px; text-transform:uppercase;">Hours</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">45</span><br><span style="font-size:11px; text-transform:uppercase;">Mins</span></div>
+      <div style="background:#222; padding:12px 20px; border-radius:8px;"><span style="font-size:24px; font-weight:700;">12</span><br><span style="font-size:11px; text-transform:uppercase;">Secs</span></div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SLIDER -->
+  <div style="max-width:800px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Real Results</h2>
+    <p style="color:#666; margin-bottom:32px;">See the difference</p>
+    <div style="position:relative; width:100%; height:400px; background:#e0e0e0; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; inset:0; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover;"></div>
+      <div style="position:absolute; inset:0; right:50%; background:url('https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png') center/cover; border-right:4px solid #fff; filter:grayscale(100%);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FREQUENTLY BOUGHT TOGETHER -->
+  <div style="max-width:1000px; margin:60px auto; background:#f9fafb; padding:40px; border-radius:12px;">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:24px; color: #111;">Frequently Bought Together</h2>
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:24px;">
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Main Item</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 1</div></div>
+      <div style="font-size:24px; color:#9ca3af;">+</div>
+      <div style="width:120px; text-align:center;"><div style="width:120px; height:120px; background:#e5e7eb; border-radius:8px; margin-bottom:12px;"></div><div style="font-weight:600; font-size:14px; color: #111;">Add-on 2</div></div>
+      <div style="margin-left:auto; text-align:right;">
+        <div style="font-size:14px; color:#6b7280; text-decoration:line-through;">$150.00</div>
+        <div style="font-size:24px; font-weight:800; color:#111827;">$135.00</div>
+        <button style="background:#111827; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-weight:600; margin-top:12px; cursor:pointer;">Add Bundle to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPABLE IMAGE -->
+  <div style="max-width:1200px; margin:60px auto; text-align:center;">
+    <h2 style="font-size:32px; font-weight:800; margin-bottom:8px; color: #111;">Shop the Look</h2>
+    <p style="color:#666; margin-bottom:32px;">Tap the pins to view products</p>
+    <div style="position:relative; width:100%; height:500px; background:#e5e7eb; border-radius:12px; overflow:hidden;">
+      <div style="position:absolute; top:40%; left:50%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute; top:60%; left:30%; width:24px; height:24px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(255,255,255,0.3); cursor:pointer;">
+        <div style="width:8px; height:8px; background:#000; border-radius:50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 `,
