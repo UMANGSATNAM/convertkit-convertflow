@@ -1,59 +1,136 @@
-<div class="page-width" style="padding:60px 20px 80px">
-  {%- if section.settings.tabs_heading != blank -%}
-  <h2 style="font-family:var(--f-heading);font-size:clamp(20px,3vw,28px);text-align:center;margin-bottom:32px">{{ section.settings.tabs_heading }}</h2>
-  {%- endif -%}
-  <div style="border-bottom:2px solid var(--c-border);display:flex;gap:0;margin-bottom:40px;overflow-x:auto">
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'tab' -%}
-      <button onclick="showTab('tab-{{ section.id }}-{{ forloop.index }}')" id="btn-{{ section.id }}-{{ forloop.index }}" style="padding:14px 24px;background:none;border:none;border-bottom:{%- if forloop.first -%}2px solid var(--c-accent);color:var(--c-accent);font-weight:700{%- else -%}2px solid transparent;color:var(--c-subtle){%- endif -%};font-family:var(--f-body);font-size:15px;cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s;margin-bottom:-2px" {{ block.shopify_attributes }}>{{ block.settings.tab_label }}</button>
-      {%- endif -%}
-    {%- endfor -%}
-  </div>
-  {%- for block in section.blocks -%}
-    {%- if block.type == 'tab' -%}
-    <div id="tab-{{ section.id }}-{{ forloop.index }}" style="display:{%- if forloop.first -%}block{%- else -%}none{%- endif -%};font-size:15px;line-height:1.8;color:var(--c-subtle);max-width:800px" class="rte">
-      {{ block.settings.tab_content }}
-    </div>
-    {%- endif -%}
-  {%- endfor -%}
-</div>
-<script>
-function showTab(id) {
-  var prefix = id.split('-').slice(0,3).join('-');
-  document.querySelectorAll('[id^="tab-"]').forEach(function(el){
-    if(el.id.startsWith(prefix.replace('tab-','tab-'))){
-      el.style.display='none';
-    }
-  });
-  document.querySelectorAll('[id^="btn-"]').forEach(function(btn){
-    if(btn.id.startsWith(prefix.replace('tab-','btn-'))){
-      btn.style.borderBottomColor='transparent';
-      btn.style.color='var(--c-subtle)';
-      btn.style.fontWeight='400';
-    }
-  });
-  document.getElementById(id).style.display='block';
-  var btnId=id.replace('tab-','btn-');
-  var btn=document.getElementById(btnId);
-  if(btn){btn.style.borderBottomColor='var(--c-accent)';btn.style.color='var(--c-accent)';btn.style.fontWeight='700';}
-}
-</script>
 {% schema %}
 {
   "name": "Product Tabs",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#333333" },
+    { "type": "checkbox", "id": "accordion_mobile", "label": "Accordion on Mobile", "default": true }
+  ],
   "blocks": [
     {
       "type": "tab",
-      "name": "Tab",
+      "name": "Tab / Accordion",
       "settings": [
-        { "type": "text", "id": "tab_label", "label": "Tab Label", "default": "Description" },
-        { "type": "richtext", "id": "tab_content", "label": "Tab Content", "default": "<p>Add product details here.</p>" }
+        { "type": "text", "id": "title", "label": "Tab Title", "default": "Shipping & Returns" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Free shipping on orders over $50. You can return any item within 30 days of purchase.</p>" },
+        { "type": "page", "id": "page", "label": "Or show content from a Page" }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Product Description",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab Title", "default": "Description" }
       ]
     }
   ],
-  "presets": [{ "name": "Product Tabs" }],
-  "settings": [
-    { "type": "text", "id": "tabs_heading", "label": "Section heading" }
-  ]
+  "presets": [{ "name": "Product Tabs" }]
 }
 {% endschema %}
+
+{%- style -%}
+  .cf-tabs-{{ section.id }} { max-width: 1000px; margin: 60px auto; padding: 0 20px; font-family: var(--f-body, sans-serif); color: {{ section.settings.text_color }}; background: {{ section.settings.bg_color }}; }
+  
+  .cf-tabs-nav { display: flex; border-bottom: 2px solid var(--c-border); margin-bottom: 30px; gap: 30px; overflow-x: auto; scrollbar-width: none; }
+  .cf-tabs-nav::-webkit-scrollbar { display: none; }
+  
+  .cf-tab-btn { background: none; border: none; padding: 14px 0; font-size: 16px; font-weight: 600; font-family: var(--f-heading, serif); color: var(--c-subtle); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.2s; }
+  .cf-tab-btn:hover { color: var(--c-text); }
+  .cf-tab-btn.active { color: var(--c-accent); border-bottom-color: var(--c-accent); }
+  
+  .cf-tab-panel { display: none; line-height: 1.8; animation: cf-fade-in 0.4s ease; }
+  .cf-tab-panel.active { display: block; }
+  
+  @keyframes cf-fade-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Mobile Accordion Styles */
+  .cf-acc-btn { display: none; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid var(--c-border); padding: 16px 0; font-size: 16px; font-weight: 600; font-family: var(--f-heading, serif); color: var(--c-text); cursor: pointer; justify-content: space-between; align-items: center; }
+  .cf-acc-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
+  .cf-acc-btn.active .cf-acc-icon { transform: rotate(180deg); }
+  
+  {% if section.settings.accordion_mobile %}
+  @media (max-width: 768px) {
+    .cf-tabs-nav { display: none; }
+    .cf-acc-btn { display: flex; }
+    .cf-tab-panel { display: none; padding: 16px 0; border-bottom: 1px solid var(--c-border); animation: none; }
+  }
+  {% endif %}
+{%- endstyle -%}
+
+<div class="cf-tabs-{{ section.id }}">
+  <div class="cf-tabs-nav">
+    {%- for block in section.blocks -%}
+      <button class="cf-tab-btn {% if forloop.first %}active{% endif %}" data-target="cf-panel-{{ block.id }}" {{ block.shopify_attributes }}>{{ block.settings.title }}</button>
+    {%- endfor -%}
+  </div>
+
+  <div class="cf-tabs-content">
+    {%- for block in section.blocks -%}
+      
+      {% if section.settings.accordion_mobile %}
+        <button class="cf-acc-btn {% if forloop.first %}active{% endif %}" data-target="cf-panel-{{ block.id }}">
+          {{ block.settings.title }}
+          <span class="cf-acc-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+      {% endif %}
+
+      <div class="cf-tab-panel {% if forloop.first %}active{% endif %}" id="cf-panel-{{ block.id }}">
+        {%- if block.type == 'description' -%}
+          {{ product.description }}
+        {%- else -%}
+          {%- if block.settings.page != blank -%}
+            {{ block.settings.page.content }}
+          {%- else -%}
+            {{ block.settings.content }}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('.cf-tabs-{{ section.id }}');
+    if(!container) return;
+
+    const tabBtns = container.querySelectorAll('.cf-tab-btn');
+    const accBtns = container.querySelectorAll('.cf-acc-btn');
+    const panels = container.querySelectorAll('.cf-tab-panel');
+
+    function openTab(targetId) {
+      panels.forEach(p => p.classList.remove('active'));
+      tabBtns.forEach(b => b.classList.remove('active'));
+      accBtns.forEach(b => b.classList.remove('active'));
+
+      const panel = document.getElementById(targetId);
+      if(panel) panel.classList.add('active');
+      
+      const tabBtn = container.querySelector(`.cf-tab-btn[data-target="${targetId}"]`);
+      if(tabBtn) tabBtn.classList.add('active');
+      
+      const accBtn = container.querySelector(`.cf-acc-btn[data-target="${targetId}"]`);
+      if(accBtn) accBtn.classList.add('active');
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => openTab(btn.dataset.target));
+    });
+
+    accBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const panel = document.getElementById(targetId);
+        if(panel.classList.contains('active')) {
+          // Close it (toggle off)
+          panel.classList.remove('active');
+          btn.classList.remove('active');
+        } else {
+          openTab(targetId);
+        }
+      });
+    });
+  });
+</script>
