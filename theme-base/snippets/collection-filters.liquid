@@ -1,0 +1,96 @@
+<style>
+  .cf-filters { width: 280px; flex-shrink: 0; font-family: var(--f-body, sans-serif); }
+  .cf-filter-group { border-bottom: 1px solid var(--c-border); padding: 20px 0; }
+  .cf-filter-title { font-size: 14px; font-weight: 700; color: var(--c-text); display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cf-filter-title svg { width: 14px; height: 14px; transition: transform 0.3s; }
+  .cf-filter-group.closed .cf-filter-title svg { transform: rotate(-180deg); }
+  .cf-filter-list { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .cf-filter-group.closed .cf-filter-list { display: none; }
+  
+  .cf-filter-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--c-text); cursor: pointer; }
+  .cf-filter-checkbox { width: 18px; height: 18px; border: 1.5px solid var(--c-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .cf-filter-item input:checked + .cf-filter-checkbox { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+  .cf-filter-item input:checked + .cf-filter-checkbox::after { content: '✓'; font-size: 12px; font-weight: 900; }
+  
+  .cf-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .cf-filter-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--c-border); cursor: pointer; position: relative; }
+  .cf-filter-swatch input:checked + .cf-filter-swatch-inner { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c-accent); }
+  .cf-filter-swatch-inner { position: absolute; inset: 2px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+  
+  .cf-price-range { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+  .cf-price-input { flex: 1; display: flex; align-items: center; border: 1px solid var(--c-border); border-radius: 6px; padding: 0 10px; }
+  .cf-price-input span { color: var(--c-subtle); font-size: 14px; }
+  .cf-price-input input { width: 100%; border: none; padding: 10px; outline: none; font-size: 14px; }
+  
+  @media (max-width: 990px) {
+    .cf-filters { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; width: 100%; }
+    .cf-filters.open { display: block; }
+    .cf-filters-inner { position: absolute; top: 0; left: 0; bottom: 0; width: 320px; max-width: 85%; background: #fff; padding: 24px; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.1); }
+  }
+</style>
+
+<div class="cf-filters" id="CFFiltersDrawer">
+  <div class="cf-filters-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px" class="cf-filters-header">
+      <h3 style="font-size:18px;font-weight:700;font-family:var(--f-heading, serif)">Filters</h3>
+      <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" style="font-size:13px;color:var(--c-subtle);text-decoration:underline">Clear All</a>
+    </div>
+
+    <form class="filter-form" id="CollectionFiltersForm">
+      {%- for filter in collection.filters -%}
+        <div class="cf-filter-group">
+          <div class="cf-filter-title" onclick="this.parentElement.classList.toggle('closed')">
+            {{ filter.label }}
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          </div>
+          
+          {%- case filter.type -%}
+            {%- when 'list' -%}
+              {%- assign is_color = false -%}
+              {%- assign downcase_label = filter.label | downcase -%}
+              {%- if downcase_label contains 'color' or downcase_label contains 'colour' -%}
+                {%- assign is_color = true -%}
+              {%- endif -%}
+
+              {%- if is_color -%}
+                <div class="cf-swatches">
+                  {%- for value in filter.values -%}
+                    <label style="display:block">
+                      <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" id="Filter-{{ filter.param_name }}-{{ forloop.index }}" {% if value.active %}checked{% endif %} {% if value.count == 0 and value.active == false %}disabled{% endif %} style="display:none" data-filter-input>
+                      <div class="cf-filter-swatch" title="{{ value.label }}">
+                        <div class="cf-filter-swatch-inner" style="background-color:{{ value.label | downcase | replace: ' ', '' }}"></div>
+                      </div>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              {%- else -%}
+                <div class="cf-filter-list">
+                  {%- for value in filter.values -%}
+                    <label class="cf-filter-item" style="{% if value.count == 0 and value.active == false %}opacity:0.4;pointer-events:none{% endif %}">
+                      <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" id="Filter-{{ filter.param_name }}-{{ forloop.index }}" {% if value.active %}checked{% endif %} style="display:none" data-filter-input>
+                      <div class="cf-filter-checkbox"></div>
+                      <span>{{ value.label }} <span style="color:var(--c-subtle);font-size:12px">({{ value.count }})</span></span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+            {%- when 'price_range' -%}
+              <div class="cf-price-range">
+                <div class="cf-price-input">
+                  <span>{{ cart.currency.symbol }}</span>
+                  <input name="{{ filter.min_value.param_name }}" id="Filter-{{ filter.min_value.param_name }}" type="number" placeholder="0" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}" data-filter-input>
+                </div>
+                <span style="color:var(--c-subtle)">to</span>
+                <div class="cf-price-input">
+                  <span>{{ cart.currency.symbol }}</span>
+                  <input name="{{ filter.max_value.param_name }}" id="Filter-{{ filter.max_value.param_name }}" type="number" placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}" data-filter-input>
+                </div>
+              </div>
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+      <input type="hidden" name="sort_by" value="{{ collection.sort_by | default: collection.default_sort_by }}">
+    </form>
+  </div>
+</div>

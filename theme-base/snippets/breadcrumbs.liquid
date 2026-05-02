@@ -1,0 +1,75 @@
+<style>
+  .cf-breadcrumbs {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--c-subtle, #6b7280);
+    font-family: var(--f-body, sans-serif);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .cf-breadcrumbs a {
+    color: var(--c-text, #111111);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .cf-breadcrumbs a:hover {
+    color: var(--c-accent, #2563EB);
+  }
+  .cf-breadcrumbs svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+  }
+</style>
+
+<nav class="cf-breadcrumbs" aria-label="breadcrumbs">
+  <a href="{{ routes.root_url }}">Home</a>
+  
+  {%- if template contains 'collection' and collection.handle -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    {%- if current_tags -%}
+      <a href="{{ collection.url }}">{{ collection.title }}</a>
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+      <span>{{ collection.title }}</span>
+    {%- endif -%}
+
+  {%- elsif template contains 'product' -%}
+    {%- if collection.url -%}
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <a href="{{ collection.url }}">{{ collection.title }}</a>
+    {%- endif -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span>{{ product.title | truncate: 40 }}</span>
+
+  {%- elsif template contains 'blog' -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    {%- if current_tags -%}
+      <a href="{{ blog.url }}">{{ blog.title }}</a>
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+      <span>{{ blog.title }}</span>
+    {%- endif -%}
+
+  {%- elsif template contains 'article' -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <a href="{{ blog.url }}">{{ blog.title }}</a>
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span>{{ article.title }}</span>
+
+  {%- elsif template contains 'page' -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span>{{ page.title }}</span>
+
+  {%- elsif template contains 'search' -%}
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span>Search</span>
+  {%- endif -%}
+</nav>

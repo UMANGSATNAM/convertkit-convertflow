@@ -1,0 +1,108 @@
+{% schema %}
+{
+  "name": "Collection Grid",
+  "settings": [
+    { "type": "checkbox", "id": "show_breadcrumbs", "label": "Show Breadcrumbs", "default": true },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable Filtering", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable Sorting", "default": true },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "select", "id": "grid_columns", "label": "Grid Columns (Desktop)", "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ], "default": "4" }
+  ]
+}
+{% endschema %}
+
+<style>
+  .cf-collection-page { max-width: 1400px; margin: 0 auto; padding: 40px 24px; display: flex; gap: 40px; }
+  .cf-collection-header { text-align: center; margin: 40px 24px; }
+  .cf-collection-title { font-size: 40px; font-weight: 800; font-family: var(--f-heading, serif); margin-bottom: 16px; }
+  .cf-collection-desc { font-size: 16px; color: var(--c-subtle); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  
+  .cf-collection-main { flex: 1; min-width: 0; }
+  .cf-collection-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--c-border); }
+  .cf-collection-count { font-size: 14px; color: var(--c-subtle); }
+  
+  .cf-collection-grid { display: grid; gap: 32px; }
+  .cf-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .cf-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .cf-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  
+  .cf-sort-select { padding: 10px 16px; border: 1px solid var(--c-border); border-radius: 6px; background: transparent; font-family: var(--f-body); font-size: 14px; color: var(--c-text); outline: none; cursor: pointer; }
+  
+  .cf-mobile-filter-btn { display: none; padding: 10px 16px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: 6px; font-weight: 600; cursor: pointer; align-items: center; gap: 8px; }
+  
+  @media (max-width: 990px) {
+    .cf-collection-page { flex-direction: column; padding: 20px 16px; gap: 24px; }
+    .cf-mobile-filter-btn { display: flex; }
+    .cf-grid-3, .cf-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  }
+</style>
+
+{%- if section.settings.show_breadcrumbs -%}
+  {%- render 'breadcrumbs' -%}
+{%- endif -%}
+
+<div class="cf-collection-header">
+  <h1 class="cf-collection-title">{{ collection.title }}</h1>
+  {%- if collection.description != blank -%}
+    <div class="cf-collection-desc">{{ collection.description }}</div>
+  {%- endif -%}
+</div>
+
+<div class="cf-collection-page">
+  {%- if section.settings.enable_filtering -%}
+    {%- render 'collection-filters' -%}
+  {%- endif -%}
+
+  <div class="cf-collection-main">
+    <div class="cf-collection-toolbar">
+      {%- if section.settings.enable_filtering -%}
+        <button class="cf-mobile-filter-btn" onclick="document.getElementById('CFFiltersDrawer').classList.add('open')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          Filter & Sort
+        </button>
+      {%- endif -%}
+      
+      <div class="cf-collection-count">{{ collection.products_count }} products found</div>
+      
+      {%- if section.settings.enable_sorting -%}
+        <div style="display:flex;align-items:center;gap:12px" class="cf-sort-wrapper">
+          <label style="font-size:13px;color:var(--c-subtle);font-weight:600">Sort by:</label>
+          <select class="cf-sort-select" name="sort_by" form="CollectionFiltersForm" onchange="this.form.submit()">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>{{ option.name }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- paginate collection.products by section.settings.products_per_page -%}
+      <div class="cf-collection-grid cf-grid-{{ section.settings.grid_columns }}">
+        {%- for product in collection.products -%}
+          {%- render 'product-card', product: product -%}
+        {%- else -%}
+          <div style="grid-column:1/-1;text-align:center;padding:60px 20px">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--c-border);margin-bottom:16px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No products found</h3>
+            <p style="color:var(--c-subtle)">Try adjusting your filters or search criteria.</p>
+            <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:var(--c-text);color:var(--c-bg);text-decoration:none;border-radius:6px;font-weight:600">Clear all filters</a>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <div style="margin-top:60px;display:flex;justify-content:center;gap:12px">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}" style="padding:10px 16px;border:1px solid var(--c-border);border-radius:6px;text-decoration:none;color:var(--c-text);font-weight:600">Previous</a>
+          {%- endif -%}
+          
+          <span style="padding:10px 16px;background:var(--c-accent);color:#fff;border-radius:6px;font-weight:700">Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+          
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}" style="padding:10px 16px;border:1px solid var(--c-border);border-radius:6px;text-decoration:none;color:var(--c-text);font-weight:600">Next</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
