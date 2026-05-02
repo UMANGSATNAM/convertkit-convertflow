@@ -602,83 +602,119 @@ export default function Index() {
             </span>
           </div>
 
-          {/* Grid */}
+          {/* Grid — Bento Style */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 12,
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gridAutoRows: "minmax(180px, auto)",
+            gap: 16,
           }}>
-            {TEMPLATES.map((tpl) => {
+            {TEMPLATES.map((tpl, idx) => {
               const isSelected = selectedTemplate === tpl.id;
+              
+              // Create bento sizing logic
+              // Make every 5th item large (span 2 cols, span 2 rows)
+              // Make every 3rd item wide (span 2 cols)
+              let gridColumn = "span 1";
+              let gridRow = "span 1";
+              
+              if (idx === 0 || idx === 7 || idx === 14) {
+                gridColumn = "span 2";
+                gridRow = "span 2";
+              } else if (idx === 2 || idx === 11 || idx === 18) {
+                gridColumn = "span 2";
+              }
+
               return (
                 <button
                   key={tpl.id}
                   onClick={() => setSelectedTemplate(tpl.id)}
                   style={{
-                    padding: "16px 18px",
-                    background: isSelected ? "#fff" : "#fafafa",
-                    border: isSelected ? `2px solid ${tpl.accent}` : "1.5px solid #e5e7eb",
-                    borderRadius: 12,
+                    gridColumn,
+                    gridRow,
+                    padding: "24px",
+                    background: isSelected ? "#fff" : tpl.nicheBg,
+                    border: isSelected ? `2.5px solid ${tpl.accent}` : "1.5px solid transparent",
+                    borderRadius: 20,
                     cursor: "pointer",
                     textAlign: "left",
-                    transition: "all 0.18s ease",
-                    boxShadow: isSelected ? `0 4px 20px ${tpl.accent}25` : "none",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    boxShadow: isSelected ? `0 8px 30px ${tpl.accent}30` : "0 4px 12px rgba(0,0,0,0.02)",
                     position: "relative",
                     overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between"
+                  }}
+                  onMouseOver={(e) => {
+                    if(!isSelected) e.currentTarget.style.transform = "translateY(-4px)";
+                  }}
+                  onMouseOut={(e) => {
+                    if(!isSelected) e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
-                  {/* Color accent strip at top */}
+                  {/* Decorative background circle */}
                   <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0, height: 3,
-                    background: tpl.accent, borderRadius: "12px 12px 0 0",
-                    opacity: isSelected ? 1 : 0.3,
+                    position: "absolute",
+                    top: -20,
+                    right: -20,
+                    width: 100,
+                    height: 100,
+                    borderRadius: "50%",
+                    background: tpl.nicheColor,
+                    opacity: 0.05,
+                    pointerEvents: "none"
                   }} />
 
-                  {/* Niche badge */}
-                  <div style={{ marginBottom: 8 }}>
-                    <span style={{
-                      background: tpl.nicheBg,
-                      color: tpl.nicheColor,
-                      padding: "3px 10px",
-                      borderRadius: 20,
-                      fontSize: 9,
-                      fontWeight: 700,
-                      letterSpacing: 0.5,
-                      textTransform: "uppercase",
-                    }}>{tpl.niche}</span>
+                  <div style={{ position: "relative", zIndex: 2 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                      <span style={{
+                        background: isSelected ? tpl.nicheBg : "#fff",
+                        color: tpl.nicheColor,
+                        padding: "6px 14px",
+                        borderRadius: 20,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: 0.8,
+                        textTransform: "uppercase",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+                      }}>{tpl.niche}</span>
+                      
+                      {/* Selected checkmark */}
+                      {isSelected && (
+                        <div style={{
+                          width: 28, height: 28, borderRadius: "50%",
+                          background: tpl.accent, color: "#fff",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          boxShadow: `0 4px 12px ${tpl.accent}50`
+                        }}>
+                          {icon("check")}
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{
+                      fontSize: (gridColumn === "span 2" && gridRow === "span 2") ? 28 : 18,
+                      fontWeight: 800,
+                      color: "#1a1a1a",
+                      marginBottom: 8,
+                      lineHeight: 1.2,
+                      fontFamily: "'Playfair Display', serif",
+                    }}>{tpl.name}</div>
                   </div>
 
-                  {/* Template name */}
-                  <div style={{
-                    fontSize: 14,
-                    fontWeight: 800,
-                    color: "#1a1a1a",
-                    marginBottom: 5,
-                    lineHeight: 1.3,
-                  }}>{tpl.name}</div>
-
-                  {/* Description — shortened */}
                   <p style={{
-                    fontSize: 11,
-                    color: "#888",
-                    lineHeight: 1.5,
+                    position: "relative", zIndex: 2,
+                    fontSize: 13,
+                    color: "#555",
+                    lineHeight: 1.6,
                     display: "-webkit-box",
-                    WebkitLineClamp: 2,
+                    WebkitLineClamp: gridRow === "span 2" ? 4 : 2,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
+                    marginTop: "auto",
+                    paddingTop: 16
                   }}>{tpl.desc}</p>
-
-                  {/* Selected checkmark */}
-                  {isSelected && (
-                    <div style={{
-                      position: "absolute", top: 10, right: 10,
-                      width: 20, height: 20, borderRadius: "50%",
-                      background: tpl.accent,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      {icon("check")}
-                    </div>
-                  )}
                 </button>
               );
             })}
