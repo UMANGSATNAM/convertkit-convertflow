@@ -1,44 +1,76 @@
-<div class="product-card" style="border-radius:var(--radius);overflow:hidden;{% if settings.card_style == 'border' %}border:1px solid var(--c-border);{% elsif settings.card_style == 'shadow' %}box-shadow:0 2px 12px rgba(0,0,0,.08);{% endif %}">
-  <div class="product-card__img" style="position:relative">
-    <a href="{{ product.url }}">
+<div class="product-card" style="border-radius:var(--radius);overflow:hidden;position:relative;background:#fff;{% if settings.card_style == 'border' %}border:1px solid var(--c-border);{% elsif settings.card_style == 'shadow' %}box-shadow:0 4px 15px rgba(0,0,0,.05);{% endif %}">
+  <div class="product-card__img" style="position:relative;background:var(--c-border)">
+    <a href="{{ product.url }}" style="display:block;aspect-ratio:1;overflow:hidden">
       {%- if product.featured_image -%}
-        <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform .4s">
       {%- else -%}
-        <div style="background:var(--c-border);aspect-ratio:1"></div>
+        <div style="width:100%;height:100%"></div>
       {%- endif -%}
       {%- if product.images[1] and settings.enable_image_zoom == false -%}
         <img src="{{ product.images[1] | image_url: width: 600 }}" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" class="rollover-img">
       {%- endif -%}
     </a>
-    {%- if product.available == false -%}
-      <span class="product-badge" style="background:#6b7280">Sold Out</span>
-    {%- elsif product.compare_at_price > product.price -%}
-      <span class="product-badge">Sale</span>
-    {%- elsif product.created_at > 'now' | date: '%s' | minus: 2592000 | date: '%Y-%m-%dT%H:%M:%SZ' -%}
-      <span class="product-badge" style="background:#16A34A">New</span>
-    {%- endif -%}
-    {%- if settings.enable_quick_view -%}
-      <button class="quick-view-btn" data-quick-view="{{ product.url }}" aria-label="Quick view {{ product.title }}">Quick View</button>
-    {%- endif -%}
-  </div>
-  <div class="product-card__info" style="padding:14px">
-    {%- if settings.show_vendor -%}
-      <div style="font-size:11px;color:var(--c-subtle);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">{{ product.vendor }}</div>
-    {%- endif -%}
-    <a href="{{ product.url }}" class="product-card__title" style="display:block;font-size:14px;font-weight:500;margin-bottom:8px;color:var(--c-text)">{{ product.title }}</a>
-    <div class="product-card__price">
-      <span style="font-size:16px;font-weight:700;color:var(--c-accent)">{{ product.price | money }}</span>
-      {%- if product.compare_at_price > product.price -%}
-        <del style="font-size:13px;color:var(--c-subtle);margin-left:6px">{{ product.compare_at_price | money }}</del>
+    
+    <div style="position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px">
+      {%- if product.available == false -%}
+        <span class="product-badge" style="background:#6b7280;color:#fff;padding:4px 8px;font-size:11px;font-weight:700;border-radius:4px;text-transform:uppercase">Sold Out</span>
+      {%- elsif product.compare_at_price > product.price -%}
+        <span class="product-badge" style="background:#EF4444;color:#fff;padding:4px 8px;font-size:11px;font-weight:700;border-radius:4px;text-transform:uppercase">Sale</span>
+      {%- elsif product.created_at > 'now' | date: '%s' | minus: 2592000 | date: '%Y-%m-%dT%H:%M:%SZ' -%}
+        <span class="product-badge" style="background:#10B981;color:#fff;padding:4px 8px;font-size:11px;font-weight:700;border-radius:4px;text-transform:uppercase">New</span>
+      {%- endif -%}
+      
+      {%- for tag in product.tags -%}
+        {%- if tag contains 'badge:' -%}
+          <span class="product-badge" style="background:var(--c-accent);color:var(--c-accent-text);padding:4px 8px;font-size:11px;font-weight:700;border-radius:4px;text-transform:uppercase">{{ tag | remove: 'badge:' }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <div style="position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:8px;opacity:0;transform:translateY(10px);transition:all .3s" class="product-card__actions">
+      {%- if settings.enable_quick_view -%}
+        <button class="quick-view-btn" data-quick-view="{{ product.url }}" aria-label="Quick view" style="flex:1;background:var(--c-bg);color:var(--c-text);border:none;padding:10px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)">Quick View</button>
+      {%- endif -%}
+      
+      {%- if product.available and product.has_only_default_variant -%}
+        <form action="/cart/add" method="post" style="flex:1">
+          <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+          <button type="button" data-atc data-text="Add to Cart" aria-label="Add to cart" style="width:100%;background:var(--c-accent);color:var(--c-accent-text);border:none;padding:10px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)">Quick Add</button>
+        </form>
+      {%- elsif product.available -%}
+        <button class="quick-view-btn" data-quick-view="{{ product.url }}" style="flex:1;background:var(--c-accent);color:var(--c-accent-text);border:none;padding:10px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.1)">Select Options</button>
       {%- endif -%}
     </div>
+  </div>
+
+  <div class="product-card__info" style="padding:16px">
+    {%- if settings.show_vendor -%}
+      <div style="font-size:11px;color:var(--c-subtle);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">{{ product.vendor }}</div>
+    {%- endif -%}
+    
+    <a href="{{ product.url }}" class="product-card__title" style="display:block;font-size:15px;font-weight:600;margin-bottom:8px;color:var(--c-text);text-decoration:none">{{ product.title }}</a>
+    
+    <div class="product-card__price" style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+      <span style="font-size:16px;font-weight:700;color:var(--c-text)">{{ product.price | money }}</span>
+      {%- if product.compare_at_price > product.price -%}
+        <del style="font-size:13px;color:var(--c-subtle)">{{ product.compare_at_price | money }}</del>
+      {%- endif -%}
+    </div>
+    
     {%- if product.variants.size > 1 -%}
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
         {%- for variant in product.variants limit: 4 -%}
-          <span style="width:20px;height:20px;border-radius:50%;background:{{ variant.option1 | downcase }};border:1.5px solid var(--c-border);display:inline-block" title="{{ variant.option1 }}"></span>
+          {%- assign color_name = variant.option1 | downcase | replace: ' ', '-' -%}
+          <a href="{{ variant.url }}" style="width:20px;height:20px;border-radius:50%;background:{{ color_name }};border:1px solid rgba(0,0,0,0.1);display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.05)" title="{{ variant.option1 }}"></a>
         {%- endfor -%}
-        {%- if product.variants.size > 4 -%}<span style="font-size:11px;color:var(--c-subtle)">+{{ product.variants.size | minus: 4 }}</span>{%- endif -%}
+        {%- if product.variants.size > 4 -%}<a href="{{ product.url }}" style="font-size:11px;color:var(--c-subtle);text-decoration:none;display:flex;align-items:center">+{{ product.variants.size | minus: 4 }}</a>{%- endif -%}
       </div>
     {%- endif -%}
   </div>
 </div>
+
+<style>
+  .product-card:hover .product-card__img > a img:first-child { transform: scale(1.05); }
+  .product-card:hover .rollover-img { opacity: 1; }
+  .product-card:hover .product-card__actions { opacity: 1; transform: translateY(0); }
+</style>

@@ -1,4 +1,4 @@
-{% comment %}ConvertFlow — BloomFit Activewear · Product Page{% endcomment %}
+{% comment %}ConvertFlow — BloomFit Activewear · Product Page (Functional & Editable){% endcomment %}
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--cf-accent:{{ section.settings.color_accent | default: '#D97B54' }};--cf-bg:{{ section.settings.color_bg | default: '#FAF7F4' }};--cf-dark:#1C1A17;}
@@ -10,8 +10,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark
 .cfp-main-img{background:#f2ede7;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden}
 .cfp-main-img img{width:100%;height:100%;object-fit:cover}
 .cfp-thumbs{display:flex;gap:10px}
-.cfp-thumb{width:80px;aspect-ratio:1;background:#e8e4de;border:2px solid transparent;cursor:pointer;overflow:hidden;background-size:cover;background-position:center}
+.cfp-thumb{width:80px;aspect-ratio:1;background:#e8e4de;border:2px solid transparent;cursor:pointer;overflow:hidden;background-size:cover;background-position:center;transition:border-color .2s}
 .cfp-thumb.active,.cfp-thumb:hover{border-color:var(--cf-accent)}
+.cfp-thumb img{width:100%;height:100%;object-fit:cover}
 .cfp-vendor{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--cf-accent);margin-bottom:12px;display:block}
 .cfp-name{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1.2;margin-bottom:16px}
 .cfp-rating{display:flex;align-items:center;gap:8px;margin-bottom:20px;color:#888;font-size:13px}
@@ -19,19 +20,22 @@ body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark
 .cfp-price-row{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #e8e0d8}
 .cfp-price{font-size:30px;font-weight:600}
 .cfp-compare{font-size:20px;color:#bbb;text-decoration:line-through}
-.cfp-save{background:#DCFCE7;color:#16A34A;padding:4px 12px;font-size:12px;font-weight:700}
+.cfp-save{background:#DCFCE7;color:#16A34A;padding:4px 12px;font-size:12px;font-weight:700;display:none}
+.cfp-save.active{display:inline-block}
 .cfp-desc{font-size:15px;color:#555;line-height:1.8;margin-bottom:28px}
 .cfp-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;color:#555}
 .cfp-variants{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
-.cfp-var{padding:8px 18px;border:1.5px solid #e8e0d8;background:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit}
+.cfp-var{padding:8px 18px;border:1.5px solid #e8e0d8;background:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit;position:relative}
 .cfp-var:hover,.cfp-var.active{border-color:var(--cf-accent);background:var(--cf-accent);color:#fff}
+.cfp-var input{display:none}
 .cfp-qty-row{display:flex;gap:12px;margin-bottom:12px}
-.cfp-qty{display:flex;align-items:center;border:1.5px solid #e8e0d8;overflow:hidden}
+.cfp-qty{display:flex;align-items:center;border:1.5px solid #e8e0d8;overflow:hidden;background:#fff}
 .cfp-qty button{width:40px;height:52px;background:#fff;border:none;font-size:20px;cursor:pointer;color:var(--cf-dark)}
-.cfp-qty span{width:40px;text-align:center;font-size:16px;font-weight:600}
+.cfp-qty input{width:40px;height:52px;text-align:center;font-size:16px;font-weight:600;border:none;-moz-appearance:textfield}
+.cfp-qty input::-webkit-outer-spin-button,.cfp-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .cfp-atc{flex:1;background:var(--cf-accent);color:#fff;border:none;padding:16px 32px;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:inherit}
 .cfp-atc:hover{opacity:.9}
-.cfp-buy-now{display:block;width:100%;background:var(--cf-dark);color:#fff;border:none;padding:14px;font-size:13px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:opacity .2s;font-family:inherit}
+.cfp-buy-now{display:block;width:100%;background:var(--cf-dark);color:#fff;border:none;padding:14px;font-size:13px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:opacity .2s;font-family:inherit;text-align:center}
 .cfp-buy-now:hover{opacity:.85}
 .cfp-trust{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px;padding-top:24px;border-top:1px solid #e8e0d8}
 .cfp-trust-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#666}
@@ -57,56 +61,108 @@ body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark
 @media(max-width:1024px){.cfp-wrap{grid-template-columns:1fr;padding:30px 20px;gap:30px}.cfp-tabs,.cfp-related{padding:40px 20px}.cfp-related-grid{grid-template-columns:repeat(2,1fr)}.cfp-crumb{padding:12px 20px}}
 </style>
 
-{% if section.settings.show_breadcrumb %}
-<div class="cfp-crumb"><a href="/">Home</a> › <a href="/collections/{{ product.type | handleize }}">{{ product.type | default: 'Activewear' }}</a> › {{ product.title }}</div>
-{% endif %}
+<div id="ProductSection-{{ section.id }}" data-section-id="{{ section.id }}" data-product-handle="{{ product.handle }}">
+  
+  {% if section.settings.show_breadcrumb %}
+  <div class="cfp-crumb"><a href="{{ routes.root_url }}">Home</a> › <a href="{{ collection.url | default: '/collections/all' }}">{{ product.type | default: 'Activewear' }}</a> › {{ product.title }}</div>
+  {% endif %}
 
-<div class="cfp-wrap">
-  <div>
-    <div class="cfp-main-img" id="cfpMainImg">
-      {% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title }}" id="cfpMainImgEl">
-      {% else %}<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1" width="20%" style="color:var(--cf-accent);opacity:.3"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>{% endif %}
-    </div>
-    <div class="cfp-thumbs">
-      {% for image in product.images limit: 5 %}
-        <div class="cfp-thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('cfpMainImgEl').src='{{ image | image_url: width: 800 }}';document.querySelectorAll('.cfp-thumb').forEach(t=>t.classList.remove('active'));this.classList.add('active')" style="background-image:url('{{ image | image_url: width: 200 }}')"></div>
-      {% endfor %}
-    </div>
-  </div>
-  <div>
-    {% if section.settings.show_vendor %}<span class="cfp-vendor">{{ product.vendor }}</span>{% endif %}
-    <h1 class="cfp-name">{{ product.title }}</h1>
-    {% if section.settings.show_rating %}
-    <div class="cfp-rating"><span class="cfp-stars">★★★★★</span> 4.8 · {{ section.settings.review_count }}</div>
-    {% endif %}
-    <div class="cfp-price-row">
-      <div class="cfp-price">{{ product.price | money }}</div>
-      {% if product.compare_at_price > product.price %}
-        <div class="cfp-compare">{{ product.compare_at_price | money }}</div>
-        <span class="cfp-save">{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round }}% OFF</span>
-      {% endif %}
-    </div>
-    <p class="cfp-desc">{{ product.description | strip_html | truncate: 280 }}</p>
-    {% unless product.has_only_default_variant %}
-      {% for option in product.options_with_values %}
-        <div class="cfp-label">{{ option.name }}</div>
-        <div class="cfp-variants">{% for value in option.values %}<button class="cfp-var{% if forloop.first %} active{% endif %}">{{ value }}</button>{% endfor %}</div>
-      {% endfor %}
-    {% endunless %}
-    <div class="cfp-qty-row">
-      <div class="cfp-qty">
-        <button onclick="var s=this.nextElementSibling;s.textContent=Math.max(1,+s.textContent-1)">−</button>
-        <span>1</span>
-        <button onclick="var s=this.previousElementSibling;s.textContent=+s.textContent+1">+</button>
+  <div class="cfp-wrap">
+    
+    <!-- Gallery -->
+    <div>
+      <div class="cfp-main-img">
+        {%- assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+        {%- if featured_media != blank -%}
+          <img id="cfpMainImg-{{ section.id }}" src="{{ featured_media | img_url: '1000x' }}" alt="{{ featured_media.alt | escape }}">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag }}
+        {%- endif -%}
       </div>
-      <button class="cfp-atc">{{ section.settings.atc_text }}</button>
+      <div class="cfp-thumbs">
+        {%- for media in product.media limit: 5 -%}
+          <div class="cfp-thumb {% if media.id == featured_media.id %}active{% endif %}" onclick="updateActivewearImg('{{ media | img_url: '1000x' }}', this)">
+            <img src="{{ media | img_url: '200x' }}" alt="{{ media.alt | escape }}">
+          </div>
+        {%- endfor -%}
+      </div>
     </div>
-    {% if section.settings.show_buy_now %}<button class="cfp-buy-now">{{ section.settings.buy_now_text }}</button>{% endif %}
-    <div class="cfp-trust">
-      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>{{ section.settings.trust_1 }}</div>
-      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>{{ section.settings.trust_2 }}</div>
-      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span>{{ section.settings.trust_3 }}</div>
-      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>{{ section.settings.trust_4 }}</div>
+
+    <!-- Product Details -->
+    <div>
+      {%- assign current_variant = product.selected_or_first_available_variant -%}
+      {%- form 'product', product, id: 'ProductForm-activewear', novalidate: 'novalidate' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+        
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+          
+            {%- when 'title' -%}
+              <h1 class="cfp-name" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+            
+            {%- when 'vendor' -%}
+              <span class="cfp-vendor" {{ block.shopify_attributes }}>{{ product.vendor }}</span>
+              
+            {%- when 'rating' -%}
+              <div class="cfp-rating" {{ block.shopify_attributes }}>
+                <span class="cfp-stars">★★★★★</span> 4.8 · {{ block.settings.review_count | default: '1,284 reviews' }}
+              </div>
+
+            {%- when 'price' -%}
+              <div class="cfp-price-row" {{ block.shopify_attributes }}>
+                <div class="cfp-price" id="ActivewearPrice-{{ section.id }}">{{ current_variant.price | money }}</div>
+                <div class="cfp-compare" id="ActivewearCompare-{{ section.id }}" style="{% unless current_variant.compare_at_price > current_variant.price %}display:none;{% endunless %}">{{ current_variant.compare_at_price | money }}</div>
+                <span class="cfp-save {% if current_variant.compare_at_price > current_variant.price %}active{% endif %}" id="ActivewearSave-{{ section.id }}">SAVE</span>
+              </div>
+              
+            {%- when 'description' -%}
+              <p class="cfp-desc" {{ block.shopify_attributes }}>{{ product.description | strip_html | truncate: 280 }}</p>
+
+            {%- when 'variant_picker' -%}
+              {%- unless product.has_only_default_variant -%}
+                <div {{ block.shopify_attributes }}>
+                  {%- for option in product.options_with_values -%}
+                    <div class="cfp-label">{{ option.name }}</div>
+                    <div class="cfp-variants">
+                      {%- for value in option.values -%}
+                        <label class="cfp-var {% if option.selected_value == value %}active{% endif %}">
+                          <input type="radio" name="options[{{ option.name | escape }}]" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} onchange="onActivewearVariant(this)">
+                          {{ value }}
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- endunless -%}
+              
+            {%- when 'buy_buttons' -%}
+              <div {{ block.shopify_attributes }}>
+                <div class="cfp-qty-row">
+                  <div class="cfp-qty">
+                    <button type="button" onclick="document.getElementById('QtyActivewear').stepDown()">−</button>
+                    <input type="number" id="QtyActivewear" name="quantity" value="1" min="1">
+                    <button type="button" onclick="document.getElementById('QtyActivewear').stepUp()">+</button>
+                  </div>
+                  <button type="submit" name="add" class="cfp-atc" id="AddToCartActivewear" {% unless current_variant.available %}disabled{% endunless %}>
+                    <span id="ActivewearBtnText">{%- if current_variant.available -%}{{ block.settings.atc_text | default: 'Add to Cart' }}{%- else -%}Sold Out{%- endif -%}</span>
+                  </button>
+                </div>
+                {%- if block.settings.show_buy_now -%}
+                  {{ form | payment_button }}
+                {%- endif -%}
+              </div>
+
+            {%- when 'trust_badges' -%}
+              <div class="cfp-trust" {{ block.shopify_attributes }}>
+                <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>{{ block.settings.badge_1 }}</div>
+                <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>{{ block.settings.badge_2 }}</div>
+                <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span>{{ block.settings.badge_3 }}</div>
+                <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>{{ block.settings.badge_4 }}</div>
+              </div>
+
+          {%- endcase -%}
+        {%- endfor -%}
+      {%- endform -%}
     </div>
   </div>
 </div>
@@ -123,8 +179,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark
       <table style="width:100%;border-collapse:collapse">
         <tr style="border-bottom:1px solid #f0ece6"><td style="padding:12px 0;color:#888;width:40%">Type</td><td>{{ product.type }}</td></tr>
         <tr style="border-bottom:1px solid #f0ece6"><td style="padding:12px 0;color:#888">Vendor</td><td>{{ product.vendor }}</td></tr>
-        <tr style="border-bottom:1px solid #f0ece6"><td style="padding:12px 0;color:#888">SKU</td><td>{{ product.selected_or_first_available_variant.sku }}</td></tr>
-        <tr><td style="padding:12px 0;color:#888">Availability</td><td>{% if product.available %}In Stock{% else %}Out of Stock{% endif %}</td></tr>
+        <tr style="border-bottom:1px solid #f0ece6"><td style="padding:12px 0;color:#888">SKU</td><td id="ActivewearSKU">{{ current_variant.sku }}</td></tr>
+        <tr><td style="padding:12px 0;color:#888">Availability</td><td id="ActivewearAvail">{% if current_variant.available %}In Stock{% else %}Out of Stock{% endif %}</td></tr>
       </table>
     </div>
     <div id="cfpShip" class="cfp-tab-content"><p>Free standard delivery on orders above ₹999. Express delivery available at checkout. Easy 30-day returns on all products.</p></div>
@@ -147,34 +203,138 @@ body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark
 </div>
 {% endif %}
 
-<script>function cfpTab(btn,id){document.querySelectorAll('.cfp-tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.cfp-tab-content').forEach(c=>c.classList.remove('active'));btn.classList.add('active');document.getElementById('cfp'+id).classList.add('active');}</script>
+<script>
+  var actVariants = {{ product.variants | json }};
+  
+  function updateActivewearImg(url, thumbEl) {
+    document.getElementById('cfpMainImg-{{ section.id }}').src = url;
+    document.querySelectorAll('.cfp-thumb').forEach(function(t) { t.classList.remove('active'); });
+    thumbEl.classList.add('active');
+  }
+  
+  function cfpTab(btn,id){
+    document.querySelectorAll('.cfp-tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.cfp-tab-content').forEach(function(c){c.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('cfp'+id).classList.add('active');
+  }
+
+  function formatMoney(cents) {
+    return '₹' + (cents / 100).toLocaleString('en-IN');
+  }
+
+  function onActivewearVariant(radio) {
+    var siblings = radio.closest('.cfp-variants').querySelectorAll('.cfp-var');
+    siblings.forEach(function(el) { el.classList.remove('active'); });
+    radio.closest('.cfp-var').classList.add('active');
+
+    var form = document.getElementById('ProductForm-activewear');
+    var selects = form.querySelectorAll('input[type="radio"]:checked');
+    var options = Array.from(selects).map(function(el) { return el.value; });
+
+    var matched = actVariants.find(function(v) {
+      return v.options.every(function(val, index) { return val === options[index]; });
+    });
+
+    if (matched) {
+      form.querySelector('input[name="id"]').value = matched.id;
+      
+      var pEl = document.getElementById('ActivewearPrice-{{ section.id }}');
+      var cEl = document.getElementById('ActivewearCompare-{{ section.id }}');
+      var sEl = document.getElementById('ActivewearSave-{{ section.id }}');
+      
+      if(pEl) pEl.innerText = formatMoney(matched.price);
+      if(cEl && sEl) {
+        if(matched.compare_at_price > matched.price) {
+          cEl.innerText = formatMoney(matched.compare_at_price);
+          cEl.style.display = 'block';
+          sEl.classList.add('active');
+        } else {
+          cEl.style.display = 'none';
+          sEl.classList.remove('active');
+        }
+      }
+
+      var btn = document.getElementById('AddToCartActivewear');
+      var btnTxt = document.getElementById('ActivewearBtnText');
+      if (matched.available) {
+        btn.disabled = false;
+        btnTxt.innerText = 'Add to Cart';
+      } else {
+        btn.disabled = true;
+        btnTxt.innerText = 'Sold Out';
+      }
+      
+      var skuEl = document.getElementById('ActivewearSKU');
+      if(skuEl) skuEl.innerText = matched.sku || '';
+      
+      var availEl = document.getElementById('ActivewearAvail');
+      if(availEl) availEl.innerText = matched.available ? 'In Stock' : 'Out of Stock';
+
+      if (matched.featured_image) {
+        document.getElementById('cfpMainImg-{{ section.id }}').src = matched.featured_image.src;
+      }
+      
+      var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?variant=' + matched.id;
+      window.history.replaceState({path: newUrl}, '', newUrl);
+    }
+  }
+</script>
 
 {% schema %}
 {
-  "name": "CF BloomFit PDP",
+  "name": "Activewear Product",
   "settings": [
-    {"type":"header","content":"Brand Colors"},
     {"type":"color","id":"color_accent","label":"Accent Color","default":"#D97B54"},
     {"type":"color","id":"color_bg","label":"Background","default":"#FAF7F4"},
-    {"type":"header","content":"Product Page"},
     {"type":"checkbox","id":"show_breadcrumb","label":"Show Breadcrumb","default":true},
-    {"type":"checkbox","id":"show_vendor","label":"Show Vendor","default":true},
-    {"type":"checkbox","id":"show_rating","label":"Show Rating","default":true},
-    {"type":"text","id":"review_count","label":"Review Count Text","default":"1,284 reviews"},
-    {"type":"header","content":"Buttons"},
-    {"type":"text","id":"atc_text","label":"Add to Cart Text","default":"Add to Cart"},
-    {"type":"checkbox","id":"show_buy_now","label":"Show Buy Now","default":true},
-    {"type":"text","id":"buy_now_text","label":"Buy Now Text","default":"Buy Now"},
-    {"type":"header","content":"Trust Badges"},
-    {"type":"text","id":"trust_1","label":"Badge 1","default":"Authentic & Certified"},
-    {"type":"text","id":"trust_2","label":"Badge 2","default":"Free Delivery"},
-    {"type":"text","id":"trust_3","label":"Badge 3","default":"Easy 30-Day Returns"},
-    {"type":"text","id":"trust_4","label":"Badge 4","default":"Secure Checkout"},
-    {"type":"header","content":"Related Products"},
     {"type":"checkbox","id":"show_related","label":"Show Related Products","default":true},
-    {"type":"text","id":"related_heading","label":"Heading","default":"You May Also Like"},
+    {"type":"text","id":"related_heading","label":"Related Heading","default":"You May Also Like"},
     {"type":"collection","id":"related_collection","label":"Related Collection"}
   ],
-  "presets":[{"name":"CF BloomFit PDP"}]
+  "blocks": [
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { 
+      "type": "rating", "name": "Rating", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "review_count", "label": "Review Text", "default": "1,284 reviews" }
+      ]
+    },
+    { "type": "price", "name": "Price", "limit": 1 },
+    { "type": "description", "name": "Short Description", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant Picker", "limit": 1 },
+    { 
+      "type": "buy_buttons", "name": "Buy Buttons", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "atc_text", "label": "Add to Cart Text", "default": "Add to Cart" },
+        { "type": "checkbox", "id": "show_buy_now", "label": "Show Dynamic Checkout", "default": true }
+      ]
+    },
+    {
+      "type": "trust_badges", "name": "Trust Badges", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "badge_1", "label": "Badge 1", "default": "Authentic & Certified" },
+        { "type": "text", "id": "badge_2", "label": "Badge 2", "default": "Free Delivery" },
+        { "type": "text", "id": "badge_3", "label": "Badge 3", "default": "Easy 30-Day Returns" },
+        { "type": "text", "id": "badge_4", "label": "Badge 4", "default": "Secure Checkout" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Activewear Product",
+      "blocks": [
+        { "type": "vendor" },
+        { "type": "title" },
+        { "type": "rating" },
+        { "type": "price" },
+        { "type": "description" },
+        { "type": "variant_picker" },
+        { "type": "buy_buttons" },
+        { "type": "trust_badges" }
+      ]
+    }
+  ]
 }
 {% endschema %}

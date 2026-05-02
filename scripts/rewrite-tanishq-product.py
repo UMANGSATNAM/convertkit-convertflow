@@ -1,4 +1,8 @@
-{% comment %}
+import os
+
+FILE_PATH = r"i:\converflow app\convertkit-convertflow\extensions\convertkit-sections\sections\cf-tanishq-product.liquid"
+
+liquid_content = """{% comment %}
   ConvertFlow — Tanishq Product Page (Redesigned & Functional)
   Authentic tanishq.co.in product detail page with Full Shopify Logic
 {% endcomment %}
@@ -349,3 +353,9 @@
   ]
 }
 {% endschema %}
+"""
+
+with open(FILE_PATH, "w", encoding="utf-8") as f:
+    f.write(liquid_content)
+
+print("Updated cf-tanishq-product.liquid successfully!")

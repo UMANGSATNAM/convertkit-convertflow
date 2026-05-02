@@ -1,0 +1,59 @@
+{% schema %}
+{
+  "name": "Countdown Banner",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#1a1a1a" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Flash Sale Ends In:" },
+    { "type": "text", "id": "end_date", "label": "End Date", "info": "Format: YYYY-MM-DDTHH:MM", "default": "2026-12-31T23:59" },
+    { "type": "url", "id": "link", "label": "Banner Link" },
+    { "type": "checkbox", "id": "sticky", "label": "Make it sticky at top", "default": false }
+  ],
+  "presets": [{ "name": "Countdown Banner" }]
+}
+{% endschema %}
+
+{%- style -%}
+  .cf-countdown-{{ section.id }} {
+    background: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 20px;
+    text-align: center;
+    font-family: var(--f-body, sans-serif);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    {% if section.settings.sticky %}
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    {% endif %}
+  }
+  .cf-countdown-{{ section.id }} a { color: inherit; text-decoration: none; }
+  .cf-timer { display: flex; gap: 8px; }
+  .cf-timer-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    min-width: 50px;
+  }
+  .cf-timer-num { font-size: 18px; font-weight: 700; line-height: 1; }
+  .cf-timer-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 4px; }
+{%- endstyle -%}
+
+<div class="cf-countdown-{{ section.id }}" data-countdown="{{ section.settings.end_date }}">
+  {%- if section.settings.link != blank -%}<a href="{{ section.settings.link }}" style="display:contents">{%- endif -%}
+    <div style="font-weight:600;font-size:15px;letter-spacing:0.5px;text-transform:uppercase">{{ section.settings.heading }}</div>
+    <div class="cf-timer">
+      <div class="cf-timer-block"><span class="cf-timer-num" data-days>00</span><span class="cf-timer-label">Days</span></div>
+      <div class="cf-timer-block"><span class="cf-timer-num" data-hours>00</span><span class="cf-timer-label">Hrs</span></div>
+      <div class="cf-timer-block"><span class="cf-timer-num" data-minutes>00</span><span class="cf-timer-label">Min</span></div>
+      <div class="cf-timer-block"><span class="cf-timer-num" data-seconds>00</span><span class="cf-timer-label">Sec</span></div>
+    </div>
+  {%- if section.settings.link != blank -%}</a>{%- endif -%}
+</div>
