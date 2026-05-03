@@ -1,117 +1,141 @@
-{% comment %}ConvertFlow — BloomFit Activewear · Cart Page{% endcomment %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--cf-accent:{{ section.settings.color_accent | default: '#D97B54' }};--cf-bg:{{ section.settings.color_bg | default: '#FAF7F4' }};--cf-dark:#1C1A17;}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Outfit',sans-serif;background:var(--cf-bg);color:var(--cf-dark);-webkit-font-smoothing:antialiased}
-.cfc-wrap{max-width:1200px;margin:0 auto;padding:60px;display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:start}
-.cfc-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;margin-bottom:32px;color:var(--cf-dark)}
-.cfc-empty{text-align:center;padding:80px 20px;color:#888}
-.cfc-empty p{font-size:18px;font-weight:600;margin-bottom:8px;color:#333}
-.cfc-empty a{display:inline-block;margin-top:24px;background:var(--cf-accent);color:#fff;padding:14px 36px;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:.5px}
-.cfc-items{display:flex;flex-direction:column;gap:0;background:#fff;border:1px solid #e8e0d8}
-.cfc-item{display:grid;grid-template-columns:90px 1fr auto;gap:20px;padding:24px;align-items:center;border-bottom:1px solid #f0ece6}
-.cfc-item:last-child{border-bottom:none}
-.cfc-item-img{width:90px;height:90px;background:#f2ede7;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.cfc-item-img img{width:100%;height:100%;object-fit:cover}
-.cfc-item-vendor{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cf-accent);margin-bottom:4px}
-.cfc-item-name{font-size:15px;font-weight:600;margin-bottom:4px}
-.cfc-item-props{font-size:12px;color:#888;margin-bottom:12px}
-.cfc-item-qty{display:flex;align-items:center;gap:12px}
-.cfc-item-qty button{width:28px;height:28px;border:1px solid #e8e0d8;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--cf-dark)}
-.cfc-item-qty span{font-size:14px;font-weight:600;min-width:20px;text-align:center}
-.cfc-item-remove{font-size:11px;color:#aaa;text-decoration:underline;cursor:pointer;transition:color .2s}
-.cfc-item-remove:hover{color:#e53e3e}
-.cfc-item-price{font-size:18px;font-weight:700;color:var(--cf-dark);white-space:nowrap}
-.cfc-summary{background:#fff;border:1px solid #e8e0d8;padding:32px;position:sticky;top:24px}
-.cfc-summary h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:24px}
-.cfc-row{display:flex;justify-content:space-between;font-size:14px;color:#555;margin-bottom:12px}
-.cfc-row.total{font-size:18px;font-weight:700;color:var(--cf-dark);padding-top:16px;margin-top:8px;border-top:1px solid #e8e0d8}
-.cfc-promo{display:flex;border:1.5px solid #e8e0d8;overflow:hidden;margin:20px 0}
-.cfc-promo input{flex:1;border:none;padding:12px 16px;font-size:14px;outline:none;font-family:inherit;background:#faf7f4}
-.cfc-promo button{background:var(--cf-accent);color:#fff;border:none;padding:12px 20px;font-size:12px;font-weight:700;cursor:pointer}
-.cfc-checkout{display:block;width:100%;background:var(--cf-dark);color:#fff;border:none;padding:18px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;letter-spacing:1px;text-transform:uppercase;transition:opacity .2s;text-decoration:none;font-family:inherit}
-.cfc-checkout:hover{opacity:.85}
-.cfc-trust{display:flex;flex-direction:column;gap:8px;margin-top:20px}
-.cfc-trust-i{display:flex;align-items:center;gap:8px;font-size:11px;color:#888}
-.cfc-trust-i svg{flex-shrink:0;color:var(--cf-accent)}
-@media(max-width:1024px){.cfc-wrap{grid-template-columns:1fr;padding:30px 20px;gap:30px}}
-</style>
+{% comment %}
+  ConvertFlow — Activewear Cart Page
+  Bold checkout experience with free shipping progress and upsells.
+{% endcomment %}
 
-<div class="cfc-wrap">
-  <div>
-    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Inter:wght@400;600;800&display=swap');
+
+  :root {
+    --aw-primary: {{ section.settings.color_primary | default: '#E2FE16' }};
+    --aw-bg: {{ section.settings.color_bg | default: '#050505' }};
+    --aw-surface: {{ section.settings.color_surface | default: '#111111' }};
+    --aw-border: rgba(255, 255, 255, 0.1);
+    --aw-text: {{ section.settings.color_text | default: '#FFFFFF' }};
+    --aw-font-heading: 'Teko', sans-serif;
+    --aw-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-aw-cart * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-aw-cart { font-family: var(--aw-font-body); background: var(--aw-bg); color: var(--aw-text); min-height: 80vh; }
+  
+  .cf-aw-cart-wrap { max-width: 1200px; margin: 0 auto; padding: 60px 5%; display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start; }
+  
+  .cf-aw-cart-h1 { font-family: var(--aw-font-heading); font-size: 48px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; }
+  
+  /* Free Shipping Bar */
+  .cf-aw-fs { background: var(--aw-surface); padding: 20px; border: 1px solid var(--aw-border); margin-bottom: 30px; }
+  .cf-aw-fs-text { font-size: 14px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .cf-aw-fs-text strong { color: var(--aw-primary); }
+  .cf-aw-fs-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+  .cf-aw-fs-progress { height: 100%; background: var(--aw-primary); width: 75%; transition: width 0.3s; }
+  
+  /* Cart Items */
+  .cf-aw-c-items { background: var(--aw-surface); border: 1px solid var(--aw-border); }
+  .cf-aw-c-item { display: grid; grid-template-columns: 100px 1fr auto; gap: 20px; padding: 24px; border-bottom: 1px solid var(--aw-border); align-items: center; }
+  .cf-aw-c-item:last-child { border-bottom: none; }
+  .cf-aw-c-img { aspect-ratio: 3/4; background: #222; }
+  .cf-aw-c-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cf-aw-c-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .cf-aw-c-var { font-size: 13px; color: #A1A1AA; margin-bottom: 12px; }
+  .cf-aw-c-qty { display: inline-flex; border: 1px solid var(--aw-border); align-items: center; }
+  .cf-aw-c-qty button { background: transparent; border: none; color: var(--aw-text); width: 32px; height: 32px; font-size: 18px; cursor: pointer; }
+  .cf-aw-c-qty span { font-size: 14px; font-weight: 600; width: 32px; text-align: center; }
+  .cf-aw-c-remove { font-size: 12px; color: #A1A1AA; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+  .cf-aw-c-price { font-family: var(--aw-font-heading); font-size: 24px; color: var(--aw-primary); }
+  
+  /* Summary Box */
+  .cf-aw-c-sum { background: var(--aw-surface); border: 1px solid var(--aw-border); padding: 30px; position: sticky; top: 40px; }
+  .cf-aw-c-sum h2 { font-family: var(--aw-font-heading); font-size: 32px; text-transform: uppercase; margin-bottom: 24px; border-bottom: 1px solid var(--aw-border); padding-bottom: 16px; }
+  .cf-aw-c-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 16px; color: #A1A1AA; }
+  .cf-aw-c-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 800; color: #fff; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--aw-border); }
+  .cf-aw-c-total span:last-child { font-family: var(--aw-font-heading); font-size: 32px; color: var(--aw-primary); }
+  
+  .cf-aw-btn-checkout {
+    display: block; width: 100%; text-align: center;
+    background: var(--aw-primary); color: #000; border: none;
+    padding: 18px; font-size: 18px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; cursor: pointer; margin-top: 30px; text-decoration: none;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: transform 0.2s;
+  }
+  .cf-aw-btn-checkout:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(226, 254, 22, 0.2); }
+  
+  .cf-aw-c-empty { text-align: center; padding: 100px 20px; grid-column: 1 / -1; }
+  .cf-aw-c-empty h2 { font-family: var(--aw-font-heading); font-size: 48px; color: var(--aw-primary); margin-bottom: 20px; }
+  .cf-aw-c-empty a { display: inline-block; padding: 14px 32px; background: #fff; color: #000; font-weight: 800; text-transform: uppercase; text-decoration: none; margin-top: 20px; }
+
+  @media(max-width: 900px) {
+    .cf-aw-cart-wrap { grid-template-columns: 1fr; }
+    .cf-aw-c-item { grid-template-columns: 80px 1fr; }
+    .cf-aw-c-price { grid-column: 1 / -1; text-align: right; }
+  }
+{% endstyle %}
+
+<div class="cf-aw-cart">
+  <div class="cf-aw-cart-wrap">
     {% if cart.item_count == 0 %}
-      <div class="cfc-empty">
-        <p>Your bag is empty</p>
-        <span>Looks like you haven't added anything yet.</span>
-        <a href="/collections/all">Continue Shopping</a>
+      <div class="cf-aw-c-empty">
+        <h2>Your Gear Bag is Empty</h2>
+        <p>Looks like you haven't added any performance gear yet.</p>
+        <a href="/collections/all">Shop Now</a>
       </div>
     {% else %}
-      <div class="cfc-items">
-        {% for item in cart.items %}
-          <div class="cfc-item">
-            <div class="cfc-item-img">
-              {% if item.image %}<img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
-              {% else %}<svg width="32" height="32" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>{% endif %}
-            </div>
-            <div>
-              <div class="cfc-item-vendor">{{ item.vendor }}</div>
-              <div class="cfc-item-name">{{ item.product_title }}</div>
-              <div class="cfc-item-props">{{ item.variant_title }}</div>
-              <div class="cfc-item-qty">
-                <button>−</button><span>{{ item.quantity }}</span><button>+</button>
-                <span class="cfc-item-remove">Remove</span>
+      <div>
+        <h1 class="cf-aw-cart-h1">Your Gear Bag</h1>
+        
+        <div class="cf-aw-fs">
+          <div class="cf-aw-fs-text">You are <strong>$25.00</strong> away from <strong>FREE SHIPPING</strong></div>
+          <div class="cf-aw-fs-bar"><div class="cf-aw-fs-progress"></div></div>
+        </div>
+        
+        <div class="cf-aw-c-items">
+          {% for item in cart.items %}
+            <div class="cf-aw-c-item">
+              <div class="cf-aw-c-img">
+                {% if item.image %}
+                  <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">
+                {% endif %}
               </div>
+              <div class="cf-aw-c-info">
+                <h3>{{ item.product.title }}</h3>
+                {% unless item.variant.title contains 'Default' %}
+                  <div class="cf-aw-c-var">{{ item.variant.title }}</div>
+                {% endunless %}
+                <div class="cf-aw-c-qty">
+                  <button>-</button><span>{{ item.quantity }}</span><button>+</button>
+                </div>
+                <br>
+                <a href="{{ item.url_to_remove }}" class="cf-aw-c-remove">Remove</a>
+              </div>
+              <div class="cf-aw-c-price">{{ item.final_line_price | money }}</div>
             </div>
-            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-    {% endif %}
-  </div>
-
-  <div class="cfc-summary">
-    <h2>Order Summary</h2>
-    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
-    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
-    {% if cart.total_discount > 0 %}
-      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>−{{ cart.total_discount | money }}</span></div>
-    {% endif %}
-    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
-    {% if section.settings.show_promo %}
-    <div class="cfc-promo">
-      <input type="text" placeholder="Discount code">
-      <button>Apply</button>
-    </div>
-    {% endif %}
-    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
-    {% if section.settings.show_trust %}
-    <div class="cfc-trust">
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>{{ section.settings.trust_1 }}</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>{{ section.settings.trust_2 }}</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ section.settings.trust_3 }}</div>
-    </div>
+      
+      <div class="cf-aw-c-sum">
+        <h2>Summary</h2>
+        <div class="cf-aw-c-row"><span>Subtotal</span> <span>{{ cart.total_price | money }}</span></div>
+        <div class="cf-aw-c-row"><span>Shipping</span> <span>Calculated at checkout</span></div>
+        <div class="cf-aw-c-total"><span>Total</span> <span>{{ cart.total_price | money }}</span></div>
+        <a href="/checkout" class="cf-aw-btn-checkout">Checkout &rarr;</a>
+      </div>
     {% endif %}
   </div>
 </div>
 
 {% schema %}
 {
-  "name": "CF BloomFit Cart",
+  "name": "CF Activewear Cart",
   "settings": [
-    {"type":"header","content":"Brand Colors"},
-    {"type":"color","id":"color_accent","label":"Accent Color","default":"#D97B54"},
-    {"type":"color","id":"color_bg","label":"Background","default":"#FAF7F4"},
-    {"type":"header","content":"Cart Settings"},
-    {"type":"text","id":"checkout_text","label":"Checkout Button Text","default":"Proceed to Checkout"},
-    {"type":"checkbox","id":"show_promo","label":"Show Promo Code Field","default":true},
-    {"type":"header","content":"Trust Signals"},
-    {"type":"checkbox","id":"show_trust","label":"Show Trust Badges","default":true},
-    {"type":"text","id":"trust_1","label":"Trust Badge 1","default":"Secure SSL Checkout"},
-    {"type":"text","id":"trust_2","label":"Trust Badge 2","default":"Free Returns"},
-    {"type":"text","id":"trust_3","label":"Trust Badge 3","default":"Money-Back Guarantee"}
+    { "type": "color", "id": "color_primary", "label": "Primary Color (Neon)", "default": "#E2FE16" },
+    { "type": "color", "id": "color_bg", "label": "Background Color", "default": "#050505" },
+    { "type": "color", "id": "color_surface", "label": "Surface Color", "default": "#111111" },
+    { "type": "color", "id": "color_text", "label": "Text Color", "default": "#FFFFFF" }
   ],
-  "presets":[{"name":"CF BloomFit Cart"}]
+  "presets": [
+    { "name": "CF Activewear Cart" }
+  ]
 }
 {% endschema %}
