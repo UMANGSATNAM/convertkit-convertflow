@@ -1,202 +1,148 @@
-�{% comment %}ConvertFlow: Tech & Electronics â��⬝ Cart Page{% endcomment %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root { --cf-accent: {{ section.settings.color_accent | default: '#5735db' }}; --cf-bg: {{ section.settings.color_bg | default: '#e9e5f5' }}; }
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
-.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
-.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
-.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
-.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
-.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
-.cfc-empty span { font-size: 14px; }
-.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
-.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
-.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
-.cfc-item:last-child { border-bottom: none; }
-.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
-.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
-.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
-.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
-.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
-.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
-.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
-.cfc-item-remove:hover { color: #e53e3e; }
-.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
-/* Summary */
-.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
-.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
-.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
-.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
-.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
-.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
-.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
-.cfc-checkout:hover { opacity: .9; }
-.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
-.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
-.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
-@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
-</style>
+{% comment %}
+  ConvertFlow — Electronics Cart Page
+  Cyberpunk cart with warranty upsell and glowing neon highlights.
+{% endcomment %}
 
-<div class="cfc-wrap">
-  <div>
-    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+
+  :root {
+    --el-primary: {{ section.settings.color_primary | default: '#00F0FF' }};
+    --el-bg: {{ section.settings.color_bg | default: '#030508' }};
+    --el-surface: {{ section.settings.color_surface | default: '#0C121E' }};
+    --el-border: rgba(0, 240, 255, 0.15);
+    --el-text: {{ section.settings.color_text | default: '#FFFFFF' }};
+    --el-font-heading: 'Rajdhani', sans-serif;
+    --el-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-el-cart * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-el-cart { font-family: var(--el-font-body); background: var(--el-bg); color: var(--el-text); min-height: 80vh; border-top: 1px solid var(--el-border); }
+  
+  .cf-el-cart-wrap { max-width: 1200px; margin: 0 auto; padding: 60px 5%; display: grid; grid-template-columns: 1fr 380px; gap: 40px; }
+  
+  .cf-el-cart-h1 { font-family: var(--el-font-heading); font-size: 48px; font-weight: 700; text-transform: uppercase; margin-bottom: 30px; text-shadow: 0 0 20px rgba(0,240,255,0.2); }
+  
+  /* Items */
+  .cf-el-c-items { background: var(--el-surface); border: 1px solid var(--el-border); }
+  .cf-el-c-item { display: grid; grid-template-columns: 120px 1fr auto; gap: 20px; padding: 24px; border-bottom: 1px solid var(--el-border); align-items: center; }
+  .cf-el-c-item:last-child { border-bottom: none; }
+  
+  .cf-el-c-img { aspect-ratio: 1; background: radial-gradient(circle, #111a28 0%, #030508 100%); display: flex; align-items: center; justify-content: center; padding: 10px; }
+  .cf-el-c-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  
+  .cf-el-c-info h3 { font-family: var(--el-font-heading); font-size: 20px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .cf-el-c-var { font-size: 13px; color: #8B9BB4; margin-bottom: 12px; }
+  
+  .cf-el-c-qty { display: inline-flex; border: 1px solid var(--el-border); align-items: center; }
+  .cf-el-c-qty button { background: transparent; border: none; color: var(--el-primary); width: 30px; height: 30px; font-size: 18px; cursor: pointer; }
+  .cf-el-c-qty span { font-size: 14px; width: 30px; text-align: center; }
+  
+  .cf-el-c-remove { font-size: 12px; color: #8B9BB4; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: none; margin-top: 10px; display: inline-block; transition: color 0.2s; }
+  .cf-el-c-remove:hover { color: #ff3366; }
+  
+  .cf-el-c-price { font-family: var(--el-font-heading); font-size: 24px; color: var(--el-primary); font-weight: 700; }
+  
+  /* Warranty Upsell */
+  .cf-el-c-warranty { margin-top: 30px; background: rgba(0,240,255,0.05); border: 1px solid var(--el-primary); padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .cf-el-c-warranty-text h4 { font-family: var(--el-font-heading); font-size: 18px; text-transform: uppercase; margin-bottom: 4px; color: var(--el-primary); }
+  .cf-el-c-warranty-text p { font-size: 13px; color: #8B9BB4; }
+  .cf-el-btn-sm { background: var(--el-primary); color: #000; border: none; padding: 8px 16px; font-family: var(--el-font-heading); font-weight: 700; text-transform: uppercase; cursor: pointer; }
+  
+  /* Summary Box */
+  .cf-el-c-sum { background: var(--el-surface); border: 1px solid var(--el-border); padding: 30px; position: sticky; top: 40px; }
+  .cf-el-c-sum h2 { font-family: var(--el-font-heading); font-size: 24px; text-transform: uppercase; margin-bottom: 24px; border-bottom: 1px solid var(--el-border); padding-bottom: 16px; color: var(--el-primary); }
+  .cf-el-c-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 16px; color: #8B9BB4; text-transform: uppercase; }
+  .cf-el-c-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #fff; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--el-border); text-transform: uppercase; }
+  .cf-el-c-total span:last-child { font-family: var(--el-font-heading); font-size: 32px; color: var(--el-primary); }
+  
+  .cf-el-btn-checkout {
+    display: block; width: 100%; text-align: center; margin-top: 30px;
+    background: transparent; color: var(--el-primary); border: 1px solid var(--el-primary);
+    padding: 16px; font-family: var(--el-font-heading); font-size: 18px; font-weight: 700; text-transform: uppercase;
+    text-decoration: none; cursor: pointer;
+    box-shadow: inset 0 0 10px rgba(0,240,255,0.1);
+    transition: all 0.3s;
+  }
+  .cf-el-btn-checkout:hover { background: var(--el-primary); color: #000; box-shadow: 0 0 20px rgba(0,240,255,0.3); }
+
+  .cf-el-c-empty { grid-column: 1 / -1; text-align: center; padding: 100px 20px; border: 1px solid var(--el-border); background: var(--el-surface); }
+  .cf-el-c-empty h2 { font-size: 32px; margin-bottom: 20px; color: var(--el-primary); }
+
+  @media(max-width: 900px) {
+    .cf-el-cart-wrap { grid-template-columns: 1fr; }
+    .cf-el-c-item { grid-template-columns: 80px 1fr; }
+    .cf-el-c-price { grid-column: 1 / -1; text-align: right; }
+    .cf-el-c-warranty { flex-direction: column; text-align: center; }
+  }
+{% endstyle %}
+
+<div class="cf-el-cart">
+  <div class="cf-el-cart-wrap">
     {% if cart.item_count == 0 %}
-      <div class="cfc-empty">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <p>Your cart is empty</p>
-        <span>Looks like you haven't added anything yet.</span>
-        <a href="/collections/all">Continue Shopping</a>
+      <div class="cf-el-c-empty">
+        <h2>SYSTEM_EMPTY</h2>
+        <p style="color:#8B9BB4; margin-bottom: 20px;">No hardware modules detected in your cart.</p>
+        <a href="/collections/all" class="cf-el-btn-checkout" style="display:inline-block; width:auto; padding: 12px 30px;">Initialize Catalog</a>
       </div>
     {% else %}
-      <div class="cfc-items">
-        {% for item in cart.items %}
-          <div class="cfc-item">
-            <div class="cfc-item-img">
-              {% if item.image %}
-                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
-              {% else %}
-                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
-              {% endif %}
-            </div>
-            <div>
-              <div class="cfc-item-vendor">{{ item.vendor }}</div>
-              <div class="cfc-item-name">{{ item.product_title }}</div>
-              <div class="cfc-item-props">{{ item.variant_title }}</div>
-              <div class="cfc-item-qty">
-                <button>Ò¢�9⬠â����</button><span>{{ item.quantity }}</span><button>+</button>
-                <span class="cfc-item-remove">Remove</span>
+      <div>
+        <h1 class="cf-el-cart-h1">Active Hardware</h1>
+        <div class="cf-el-c-items">
+          {% for item in cart.items %}
+            <div class="cf-el-c-item">
+              <div class="cf-el-c-img">
+                {% if item.image %}
+                  <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">
+                {% endif %}
               </div>
+              <div class="cf-el-c-info">
+                <h3>{{ item.product.title }}</h3>
+                {% unless item.variant.title contains 'Default' %}
+                  <div class="cf-el-c-var">CONFIG: {{ item.variant.title }}</div>
+                {% endunless %}
+                <div class="cf-el-c-qty">
+                  <button>-</button><span>{{ item.quantity }}</span><button>+</button>
+                </div>
+                <br>
+                <a href="{{ item.url_to_remove }}" class="cf-el-c-remove">Deactivate</a>
+              </div>
+              <div class="cf-el-c-price">{{ item.final_line_price | money }}</div>
             </div>
-            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
+          {% endfor %}
+        </div>
+        
+        <div class="cf-el-c-warranty">
+          <div class="cf-el-c-warranty-text">
+            <h4>Protect Your Hardware</h4>
+            <p>Add 3-Year Extended System Warranty for $99.00.</p>
           </div>
-        {% endfor %}
+          <button class="cf-el-btn-sm">+ ADD PROTECTION</button>
+        </div>
       </div>
-    {% endif %}
-  </div>
-
-  <div class="cfc-summary">
-    <h2>Order Summary</h2>
-    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
-    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
-    {% if cart.total_discount > 0 %}
-      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>Ò¢�9⬠â����{{ cart.total_discount | money }}</span></div>
-    {% endif %}
-    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
-    <div class="cfc-promo">
-      <input type="text" placeholder="Discount code">
-      <button>Apply</button>
-    </div>
-    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
-    {% if section.settings.show_trust %}
-    <div class="cfc-trust">
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
-      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
-    </div>
+      
+      <div class="cf-el-c-sum">
+        <h2>Order Summary</h2>
+        <div class="cf-el-c-row"><span>Hardware Subtotal</span> <span>{{ cart.total_price | money }}</span></div>
+        <div class="cf-el-c-row"><span>Logistics</span> <span>Calculated next step</span></div>
+        <div class="cf-el-c-total"><span>Total Configuration</span> <span>{{ cart.total_price | money }}</span></div>
+        <a href="/checkout" class="cf-el-btn-checkout">Proceed to Secure Checkout</a>
+      </div>
     {% endif %}
   </div>
 </div>
 
 {% schema %}
 {
-  "name": "CF Tech & Electronics Car",
+  "name": "CF Electronics Cart",
   "settings": [
-    {
-      "type": "header",
-      "content": "Brand Colors"
-    },
-    {
-      "type": "color",
-      "id": "color_accent",
-      "label": "Accent Color",
-      "default": "#5735db"
-    },
-    {
-      "type": "color",
-      "id": "color_bg",
-      "label": "Background",
-      "default": "#e9e5f5"
-    },
-    {
-      "type": "header",
-      "content": "Cart Settings"
-    },
-    {
-      "type": "text",
-      "id": "checkout_text",
-      "label": "Checkout Button Text",
-      "default": "Proceed to Checkout"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_promo",
-      "label": "Show Promo Code Field",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "continue_text",
-      "label": "Empty Cart Button Text",
-      "default": "Continue Shopping"
-    },
-    {
-      "type": "header",
-      "content": "Trust Signals"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_trust",
-      "label": "Show Trust Badges",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "trust_1",
-      "label": "Trust Badge 1",
-      "default": "Secure SSL Checkout"
-    },
-    {
-      "type": "text",
-      "id": "trust_2",
-      "label": "Trust Badge 2",
-      "default": "Free Returns"
-    },
-    {
-      "type": "text",
-      "id": "trust_3",
-      "label": "Trust Badge 3",
-      "default": "Money-Back Guarantee"
-    },
-    {
-      "type": "header",
-      "content": "Upsell"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_upsell",
-      "label": "Show Upsell Block",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "upsell_heading",
-      "label": "Upsell Heading",
-      "default": "You might also like"
-    },
-    {
-      "type": "collection",
-      "id": "upsell_collection",
-      "label": "Upsell Collection"
-    }
+    { "type": "color", "id": "color_primary", "label": "Primary Accent (Neon)", "default": "#00F0FF" },
+    { "type": "color", "id": "color_bg", "label": "Background", "default": "#030508" },
+    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#0C121E" },
+    { "type": "color", "id": "color_text", "label": "Text", "default": "#FFFFFF" }
   ],
   "presets": [
-    {
-      "name": "CF Tech & Electronics Car"
-    }
+    { "name": "CF Electronics Cart" }
   ]
 }
 {% endschema %}

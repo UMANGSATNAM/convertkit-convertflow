@@ -1,213 +1,150 @@
-�{% comment %}ConvertFlow: Tech & Electronics Ò¢â�a¬â�� Collection Page{% endcomment %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root { --cf-accent: #5735db; --cf-bg: #e9e5f5; }
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
-.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
-.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
-.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
-.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
-.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
-.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
-.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
-.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
-.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
-.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
-.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
-.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
-.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
-.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
-.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
-.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-.cfcol-info { padding: 18px; }
-.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
-.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
-.cfcol-price { display: flex; align-items: center; gap: 10px; }
-.cfcol-price strong { font-size: 18px; font-weight: 700; }
-.cfcol-price del { font-size: 13px; color: #aaa; }
-.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
-.cfcol-atc:hover { opacity: .88; }
-.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
-.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
-.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
-.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
-@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
-</style>
+{% comment %}
+  ConvertFlow — Electronics Collection Page
+  High-tech grid with filter sidebar.
+{% endcomment %}
 
-<div class="cfcol-banner">
-  <h1>{{ collection.title }}</h1>
-  {% if collection.description != blank %}
-    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
-  {% endif %}
-  <div class="cfcol-count">{{ collection.products_count }} Products</div>
-</div>
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
 
-<div class="cfcol-body">
-  <div class="cfcol-toolbar">
-    <div class="cfcol-filters">
-      <button class="cfcol-filter active">All</button>
-      <button class="cfcol-filter">New Arrivals</button>
-      <button class="cfcol-filter">Best Sellers</button>
-      <button class="cfcol-filter">On Sale</button>
+  :root {
+    --el-primary: {{ section.settings.color_primary | default: '#00F0FF' }};
+    --el-bg: {{ section.settings.color_bg | default: '#030508' }};
+    --el-surface: {{ section.settings.color_surface | default: '#0C121E' }};
+    --el-border: rgba(0, 240, 255, 0.15);
+    --el-text: {{ section.settings.color_text | default: '#FFFFFF' }};
+    --el-font-heading: 'Rajdhani', sans-serif;
+    --el-font-body: 'Inter', sans-serif;
+  }
+
+  .cf-el-c * { box-sizing: border-box; margin: 0; padding: 0; }
+  .cf-el-c { font-family: var(--el-font-body); background: var(--el-bg); color: var(--el-text); border-top: 1px solid var(--el-border); }
+  
+  .cf-el-c-header { padding: 60px 5%; background: radial-gradient(circle at top right, rgba(0,240,255,0.1), transparent 50%); border-bottom: 1px solid var(--el-border); }
+  .cf-el-c-header h1 { font-family: var(--el-font-heading); font-size: clamp(40px, 6vw, 64px); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 0 20px rgba(0,240,255,0.2); }
+  .cf-el-c-header p { color: #8B9BB4; max-width: 600px; font-size: 15px; }
+  
+  .cf-el-c-wrap { display: grid; grid-template-columns: 250px 1fr; max-width: 1400px; margin: 0 auto; min-height: 70vh; }
+  
+  /* Sidebar */
+  .cf-el-c-sidebar { border-right: 1px solid var(--el-border); padding: 40px 30px; background: var(--el-surface); }
+  .cf-el-c-filter-group { margin-bottom: 30px; }
+  .cf-el-c-filter-title { font-family: var(--el-font-heading); font-size: 18px; font-weight: 600; text-transform: uppercase; color: var(--el-primary); margin-bottom: 16px; letter-spacing: 1px; }
+  .cf-el-c-filter-list { list-style: none; }
+  .cf-el-c-filter-list li { margin-bottom: 10px; font-size: 14px; color: #8B9BB4; cursor: pointer; transition: color 0.2s; display: flex; align-items: center; gap: 10px; }
+  .cf-el-c-filter-list li:hover, .cf-el-c-filter-list li.active { color: var(--el-text); }
+  .cf-el-c-filter-list li::before { content: ''; display: inline-block; width: 12px; height: 12px; border: 1px solid var(--el-border); }
+  .cf-el-c-filter-list li.active::before { background: var(--el-primary); box-shadow: 0 0 10px var(--el-primary); border-color: var(--el-primary); }
+  
+  /* Grid */
+  .cf-el-c-main { padding: 40px; }
+  .cf-el-c-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--el-border); }
+  .cf-el-c-toolbar-count { font-family: var(--el-font-heading); font-size: 16px; font-weight: 600; color: #8B9BB4; text-transform: uppercase; }
+  .cf-el-c-sort select { background: var(--el-surface); color: var(--el-primary); border: 1px solid var(--el-primary); padding: 10px 16px; font-family: var(--el-font-heading); font-size: 14px; font-weight: 600; text-transform: uppercase; outline: none; cursor: pointer; }
+  
+  .cf-el-c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+  .cf-el-prod { background: var(--el-surface); border: 1px solid var(--el-border); padding: 20px; text-decoration: none; transition: all 0.3s; position: relative; display: flex; flex-direction: column; }
+  .cf-el-prod:hover { border-color: var(--el-primary); box-shadow: 0 0 20px rgba(0,240,255,0.1); transform: translateY(-3px); }
+  
+  .cf-el-prod-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #111a28 0%, #030508 100%); margin-bottom: 20px; padding: 20px; }
+  .cf-el-prod-img img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); transition: transform 0.5s; }
+  .cf-el-prod:hover .cf-el-prod-img img { transform: scale(1.05); }
+  
+  .cf-el-prod-tag { position: absolute; top: 10px; right: 10px; font-family: var(--el-font-heading); font-size: 12px; font-weight: 600; color: #000; background: var(--el-primary); padding: 2px 8px; text-transform: uppercase; z-index: 2; }
+  
+  .cf-el-prod-title { font-family: var(--el-font-heading); font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 8px; text-transform: uppercase; }
+  .cf-el-prod-price { color: var(--el-primary); font-family: var(--el-font-heading); font-size: 22px; font-weight: 700; margin-top: auto; }
+
+  @media(max-width: 1024px) {
+    .cf-el-c-wrap { grid-template-columns: 1fr; }
+    .cf-el-c-sidebar { border-right: none; border-bottom: 1px solid var(--el-border); display: flex; gap: 40px; overflow-x: auto; }
+  }
+{% endstyle %}
+
+<div class="cf-el-c">
+  <div class="cf-el-c-header">
+    <h1>{{ collection.title | default: 'Hardware Catalog' }}</h1>
+    {% if collection.description != blank %}
+      <p>{{ collection.description | strip_html | truncate: 150 }}</p>
+    {% endif %}
+  </div>
+  
+  <div class="cf-el-c-wrap">
+    <div class="cf-el-c-sidebar">
+      <div class="cf-el-c-filter-group">
+        <div class="cf-el-c-filter-title">Category</div>
+        <ul class="cf-el-c-filter-list">
+          <li class="active">All Devices</li>
+          <li>Processing Units</li>
+          <li>Display Tech</li>
+          <li>Audio Systems</li>
+        </ul>
+      </div>
+      <div class="cf-el-c-filter-group">
+        <div class="cf-el-c-filter-title">Status</div>
+        <ul class="cf-el-c-filter-list">
+          <li>In Stock</li>
+          <li>Pre-order</li>
+          <li>New Releases</li>
+        </ul>
+      </div>
     </div>
-    <div class="cfcol-sort">
-      <select name="sort_by">
-        <option value="featured">Sort: Featured</option>
-        <option value="price-ascending">Price: Low to High</option>
-        <option value="price-descending">Price: High to Low</option>
-        <option value="created-descending">Newest</option>
-      </select>
+    
+    <div class="cf-el-c-main">
+      <div class="cf-el-c-toolbar">
+        <div class="cf-el-c-toolbar-count">{{ collection.products_count | default: '0' }} Modules Found</div>
+        <div class="cf-el-c-sort">
+          <select>
+            <option>Sort: Default Configuration</option>
+            <option>Sort: Price (Ascending)</option>
+            <option>Sort: Price (Descending)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="cf-el-c-grid">
+        {% if collection.products.size > 0 %}
+          {% for product in collection.products %}
+            <a href="{{ product.url }}" class="cf-el-prod">
+              {% if product.available == false %}
+                <div class="cf-el-prod-tag" style="background:#555; color:#fff;">Offline</div>
+              {% elsif product.compare_at_price > product.price %}
+                <div class="cf-el-prod-tag">Upgrade Offer</div>
+              {% endif %}
+              
+              <div class="cf-el-prod-img">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
+                {% endif %}
+              </div>
+              <div class="cf-el-prod-title">{{ product.title }}</div>
+              <div class="cf-el-prod-price">{{ product.price | money }}</div>
+            </a>
+          {% endfor %}
+        {% else %}
+          {% for i in (1..6) %}
+            <a href="#" class="cf-el-prod">
+              <div class="cf-el-prod-img"><div style="width:100px; height:100px; background:rgba(255,255,255,0.05);"></div></div>
+              <div class="cf-el-prod-title">System Module 0{{ i }}</div>
+              <div class="cf-el-prod-price">$499.00</div>
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
     </div>
   </div>
-
-  {% if collection.products.size > 0 %}
-    <div class="cfcol-grid">
-      {% for product in collection.products %}
-        <a href="{{ product.url }}" class="cfcol-card">
-          <div class="cfcol-img">
-            {% if product.featured_image %}
-              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
-            {% else %}
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
-            {% endif %}
-            {% if product.available == false %}
-              <span class="cfcol-badge">Sold Out</span>
-            {% elsif product.compare_at_price > product.price %}
-              <span class="cfcol-badge">Sale</span>
-            {% endif %}
-          </div>
-          <div class="cfcol-info">
-            <div class="cfcol-vendor">{{ product.vendor }}</div>
-            <div class="cfcol-title">{{ product.title }}</div>
-            <div class="cfcol-price">
-              <strong>{{ product.price | money }}</strong>
-              {% if product.compare_at_price > product.price %}
-                <del>{{ product.compare_at_price | money }}</del>
-              {% endif %}
-            </div>
-          </div>
-          <button class="cfcol-atc">Add to Cart</button>
-        </a>
-      {% endfor %}
-    </div>
-
-    {% if paginate.pages > 1 %}
-      {% paginate collection.products by 16 %}
-        <div class="cfcol-pagination">
-          {% for page in (1..paginate.pages) %}
-            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
-          {% endfor %}
-        </div>
-      {% endpaginate %}
-    {% endif %}
-  {% else %}
-    <div class="cfcol-empty">No products found in this collection.</div>
-  {% endif %}
 </div>
 
 {% schema %}
 {
-  "name": "CF Tech & Electronics Col",
+  "name": "CF Electronics Collection",
   "settings": [
-    {
-      "type": "header",
-      "content": "Brand Colors"
-    },
-    {
-      "type": "color",
-      "id": "color_accent",
-      "label": "Accent Color",
-      "default": "#5735db"
-    },
-    {
-      "type": "color",
-      "id": "color_bg",
-      "label": "Background",
-      "default": "#e9e5f5"
-    },
-    {
-      "type": "header",
-      "content": "Banner"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_banner",
-      "label": "Show Collection Banner",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "banner_image",
-      "label": "Banner Background Image"
-    },
-    {
-      "type": "header",
-      "content": "Grid"
-    },
-    {
-      "type": "range",
-      "id": "grid_cols",
-      "label": "Products per Row (Desktop)",
-      "min": 2,
-      "max": 5,
-      "step": 1,
-      "default": 4
-    },
-    {
-      "type": "range",
-      "id": "products_per_page",
-      "label": "Products per Page",
-      "min": 8,
-      "max": 48,
-      "step": 4,
-      "default": 16
-    },
-    {
-      "type": "header",
-      "content": "Filters & Sort"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_sort",
-      "label": "Show Sort Dropdown",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_filters",
-      "label": "Show Filter Buttons",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Cards"
-    },
-    {
-      "type": "text",
-      "id": "atc_text",
-      "label": "Add to Cart Text",
-      "default": "Add to Cart"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "Show Vendor",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_compare_price",
-      "label": "Show Compare Price",
-      "default": true
-    }
+    { "type": "color", "id": "color_primary", "label": "Primary Accent (Neon)", "default": "#00F0FF" },
+    { "type": "color", "id": "color_bg", "label": "Background", "default": "#030508" },
+    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#0C121E" },
+    { "type": "color", "id": "color_text", "label": "Text", "default": "#FFFFFF" }
   ],
   "presets": [
-    {
-      "name": "CF Tech & Electronics Col"
-    }
+    { "name": "CF Electronics Collection" }
   ]
 }
 {% endschema %}
