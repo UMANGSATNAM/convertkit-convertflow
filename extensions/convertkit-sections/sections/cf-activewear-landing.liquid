@@ -1,338 +1,247 @@
-{% comment %}
-  ConvertFlow — Activewear Landing Page
-  High-energy, fitness-oriented layout with Video Hero, Performance Specs, and Dynamic Grids.
-{% endcomment %}
+{% comment %} ConvertFlow — Activewear Landing | Always-Visible, No Blocks Required {% endcomment %}
 
 {% style %}
   @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Inter:wght@400;600;800&display=swap');
+  .cf-aw*{box-sizing:border-box;margin:0;padding:0}
+  .cf-aw{font-family:'Inter',sans-serif;background:#050505;color:#fff;overflow-x:hidden}
 
-  :root {
-    --aw-primary: {{ section.settings.color_primary | default: '#E2FE16' }}; /* Neon Yellow */
-    --aw-bg: {{ section.settings.color_bg | default: '#050505' }};
-    --aw-surface: {{ section.settings.color_surface | default: '#111111' }};
-    --aw-text: {{ section.settings.color_text | default: '#FFFFFF' }};
-    --aw-text-dim: #A1A1AA;
-    --aw-font-heading: 'Teko', sans-serif;
-    --aw-font-body: 'Inter', sans-serif;
-  }
+  /* ═══ HERO ═══ */
+  .cf-aw-hero{position:relative;min-height:92vh;display:flex;align-items:center;padding:0 6%}
+  .cf-aw-hero-bg{position:absolute;inset:0}
+  .cf-aw-hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.55}
+  .cf-aw-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,rgba(5,5,5,.96) 40%,rgba(5,5,5,.2) 100%)}
+  .cf-aw-hero-inner{position:relative;z-index:2;max-width:740px}
+  .cf-aw-tag{display:inline-block;background:#E2FE16;color:#000;font-family:'Teko',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:4px 14px;margin-bottom:24px}
+  .cf-aw-h1{font-family:'Teko',sans-serif;font-size:clamp(64px,10vw,130px);line-height:.95;text-transform:uppercase;color:#fff;margin-bottom:20px}
+  .cf-aw-h1 em{font-style:normal;color:#E2FE16;display:block}
+  .cf-aw-p{font-size:18px;color:#bbb;margin-bottom:40px;max-width:500px;line-height:1.6}
+  .cf-aw-cta-row{display:flex;gap:16px;flex-wrap:wrap}
+  .cf-aw-btn{display:inline-flex;align-items:center;gap:8px;padding:16px 36px;font-family:'Teko',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer;border:none;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:all .3s}
+  .cf-aw-btn-fill{background:#E2FE16;color:#000}
+  .cf-aw-btn-fill:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(226,254,22,.35)}
+  .cf-aw-btn-ghost{background:transparent;color:#E2FE16;border:2px solid #E2FE16}
+  .cf-aw-btn-ghost:hover{background:#E2FE16;color:#000}
 
-  .cf-aw * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-aw { font-family: var(--aw-font-body); background: var(--aw-bg); color: var(--aw-text); overflow-x: hidden; }
-  .cf-aw h1, .cf-aw h2, .cf-aw h3 { font-family: var(--aw-font-heading); text-transform: uppercase; line-height: 1.1; }
+  /* ═══ TICKER ═══ */
+  .cf-aw-ticker{background:#E2FE16;overflow:hidden;padding:10px 0;white-space:nowrap}
+  .cf-aw-ticker-track{display:inline-flex;animation:aw-ticker 28s linear infinite;gap:0}
+  .cf-aw-ticker-track span{font-family:'Teko',sans-serif;font-size:18px;font-weight:700;color:#000;letter-spacing:2px;text-transform:uppercase;padding:0 40px}
+  .cf-aw-ticker-track span::after{content:'//';margin-left:40px;color:rgba(0,0,0,.3)}
+  @keyframes aw-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ═══ STATS ═══ */
+  .cf-aw-stats{display:grid;grid-template-columns:repeat(4,1fr);background:#0F0F0F;border-top:1px solid #222;border-bottom:1px solid #222}
+  .cf-aw-stat{padding:40px 24px;text-align:center;border-right:1px solid #222}
+  .cf-aw-stat:last-child{border-right:none}
+  .cf-aw-stat-num{font-family:'Teko',sans-serif;font-size:56px;font-weight:700;color:#E2FE16;line-height:1}
+  .cf-aw-stat-label{font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#666;margin-top:8px}
+
+  /* ═══ PRODUCT CARDS ═══ */
+  .cf-aw-products{padding:80px 6%}
+  .cf-aw-products-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:50px}
+  .cf-aw-products-head h2{font-family:'Teko',sans-serif;font-size:clamp(40px,5vw,60px);text-transform:uppercase;line-height:1}
+  .cf-aw-products-head a{color:#E2FE16;font-size:13px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid #E2FE16;padding-bottom:2px}
+  .cf-aw-prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
   
-  /* Buttons */
-  .cf-aw-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    background: var(--aw-primary); color: #000;
-    padding: 16px 32px; font-size: 16px; font-weight: 800; text-transform: uppercase;
-    text-decoration: none; border: none; cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 1px;
-    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  }
-  .cf-aw-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(226, 254, 22, 0.2); }
-  .cf-aw-btn-outline { background: transparent; color: var(--aw-primary); border: 2px solid var(--aw-primary); }
-  .cf-aw-btn-outline:hover { background: var(--aw-primary); color: #000; }
+  /* Activewear card: dark, angular, badge-heavy */
+  .cf-aw-card{position:relative;background:#111;overflow:hidden;text-decoration:none;color:#fff;display:block}
+  .cf-aw-card-img{aspect-ratio:3/4;overflow:hidden;position:relative}
+  .cf-aw-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+  .cf-aw-card:hover .cf-aw-card-img img{transform:scale(1.08)}
+  .cf-aw-card-badge{position:absolute;top:12px;left:0;background:#E2FE16;color:#000;font-family:'Teko',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:4px 12px;text-transform:uppercase;z-index:2}
+  .cf-aw-card-quick{position:absolute;bottom:0;left:0;right:0;background:#E2FE16;color:#000;font-family:'Teko',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;text-transform:uppercase;padding:12px;text-align:center;transform:translateY(100%);transition:transform .3s ease;z-index:3}
+  .cf-aw-card:hover .cf-aw-card-quick{transform:translateY(0)}
+  .cf-aw-card-info{padding:16px}
+  .cf-aw-card-title{font-family:'Teko',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cf-aw-card-price{font-size:16px;color:#E2FE16;font-weight:700}
 
-  /* ── Blocks ── */
-  
-  /* Hero Video/Image */
-  .cf-aw-hero { position: relative; min-height: 90vh; display: flex; align-items: center; padding: 5%; overflow: hidden; }
-  .cf-aw-hero-bg { position: absolute; inset: 0; z-index: 1; }
-  .cf-aw-hero-bg img, .cf-aw-hero-bg video { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
-  .cf-aw-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 100%); z-index: 2; }
-  .cf-aw-hero-content { position: relative; z-index: 3; max-width: 800px; }
-  .cf-aw-hero-tag { display: inline-block; background: var(--aw-primary); color: #000; padding: 4px 12px; font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 2px; }
-  .cf-aw-hero-title { font-size: clamp(60px, 10vw, 120px); font-weight: 700; margin-bottom: 20px; color: #fff; text-shadow: 2px 2px 0px rgba(226, 254, 22, 0.3); }
-  .cf-aw-hero-title span { color: var(--aw-primary); }
-  .cf-aw-hero-text { font-size: clamp(16px, 2vw, 20px); color: #ddd; margin-bottom: 40px; max-width: 600px; line-height: 1.6; }
-  .cf-aw-hero-actions { display: flex; gap: 20px; flex-wrap: wrap; }
+  /* ═══ FEATURES ═══ */
+  .cf-aw-features{background:#0F0F0F;padding:80px 6%}
+  .cf-aw-features-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;max-width:1400px;margin:80px auto 0}
+  .cf-aw-feat{position:relative;overflow:hidden;aspect-ratio:16/9}
+  .cf-aw-feat:first-child{grid-column:span 2;aspect-ratio:21/9}
+  .cf-aw-feat img{width:100%;height:100%;object-fit:cover;transition:transform .8s;opacity:.7}
+  .cf-aw-feat:hover img{transform:scale(1.04)}
+  .cf-aw-feat::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9),transparent 50%)}
+  .cf-aw-feat-text{position:absolute;bottom:30px;left:30px;z-index:2}
+  .cf-aw-feat-cat{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#E2FE16;margin-bottom:8px}
+  .cf-aw-feat-title{font-family:'Teko',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase}
 
-  /* Performance Specs */
-  .cf-aw-specs { padding: 80px 5%; background: var(--aw-surface); border-top: 1px solid rgba(255,255,255,0.05); }
-  .cf-aw-specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; }
-  .cf-aw-spec-item { display: flex; gap: 20px; align-items: flex-start; }
-  .cf-aw-spec-icon { width: 60px; height: 60px; background: rgba(226, 254, 22, 0.1); color: var(--aw-primary); display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0; font-size: 24px; }
-  .cf-aw-spec-info h3 { font-size: 28px; margin-bottom: 8px; letter-spacing: 1px; }
-  .cf-aw-spec-info p { color: var(--aw-text-dim); font-size: 15px; line-height: 1.6; }
+  /* ═══ SECTION HEAD ═══ */
+  .cf-aw-section-head{text-align:center;max-width:700px;margin:0 auto}
+  .cf-aw-section-head .sub{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#E2FE16;margin-bottom:12px}
+  .cf-aw-section-head h2{font-family:'Teko',sans-serif;font-size:clamp(40px,5vw,64px);text-transform:uppercase}
 
-  /* Grid Categories */
-  .cf-aw-cats { padding: 100px 5%; }
-  .cf-aw-section-header { text-align: center; margin-bottom: 60px; }
-  .cf-aw-section-header h2 { font-size: clamp(40px, 6vw, 64px); letter-spacing: 2px; }
-  .cf-aw-section-header p { color: var(--aw-primary); font-family: var(--aw-font-heading); font-size: 24px; text-transform: uppercase; letter-spacing: 4px; }
-  .cf-aw-cats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1400px; margin: 0 auto; }
-  .cf-aw-cat-card { position: relative; aspect-ratio: 4/5; overflow: hidden; text-decoration: none; group; display: block; }
-  .cf-aw-cat-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; opacity: 0.8; }
-  .cf-aw-cat-card:hover img { transform: scale(1.1); opacity: 0.5; }
-  .cf-aw-cat-content { position: absolute; inset: 0; padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 60%); }
-  .cf-aw-cat-content h3 { font-size: 48px; color: #fff; margin-bottom: 10px; transform: translateY(20px); transition: transform 0.4s ease; }
-  .cf-aw-cat-content span { color: var(--aw-primary); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
-  .cf-aw-cat-card:hover .cf-aw-cat-content h3 { transform: translateY(0); }
-  .cf-aw-cat-card:hover .cf-aw-cat-content span { opacity: 1; transform: translateY(0); }
+  /* ═══ CTA BANNER ═══ */
+  .cf-aw-cta-banner{background:#E2FE16;padding:80px 6%;text-align:center}
+  .cf-aw-cta-banner h2{font-family:'Teko',sans-serif;font-size:clamp(48px,7vw,90px);font-weight:700;text-transform:uppercase;color:#000;line-height:1;margin-bottom:30px}
+  .cf-aw-cta-banner p{font-size:18px;color:#333;margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto}
+  .cf-aw-cta-banner .cf-aw-btn-fill{background:#000;color:#E2FE16}
 
-  /* Featured Products Slider (CSS Scroll) */
-  .cf-aw-prods { padding: 100px 0; background: var(--aw-surface); overflow: hidden; }
-  .cf-aw-prods-inner { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
-  .cf-aw-prods-scroll { display: flex; gap: 30px; overflow-x: auto; padding-bottom: 40px; scroll-snap-type: x mandatory; scrollbar-color: var(--aw-primary) #222; scrollbar-width: thin; }
-  .cf-aw-prod-card { flex: 0 0 clamp(280px, 30vw, 350px); scroll-snap-align: start; background: var(--aw-bg); border: 1px solid rgba(255,255,255,0.05); transition: border-color 0.3s; }
-  .cf-aw-prod-card:hover { border-color: var(--aw-primary); }
-  .cf-aw-prod-img { aspect-ratio: 3/4; background: #111; position: relative; overflow: hidden; }
-  .cf-aw-prod-img img { width: 100%; height: 100%; object-fit: cover; }
-  .cf-aw-prod-badge { position: absolute; top: 16px; left: 16px; background: var(--aw-primary); color: #000; padding: 4px 12px; font-size: 12px; font-weight: 800; text-transform: uppercase; }
-  .cf-aw-prod-info { padding: 24px; }
-  .cf-aw-prod-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #fff; }
-  .cf-aw-prod-price { font-size: 24px; font-family: var(--aw-font-heading); color: var(--aw-primary); margin-bottom: 16px; }
-  .cf-aw-prod-btn { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); font-weight: 800; text-transform: uppercase; cursor: pointer; transition: all 0.3s; font-size: 14px; letter-spacing: 1px; }
-  .cf-aw-prod-card:hover .cf-aw-prod-btn { background: var(--aw-primary); color: #000; border-color: var(--aw-primary); }
-
-  /* Motivation Banner */
-  .cf-aw-banner { padding: 120px 5%; background: var(--aw-primary); color: #000; text-align: center; position: relative; overflow: hidden; }
-  .cf-aw-banner h2 { font-size: clamp(60px, 12vw, 150px); line-height: 0.9; margin-bottom: 30px; mix-blend-mode: overlay; opacity: 0.8; }
-  .cf-aw-banner p { font-size: clamp(18px, 3vw, 24px); font-weight: 800; text-transform: uppercase; max-width: 800px; margin: 0 auto 40px; }
-
-  @media (max-width: 1024px) {
-    .cf-aw-cats-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .cf-aw-cats-grid { grid-template-columns: 1fr; }
-    .cf-aw-hero-actions { flex-direction: column; }
-    .cf-aw-btn { width: 100%; }
+  @media(max-width:900px){
+    .cf-aw-stats{grid-template-columns:repeat(2,1fr)}
+    .cf-aw-prod-grid{grid-template-columns:repeat(2,1fr)}
+    .cf-aw-features-grid{grid-template-columns:1fr}
+    .cf-aw-feat:first-child{grid-column:span 1;aspect-ratio:16/9}
+    .cf-aw-products-head{flex-direction:column;gap:20px;align-items:flex-start}
   }
 {% endstyle %}
 
 <div class="cf-aw">
-  {% for block in section.blocks %}
-    {% case block.type %}
-      
-      {% when 'hero' %}
-        <section class="cf-aw-hero">
-          <div class="cf-aw-hero-bg">
-            {% if block.settings.video_url != blank %}
-              <video src="{{ block.settings.video_url }}" autoplay loop muted playsinline></video>
-            {% elsif block.settings.image != blank %}
-              <img src="{{ block.settings.image | img_url: 'master' }}" alt="Hero">
-            {% else %}
-              <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/activewear-hero-bg.jpg" alt="Activewear">
-            {% endif %}
-          </div>
-          <div class="cf-aw-hero-overlay"></div>
-          <div class="cf-aw-hero-content">
-            {% if block.settings.tag != blank %}
-              <div class="cf-aw-hero-tag">{{ block.settings.tag }}</div>
-            {% endif %}
-            <h1 class="cf-aw-hero-title">{{ block.settings.title }}</h1>
-            <p class="cf-aw-hero-text">{{ block.settings.text }}</p>
-            <div class="cf-aw-hero-actions">
-              <a href="{{ block.settings.btn_1_url }}" class="cf-aw-btn">{{ block.settings.btn_1_text }} <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-              {% if block.settings.btn_2_text != blank %}
-                <a href="{{ block.settings.btn_2_url }}" class="cf-aw-btn cf-aw-btn-outline">{{ block.settings.btn_2_text }}</a>
-              {% endif %}
-            </div>
-          </div>
-        </section>
 
-      {% when 'specs' %}
-        <section class="cf-aw-specs">
-          <div class="cf-aw-specs-grid">
-            <div class="cf-aw-spec-item">
-              <div class="cf-aw-spec-icon">
-                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-              <div class="cf-aw-spec-info">
-                <h3>{{ block.settings.spec_1_title }}</h3>
-                <p>{{ block.settings.spec_1_text }}</p>
-              </div>
-            </div>
-            <div class="cf-aw-spec-item">
-              <div class="cf-aw-spec-icon">
-                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg>
-              </div>
-              <div class="cf-aw-spec-info">
-                <h3>{{ block.settings.spec_2_title }}</h3>
-                <p>{{ block.settings.spec_2_text }}</p>
-              </div>
-            </div>
-            <div class="cf-aw-spec-item">
-              <div class="cf-aw-spec-icon">
-                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              </div>
-              <div class="cf-aw-spec-info">
-                <h3>{{ block.settings.spec_3_title }}</h3>
-                <p>{{ block.settings.spec_3_text }}</p>
-              </div>
-            </div>
-          </div>
-        </section>
+  {%- comment -%} HERO {%- endcomment -%}
+  <section class="cf-aw-hero">
+    <div class="cf-aw-hero-bg">
+      {% if section.settings.hero_image != blank %}
+        <img src="{{ section.settings.hero_image | img_url: 'master' }}" alt="Activewear Hero">
+      {% else %}
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&auto=format&fit=crop" alt="Activewear">
+      {% endif %}
+    </div>
+    <div class="cf-aw-hero-inner">
+      <div class="cf-aw-tag">{{ section.settings.hero_tag | default: 'New Season Drop' }}</div>
+      <h1 class="cf-aw-h1">
+        {{ section.settings.hero_headline | default: 'Built For' }}
+        <em>{{ section.settings.hero_subline | default: 'Champions' }}</em>
+      </h1>
+      <p class="cf-aw-p">{{ section.settings.hero_text | default: 'Performance gear engineered to push every limit. Train harder, move faster, recover smarter.' }}</p>
+      <div class="cf-aw-cta-row">
+        <a href="{{ section.settings.btn1_url | default: '/collections/all' }}" class="cf-aw-btn cf-aw-btn-fill">{{ section.settings.btn1_text | default: 'Shop Collection' }}</a>
+        <a href="{{ section.settings.btn2_url | default: '/pages/lookbook' }}" class="cf-aw-btn cf-aw-btn-ghost">{{ section.settings.btn2_text | default: 'View Lookbook' }}</a>
+      </div>
+    </div>
+  </section>
 
-      {% when 'categories' %}
-        <section class="cf-aw-cats">
-          <div class="cf-aw-section-header">
-            <p>Gear Up</p>
-            <h2>{{ block.settings.heading }}</h2>
-          </div>
-          <div class="cf-aw-cats-grid">
-            {% for i in (1..3) %}
-              {% capture title %}cat_{{ i }}_title{% endcapture %}
-              {% capture img %}cat_{{ i }}_img{% endcapture %}
-              {% capture link %}cat_{{ i }}_url{% endcapture %}
-              
-              <a href="{{ block.settings[link] }}" class="cf-aw-cat-card">
-                {% if block.settings[img] != blank %}
-                  <img src="{{ block.settings[img] | img_url: '800x' }}" alt="{{ block.settings[title] }}">
-                {% else %}
-                  <div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center;">Placeholder</div>
-                {% endif %}
-                <div class="cf-aw-cat-content">
-                  <h3>{{ block.settings[title] }}</h3>
-                  <span>Shop Collection &rarr;</span>
-                </div>
-              </a>
-            {% endfor %}
-          </div>
-        </section>
+  {%- comment -%} TICKER {%- endcomment -%}
+  <div class="cf-aw-ticker">
+    <div class="cf-aw-ticker-track">
+      {% assign t = 'Free Shipping on Orders Over ₹999 // New Drop: AeroFlex Pro // 30-Day Returns // Athlete-Tested Gear // Free Shipping on Orders Over ₹999 // New Drop: AeroFlex Pro // 30-Day Returns // Athlete-Tested Gear //' %}
+      {% assign tparts = t | split: '//' %}
+      {% for i in (1..2) %}{% for part in tparts %}<span>{{ part | strip }}</span>{% endfor %}{% endfor %}
+    </div>
+  </div>
 
-      {% when 'products' %}
-        <section class="cf-aw-prods">
-          <div class="cf-aw-prods-inner">
-            <div class="cf-aw-section-header">
-              <p>Top Rated</p>
-              <h2>{{ block.settings.heading }}</h2>
+  {%- comment -%} STATS {%- endcomment -%}
+  <div class="cf-aw-stats">
+    <div class="cf-aw-stat"><div class="cf-aw-stat-num">2M+</div><div class="cf-aw-stat-label">Athletes Trust Us</div></div>
+    <div class="cf-aw-stat"><div class="cf-aw-stat-num">150+</div><div class="cf-aw-stat-label">Performance Styles</div></div>
+    <div class="cf-aw-stat"><div class="cf-aw-stat-num">48h</div><div class="cf-aw-stat-label">Fast Dispatch</div></div>
+    <div class="cf-aw-stat"><div class="cf-aw-stat-num">4.9★</div><div class="cf-aw-stat-label">Avg. Rating</div></div>
+  </div>
+
+  {%- comment -%} PRODUCTS {%- endcomment -%}
+  <section class="cf-aw-products">
+    <div class="cf-aw-products-head">
+      <h2>{{ section.settings.prods_heading | default: 'Top Performers' }}</h2>
+      <a href="{{ section.settings.prods_link | default: '/collections/all' }}">View All →</a>
+    </div>
+    <div class="cf-aw-prod-grid">
+      {% assign coll = section.settings.featured_collection %}
+      {% if coll != blank and coll.products_count > 0 %}
+        {% for p in coll.products limit: 4 %}
+          <a href="{{ p.url }}" class="cf-aw-card">
+            <div class="cf-aw-card-img">
+              {% if p.featured_image %}<img src="{{ p.featured_image | img_url: '600x' }}" alt="{{ p.title }}">{% endif %}
+              {% if p.compare_at_price > p.price %}<span class="cf-aw-card-badge">Sale</span>{% endif %}
+              <div class="cf-aw-card-quick">Quick Add +</div>
             </div>
-            <div class="cf-aw-prods-scroll">
-              {% assign collection = block.settings.collection %}
-              {% if collection != blank and collection.products_count > 0 %}
-                {% for product in collection.products limit: block.settings.limit %}
-                  <div class="cf-aw-prod-card">
-                    <a href="{{ product.url }}" class="cf-aw-prod-img" style="display:block;">
-                      {% if product.featured_image %}
-                        <img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}">
-                      {% endif %}
-                      {% if product.compare_at_price > product.price %}
-                        <span class="cf-aw-prod-badge">Sale</span>
-                      {% endif %}
-                    </a>
-                    <div class="cf-aw-prod-info">
-                      <div class="cf-aw-prod-title">{{ product.title }}</div>
-                      <div class="cf-aw-prod-price">{{ product.price | money }}</div>
-                      <button class="cf-aw-prod-btn">Quick Add</button>
-                    </div>
-                  </div>
-                {% endfor %}
-              {% else %}
-                {% for i in (1..5) %}
-                  <div class="cf-aw-prod-card">
-                    <div class="cf-aw-prod-img"><div style="width:100%; height:100%; background:#222;"></div></div>
-                    <div class="cf-aw-prod-info">
-                      <div class="cf-aw-prod-title">Performance Tee {{ i }}</div>
-                      <div class="cf-aw-prod-price">$45.00</div>
-                      <button class="cf-aw-prod-btn">Quick Add</button>
-                    </div>
-                  </div>
-                {% endfor %}
-              {% endif %}
+            <div class="cf-aw-card-info">
+              <div class="cf-aw-card-title">{{ p.title }}</div>
+              <div class="cf-aw-card-price">{{ p.price | money }}</div>
             </div>
-          </div>
-        </section>
+          </a>
+        {% endfor %}
+      {% else %}
+        {% assign demo = 'AeroFlex Training Tee,ProGrid Shorts,Compression Leggings,Elite Performance Jacket' | split: ',' %}
+        {% for name in demo %}
+          <a href="/collections/all" class="cf-aw-card">
+            <div class="cf-aw-card-img">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#111 0%,#1a1a1a 100%)"></div>
+              {% if forloop.first %}<span class="cf-aw-card-badge">Bestseller</span>{% endif %}
+              <div class="cf-aw-card-quick">Quick Add +</div>
+            </div>
+            <div class="cf-aw-card-info">
+              <div class="cf-aw-card-title">{{ name }}</div>
+              <div class="cf-aw-card-price">₹{{ forloop.index | times: 599 | plus: 1999 }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </section>
 
-      {% when 'banner' %}
-        <section class="cf-aw-banner">
-          <h2>{{ block.settings.bg_text }}</h2>
-          <p>{{ block.settings.heading }}</p>
-          <a href="{{ block.settings.btn_url }}" class="cf-aw-btn cf-aw-btn-outline" style="border-color:#000; color:#000;">{{ block.settings.btn_text }}</a>
-        </section>
+  {%- comment -%} FEATURES GRID {%- endcomment -%}
+  <section class="cf-aw-features">
+    <div class="cf-aw-section-head">
+      <div class="sub">Collections</div>
+      <h2>{{ section.settings.feat_heading | default: 'Train Every Discipline' }}</h2>
+    </div>
+    <div class="cf-aw-features-grid">
+      <div class="cf-aw-feat">
+        {% if section.settings.feat_img1 != blank %}
+          <img src="{{ section.settings.feat_img1 | img_url: 'master' }}" alt="">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&auto=format&fit=crop" alt="">
+        {% endif %}
+        <div class="cf-aw-feat-text"><div class="cf-aw-feat-cat">Running</div><div class="cf-aw-feat-title">Speed & Endurance Gear</div></div>
+      </div>
+      <div class="cf-aw-feat">
+        {% if section.settings.feat_img2 != blank %}
+          <img src="{{ section.settings.feat_img2 | img_url: 'master' }}" alt="">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&auto=format&fit=crop" alt="">
+        {% endif %}
+        <div class="cf-aw-feat-text"><div class="cf-aw-feat-cat">Strength</div><div class="cf-aw-feat-title">Gym & Lifting</div></div>
+      </div>
+      <div class="cf-aw-feat">
+        {% if section.settings.feat_img3 != blank %}
+          <img src="{{ section.settings.feat_img3 | img_url: 'master' }}" alt="">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop" alt="">
+        {% endif %}
+        <div class="cf-aw-feat-text"><div class="cf-aw-feat-cat">Yoga</div><div class="cf-aw-feat-title">Flow & Flexibility</div></div>
+      </div>
+    </div>
+  </section>
 
-    {% endcase %}
-  {% endfor %}
+  {%- comment -%} CTA BANNER {%- endcomment -%}
+  <section class="cf-aw-cta-banner">
+    <h2>{{ section.settings.cta_heading | default: 'Your Best Performance Starts Here' }}</h2>
+    <p>{{ section.settings.cta_text | default: 'Join 2 million athletes who trust our gear for every training session.' }}</p>
+    <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="cf-aw-btn cf-aw-btn-fill">{{ section.settings.cta_btn | default: 'Shop Now' }}</a>
+  </section>
+
 </div>
 
 {% schema %}
 {
   "name": "CF Activewear Landing",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Color (Neon)", "default": "#E2FE16" },
-    { "type": "color", "id": "color_bg", "label": "Background Color", "default": "#050505" },
-    { "type": "color", "id": "color_surface", "label": "Surface Color", "default": "#111111" },
-    { "type": "color", "id": "color_text", "label": "Text Color", "default": "#FFFFFF" }
+    { "type": "header", "content": "Hero" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero Background Image" },
+    { "type": "text", "id": "hero_tag", "label": "Badge Text", "default": "New Season Drop" },
+    { "type": "text", "id": "hero_headline", "label": "Headline Line 1", "default": "Built For" },
+    { "type": "text", "id": "hero_subline", "label": "Headline Line 2 (Accent)", "default": "Champions" },
+    { "type": "textarea", "id": "hero_text", "label": "Hero Paragraph", "default": "Performance gear engineered to push every limit." },
+    { "type": "text", "id": "btn1_text", "label": "Button 1 Text", "default": "Shop Collection" },
+    { "type": "url", "id": "btn1_url", "label": "Button 1 Link" },
+    { "type": "text", "id": "btn2_text", "label": "Button 2 Text", "default": "View Lookbook" },
+    { "type": "url", "id": "btn2_url", "label": "Button 2 Link" },
+    { "type": "header", "content": "Products" },
+    { "type": "text", "id": "prods_heading", "label": "Products Heading", "default": "Top Performers" },
+    { "type": "url", "id": "prods_link", "label": "View All Link" },
+    { "type": "collection", "id": "featured_collection", "label": "Featured Collection" },
+    { "type": "header", "content": "Features Grid" },
+    { "type": "text", "id": "feat_heading", "label": "Features Heading", "default": "Train Every Discipline" },
+    { "type": "image_picker", "id": "feat_img1", "label": "Feature Image 1" },
+    { "type": "image_picker", "id": "feat_img2", "label": "Feature Image 2" },
+    { "type": "image_picker", "id": "feat_img3", "label": "Feature Image 3" },
+    { "type": "header", "content": "CTA Banner" },
+    { "type": "text", "id": "cta_heading", "label": "CTA Heading", "default": "Your Best Performance Starts Here" },
+    { "type": "textarea", "id": "cta_text", "label": "CTA Text", "default": "Join 2 million athletes who trust our gear." },
+    { "type": "text", "id": "cta_btn", "label": "CTA Button Text", "default": "Shop Now" },
+    { "type": "url", "id": "cta_url", "label": "CTA Button Link" }
   ],
-  "blocks": [
-    {
-      "type": "hero",
-      "name": "Hero Section",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "tag", "label": "Badge Text", "default": "New Collection" },
-        { "type": "textarea", "id": "title", "label": "Headline", "default": "Push Your <span>Limits</span>" },
-        { "type": "textarea", "id": "text", "label": "Subheading", "default": "Engineered for maximum performance and durability." },
-        { "type": "text", "id": "video_url", "label": "Background Video URL (.mp4)" },
-        { "type": "image_picker", "id": "image", "label": "Fallback Image" },
-        { "type": "text", "id": "btn_1_text", "label": "Button 1 Text", "default": "Shop Men" },
-        { "type": "url", "id": "btn_1_url", "label": "Button 1 Link" },
-        { "type": "text", "id": "btn_2_text", "label": "Button 2 Text", "default": "Shop Women" },
-        { "type": "url", "id": "btn_2_url", "label": "Button 2 Link" }
-      ]
-    },
-    {
-      "type": "specs",
-      "name": "Performance Specs",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "spec_1_title", "label": "Spec 1 Title", "default": "Sweat-Wicking Tech" },
-        { "type": "textarea", "id": "spec_1_text", "label": "Spec 1 Text", "default": "Stays dry during intense sessions." },
-        { "type": "text", "id": "spec_2_title", "label": "Spec 2 Title", "default": "Four-Way Stretch" },
-        { "type": "textarea", "id": "spec_2_text", "label": "Spec 2 Text", "default": "Moves with your body perfectly." },
-        { "type": "text", "id": "spec_3_title", "label": "Spec 3 Title", "default": "Odor Resistant" },
-        { "type": "textarea", "id": "spec_3_text", "label": "Spec 3 Text", "default": "Anti-microbial fabric finish." }
-      ]
-    },
-    {
-      "type": "categories",
-      "name": "Category Grid",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop By Activity" },
-        { "type": "image_picker", "id": "cat_1_img", "label": "Category 1 Image" },
-        { "type": "text", "id": "cat_1_title", "label": "Category 1 Title", "default": "Running" },
-        { "type": "url", "id": "cat_1_url", "label": "Category 1 Link" },
-        { "type": "image_picker", "id": "cat_2_img", "label": "Category 2 Image" },
-        { "type": "text", "id": "cat_2_title", "label": "Category 2 Title", "default": "Training" },
-        { "type": "url", "id": "cat_2_url", "label": "Category 2 Link" },
-        { "type": "image_picker", "id": "cat_3_img", "label": "Category 3 Image" },
-        { "type": "text", "id": "cat_3_title", "label": "Category 3 Title", "default": "Yoga" },
-        { "type": "url", "id": "cat_3_url", "label": "Category 3 Link" }
-      ]
-    },
-    {
-      "type": "products",
-      "name": "Featured Products",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "New Arrivals" },
-        { "type": "collection", "id": "collection", "label": "Collection" },
-        { "type": "range", "id": "limit", "label": "Product Limit", "min": 4, "max": 12, "step": 1, "default": 6 }
-      ]
-    },
-    {
-      "type": "banner",
-      "name": "Motivation Banner",
-      "settings": [
-        { "type": "text", "id": "bg_text", "label": "Background Big Text", "default": "NO EXCUSES" },
-        { "type": "textarea", "id": "heading", "label": "Heading", "default": "Join the elite club of athletes pushing their boundaries daily." },
-        { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Join Community" },
-        { "type": "url", "id": "btn_url", "label": "Button Link" }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "CF Activewear Landing",
-      "blocks": [
-        { "type": "hero" },
-        { "type": "specs" },
-        { "type": "categories" },
-        { "type": "products" },
-        { "type": "banner" }
-      ]
-    }
-  ]
+  "presets": [{ "name": "CF Activewear Landing" }]
 }
 {% endschema %}

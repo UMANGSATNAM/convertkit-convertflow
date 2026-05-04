@@ -1,237 +1,259 @@
-{% comment %}
-  ConvertFlow — Fashion Clothing Landing Page
-  Elegant lookbook, soft aesthetics, masonry grid, serif typography.
-{% endcomment %}
+{% comment %} ConvertFlow — Fashion Clothing Landing | Always-Visible Editorial Layout {% endcomment %}
 
 {% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+  .cf-fc*{box-sizing:border-box;margin:0;padding:0}
+  .cf-fc{font-family:'Jost',sans-serif;background:#F9F6F2;color:#1C1C1A;overflow-x:hidden}
 
-  :root {
-    --fc-primary: {{ section.settings.color_primary | default: '#0A0A0A' }};
-    --fc-bg: {{ section.settings.color_bg | default: '#F5F3EF' }};
-    --fc-surface: {{ section.settings.color_surface | default: '#FFFFFF' }};
-    --fc-text: {{ section.settings.color_text | default: '#1a1a1a' }};
-    --fc-border: rgba(0, 0, 0, 0.08);
-    --fc-font-heading: 'Playfair Display', serif;
-    --fc-font-body: 'Inter', sans-serif;
-  }
+  /* ═══ NAV STRIP ═══ */
+  .cf-fc-strip{background:#1C1C1A;color:#F9F6F2;padding:10px 5%;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+  .cf-fc-strip a{color:#F9F6F2;text-decoration:none;opacity:.7;transition:opacity .2s}
+  .cf-fc-strip a:hover{opacity:1}
 
-  .cf-fc * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-fc { font-family: var(--fc-font-body); background: var(--fc-bg); color: var(--fc-text); line-height: 1.6; }
-  .cf-fc h1, .cf-fc h2, .cf-fc h3 { font-family: var(--fc-font-heading); font-weight: 400; color: var(--fc-primary); }
-
-  /* Buttons */
-  .cf-fc-btn { display: inline-block; padding: 16px 40px; background: var(--fc-primary); color: #fff; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: all 0.4s ease; border: 1px solid var(--fc-primary); }
-  .cf-fc-btn:hover { background: transparent; color: var(--fc-primary); }
+  /* ═══ EDITORIAL HERO ═══ */
+  .cf-fc-hero{display:grid;grid-template-columns:1fr 1fr;min-height:90vh}
+  .cf-fc-hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:60px 60px 80px;background:#F0EDE8;position:relative;overflow:hidden}
+  .cf-fc-hero-left img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+  .cf-fc-hero-left::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,rgba(0,0,0,.1) 60%)}
+  .cf-fc-hero-left-content{position:relative;z-index:2;color:#fff}
+  .cf-fc-hero-issue{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:20px}
+  .cf-fc-hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,6vw,80px);font-weight:300;line-height:1.05;margin-bottom:24px}
+  .cf-fc-hero-h1 em{font-style:italic;display:block}
+  .cf-fc-hero-p{font-size:15px;font-weight:300;line-height:1.7;opacity:.8;max-width:380px;margin-bottom:36px}
   
-  /* Hero Split */
-  .cf-fc-hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 90vh; }
-  .cf-fc-hero-img { background: #e0dcd3; position: relative; }
-  .cf-fc-hero-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .cf-fc-hero-text { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10%; }
-  .cf-fc-hero-text h1 { font-size: clamp(48px, 6vw, 80px); line-height: 1.1; margin-bottom: 24px; }
-  .cf-fc-hero-text h1 i { color: #888; font-style: italic; }
-  .cf-fc-hero-text p { font-size: 16px; color: #555; margin-bottom: 40px; max-width: 400px; }
+  .cf-fc-btn{display:inline-block;padding:14px 36px;font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:3px;text-decoration:none;cursor:pointer;border:none;transition:all .35s}
+  .cf-fc-btn-light{background:#F9F6F2;color:#1C1C1A}
+  .cf-fc-btn-light:hover{background:#fff;transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.15)}
+  .cf-fc-btn-dark{background:#1C1C1A;color:#F9F6F2}
+  .cf-fc-btn-dark:hover{background:#333;transform:translateY(-2px)}
+  .cf-fc-btn-outline{background:transparent;color:#1C1C1A;border:1px solid #1C1C1A}
+  .cf-fc-btn-outline:hover{background:#1C1C1A;color:#F9F6F2}
 
-  /* Lookbook / Masonry */
-  .cf-fc-lookbook { padding: 100px 5%; background: var(--fc-surface); }
-  .cf-fc-section-title { text-align: center; font-size: clamp(36px, 5vw, 56px); margin-bottom: 60px; }
-  
-  .cf-fc-masonry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1400px; margin: 0 auto; }
-  .cf-fc-masonry-item { position: relative; overflow: hidden; display: block; text-decoration: none; color: var(--fc-text); }
-  .cf-fc-masonry-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
-  .cf-fc-masonry-item:hover img { transform: scale(1.05); }
-  .cf-fc-masonry-item:nth-child(1) { grid-row: span 2; aspect-ratio: 3/4; }
-  .cf-fc-masonry-item:nth-child(2) { aspect-ratio: 4/3; }
-  .cf-fc-masonry-item:nth-child(3) { grid-row: span 2; aspect-ratio: 3/4; }
-  .cf-fc-masonry-item:nth-child(4) { aspect-ratio: 4/5; }
-  
-  .cf-fc-masonry-text { position: absolute; bottom: 30px; left: 30px; background: rgba(255,255,255,0.9); padding: 16px 24px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-  .cf-fc-masonry-item:hover .cf-fc-masonry-text { opacity: 1; transform: translateY(0); }
+  .cf-fc-hero-right{display:grid;grid-template-rows:1fr 1fr}
+  .cf-fc-hero-right-top{background:#E8E4DE;overflow:hidden;position:relative}
+  .cf-fc-hero-right-top img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease}
+  .cf-fc-hero-right-top:hover img{transform:scale(1.04)}
+  .cf-fc-hero-right-bottom{background:#1C1C1A;color:#F9F6F2;padding:50px;display:flex;flex-direction:column;justify-content:space-between}
+  .cf-fc-new-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(249,246,242,.4);margin-bottom:16px}
+  .cf-fc-hero-right-bottom h2{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;line-height:1.1;margin-bottom:20px}
 
-  /* Featured Editorial */
-  .cf-fc-editorial { padding: 120px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1400px; margin: 0 auto; }
-  .cf-fc-edit-img { aspect-ratio: 4/5; background: #e0dcd3; overflow: hidden; }
-  .cf-fc-edit-img img { width: 100%; height: 100%; object-fit: cover; }
-  .cf-fc-edit-content { max-width: 500px; }
-  .cf-fc-edit-content h2 { font-size: 48px; margin-bottom: 30px; line-height: 1.2; }
-  .cf-fc-edit-content p { font-size: 16px; color: #666; margin-bottom: 40px; font-weight: 300; }
+  /* ═══ BRAND BAR ═══ */
+  .cf-fc-brand-bar{padding:24px 5%;border-top:1px solid rgba(28,28,26,.08);border-bottom:1px solid rgba(28,28,26,.08);display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#888;flex-wrap:wrap;gap:20px}
+  .cf-fc-brand-bar-item{display:flex;align-items:center;gap:8px}
+  .cf-fc-brand-bar-item::before{content:'✦';color:#C5A87A}
 
-  /* Collection Slider */
-  .cf-fc-slider { padding: 100px 0; background: var(--fc-surface); border-top: 1px solid var(--fc-border); overflow: hidden; }
-  .cf-fc-slider-header { text-align: center; margin-bottom: 60px; }
-  .cf-fc-slider-header h2 { font-size: 40px; }
-  .cf-fc-slider-track { display: flex; gap: 30px; padding: 0 5% 40px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-  .cf-fc-slider-track::-webkit-scrollbar { display: none; }
-  
-  .cf-fc-slide { flex: 0 0 clamp(280px, 25vw, 350px); scroll-snap-align: start; text-decoration: none; color: var(--fc-text); }
-  .cf-fc-slide-img { aspect-ratio: 3/4; background: #f0ece6; margin-bottom: 20px; overflow: hidden; }
-  .cf-fc-slide-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-  .cf-fc-slide:hover .cf-fc-slide-img img { transform: scale(1.05); }
-  .cf-fc-slide-info { text-align: center; }
-  .cf-fc-slide-title { font-size: 15px; margin-bottom: 6px; font-weight: 500; }
-  .cf-fc-slide-price { font-size: 14px; color: #666; }
+  /* ═══ LOOKBOOK MASONRY ═══ */
+  .cf-fc-looks{padding:80px 5%}
+  .cf-fc-looks-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:50px}
+  .cf-fc-looks-head h2{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,56px);font-weight:300;font-style:italic}
+  .cf-fc-looks-head a{font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:#888;border-bottom:1px solid #888;padding-bottom:2px;transition:color .2s}
+  .cf-fc-looks-head a:hover{color:#1C1C1A}
+  .cf-fc-looks-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:auto;gap:20px}
+  .cf-fc-look{overflow:hidden;position:relative}
+  .cf-fc-look:nth-child(1){grid-column:span 5;grid-row:span 2}
+  .cf-fc-look:nth-child(2){grid-column:span 4}
+  .cf-fc-look:nth-child(3){grid-column:span 3}
+  .cf-fc-look:nth-child(4){grid-column:span 7}
+  .cf-fc-look:nth-child(5){grid-column:span 5}
+  .cf-fc-look img{width:100%;height:100%;object-fit:cover;aspect-ratio:auto;min-height:240px;transition:transform .8s ease}
+  .cf-fc-look:hover img{transform:scale(1.04)}
+  .cf-fc-look-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);padding:24px;opacity:0;transition:opacity .4s}
+  .cf-fc-look:hover .cf-fc-look-overlay{opacity:1}
+  .cf-fc-look-overlay-text{color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:2px}
 
-  @media (max-width: 900px) {
-    .cf-fc-hero { grid-template-columns: 1fr; grid-template-rows: 50vh auto; }
-    .cf-fc-masonry { grid-template-columns: 1fr 1fr; }
-    .cf-fc-editorial { grid-template-columns: 1fr; }
-    .cf-fc-edit-content { order: -1; text-align: center; margin: 0 auto; }
-  }
-  @media (max-width: 600px) {
-    .cf-fc-masonry { grid-template-columns: 1fr; }
-    .cf-fc-masonry-item:nth-child(n) { grid-row: auto; aspect-ratio: 4/5; }
+  /* ═══ PRODUCT CARDS ═══ */
+  .cf-fc-products{padding:80px 5%;background:#1C1C1A}
+  .cf-fc-products-head{text-align:center;margin-bottom:60px}
+  .cf-fc-products-head h2{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,56px);font-weight:300;color:#F9F6F2;margin-bottom:16px}
+  .cf-fc-products-head p{font-size:14px;color:#888;letter-spacing:1px}
+  .cf-fc-prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+
+  /* Fashion card: minimalist, no-border, centered text, hover reveals price */
+  .cf-fc-card{text-decoration:none;color:#F9F6F2;position:relative;display:block}
+  .cf-fc-card-img{aspect-ratio:3/4;overflow:hidden;background:#2a2a2a;position:relative}
+  .cf-fc-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .9s ease}
+  .cf-fc-card:hover .cf-fc-card-img img{transform:scale(1.06)}
+  .cf-fc-card-wish{position:absolute;top:16px;right:16px;width:36px;height:36px;background:rgba(249,246,242,.1);backdrop-filter:blur(4px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:0;transition:opacity .3s;z-index:3;cursor:pointer}
+  .cf-fc-card:hover .cf-fc-card-wish{opacity:1}
+  .cf-fc-card-info{padding:20px 16px;text-align:center}
+  .cf-fc-card-brand{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#666;margin-bottom:6px}
+  .cf-fc-card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:8px;line-height:1.2}
+  .cf-fc-card-price{font-size:14px;color:#C5A87A;font-weight:400;letter-spacing:1px;opacity:0;transform:translateY(6px);transition:all .3s}
+  .cf-fc-card:hover .cf-fc-card-price{opacity:1;transform:translateY(0)}
+
+  /* ═══ EDITORIAL QUOTE ═══ */
+  .cf-fc-quote{padding:120px 5%;text-align:center;background:#F0EDE8}
+  .cf-fc-quote blockquote{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,48px);font-weight:300;font-style:italic;line-height:1.3;max-width:900px;margin:0 auto 30px;color:#1C1C1A}
+  .cf-fc-quote cite{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#888}
+
+  @media(max-width:900px){
+    .cf-fc-hero{grid-template-columns:1fr;min-height:auto}
+    .cf-fc-hero-left{min-height:70vh;padding:40px 30px 60px}
+    .cf-fc-hero-right-top{min-height:40vh}
+    .cf-fc-hero-right-bottom{padding:36px 30px}
+    .cf-fc-looks-grid{grid-template-columns:1fr 1fr}
+    .cf-fc-look:nth-child(n){grid-column:span 1}
+    .cf-fc-prod-grid{grid-template-columns:repeat(2,1fr)}
+    .cf-fc-looks-head{flex-direction:column;gap:16px}
   }
 {% endstyle %}
 
 <div class="cf-fc">
-  {% for block in section.blocks %}
-    {% case block.type %}
-      
-      {% when 'hero' %}
-        <section class="cf-fc-hero">
-          <div class="cf-fc-hero-img">
-            {% if block.settings.image != blank %}
-              <img src="{{ block.settings.image | img_url: 'master' }}" alt="Hero">
-            {% else %}
-              <div style="width:100%; height:100%; background:#dcd4ca;"></div>
-            {% endif %}
-          </div>
-          <div class="cf-fc-hero-text">
-            <h1>{{ block.settings.title | default: 'The <i>Spring</i><br>Collection' }}</h1>
-            <p>{{ block.settings.text | default: 'Embrace effortless elegance with our carefully curated pieces for the new season.' }}</p>
-            <a href="{{ block.settings.btn_url }}" class="cf-fc-btn">{{ block.settings.btn_text | default: 'Discover Now' }}</a>
-          </div>
-        </section>
 
-      {% when 'lookbook' %}
-        <section class="cf-fc-lookbook">
-          <h2 class="cf-fc-section-title">{{ block.settings.heading | default: 'Curated Looks' }}</h2>
-          <div class="cf-fc-masonry">
-            {% for i in (1..4) %}
-              <a href="#" class="cf-fc-masonry-item">
-                <div style="width:100%; height:100%; background:#{{ i | times: 111 | plus: 111111 }};"></div>
-                <div class="cf-fc-masonry-text">Shop Look 0{{ i }}</div>
-              </a>
-            {% endfor %}
-          </div>
-        </section>
+  {%- comment -%} TOP STRIP {%- endcomment -%}
+  <div class="cf-fc-strip">
+    <span>{{ section.settings.strip_left | default: 'Free Shipping on Orders ₹2,999+' }}</span>
+    <div style="display:flex;gap:30px">
+      <a href="/pages/about">Our Story</a>
+      <a href="/collections/all">Shop</a>
+      <a href="/pages/contact">Contact</a>
+    </div>
+  </div>
 
-      {% when 'editorial' %}
-        <section class="cf-fc-editorial">
-          <div class="cf-fc-edit-content">
-            <h2>{{ block.settings.heading | default: 'A Return to Tailoring' }}</h2>
-            <p>{{ block.settings.text | default: 'Our latest collection focuses on precise cuts, premium fabrics, and silhouettes that stand the test of time. Quality over quantity, always.' }}</p>
-            <a href="{{ block.settings.btn_url }}" class="cf-fc-btn" style="padding: 14px 30px;">{{ block.settings.btn_text | default: 'Read The Journal' }}</a>
-          </div>
-          <div class="cf-fc-edit-img">
-            {% if block.settings.image != blank %}
-              <img src="{{ block.settings.image | img_url: '800x' }}" alt="Editorial">
-            {% else %}
-              <div style="width:100%; height:100%; background:#dcd4ca;"></div>
-            {% endif %}
-          </div>
-        </section>
+  {%- comment -%} EDITORIAL HERO {%- endcomment -%}
+  <section class="cf-fc-hero">
+    <div class="cf-fc-hero-left">
+      {% if section.settings.hero_image != blank %}
+        <img src="{{ section.settings.hero_image | img_url: 'master' }}" alt="Fashion Hero">
+      {% else %}
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&auto=format&fit=crop" alt="">
+      {% endif %}
+      <div class="cf-fc-hero-left-content">
+        <div class="cf-fc-hero-issue">{{ section.settings.hero_issue | default: 'The Summer Edit — Volume III' }}</div>
+        <h1 class="cf-fc-hero-h1">
+          {{ section.settings.hero_headline | default: 'Effortless' }}
+          <em>{{ section.settings.hero_subline | default: 'Sophistication' }}</em>
+        </h1>
+        <p class="cf-fc-hero-p">{{ section.settings.hero_text | default: 'Curated pieces for the woman who moves through the world with intention and grace.' }}</p>
+        <a href="{{ section.settings.hero_btn_url | default: '/collections/all' }}" class="cf-fc-btn cf-fc-btn-light">{{ section.settings.hero_btn_text | default: 'Explore the Edit' }}</a>
+      </div>
+    </div>
+    <div class="cf-fc-hero-right">
+      <div class="cf-fc-hero-right-top">
+        {% if section.settings.hero_image2 != blank %}
+          <img src="{{ section.settings.hero_image2 | img_url: 'master' }}" alt="">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop" alt="">
+        {% endif %}
+      </div>
+      <div class="cf-fc-hero-right-bottom">
+        <div>
+          <div class="cf-fc-new-label">Now In Store</div>
+          <h2>{{ section.settings.right_title | default: 'The Autumn Silk Collection' }}</h2>
+          <p style="font-size:14px;color:#888;margin-bottom:24px;">{{ section.settings.right_text | default: 'Lightweight luxury in 12 natural tones.' }}</p>
+        </div>
+        <a href="{{ section.settings.right_url | default: '/collections/all' }}" class="cf-fc-btn cf-fc-btn-outline" style="border-color:rgba(249,246,242,.3);color:#F9F6F2;align-self:flex-start">{{ section.settings.right_btn | default: 'Shop Now →' }}</a>
+      </div>
+    </div>
+  </section>
 
-      {% when 'products' %}
-        <section class="cf-fc-slider">
-          <div class="cf-fc-slider-header">
-            <h2>{{ block.settings.heading | default: 'New Arrivals' }}</h2>
-          </div>
-          <div class="cf-fc-slider-track">
-            {% assign collection = block.settings.collection %}
-            {% if collection != blank and collection.products_count > 0 %}
-              {% for product in collection.products limit: 6 %}
-                <a href="{{ product.url }}" class="cf-fc-slide">
-                  <div class="cf-fc-slide-img">
-                    {% if product.featured_image %}
-                      <img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}">
-                    {% endif %}
-                  </div>
-                  <div class="cf-fc-slide-info">
-                    <div class="cf-fc-slide-title">{{ product.title }}</div>
-                    <div class="cf-fc-slide-price">{{ product.price | money }}</div>
-                  </div>
-                </a>
-              {% endfor %}
-            {% else %}
-              {% for i in (1..5) %}
-                <a href="#" class="cf-fc-slide">
-                  <div class="cf-fc-slide-img"><div style="background:#f0ece6; width:100%; height:100%;"></div></div>
-                  <div class="cf-fc-slide-info">
-                    <div class="cf-fc-slide-title">Silk Blend Dress</div>
-                    <div class="cf-fc-slide-price">$120.00</div>
-                  </div>
-                </a>
-              {% endfor %}
-            {% endif %}
-          </div>
-        </section>
+  {%- comment -%} BRAND BAR {%- endcomment -%}
+  <div class="cf-fc-brand-bar">
+    <div class="cf-fc-brand-bar-item">Complimentary Shipping</div>
+    <div class="cf-fc-brand-bar-item">Easy 30-Day Returns</div>
+    <div class="cf-fc-brand-bar-item">Sustainably Sourced Fabrics</div>
+    <div class="cf-fc-brand-bar-item">Lifetime Craftsmanship Guarantee</div>
+  </div>
 
-    {% endcase %}
-  {% endfor %}
+  {%- comment -%} LOOKBOOK MASONRY {%- endcomment -%}
+  <section class="cf-fc-looks">
+    <div class="cf-fc-looks-head">
+      <h2>{{ section.settings.looks_heading | default: 'The Lookbook' }}</h2>
+      <a href="{{ section.settings.looks_link | default: '/pages/lookbook' }}">See All Looks →</a>
+    </div>
+    <div class="cf-fc-looks-grid">
+      {% assign look_imgs = '1483985988355-763728e1935b,1490481651871-ab68de25d43d,1539109136527-10c4f8c60b2d,1469334031814-100d5da60661,1515372839711-e5592f3ad6b1' | split: ',' %}
+      {% assign look_labels = 'The Silk Edit,Evening Collection,Resort Wear,Casuals,The Capsule' | split: ',' %}
+      {% for img_id in look_imgs %}
+        <div class="cf-fc-look">
+          <img src="https://images.unsplash.com/photo-{{ img_id }}?w=800&auto=format&fit=crop" alt="Look {{ forloop.index }}">
+          <div class="cf-fc-look-overlay">
+            <div class="cf-fc-look-overlay-text">{{ look_labels[forloop.index0] }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {%- comment -%} PRODUCTS {%- endcomment -%}
+  <section class="cf-fc-products">
+    <div class="cf-fc-products-head">
+      <h2>{{ section.settings.prods_heading | default: 'New Arrivals' }}</h2>
+      <p>{{ section.settings.prods_text | default: 'Thoughtfully designed, endlessly wearable.' }}</p>
+    </div>
+    <div class="cf-fc-prod-grid">
+      {% assign coll = section.settings.featured_collection %}
+      {% if coll != blank and coll.products_count > 0 %}
+        {% for p in coll.products limit: 4 %}
+          <a href="{{ p.url }}" class="cf-fc-card">
+            <div class="cf-fc-card-img">
+              {% if p.featured_image %}<img src="{{ p.featured_image | img_url: '600x' }}" alt="{{ p.title }}">{% endif %}
+              <div class="cf-fc-card-wish">♡</div>
+            </div>
+            <div class="cf-fc-card-info">
+              <div class="cf-fc-card-brand">{{ p.vendor }}</div>
+              <div class="cf-fc-card-title">{{ p.title }}</div>
+              <div class="cf-fc-card-price">{{ p.price | money }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        {% assign fc_demo = 'The Silk Midi Dress,Linen Tailored Blazer,Organic Cotton Blouse,Cashmere Trench Coat' | split: ',' %}
+        {% for name in fc_demo %}
+          <a href="/collections/all" class="cf-fc-card">
+            <div class="cf-fc-card-img">
+              <div style="width:100%;height:100%;background:{% cycle '#2d2520','#1e2428','#231e2a','#1e241f' %}"></div>
+              <div class="cf-fc-card-wish">♡</div>
+            </div>
+            <div class="cf-fc-card-info">
+              <div class="cf-fc-card-brand">VÅŒLT Studio</div>
+              <div class="cf-fc-card-title">{{ name }}</div>
+              <div class="cf-fc-card-price">₹{{ forloop.index | times: 1200 | plus: 3499 }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </section>
+
+  {%- comment -%} EDITORIAL QUOTE {%- endcomment -%}
+  <section class="cf-fc-quote">
+    <blockquote>{{ section.settings.quote_text | default: '"Fashion is the armour to survive the reality of everyday life."' }}</blockquote>
+    <cite>{{ section.settings.quote_author | default: '— The Edit, Summer 2025' }}</cite>
+  </section>
+
 </div>
 
 {% schema %}
 {
-  "name": "CF Fashion Landing",
+  "name": "CF Fashion Clothing Landing",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Color", "default": "#0A0A0A" },
-    { "type": "color", "id": "color_bg", "label": "Background Color", "default": "#F5F3EF" },
-    { "type": "color", "id": "color_surface", "label": "Surface Color", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_text", "label": "Text Color", "default": "#1a1a1a" }
+    { "type": "header", "content": "Top Strip" },
+    { "type": "text", "id": "strip_left", "label": "Strip Message", "default": "Free Shipping on Orders ₹2,999+" },
+    { "type": "header", "content": "Hero Section" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero Left Image" },
+    { "type": "image_picker", "id": "hero_image2", "label": "Hero Right Top Image" },
+    { "type": "text", "id": "hero_issue", "label": "Issue Tag", "default": "The Summer Edit — Volume III" },
+    { "type": "text", "id": "hero_headline", "label": "Headline", "default": "Effortless" },
+    { "type": "text", "id": "hero_subline", "label": "Italic Subline", "default": "Sophistication" },
+    { "type": "textarea", "id": "hero_text", "label": "Hero Text" },
+    { "type": "text", "id": "hero_btn_text", "label": "Hero Button", "default": "Explore the Edit" },
+    { "type": "url", "id": "hero_btn_url", "label": "Hero Button Link" },
+    { "type": "text", "id": "right_title", "label": "Right Block Title", "default": "The Autumn Silk Collection" },
+    { "type": "text", "id": "right_text", "label": "Right Block Text", "default": "Lightweight luxury in 12 natural tones." },
+    { "type": "text", "id": "right_btn", "label": "Right Block Button", "default": "Shop Now →" },
+    { "type": "url", "id": "right_url", "label": "Right Block Link" },
+    { "type": "header", "content": "Lookbook" },
+    { "type": "text", "id": "looks_heading", "label": "Heading", "default": "The Lookbook" },
+    { "type": "url", "id": "looks_link", "label": "Lookbook Link" },
+    { "type": "header", "content": "Products" },
+    { "type": "text", "id": "prods_heading", "label": "Heading", "default": "New Arrivals" },
+    { "type": "text", "id": "prods_text", "label": "Subtext", "default": "Thoughtfully designed, endlessly wearable." },
+    { "type": "collection", "id": "featured_collection", "label": "Featured Collection" },
+    { "type": "header", "content": "Quote" },
+    { "type": "textarea", "id": "quote_text", "label": "Quote", "default": "\"Fashion is the armour to survive the reality of everyday life.\"" },
+    { "type": "text", "id": "quote_author", "label": "Quote Attribution", "default": "— The Edit, Summer 2025" }
   ],
-  "blocks": [
-    {
-      "type": "hero",
-      "name": "Hero Section",
-      "limit": 1,
-      "settings": [
-        { "type": "textarea", "id": "title", "label": "Headline", "default": "The <i>Spring</i><br>Collection" },
-        { "type": "textarea", "id": "text", "label": "Text", "default": "Embrace effortless elegance." },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Discover Now" },
-        { "type": "url", "id": "btn_url", "label": "Button Link" }
-      ]
-    },
-    {
-      "type": "lookbook",
-      "name": "Lookbook Grid",
-      "limit": 1,
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Curated Looks" }
-      ]
-    },
-    {
-      "type": "editorial",
-      "name": "Editorial Block",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "A Return to Tailoring" },
-        { "type": "textarea", "id": "text", "label": "Text", "default": "Quality over quantity, always." },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Read The Journal" },
-        { "type": "url", "id": "btn_url", "label": "Button Link" }
-      ]
-    },
-    {
-      "type": "products",
-      "name": "Featured Products",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "New Arrivals" },
-        { "type": "collection", "id": "collection", "label": "Collection" }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "CF Fashion Landing",
-      "blocks": [
-        { "type": "hero" },
-        { "type": "lookbook" },
-        { "type": "editorial" },
-        { "type": "products" }
-      ]
-    }
-  ]
+  "presets": [{ "name": "CF Fashion Clothing Landing" }]
 }
 {% endschema %}
