@@ -9,31 +9,31 @@ const THEME_BASE_DIR = path.resolve(__dirname, "../../theme-base");
 const THEME_NICHES_DIR = path.resolve(__dirname, "../../theme-niches");
 
 const TEMPLATES = {
-  pilgrim:              { label: "Pilgrim Beauty" },
-  tanishq:              { label: "Tanishq Jewellery" },
-  caratlane:            { label: "CaratLane" },
+  pilgrim: { label: "Pilgrim Beauty" },
+  tanishq: { label: "Tanishq Jewellery" },
+  caratlane: { label: "CaratLane" },
   "jewellery-heritage": { label: "Jewellery Heritage" },
-  "fashion-clothing":   { label: "Urban Fashion" },
-  footwear:             { label: "Solera Footwear" },
-  "ayurveda-wellness":  { label: "AyurVeda Wellness" },
+  "fashion-clothing": { label: "Urban Fashion" },
+  footwear: { label: "Solera Footwear" },
+  "ayurveda-wellness": { label: "AyurVeda Wellness" },
   "mobile-accessories": { label: "TechShield" },
-  "kids-toys":          { label: "PlayWorld" },
-  "home-furniture":     { label: "UrbanNest" },
-  "food-delivery":      { label: "SpiceRoute" },
-  electronics:          { label: "VoltZone" },
-  "home-decor":         { label: "Artisano" },
-  "pet-supplies":       { label: "PawParadise" },
-  "luxury-watches":     { label: "Chrono Prestige" },
-  "outdoor-gear":       { label: "TrailBlaze" },
-  "organic-food":       { label: "GreenHarvest" },
-  "fitness-supplements":{ label: "IronFuel" },
-  "baby-apparel":       { label: "TinyTots" },
-  "coffee-roasters":    { label: "BlackBrew" },
-  "beauty-cosmetics":   { label: "GlowLab" },
-  "mens-grooming":      { label: "BladeCode" },
-  activewear:           { label: "BloomFit" },
-  streetwear:           { label: "URBNCO" },
-  "personal-care":      { label: "PureBody" },
+  "kids-toys": { label: "PlayWorld" },
+  "home-furniture": { label: "UrbanNest" },
+  "food-delivery": { label: "SpiceRoute" },
+  electronics: { label: "VoltZone" },
+  "home-decor": { label: "Artisano" },
+  "pet-supplies": { label: "PawParadise" },
+  "luxury-watches": { label: "Chrono Prestige" },
+  "outdoor-gear": { label: "TrailBlaze" },
+  "organic-food": { label: "GreenHarvest" },
+  "fitness-supplements": { label: "IronFuel" },
+  "baby-apparel": { label: "TinyTots" },
+  "coffee-roasters": { label: "BlackBrew" },
+  "beauty-cosmetics": { label: "GlowLab" },
+  "mens-grooming": { label: "BladeCode" },
+  activewear: { label: "BloomFit" },
+  streetwear: { label: "URBNCO" },
+  "personal-care": { label: "PureBody" },
 };
 
 /** Recursively collect all files in a directory */
@@ -45,7 +45,10 @@ function walkDir(dir, base = dir) {
     if (entry.isDirectory()) {
       results.push(...walkDir(full, base));
     } else {
-      results.push({ full, rel: path.relative(base, full).replace(/\\/g, '/') });
+      results.push({
+        full,
+        rel: path.relative(base, full).replace(/\\/g, "/"),
+      });
     }
   }
   return results;
@@ -56,21 +59,28 @@ async function upsertChunked(admin, themeId, files, label) {
   const CHUNK = 50;
   for (let i = 0; i < files.length; i += CHUNK) {
     const chunk = files.slice(i, i + CHUNK);
-    const res = await admin.graphql(`
+    const res = await admin.graphql(
+      `
       mutation Upsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
         themeFilesUpsert(themeId: $themeId, files: $files) {
           upsertedThemeFiles { filename }
           userErrors { field message }
         }
       }
-    `, { variables: { themeId, files: chunk } });
+    `,
+      { variables: { themeId, files: chunk } },
+    );
 
     const { data } = await res.json();
     const errs = data?.themeFilesUpsert?.userErrors ?? [];
     if (errs.length > 0) {
-      throw new Error(`${label} upload failed: ${errs.map(e => e.message).join(', ')}`);
+      throw new Error(
+        `${label} upload failed: ${errs.map((e) => e.message).join(", ")}`,
+      );
     }
-    console.log(`[theme-create] ${label} ${i+1}-${i+chunk.length}: ${data?.themeFilesUpsert?.upsertedThemeFiles?.length} files OK`);
+    console.log(
+      `[theme-create] ${label} ${i + 1}-${i + chunk.length}: ${data?.themeFilesUpsert?.upsertedThemeFiles?.length} files OK`,
+    );
   }
 }
 
@@ -83,7 +93,10 @@ export const action = async ({ request }) => {
     const tplConfig = TEMPLATES[templateId];
 
     if (!tplConfig) {
-      return json({ success: false, error: `Unknown template: ${templateId}` }, { status: 400 });
+      return json(
+        { success: false, error: `Unknown template: ${templateId}` },
+        { status: 400 },
+      );
     }
 
     // ── Step 1: Find the active (MAIN) theme ──────────────────────────────
@@ -91,20 +104,29 @@ export const action = async ({ request }) => {
       query { themes(first: 10) { nodes { id name role } } }
     `);
     const { data: themesData } = await themesRes.json();
-    const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
-    
+    const mainTheme = themesData.themes.nodes.find(
+      (t) =>
+        t.role === "MAIN" ||
+        (typeof t.role === "string" && t.role.toLowerCase() === "main"),
+    );
+
     if (!mainTheme) {
-      return json({ success: false, error: "No active MAIN theme found on this store." }, { status: 400 });
+      return json(
+        { success: false, error: "No active MAIN theme found on this store." },
+        { status: 400 },
+      );
     }
-    
+
     const theme = mainTheme;
-    console.log(`[theme-inject] Injecting into MAIN theme: ${theme.name} (${theme.id})`);
+    console.log(
+      `[theme-inject] Injecting into MAIN theme: ${theme.name} (${theme.id})`,
+    );
 
     // ── Step 2: Collect base theme files ──────────────────────────────────
     const baseFiles = walkDir(THEME_BASE_DIR);
     const filesToUpsert = baseFiles.map(({ full, rel }) => ({
       filename: rel,
-      body: { type: 'TEXT', value: fs.readFileSync(full, 'utf8') },
+      body: { type: "TEXT", value: fs.readFileSync(full, "utf8") },
     }));
 
     // ── Step 3: Overlay niche-specific files (settings_data.json etc.) ────
@@ -112,31 +134,38 @@ export const action = async ({ request }) => {
     if (fs.existsSync(nicheDir)) {
       const nicheFiles = walkDir(nicheDir);
       for (const { full, rel } of nicheFiles) {
-        const idx = filesToUpsert.findIndex(f => f.filename === rel);
-        const entry = { filename: rel, body: { type: 'TEXT', value: fs.readFileSync(full, 'utf8') } };
-        if (idx >= 0) filesToUpsert[idx] = entry;  // override
+        const idx = filesToUpsert.findIndex((f) => f.filename === rel);
+        const entry = {
+          filename: rel,
+          body: { type: "TEXT", value: fs.readFileSync(full, "utf8") },
+        };
+        if (idx >= 0)
+          filesToUpsert[idx] = entry; // override
         else filesToUpsert.push(entry);
       }
     }
 
-    console.log(`[theme-create] Total files to upload: ${filesToUpsert.length}`);
+    console.log(
+      `[theme-create] Total files to upload: ${filesToUpsert.length}`,
+    );
 
     // ── Step 4: Two-phase upload ───────────────────────────────────────────
-    const liquidFiles = filesToUpsert.filter(f =>
-      f.filename.startsWith('layout/') ||
-      f.filename.startsWith('sections/') ||
-      f.filename.startsWith('snippets/') ||
-      f.filename.startsWith('assets/') ||
-      f.filename.startsWith('locales/') ||
-      f.filename.endsWith('.liquid')
+    const liquidFiles = filesToUpsert.filter(
+      (f) =>
+        f.filename.startsWith("layout/") ||
+        f.filename.startsWith("sections/") ||
+        f.filename.startsWith("snippets/") ||
+        f.filename.startsWith("assets/") ||
+        f.filename.startsWith("locales/") ||
+        f.filename.endsWith(".liquid"),
     );
-    const jsonFiles = filesToUpsert.filter(f =>
-      f.filename.startsWith('templates/') ||
-      f.filename.startsWith('config/')
+    const jsonFiles = filesToUpsert.filter(
+      (f) =>
+        f.filename.startsWith("templates/") || f.filename.startsWith("config/"),
     );
 
-    await upsertChunked(admin, theme.id, liquidFiles, 'Liquid+Assets');
-    await upsertChunked(admin, theme.id, jsonFiles, 'Templates+Config');
+    await upsertChunked(admin, theme.id, liquidFiles, "Liquid+Assets");
+    await upsertChunked(admin, theme.id, jsonFiles, "Templates+Config");
 
     // ── Step 5: Return success with preview/editor links ──────────────────
     const shopRes = await admin.graphql(`query { shop { myshopifyDomain } }`);
@@ -151,10 +180,9 @@ export const action = async ({ request }) => {
       themeId: numericId,
       filesUploaded: filesToUpsert.length,
       previewUrl: `https://${domain}/?preview_theme_id=${numericId}`,
-      editorUrl:  `https://${domain}/admin/themes/${numericId}/editor`,
+      editorUrl: `https://${domain}/admin/themes/${numericId}/editor`,
       publishUrl: `https://${domain}/admin/themes`,
     });
-
   } catch (err) {
     console.error("[theme-create] Error:", err);
     return json({ success: false, error: err.message }, { status: 500 });

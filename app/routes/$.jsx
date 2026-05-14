@@ -1,7 +1,7 @@
 import { json } from "@remix-run/node";
 
 // Catch-all route to handle trailing 404 requests gracefully
-// e.g. /web-pixels@... or /.well-known/shopify/monorail/... 
+// e.g. /web-pixels@... or /.well-known/shopify/monorail/...
 // injected by Shopify App Proxies that hit our Remix instance.
 
 export const loader = () => {

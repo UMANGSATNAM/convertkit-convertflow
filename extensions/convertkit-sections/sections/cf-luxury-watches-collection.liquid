@@ -1,94 +1,379 @@
-{% comment %} ConvertFlow — Luxury Watches Collection Page {% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;600&display=swap');
-  .cf-lw-c*{box-sizing:border-box;margin:0;padding:0}
-  .cf-lw-c{font-family:'Montserrat',sans-serif;background:#0A0A0A;color:#E5E4E2;padding-bottom:100px}
-  
-  .cf-lw-c-head{text-align:center;padding:120px 5% 80px;border-bottom:1px solid rgba(255,255,255,.05)}
-  .cf-lw-c-sub{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:{{ section.settings.color_accent | default: '#D4AF37' }};margin-bottom:20px}
-  .cf-lw-c-h1{font-family:'Cinzel',serif;font-size:clamp(40px,5vw,64px);color:#fff;margin-bottom:24px;font-weight:400;letter-spacing:2px}
-  .cf-lw-c-p{font-size:14px;color:#888;max-width:600px;margin:0 auto;line-height:1.6}
-  
-  .cf-lw-c-wrap{max-width:1400px;margin:0 auto;padding:60px 5%}
-  
-  .cf-lw-c-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:60px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:20px}
-  .cf-lw-c-filters{display:flex;gap:30px;overflow-x:auto}
-  .cf-lw-c-filter{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#888;text-decoration:none;transition:color .3s;white-space:nowrap}
-  .cf-lw-c-filter:hover,.cf-lw-c-filter.active{color:{{ section.settings.color_accent | default: '#D4AF37' }}}
-  
-  .cf-lw-prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px}
-  .cf-lw-card{text-decoration:none;color:#E5E4E2;text-align:center;display:block}
-  .cf-lw-card-img{aspect-ratio:3/4;background:#111;padding:20px;position:relative;margin-bottom:24px;display:flex;align-items:center;justify-content:center}
-  .cf-lw-card-img::before{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.05);transition:border-color .5s}
-  .cf-lw-card:hover .cf-lw-card-img::before{border-color:{{ section.settings.color_accent | default: '#D4AF37' }}}
-  .cf-lw-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .8s;filter:drop-shadow(0 10px 20px rgba(0,0,0,.5))}
-  .cf-lw-card:hover .cf-lw-card-img img{transform:scale(1.05)}
-  
-  .cf-lw-card-title{font-family:'Cinzel',serif;font-size:16px;margin-bottom:8px;color:#fff;letter-spacing:1px}
-  .cf-lw-card-price{font-size:14px;color:#888}
+:root {
+  --bg: #050505;
+  --text: #F2F2F2;
+  --text-muted: #999999;
+  --gold: #D4AF37;
+  --gold-dark: #AA8C2C;
+  --surface: #111111;
+  --border: #333333;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Lato', sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; letter-spacing: 0.5px; }
+h1, h2, h3, .brand { font-family: 'Cinzel', serif; font-weight: 400; }
 
-  @media(max-width:1024px){
-    .cf-lw-prod-grid{grid-template-columns:repeat(3,1fr)}
-  }
-  @media(max-width:768px){
-    .cf-lw-prod-grid{grid-template-columns:repeat(2,1fr)}
-  }
-{% endstyle %}
+/* HEADER - SPLIT NAV */
+header { display: flex; align-items: center; justify-content: space-between; padding: 40px 60px; position: absolute; top: 0; left: 0; width: 100%; z-index: 50; }
+.hamburger { width: 30px; height: 20px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+.hamburger span { display: block; height: 1px; width: 100%; background: #fff; transition: 0.3s; }
+.hamburger:hover span { background: var(--gold); }
+.brand { font-size: 28px; letter-spacing: 6px; color: #fff; text-decoration: none; text-align: center; position: absolute; left: 50%; transform: translateX(-50%); }
+.nav-actions { display: flex; gap: 30px; }
+.action-link { color: #fff; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+.action-link:hover { color: var(--gold); }
 
-<div class="cf-lw-c">
-  <div class="cf-lw-c-head">
-    <div class="cf-lw-c-sub">The Collection</div>
-    <h1 class="cf-lw-c-h1">{{ collection.title | default: 'All Timepieces' }}</h1>
-    <p class="cf-lw-c-p">{{ collection.description | strip_html | truncate: 150 | default: 'Discover our complete range of horological masterpieces.' }}</p>
-  </div>
-  
-  <div class="cf-lw-c-wrap">
-    <div class="cf-lw-c-toolbar">
-      <div class="cf-lw-c-filters">
-        <a href="#" class="cf-lw-c-filter active">All Models</a>
-        <a href="#" class="cf-lw-c-filter">Chronograph</a>
-        <a href="#" class="cf-lw-c-filter">Diving</a>
-        <a href="#" class="cf-lw-c-filter">Dress</a>
-        <a href="#" class="cf-lw-c-filter">Complications</a>
-      </div>
-      <div style="font-size:11px;letter-spacing:2px;color:#666;text-transform:uppercase">
-        {{ collection.products_count | default: '12' }} Timepieces Found
-      </div>
-    </div>
-    
-    <div class="cf-lw-prod-grid">
-      {% if collection.products.size > 0 %}
-        {% for product in collection.products %}
-          <a href="{{ product.url }}" class="cf-lw-card">
-            <div class="cf-lw-card-img">
-              {% if product.featured_image %}<img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}">{% endif %}
-            </div>
-            <div class="cf-lw-card-title">{{ product.title }}</div>
-            <div class="cf-lw-card-price">{{ product.price | money }}</div>
-          </a>
-        {% endfor %}
-      {% else %}
-        {% for i in (1..8) %}
-          <a href="#" class="cf-lw-card">
-            <div class="cf-lw-card-img">
-              <div style="width:50%;height:50%;border-radius:50%;background:radial-gradient(circle at center,#333,#0A0A0A)"></div>
-            </div>
-            <div class="cf-lw-card-title">Exquisite Timepiece {{ i }}</div>
-            <div class="cf-lw-card-price">${{ i | times: 10000 | plus: 5000 | money_without_currency }}</div>
-          </a>
-        {% endfor %}
-      {% endif %}
-    </div>
-  </div>
+/* HERO */
+.hero { height: 100vh; position: relative; display: flex; align-items: center; padding-left: 10vw; overflow: hidden; }
+.hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 50%, rgba(212, 175, 55, 0.15) 0%, transparent 60%); z-index: 1; }
+.hero-video { position: absolute; top: 0; right: -10vw; width: 60%; height: 100%; background: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'0.5\' opacity=\'0.3\'/><circle cx=\'50\' cy=\'50\' r=\'30\' fill=\'none\' stroke=\'%23D4AF37\' stroke-width=\'0.2\' opacity=\'0.1\'/></svg>') center center/cover no-repeat; opacity: 0.8; z-index: 0; filter: blur(2px); }
+.hero-content { position: relative; z-index: 2; max-width: 600px; }
+.kicker { font-size: 11px; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; display: block; }
+.hero h1 { font-size: 64px; line-height: 1.1; margin-bottom: 30px; }
+.hero p { font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
+.btn-gold { padding: 16px 48px; border: 1px solid var(--gold); background: transparent; color: var(--gold); font-family: 'Lato', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s ease; text-decoration: none; display: inline-block; }
+.btn-gold:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+
+/* COLLECTIONS / PRODUCTS */
+.collections { padding: 120px 60px; max-width: 1600px; margin: 0 auto; }
+.section-title { text-align: center; margin-bottom: 80px; }
+.section-title h2 { font-size: 36px; letter-spacing: 4px; margin-bottom: 16px; }
+.section-title p { font-size: 13px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.product-card { position: relative; background: var(--surface); height: 600px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: crosshair; }
+.product-card::before { content: ''; position: absolute; inset: 0; border: 1px solid var(--border); transition: border-color 0.6s ease; z-index: 1; pointer-events: none; }
+.product-card:hover::before { border-color: rgba(212, 175, 55, 0.5); }
+
+.p-img-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transition: transform 1s cubic-bezier(0.2, 1, 0.3, 1); background: radial-gradient(circle at center, #1A1A1A 0%, #050505 100%); display: flex; align-items: center; justify-content: center; }
+.p-img-container svg { width: 50%; height: 50%; opacity: 0.8; stroke: #fff; }
+.product-card:hover .p-img-container { transform: scale(1.05); }
+
+/* Glassmorphism overlay on hover */
+.p-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; z-index: 2; opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.2, 1, 0.3, 1); }
+.product-card:hover .p-overlay { opacity: 1; transform: translateY(0); }
+
+.p-name { font-family: 'Cinzel', serif; font-size: 24px; letter-spacing: 2px; color: #fff; margin-bottom: 8px; }
+.p-specs { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; font-weight: 300; display: flex; gap: 12px; }
+.p-specs span::after { content: '|'; margin-left: 12px; color: var(--border); }
+.p-specs span:last-child::after { content: ''; }
+.p-action-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+.p-price { font-size: 14px; letter-spacing: 2px; color: var(--gold); }
+.btn-concierge { background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 20px; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; font-family: 'Lato', sans-serif; }
+.btn-concierge:hover { background: #fff; color: #000; }
+
+/* HOROLOGY INFO */
+.horology { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.h-text { padding: 120px 10vw; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border); }
+.h-img { background: #111; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.h-img svg { width: 40%; height: 40%; stroke: var(--gold-dark); stroke-width: 0.5; }
+.h-title { font-size: 40px; margin-bottom: 30px; letter-spacing: 2px; }
+.h-desc { font-weight: 300; color: var(--text-muted); line-height: 2; margin-bottom: 40px; font-size: 15px; }
+
+/* ULTRA MINIMAL FOOTER */
+footer { padding: 80px 60px; max-width: 1600px; margin: 0 auto; text-align: center; }
+.f-logo { font-family: 'Cinzel', serif; font-size: 24px; letter-spacing: 8px; color: #fff; text-decoration: none; display: block; margin-bottom: 40px; }
+.f-links { display: flex; justify-content: center; gap: 40px; margin-bottom: 60px; }
+.f-links a { color: var(--text-muted); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; transition: color 0.3s; }
+.f-links a:hover { color: var(--gold); }
+.f-legal { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; }
+
+/* RESPONSIVE */
+@media(max-width: 1024px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .horology { grid-template-columns: 1fr; }
+  .h-text { border-right: none; padding: 80px 40px; border-bottom: 1px solid var(--border); }
+  .h-img { height: 400px; }
+  .hero-video { opacity: 0.3; right: 0; width: 100%; }
+}
+@media(max-width: 768px) {
+  header { padding: 20px; }
+  .nav-actions span { display: none; }
+  .hero { padding: 40px; }
+  .hero h1 { font-size: 48px; }
+  .product-grid { grid-template-columns: 1fr; }
+  .collections { padding: 80px 20px; }
+  .f-links { flex-direction: column; gap: 20px; }
+}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#C5A028' }};
+  --cf-bg:{{ section.settings.bg | default: '#0a0a0a' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#C5A028' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
 </div>
+{% endif %}
+
+<header>
+  <div class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <a href="#" class="brand">CHRONOS</a>
+  <div class="nav-actions">
+    <a href="#" class="action-link">Boutiques</a>
+    <a href="#" class="action-link">Contact <span style="margin-left:5px">Concierge</span></a>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: Luxury Watches ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #C5A028; --cf-bg: #0a0a0a; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
+
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
+
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
+    </div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
+    </div>
+  </div>
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+            {% else %}
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+            {% endif %}
+            {% if product.available == false %}
+              <span class="cfcol-badge">Sold Out</span>
+            {% elsif product.compare_at_price > product.price %}
+              <span class="cfcol-badge">Sale</span>
+            {% endif %}
+          </div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
+              {% endif %}
+            </div>
+          </div>
+          <button class="cfcol-atc">Add to Cart</button>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
+    {% endif %}
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
+</div>
+
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#C5A028);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#C5A028);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#C5A028);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
   "name": "CF Luxury Watches Coll",
   "settings": [
-    { "type": "color", "id": "color_accent", "label": "Gold Accent", "default": "#D4AF37" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#C5A028"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
-  "presets": [{ "name": "CF Luxury Watches Coll" }]
+  "presets": [
+    {
+      "name": "CF Luxury Watches Coll"
+    }
+  ]
 }
 {% endschema %}

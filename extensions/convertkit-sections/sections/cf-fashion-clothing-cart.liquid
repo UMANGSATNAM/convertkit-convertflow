@@ -1,118 +1,384 @@
-{% comment %}
-  ConvertFlow — Fashion Clothing Cart Page
-  Minimalist, elegant cart layout.
-{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+:root{--ink:#0A0A0A;--paper:#F5F3EF;--accent:#E8D5B0;--mid:#888;--border:#E0DDD8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.bebas{font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:2px;}
 
-  :root {
-    --fc-primary: {{ section.settings.color_primary | default: '#0A0A0A' }};
-    --fc-bg: {{ section.settings.color_bg | default: '#F5F3EF' }};
-    --fc-surface: {{ section.settings.color_surface | default: '#FFFFFF' }};
-    --fc-text: {{ section.settings.color_text | default: '#1a1a1a' }};
-    --fc-border: rgba(0, 0, 0, 0.08);
-    --fc-font-heading: 'Playfair Display', serif;
-    --fc-font-body: 'Inter', sans-serif;
-  }
+/* PROMO */
+.promo{background:var(--ink);color:#fff;text-align:center;padding:11px;font-size:12px;letter-spacing:3px;text-transform:uppercase;}
+.promo a{color:var(--accent);text-decoration:none;}
 
-  .cf-fc-cart * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-fc-cart { font-family: var(--fc-font-body); background: var(--fc-surface); color: var(--fc-text); min-height: 70vh; padding: 80px 5%; }
-  
-  .cf-fc-cart-inner { max-width: 900px; margin: 0 auto; }
-  .cf-fc-cart h1 { font-family: var(--fc-font-heading); font-size: 48px; font-weight: 400; margin-bottom: 40px; text-align: center; }
-  
-  .cf-fc-cart-empty { text-align: center; padding: 60px 0; }
-  .cf-fc-cart-empty p { color: #666; margin-bottom: 30px; font-size: 15px; }
-  .cf-fc-btn-shop { display: inline-block; padding: 14px 40px; border: 1px solid var(--fc-primary); color: var(--fc-primary); font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: all 0.3s; }
-  .cf-fc-btn-shop:hover { background: var(--fc-primary); color: #fff; }
-  
-  .cf-fc-cart-items { border-top: 1px solid var(--fc-border); margin-bottom: 60px; }
-  .cf-fc-c-item { display: grid; grid-template-columns: 100px 1fr auto; gap: 30px; padding: 30px 0; border-bottom: 1px solid var(--fc-border); align-items: center; }
-  .cf-fc-c-img { aspect-ratio: 3/4; background: #f0ece6; }
-  .cf-fc-c-img img { width: 100%; height: 100%; object-fit: cover; }
-  
-  .cf-fc-c-info h3 { font-family: var(--fc-font-body); font-size: 16px; font-weight: 500; margin-bottom: 8px; }
-  .cf-fc-c-var { font-size: 13px; color: #888; margin-bottom: 16px; }
-  .cf-fc-c-actions { display: flex; align-items: center; gap: 24px; }
-  .cf-fc-c-qty { display: flex; align-items: center; border: 1px solid var(--fc-border); padding: 4px 12px; }
-  .cf-fc-c-qty button { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--fc-text); }
-  .cf-fc-c-qty span { font-size: 13px; margin: 0 12px; }
-  .cf-fc-c-remove { font-size: 12px; color: #888; text-decoration: underline; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-  
-  .cf-fc-c-price { font-size: 16px; font-weight: 500; }
-  
-  .cf-fc-cart-footer { max-width: 400px; margin-left: auto; }
-  .cf-fc-c-subtotal { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 12px; }
-  .cf-fc-c-note { font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.6; }
-  .cf-fc-btn-checkout { display: block; width: 100%; padding: 18px; background: var(--fc-primary); color: #fff; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; border: none; cursor: pointer; transition: opacity 0.3s; text-align: center; text-decoration: none; }
-  .cf-fc-btn-checkout:hover { opacity: 0.9; }
+/* HEADER */
+header{background:var(--paper);padding:20px 60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:6px;color:var(--ink);text-decoration:none;}
+nav{display:flex;gap:36px;list-style:none;}
+nav a{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--mid);}
+.h-actions{display:flex;align-items:center;gap:20px;}
+.h-btn{background:var(--ink);color:#fff;padding:10px 24px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.h-btn:hover{opacity:.8;}
 
-  @media(max-width: 600px) {
-    .cf-fc-c-item { grid-template-columns: 80px 1fr; gap: 20px; position: relative; }
-    .cf-fc-c-price { position: absolute; top: 30px; right: 0; }
-    .cf-fc-cart-footer { max-width: 100%; margin-top: 40px; }
-  }
-{% endstyle %}
+/* HERO — full viewport editorial */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;height:92vh;border-bottom:1px solid var(--border);}
+.hero-visual{background:#1A1A1A;display:flex;align-items:flex-end;padding:60px;position:relative;overflow:hidden;}
+.hero-visual::before{content:'COLLECTION';position:absolute;top:50%;left:-80px;transform:translateY(-50%) rotate(-90deg);font-family:'Bebas Neue',sans-serif;font-size:200px;color:rgba(255,255,255,.04);letter-spacing:10px;white-space:nowrap;}
+.hero-tag{display:inline-flex;align-items:center;gap:12px;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--accent);}
 
-<div class="cf-fc-cart">
-  <div class="cf-fc-cart-inner">
-    <h1>Your Bag</h1>
-    
+.hero-content{padding:80px 80px 80px 70px;display:flex;flex-direction:column;justify-content:center;position:relative;}
+.hero-content h1{font-size:110px;line-height:.92;margin:20px 0 30px;color:var(--ink);}
+.hero-content p{font-size:17px;color:var(--mid);line-height:1.8;max-width:380px;margin-bottom:48px;font-weight:300;}
+.hero-cta-group{display:flex;gap:16px;}
+.btn-dark{background:var(--ink);color:#fff;padding:18px 40px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:opacity .2s;}
+.btn-dark:hover{opacity:.8;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:17px 40px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+.btn-outline:hover{background:var(--ink);color:#fff;}
+.hero-scroll{position:absolute;bottom:40px;right:60px;display:flex;align-items:center;gap:12px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mid);}
+.hero-scroll::after{content:'';width:40px;height:1px;background:var(--mid);}
+
+/* CATEGORIES */
+.cats{display:flex;border-bottom:1px solid var(--border);}
+.cat{flex:1;padding:32px;text-align:center;border-right:1px solid var(--border);text-decoration:none;color:var(--ink);transition:background .2s;position:relative;overflow:hidden;}
+.cat:last-child{border-right:none;}
+.cat:hover{background:var(--ink);}
+.cat:hover .cat-label,.cat:hover .cat-count{color:#fff;}
+.cat-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;display:block;margin-bottom:4px;transition:color .2s;}
+.cat-count{font-size:11px;color:var(--mid);letter-spacing:2px;text-transform:uppercase;transition:color .2s;}
+
+/* PRODUCTS */
+.shop{padding:100px 60px;max-width:1400px;margin:0 auto;}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;}
+.sec-head h2{font-size:64px;color:var(--ink);}
+.view-all{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mid);text-decoration:none;border-bottom:1px solid var(--mid);padding-bottom:4px;}
+.view-all:hover{color:var(--ink);border-color:var(--ink);}
+
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{position:relative;cursor:pointer;}
+.prod-card:hover .pc-overlay{opacity:1;}
+.pc-img{aspect-ratio:3/4;background:#E8E4DC;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:18px;}
+.pc-img:nth-child(odd){background:#1A1A1A;}
+.pc-img svg{width:35%;color:rgba(0,0,0,.15);transition:transform .6s;}
+.prod-card:hover .pc-img svg{transform:scale(1.05);}
+.pc-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
+.pc-overlay-btn{background:#fff;color:var(--ink);padding:12px 28px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;}
+.pc-badge{position:absolute;top:16px;left:16px;background:var(--ink);color:#fff;padding:5px 12px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;z-index:2;}
+.pc-badge.sale{background:#C0392B;}
+.pc-name{font-weight:700;font-size:14px;margin-bottom:4px;}
+.pc-type{font-size:12px;color:var(--mid);margin-bottom:8px;letter-spacing:1px;}
+.pc-prices{display:flex;gap:10px;align-items:center;}
+.pc-price{font-size:15px;font-weight:700;}
+.pc-old{font-size:13px;color:var(--mid);text-decoration:line-through;}
+
+/* EDITORIAL STRIP */
+.editorial{display:grid;grid-template-columns:1fr 1fr;height:600px;margin:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.ed-left{background:#1a1a1a;display:flex;flex-direction:column;justify-content:flex-end;padding:60px;position:relative;overflow:hidden;}
+.ed-left::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);}
+.ed-left-content{position:relative;z-index:1;}
+.ed-left h2{font-size:72px;color:#fff;margin-bottom:16px;}
+.ed-left p{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:30px;max-width:360px;line-height:1.8;}
+.ed-right{display:grid;grid-template-rows:1fr 1fr;}
+.ed-item{background:#2A2A2A;display:flex;flex-direction:column;justify-content:flex-end;padding:40px;border-bottom:1px solid rgba(255,255,255,.05);position:relative;}
+.ed-item:last-child{border-bottom:none;background:#F0EBE0;}
+.ed-item h3{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;letter-spacing:2px;margin-bottom:8px;}
+.ed-item:last-child h3{color:var(--ink);}
+.ed-item p{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:1px;}
+.ed-item:last-child p{color:var(--mid);}
+
+/* SIZE GUIDE BAND */
+.size-band{background:var(--ink);color:#fff;padding:40px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;}
+.sb-text h3{font-size:32px;margin-bottom:8px;}
+.sb-text p{font-size:14px;color:rgba(255,255,255,.5);}
+.sb-sizes{display:flex;gap:16px;}
+.sz{width:52px;height:52px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.sz:hover,.sz.active{background:#fff;color:var(--ink);}
+.sb-btn{background:#fff;color:var(--ink);padding:16px 32px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.sb-btn:hover{opacity:.85;}
+
+/* FOOTER */
+footer{background:var(--ink);padding:80px 60px 40px;}
+.f-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.1);}
+.f-brand a{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:6px;color:#fff;text-decoration:none;display:block;margin-bottom:20px;}
+.f-brand p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.9;max-width:280px;}
+.f-col h4{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:24px;}
+.f-col ul{list-style:none;}
+.f-col li{margin-bottom:12px;}
+.f-col a{color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;transition:color .2s;}
+.f-col a:hover{color:#fff;}
+.f-bottom{display:flex;justify-content:space-between;padding-top:30px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;height:auto}.hero-content{padding:60px 40px}.hero-content h1{font-size:72px}.prod-grid{grid-template-columns:repeat(2,1fr)}.editorial{grid-template-columns:1fr;height:auto}.f-top{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.shop{padding:60px 20px}.cats{flex-wrap:wrap}.cat{min-width:50%}.size-band{flex-direction:column;padding:40px 20px}.f-top{grid-template-columns:1fr;gap:40px}}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#0A0A0A' }};
+  --cf-bg:{{ section.settings.bg | default: '#F5F3EF' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#0A0A0A' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="promo">New Season Drop — Extra 15% off with code VOLT15 &nbsp;<a href="#">Shop Now →</a></div>
+<header>
+  <a href="#" class="brand">VŌLT</a>
+  <nav>
+    <li><a href="#">New In</a></li>
+    <li><a href="#">Women</a></li>
+    <li><a href="#">Men</a></li>
+    <li><a href="#">Denim</a></li>
+    <li><a href="#">Sale</a></li>
+  </nav>
+  <div class="h-actions">
+    <a href="#" class="h-btn">{{ section.settings.hero_cta | default: "Shop Now" }}</a>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: VÃƒâ€¦Ã…â€™LT Fashion Ã¢â‚¬â€ Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: {{ section.settings.color_accent | default: '#0A0A0A' }}; --cf-bg: {{ section.settings.color_bg | default: '#F5F3EF' }}; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
+.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
+.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
+.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.cfc-empty span { font-size: 14px; }
+.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
+.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.cfc-item:last-child { border-bottom: none; }
+.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
+.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
+.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
+.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
+.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
+.cfc-item-remove:hover { color: #e53e3e; }
+.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+/* Summary */
+.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
+.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
+.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
+.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
+.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
+.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
+.cfc-checkout:hover { opacity: .9; }
+.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
+@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
+</style>
+
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
     {% if cart.item_count == 0 %}
-      <div class="cf-fc-cart-empty">
-        <p>Your shopping bag is currently empty.</p>
-        <a href="/collections/all" class="cf-fc-btn-shop">Continue Shopping</a>
+      <div class="cfc-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Your cart is empty</p>
+        <span>Looks like you haven't added anything yet.</span>
+        <a href="/collections/all">Continue Shopping</a>
       </div>
     {% else %}
-      <div class="cf-fc-cart-items">
+      <div class="cfc-items">
         {% for item in cart.items %}
-          <div class="cf-fc-c-item">
-            <div class="cf-fc-c-img">
+          <div class="cfc-item">
+            <div class="cfc-item-img">
               {% if item.image %}
-                <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
+              {% else %}
+                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
               {% endif %}
             </div>
-            <div class="cf-fc-c-info">
-              <h3>{{ item.product.title }}</h3>
-              {% unless item.variant.title contains 'Default' %}
-                <div class="cf-fc-c-var">{{ item.variant.title }}</div>
-              {% endunless %}
-              <div class="cf-fc-c-actions">
-                <div class="cf-fc-c-qty">
-                  <button>-</button><span>{{ item.quantity }}</span><button>+</button>
-                </div>
-                <a href="{{ item.url_to_remove }}" class="cf-fc-c-remove">Remove</a>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
               </div>
             </div>
-            <div class="cf-fc-c-price">{{ item.final_line_price | money }}</div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
           </div>
         {% endfor %}
       </div>
-      
-      <div class="cf-fc-cart-footer">
-        <div class="cf-fc-c-subtotal">
-          <span>Subtotal</span>
-          <span>{{ cart.total_price | money }}</span>
-        </div>
-        <p class="cf-fc-c-note">Taxes and shipping calculated at checkout.</p>
-        <a href="/checkout" class="cf-fc-btn-checkout">Proceed to Checkout</a>
-      </div>
+    {% endif %}
+  </div>
+
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢{{ cart.total_discount | money }}</span></div>
+    {% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo">
+      <input type="text" placeholder="Discount code">
+      <button>Apply</button>
+    </div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
+    </div>
     {% endif %}
   </div>
 </div>
 
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#0A0A0A);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#0A0A0A);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#0A0A0A);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
+
 {% schema %}
 {
-  "name": "CF Fashion Cart",
+  "name": "CF VÃƒâ€¦Ã…â€™LT Fashion",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Color", "default": "#0A0A0A" },
-    { "type": "color", "id": "color_bg", "label": "Background Color", "default": "#F5F3EF" },
-    { "type": "color", "id": "color_surface", "label": "Surface Color", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_text", "label": "Text Color", "default": "#1a1a1a" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#F5F3EF"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout Ã¢â€ â€™"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
   ],
   "presets": [
-    { "name": "CF Fashion Cart" }
+    {
+      "name": "CF VÃƒâ€¦Ã…â€™LT Fashion"
+    }
   ]
 }
 {% endschema %}

@@ -1,163 +1,407 @@
-{% comment %}
-  ConvertFlow — Pet Supplies Cart Page
-  Friendly cart layout with rounded elements and treats upsell.
-{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
+:root {
+  --primary: #3E8ED0;
+  --secondary: #FF8F3D;
+  --bg: #F0F8FF;
+  --card-bg: #FFFFFF;
+  --text: #2D3748;
+  --text-muted: #718096;
+  --border: #E2E8F0;
+  --success: #48BB78;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 16px; line-height: 1.5; }
+h1, h2, h3, h4, .brand { font-family: 'Quicksand', sans-serif; }
 
-  :root {
-    --pet-primary: {{ section.settings.color_primary | default: '#FF6B35' }};
-    --pet-secondary: {{ section.settings.color_secondary | default: '#FFD166' }};
-    --pet-bg: {{ section.settings.color_bg | default: '#FFF8F0' }};
-    --pet-surface: {{ section.settings.color_surface | default: '#FFFFFF' }};
-    --pet-text: {{ section.settings.color_text | default: '#2B2D42' }};
-    --pet-font-heading: 'Quicksand', sans-serif;
-    --pet-font-body: 'Nunito', sans-serif;
-  }
+/* HEADER */
+.promo { background: var(--secondary); color: #fff; text-align: center; padding: 12px; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; }
+header { background: var(--card-bg); padding: 20px 40px; border-bottom: 3px solid var(--border); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; border-radius: 0 0 24px 24px; margin: 0 10px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+.brand { font-size: 28px; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.brand-icon { width: 36px; height: 36px; background: var(--secondary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: rotate(-10deg); transition: transform 0.3s; }
+.brand:hover .brand-icon { transform: rotate(10deg); }
+.nav-links { display: flex; gap: 24px; list-style: none; }
+.nav-links a { color: var(--text); text-decoration: none; font-weight: 700; font-size: 15px; padding: 8px 16px; border-radius: 20px; transition: background 0.2s, color 0.2s; }
+.nav-links a:hover { background: var(--bg); color: var(--primary); }
+.header-actions { display: flex; gap: 16px; align-items: center; }
+.cart-btn { background: var(--primary); color: #fff; border: none; padding: 10px 24px; border-radius: 20px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; box-shadow: 0 4px 6px rgba(62, 142, 208, 0.3); }
+.cart-btn:hover { background: #3178B3; transform: translateY(-2px); }
 
-  .cf-pet-cart * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-pet-cart { font-family: var(--pet-font-body); background: var(--pet-bg); color: var(--pet-text); min-height: 80vh; padding: 60px 5%; }
-  
-  .cf-pet-cart-wrap { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 40px; }
-  
-  .cf-pet-cart-h1 { font-family: var(--pet-font-heading); font-size: 40px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; }
-  .cf-pet-cart-h1 svg { color: var(--pet-primary); width: 32px; height: 32px; }
-  
-  /* Items List */
-  .cf-pet-c-items { background: var(--pet-surface); border-radius: 30px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-  .cf-pet-c-item { display: grid; grid-template-columns: 100px 1fr auto; gap: 24px; padding: 24px 0; border-bottom: 2px dashed #eee; align-items: center; }
-  .cf-pet-c-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .cf-pet-c-item:first-child { padding-top: 0; }
-  
-  .cf-pet-c-img { aspect-ratio: 1; background: #fff0eb; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: center; }
-  .cf-pet-c-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  
-  .cf-pet-c-info h3 { font-family: var(--pet-font-heading); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-  .cf-pet-c-var { font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600; }
-  
-  .cf-pet-c-actions { display: flex; align-items: center; gap: 20px; }
-  .cf-pet-c-qty { display: inline-flex; border: 2px solid #eee; border-radius: 50px; align-items: center; padding: 0 12px; }
-  .cf-pet-c-qty button { background: none; border: none; font-size: 18px; font-weight: 700; color: var(--pet-primary); cursor: pointer; width: 24px; height: 32px; }
-  .cf-pet-c-qty span { font-size: 15px; font-weight: 700; margin: 0 10px; }
-  
-  .cf-pet-c-remove { width: 32px; height: 32px; background: #ffece6; color: #ff3366; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s; }
-  .cf-pet-c-remove:hover { background: #ff3366; color: #fff; }
-  
-  .cf-pet-c-price { font-family: var(--pet-font-heading); font-size: 20px; font-weight: 800; color: var(--pet-primary); }
-  
-  /* Upsell */
-  .cf-pet-c-upsell { background: var(--pet-secondary); border-radius: 20px; padding: 20px; margin-top: 30px; display: flex; align-items: center; gap: 20px; }
-  .cf-pet-c-upsell-img { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .cf-pet-c-upsell-info h4 { font-family: var(--pet-font-heading); font-size: 16px; margin-bottom: 4px; }
-  .cf-pet-c-upsell-info p { font-size: 13px; font-weight: 600; color: #555; }
-  .cf-pet-c-upsell-btn { margin-left: auto; background: #fff; color: var(--pet-text); border: none; border-radius: 50px; padding: 8px 16px; font-family: var(--pet-font-heading); font-weight: 700; cursor: pointer; font-size: 13px; }
-  
-  /* Summary */
-  .cf-pet-c-sum { background: var(--pet-surface); border-radius: 30px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: sticky; top: 40px; }
-  .cf-pet-c-sum h2 { font-family: var(--pet-font-heading); font-size: 24px; margin-bottom: 24px; border-bottom: 2px dashed #eee; padding-bottom: 16px; }
-  .cf-pet-c-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #555; }
-  .cf-pet-c-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 800; color: var(--pet-text); margin-top: 24px; padding-top: 24px; border-top: 2px dashed #eee; font-family: var(--pet-font-heading); }
-  .cf-pet-c-total span:last-child { color: var(--pet-primary); font-size: 28px; }
-  
-  .cf-pet-btn-checkout {
-    display: block; width: 100%; text-align: center; margin-top: 30px;
-    background: var(--pet-primary); color: #fff; border: none; border-radius: 50px;
-    padding: 18px; font-family: var(--pet-font-heading); font-size: 18px; font-weight: 700;
-    text-decoration: none; cursor: pointer;
-    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
-    transition: all 0.3s;
-  }
-  .cf-pet-btn-checkout:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255, 107, 53, 0.4); }
+/* HERO */
+.hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 60px 80px; gap: 40px; max-width: 1400px; margin: 0 auto; }
+.hero-content { display: flex; flex-direction: column; gap: 24px; }
+.hero-tag { background: #EBF8FF; color: var(--primary); font-weight: 800; font-size: 13px; padding: 8px 16px; border-radius: 20px; width: max-content; display: flex; align-items: center; gap: 6px; }
+.hero-title { font-size: 56px; font-weight: 900; line-height: 1.1; color: var(--text); }
+.hero-title span { color: var(--secondary); }
+.hero-desc { font-size: 18px; color: var(--text-muted); font-weight: 600; max-width: 480px; }
+.btn-primary { background: var(--secondary); color: #fff; padding: 18px 40px; border-radius: 30px; font-weight: 800; font-size: 18px; text-decoration: none; display: inline-block; width: max-content; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 15px rgba(255, 143, 61, 0.4); border: none; cursor: pointer; font-family: 'Nunito', sans-serif;}
+.btn-primary:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(255, 143, 61, 0.5); }
+.hero-img-wrapper { position: relative; }
+.hero-img { width: 100%; aspect-ratio: 1; background: #FFDDA1; border-radius: 50% 50% 40% 40%; border: 8px solid #fff; box-shadow: 0 20px 40px rgba(0,0,0,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.hero-img svg { width: 40%; color: var(--secondary); }
 
-  .cf-pet-c-empty { grid-column: 1 / -1; text-align: center; padding: 80px 20px; background: var(--pet-surface); border-radius: 30px; }
-  .cf-pet-c-empty h2 { font-size: 28px; margin-bottom: 16px; color: var(--pet-primary); }
+/* CATEGORY PILLS */
+.categories { display: flex; justify-content: center; gap: 16px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; }
+.cat-pill { background: var(--card-bg); border: 2px solid var(--border); padding: 12px 24px; border-radius: 30px; font-weight: 800; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+.cat-pill:hover, .cat-pill.active { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
 
-  @media(max-width: 900px) {
-    .cf-pet-cart-wrap { grid-template-columns: 1fr; }
-    .cf-pet-c-item { grid-template-columns: 80px 1fr; position: relative; }
-    .cf-pet-c-price { position: absolute; top: 24px; right: 0; }
-    .cf-pet-c-upsell { flex-direction: column; text-align: center; }
-    .cf-pet-c-upsell-btn { margin-left: 0; margin-top: 10px; width: 100%; }
-  }
-{% endstyle %}
+/* PRODUCTS */
+.products-section { padding: 40px 80px 80px; max-width: 1400px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 40px; }
+.section-header h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+.products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.product-card { background: var(--card-bg); border-radius: 24px; padding: 24px; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.04); transition: transform 0.3s; border: 2px solid transparent; }
+.product-card:hover { transform: translateY(-8px); border-color: #EBF8FF; }
 
-<div class="cf-pet-cart">
-  <div class="cf-pet-cart-wrap">
+/* Badges */
+.card-badges { position: absolute; top: 16px; left: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.badge.bestseller { background: var(--secondary); }
+.badge.organic { background: var(--success); }
+.badge.new { background: var(--primary); }
+
+.p-img-box { aspect-ratio: 1; background: var(--bg); border-radius: 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; }
+.p-img-box svg { width: 50%; color: var(--primary); opacity: 0.8; }
+
+.p-brand { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.p-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; line-height: 1.3; font-family: 'Nunito', sans-serif; }
+.p-rating { display: flex; align-items: center; gap: 4px; margin-bottom: 16px; }
+.star { color: #F6E05E; font-size: 16px; }
+.rev-count { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-left: 4px; }
+
+/* Subscription Toggle */
+.sub-box { background: var(--bg); border-radius: 16px; padding: 12px; margin-bottom: 16px; border: 2px solid var(--border); }
+.sub-option { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer; }
+.sub-option:last-child { margin-bottom: 0; }
+.sub-radio { accent-color: var(--primary); width: 16px; height: 16px; }
+.sub-label { font-size: 13px; font-weight: 700; color: var(--text); flex-grow: 1; }
+.sub-price { font-size: 14px; font-weight: 800; color: var(--text); }
+.sub-save { font-size: 10px; background: #C6F6D5; color: #22543D; padding: 2px 6px; border-radius: 4px; font-weight: 800; margin-left: auto; }
+
+.btn-add { width: 100%; background: var(--bg); color: var(--primary); border: 2px solid var(--primary); padding: 14px; border-radius: 16px; font-weight: 800; font-size: 15px; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif; }
+.btn-add:hover { background: var(--primary); color: #fff; }
+
+/* BANNER */
+.value-banner { background: var(--primary); margin: 40px auto; max-width: 1400px; border-radius: 32px; padding: 60px; color: #fff; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; text-align: center; }
+.val-item .val-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.val-item .val-icon svg { width: 32px; height: 32px; color: #fff; }
+.val-item h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.val-item p { font-size: 15px; font-weight: 600; opacity: 0.9; }
+
+/* FOOTER */
+footer { background: #2D3748; color: #A0AEC0; padding: 80px 80px 40px; border-radius: 48px 48px 0 0; margin-top: 60px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; max-width: 1400px; margin: 0 auto 40px; }
+.f-brand .brand { color: #fff; margin-bottom: 20px; }
+.f-brand p { font-weight: 600; line-height: 1.6; max-width: 300px; margin-bottom: 24px; }
+.f-col h4 { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 24px; font-family: 'Quicksand', sans-serif; }
+.f-col ul { list-style: none; }
+.f-col li { margin-bottom: 12px; }
+.f-col a { color: #A0AEC0; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+.f-col a:hover { color: #fff; }
+.newsletter { background: rgba(255,255,255,0.05); padding: 24px; border-radius: 20px; }
+.newsletter p { margin-bottom: 16px; font-weight: 600; font-size: 14px; }
+.nw-form { display: flex; gap: 8px; }
+.nw-input { flex-grow: 1; padding: 12px 16px; border-radius: 12px; border: none; background: #fff; font-family: 'Nunito', sans-serif; font-weight: 600; }
+.nw-btn { background: var(--secondary); color: #fff; border: none; padding: 0 20px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+
+.footer-bottom { text-align: center; border-top: 2px solid rgba(255,255,255,0.05); padding-top: 40px; font-weight: 600; font-size: 14px; }
+
+/* RESPONSIVE */
+@media(max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media(max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; text-align: center; padding: 40px; }
+  .hero-content { align-items: center; }
+  .hero-desc { max-width: 600px; }
+  .hero-img-wrapper { max-width: 500px; margin: 0 auto; }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .value-banner { grid-template-columns: 1fr; border-radius: 0; padding: 60px 40px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 768px) {
+  header { padding: 16px 20px; margin: 0; border-radius: 0; }
+  .nav-links { display: none; }
+  .hero-title { font-size: 40px; }
+  .products-section { padding: 40px 20px; }
+  .products-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+  footer { padding: 60px 20px 40px; border-radius: 24px 24px 0 0; }
+}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#D35400' }};
+  --cf-bg:{{ section.settings.bg | default: '#f9e0d1' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#D35400' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="promo"> FREE Shipping on orders over $50 + 20% OFF your first Autoship!</div>
+
+<header>
+  <a href="#" class="brand">
+    <div class="brand-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c-5.514 0-10 4.486-10 10s4.486 10 10 10 10-4.486 10-10-4.486-10-10-10zM12 20c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M9.5 9c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zM14.5 9c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z"/><path d="M12 16c-1.654 0-3-1.346-3-3h6c0 1.654-1.346 3-3 3z"/></svg></div>
+    HappyPaws
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Dogs</a></li>
+    <li><a href="#">Cats</a></li>
+    <li><a href="#">Health</a></li>
+    <li><a href="#">Toys</a></li>
+    <li><a href="#" style="color:var(--secondary)">Autoship</a></li>
+  </ul>
+  <div class="header-actions">
+    <button class="cart-btn">{{ section.settings.hero_cta | default: "Shop Now" }}</button>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: Pet Supplies Ã¢â‚¬â€ Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: {{ section.settings.color_accent | default: '#D35400' }}; --cf-bg: {{ section.settings.color_bg | default: '#f9e0d1' }}; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
+.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
+.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
+.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.cfc-empty span { font-size: 14px; }
+.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
+.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.cfc-item:last-child { border-bottom: none; }
+.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
+.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
+.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
+.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
+.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
+.cfc-item-remove:hover { color: #e53e3e; }
+.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+/* Summary */
+.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
+.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
+.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
+.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
+.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
+.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
+.cfc-checkout:hover { opacity: .9; }
+.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
+@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
+</style>
+
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
     {% if cart.item_count == 0 %}
-      <div class="cf-pet-c-empty">
-        <h2>Your bowl is empty!</h2>
-        <p style="color:#666; font-weight:600; margin-bottom: 30px;">Looks like you haven't added any treats or toys yet.</p>
-        <a href="/collections/all" class="cf-pet-btn-checkout" style="display:inline-block; width:auto; padding: 14px 40px;">Fetch Some Goodies</a>
+      <div class="cfc-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Your cart is empty</p>
+        <span>Looks like you haven't added anything yet.</span>
+        <a href="/collections/all">Continue Shopping</a>
       </div>
     {% else %}
-      <div>
-        <h1 class="cf-pet-cart-h1">
-          Your Cart
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.5c-4 0-7-2.5-7-6s3-4 7-4 7 .5 7 4-3 6-7 6zm-5-10c-1.5 0-3-1.5-3-3.5s1.5-3.5 3-3.5 3 1.5 3 3.5-1.5 3.5-3 3.5zm10 0c-1.5 0-3-1.5-3-3.5s1.5-3.5 3-3.5 3 1.5 3 3.5-1.5 3.5-3 3.5zm-5-2c-1.5 0-2.5-1-2.5-2.5s1-2.5 2.5-2.5 2.5 1 2.5 2.5-1 2.5-2.5 2.5z"/></svg>
-        </h1>
-        
-        <div class="cf-pet-c-items">
-          {% for item in cart.items %}
-            <div class="cf-pet-c-item">
-              <div class="cf-pet-c-img">
-                {% if item.image %}
-                  <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">
-                {% endif %}
-              </div>
-              <div class="cf-pet-c-info">
-                <h3>{{ item.product.title }}</h3>
-                {% unless item.variant.title contains 'Default' %}
-                  <div class="cf-pet-c-var">Size/Flavor: {{ item.variant.title }}</div>
-                {% endunless %}
-                <div class="cf-pet-c-actions">
-                  <div class="cf-pet-c-qty">
-                    <button>-</button><span>{{ item.quantity }}</span><button>+</button>
-                  </div>
-                  <a href="{{ item.url_to_remove }}" class="cf-pet-c-remove">✕</a>
-                </div>
-              </div>
-              <div class="cf-pet-c-price">{{ item.final_line_price | money }}</div>
+      <div class="cfc-items">
+        {% for item in cart.items %}
+          <div class="cfc-item">
+            <div class="cfc-item-img">
+              {% if item.image %}
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
+              {% else %}
+                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
+              {% endif %}
             </div>
-          {% endfor %}
-        </div>
-        
-        <div class="cf-pet-c-upsell">
-          <div class="cf-pet-c-upsell-img">🍖</div>
-          <div class="cf-pet-c-upsell-info">
-            <h4>Add Daily Dental Chews</h4>
-            <p>Keep their breath fresh! Only $9.99</p>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
+              </div>
+            </div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
           </div>
-          <button class="cf-pet-c-upsell-btn">+ Add to Cart</button>
-        </div>
-      </div>
-      
-      <div class="cf-pet-c-sum">
-        <h2>Order Summary</h2>
-        <div class="cf-pet-c-row"><span>Subtotal</span> <span>{{ cart.total_price | money }}</span></div>
-        <div class="cf-pet-c-row"><span>Shipping</span> <span style="color:#00C853;">Free</span></div>
-        <div class="cf-pet-c-total"><span>Total</span> <span>{{ cart.total_price | money }}</span></div>
-        <a href="/checkout" class="cf-pet-btn-checkout">Go to Checkout</a>
-        <p style="text-align:center; font-size:13px; font-weight:600; color:#888; margin-top:20px;">
-          🔒 Secure checkout by Stripe
-        </p>
+        {% endfor %}
       </div>
     {% endif %}
   </div>
+
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢{{ cart.total_discount | money }}</span></div>
+    {% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo">
+      <input type="text" placeholder="Discount code">
+      <button>Apply</button>
+    </div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
+    </div>
+    {% endif %}
+  </div>
 </div>
+
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#D35400);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#D35400);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#D35400);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
   "name": "CF Pet Supplies Cart",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Accent", "default": "#FF6B35" },
-    { "type": "color", "id": "color_secondary", "label": "Secondary Accent", "default": "#FFD166" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#FFF8F0" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#2B2D42" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#D35400"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#f9e0d1"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout Ã¢â€ â€™"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
   ],
   "presets": [
-    { "name": "CF Pet Supplies Cart" }
+    {
+      "name": "CF Pet Supplies Cart"
+    }
   ]
 }
 {% endschema %}

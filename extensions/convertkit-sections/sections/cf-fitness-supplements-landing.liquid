@@ -1,235 +1,683 @@
-{% comment %}ConvertFlow - Fitness Supplements Landing | IronCore style{% endcomment %}
-<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700;800&family=Barlow:wght@400;600;800&display=swap" rel="stylesheet">
+{% comment %}ConvertFlow: Fitness Supplements — Landing Page{% endcomment %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700;800&family=Barlow:ital,wght@0,400;0,600;0,800;1,800&display=swap" rel="stylesheet">
 <style>
-.cfs *{box-sizing:border-box;margin:0;padding:0}
-.cfs{font-family:'Barlow',sans-serif;font-size:16px;color:#fff;background:#0A0A0A;-webkit-font-smoothing:antialiased;text-transform:uppercase}
-.cfs h1,.cfs h2,.cfs h3,.cfs-brand{font-family:'Teko',sans-serif;letter-spacing:1px}
-/* PROMO BAR */
-.cfs-promo{background:{{ section.settings.color_accent }};color:#000;padding:6px;text-align:center;font-weight:800;font-size:14px;letter-spacing:2px}
+
+:root {
+  --bg: #0A0A0A;
+  --surface: #171717;
+  --primary: #D4FF00; /* Neon Yellow */
+  --text: #FFFFFF;
+  --text-muted: #888888;
+  --border: #333333;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; font-size: 16px; line-height: 1.4; text-transform: uppercase; }
+h1, h2, h3, .brand { font-family: 'Teko', sans-serif; letter-spacing: 1px; }
+
+/* AGGRESSIVE HEADER */
+.promo-bar { background: var(--primary); color: #000; padding: 6px; text-align: center; font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+header { background: var(--bg); padding: 20px 40px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 44px; font-weight: 800; color: #fff; text-decoration: none; line-height: 1; transform: skewX(-10deg); display: inline-block; }
+.brand span { color: var(--primary); }
+
+.nav-links { display: flex; justify-content: center; gap: 40px; list-style: none; }
+.nav-links a { color: #fff; text-decoration: none; font-weight: 800; font-size: 18px; letter-spacing: 2px; transition: color 0.2s; position: relative; }
+.nav-links a:hover { color: var(--primary); }
+.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 3px; background: var(--primary); transform: scaleX(0); transition: transform 0.2s; transform-origin: left; }
+.nav-links a:hover::after { transform: scaleX(1); }
+
+.header-actions { display: flex; gap: 20px; align-items: center; }
+.btn-vip { background: var(--primary); color: #000; padding: 8px 20px; font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 14px; border: none; cursor: pointer; text-decoration: none; transform: skewX(-10deg); transition: all 0.2s; }
+.btn-vip:hover { background: #fff; }
+.btn-vip span { display: block; transform: skewX(10deg); letter-spacing: 1px; }
+
+.cart-icon { color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: 800; }
+.cart-icon:hover { color: var(--primary); }
+
 /* HERO */
-.cfs-hero{min-height:calc(100vh - 120px);display:flex;align-items:center;position:relative;padding:0 80px;overflow:hidden;background:linear-gradient(90deg,rgba(10,10,10,1) 0%,rgba(10,10,10,.4) 100%),#171717}
-.cfs-hero::after{content:'';position:absolute;right:-5vw;top:0;width:40vw;height:100%;background:{{ section.settings.color_accent }};transform:skewX(-15deg);z-index:1;opacity:.1}
-.cfs-hero-content{position:relative;z-index:2;max-width:700px}
-.cfs-hero-tag{display:inline-block;border:2px solid {{ section.settings.color_accent }};color:{{ section.settings.color_accent }};font-weight:800;padding:4px 12px;margin-bottom:20px;transform:skewX(-10deg)}
-.cfs-hero-tag span{display:block;transform:skewX(10deg)}
-.cfs-hero h1{font-size:110px;line-height:.85;margin-bottom:30px;color:#fff}
-.cfs-hero h1 em{font-style:normal;-webkit-text-stroke:2px {{ section.settings.color_accent }};color:transparent}
-.cfs-hero p{font-size:18px;font-weight:600;color:#888;margin-bottom:40px;max-width:500px;text-transform:none}
-.cfs-btn-hero{background:{{ section.settings.color_accent }};color:#000;font-family:'Teko',sans-serif;font-size:32px;font-weight:700;padding:12px 48px;border:none;cursor:pointer;display:inline-block;transform:skewX(-10deg);box-shadow:-8px 8px 0 rgba(212,255,0,.3);transition:all .2s;text-decoration:none}
-.cfs-btn-hero:hover{box-shadow:-4px 4px 0 rgba(212,255,0,.5);transform:skewX(-10deg) translate(-4px,4px);background:#fff}
-.cfs-btn-hero span{display:block;transform:skewX(10deg)}
-/* TICKER */
-.cfs-ticker{background:{{ section.settings.color_accent }};color:#000;padding:16px 0;overflow:hidden;white-space:nowrap;border-top:4px solid #fff;border-bottom:4px solid #fff}
-.cfs-ticker-inner{display:inline-block;animation:cfs-scroll 20s linear infinite;font-family:'Teko',sans-serif;font-size:28px;font-weight:700;letter-spacing:2px}
-@keyframes cfs-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-/* PRODUCT GRID */
-.cfs-section{padding:100px 40px;max-width:1600px;margin:0 auto}
-.cfs-sec-title{font-size:64px;text-align:center;margin-bottom:60px;line-height:1}
-.cfs-sec-title span{color:{{ section.settings.color_accent }}}
-.cfs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
-.cfs-card{background:#171717;position:relative;padding:30px;border:2px solid #333;clip-path:polygon(0 0,100% 0,100% calc(100% - 30px),calc(100% - 30px) 100%,0 100%);transition:all .3s;display:flex;flex-direction:column}
-.cfs-card::after{content:'';position:absolute;bottom:0;right:0;width:30px;height:30px;background:{{ section.settings.color_accent }};transition:all .3s}
-.cfs-card:hover{border-color:{{ section.settings.color_accent }};transform:translateY(-10px)}
-.cfs-card-badge{position:absolute;top:16px;left:-10px;background:#fff;color:#000;font-weight:800;font-size:14px;padding:4px 16px;font-family:'Teko',sans-serif;letter-spacing:1px;z-index:2;box-shadow:4px 4px 0 {{ section.settings.color_accent }}}
-.cfs-card-img{width:100%;aspect-ratio:1;background:#0A0A0A;margin-bottom:24px;display:flex;align-items:center;justify-content:center}
-.cfs-card-img svg{width:50%;opacity:.8;color:{{ section.settings.color_accent }};filter:drop-shadow(0 0 10px rgba(212,255,0,.5))}
-.cfs-card-name{font-size:32px;font-family:'Teko',sans-serif;line-height:1;margin-bottom:8px}
-.cfs-card-desc{font-size:12px;color:#888;font-weight:600;margin-bottom:24px;letter-spacing:1px;text-transform:none}
-.cfs-card-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:auto;border-top:2px solid #333;padding-top:20px}
-.cfs-price{font-family:'Teko',sans-serif;font-size:36px;line-height:1;color:{{ section.settings.color_accent }};font-weight:600}
-.cfs-old-price{font-size:18px;color:#888;text-decoration:line-through;font-family:'Teko',sans-serif;display:block;margin-bottom:-4px}
-.cfs-btn-add{background:#fff;color:#000;border:none;padding:12px 24px;font-family:'Barlow',sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all .2s;transform:skewX(-10deg)}
-.cfs-btn-add:hover{background:{{ section.settings.color_accent }}}
-.cfs-btn-add span{display:block;transform:skewX(10deg)}
-/* STATS */
-.cfs-stats{display:flex;background:#171717;border-top:2px solid #333;border-bottom:2px solid #333}
-.cfs-stat{flex:1;padding:40px;text-align:center;border-right:2px solid #333}
-.cfs-stat:last-child{border-right:none}
-.cfs-stat-val{font-family:'Teko',sans-serif;font-size:64px;color:{{ section.settings.color_accent }};line-height:1;margin-bottom:8px}
-.cfs-stat-lbl{font-size:14px;font-weight:800;letter-spacing:2px}
+.hero { height: calc(100vh - 120px); min-height: 600px; display: flex; align-items: center; position: relative; padding: 0 80px; overflow: hidden; background: linear-gradient(90deg, rgba(10,10,10,1) 0%, rgba(10,10,10,0.4) 100%), url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23171717\'/><path d=\'M0 0 L100 100 M100 0 L0 100\' stroke=\'%23333333\' stroke-width=\'1\'/></svg>') center/cover; }
+.hero::after { content: ''; position: absolute; right: -5vw; top: 0; width: 40vw; height: 100%; background: var(--primary); transform: skewX(-15deg); z-index: 1; opacity: 0.1; }
+
+.hero-content { position: relative; z-index: 2; max-width: 700px; }
+.hero-tag { display: inline-block; border: 2px solid var(--primary); color: var(--primary); font-weight: 800; padding: 4px 12px; margin-bottom: 20px; transform: skewX(-10deg); }
+.hero-tag span { display: block; transform: skewX(10deg); }
+.hero h1 { font-size: 110px; line-height: 0.85; margin-bottom: 30px; text-transform: uppercase; color: #fff; }
+.hero h1 em { font-style: normal; -webkit-text-stroke: 2px var(--primary); color: transparent; }
+.hero p { font-size: 18px; font-weight: 600; color: var(--text-muted); margin-bottom: 40px; max-width: 500px; text-transform: none; }
+
+.btn-hero { background: var(--primary); color: #000; font-family: 'Teko', sans-serif; font-size: 32px; font-weight: 700; padding: 12px 48px; border: none; cursor: pointer; text-decoration: none; display: inline-block; transform: skewX(-10deg); box-shadow: -8px 8px 0px rgba(212, 255, 0, 0.3); transition: all 0.2s; }
+.btn-hero:hover { box-shadow: -4px 4px 0px rgba(212, 255, 0, 0.5); transform: skewX(-10deg) translate(-4px, 4px); background: #fff; }
+.btn-hero span { display: block; transform: skewX(10deg); }
+
+/* HORIZONTAL SCROLL PRODUCT BAR */
+.ticker { background: var(--primary); color: #000; padding: 16px 0; overflow: hidden; white-space: nowrap; border-top: 4px solid #fff; border-bottom: 4px solid #fff; }
+.ticker-inner { display: inline-block; animation: scroll 20s linear infinite; font-family: 'Teko', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+@keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* ANGLED PRODUCT GRID */
+.section { padding: 100px 40px; max-width: 1600px; margin: 0 auto; }
+.sec-title { font-size: 64px; text-align: center; margin-bottom: 60px; line-height: 1; }
+.sec-title span { color: var(--primary); }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.card { background: var(--surface); position: relative; padding: 30px; border: 2px solid var(--border); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%); transition: all 0.3s; display: flex; flex-direction: column; }
+.card::after { content: ''; position: absolute; bottom: 0; right: 0; width: 30px; height: 30px; background: var(--primary); transition: all 0.3s; }
+.card:hover { border-color: var(--primary); transform: translateY(-10px); }
+
+.c-badge { position: absolute; top: 16px; left: -10px; background: #fff; color: #000; font-weight: 800; font-size: 14px; padding: 4px 16px; font-family: 'Teko', sans-serif; letter-spacing: 1px; z-index: 2; box-shadow: 4px 4px 0 var(--primary); }
+
+.c-img { width: 100%; aspect-ratio: 1; background: #0A0A0A; margin-bottom: 24px; position: relative; display: flex; align-items: center; justify-content: center; }
+.c-img::before { content: 'O'; font-family: 'Teko', sans-serif; font-size: 200px; font-weight: 800; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.02); line-height: 0; }
+.c-img svg { width: 50%; opacity: 0.8; color: var(--primary); filter: drop-shadow(0 0 10px rgba(212,255,0,0.5)); }
+
+.c-info { flex-grow: 1; display: flex; flex-direction: column; }
+.c-name { font-size: 32px; font-family: 'Teko', sans-serif; line-height: 1; margin-bottom: 8px; }
+.c-desc { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 24px; letter-spacing: 1px; text-transform: none; }
+
+.c-flavor { width: 100%; background: var(--bg); border: 2px solid var(--border); color: #fff; padding: 12px; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; margin-bottom: 24px; outline: none; appearance: none; cursor: pointer; }
+.c-flavor:focus { border-color: var(--primary); }
+
+.c-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 2px solid var(--border); padding-top: 20px; }
+.c-price-box { display: flex; flex-direction: column; }
+.c-price { font-family: 'Teko', sans-serif; font-size: 36px; line-height: 1; color: var(--primary); font-weight: 600; }
+.c-old-price { font-size: 18px; color: var(--text-muted); text-decoration: line-through; font-family: 'Teko', sans-serif; margin-bottom: -4px; }
+
+.btn-add { background: #fff; color: #000; border: none; padding: 12px 24px; font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s; transform: skewX(-10deg); }
+.btn-add:hover { background: var(--primary); }
+.btn-add span { display: block; transform: skewX(10deg); }
+
+/* STAT BAND */
+.stats { display: flex; background: var(--surface); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
+.stat-item { flex: 1; padding: 40px; text-align: center; border-right: 2px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-val { font-family: 'Teko', sans-serif; font-size: 64px; color: var(--primary); line-height: 1; margin-bottom: 8px; }
+.stat-lbl { font-size: 14px; font-weight: 800; letter-spacing: 2px; }
+
 /* FOOTER */
-.cfs-footer{padding:80px 40px 40px;background:#000;border-top:4px solid {{ section.settings.color_accent }}}
-.cfs-f-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:60px;max-width:1600px;margin:0 auto}
-.cfs-f-brand h2{font-size:56px;line-height:1;margin-bottom:20px;transform:skewX(-10deg)}
-.cfs-f-brand h2 span{color:{{ section.settings.color_accent }}}
-.cfs-f-desc{text-transform:none;color:#888;font-weight:600;max-width:300px;margin-bottom:30px}
-.cfs-f-col h4{font-family:'Teko',sans-serif;font-size:28px;margin-bottom:20px;color:{{ section.settings.color_accent }}}
-.cfs-f-col ul{list-style:none}
-.cfs-f-col li{margin-bottom:12px}
-.cfs-f-col a{color:#fff;text-decoration:none;font-weight:800;letter-spacing:1px;transition:color .2s}
-.cfs-f-col a:hover{color:{{ section.settings.color_accent }}}
-.cfs-vip-box{border:2px solid {{ section.settings.color_accent }};padding:30px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%)}
-.cfs-vip-box h4{font-family:'Teko',sans-serif;font-size:28px;margin-bottom:10px;color:{{ section.settings.color_accent }}}
-.cfs-vip-box p{text-transform:none;color:#888;font-size:14px;margin-bottom:20px;font-weight:600}
-.cfs-vip-input{width:100%;background:transparent;border:2px solid #333;color:#fff;padding:12px;font-family:'Barlow',sans-serif;font-weight:700;margin-bottom:12px;outline:none}
-.cfs-vip-btn{width:100%;background:{{ section.settings.color_accent }};color:#000;border:none;padding:12px;font-family:'Barlow',sans-serif;font-weight:800;font-size:16px;cursor:pointer}
-.cfs-f-bottom{max-width:1600px;margin:40px auto 0;padding-top:20px;border-top:2px solid #333;display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:#888}
-@media(max-width:1200px){.cfs-grid{grid-template-columns:repeat(2,1fr)}.cfs-f-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:900px){.cfs-hero{padding:80px 40px}.cfs-hero h1{font-size:80px}.cfs-stats{flex-direction:column}.cfs-stat{border-right:none;border-bottom:2px solid #333}}
-@media(max-width:600px){.cfs-hero{padding:60px 20px;text-align:center}.cfs-hero-content{display:flex;flex-direction:column;align-items:center}.cfs-hero h1{font-size:60px}.cfs-grid{grid-template-columns:1fr}.cfs-f-grid{grid-template-columns:1fr}}
+footer { padding: 80px 40px 40px; background: #000; border-top: 4px solid var(--primary); }
+.f-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; max-width: 1600px; margin: 0 auto; }
+.f-brand h2 { font-size: 56px; line-height: 1; margin-bottom: 20px; transform: skewX(-10deg); }
+.f-brand h2 span { color: var(--primary); }
+.f-desc { text-transform: none; color: var(--text-muted); font-weight: 600; max-width: 300px; margin-bottom: 30px; }
+
+.f-col h4 { font-family: 'Teko', sans-serif; font-size: 28px; margin-bottom: 20px; color: var(--primary); }
+.f-col ul { list-style: none; }
+.f-col li { margin-bottom: 12px; }
+.f-col a { color: #fff; text-decoration: none; font-weight: 800; letter-spacing: 1px; transition: color 0.2s; }
+.f-col a:hover { color: var(--primary); }
+
+.vip-box { border: 2px solid var(--primary); padding: 30px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%); }
+.vip-box h4 { margin-bottom: 10px; }
+.vip-box p { text-transform: none; color: var(--text-muted); font-size: 14px; margin-bottom: 20px; font-weight: 600; }
+.vip-input { width: 100%; background: transparent; border: 2px solid var(--border); color: #fff; padding: 12px; font-family: 'Barlow', sans-serif; font-weight: 700; margin-bottom: 12px; outline: none; }
+.vip-input:focus { border-color: #fff; }
+.vip-btn { width: 100%; background: var(--primary); color: #000; border: none; padding: 12px; font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+.vip-btn:hover { background: #fff; }
+
+.f-bottom { max-width: 1600px; margin: 40px auto 0; padding-top: 20px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--text-muted); }
+
+/* RESPONSIVE */
+@media(max-width: 1200px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .f-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 900px) {
+  header { grid-template-columns: 1fr auto; }
+  .nav-links { display: none; }
+  .hero { height: auto; min-height: auto; padding: 80px 40px; }
+  .hero h1 { font-size: 80px; }
+  .stats { flex-direction: column; }
+  .stat-item { border-right: none; border-bottom: 2px solid var(--border); }
+}
+@media(max-width: 600px) {
+  .hero { padding: 60px 20px; text-align: center; }
+  .hero-content { display: flex; flex-direction: column; align-items: center; }
+  .hero h1 { font-size: 60px; }
+  .grid { grid-template-columns: 1fr; }
+  .f-grid { grid-template-columns: 1fr; }
+}
+
+</style>
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#E2FE16' }};
+  --cf-bg:{{ section.settings.bg | default: '#050505' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
 </style>
 
-<div class="cfs">
-  <div class="cfs-promo">{{ section.settings.promo_bar_text }}</div>
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#E2FE16' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
 
-  <section class="cfs-hero">
-    <div class="cfs-hero-content">
-      {% if section.settings.hero_tag != blank %}
-      <div class="cfs-hero-tag"><span>{{ section.settings.hero_tag }}</span></div>
-      {% endif %}
-      <h1>{{ section.settings.hero_line1 }}<br>{{ section.settings.hero_line2 }} <em>{{ section.settings.hero_line2_accent }}</em><br>{{ section.settings.hero_line3 }}</h1>
-      <p>{{ section.settings.hero_subtext }}</p>
-      <a href="{{ section.settings.hero_cta_link }}" class="cfs-btn-hero"><span>{{ section.settings.hero_cta_text }}</span></a>
-    </div>
-  </section>
+<div class="promo-bar"> FREE SHIPPING ON ORDERS OVER $99 + GET A FREE SHAKER </div>
 
-  <div class="cfs-ticker">
-    <div class="cfs-ticker-inner">{{ section.settings.ticker_text }} &nbsp;&nbsp;&nbsp; {{ section.settings.ticker_text }} &nbsp;&nbsp;&nbsp;</div>
+<header>
+  <a href="#" class="brand">IRON<span>CORE</span></a>
+  <ul class="nav-links">
+    <li><a href="#">Pre-Workout</a></li>
+    <li><a href="#">Protein</a></li>
+    <li><a href="#">Recovery</a></li>
+    <li><a href="#">Apparel</a></li>
+  </ul>
+  <div class="header-actions">
+    <a href="#" class="btn-vip">{{ section.settings.hero_cta | default: "Shop Now" }}</a>
+    <a href="#" class="cart-icon">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 11-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      (2)
+    </a>
   </div>
+</header>
 
-  <section class="cfs-section">
-    <h2 class="cfs-sec-title">{{ section.settings.products_heading_line1 }} <span>{{ section.settings.products_heading_line2 }}</span></h2>
-    <div class="cfs-grid">
-      {% for block in section.blocks %}
-        {% if block.type == 'product_card' %}
-        <div class="cfs-card" {{ block.shopify_attributes }}>
-          {% if block.settings.badge != blank %}<div class="cfs-card-badge">{{ block.settings.badge }}</div>{% endif %}
-          <div class="cfs-card-img">
-            {% if block.settings.image %}
-              <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.name }}" style="width:100%;height:100%;object-fit:cover">
-            {% else %}
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            {% endif %}
-          </div>
-          <div>
-            <h3 class="cfs-card-name">{{ block.settings.name }}</h3>
-            <p class="cfs-card-desc">{{ block.settings.description }}</p>
-            <div class="cfs-card-bottom">
-              <div>
-                {% if block.settings.old_price != blank %}<span class="cfs-old-price">{{ block.settings.old_price }}</span>{% endif %}
-                <div class="cfs-price">{{ block.settings.price }}</div>
-              </div>
-              <button class="cfs-btn-add"><span>ADD TO CART</span></button>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </section>
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag"><span>CLINICALLY DOSED</span></div>
+    <h1>{{ section.settings.hero_h1 | default: 'Fitness Supplements' }}</h1>
+    <p>No proprietary blends. No fillers. Just scientifically formulated supplements designed to push your limits and shatter plateaus.</p>
+    <a href="#shop" class="btn-hero">{{ section.settings.hero_cta2 | default: "View Collection" }}</a>
+  </div>
+</section>
 
-  {% if section.settings.show_stats %}
-  <div class="cfs-stats">
-    {% for block in section.blocks %}
-      {% if block.type == 'stat' %}
-      <div class="cfs-stat" {{ block.shopify_attributes }}>
-        <div class="cfs-stat-val">{{ block.settings.value }}</div>
-        <div class="cfs-stat-lbl">{{ block.settings.label }}</div>
+<div class="ticker">
+  <div class="ticker-inner">
+    /// 0% FILLERS /// 100% TRANSPARENCY /// CLINICAL DOSAGES /// GMP CERTIFIED /// BANNED SUBSTANCE TESTED /// 0% FILLERS /// 100% TRANSPARENCY /// CLINICAL DOSAGES /// GMP CERTIFIED /// BANNED SUBSTANCE TESTED /// 
+  </div>
+</div>
+
+<section class="section" id="shop">
+  <h2 class="sec-title">ELITE <span>ARSENAL</span></h2>
+  
+  <div class="grid">
+    <!-- Item 1 -->
+    <div class="card">
+      <div class="c-badge">#1 PRE-WORKOUT</div>
+      <div class="c-img">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
       </div>
-      {% endif %}
+      <div class="c-info">
+        <h3 class="c-name">OBLITERATE X3</h3>
+        <p class="c-desc">High-stimulant pre-workout designed for explosive energy, laser focus, and skin-tearing pumps. 400mg Caffeine.</p>
+        <select class="c-flavor">
+          <option>Sour Gummy Worm</option>
+          <option>Blue Raspberry</option>
+          <option>Fruit Punch</option>
+        </select>
+        <div class="c-bottom">
+          <div class="c-price-box">
+            <div class="c-old-price">$49.99</div>
+            <div class="c-price">$39.99</div>
+          </div>
+          <button class="btn-add"><span>ADD TO CART</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 2 -->
+    <div class="card">
+      <div class="c-img">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+      </div>
+      <div class="c-info">
+        <h3 class="c-name">ISOLATE PRO</h3>
+        <p class="c-desc">100% Hydrolyzed Whey Protein Isolate. 25g Protein, 0g Sugar, rapid absorption for ultimate muscle recovery.</p>
+        <select class="c-flavor">
+          <option>Fudge Brownie</option>
+          <option>Vanilla Bean</option>
+          <option>Peanut Butter</option>
+        </select>
+        <div class="c-bottom">
+          <div class="c-price-box">
+            <div class="c-old-price">$64.99</div>
+            <div class="c-price">$54.99</div>
+          </div>
+          <button class="btn-add"><span>ADD TO CART</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="card">
+      <div class="c-img">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </div>
+      <div class="c-info">
+        <h3 class="c-name">AMINO RECOVER R</h3>
+        <p class="c-desc">Intra-workout EAA + BCAA complex with hydration matrix. Prevent catabolism and stay hydrated during grueling sessions.</p>
+        <select class="c-flavor">
+          <option>Watermelon Smash</option>
+          <option>Lemon Lime</option>
+        </select>
+        <div class="c-bottom">
+          <div class="c-price-box">
+            <div class="c-old-price">$39.99</div>
+            <div class="c-price">$29.99</div>
+          </div>
+          <button class="btn-add"><span>ADD TO CART</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat-item">
+    <div class="stat-val">100%</div>
+    <div class="stat-lbl">LABEL TRANSPARENCY</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val">3RD</div>
+    <div class="stat-lbl">PARTY TESTED</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val">PRO</div>
+    <div class="stat-lbl">ATHLETE APPROVED</div>
+  </div>
+</div>
+
+
+
+{% if section.settings.show_products and section.settings.prod_col != blank %}
+<div style="background:var(--cf-bg,#050505);padding:80px 60px">
+  <div style="text-align:center;margin-bottom:48px">
+    <h2 style="font-size:36px;font-weight:800;margin-bottom:10px">{{ section.settings.prod_heading }}</h2>
+    <p style="font-size:15px;color:#888">{{ section.settings.prod_sub }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;max-width:1400px;margin:0 auto">
+    {% for p in section.settings.prod_col.products limit: section.settings.prod_count %}
+    <a href="{{ p.url }}" style="background:#fff;border:1px solid rgba(0,0,0,.08);text-decoration:none;color:#1a1a1a;display:block;transition:all .3s;overflow:hidden">
+      <div style="aspect-ratio:1;overflow:hidden;position:relative;background:#f5f5f5;display:flex;align-items:center;justify-content:center">
+        {% if p.featured_image %}
+          <img src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        {% else %}
+          <svg width="40" height="40" fill="none" stroke="#ccc" viewBox="0 0 24 24"><path d="M20 7H4l1 12h14z"/></svg>
+        {% endif %}
+        {% if p.available == false %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#E2FE16);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sold Out</span>
+        {% elsif p.compare_at_price > p.price %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#E2FE16);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sale</span>
+        {% endif %}
+      </div>
+      <div style="padding:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cf-accent,#E2FE16);margin-bottom:4px">{{ p.vendor }}</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.4">{{ p.title | truncate: 55 }}</div>
+        <div style="font-size:18px;font-weight:800">{{ p.price | money }}{% if p.compare_at_price > p.price %} <del style="font-size:13px;color:#aaa;font-weight:400">{{ p.compare_at_price | money }}</del>{% endif %}</div>
+        <button style="display:block;width:100%;margin-top:12px;padding:12px;background:var(--cf-accent,#E2FE16);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px;font-family:inherit">Add to Cart</button>
+      </div>
+    </a>
     {% endfor %}
   </div>
-  {% endif %}
-
-  <footer class="cfs-footer">
-    <div class="cfs-f-grid">
-      <div class="cfs-f-brand">
-        <h2>{{ section.settings.brand_line1 }}<span>{{ section.settings.brand_line2 }}</span></h2>
-        <p class="cfs-f-desc">{{ section.settings.brand_desc }}</p>
-      </div>
-      <div class="cfs-f-col"><h4>SHOP</h4><ul>
-        <li><a href="#">ALL PRODUCTS</a></li>
-        <li><a href="#">PRE-WORKOUTS</a></li>
-        <li><a href="#">PROTEINS</a></li>
-        <li><a href="#">FAT BURNERS</a></li>
-      </ul></div>
-      <div class="cfs-f-col"><h4>SUPPORT</h4><ul>
-        <li><a href="#">FAQ</a></li>
-        <li><a href="#">SHIPPING</a></li>
-        <li><a href="#">RETURNS</a></li>
-        <li><a href="#">CONTACT</a></li>
-      </ul></div>
-      <div class="cfs-vip-box">
-        <h4>{{ section.settings.newsletter_heading }}</h4>
-        <p>{{ section.settings.newsletter_text }}</p>
-        <input type="email" class="cfs-vip-input" placeholder="EMAIL ADDRESS">
-        <button class="cfs-vip-btn">{{ section.settings.newsletter_btn }}</button>
-      </div>
-    </div>
-    <div class="cfs-f-bottom">
-      <div>{{ section.settings.copyright }}</div>
-      <div style="display:flex;gap:20px"><a href="#" style="color:#888;text-decoration:none">PRIVACY POLICY</a><a href="#" style="color:#888;text-decoration:none">TERMS OF SERVICE</a></div>
-    </div>
-  </footer>
 </div>
+{% endif %}
+{% if section.settings.show_testi %}
+<div style="padding:80px 60px;background:#fafafa">
+  <h2 style="text-align:center;font-size:36px;font-weight:800;margin-bottom:48px">{{ section.settings.testi_h }}</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1400px;margin:0 auto">
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t1_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#E2FE16)">{{ section.settings.t1_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t2_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#E2FE16)">{{ section.settings.t2_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t3_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#E2FE16)">{{ section.settings.t3_auth }}</div></div>
+  </div>
+</div>
+{% endif %}
+{% if section.settings.show_nl %}
+<div style="padding:80px 60px;background:var(--cf-accent,#E2FE16);text-align:center;color:#fff">
+  <h2 style="font-size:36px;font-weight:800;margin-bottom:12px">{{ section.settings.nl_h }}</h2>
+  <p style="font-size:15px;opacity:.85;margin-bottom:36px">{{ section.settings.nl_sub }}</p>
+  <form action="/contact#contact_form" method="post" style="display:flex;max-width:480px;margin:0 auto">
+    <input type="hidden" name="form_type" value="customer">
+    <input type="hidden" name="utf8" value="&#x2713;">
+    <input type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder }}" required style="flex:1;padding:16px 20px;border:none;font-size:14px;outline:none;font-family:inherit">
+    <button type="submit" style="padding:16px 28px;background:#1a1a1a;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">{{ section.settings.nl_btn }}</button>
+  </form>
+</div>
+{% endif %}
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#E2FE16);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#E2FE16);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#E2FE16);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Fitness Supplements",
+  "name": "CF Fitness Supplements LP",
   "settings": [
-    { "type": "header", "content": "Brand" },
-    { "type": "text", "id": "brand_line1", "label": "Brand Name Line 1", "default": "IRON" },
-    { "type": "text", "id": "brand_line2", "label": "Brand Name Line 2 (accent)", "default": "CORE" },
-    { "type": "textarea", "id": "brand_desc", "label": "Brand Description", "default": "We don't do compromises. We engineer the highest quality supplements for those who demand more from their bodies." },
-    { "type": "text", "id": "copyright", "label": "Copyright Text", "default": "© 2025 IRONCORE SUPPS. ALL RIGHTS RESERVED." },
-    { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "color_accent", "label": "Accent Color (Neon)", "default": "#D4FF00" },
-    { "type": "header", "content": "Promo Bar" },
-    { "type": "text", "id": "promo_bar_text", "label": "Promo Bar Text", "default": "FREE SHIPPING ON ORDERS OVER $99 + GET A FREE SHAKER" },
-    { "type": "header", "content": "Hero" },
-    { "type": "text", "id": "hero_tag", "label": "Hero Tag", "default": "CLINICALLY DOSED" },
-    { "type": "text", "id": "hero_line1", "label": "Hero Line 1", "default": "Unleash" },
-    { "type": "text", "id": "hero_line2", "label": "Hero Line 2", "default": "Your" },
-    { "type": "text", "id": "hero_line2_accent", "label": "Hero Line 2 Accent (outline)", "default": "True" },
-    { "type": "text", "id": "hero_line3", "label": "Hero Line 3", "default": "Potential" },
-    { "type": "textarea", "id": "hero_subtext", "label": "Hero Subtext", "default": "No proprietary blends. No fillers. Just scientifically formulated supplements designed to push your limits and shatter plateaus." },
-    { "type": "text", "id": "hero_cta_text", "label": "CTA Button Text", "default": "SHOP THE STACK" },
-    { "type": "url", "id": "hero_cta_link", "label": "CTA Button Link" },
-    { "type": "header", "content": "Ticker" },
-    { "type": "text", "id": "ticker_text", "label": "Ticker Text (repeats)", "default": "/// 0% FILLERS /// 100% TRANSPARENCY /// CLINICAL DOSAGES /// GMP CERTIFIED /// BANNED SUBSTANCE TESTED" },
-    { "type": "header", "content": "Products Section" },
-    { "type": "text", "id": "products_heading_line1", "label": "Products Heading Line 1", "default": "ELITE" },
-    { "type": "text", "id": "products_heading_line2", "label": "Products Heading Line 2 (accent)", "default": "ARSENAL" },
-    { "type": "header", "content": "Stats Strip" },
-    { "type": "checkbox", "id": "show_stats", "label": "Show Stats Strip", "default": true },
-    { "type": "header", "content": "Newsletter" },
-    { "type": "text", "id": "newsletter_heading", "label": "Newsletter Heading", "default": "UNLOCK VIP PRICING" },
-    { "type": "textarea", "id": "newsletter_text", "label": "Newsletter Text", "default": "Subscribe for 15% off your first order, exclusive drops, and workout guides." },
-    { "type": "text", "id": "newsletter_btn", "label": "Newsletter Button Text", "default": "GET 15% OFF" }
-  ],
-  "blocks": [
     {
-      "type": "product_card",
-      "name": "Product Card",
-      "settings": [
-        { "type": "image_picker", "id": "image", "label": "Product Image" },
-        { "type": "text", "id": "badge", "label": "Badge (optional)", "default": "#1 PRE-WORKOUT" },
-        { "type": "text", "id": "name", "label": "Product Name", "default": "OBLITERATE X3" },
-        { "type": "textarea", "id": "description", "label": "Description", "default": "High-stimulant pre-workout designed for explosive energy, laser focus, and skin-tearing pumps. 400mg Caffeine." },
-        { "type": "text", "id": "old_price", "label": "Original Price (optional)", "default": "$49.99" },
-        { "type": "text", "id": "price", "label": "Sale Price", "default": "$39.99" }
-      ]
+      "type": "header",
+      "content": "Brand & Colors"
     },
     {
-      "type": "stat",
-      "name": "Stat Item",
-      "settings": [
-        { "type": "text", "id": "value", "label": "Value", "default": "100%" },
-        { "type": "text", "id": "label", "label": "Label", "default": "LABEL TRANSPARENCY" }
-      ]
+      "type": "color",
+      "id": "accent",
+      "label": "Accent Color",
+      "default": "#E2FE16"
+    },
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_col",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Announcement Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ann",
+      "label": "Show Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "ann_text",
+      "label": "Announcement Text",
+      "default": "Free shipping on orders above Rs.999"
+    },
+    {
+      "type": "color",
+      "id": "ann_bg",
+      "label": "Bar Background",
+      "default": "#E2FE16"
+    },
+    {
+      "type": "color",
+      "id": "ann_color",
+      "label": "Bar Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_tag",
+      "label": "Eyebrow Tag",
+      "default": "New Arrival"
+    },
+    {
+      "type": "text",
+      "id": "hero_h1",
+      "label": "Headline",
+      "default": "Fitness Supplements"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_sub",
+      "label": "Subheading",
+      "default": "Discover our curated collection crafted with quality."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta",
+      "label": "Primary CTA Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "hero_url",
+      "label": "Primary CTA URL"
+    },
+    {
+      "type": "text",
+      "id": "hero_cta2",
+      "label": "Secondary CTA Text",
+      "default": "View Collection"
+    },
+    {
+      "type": "url",
+      "id": "hero_url2",
+      "label": "Secondary CTA URL"
+    },
+    {
+      "type": "header",
+      "content": "Stats Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show Stats",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "stat1_n",
+      "label": "Stat 1 Number",
+      "default": "50,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat1_l",
+      "label": "Stat 1 Label",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "stat2_n",
+      "label": "Stat 2 Number",
+      "default": "4.9 Stars"
+    },
+    {
+      "type": "text",
+      "id": "stat2_l",
+      "label": "Stat 2 Label",
+      "default": "Average Rating"
+    },
+    {
+      "type": "text",
+      "id": "stat3_n",
+      "label": "Stat 3 Number",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "stat3_l",
+      "label": "Stat 3 Label",
+      "default": "Authentic"
+    },
+    {
+      "type": "text",
+      "id": "stat4_n",
+      "label": "Stat 4 Number",
+      "default": "30-Day"
+    },
+    {
+      "type": "text",
+      "id": "stat4_l",
+      "label": "Stat 4 Label",
+      "default": "Easy Returns"
+    },
+    {
+      "type": "header",
+      "content": "Featured Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_products",
+      "label": "Show Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "prod_heading",
+      "label": "Section Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "prod_sub",
+      "label": "Subheading",
+      "default": "Handpicked for you"
+    },
+    {
+      "type": "collection",
+      "id": "prod_col",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "prod_count",
+      "label": "Number of Products",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Testimonials"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_testi",
+      "label": "Show Testimonials",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "testi_h",
+      "label": "Heading",
+      "default": "What Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "t1_text",
+      "label": "Testimonial 1",
+      "default": "Absolutely love the quality!"
+    },
+    {
+      "type": "text",
+      "id": "t1_auth",
+      "label": "Author 1",
+      "default": "Priya S."
+    },
+    {
+      "type": "textarea",
+      "id": "t2_text",
+      "label": "Testimonial 2",
+      "default": "Fast shipping and beautiful packaging."
+    },
+    {
+      "type": "text",
+      "id": "t2_auth",
+      "label": "Author 2",
+      "default": "Rahul M."
+    },
+    {
+      "type": "textarea",
+      "id": "t3_text",
+      "label": "Testimonial 3",
+      "default": "Best purchase this year."
+    },
+    {
+      "type": "text",
+      "id": "t3_auth",
+      "label": "Author 3",
+      "default": "Ananya K."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nl",
+      "label": "Show Newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nl_h",
+      "label": "Heading",
+      "default": "Join Our Community"
+    },
+    {
+      "type": "text",
+      "id": "nl_sub",
+      "label": "Subtext",
+      "default": "Subscribe for exclusive offers and updates."
+    },
+    {
+      "type": "text",
+      "id": "nl_btn",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "nl_placeholder",
+      "label": "Placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_about",
+      "label": "About Text",
+      "default": "Premium Fitness Supplements products. Quality you can trust."
+    },
+    {
+      "type": "header",
+      "content": "Custom Code"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom Liquid Code"
     }
   ],
   "presets": [
     {
-      "name": "CF Fitness Supplements",
-      "blocks": [
-        { "type": "product_card", "settings": { "badge": "#1 PRE-WORKOUT", "name": "OBLITERATE X3", "description": "High-stimulant pre-workout for explosive energy, laser focus, and skin-tearing pumps. 400mg Caffeine.", "old_price": "$49.99", "price": "$39.99" } },
-        { "type": "product_card", "settings": { "badge": "", "name": "ISOLATE PRO", "description": "100% Hydrolyzed Whey Protein Isolate. 25g Protein, 0g Sugar, rapid absorption for ultimate muscle recovery.", "old_price": "$64.99", "price": "$54.99" } },
-        { "type": "product_card", "settings": { "badge": "", "name": "AMINO RECOVER R", "description": "Intra-workout EAA + BCAA complex with hydration matrix. Prevent catabolism during grueling sessions.", "old_price": "$39.99", "price": "$29.99" } },
-        { "type": "stat", "settings": { "value": "100%", "label": "LABEL TRANSPARENCY" } },
-        { "type": "stat", "settings": { "value": "3RD", "label": "PARTY TESTED" } },
-        { "type": "stat", "settings": { "value": "PRO", "label": "ATHLETE APPROVED" } }
-      ]
+      "name": "CF Fitness Supplements LP"
     }
   ]
 }

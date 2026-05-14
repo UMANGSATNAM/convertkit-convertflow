@@ -1,99 +1,384 @@
-{% comment %} ConvertFlow — Kids Toys Cart Page {% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap');
-  .cf-kids-cart*{box-sizing:border-box;margin:0;padding:0}
-  .cf-kids-cart{font-family:'Varela Round',sans-serif;background:#F0F8FF;color:#333;padding:80px 5%;min-height:80vh}
-  
-  .cf-kids-cart-wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:40px}
-  
-  .cf-kids-cart-h1{font-family:'Fredoka One',cursive;font-size:48px;margin-bottom:30px;color:{{ section.settings.color_blue | default: '#4D94FF' }}}
-  
-  .cf-kids-c-items{background:#fff;border-radius:40px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,.05)}
-  .cf-kids-c-item{display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:24px 0;border-bottom:4px dotted #F0F8FF;align-items:center}
-  .cf-kids-c-item:last-child{border-bottom:none;padding-bottom:0}
-  .cf-kids-c-item:first-child{padding-top:0}
-  
-  .cf-kids-c-img{aspect-ratio:1;background:#F0F8FF;border-radius:20px;padding:10px;display:flex;align-items:center;justify-content:center}
-  .cf-kids-c-img img{max-width:100%;max-height:100%;object-fit:contain}
-  
-  .cf-kids-c-info h3{font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:8px}
-  
-  .cf-kids-c-qty{display:inline-flex;background:#F0F8FF;border-radius:50px;align-items:center;padding:4px 16px;font-family:'Fredoka One',cursive}
-  .cf-kids-c-qty button{background:none;border:none;font-size:20px;color:{{ section.settings.color_blue | default: '#4D94FF' }};cursor:pointer}
-  .cf-kids-c-qty span{margin:0 12px;font-size:18px}
-  
-  .cf-kids-c-remove{margin-left:20px;color:{{ section.settings.color_red | default: '#FF4D4D' }};text-decoration:none;font-weight:700}
-  
-  .cf-kids-c-price{font-family:'Fredoka One',cursive;font-size:24px;color:{{ section.settings.color_red | default: '#FF4D4D' }}}
-  
-  .cf-kids-c-sum{background:#fff;border-radius:40px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,.05);position:sticky;top:40px}
-  .cf-kids-c-sum h2{font-family:'Fredoka One',cursive;font-size:28px;margin-bottom:24px;color:{{ section.settings.color_blue | default: '#4D94FF' }}}
-  .cf-kids-c-row{display:flex;justify-content:space-between;font-size:18px;font-weight:600;margin-bottom:16px;color:#666}
-  .cf-kids-c-total{display:flex;justify-content:space-between;font-size:24px;font-weight:700;color:#333;margin-top:24px;padding-top:24px;border-top:4px dotted #F0F8FF;font-family:'Fredoka One',cursive}
-  .cf-kids-c-total span:last-child{color:{{ section.settings.color_red | default: '#FF4D4D' }};font-size:32px}
-  
-  .cf-kids-c-btn{display:block;width:100%;text-align:center;margin-top:30px;background:{{ section.settings.color_yellow | default: '#FFD11A' }};color:#333;border:none;border-radius:50px;padding:20px;font-family:'Fredoka One',cursive;font-size:24px;text-decoration:none;cursor:pointer;box-shadow:0 8px 0px rgba(200,160,0,1);transition:all .2s;text-transform:uppercase}
-  .cf-kids-c-btn:hover{transform:translateY(4px);box-shadow:0 4px 0px rgba(200,160,0,1)}
+:root{--yellow:#F9C22E;--blue:#2D6BE4;--red:#E83A3A;--teal:#1ABFA1;--bg:#FFFEF8;--surface:#fff;--text:#1A1A2E;--muted:#6B6B80;--border:#EAE8F0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.baloo{font-family:'Baloo 2',cursive;}
 
-  .cf-kids-empty{grid-column:1/-1;text-align:center;padding:80px;background:#fff;border-radius:40px}
-  .cf-kids-empty h2{font-family:'Fredoka One',cursive;font-size:40px;margin-bottom:20px;color:{{ section.settings.color_blue | default: '#4D94FF' }}}
+/* WAVY TOP */
+.top-wave{background:var(--yellow);color:#000;text-align:center;padding:10px;font-size:13px;font-weight:700;letter-spacing:.5px;}
 
-  @media(max-width:900px){
-    .cf-kids-cart-wrap{grid-template-columns:1fr}
-    .cf-kids-c-item{grid-template-columns:80px 1fr;position:relative}
-    .cf-kids-c-price{position:absolute;top:24px;right:0}
-  }
-{% endstyle %}
+/* HEADER */
+header{padding:16px 60px;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.04);}
+.brand{font-family:'Baloo 2',cursive;font-size:30px;font-weight:800;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;}
+.brand .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--yellow);margin-bottom:8px;}
+nav ul{display:flex;gap:28px;list-style:none;}
+nav a{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--blue);}
+.hdr-right{display:flex;gap:12px;align-items:center;}
+.hdr-btn{background:var(--blue);color:#fff;padding:12px 24px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .2s;}
+.hdr-btn:hover{opacity:.88;}
 
-<div class="cf-kids-cart">
-  <div class="cf-kids-cart-wrap">
+/* HERO */
+.hero{background:linear-gradient(135deg,#EEF4FF 0%,#FFF8E8 100%);display:grid;grid-template-columns:1fr 1fr;min-height:88vh;padding:0 60px;align-items:center;gap:60px;overflow:hidden;position:relative;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(249,194,46,.15);}
+.hero::after{content:'';position:absolute;bottom:-40px;left:40px;width:200px;height:200px;border-radius:50%;background:rgba(45,107,228,.08);}
+.hero-text .badge{display:inline-flex;align-items:center;gap:8px;background:var(--yellow);color:#000;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;margin-bottom:20px;}
+.hero-text h1{font-size:64px;font-weight:800;line-height:1.1;color:var(--text);margin-bottom:20px;}
+.hero-text h1 span{color:var(--blue);}
+.hero-text p{font-size:17px;color:var(--muted);line-height:1.8;max-width:440px;margin-bottom:36px;}
+.hero-btns{display:flex;gap:12px;}
+.btn-blue{background:var(--blue);color:#fff;padding:16px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;box-shadow:0 6px 20px rgba(45,107,228,.3);}
+.btn-blue:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,107,228,.35);}
+.btn-outline-b{background:transparent;color:var(--blue);border:2px solid var(--blue);padding:14px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-outline-b:hover{background:var(--blue);color:#fff;}
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.toy-float{width:100%;max-width:460px;aspect-ratio:1;border-radius:40% 60% 60% 40% / 60% 40% 60% 40%;background:linear-gradient(135deg,#FFE8A3,#FFD166);display:flex;align-items:center;justify-content:center;animation:blob 6s ease-in-out infinite;}
+.toy-float svg{width:55%;color:#2D6BE4;opacity:.5;}
+@keyframes blob{0%,100%{border-radius:40% 60% 60% 40% / 60% 40% 60% 40%}50%{border-radius:60% 40% 40% 60% / 40% 60% 40% 60%}}
+.age-badges{display:flex;gap:8px;margin-top:32px;}
+.age-b{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+.ab1{background:#FFE8E8;color:#E83A3A;}
+.ab2{background:#E8F0FF;color:#2D6BE4;}
+.ab3{background:#E8FAF7;color:#1ABFA1;}
+
+/* CATEGORIES */
+.categories{padding:70px 60px;max-width:1400px;margin:0 auto;}
+.sec-head{text-align:center;margin-bottom:50px;}
+.sec-head h2{font-size:44px;font-weight:800;color:var(--text);}
+.sec-head p{font-size:16px;color:var(--muted);margin-top:8px;}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.cat-card{border-radius:24px;padding:28px 20px;text-align:center;text-decoration:none;color:var(--text);transition:all .3s;position:relative;overflow:hidden;}
+.cat-card:hover{transform:translateY(-6px);}
+.cat-card:nth-child(1){background:#FFF0E0;}
+.cat-card:nth-child(2){background:#E8F0FF;}
+.cat-card:nth-child(3){background:#E8FAF7;}
+.cat-card:nth-child(4){background:#FFF0F0;}
+.cat-card:nth-child(5){background:#F0EAFF;}
+.cat-icon{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;}
+.cat-icon svg{width:36px;stroke-width:2;}
+.cat-name{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;margin-bottom:4px;}
+.cat-count{font-size:12px;color:var(--muted);}
+
+/* PRODUCTS */
+.products{padding:0 60px 80px;max-width:1400px;margin:0 auto;}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+.ph h2{font-size:40px;font-weight:800;}
+.ph a{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{background:#fff;border-radius:24px;overflow:hidden;border:2px solid var(--border);transition:all .3s;}
+.prod-card:hover{border-color:var(--yellow);box-shadow:0 12px 40px rgba(0,0,0,.07);transform:translateY(-4px);}
+.pc-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;}
+.pc-img svg{width:45%;opacity:.5;transition:transform .4s,opacity .3s;}
+.prod-card:hover .pc-img svg{transform:scale(1.08);opacity:.8;}
+.pc-age{position:absolute;top:14px;left:14px;background:var(--yellow);color:#000;padding:5px 12px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:1px;}
+.pc-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);cursor:pointer;}
+.pc-wish svg{width:16px;color:var(--muted);stroke-width:2;}
+.pc-body{padding:20px;}
+.pc-type{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.pc-name{font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+.pc-skills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.skill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;}
+.sk-green{background:#E8FAF7;color:#1ABFA1;}
+.sk-blue{background:#E8F0FF;color:#2D6BE4;}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;}
+.pc-price{font-size:20px;font-weight:800;color:var(--text);}
+.pc-old{font-size:13px;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.btn-add{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:100px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-add:hover{background:#1d54c4;}
+
+/* SAFETY BANNER */
+.safety{background:var(--blue);padding:70px 60px;display:flex;align-items:center;justify-content:center;gap:80px;flex-wrap:wrap;}
+.safety-item{display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff;}
+.s-icon{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;}
+.s-icon svg{width:28px;color:#fff;stroke-width:1.5;}
+.safety-item strong{font-family:'Baloo 2',cursive;font-size:16px;}
+.safety-item span{font-size:12px;color:rgba(255,255,255,.6);text-align:center;max-width:120px;}
+
+/* FOOTER */
+footer{background:var(--text);padding:80px 60px 40px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.08);}
+.fb a{font-family:'Baloo 2',cursive;font-size:26px;font-weight:800;color:var(--yellow);text-decoration:none;display:block;margin-bottom:16px;}
+.fb p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.9;max-width:260px;}
+.fc h4{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.fc a:hover{color:var(--yellow);}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-visual{display:none}.cat-grid{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.categories{padding:60px 20px}.cat-grid{grid-template-columns:repeat(2,1fr)}.products{padding:0 20px 60px}.safety{gap:40px;padding:60px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#F9C22E' }};
+  --cf-bg:{{ section.settings.bg | default: '#EFF4FF' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#F9C22E' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="top-wave"> Free gift-wrapping on all orders! Use code GIFTED at checkout.</div>
+<header>
+  <a href="#" class="brand">PLAY<div class="dot"></div>BOX</a>
+  <nav><ul>
+    <li><a href="#">Toys</a></li>
+    <li><a href="#">Learning</a></li>
+    <li><a href="#">Outdoor</a></li>
+    <li><a href="#">Arts & Crafts</a></li>
+    <li><a href="#">Gift Sets</a></li>
+  </ul></nav>
+  <div class="hdr-right">
+    <a href="#" class="hdr-btn">{{ section.settings.hero_cta | default: "Shop Now" }}</a>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: PlayBox Kids Ã¢â‚¬â€ Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: {{ section.settings.color_accent | default: '#F9C22E' }}; --cf-bg: {{ section.settings.color_bg | default: '#EFF4FF' }}; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
+.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
+.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
+.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.cfc-empty span { font-size: 14px; }
+.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
+.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.cfc-item:last-child { border-bottom: none; }
+.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
+.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
+.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
+.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
+.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
+.cfc-item-remove:hover { color: #e53e3e; }
+.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+/* Summary */
+.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
+.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
+.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
+.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
+.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
+.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
+.cfc-checkout:hover { opacity: .9; }
+.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
+@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
+</style>
+
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
     {% if cart.item_count == 0 %}
-      <div class="cf-kids-empty">
-        <h2>Your Toy Box is Empty! 🎈</h2>
-        <p style="font-size:20px;color:#666;margin-bottom:30px;font-weight:600">Let's find some fun toys to play with.</p>
-        <a href="/collections/all" class="cf-kids-c-btn" style="display:inline-block;width:auto;padding:16px 40px">Explore Toys</a>
+      <div class="cfc-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Your cart is empty</p>
+        <span>Looks like you haven't added anything yet.</span>
+        <a href="/collections/all">Continue Shopping</a>
       </div>
     {% else %}
-      <div>
-        <h1 class="cf-kids-cart-h1">Toy Box 🎁</h1>
-        <div class="cf-kids-c-items">
-          {% for item in cart.items %}
-            <div class="cf-kids-c-item">
-              <div class="cf-kids-c-img">
-                {% if item.image %}<img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">{% endif %}
-              </div>
-              <div class="cf-kids-c-info">
-                <h3>{{ item.product.title }}</h3>
-                <div class="cf-kids-c-qty">
-                  <button>-</button><span>{{ item.quantity }}</span><button>+</button>
-                </div>
-                <a href="{{ item.url_to_remove }}" class="cf-kids-c-remove">Remove</a>
-              </div>
-              <div class="cf-kids-c-price">{{ item.final_line_price | money }}</div>
+      <div class="cfc-items">
+        {% for item in cart.items %}
+          <div class="cfc-item">
+            <div class="cfc-item-img">
+              {% if item.image %}
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
+              {% else %}
+                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
+              {% endif %}
             </div>
-          {% endfor %}
-        </div>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
+              </div>
+            </div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
+          </div>
+        {% endfor %}
       </div>
-      
-      <div class="cf-kids-c-sum">
-        <h2>Order Summary</h2>
-        <div class="cf-kids-c-row"><span>Subtotal</span> <span>{{ cart.total_price | money }}</span></div>
-        <div class="cf-kids-c-total"><span>Total</span> <span>{{ cart.total_price | money }}</span></div>
-        <a href="/checkout" class="cf-kids-c-btn">Checkout Now!</a>
-      </div>
+    {% endif %}
+  </div>
+
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢{{ cart.total_discount | money }}</span></div>
+    {% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo">
+      <input type="text" placeholder="Discount code">
+      <button>Apply</button>
+    </div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
+    </div>
     {% endif %}
   </div>
 </div>
 
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
+
 {% schema %}
 {
-  "name": "CF Kids Toys Cart",
+  "name": "CF PlayBox Kids Cart",
   "settings": [
-    { "type": "color", "id": "color_red", "label": "Red", "default": "#FF4D4D" },
-    { "type": "color", "id": "color_blue", "label": "Blue", "default": "#4D94FF" },
-    { "type": "color", "id": "color_yellow", "label": "Yellow", "default": "#FFD11A" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#F9C22E"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#EFF4FF"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout Ã¢â€ â€™"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
   ],
-  "presets": [{ "name": "CF Kids Toys Cart" }]
+  "presets": [
+    {
+      "name": "CF PlayBox Kids Cart"
+    }
+  ]
 }
 {% endschema %}

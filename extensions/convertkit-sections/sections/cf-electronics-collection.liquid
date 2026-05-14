@@ -1,150 +1,447 @@
-{% comment %}
-  ConvertFlow — Electronics Collection Page
-  High-tech grid with filter sidebar.
-{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+:root {
+  --bg: #0B0F19;
+  --surface: #131B2C;
+  --surface-hover: #1A243A;
+  --primary: #3B82F6;
+  --primary-glow: rgba(59, 130, 246, 0.5);
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border: #1E293B;
+  --accent: #10B981;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .nav-logo { font-family: 'Space Grotesk', sans-serif; }
 
-  :root {
-    --el-primary: {{ section.settings.color_primary | default: '#00F0FF' }};
-    --el-bg: {{ section.settings.color_bg | default: '#030508' }};
-    --el-surface: {{ section.settings.color_surface | default: '#0C121E' }};
-    --el-border: rgba(0, 240, 255, 0.15);
-    --el-text: {{ section.settings.color_text | default: '#FFFFFF' }};
-    --el-font-heading: 'Rajdhani', sans-serif;
-    --el-font-body: 'Inter', sans-serif;
-  }
+/* PROMO BAR */
+.promo-bar { background: var(--primary); color: #fff; padding: 10px 0; text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
-  .cf-el-c * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-el-c { font-family: var(--el-font-body); background: var(--el-bg); color: var(--el-text); border-top: 1px solid var(--el-border); }
-  
-  .cf-el-c-header { padding: 60px 5%; background: radial-gradient(circle at top right, rgba(0,240,255,0.1), transparent 50%); border-bottom: 1px solid var(--el-border); }
-  .cf-el-c-header h1 { font-family: var(--el-font-heading); font-size: clamp(40px, 6vw, 64px); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 0 20px rgba(0,240,255,0.2); }
-  .cf-el-c-header p { color: #8B9BB4; max-width: 600px; font-size: 15px; }
-  
-  .cf-el-c-wrap { display: grid; grid-template-columns: 250px 1fr; max-width: 1400px; margin: 0 auto; min-height: 70vh; }
-  
-  /* Sidebar */
-  .cf-el-c-sidebar { border-right: 1px solid var(--el-border); padding: 40px 30px; background: var(--el-surface); }
-  .cf-el-c-filter-group { margin-bottom: 30px; }
-  .cf-el-c-filter-title { font-family: var(--el-font-heading); font-size: 18px; font-weight: 600; text-transform: uppercase; color: var(--el-primary); margin-bottom: 16px; letter-spacing: 1px; }
-  .cf-el-c-filter-list { list-style: none; }
-  .cf-el-c-filter-list li { margin-bottom: 10px; font-size: 14px; color: #8B9BB4; cursor: pointer; transition: color 0.2s; display: flex; align-items: center; gap: 10px; }
-  .cf-el-c-filter-list li:hover, .cf-el-c-filter-list li.active { color: var(--el-text); }
-  .cf-el-c-filter-list li::before { content: ''; display: inline-block; width: 12px; height: 12px; border: 1px solid var(--el-border); }
-  .cf-el-c-filter-list li.active::before { background: var(--el-primary); box-shadow: 0 0 10px var(--el-primary); border-color: var(--el-primary); }
-  
-  /* Grid */
-  .cf-el-c-main { padding: 40px; }
-  .cf-el-c-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--el-border); }
-  .cf-el-c-toolbar-count { font-family: var(--el-font-heading); font-size: 16px; font-weight: 600; color: #8B9BB4; text-transform: uppercase; }
-  .cf-el-c-sort select { background: var(--el-surface); color: var(--el-primary); border: 1px solid var(--el-primary); padding: 10px 16px; font-family: var(--el-font-heading); font-size: 14px; font-weight: 600; text-transform: uppercase; outline: none; cursor: pointer; }
-  
-  .cf-el-c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-  .cf-el-prod { background: var(--el-surface); border: 1px solid var(--el-border); padding: 20px; text-decoration: none; transition: all 0.3s; position: relative; display: flex; flex-direction: column; }
-  .cf-el-prod:hover { border-color: var(--el-primary); box-shadow: 0 0 20px rgba(0,240,255,0.1); transform: translateY(-3px); }
-  
-  .cf-el-prod-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #111a28 0%, #030508 100%); margin-bottom: 20px; padding: 20px; }
-  .cf-el-prod-img img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); transition: transform 0.5s; }
-  .cf-el-prod:hover .cf-el-prod-img img { transform: scale(1.05); }
-  
-  .cf-el-prod-tag { position: absolute; top: 10px; right: 10px; font-family: var(--el-font-heading); font-size: 12px; font-weight: 600; color: #000; background: var(--el-primary); padding: 2px 8px; text-transform: uppercase; z-index: 2; }
-  
-  .cf-el-prod-title { font-family: var(--el-font-heading); font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 8px; text-transform: uppercase; }
-  .cf-el-prod-price { color: var(--el-primary); font-family: var(--el-font-heading); font-size: 22px; font-weight: 700; margin-top: auto; }
+/* HEADER / MEGA MENU */
+header { position: sticky; top: 0; z-index: 100; background: rgba(11, 15, 25, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 80px; }
+.nav-logo { font-size: 24px; font-weight: 700; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.nav-logo svg { width: 24px; height: 24px; color: var(--primary); }
+.nav-links { display: flex; gap: 32px; height: 100%; list-style: none; }
+.nav-links li { height: 100%; display: flex; align-items: center; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.2s; font-size: 14px; position: relative; }
+.nav-links a:hover, .nav-links a.active { color: #fff; }
+.MEGA-MENU { display: none; position: absolute; top: 80px; left: 0; width: 100%; background: var(--surface); border-bottom: 1px solid var(--border); padding: 40px; grid-template-columns: repeat(4, 1fr); gap: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+.nav-links li:hover .MEGA-MENU { display: grid; }
+.mega-col h4 { color: #fff; font-size: 14px; margin-bottom: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--primary); }
+.mega-col a { display: block; padding: 8px 0; color: var(--text-muted); font-size: 14px; }
+.mega-col a:hover { color: #fff; padding-left: 5px; }
 
-  @media(max-width: 1024px) {
-    .cf-el-c-wrap { grid-template-columns: 1fr; }
-    .cf-el-c-sidebar { border-right: none; border-bottom: 1px solid var(--el-border); display: flex; gap: 40px; overflow-x: auto; }
-  }
-{% endstyle %}
+.header-actions { display: flex; gap: 20px; align-items: center; }
+.icon-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+.icon-btn:hover { color: var(--primary); }
 
-<div class="cf-el-c">
-  <div class="cf-el-c-header">
-    <h1>{{ collection.title | default: 'Hardware Catalog' }}</h1>
-    {% if collection.description != blank %}
-      <p>{{ collection.description | strip_html | truncate: 150 }}</p>
-    {% endif %}
-  </div>
-  
-  <div class="cf-el-c-wrap">
-    <div class="cf-el-c-sidebar">
-      <div class="cf-el-c-filter-group">
-        <div class="cf-el-c-filter-title">Category</div>
-        <ul class="cf-el-c-filter-list">
-          <li class="active">All Devices</li>
-          <li>Processing Units</li>
-          <li>Display Tech</li>
-          <li>Audio Systems</li>
-        </ul>
-      </div>
-      <div class="cf-el-c-filter-group">
-        <div class="cf-el-c-filter-title">Status</div>
-        <ul class="cf-el-c-filter-list">
-          <li>In Stock</li>
-          <li>Pre-order</li>
-          <li>New Releases</li>
-        </ul>
-      </div>
-    </div>
-    
-    <div class="cf-el-c-main">
-      <div class="cf-el-c-toolbar">
-        <div class="cf-el-c-toolbar-count">{{ collection.products_count | default: '0' }} Modules Found</div>
-        <div class="cf-el-c-sort">
-          <select>
-            <option>Sort: Default Configuration</option>
-            <option>Sort: Price (Ascending)</option>
-            <option>Sort: Price (Descending)</option>
-          </select>
+/* HERO */
+.hero { min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 0 40px; }
+.hero-bg { position: absolute; top: 50%; left: 80%; transform: translate(-50%, -50%); width: 800px; height: 800px; background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%); opacity: 0.15; z-index: 0; pointer-events: none; }
+.hero-content { position: relative; z-index: 1; max-width: 600px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 24px; letter-spacing: 1px; text-transform: uppercase; }
+.hero h1 { font-size: 80px; line-height: 1.1; margin-bottom: 24px; font-weight: 700; letter-spacing: -2px; }
+.hero h1 span { color: var(--primary); }
+.hero p { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; max-width: 500px; }
+.btn-primary { background: var(--text); color: var(--bg); padding: 16px 32px; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; border-radius: 4px; transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+.btn-secondary { background: transparent; color: var(--text); padding: 16px 32px; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-left: 16px; }
+.btn-secondary:hover { background: var(--surface); }
+
+/* STATS */
+.trust-stats { display: flex; gap: 60px; margin-top: 60px; border-top: 1px solid var(--border); padding-top: 40px; }
+.stat-item h4 { font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.stat-item p { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* PRODUCTS (LIST STYLE) */
+.section { padding: 100px 40px; max-width: 1400px; margin: 0 auto; }
+.section-header { margin-bottom: 60px; text-align: center; }
+.section-header h2 { font-size: 40px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px; }
+.section-header p { color: var(--text-muted); font-size: 16px; max-width: 500px; margin: 0 auto; }
+
+.product-list { display: flex; flex-direction: column; gap: 24px; }
+.product-row { display: grid; grid-template-columns: 240px 1fr 300px; gap: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; align-items: center; transition: border-color 0.2s; cursor: pointer; }
+.product-row:hover { border-color: var(--primary); }
+.p-image { width: 100%; aspect-ratio: 1; background: #000; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.p-image svg { width: 64px; height: 64px; color: var(--primary); }
+
+.p-info h3 { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.p-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+.p-specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.spec-box { background: var(--bg); padding: 10px; border-radius: 4px; border: 1px solid var(--border); }
+.spec-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.spec-val { font-size: 14px; font-weight: 600; color: #fff; }
+
+.p-action { text-align: right; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; }
+.p-price { font-size: 32px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 8px; }
+.p-price-old { color: var(--text-muted); text-decoration: line-through; font-size: 16px; margin-bottom: 24px; display: block; }
+.btn-mono { width: 100%; background: var(--text); color: var(--bg); padding: 14px 20px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: opacity 0.2s; }
+.btn-mono:hover { opacity: 0.9; }
+
+/* FEATURES GRID */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.feature-card { background: var(--surface); padding: 40px; border: 1px solid var(--border); border-radius: 8px; text-align: center; }
+.feature-icon { width: 64px; height: 64px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+.feature-icon svg { width: 32px; height: 32px; }
+.feature-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+.feature-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+/* SPEC DENSE FOOTER */
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 80px 40px 40px; }
+.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; max-width: 1400px; margin: 0 auto 60px; }
+.f-brand h4 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.f-brand p { color: var(--text-muted); font-size: 14px; line-height: 1.6; max-width: 300px; margin-bottom: 24px; }
+.f-socials { display: flex; gap: 16px; }
+.f-socials a { color: var(--text-muted); width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.f-socials a:hover { color: #fff; border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+.f-links h5 { color: #fff; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 24px; }
+.f-links ul { list-style: none; }
+.f-links li { margin-bottom: 12px; }
+.f-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+.f-links a:hover { color: var(--primary); }
+
+.footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-top: 40px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+
+/* STICKY ATC */
+.sticky-atc { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); border-top: 1px solid var(--border); padding: 16px 40px; display: none; align-items: center; justify-content: space-between; z-index: 99; transform: translateY(100%); transition: transform 0.4s; }
+.sticky-atc.show { display: flex; transform: translateY(0); }
+.s-atc-l { display: flex; align-items: center; gap: 16px; }
+.s-img { width: 48px; height: 48px; background: #000; border-radius: 4px; }
+.s-info h4 { font-size: 15px; color: #fff; }
+.s-info p { font-size: 13px; color: var(--text-muted); }
+.s-atc-r { display: flex; align-items: center; gap: 24px; }
+.s-price { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+
+/* Responsive */
+@media(max-width: 1024px) {
+  .hero h1 { font-size: 60px; }
+  .product-row { grid-template-columns: 1fr; gap: 24px; }
+  .p-action { text-align: left; align-items: flex-start; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .p-image { aspect-ratio: 2/1; }
+  .features-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { padding: 40px 20px; text-align: center; }
+  .hero h1 { font-size: 40px; }
+  .hero p { margin: 0 auto 32px; }
+  .trust-stats { flex-direction: column; gap: 24px; align-items: center; }
+  .p-specs { grid-template-columns: 1fr; }
+  .btn-secondary { margin-left: 0; margin-top: 16px; width: 100%; }
+}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#5735db' }};
+  --cf-bg:{{ section.settings.bg | default: '#e9e5f5' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#5735db' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="promo-bar"> Free Express Shipping on orders over $150</div>
+
+<header>
+  <a href="#" class="nav-logo">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+    TechVault
+  </a>
+  <ul class="nav-links">
+    <li>
+      <a href="#" class="active">Audio</a>
+      <div class="MEGA-MENU">
+        <div class="mega-col">
+          <h4>Headphones</h4>
+          <a href="#">Over-Ear Wireless</a>
+          <a href="#">Noise Cancelling</a>
+          <a href="#">Studio Monitors</a>
+          <a href="#">Gaming Headsets</a>
+        </div>
+        <div class="mega-col">
+          <h4>Earbuds</h4>
+          <a href="#">True Wireless</a>
+          <a href="#">Sport Earbuds</a>
+          <a href="#">Audiophile In-Ear</a>
+        </div>
+        <div class="mega-col">
+          <h4>Speakers</h4>
+          <a href="#">Portable Bluetooth</a>
+          <a href="#">Home Theater</a>
+          <a href="#">Soundbars</a>
+        </div>
+        <div class="mega-col">
+          <div style="background:var(--bg);height:100%;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);border:1px dashed var(--border)">Promo Image</div>
         </div>
       </div>
-      
-      <div class="cf-el-c-grid">
-        {% if collection.products.size > 0 %}
-          {% for product in collection.products %}
-            <a href="{{ product.url }}" class="cf-el-prod">
-              {% if product.available == false %}
-                <div class="cf-el-prod-tag" style="background:#555; color:#fff;">Offline</div>
-              {% elsif product.compare_at_price > product.price %}
-                <div class="cf-el-prod-tag">Upgrade Offer</div>
-              {% endif %}
-              
-              <div class="cf-el-prod-img">
-                {% if product.featured_image %}
-                  <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
-                {% endif %}
-              </div>
-              <div class="cf-el-prod-title">{{ product.title }}</div>
-              <div class="cf-el-prod-price">{{ product.price | money }}</div>
-            </a>
-          {% endfor %}
-        {% else %}
-          {% for i in (1..6) %}
-            <a href="#" class="cf-el-prod">
-              <div class="cf-el-prod-img"><div style="width:100px; height:100px; background:rgba(255,255,255,0.05);"></div></div>
-              <div class="cf-el-prod-title">System Module 0{{ i }}</div>
-              <div class="cf-el-prod-price">$499.00</div>
-            </a>
-          {% endfor %}
-        {% endif %}
-      </div>
+    </li>
+    <li><a href="#">Computing</a></li>
+    <li><a href="#">Wearables</a></li>
+    <li><a href="#">Accessories</a></li>
+  </ul>
+  <div class="header-actions">
+    <button class="icon-btn" aria-label="Search">{{ section.settings.hero_cta | default: "Shop Now" }}</button>
+    <button class="icon-btn" aria-label="Cart">{{ section.settings.hero_cta2 | default: "View Collection" }}</button>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: Tech & Electronics ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #5735db; --cf-bg: #e9e5f5; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
+
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
+
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
+    </div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
     </div>
   </div>
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+            {% else %}
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+            {% endif %}
+            {% if product.available == false %}
+              <span class="cfcol-badge">Sold Out</span>
+            {% elsif product.compare_at_price > product.price %}
+              <span class="cfcol-badge">Sale</span>
+            {% endif %}
+          </div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
+              {% endif %}
+            </div>
+          </div>
+          <button class="cfcol-atc">Add to Cart</button>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
+    {% endif %}
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
 </div>
+
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Electronics Collection",
+  "name": "CF Tech & Electronics Col",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Accent (Neon)", "default": "#00F0FF" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#030508" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#0C121E" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#FFFFFF" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#5735db"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#e9e5f5"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
   "presets": [
-    { "name": "CF Electronics Collection" }
+    {
+      "name": "CF Tech & Electronics Col"
+    }
   ]
 }
 {% endschema %}

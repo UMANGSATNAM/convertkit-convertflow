@@ -1,120 +1,518 @@
-{% comment %}
-  ConvertFlow — Jewellery Heritage Collection Page
-  Clean grid with gold accents and elegant typography.
-{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+:root {
+  --crimson: #8B1A2C;
+  --rose-gold: #C89B72;
+  --deep-red: #5C0E1A;
+  --cream: #FDF8F2;
+  --ivory: #F5ECD9;
+  --text: #2A1A1A;
+  --text-muted: #7A6060;
+  --border: rgba(200, 155, 114, 0.25);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--text); font-family: 'Raleway', sans-serif; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.5px; }
 
-  :root {
-    --jh-primary: {{ section.settings.color_primary | default: '#D4AF37' }};
-    --jh-bg: {{ section.settings.color_bg | default: '#FFFFFF' }};
-    --jh-surface: {{ section.settings.color_surface | default: '#FAFAFA' }};
-    --jh-border: rgba(212, 175, 55, 0.3);
-    --jh-text: {{ section.settings.color_text | default: '#222222' }};
-    --jh-font-heading: 'Playfair Display', serif;
-    --jh-font-body: 'Lato', sans-serif;
-  }
+/* ── UTILITY ── */
+.container { max-width: 1380px; margin: 0 auto; padding: 0 48px; }
+.ornament { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+.ornament::before, .ornament::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--rose-gold), transparent); max-width: 80px; }
+.ornament span { font-size: 18px; color: var(--rose-gold); }
 
-  .cf-jh-c * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-jh-c { font-family: var(--jh-font-body); background: var(--jh-bg); color: var(--jh-text); }
-  
-  .cf-jh-c-header { text-align: center; padding: 80px 5%; background: var(--jh-surface); border-bottom: 1px solid #eaeaea; }
-  .cf-jh-c-header h1 { font-family: var(--jh-font-heading); font-size: clamp(40px, 5vw, 56px); font-weight: 400; margin-bottom: 16px; position: relative; display: inline-block; padding-bottom: 15px; }
-  .cf-jh-c-header h1::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 1px; background: var(--jh-primary); }
-  .cf-jh-c-header p { color: #666; font-size: 15px; max-width: 600px; margin: 20px auto 0; font-weight: 300; line-height: 1.8; }
-  
-  .cf-jh-c-main { max-width: 1400px; margin: 0 auto; padding: 60px 5%; }
-  
-  .cf-jh-c-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; border-bottom: 1px solid #eaeaea; padding-bottom: 20px; }
-  .cf-jh-c-filters { display: flex; gap: 30px; }
-  .cf-jh-c-filter { cursor: pointer; transition: color 0.3s; }
-  .cf-jh-c-filter:hover, .cf-jh-c-filter.active { color: var(--jh-primary); }
-  
-  .cf-jh-c-sort select { border: none; background: transparent; font-family: inherit; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--jh-text); outline: none; cursor: pointer; }
-  
-  .cf-jh-c-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 30px; }
-  .cf-jh-prod { text-decoration: none; color: var(--jh-text); text-align: center; group; display: block; }
-  .cf-jh-prod-img { aspect-ratio: 1; background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-  .cf-jh-prod-img img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.8s ease; }
-  .cf-jh-prod:hover .cf-jh-prod-img img { transform: scale(1.05); }
-  .cf-jh-prod-img::after { content: ''; position: absolute; inset: 10px; border: 1px solid transparent; transition: border-color 0.4s ease; }
-  .cf-jh-prod:hover .cf-jh-prod-img::after { border-color: var(--jh-border); }
-  
-  .cf-jh-prod-title { font-family: var(--jh-font-heading); font-size: 18px; margin-bottom: 8px; color: var(--jh-text); }
-  .cf-jh-prod-price { font-size: 14px; color: #666; font-weight: 300; }
+/* ── TOP BAND ── */
+.top-band { background: var(--crimson); color: var(--rose-gold); text-align: center; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; }
 
-  @media(max-width: 1024px) {
-    .cf-jh-c-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media(max-width: 768px) {
-    .cf-jh-c-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .cf-jh-c-toolbar { flex-direction: column; gap: 20px; }
-  }
-{% endstyle %}
+/* ── HEADER ── */
+header { background: var(--cream); padding: 0 48px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+.header-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 20px 0; }
+.brand { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; color: var(--crimson); text-decoration: none; text-align: center; letter-spacing: 3px; line-height: 1; }
+.brand small { display: block; font-size: 9px; letter-spacing: 6px; color: var(--rose-gold); font-weight: 400; margin-top: 4px; text-transform: uppercase; }
 
-<div class="cf-jh-c">
-  <div class="cf-jh-c-header">
-    <h1>{{ collection.title | default: 'The Bridal Collection' }}</h1>
-    {% if collection.description != blank %}
-      <p>{{ collection.description | strip_html | truncate: 150 }}</p>
-    {% endif %}
-  </div>
-  
-  <div class="cf-jh-c-main">
-    <div class="cf-jh-c-toolbar">
-      <div class="cf-jh-c-filters">
-        <span class="cf-jh-c-filter active">All Categories</span>
-        <span class="cf-jh-c-filter">Rings</span>
-        <span class="cf-jh-c-filter">Necklaces</span>
-        <span class="cf-jh-c-filter">Earrings</span>
-      </div>
-      <div class="cf-jh-c-sort">
-        <select>
-          <option>Sort By: Featured</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-        </select>
-      </div>
+.header-left { display: flex; align-items: center; gap: 8px; }
+.h-badge { background: var(--ivory); border: 1px solid var(--border); padding: 5px 14px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--crimson); cursor: pointer; transition: all 0.2s; }
+.h-badge:hover { background: var(--crimson); color: #fff; }
+.header-right { display: flex; align-items: center; gap: 20px; justify-content: flex-end; }
+.icon-link { color: var(--text); text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; gap: 4px; font-weight: 600; transition: color 0.2s; }
+.icon-link:hover { color: var(--crimson); }
+.icon-link svg { width: 20px; height: 20px; stroke-width: 1.5; }
+
+.header-nav { display: flex; justify-content: center; gap: 40px; padding: 12px 0; border-top: 1px solid var(--border); }
+.header-nav a { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: var(--text); transition: color 0.3s; position: relative; }
+.header-nav a::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 0; height: 1.5px; background: var(--rose-gold); transition: width 0.3s; }
+.header-nav a:hover { color: var(--crimson); }
+.header-nav a:hover::after { width: 100%; }
+
+/* ── HERO: SPLIT ── */
+.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; }
+.hero-left { position: relative; background: var(--deep-red); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.hero-left::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C89B72' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.hero-img-placeholder { width: 70%; aspect-ratio: 2/3; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; }
+.hero-img-placeholder svg { width: 60%; color: rgba(200, 155, 114, 0.2); }
+.hero-frame { position: absolute; inset: 30px; border: 1px solid rgba(200, 155, 114, 0.2); pointer-events: none; z-index: 2; }
+.hero-frame::before, .hero-frame::after { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--rose-gold); border-style: solid; opacity: 0.8; }
+.hero-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.hero-frame::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+.hero-right { background: var(--ivory); padding: 80px 80px 80px 70px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.hero-right::before { content: ''; position: absolute; top: 40px; left: 40px; width: 80%; height: 80%; border: 1px solid var(--border); pointer-events: none; }
+.hero-tag { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 20px; }
+.hero-right h1 { font-size: 56px; line-height: 1.1; color: var(--crimson); margin-bottom: 24px; }
+.hero-right h1 span { color: var(--rose-gold); display: block; font-style: italic; }
+.hero-right p { font-size: 16px; color: var(--text-muted); line-height: 1.9; margin-bottom: 40px; max-width: 420px; font-weight: 400; }
+.hero-ctas { display: flex; flex-direction: column; gap: 16px; max-width: 240px; }
+.btn-primary { background: var(--crimson); color: #fff; padding: 18px 32px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--crimson); text-decoration: none; text-align: center; transition: all 0.3s; }
+.btn-primary:hover { background: var(--deep-red); }
+.btn-secondary { background: transparent; color: var(--crimson); padding: 17px 32px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--rose-gold); text-decoration: none; text-align: center; transition: all 0.3s; font-family: 'Raleway', sans-serif; }
+.btn-secondary:hover { background: var(--rose-gold); color: #fff; }
+
+/* HERO BADGES */
+.hero-badges { display: flex; gap: 24px; margin-top: 40px; padding-top: 32px; border-top: 1px dashed var(--border); }
+.h-badge-item { text-align: center; }
+.h-badge-item strong { display: block; font-family: 'Cinzel', serif; font-size: 22px; color: var(--crimson); }
+.h-badge-item span { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); }
+
+/* ── OCCASION STRIP ── */
+.occasion-strip { padding: 60px 0; background: var(--deep-red); overflow: hidden; }
+.occasion-strip .container { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.occ-btn { background: transparent; border: 1px solid rgba(200, 155, 114, 0.4); color: var(--rose-gold); padding: 12px 28px; font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+.occ-btn:hover, .occ-btn.active { background: var(--rose-gold); color: var(--deep-red); border-color: var(--rose-gold); }
+.occ-title { text-align: center; margin-bottom: 32px; }
+.occ-title h2 { font-size: 28px; color: #fff; margin-bottom: 8px; }
+.occ-title p { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(200, 155, 114, 0.7); }
+
+/* ── FEATURED COLLECTION: HORIZONTAL SCROLLABLE ── */
+.featured { padding: 100px 0; background: var(--cream); }
+.featured .container > .sec-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
+.sec-header h2 { font-size: 32px; color: var(--crimson); }
+.sec-header a { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rose-gold); text-decoration: none; border-bottom: 1px solid var(--rose-gold); padding-bottom: 4px; transition: color 0.2s; }
+.sec-header a:hover { color: var(--crimson); }
+
+/* Unique horizontal product cards */
+.prod-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.prod-card { position: relative; background: #fff; border: 1px solid var(--border); display: flex; flex-direction: column; transition: all 0.4s ease; }
+.prod-card:hover { box-shadow: 0 20px 60px rgba(139, 26, 44, 0.08); transform: translateY(-6px); }
+
+.pc-img { aspect-ratio: 3/4; background: var(--ivory); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.pc-img svg { width: 35%; color: var(--rose-gold); opacity: 0.7; transition: transform 0.6s ease, opacity 0.4s; }
+.prod-card:hover .pc-img svg { transform: scale(1.08); opacity: 1; }
+.pc-badge { position: absolute; top: 0; right: 0; background: var(--crimson); color: #fff; padding: 6px 14px; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.pc-badge.new { background: var(--rose-gold); }
+
+.pc-info { padding: 24px; border-top: 1px solid var(--border); }
+.pc-type { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 6px; }
+.pc-name { font-family: 'Cinzel', serif; font-size: 16px; margin-bottom: 12px; color: var(--text); line-height: 1.4; }
+.pc-material { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; font-style: italic; }
+.pc-footer { display: flex; justify-content: space-between; align-items: center; }
+.pc-price { font-family: 'Cinzel', serif; font-size: 18px; color: var(--crimson); }
+.pc-price small { font-size: 12px; color: var(--text-muted); text-decoration: line-through; font-family: 'Raleway', sans-serif; margin-left: 8px; font-weight: 400; }
+.pc-wish { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted); }
+.pc-wish:hover { border-color: var(--crimson); color: var(--crimson); }
+.pc-atc { display: block; width: 100%; padding: 14px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; background: var(--ivory); border: none; border-top: 1px solid var(--border); font-family: 'Raleway', sans-serif; cursor: pointer; color: var(--text); transition: all 0.3s; }
+.pc-atc:hover { background: var(--crimson); color: #fff; }
+
+/* ── THE CRAFT SECTION ── */
+.craft { padding: 120px 0; background: var(--ivory); }
+.craft-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; align-items: center; }
+.craft-text { grid-column: 1 / 2; }
+.craft-text .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 24px; display: block; }
+.craft-text h2 { font-size: 38px; color: var(--crimson); line-height: 1.2; margin-bottom: 24px; }
+.craft-text p { font-size: 15px; color: var(--text-muted); line-height: 1.9; margin-bottom: 32px; }
+.craft-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
+.craft-stat strong { display: block; font-family: 'Cinzel', serif; font-size: 32px; color: var(--crimson); }
+.craft-stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
+
+.craft-visual { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.craft-img { background: #E8D5C0; display: flex; align-items: center; justify-content: center; position: relative; }
+.craft-img:first-child { aspect-ratio: 3/4; }
+.craft-img:last-child { aspect-ratio: 3/4; margin-top: 60px; background: #D4C0A8; }
+.craft-img svg { width: 40%; color: #a08060; opacity: 0.5; }
+
+/* ── BRIDAL SHOWCASE ── */
+.bridal { padding: 100px 0; background: var(--deep-red); }
+.bridal .container { text-align: center; }
+.bridal h2 { font-size: 40px; color: #fff; margin-bottom: 16px; }
+.bridal-sub { font-size: 13px; color: rgba(200, 155, 114, 0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 70px; }
+.bridal-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 30px; align-items: center; }
+.b-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(200, 155, 114, 0.2); padding: 30px; text-align: center; position: relative; }
+.b-card-center { background: rgba(255,255,255,0.08); border: 1px solid rgba(200, 155, 114, 0.4); }
+.b-img { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.b-img svg { width: 40%; color: var(--rose-gold); opacity: 0.6; }
+.b-card h3 { font-family: 'Cinzel', serif; font-size: 18px; color: #fff; margin-bottom: 8px; }
+.b-card p { font-size: 13px; color: rgba(200, 155, 114, 0.7); }
+.b-card-center h3 { font-size: 24px; }
+.b-price { font-family: 'Cinzel', serif; font-size: 20px; color: var(--rose-gold); margin-top: 16px; }
+.b-cta { display: inline-block; margin-top: 50px; background: var(--rose-gold); color: var(--deep-red); padding: 18px 60px; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; font-family: 'Raleway', sans-serif; transition: all 0.3s; }
+.b-cta:hover { background: #fff; }
+
+/* ── TESTIMONIALS ── */
+.testimonials { padding: 100px 0; }
+.test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
+.t-card { padding: 40px; border: 1px solid var(--border); position: relative; }
+.t-card::before { content: '"'; position: absolute; top: 20px; left: 28px; font-family: 'Cinzel', serif; font-size: 80px; color: var(--rose-gold); opacity: 0.15; line-height: 1; }
+.t-stars { display: flex; gap: 4px; margin-bottom: 20px; }
+.t-stars svg { width: 14px; fill: var(--rose-gold); }
+.t-text { font-size: 14px; color: var(--text-muted); line-height: 1.9; font-style: italic; margin-bottom: 24px; }
+.t-author { display: flex; align-items: center; gap: 14px; padding-top: 20px; border-top: 1px solid var(--border); }
+.t-av { width: 44px; height: 44px; border-radius: 50%; background: var(--ivory); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 16px; color: var(--crimson); }
+.t-name { font-family: 'Cinzel', serif; font-size: 14px; color: var(--text); }
+.t-city { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
+
+/* ── FOOTER ── */
+footer { background: #160A0A; padding: 80px 0 0; color: rgba(255,255,255,0.6); }
+.f-top { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(200, 155, 114, 0.15); }
+.f-brand .brand { text-align: left; display: inline-block; }
+.f-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.9; margin: 20px 0 30px; max-width: 280px; }
+.f-socials { display: flex; gap: 12px; }
+.f-social { width: 36px; height: 36px; border: 1px solid rgba(200, 155, 114, 0.3); display: flex; align-items: center; justify-content: center; color: var(--rose-gold); transition: all 0.2s; }
+.f-social:hover { border-color: var(--rose-gold); background: rgba(200, 155, 114, 0.1); }
+.f-social svg { width: 16px; fill: currentColor; }
+
+.f-col h4 { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: var(--rose-gold); margin-bottom: 24px; text-transform: uppercase; }
+.f-col ul { list-style: none; }
+.f-col li { margin-bottom: 12px; }
+.f-col a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 13px; transition: color 0.3s; }
+.f-col a:hover { color: var(--rose-gold); }
+
+.f-bottom { display: flex; justify-content: space-between; padding: 24px 0; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.25); }
+.f-bottom-links { display: flex; gap: 32px; }
+.f-bottom-links a { color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.3s; }
+.f-bottom-links a:hover { color: var(--rose-gold); }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 1200px) {
+  .prod-scroll { grid-template-columns: repeat(2, 1fr); }
+  .bridal-grid { grid-template-columns: 1fr 1fr; }
+  .f-top { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-left { aspect-ratio: 4/3; }
+  .hero-right { padding: 60px 48px; }
+  .hero-right h1 { font-size: 40px; }
+  .craft-inner { grid-template-columns: 1fr; }
+  .craft-visual { grid-column: 1 / 2; }
+  .bridal-grid { grid-template-columns: 1fr; }
+  .test-grid { grid-template-columns: 1fr; }
+}
+@media(max-width: 768px) {
+  .container { padding: 0 20px; }
+  header { padding: 0 20px; }
+  .header-top { grid-template-columns: auto 1fr; gap: 0; }
+  .header-left { display: none; }
+  .header-nav { gap: 20px; overflow-x: auto; }
+  .hero-right { padding: 40px 20px; }
+  .prod-scroll { grid-template-columns: 1fr; }
+  .craft-stats { grid-template-columns: 1fr 1fr; }
+  .f-top { grid-template-columns: 1fr; gap: 40px; }
+  .f-bottom { flex-direction: column; gap: 16px; }
+}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#8B1A2C' }};
+  --cf-bg:{{ section.settings.bg | default: '#FAF0F0' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#8B1A2C' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="top-band"> Make charges waived on bridal sets this season  BIS Hallmarked  Free insured shipping across India </div>
+
+<header>
+  <div class="header-top">
+    <div class="header-left">
+      <a href="#" class="h-badge">Book Visit</a>
+      <a href="#" class="h-badge">Bridal Lookbook</a>
     </div>
-    
-    <div class="cf-jh-c-grid">
-      {% if collection.products.size > 0 %}
-        {% for product in collection.products %}
-          <a href="{{ product.url }}" class="cf-jh-prod">
-            <div class="cf-jh-prod-img">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
+    <a href="#" class="brand">
+      MEENAKSHI
+      <small>Heritage Jewellers Est. 1966</small>
+    </a>
+    <div class="header-right">
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Search
+      </a>
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        Wishlist
+      </a>
+      <a href="#" class="icon-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        Bag (0)
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a href="#">New Arrivals</a>
+    <a href="#">Necklaces</a>
+    <a href="#">Rings</a>
+    <a href="#">Earrings</a>
+    <a href="#">Bangles & Kadas</a>
+    <a href="#">Bridal Sets</a>
+    <a href="#">Men's</a>
+    <a href="#">Our Story</a>
+  </nav>
+</header>
+
+{% comment %}ConvertFlow: Meenakshi Heritage Jewellers ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #8B1A2C; --cf-bg: #FAF0F0; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
+
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
+
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
+    </div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
+    </div>
+  </div>
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+            {% else %}
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+            {% endif %}
+            {% if product.available == false %}
+              <span class="cfcol-badge">Sold Out</span>
+            {% elsif product.compare_at_price > product.price %}
+              <span class="cfcol-badge">Sale</span>
+            {% endif %}
+          </div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
               {% endif %}
             </div>
-            <div class="cf-jh-prod-title">{{ product.title }}</div>
-            <div class="cf-jh-prod-price">{{ product.price | money }}</div>
-          </a>
-        {% endfor %}
-      {% else %}
-        {% for i in (1..8) %}
-          <a href="#" class="cf-jh-prod">
-            <div class="cf-jh-prod-img"><div style="width:60%; height:60%; background:#f5f5f5; border-radius:50%;"></div></div>
-            <div class="cf-jh-prod-title">Heritage Piece 0{{ i }}</div>
-            <div class="cf-jh-prod-price">$1,200.00</div>
-          </a>
-        {% endfor %}
-      {% endif %}
+          </div>
+          <button class="cfcol-atc">Add to Cart</button>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
+    {% endif %}
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
+</div>
+
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#8B1A2C);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#8B1A2C);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#8B1A2C);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
     </div>
   </div>
-</div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Jewellery Collection",
+  "name": "CF Meenakshi Heritage Jew",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Gold Accent", "default": "#D4AF37" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#FAFAFA" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#222222" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#8B1A2C"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#FAF0F0"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
   "presets": [
-    { "name": "CF Jewellery Collection" }
+    {
+      "name": "CF Meenakshi Heritage Jew"
+    }
   ]
 }
 {% endschema %}

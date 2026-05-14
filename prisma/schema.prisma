@@ -55,6 +55,9 @@ model Shop {
   extractions     Extraction[]
   libraryItems    LibraryItem[]
   pushHistories   PushHistory[]
+  bundles         Bundle[]
+  funnels         Funnel[]
+  croWidgets      CroWidget[]
 }
 
 model Section {
@@ -217,4 +220,54 @@ model PushHistory {
 
   @@index([shopId])
   @@index([libraryItemId])
+}
+
+model Bundle {
+  id          String   @id @default(cuid())
+  shopId      String
+  name        String
+  type        String   // fixed | mix_and_match | buy_x_get_y | volume_discount
+  status      String   @default("draft") // draft | active | archived
+  config      String?  @db.LongText // JSON: products, discounts, conditions
+  generatedRevenue Decimal? @db.Decimal(10, 2) @default(0.00)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model Funnel {
+  id          String   @id @default(cuid())
+  shopId      String
+  name        String
+  type        String   // pre_purchase | post_purchase | cart_upsell
+  status      String   @default("draft") // draft | active | archived
+  steps       String?  @db.LongText // JSON: sequence of upsells/downsells
+  conversionRate Decimal? @db.Decimal(5, 2) @default(0.00)
+  generatedRevenue Decimal? @db.Decimal(10, 2) @default(0.00)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model CroWidget {
+  id          String   @id @default(cuid())
+  shopId      String
+  name        String
+  type        String   // popup | sticky_bar | pincode | whatsapp_chat
+  status      String   @default("draft") // draft | active | archived
+  config      String?  @db.LongText // JSON: triggers, design, text
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
 }

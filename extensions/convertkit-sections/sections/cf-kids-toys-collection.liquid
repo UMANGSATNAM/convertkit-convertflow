@@ -1,83 +1,395 @@
-{% comment %} ConvertFlow — Kids Toys Collection Page {% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap');
-  .cf-kids-c*{box-sizing:border-box;margin:0;padding:0}
-  .cf-kids-c{font-family:'Varela Round',sans-serif;background:#F0F8FF;color:#333;padding-bottom:80px}
-  
-  .cf-kids-c-head{background:{{ section.settings.color_blue | default: '#4D94FF' }};color:#fff;text-align:center;padding:80px 5% 120px;position:relative}
-  .cf-kids-c-h1{font-family:'Fredoka One',cursive;font-size:clamp(40px,6vw,64px);margin-bottom:16px;text-shadow:3px 3px 0px rgba(0,0,0,.1)}
-  .cf-kids-c-p{font-size:18px;max-width:600px;margin:0 auto;font-weight:600}
-  
-  .cf-kids-c-wave{position:absolute;bottom:0;left:0;width:100%;height:60px;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,119.56,193,101.44Z' fill='%23F0F8FF'/%3E%3C/svg%3E");background-size:cover;background-position:center;z-index:3}
+:root{--yellow:#F9C22E;--blue:#2D6BE4;--red:#E83A3A;--teal:#1ABFA1;--bg:#FFFEF8;--surface:#fff;--text:#1A1A2E;--muted:#6B6B80;--border:#EAE8F0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.baloo{font-family:'Baloo 2',cursive;}
 
-  .cf-kids-c-wrap{max-width:1400px;margin:-40px auto 0;padding:0 5%;position:relative;z-index:4}
-  
-  .cf-kids-c-filters{display:flex;gap:16px;margin-bottom:40px;flex-wrap:wrap}
-  .cf-kids-c-filter{background:#fff;border-radius:30px;padding:12px 24px;font-family:'Fredoka One',cursive;font-size:16px;color:#333;text-decoration:none;box-shadow:0 6px 0px rgba(0,0,0,.05);transition:all .2s;border:4px solid transparent}
-  .cf-kids-c-filter:hover,.cf-kids-c-filter.active{transform:translateY(4px);box-shadow:0 2px 0px rgba(0,0,0,.05);border-color:{{ section.settings.color_yellow | default: '#FFD11A' }}}
-  
-  .cf-kids-prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
-  .cf-kids-card{background:#fff;border-radius:24px;padding:20px;text-decoration:none;color:#333;position:relative;border:4px solid transparent;transition:all .3s;box-shadow:0 10px 20px rgba(0,0,0,.04)}
-  .cf-kids-card:hover{border-color:{{ section.settings.color_red | default: '#FF4D4D' }};transform:translateY(-8px)}
-  .cf-kids-card-img{aspect-ratio:1;background:#F0F8FF;border-radius:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;padding:16px}
-  .cf-kids-card-img img{max-width:100%;max-height:100%;object-fit:contain}
-  .cf-kids-card-title{font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:8px;line-height:1.2}
-  .cf-kids-card-price{font-size:24px;font-weight:700;color:{{ section.settings.color_red | default: '#FF4D4D' }}}
+/* WAVY TOP */
+.top-wave{background:var(--yellow);color:#000;text-align:center;padding:10px;font-size:13px;font-weight:700;letter-spacing:.5px;}
 
-  @media(max-width:900px){
-    .cf-kids-prod-grid{grid-template-columns:repeat(2,1fr)}
-  }
-{% endstyle %}
+/* HEADER */
+header{padding:16px 60px;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.04);}
+.brand{font-family:'Baloo 2',cursive;font-size:30px;font-weight:800;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;}
+.brand .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--yellow);margin-bottom:8px;}
+nav ul{display:flex;gap:28px;list-style:none;}
+nav a{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;transition:color .2s;}
+nav a:hover{color:var(--blue);}
+.hdr-right{display:flex;gap:12px;align-items:center;}
+.hdr-btn{background:var(--blue);color:#fff;padding:12px 24px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .2s;}
+.hdr-btn:hover{opacity:.88;}
 
-<div class="cf-kids-c">
-  <div class="cf-kids-c-head">
-    <h1 class="cf-kids-c-h1">{{ collection.title | default: 'All Awesome Toys!' }}</h1>
-    <p class="cf-kids-c-p">{{ collection.description | strip_html | truncate: 120 | default: 'Find the perfect toy to make them smile today.' }}</p>
-    <div class="cf-kids-c-wave"></div>
-  </div>
-  
-  <div class="cf-kids-c-wrap">
-    <div class="cf-kids-c-filters">
-      <a href="#" class="cf-kids-c-filter active">All Toys</a>
-      <a href="#" class="cf-kids-c-filter">Action Figures</a>
-      <a href="#" class="cf-kids-c-filter">Educational</a>
-      <a href="#" class="cf-kids-c-filter">Plushies</a>
-      <a href="#" class="cf-kids-c-filter">Puzzles</a>
-    </div>
-    
-    <div class="cf-kids-prod-grid">
-      {% if collection.products.size > 0 %}
-        {% for product in collection.products %}
-          <a href="{{ product.url }}" class="cf-kids-card">
-            <div class="cf-kids-card-img">
-              {% if product.featured_image %}<img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">{% endif %}
-            </div>
-            <div class="cf-kids-card-title">{{ product.title }}</div>
-            <div class="cf-kids-card-price">{{ product.price | money }}</div>
-          </a>
-        {% endfor %}
-      {% else %}
-        {% for i in (1..8) %}
-          <a href="#" class="cf-kids-card">
-            <div class="cf-kids-card-img"><div style="font-size:60px">🧸</div></div>
-            <div class="cf-kids-card-title">Awesome Toy {{ i }}</div>
-            <div class="cf-kids-card-price">${{ i | times: 10 }}.99</div>
-          </a>
-        {% endfor %}
-      {% endif %}
-    </div>
-  </div>
+/* HERO */
+.hero{background:linear-gradient(135deg,#EEF4FF 0%,#FFF8E8 100%);display:grid;grid-template-columns:1fr 1fr;min-height:88vh;padding:0 60px;align-items:center;gap:60px;overflow:hidden;position:relative;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(249,194,46,.15);}
+.hero::after{content:'';position:absolute;bottom:-40px;left:40px;width:200px;height:200px;border-radius:50%;background:rgba(45,107,228,.08);}
+.hero-text .badge{display:inline-flex;align-items:center;gap:8px;background:var(--yellow);color:#000;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;margin-bottom:20px;}
+.hero-text h1{font-size:64px;font-weight:800;line-height:1.1;color:var(--text);margin-bottom:20px;}
+.hero-text h1 span{color:var(--blue);}
+.hero-text p{font-size:17px;color:var(--muted);line-height:1.8;max-width:440px;margin-bottom:36px;}
+.hero-btns{display:flex;gap:12px;}
+.btn-blue{background:var(--blue);color:#fff;padding:16px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;box-shadow:0 6px 20px rgba(45,107,228,.3);}
+.btn-blue:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,107,228,.35);}
+.btn-outline-b{background:transparent;color:var(--blue);border:2px solid var(--blue);padding:14px 40px;border-radius:100px;font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-outline-b:hover{background:var(--blue);color:#fff;}
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.toy-float{width:100%;max-width:460px;aspect-ratio:1;border-radius:40% 60% 60% 40% / 60% 40% 60% 40%;background:linear-gradient(135deg,#FFE8A3,#FFD166);display:flex;align-items:center;justify-content:center;animation:blob 6s ease-in-out infinite;}
+.toy-float svg{width:55%;color:#2D6BE4;opacity:.5;}
+@keyframes blob{0%,100%{border-radius:40% 60% 60% 40% / 60% 40% 60% 40%}50%{border-radius:60% 40% 40% 60% / 40% 60% 40% 60%}}
+.age-badges{display:flex;gap:8px;margin-top:32px;}
+.age-b{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+.ab1{background:#FFE8E8;color:#E83A3A;}
+.ab2{background:#E8F0FF;color:#2D6BE4;}
+.ab3{background:#E8FAF7;color:#1ABFA1;}
+
+/* CATEGORIES */
+.categories{padding:70px 60px;max-width:1400px;margin:0 auto;}
+.sec-head{text-align:center;margin-bottom:50px;}
+.sec-head h2{font-size:44px;font-weight:800;color:var(--text);}
+.sec-head p{font-size:16px;color:var(--muted);margin-top:8px;}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.cat-card{border-radius:24px;padding:28px 20px;text-align:center;text-decoration:none;color:var(--text);transition:all .3s;position:relative;overflow:hidden;}
+.cat-card:hover{transform:translateY(-6px);}
+.cat-card:nth-child(1){background:#FFF0E0;}
+.cat-card:nth-child(2){background:#E8F0FF;}
+.cat-card:nth-child(3){background:#E8FAF7;}
+.cat-card:nth-child(4){background:#FFF0F0;}
+.cat-card:nth-child(5){background:#F0EAFF;}
+.cat-icon{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;}
+.cat-icon svg{width:36px;stroke-width:2;}
+.cat-name{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;margin-bottom:4px;}
+.cat-count{font-size:12px;color:var(--muted);}
+
+/* PRODUCTS */
+.products{padding:0 60px 80px;max-width:1400px;margin:0 auto;}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+.ph h2{font-size:40px;font-weight:800;}
+.ph a{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{background:#fff;border-radius:24px;overflow:hidden;border:2px solid var(--border);transition:all .3s;}
+.prod-card:hover{border-color:var(--yellow);box-shadow:0 12px 40px rgba(0,0,0,.07);transform:translateY(-4px);}
+.pc-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;}
+.pc-img svg{width:45%;opacity:.5;transition:transform .4s,opacity .3s;}
+.prod-card:hover .pc-img svg{transform:scale(1.08);opacity:.8;}
+.pc-age{position:absolute;top:14px;left:14px;background:var(--yellow);color:#000;padding:5px 12px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:1px;}
+.pc-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);cursor:pointer;}
+.pc-wish svg{width:16px;color:var(--muted);stroke-width:2;}
+.pc-body{padding:20px;}
+.pc-type{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.pc-name{font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+.pc-skills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.skill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;}
+.sk-green{background:#E8FAF7;color:#1ABFA1;}
+.sk-blue{background:#E8F0FF;color:#2D6BE4;}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;}
+.pc-price{font-size:20px;font-weight:800;color:var(--text);}
+.pc-old{font-size:13px;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.btn-add{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:100px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-add:hover{background:#1d54c4;}
+
+/* SAFETY BANNER */
+.safety{background:var(--blue);padding:70px 60px;display:flex;align-items:center;justify-content:center;gap:80px;flex-wrap:wrap;}
+.safety-item{display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff;}
+.s-icon{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;}
+.s-icon svg{width:28px;color:#fff;stroke-width:1.5;}
+.safety-item strong{font-family:'Baloo 2',cursive;font-size:16px;}
+.safety-item span{font-size:12px;color:rgba(255,255,255,.6);text-align:center;max-width:120px;}
+
+/* FOOTER */
+footer{background:var(--text);padding:80px 60px 40px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.08);}
+.fb a{font-family:'Baloo 2',cursive;font-size:26px;font-weight:800;color:var(--yellow);text-decoration:none;display:block;margin-bottom:16px;}
+.fb p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.9;max-width:260px;}
+.fc h4{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:20px;}
+.fc ul{list-style:none;}
+.fc li{margin-bottom:10px;}
+.fc a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.fc a:hover{color:var(--yellow);}
+.fbot{display:flex;justify-content:space-between;padding-top:28px;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+
+@media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-visual{display:none}.cat-grid{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.categories{padding:60px 20px}.cat-grid{grid-template-columns:repeat(2,1fr)}.products{padding:0 20px 60px}.safety{gap:40px;padding:60px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+</style>
+
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#F9C22E' }};
+  --cf-bg:{{ section.settings.bg | default: '#EFF4FF' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#F9C22E' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
 </div>
+{% endif %}
+
+<div class="top-wave"> Free gift-wrapping on all orders! Use code GIFTED at checkout.</div>
+<header>
+  <a href="#" class="brand">PLAY<div class="dot"></div>BOX</a>
+  <nav><ul>
+    <li><a href="#">Toys</a></li>
+    <li><a href="#">Learning</a></li>
+    <li><a href="#">Outdoor</a></li>
+    <li><a href="#">Arts & Crafts</a></li>
+    <li><a href="#">Gift Sets</a></li>
+  </ul></nav>
+  <div class="hdr-right">
+    <a href="#" class="hdr-btn">{{ section.settings.hero_cta | default: "Shop Now" }}</a>
+  </div>
+</header>
+
+{% comment %}ConvertFlow: PlayBox Kids ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #F9C22E; --cf-bg: #EFF4FF; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
+
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
+
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
+    </div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
+    </div>
+  </div>
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+            {% else %}
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+            {% endif %}
+            {% if product.available == false %}
+              <span class="cfcol-badge">Sold Out</span>
+            {% elsif product.compare_at_price > product.price %}
+              <span class="cfcol-badge">Sale</span>
+            {% endif %}
+          </div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
+              {% endif %}
+            </div>
+          </div>
+          <button class="cfcol-atc">Add to Cart</button>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
+    {% endif %}
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
+</div>
+
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#F9C22E);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Kids Toys Collection",
+  "name": "CF PlayBox Kids Coll",
   "settings": [
-    { "type": "color", "id": "color_red", "label": "Red", "default": "#FF4D4D" },
-    { "type": "color", "id": "color_blue", "label": "Blue", "default": "#4D94FF" },
-    { "type": "color", "id": "color_yellow", "label": "Yellow", "default": "#FFD11A" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#F9C22E"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#EFF4FF"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
-  "presets": [{ "name": "CF Kids Toys Collection" }]
+  "presets": [
+    {
+      "name": "CF PlayBox Kids Coll"
+    }
+  ]
 }
 {% endschema %}

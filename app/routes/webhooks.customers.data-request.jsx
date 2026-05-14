@@ -45,7 +45,8 @@ export const action = async ({ request }) => {
       shop: shopDomain,
       data: {
         review_requests: reviewRequests,
-        analytics_events: "Analytics events are anonymous (session-based, no PII stored)",
+        analytics_events:
+          "Analytics events are anonymous (session-based, no PII stored)",
       },
     });
   } catch (error) {

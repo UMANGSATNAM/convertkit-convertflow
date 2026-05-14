@@ -29,7 +29,9 @@ export const action = async ({ request }) => {
       where: { shopId: shop.id, customerId },
     });
 
-    console.log(`GDPR: Redacted customer ${customerId} data for shop ${shopDomain}`);
+    console.log(
+      `GDPR: Redacted customer ${customerId} data for shop ${shopDomain}`,
+    );
     return json({ success: true });
   } catch (error) {
     console.error("GDPR customer redact error:", error);

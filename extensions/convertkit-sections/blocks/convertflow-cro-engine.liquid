@@ -1,0 +1,171 @@
+{% comment %}
+  ConvertFlow CRO Engine
+  This app embed renders all active CRO widgets (popups, sticky carts, countdowns)
+  and handles bundle logic on the storefront.
+{% endcomment %}
+
+<div id="cf-cro-engine-root"></div>
+
+{% schema %}
+{
+  "name": "ConvertFlow CRO Engine",
+  "target": "body",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Global Settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "Enable this App Embed to activate your ConvertFlow CRO Widgets and Bundles across your store."
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+/* Base Styles for CRO Widgets */
+.cf-widget-container {
+  font-family: inherit;
+  z-index: 2147483647; /* Max z-index to stay above everything */
+}
+
+/* Exit Intent Popup */
+.cf-popup-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  z-index: 2147483647;
+}
+.cf-popup-overlay.cf-active {
+  opacity: 1; pointer-events: all;
+}
+.cf-popup-content {
+  background: #fff; padding: 40px; border-radius: 16px;
+  max-width: 480px; width: 90%; text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  transform: translateY(20px); transition: transform 0.3s ease;
+  position: relative;
+}
+.cf-popup-overlay.cf-active .cf-popup-content {
+  transform: translateY(0);
+}
+.cf-popup-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; font-size: 24px;
+  cursor: pointer; color: #999; line-height: 1;
+}
+
+/* Free Shipping Bar */
+.cf-shipping-bar {
+  background: #000; color: #fff; text-align: center;
+  padding: 10px; font-weight: 600; font-size: 14px;
+  position: relative; z-index: 2147483646;
+}
+
+/* WhatsApp Float */
+.cf-whatsapp-float {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 60px; height: 60px; background: #25d366;
+  border-radius: 50%; display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  color: white; font-size: 32px; cursor: pointer;
+  z-index: 2147483646; transition: transform 0.2s ease;
+  text-decoration: none;
+}
+.cf-whatsapp-float:hover {
+  transform: scale(1.1);
+}
+
+/* Buttons */
+.cf-btn {
+  background: #000; color: #fff; border: none;
+  padding: 14px 24px; border-radius: 8px; font-weight: 700;
+  width: 100%; cursor: pointer; font-size: 16px;
+  margin-top: 16px; transition: background 0.2s;
+}
+.cf-btn:hover { background: #333; }
+</style>
+
+<script>
+(function() {
+  // 1. Fetch the active widgets config from App Metafields
+  // (In production, the Remix backend pushes this JSON string to shop.metafields.convertflow.cro_config)
+  const croConfigRaw = '{{ shop.metafields.convertflow.cro_config.value | escape }}';
+  
+  // Dummy fallback for development testing if metafield is empty
+  let widgets = [];
+  if (croConfigRaw) {
+    try {
+      widgets = JSON.parse(croConfigRaw.replace(/&quot;/g, '"'));
+    } catch(e) { console.error("ConvertFlow: Error parsing CRO config"); }
+  } else {
+    // Development mockup
+    widgets = [
+      { type: 'popup', config: { headline: "Wait! Don't leave yet 👋", bodyText: "Get 10% off your first order by signing up today.", buttonText: "Claim My 10% Off", primaryColor: "#1a1a1a" } },
+      { type: 'free_shipping', config: { headline: "Free shipping on orders over ₹999!" } },
+      { type: 'whatsapp', config: { buttonText: "919876543210" } }
+    ];
+  }
+
+  const root = document.getElementById('cf-cro-engine-root');
+
+  // 2. Render Widgets
+  widgets.forEach(widget => {
+    if (widget.type === 'free_shipping') {
+      const bar = document.createElement('div');
+      bar.className = 'cf-shipping-bar';
+      bar.innerHTML = widget.config.headline;
+      document.body.prepend(bar);
+    }
+    
+    if (widget.type === 'whatsapp') {
+      const wa = document.createElement('a');
+      wa.className = 'cf-whatsapp-float cf-widget-container';
+      wa.href = \`https://wa.me/\${widget.config.buttonText}?text=Hi, I need help with my order.\`;
+      wa.target = '_blank';
+      wa.innerHTML = \`<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>\`;
+      document.body.appendChild(wa);
+    }
+
+    if (widget.type === 'popup') {
+      const overlay = document.createElement('div');
+      overlay.className = 'cf-popup-overlay cf-widget-container';
+      overlay.innerHTML = \`
+        <div class="cf-popup-content">
+          <button class="cf-popup-close">&times;</button>
+          <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 12px; color: #111;">\${widget.config.headline}</h2>
+          <p style="font-size: 16px; color: #555; margin-bottom: 24px;">\${widget.config.bodyText}</p>
+          <button class="cf-btn" style="background: \${widget.config.primaryColor || '#000'}">\${widget.config.buttonText}</button>
+        </div>
+      \`;
+      document.body.appendChild(overlay);
+
+      // Exit Intent Logic
+      let popupShown = false;
+      document.addEventListener('mouseleave', (e) => {
+        if (e.clientY < 0 && !popupShown) {
+          overlay.classList.add('cf-active');
+          popupShown = true;
+        }
+      });
+
+      overlay.querySelector('.cf-popup-close').addEventListener('click', () => {
+        overlay.classList.remove('cf-active');
+      });
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('cf-active');
+      });
+    }
+  });
+
+  // 3. Bundle Integration Logic (Mockup for Cart Interception)
+  const bundleConfigRaw = '{{ shop.metafields.convertflow.bundle_config.value | escape }}';
+  if (bundleConfigRaw) {
+    console.log("ConvertFlow: Bundle logic initialized.");
+    // Hooks into fetch() to modify cart/add requests based on active bundles
+  }
+
+})();
+</script>
