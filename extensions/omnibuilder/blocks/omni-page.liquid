@@ -1,0 +1,40 @@
+{% liquid
+  assign handle = block.settings.page_handle | strip
+  assign mf_key = 'page_' | append: handle
+  assign content = shop.metafields.omnibuilder[mf_key].value
+%}
+
+{% if handle != blank and content != blank %}
+  <div class="om-page-wrap" data-page-handle="{{ handle }}">
+    {{ content }}
+  </div>
+{% else %}
+  {% if request.design_mode %}
+    <div style="padding:32px;text-align:center;background:#fff4cc;border:2px dashed #d4a017;font-family:system-ui;border-radius:8px;">
+      <strong>OmniBuilder</strong><br>
+      {% if handle == blank %}
+        Enter a page handle in the block settings.
+      {% else %}
+        No published page found for handle &ldquo;{{ handle | escape }}&rdquo;.<br>
+        <small>Open the OmniBuilder app, publish a page, then refresh.</small>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{{ 'omnibuilder.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "OmniBuilder Page",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_handle",
+      "label": "Page handle",
+      "info": "Handle of a published page in the OmniBuilder app (e.g. summer-sale)"
+    }
+  ]
+}
+{% endschema %}

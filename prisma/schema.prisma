@@ -1,0 +1,130 @@
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Session (required by @shopify/shopify-app-session-storage-prisma — do NOT modify) ---
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+// --- OmniBuilder models ---
+
+enum Plan {
+  FREE
+  STARTER
+  GROWTH
+  SCALE
+  AGENCY
+}
+
+model Shop {
+  id            String    @id @default(cuid())
+  shopifyDomain String    @unique
+  plan          Plan      @default(FREE)
+  installedAt   DateTime  @default(now())
+  uninstalledAt DateTime?
+  country       String?
+  currency      String?
+  pages         Page[]
+
+  @@index([shopifyDomain])
+}
+
+enum PageType {
+  LANDING
+  HOME
+  PRODUCT
+  COLLECTION
+  CART
+  ABOUT
+  CONTACT
+  FAQ
+  NOT_FOUND
+  CUSTOM
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Page {
+  id          String      @id @default(cuid())
+  shopId      String
+  shop        Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  type        PageType
+  title       String
+  handle      String
+  status      PageStatus  @default(DRAFT)
+  seo         Json?
+  version     Int         @default(1)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+  sections    Section[]
+  versions    PageVersion[]
+
+  @@unique([shopId, handle])
+  @@index([shopId, type, status])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  pageId    String
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      String   // registry id, e.g. "hero-split-image"
+  order     Int
+  settings  Json
+  blocks    Block[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pageId, order])
+}
+
+model Block {
+  id        String  @id @default(cuid())
+  sectionId String
+  section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  type      String
+  order     Int
+  settings  Json
+
+  @@index([sectionId, order])
+}
+
+model PageVersion {
+  id        String   @id @default(cuid())
+  pageId    String
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  snapshot  Json
+  message   String?
+  createdAt DateTime @default(now())
+
+  @@index([pageId, createdAt])
+}
