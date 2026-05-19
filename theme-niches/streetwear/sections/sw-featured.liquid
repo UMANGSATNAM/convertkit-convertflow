@@ -1,0 +1,23 @@
+<div style="padding:80px 20px;background:var(--sw-black)">
+  <div style="max-width:1320px;margin:0 auto">
+    <div class="sw-section-header"><p class="sw-eyebrow">{{ section.settings.eyebrow }}</p><h2>{{ section.settings.heading }}</h2></div>
+    {%- assign col = collections[section.settings.collection] -%}
+    <div class="sw-prod-grid">
+      {%- for product in col.products limit: section.settings.count -%}
+      <a href="{{ product.url }}" class="sw-prod-card">
+        <div class="sw-prod-card__img">
+          {%- if product.tags contains 'limited' -%}<span class="sw-prod-card__tag">Limited</span>{%- endif -%}
+          {%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">
+          {%- else -%}<div style="width:100%;height:100%;background:var(--sw-grey)"></div>{%- endif -%}
+        </div>
+        <div class="sw-prod-card__name">{{ product.title }}</div>
+        <div class="sw-prod-card__price">{{ product.price | money }}</div>
+      </a>
+      {%- endfor -%}
+    </div>
+    <div style="text-align:center;margin-top:48px"><a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="sw-btn">{{ section.settings.cta_label }}</a></div>
+  </div>
+</div>
+{% schema %}
+{"name":"SW Featured","settings":[{"type":"text","id":"eyebrow","label":"Eyebrow","default":"FRESH DROPS"},{"type":"text","id":"heading","label":"Heading","default":"LATEST HEAT"},{"type":"collection","id":"collection","label":"Collection"},{"type":"range","id":"count","label":"Products","min":4,"max":12,"step":4,"default":8},{"type":"text","id":"cta_label","label":"CTA","default":"VIEW ALL DROPS"},{"type":"url","id":"cta_url","label":"CTA URL"}],"presets":[{"name":"SW Featured"}]}
+{% endschema %}
