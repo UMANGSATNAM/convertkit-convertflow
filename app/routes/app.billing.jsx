@@ -14,6 +14,9 @@ import {
 } from "@shopify/polaris";
 import { authenticate, PLAN_PRO, PLAN_ENTERPRISE } from "../shopify.server";
 
+const PLAN_PRO_CLIENT = 'Pro - $19/mo';
+const PLAN_ENTERPRISE_CLIENT = 'Enterprise - $49/mo';
+
 export const loader = async ({ request }) => {
   const { billing, session } = await authenticate.admin(request);
   
@@ -121,7 +124,7 @@ export default function BillingRoute() {
                 <BlockStack gap="400">
                   <InlineStack align="space-between">
                     <Text as="h3" variant="headingMd">Pro</Text>
-                    {activePlan === PLAN_PRO && <Badge tone="success">Active</Badge>}
+                    {activePlan === PLAN_PRO_CLIENT && <Badge tone="success">Active</Badge>}
                   </InlineStack>
                   <Text as="p" variant="bodyLg" tone="subdued">
                     Unlock premium sections and page templates.
@@ -135,11 +138,11 @@ export default function BillingRoute() {
                   </ul>
                   <Button 
                     variant="primary" 
-                    disabled={activePlan === PLAN_PRO}
+                    disabled={activePlan === PLAN_PRO_CLIENT}
                     loading={isSubmitting}
-                    onClick={() => handleSubscribe(PLAN_PRO)}
+                    onClick={() => handleSubscribe(PLAN_PRO_CLIENT)}
                   >
-                    {activePlan === PLAN_PRO ? "Current Plan" : "Upgrade to Pro"}
+                    {activePlan === PLAN_PRO_CLIENT ? "Current Plan" : "Upgrade to Pro"}
                   </Button>
                 </BlockStack>
               </Card>
@@ -149,7 +152,7 @@ export default function BillingRoute() {
                 <BlockStack gap="400">
                   <InlineStack align="space-between">
                     <Text as="h3" variant="headingMd">Enterprise</Text>
-                    {activePlan === PLAN_ENTERPRISE && <Badge tone="success">Active</Badge>}
+                    {activePlan === PLAN_ENTERPRISE_CLIENT && <Badge tone="success">Active</Badge>}
                   </InlineStack>
                   <Text as="p" variant="bodyLg" tone="subdued">
                     Full agency access with white-glove onboarding.
@@ -162,11 +165,11 @@ export default function BillingRoute() {
                     <li>API Access & Webhooks</li>
                   </ul>
                   <Button 
-                    disabled={activePlan === PLAN_ENTERPRISE}
+                    disabled={activePlan === PLAN_ENTERPRISE_CLIENT}
                     loading={isSubmitting}
-                    onClick={() => handleSubscribe(PLAN_ENTERPRISE)}
+                    onClick={() => handleSubscribe(PLAN_ENTERPRISE_CLIENT)}
                   >
-                    {activePlan === PLAN_ENTERPRISE ? "Current Plan" : "Upgrade to Enterprise"}
+                    {activePlan === PLAN_ENTERPRISE_CLIENT ? "Current Plan" : "Upgrade to Enterprise"}
                   </Button>
                 </BlockStack>
               </Card>
