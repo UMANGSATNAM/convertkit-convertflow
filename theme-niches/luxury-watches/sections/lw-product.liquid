@@ -1,0 +1,88 @@
+<div class="product-page page-width" style="padding-top:48px;padding-bottom:80px;background:var(--lw-midnight)">
+  <nav style="font-size:12px;color:var(--lw-muted);margin-bottom:32px;font-family:'DM Sans',sans-serif;letter-spacing:0.04em;max-width:1320px;margin:0 auto 32px;padding:48px 20px 0" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--lw-muted)">Home</a> / <a href="{{ product.collections.first.url }}" style="color:var(--lw-muted)">{{ product.collections.first.title }}</a> / <span style="color:var(--lw-ivory)">{{ product.title }}</span>
+  </nav>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;max-width:1320px;margin:0 auto;padding:0 20px">
+    <div data-gallery>
+      <div style="overflow:hidden;background:var(--lw-charcoal);aspect-ratio:1;margin-bottom:12px;cursor:zoom-in" {% if settings.enable_image_zoom %}data-zoom{% endif %}>
+        <img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" height="900" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        {%- for img in product.images limit: 6 -%}
+        <div data-thumb data-src="{{ img | image_url: width: 900 }}" class="{% if forloop.first %}active{% endif %}" style="width:72px;height:72px;overflow:hidden;cursor:pointer;border:2px solid {% if forloop.first %}var(--lw-amber){% else %}transparent{% endif %};transition:border-color .2s">
+          <img src="{{ img | image_url: width: 144 }}" alt="" width="72" height="72" style="width:100%;height:100%;object-fit:cover">
+        </div>
+        {%- endfor -%}
+      </div>
+    </div>
+    <div>
+      <p class="lw-eyebrow" style="margin-bottom:10px">{{ product.vendor }}</p>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--lw-ivory);margin-bottom:16px;line-height:1.2">{{ product.title }}</h1>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--lw-border)">
+        <span style="font-size:28px;font-weight:700;color:var(--lw-amber)" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}
+        <span style="font-size:18px;color:var(--lw-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>
+        {%- endif -%}
+      </div>
+
+      <!-- Specs -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'spec' -%}
+          <div style="padding:12px;border:1px solid var(--lw-border);font-size:12px" {{ block.shopify_attributes }}>
+            <div style="color:var(--lw-muted);margin-bottom:2px;letter-spacing:0.06em;text-transform:uppercase;font-size:10px">{{ block.settings.label }}</div>
+            <div style="color:var(--lw-ivory);font-weight:600">{{ block.settings.value }}</div>
+          </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+          <div style="margin-bottom:20px">
+            <label style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:10px;color:var(--lw-ivory)">{{ option.name }}</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" data-swatches>
+              {%- for value in option.values -%}
+              <button type="button" data-swatch="{{ value }}" style="padding:10px 20px;border:1px solid {% if option.selected_value == value %}var(--lw-amber){% else %}var(--lw-border){% endif %};background:{% if option.selected_value == value %}var(--lw-amber){% else %}transparent{% endif %};color:{% if option.selected_value == value %}var(--lw-midnight){% else %}var(--lw-ivory){% endif %};font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:0.06em">{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          </div>
+          {%- endfor -%}
+          <select name="id" data-variant-select style="display:none">{%- for variant in product.variants -%}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>{%- endfor -%}</select>
+        {%- endunless -%}
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;border:1px solid var(--lw-border)">
+            <button type="button" class="qty-selector__btn" data-dir="down" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--lw-ivory)">−</button>
+            <input type="number" name="quantity" value="1" min="1" style="width:48px;height:52px;text-align:center;border:none;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;background:transparent;color:var(--lw-ivory)">
+            <button type="button" class="qty-selector__btn" data-dir="up" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--lw-ivory)">+</button>
+          </div>
+          <button type="submit" class="lw-btn lw-btn--solid" data-atc style="flex:1;justify-content:center;font-size:12px" {% unless product.available %}disabled{% endunless %}>{%- if product.available -%}ADD TO COLLECTION{%- else -%}SOLD OUT{%- endif -%}</button>
+        </div>
+      </form>
+
+      <div style="font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.8;color:var(--lw-muted);margin-top:24px">{{ product.description }}</div>
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name":"LW Product",
+  "settings":[],
+  "blocks":[
+    {"type":"spec","name":"Specification","limit":8,"settings":[
+      {"type":"text","id":"label","label":"Label","default":"Case Size"},
+      {"type":"text","id":"value","label":"Value","default":"42mm"}
+    ]}
+  ],
+  "presets":[{"name":"LW Product","blocks":[
+    {"type":"spec","settings":{"label":"Case Size","value":"42mm"}},
+    {"type":"spec","settings":{"label":"Movement","value":"Automatic"}},
+    {"type":"spec","settings":{"label":"Water Resistance","value":"100m"}},
+    {"type":"spec","settings":{"label":"Power Reserve","value":"40 hours"}},
+    {"type":"spec","settings":{"label":"Crystal","value":"Sapphire"}},
+    {"type":"spec","settings":{"label":"Warranty","value":"5 Years"}}
+  ]}]
+}
+{% endschema %}

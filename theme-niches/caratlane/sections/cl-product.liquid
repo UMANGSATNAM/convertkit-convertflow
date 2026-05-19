@@ -1,0 +1,76 @@
+<div class="product-page page-width" style="padding-top:48px;padding-bottom:80px">
+  <nav style="font-size:13px;color:var(--cl-muted);margin-bottom:32px;font-family:'Inter',sans-serif" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--cl-muted)">Home</a> / <a href="{{ product.collections.first.url }}" style="color:var(--cl-muted)">{{ product.collections.first.title }}</a> / <span style="color:var(--cl-charcoal)">{{ product.title }}</span>
+  </nav>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+    <div data-gallery>
+      <div style="border-radius:16px;overflow:hidden;background:var(--cl-blush);aspect-ratio:1;margin-bottom:12px;cursor:zoom-in" {% if settings.enable_image_zoom %}data-zoom{% endif %}>
+        <img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" height="900" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        {%- for img in product.images limit: 6 -%}
+        <div data-thumb data-src="{{ img | image_url: width: 900 }}" class="{% if forloop.first %}active{% endif %}" style="width:72px;height:72px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid {% if forloop.first %}var(--cl-pink){% else %}transparent{% endif %};transition:border-color .2s">
+          <img src="{{ img | image_url: width: 144 }}" alt="" width="72" height="72" style="width:100%;height:100%;object-fit:cover">
+        </div>
+        {%- endfor -%}
+      </div>
+    </div>
+    <div>
+      <p class="cl-eyebrow" style="margin-bottom:10px">{{ product.vendor }}</p>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:30px;font-weight:400;color:var(--cl-charcoal);margin-bottom:12px;line-height:1.25">{{ product.title }}</h1>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span style="color:var(--cl-gold);font-size:15px;letter-spacing:2px">★★★★★</span>
+        <span style="font-size:13px;color:var(--cl-muted)">({{ product.metafields.reviews.rating_count | default: '3.1k' }} reviews)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--cl-border)">
+        <span style="font-size:28px;font-weight:700;color:var(--cl-pink)" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}
+        <span style="font-size:18px;color:var(--cl-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>
+        {%- endif -%}
+      </div>
+      <div style="background:var(--cl-blush);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--cl-charcoal)">
+        💎 EMI from <strong>₹{{ product.price | divided_by: 100 | divided_by: 12 | money_without_currency }}/mo</strong> · Try at Home available
+      </div>
+
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+          <div style="margin-bottom:20px">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:10px;color:var(--cl-charcoal)">{{ option.name }}</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" data-swatches>
+              {%- for value in option.values -%}
+              <button type="button" data-swatch="{{ value }}" style="padding:10px 20px;border:2px solid {% if option.selected_value == value %}var(--cl-pink){% else %}var(--cl-border){% endif %};background:{% if option.selected_value == value %}var(--cl-pink){% else %}#fff{% endif %};color:{% if option.selected_value == value %}#fff{% else %}var(--cl-charcoal){% endif %};font-size:13px;font-weight:500;cursor:pointer;border-radius:100px;transition:all .2s;font-family:'Inter',sans-serif">{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          </div>
+          {%- endfor -%}
+          <select name="id" data-variant-select style="display:none">{%- for variant in product.variants -%}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>{%- endfor -%}</select>
+        {%- endunless -%}
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;border:1.5px solid var(--cl-border);border-radius:100px;overflow:hidden">
+            <button type="button" class="qty-selector__btn" data-dir="down" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">−</button>
+            <input type="number" name="quantity" value="1" min="1" style="width:48px;height:52px;text-align:center;border:none;font-size:16px;font-weight:600;font-family:'Inter',sans-serif">
+            <button type="button" class="qty-selector__btn" data-dir="up" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">+</button>
+          </div>
+          <button type="submit" class="cl-btn cl-btn--rose" data-atc style="flex:1;justify-content:center;font-size:15px" {% unless product.available %}disabled{% endunless %}>{%- if product.available -%}Add to Bag{%- else -%}Sold Out{%- endif -%}</button>
+        </div>
+        {%- if product.available -%}
+        <a href="#" class="cl-btn cl-btn--outline" style="width:100%;display:flex;justify-content:center;margin-bottom:20px">📦 Try at Home — Free</a>
+        {%- endif -%}
+      </form>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--cl-warm);border-radius:12px;font-size:12px;color:var(--cl-charcoal)"><span style="color:var(--cl-pink)">✓</span> BIS Hallmarked</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--cl-warm);border-radius:12px;font-size:12px;color:var(--cl-charcoal)"><span style="color:var(--cl-pink)">↩</span> Lifetime Exchange</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--cl-warm);border-radius:12px;font-size:12px;color:var(--cl-charcoal)"><span style="color:var(--cl-pink)">🚚</span> Free Insured Delivery</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--cl-warm);border-radius:12px;font-size:12px;color:var(--cl-charcoal)"><span style="color:var(--cl-pink)">🔒</span> 15-Day Returns</div>
+      </div>
+
+      <div style="font-family:'Inter',sans-serif;font-size:15px;line-height:1.8;color:var(--cl-muted)">{{ product.description }}</div>
+    </div>
+  </div>
+</div>
+{% schema %}
+{"name":"CL Product","settings":[{"type":"text","id":"atc_text","label":"ATC","default":"Add to Bag"}],"presets":[{"name":"CL Product"}]}
+{% endschema %}
