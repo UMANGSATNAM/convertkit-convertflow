@@ -1,0 +1,134 @@
+<div class="product-page page-width" style="padding-top:48px;padding-bottom:80px">
+  <nav style="font-size:12px;color:var(--tanishq-muted);margin-bottom:32px;font-family:'DM Sans',sans-serif;letter-spacing:0.04em" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--tanishq-muted)">Home</a> /
+    <a href="{{ product.collections.first.url }}" style="color:var(--tanishq-muted)">{{ product.collections.first.title }}</a> /
+    <span style="color:var(--tanishq-charcoal)">{{ product.title }}</span>
+  </nav>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+    <!-- Gallery -->
+    <div data-gallery>
+      <div style="overflow:hidden;background:var(--tanishq-cream);aspect-ratio:1;margin-bottom:12px;cursor:zoom-in" {% if settings.enable_image_zoom %}data-zoom{% endif %}>
+        <img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" height="900" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        {%- for img in product.images limit: 6 -%}
+        <div data-thumb data-src="{{ img | image_url: width: 900 }}" class="{% if forloop.first %}active{% endif %}" style="width:72px;height:72px;overflow:hidden;cursor:pointer;border:2px solid {% if forloop.first %}var(--tanishq-gold){% else %}transparent{% endif %};transition:border-color .2s">
+          <img src="{{ img | image_url: width: 144 }}" alt="" width="72" height="72" style="width:100%;height:100%;object-fit:cover">
+        </div>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div>
+      <p class="tanishq-eyebrow" style="margin-bottom:10px">{{ product.vendor }}</p>
+      <h1 style="font-family:'Playfair Display',serif;font-size:30px;font-weight:400;color:var(--tanishq-charcoal);margin-bottom:12px;line-height:1.25">{{ product.title }}</h1>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span style="color:var(--tanishq-gold);font-size:15px;letter-spacing:2px">★★★★★</span>
+        <span style="font-size:13px;color:var(--tanishq-muted)">({{ product.metafields.reviews.rating_count | default: '1.2k' }} reviews)</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--tanishq-border)">
+        <span style="font-size:28px;font-weight:700;color:var(--tanishq-burgundy)" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}
+        <span style="font-size:18px;color:var(--tanishq-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>
+        {%- endif -%}
+      </div>
+
+      <!-- Purity & Certification -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'cert' -%}
+          <div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--tanishq-border);font-size:12px" {{ block.shopify_attributes }}>
+            <span style="color:var(--tanishq-gold);font-weight:700">{{ block.settings.icon }}</span>
+            <span style="color:var(--tanishq-charcoal);font-weight:600">{{ block.settings.text }}</span>
+          </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <!-- Variants -->
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+          <div style="margin-bottom:20px">
+            <label style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:10px;color:var(--tanishq-charcoal)">{{ option.name }}</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" data-swatches>
+              {%- for value in option.values -%}
+              <button type="button" data-swatch="{{ value }}" style="padding:10px 20px;border:1.5px solid {% if option.selected_value == value %}var(--tanishq-gold){% else %}var(--tanishq-border){% endif %};background:{% if option.selected_value == value %}var(--tanishq-gold){% else %}#fff{% endif %};color:{% if option.selected_value == value %}var(--tanishq-deep){% else %}var(--tanishq-charcoal){% endif %};font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif">{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          </div>
+          {%- endfor -%}
+          <select name="id" data-variant-select style="display:none">
+            {%- for variant in product.variants -%}
+            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>
+            {%- endfor -%}
+          </select>
+        {%- endunless -%}
+
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;border:1.5px solid var(--tanishq-border);overflow:hidden">
+            <button type="button" class="qty-selector__btn" data-dir="down" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">−</button>
+            <input type="number" name="quantity" value="1" min="1" style="width:48px;height:52px;text-align:center;border:none;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif">
+            <button type="button" class="qty-selector__btn" data-dir="up" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">+</button>
+          </div>
+          <button type="submit" class="tanishq-btn" data-atc style="flex:1;justify-content:center;font-size:13px" {% unless product.available %}disabled{% endunless %}>
+            {%- if product.available -%}{{ section.settings.atc_text }}{%- else -%}SOLD OUT{%- endif -%}
+          </button>
+        </div>
+        {%- if section.settings.show_buy_now and product.available -%}
+        <a href="{{ product.selected_or_first_available_variant.url | append: '?action=buy_now' }}" class="tanishq-btn tanishq-btn--outline" style="width:100%;display:flex;justify-content:center;margin-bottom:24px">{{ section.settings.buy_now_text }}</a>
+        {%- endif -%}
+      </form>
+
+      <!-- Description -->
+      <div style="font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.8;color:var(--tanishq-muted)">{{ product.description }}</div>
+
+      <!-- Share -->
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--tanishq-border);display:flex;align-items:center;gap:12px">
+        <span style="font-size:12px;color:var(--tanishq-muted);letter-spacing:0.08em;text-transform:uppercase;font-weight:600">Share:</span>
+        <a href="https://www.facebook.com/sharer.php?u={{ shop.url }}{{ product.url }}" target="_blank" rel="noopener" style="color:var(--tanishq-muted);font-size:13px">Facebook</a>
+        <a href="whatsapp://send?text={{ product.title | url_encode }}%20{{ shop.url }}{{ product.url }}" style="color:var(--tanishq-muted);font-size:13px">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- if settings.sticky_atc -%}
+<div class="sticky-atc" id="StickyATC" style="opacity:0;transition:opacity .3s;background:var(--tanishq-charcoal);border-top:1px solid var(--tanishq-border)">
+  <img src="{{ product.featured_image | image_url: width: 80 }}" alt="" width="40" height="40" style="object-fit:cover">
+  <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tanishq-ivory)">{{ product.title }}</div><div style="font-size:14px;color:var(--tanishq-gold);font-weight:700">{{ product.price | money }}</div></div>
+  <button class="tanishq-btn" data-atc onclick="document.getElementById('ProductForm').requestSubmit()">{{ section.settings.atc_text }}</button>
+</div>
+<script>
+const sa=document.getElementById('StickyATC');const pf=document.getElementById('ProductForm');
+window.addEventListener('scroll',()=>{sa.style.opacity=pf.getBoundingClientRect().bottom<0?'1':'0';},{passive:true});
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name":"Tanishq Product",
+  "settings":[
+    {"type":"text","id":"atc_text","label":"Add to Cart Text","default":"ADD TO BAG"},
+    {"type":"checkbox","id":"show_buy_now","label":"Show Buy Now","default":true},
+    {"type":"text","id":"buy_now_text","label":"Buy Now Text","default":"BUY NOW"}
+  ],
+  "blocks":[
+    {"type":"cert","name":"Certification","limit":6,"settings":[
+      {"type":"text","id":"icon","label":"Icon","default":"✓"},
+      {"type":"text","id":"text","label":"Text","default":"BIS Hallmarked"}
+    ]}
+  ],
+  "presets":[{"name":"Tanishq Product","blocks":[
+    {"type":"cert","settings":{"icon":"✓","text":"BIS 916 Hallmarked"}},
+    {"type":"cert","settings":{"icon":"◆","text":"Certified Diamonds"}},
+    {"type":"cert","settings":{"icon":"↩","text":"Lifetime Exchange"}},
+    {"type":"cert","settings":{"icon":"🛡","text":"Tata Trust Guarantee"}}
+  ]}]
+}
+{% endschema %}
