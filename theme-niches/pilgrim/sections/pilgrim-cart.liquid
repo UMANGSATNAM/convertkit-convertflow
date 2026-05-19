@@ -1,0 +1,107 @@
+<div style="padding:48px 20px 80px;background:var(--pilgrim-cream);min-height:60vh">
+  <div style="max-width:960px;margin:0 auto">
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,44px);font-weight:400;color:var(--pilgrim-espresso);text-align:center;margin-bottom:48px">Your Beauty Ritual</h1>
+
+    {%- if cart.item_count == 0 -%}
+    <div style="text-align:center;padding:80px 20px">
+      <div style="font-size:48px;margin-bottom:20px">🧴</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--pilgrim-espresso);margin-bottom:12px">Your ritual is empty</h2>
+      <p style="color:var(--pilgrim-muted);margin-bottom:32px">Discover our bestselling skincare and haircare products</p>
+      <a href="/collections/all" class="pilgrim-btn">Start Shopping</a>
+    </div>
+    {%- else -%}
+
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start">
+      <!-- Cart Items -->
+      <div>
+        {%- for item in cart.items -%}
+        <div style="display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--pilgrim-border);align-items:center">
+          <a href="{{ item.url }}" style="flex-shrink:0">
+            <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.title | escape }}" width="100" height="100" style="border-radius:16px;object-fit:cover">
+          </a>
+          <div style="flex:1;min-width:0">
+            <a href="{{ item.url }}" style="text-decoration:none;font-size:15px;font-weight:600;color:var(--pilgrim-espresso);display:block;margin-bottom:4px">{{ item.product.title }}</a>
+            {%- unless item.variant.title == 'Default Title' -%}
+            <div style="font-size:13px;color:var(--pilgrim-muted);margin-bottom:8px">{{ item.variant.title }}</div>
+            {%- endunless -%}
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;border:1px solid var(--pilgrim-border);border-radius:100px;overflow:hidden">
+                <button type="button" style="width:32px;height:36px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--pilgrim-espresso)">−</button>
+                <span style="width:32px;text-align:center;font-size:14px;font-weight:600">{{ item.quantity }}</span>
+                <button type="button" style="width:32px;height:36px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--pilgrim-espresso)">+</button>
+              </div>
+              <a href="{{ routes.cart_change_url }}?id={{ item.key }}&quantity=0" style="font-size:12px;color:var(--pilgrim-muted);text-decoration:underline">Remove</a>
+            </div>
+          </div>
+          <div style="font-size:16px;font-weight:700;color:var(--pilgrim-terracotta)">{{ item.final_line_price | money }}</div>
+        </div>
+        {%- endfor -%}
+      </div>
+
+      <!-- Order Summary -->
+      <div style="background:#fff;border-radius:20px;padding:32px;border:1px solid var(--pilgrim-border);position:sticky;top:120px">
+        <h3 style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;color:var(--pilgrim-espresso);margin-bottom:24px">Order Summary</h3>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px">
+          <span style="color:var(--pilgrim-muted)">Subtotal ({{ cart.item_count }} items)</span>
+          <span style="font-weight:600;color:var(--pilgrim-espresso)">{{ cart.total_price | money }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px">
+          <span style="color:var(--pilgrim-muted)">Shipping</span>
+          <span style="font-weight:600;color:var(--pilgrim-olive)">FREE</span>
+        </div>
+
+        {%- if section.settings.show_free_shipping_bar -%}
+        {%- assign fs_threshold = 49900 -%}
+        {%- assign remaining = fs_threshold | minus: cart.total_price -%}
+        {%- if remaining > 0 -%}
+        <div style="margin:16px 0;padding:12px;background:var(--pilgrim-sand);border-radius:12px;font-size:13px;color:var(--pilgrim-muted);text-align:center">
+          🚚 Add <strong style="color:var(--pilgrim-terracotta)">{{ remaining | money }}</strong> more for free shipping
+          <div style="height:4px;background:var(--pilgrim-border);border-radius:2px;margin-top:8px;overflow:hidden">
+            <div style="height:100%;background:var(--pilgrim-terracotta);border-radius:2px;width:{{ cart.total_price | times: 100 | divided_by: fs_threshold }}%"></div>
+          </div>
+        </div>
+        {%- else -%}
+        <div style="margin:16px 0;padding:12px;background:rgba(107,127,94,0.1);border-radius:12px;font-size:13px;color:var(--pilgrim-olive);text-align:center;font-weight:600">
+          ✓ You've unlocked free shipping!
+        </div>
+        {%- endif -%}
+        {%- endif -%}
+
+        <div style="padding-top:16px;border-top:1px solid var(--pilgrim-border);margin-top:16px;display:flex;justify-content:space-between;margin-bottom:24px">
+          <span style="font-size:16px;font-weight:700;color:var(--pilgrim-espresso)">Total</span>
+          <span style="font-size:20px;font-weight:700;color:var(--pilgrim-terracotta)">{{ cart.total_price | money }}</span>
+        </div>
+
+        {%- if section.settings.show_note -%}
+        <details style="margin-bottom:20px">
+          <summary style="font-size:13px;color:var(--pilgrim-muted);cursor:pointer;margin-bottom:8px">Add a note</summary>
+          <textarea name="note" rows="3" style="width:100%;border:1px solid var(--pilgrim-border);border-radius:12px;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical">{{ cart.note }}</textarea>
+        </details>
+        {%- endif -%}
+
+        <form action="{{ routes.cart_url }}" method="post">
+          <button type="submit" name="checkout" class="pilgrim-btn" style="width:100%;justify-content:center;font-size:15px">Proceed to Checkout</button>
+        </form>
+
+        <div style="display:flex;justify-content:center;gap:16px;margin-top:16px">
+          <span style="font-size:11px;color:var(--pilgrim-muted);display:flex;align-items:center;gap:4px">🔒 Secure</span>
+          <span style="font-size:11px;color:var(--pilgrim-muted);display:flex;align-items:center;gap:4px">🌿 Vegan</span>
+          <span style="font-size:11px;color:var(--pilgrim-muted);display:flex;align-items:center;gap:4px">↩️ Easy Returns</span>
+        </div>
+      </div>
+    </div>
+
+    {%- endif -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name":"Pilgrim Cart",
+  "settings":[
+    {"type":"checkbox","id":"show_note","label":"Show Order Note","default":true},
+    {"type":"checkbox","id":"show_free_shipping_bar","label":"Show Free Shipping Bar","default":true}
+  ],
+  "presets":[{"name":"Pilgrim Cart"}]
+}
+{% endschema %}
