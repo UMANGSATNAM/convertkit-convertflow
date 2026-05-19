@@ -1,0 +1,48 @@
+<div class="pilgrim-reviews">
+  <div class="pilgrim-section-header">
+    <p class="pilgrim-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.subheading }}</p>
+  </div>
+  <div class="pilgrim-review-grid">
+    {%- for block in section.blocks -%}
+    <div class="pilgrim-review-card" {{ block.shopify_attributes }}>
+      <div class="pilgrim-review-card__stars">{%- for i in (1..block.settings.rating) -%}★{%- endfor -%}{%- assign empty = 5 | minus: block.settings.rating -%}{%- for i in (1..empty) -%}☆{%- endfor -%}</div>
+      <div class="pilgrim-review-card__text">"{{ block.settings.quote }}"</div>
+      <div class="pilgrim-review-card__author">{{ block.settings.name }}</div>
+      <div class="pilgrim-review-card__meta">{{ block.settings.product }} · {{ block.settings.location }}</div>
+    </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Pilgrim Reviews",
+  "settings": [
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"REAL REVIEWS"},
+    {"type":"text","id":"heading","label":"Heading","default":"Loved by 5 Lakh+ Customers"},
+    {"type":"text","id":"subheading","label":"Subheading","default":"Don't just take our word for it — hear from our community"}
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {"type":"range","id":"rating","label":"Rating","min":1,"max":5,"step":1,"default":5},
+        {"type":"textarea","id":"quote","label":"Quote","default":"My skin has never felt this good. The Vitamin C serum is a game-changer!"},
+        {"type":"text","id":"name","label":"Name","default":"Sneha P."},
+        {"type":"text","id":"product","label":"Product","default":"Vitamin C Face Serum"},
+        {"type":"text","id":"location","label":"Location","default":"Mumbai"}
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Pilgrim Reviews",
+    "blocks": [
+      {"type":"review","settings":{"rating":5,"quote":"My skin has never felt this good. The Vitamin C serum is a game-changer — visible glow in just 2 weeks!","name":"Sneha P.","product":"Vitamin C Serum","location":"Mumbai"}},
+      {"type":"review","settings":{"rating":5,"quote":"I've tried so many shampoos but Pilgrim's Argan Oil one actually stopped my hair fall. Absolutely love it.","name":"Priya K.","product":"Argan Shampoo","location":"Delhi"}},
+      {"type":"review","settings":{"rating":5,"quote":"The Jeju face wash leaves my skin so clean without drying it out. Perfect for my oily skin. Repurchased 3 times!","name":"Arjun M.","product":"Jeju Volcanic Face Wash","location":"Bangalore"}}
+    ]
+  }]
+}
+{% endschema %}
