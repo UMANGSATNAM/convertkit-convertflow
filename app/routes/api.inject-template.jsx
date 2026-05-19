@@ -2,11 +2,11 @@ import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const THEME_BASE_DIR = path.resolve(__dirname, "../../theme-base");
-const THEME_NICHES_DIR = path.resolve(__dirname, "../../theme-niches");
+// Use process.cwd() — reliable in both dev (project root) and production (Docker WORKDIR /app)
+const PROJECT_ROOT = process.cwd();
+const THEME_BASE_DIR = path.resolve(PROJECT_ROOT, "theme-base");
+const THEME_NICHES_DIR = path.resolve(PROJECT_ROOT, "theme-niches");
 
 const TEMPLATES = {
   pilgrim:              { label: "Pilgrim Beauty" },
@@ -99,10 +99,17 @@ export const action = async ({ request }) => {
     }
     
     const theme = mainTheme;
-    console.log(`[theme-inject] Injecting into MAIN theme: ${theme.name} (${theme.id})`);
+    console.log(`[theme-inject] Injecting template "${templateId}" into MAIN theme: ${theme.name} (${theme.id})`);
+    console.log(`[theme-inject] PROJECT_ROOT: ${PROJECT_ROOT}`);
+    console.log(`[theme-inject] THEME_BASE_DIR exists: ${fs.existsSync(THEME_BASE_DIR)} (${THEME_BASE_DIR})`);
+    console.log(`[theme-inject] THEME_NICHES_DIR exists: ${fs.existsSync(THEME_NICHES_DIR)} (${THEME_NICHES_DIR})`);
 
     // ── Step 2: Collect base theme files ──────────────────────────────────
     const baseFiles = walkDir(THEME_BASE_DIR);
+    if (baseFiles.length === 0) {
+      console.error(`[theme-inject] CRITICAL: theme-base directory is empty or missing!`);
+      return json({ success: false, error: "Theme base files not found on server. Check deployment." }, { status: 500 });
+    }
     const filesToUpsert = baseFiles.map(({ full, rel }) => ({
       filename: rel,
       body: { type: 'TEXT', value: fs.readFileSync(full, 'utf8') },
