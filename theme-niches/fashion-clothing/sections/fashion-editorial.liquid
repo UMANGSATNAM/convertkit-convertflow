@@ -1,0 +1,134 @@
+{% style %}
+.editorial {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 600px;
+  margin: 40px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ed-left {
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 60px;
+  position: relative;
+  overflow: hidden;
+}
+.ed-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+  z-index: 1;
+}
+.ed-left img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+}
+.ed-left-content {
+  position: relative;
+  z-index: 2;
+}
+.ed-left h2 {
+  font-size: 72px;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.ed-left p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 30px;
+  max-width: 360px;
+  line-height: 1.8;
+}
+.ed-right {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+.ed-item {
+  background: #2A2A2A;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+}
+.ed-item:last-child {
+  border-bottom: none;
+  background: #F0EBE0;
+}
+.ed-item h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.ed-item:last-child h3 { color: var(--ink); }
+.ed-item p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+}
+.ed-item:last-child p { color: var(--mid); }
+
+@media(max-width:1024px) {
+  .editorial { grid-template-columns: 1fr; height: auto; }
+  .ed-left { padding: 40px; min-height: 400px; }
+}
+{% endstyle %}
+
+<div class="editorial">
+  <div class="ed-left">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 800 }}" loading="lazy" alt="Editorial">
+    {%- endif -%}
+    <div class="ed-left-content">
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.text }}</p>
+      {%- if section.settings.btn_text != blank -%}
+        <a href="{{ section.settings.btn_url }}" class="fashion-hero__btn-dark">{{ section.settings.btn_text }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+  <div class="ed-right">
+    {%- for block in section.blocks -%}
+      <div class="ed-item">
+        <h3>{{ block.settings.title }}</h3>
+        <p>{{ block.settings.subtitle }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Fashion Editorial",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Background Image" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "THE DENIM STORY" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Raw, tumbled, and washed to perfection. Our denim is built to break in beautifully and last a lifetime." },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Shop Denim" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Fashion Editorial" }]
+}
+{% endschema %}

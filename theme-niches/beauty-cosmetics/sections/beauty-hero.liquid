@@ -1,0 +1,119 @@
+{% style %}
+.beauty-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  height: calc(100vh - 100px);
+  min-height: 600px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-content {
+  padding: 10vw 8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: radial-gradient(circle at top left, #FFFFFF 0%, #FAFAF8 100%);
+}
+.h-tag {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  display: block;
+}
+.hero-content h1 {
+  font-size: 72px;
+  line-height: 1.1;
+  margin-bottom: 32px;
+  color: var(--primary);
+}
+.hero-content p {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin-bottom: 48px;
+  max-width: 480px;
+  font-weight: 300;
+}
+.hero-img {
+  background: var(--shade-1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  mix-blend-mode: multiply;
+}
+.hero-img svg {
+  width: 40%;
+  color: var(--shade-3);
+  opacity: 0.3;
+  filter: blur(2px);
+  position: relative;
+  z-index: 1;
+}
+.floating-element {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--shade-2) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+  filter: blur(20px);
+}
+
+@media(max-width: 1024px) {
+  .beauty-hero { grid-template-columns: 1fr; height: auto; min-height: auto; }
+  .hero-content { padding: 80px 6vw; text-align: center; align-items: center; }
+  .hero-img { display: none; }
+}
+@media(max-width: 768px) {
+  .hero-content h1 { font-size: 48px; }
+}
+{% endstyle %}
+
+<section class="beauty-hero">
+  <div class="hero-content">
+    {%- if section.settings.tag != blank -%}
+      <span class="h-tag">{{ section.settings.tag }}</span>
+    {%- endif -%}
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.text }}</p>
+    {%- if section.settings.btn_text != blank -%}
+      <a href="{{ section.settings.btn_url }}" class="btn-primary">{{ section.settings.btn_text }}</a>
+    {%- endif -%}
+  </div>
+  <div class="hero-img">
+    <div class="floating-element" style="top: -50px; left: -50px;"></div>
+    <div class="floating-element" style="bottom: -100px; right: -50px; background: radial-gradient(circle, var(--shade-3) 0%, transparent 70%);"></div>
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 800 }}" loading="lazy">
+    {%- else -%}
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Beauty Hero",
+  "settings": [
+    { "type": "text", "id": "tag", "label": "Tag", "default": "New Formulation" },
+    { "type": "html", "id": "heading", "label": "Heading", "default": "Luminous silk. <br>Breathable cover." },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Discover our new weightless foundation formula. Enriched with botanical extracts to nourish your skin while providing a flawless, imperceptible finish." },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Shop The Collection" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "image_picker", "id": "image", "label": "Image" }
+  ],
+  "presets": [{ "name": "Beauty Hero" }]
+}
+{% endschema %}

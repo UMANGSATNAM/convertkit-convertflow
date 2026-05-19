@@ -45,7 +45,8 @@ function walkDir(dir, base = dir) {
     if (entry.isDirectory()) {
       results.push(...walkDir(full, base));
     } else {
-      results.push({ full, rel: path.relative(base, full).replace(/\\/g, '/') });
+      // Normalize Windows backslashes → forward slashes for Shopify API
+      results.push({ full, rel: path.relative(base, full).split(path.sep).join('/') });
     }
   }
   return results;
@@ -120,6 +121,7 @@ export const action = async ({ request }) => {
     }
 
     console.log(`[theme-create] Total files to upload: ${filesToUpsert.length}`);
+    console.log(`[theme-create] Sample filenames:`, filesToUpsert.slice(0, 5).map(f => f.filename));
 
     // ── Step 4: Two-phase upload ───────────────────────────────────────────
     const liquidFiles = filesToUpsert.filter(f =>
@@ -134,6 +136,19 @@ export const action = async ({ request }) => {
       f.filename.startsWith('templates/') ||
       f.filename.startsWith('config/')
     );
+
+    console.log(`[theme-create] Phase 1 (Liquid+Assets): ${liquidFiles.length} files`);
+    console.log(`[theme-create] Phase 2 (Templates+Config): ${jsonFiles.length} files`);
+
+    // Safety: catch files that slipped through both filters
+    const uncategorized = filesToUpsert.filter(f =>
+      !liquidFiles.includes(f) && !jsonFiles.includes(f)
+    );
+    if (uncategorized.length > 0) {
+      console.warn(`[theme-create] WARNING: ${uncategorized.length} uncategorized files:`, uncategorized.map(f => f.filename));
+      // Push uncategorized into liquid phase to ensure nothing is lost
+      liquidFiles.push(...uncategorized);
+    }
 
     await upsertChunked(admin, theme.id, liquidFiles, 'Liquid+Assets');
     await upsertChunked(admin, theme.id, jsonFiles, 'Templates+Config');

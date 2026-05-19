@@ -1,0 +1,79 @@
+{% style %}
+.sticky-atc {
+  position: fixed;
+  bottom: -100px;
+  left: 0;
+  width: 100%;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 6vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  z-index: 90;
+  transition: bottom 0.4s ease;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.02);
+}
+.sticky-atc.visible { bottom: 0; }
+.s-prod { display: flex; align-items: center; gap: 24px; }
+.s-prod-img {
+  width: 48px;
+  height: 48px;
+  background: var(--shade-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.s-prod-img img { width: 100%; height: 100%; object-fit: cover; }
+.s-prod-img svg { width: 24px; color: var(--primary); }
+.s-prod-info h4 { font-size: 16px; color: var(--primary); margin-bottom: 4px; }
+.s-prod-info p { font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text-muted); }
+
+@media(max-width: 768px) {
+  .sticky-atc { flex-direction: column; gap: 16px; padding: 20px 6vw; }
+  .sticky-atc .btn-primary { width: 100%; text-align: center; }
+}
+{% endstyle %}
+
+<div class="sticky-atc" id="sticky-atc">
+  <div class="s-prod">
+    <div class="s-prod-img">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 100 }}" loading="lazy">
+      {%- else -%}
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="7" y="3" width="10" height="18" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line></svg>
+      {%- endif -%}
+    </div>
+    <div class="s-prod-info">
+      <h4>{{ section.settings.title }}</h4>
+      <p>{{ section.settings.subtitle }}</p>
+    </div>
+  </div>
+  <button class="btn-primary" style="padding:12px 32px; font-size:12px;">{{ section.settings.btn_text }}</button>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const stickyAtc = document.getElementById('sticky-atc');
+    if (stickyAtc && window.scrollY > 800) {
+      stickyAtc.classList.add('visible');
+    } else if (stickyAtc) {
+      stickyAtc.classList.remove('visible');
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Beauty Sticky ATC",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Product Image" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Silk Veil Foundation" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "$54.00 · Shade 01 (Fair Neutral)" },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Add to Bag" }
+  ],
+  "presets": [{ "name": "Beauty Sticky ATC" }]
+}
+{% endschema %}

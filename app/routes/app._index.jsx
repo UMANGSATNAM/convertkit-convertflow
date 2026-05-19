@@ -788,85 +788,112 @@ export default function Index() {
             </span>
           </div>
 
-          {/* Grid — Bento Style */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gridAutoRows: "minmax(180px, auto)",
-            gap: 16,
-          }}>
+          {/* Grid — Premium Bento Style */}
+          <style>{`
+            .bento-grid {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              grid-auto-rows: 240px;
+              gap: 20px;
+            }
+            .bento-card {
+              border-radius: 24px;
+              padding: 32px;
+              cursor: pointer;
+              text-align: left;
+              transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+              position: relative;
+              overflow: hidden;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              border: 1px solid rgba(0,0,0,0.04);
+            }
+            .bento-card:hover {
+              transform: translateY(-6px) scale(1.01);
+              box-shadow: 0 24px 48px rgba(0,0,0,0.06);
+            }
+            .bento-card-bg {
+              position: absolute;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background-size: cover;
+              background-position: center;
+              opacity: 0.15;
+              mix-blend-mode: multiply;
+              transition: opacity 0.5s ease;
+            }
+            .bento-card:hover .bento-card-bg {
+              opacity: 0.3;
+              transform: scale(1.05);
+            }
+            .bento-span-large {
+              grid-column: span 2;
+              grid-row: span 2;
+            }
+            .bento-span-wide {
+              grid-column: span 2;
+              grid-row: span 1;
+            }
+            .bento-span-tall {
+              grid-column: span 1;
+              grid-row: span 2;
+            }
+            @media (max-width: 1024px) {
+              .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            }
+            @media (max-width: 640px) {
+              .bento-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+              .bento-span-large, .bento-span-wide, .bento-span-tall { grid-column: span 1; grid-row: span 1; min-height: 200px; }
+            }
+          `}</style>
+          <div className="bento-grid">
             {TEMPLATES.map((tpl, idx) => {
               const isSelected = selectedTemplate === tpl.id;
-              
-              // Create bento sizing logic
-              // Make every 5th item large (span 2 cols, span 2 rows)
-              // Make every 3rd item wide (span 2 cols)
-              let gridColumn = "span 1";
-              let gridRow = "span 1";
-              
-              if (idx === 0 || idx === 7 || idx === 14) {
-                gridColumn = "span 2";
-                gridRow = "span 2";
-              } else if (idx === 2 || idx === 11 || idx === 18) {
-                gridColumn = "span 2";
+              let spanClass = "";
+              if (idx === 0 || idx === 11 || idx === 18) {
+                spanClass = "bento-span-large";
+              } else if (idx === 2 || idx === 7 || idx === 15) {
+                spanClass = "bento-span-wide";
+              } else if (idx === 4 || idx === 13) {
+                spanClass = "bento-span-tall";
               }
 
               return (
                 <button
                   key={tpl.id}
+                  className={`bento-card ${spanClass}`}
                   onClick={() => setSelectedTemplate(tpl.id)}
                   style={{
-                    gridColumn,
-                    gridRow,
-                    padding: "24px",
                     background: isSelected ? "#fff" : tpl.nicheBg,
-                    border: isSelected ? `2.5px solid ${tpl.accent}` : "1.5px solid transparent",
-                    borderRadius: 20,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    boxShadow: isSelected ? `0 8px 30px ${tpl.accent}30` : "0 4px 12px rgba(0,0,0,0.02)",
-                    position: "relative",
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between"
-                  }}
-                  onMouseOver={(e) => {
-                    if(!isSelected) e.currentTarget.style.transform = "translateY(-4px)";
-                  }}
-                  onMouseOut={(e) => {
-                    if(!isSelected) e.currentTarget.style.transform = "translateY(0)";
+                    borderColor: isSelected ? tpl.accent : "rgba(0,0,0,0.04)",
+                    boxShadow: isSelected ? `0 0 0 2px ${tpl.accent}, 0 20px 40px ${tpl.accent}20` : undefined,
                   }}
                 >
-                  {/* Decorative background circle */}
+                  {/* Decorative background gradient */}
                   <div style={{
                     position: "absolute",
-                    top: -20,
-                    right: -20,
-                    width: 100,
-                    height: 100,
-                    borderRadius: "50%",
-                    background: tpl.nicheColor,
-                    opacity: 0.05,
-                    pointerEvents: "none"
+                    top: "-20%", right: "-20%",
+                    width: "70%", height: "70%",
+                    background: `radial-gradient(circle, ${tpl.nicheColor} 0%, transparent 70%)`,
+                    opacity: 0.08,
+                    pointerEvents: "none",
+                    filter: "blur(40px)"
                   }} />
 
-                  <div style={{ position: "relative", zIndex: 2 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                  <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                       <span style={{
                         background: isSelected ? tpl.nicheBg : "#fff",
                         color: tpl.nicheColor,
                         padding: "6px 14px",
-                        borderRadius: 20,
+                        borderRadius: 30,
                         fontSize: 10,
                         fontWeight: 800,
-                        letterSpacing: 0.8,
+                        letterSpacing: 1.2,
                         textTransform: "uppercase",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
                       }}>{tpl.niche}</span>
                       
-                      {/* Selected checkmark */}
                       {isSelected && (
                         <div style={{
                           width: 28, height: 28, borderRadius: "50%",
@@ -880,22 +907,24 @@ export default function Index() {
                     </div>
 
                     <div style={{
-                      fontSize: (gridColumn === "span 2" && gridRow === "span 2") ? 28 : 18,
+                      fontSize: spanClass === "bento-span-large" ? 36 : 22,
                       fontWeight: 800,
-                      color: "#1a1a1a",
-                      marginBottom: 8,
-                      lineHeight: 1.2,
-                      fontFamily: "'Playfair Display', serif",
+                      color: "#111",
+                      marginBottom: 12,
+                      lineHeight: 1.1,
+                      fontFamily: "'Inter', sans-serif",
+                      letterSpacing: "-0.5px"
                     }}>{tpl.name}</div>
                   </div>
 
                   <p style={{
                     position: "relative", zIndex: 2,
-                    fontSize: 13,
-                    color: "#555",
+                    fontSize: 14,
+                    color: "#666",
                     lineHeight: 1.6,
+                    fontWeight: 400,
                     display: "-webkit-box",
-                    WebkitLineClamp: gridRow === "span 2" ? 4 : 2,
+                    WebkitLineClamp: spanClass.includes("large") || spanClass.includes("tall") ? 4 : 2,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
                     marginTop: "auto",

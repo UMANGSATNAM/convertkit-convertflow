@@ -1,0 +1,107 @@
+{% style %}
+.sticky-atc {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 99;
+  transform: translateY(100%);
+  transition: transform 0.4s;
+}
+.sticky-atc.show {
+  transform: translateY(0);
+}
+.s-atc-l {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.s-img {
+  width: 48px;
+  height: 48px;
+  background: #000;
+  border-radius: 4px;
+}
+.s-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.s-info h4 {
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.s-info p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.s-atc-r {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.s-price {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+@media(max-width: 768px) {
+  .sticky-atc { padding: 12px 20px; }
+  .s-info p { display: none; }
+  .s-atc-r { gap: 12px; }
+  .s-price { font-size: 16px; }
+}
+{% endstyle %}
+
+<div class="sticky-atc" id="stickyATC">
+  <div class="s-atc-l">
+    <div class="s-img">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 100 }}" loading="lazy">
+      {%- else -%}
+        <svg fill="none" stroke="#fff" viewBox="0 0 24 24" style="width:100%;height:100%;padding:10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+      {%- endif -%}
+    </div>
+    <div class="s-info">
+      <h4>{{ section.settings.title }}</h4>
+      <p>{{ section.settings.subtitle }}</p>
+    </div>
+  </div>
+  <div class="s-atc-r">
+    <div class="s-price">{{ section.settings.price }}</div>
+    <button class="btn-primary" style="padding:10px 20px;font-size:13px;width:auto">{{ section.settings.btn_text }}</button>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const atc = document.getElementById('stickyATC');
+    if (window.scrollY > 400) {
+      atc.classList.add('show');
+    } else {
+      atc.classList.remove('show');
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Electronics Sticky ATC",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Vertex Pro Max" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Pre-order (Ships in 2 weeks)" },
+    { "type": "text", "id": "price", "label": "Price", "default": "$349.00" },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Add to Cart" }
+  ],
+  "presets": [{ "name": "Electronics Sticky ATC" }]
+}
+{% endschema %}
