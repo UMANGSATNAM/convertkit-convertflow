@@ -1,5 +1,56 @@
-<div style="padding:48px 20px 0;background:var(--pet-cream)"><div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:48px"><span class="pet-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</span><h1 style="font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--pet-dark);margin-bottom:12px">{{ collection.title }}</h1>{%- if collection.description != blank -%}<p style="font-family:'Fredoka',sans-serif;font-size:16px;color:var(--pet-muted);max-width:560px;margin:0 auto">{{ collection.description }}</p>{%- endif -%}</div></div>
-<div style="padding:0 20px 80px;background:#fff"><div style="max-width:1320px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:2px solid var(--pet-border);margin-bottom:32px"><div style="font-size:14px;color:var(--pet-muted)">{{ collection.products_count }} items</div><select style="padding:8px 16px;border:2px solid var(--pet-border);border-radius:12px;font-size:13px;cursor:pointer"><option>Featured</option><option>Price: Low to High</option><option>Price: High to Low</option><option>Newest</option></select></div><div class="pet-prod-grid">{%- for product in collection.products -%}<a href="{{ product.url }}" class="pet-prod-card"><div class="pet-prod-card__img">{%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">{%- else -%}<div style="width:100%;height:100%;background:var(--pet-cream)"></div>{%- endif -%}</div><div class="pet-prod-card__name">{{ product.title }}</div><div class="pet-prod-card__price">{{ product.price | money }}</div></a>{%- endfor -%}</div></div></div>
+<div style="background:var(--pet-bg);padding:100px 40px">
+  <div style="max-width:1200px;margin:0 auto">
+    
+    <div style="text-align:center;margin-bottom:60px">
+      <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">
+        <span style="font-size:24px">🦴</span>
+        <span style="font-size:24px">🎾</span>
+        <span style="font-size:24px">🐟</span>
+      </div>
+      <h2 class="pet-head" style="font-size:40px;margin-bottom:16px">{{ collection.title | default: 'Top Picks for Pals' }}</h2>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:32px">
+      {%- for product in collection.products limit: 8 -%}
+      <a href="{{ product.url }}" class="pet-card">
+        <div class="image-wrapper">
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">
+          {%- else -%}
+          <div style="width:100%;height:100%;background:#FFF8E7"></div>
+          {%- endif -%}
+        </div>
+        <div class="title">{{ product.title }}</div>
+        <div class="price">{{ product.price | money }}</div>
+      </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..8) -%}
+      <a href="#" class="pet-card">
+        <div class="image-wrapper">
+          <div style="width:100%;height:100%;background:#FFF8E7"></div>
+        </div>
+        <div class="title">Premium Kibble V{{i}}</div>
+        <div class="price">₹1,499</div>
+      </a>
+      {%- endfor -%}
+      {%- endfor -%}
+    </div>
+    
+    <div style="text-align:center;margin-top:60px">
+      <a href="/collections/all" class="pet-btn">See All Goodies</a>
+    </div>
+  </div>
+</div>
+
 {% schema %}
-{"name":"Pet Collection","settings":[],"presets":[{"name":"Pet Collection"}]}
+{
+  "name": "Pet Supplies Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Pet Supplies Grid"
+    }
+  ]
+}
 {% endschema %}

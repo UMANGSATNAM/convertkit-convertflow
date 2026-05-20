@@ -1,5 +1,57 @@
-<div style="padding:60px 20px 0;background:var(--lf-black)"><div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:56px"><span class="lf-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</span><h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:300;color:var(--lf-white);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.04em">{{ collection.title }}</h1>{%- if collection.description != blank -%}<p style="font-family:'Montserrat',sans-serif;font-size:13px;color:var(--lf-muted);max-width:560px;margin:0 auto;letter-spacing:0.05em">{{ collection.description }}</p>{%- endif -%}</div></div>
-<div style="padding:0 20px 100px;background:var(--lf-black)"><div style="max-width:1320px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid var(--lf-border);margin-bottom:40px"><div style="font-family:'Montserrat',sans-serif;font-size:12px;color:var(--lf-muted);letter-spacing:0.1em;text-transform:uppercase">{{ collection.products_count }} garments</div><select style="padding:10px 20px;border:1px solid var(--lf-border);border-radius:0px;background:transparent;color:#fff;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer"><option>Featured</option><option>Price: Low to High</option><option>Price: High to Low</option><option>Newest</option></select></div><div class="lf-prod-grid">{%- for product in collection.products -%}<a href="{{ product.url }}" class="lf-prod-card"><div class="lf-prod-card__img">{%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title | escape }}" width="700" loading="lazy">{%- else -%}<div style="width:100%;height:100%;background:#161616"></div>{%- endif -%}</div><div class="lf-prod-card__name">{{ product.title }}</div><div class="lf-prod-card__price">{{ product.price | money }}</div></a>{%- endfor -%}</div></div></div>
+<div style="background:var(--lf-bg);padding:140px 60px">
+  <div style="max-width:1600px;margin:0 auto">
+    
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:100px;border-bottom:1px solid var(--lf-border);padding-bottom:40px">
+      <h2 class="lf-head" style="font-size:72px">{{ collection.title | default: 'The Edit' }}</h2>
+      <div class="lf-meta" style="padding-bottom:16px">{{ collection.products_count | default: '24' }} PIECES</div>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:80px 40px">
+      {%- for product in collection.products limit: 6 -%}
+      <!-- Apply asymmetrical offset to middle column -->
+      <a href="{{ product.url }}" class="lf-card {% if forloop.index == 2 or forloop.index == 5 %}lf-offset-left{% endif %}">
+        <div class="image-wrapper">
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy" style="filter:grayscale(100%)">
+          {%- else -%}
+          <div style="width:100%;height:100%;background:#F8F8F8"></div>
+          {%- endif -%}
+        </div>
+        <div class="info">
+          <div class="title">{{ product.title }}</div>
+          <div class="price">{{ product.price | money }}</div>
+        </div>
+      </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..6) -%}
+      <a href="#" class="lf-card {% if i == 2 or i == 5 %}lf-offset-left{% endif %}">
+        <div class="image-wrapper">
+          <div style="width:100%;height:100%;background:#F8F8F8"></div>
+        </div>
+        <div class="info">
+          <div class="title">Structure Coat V{{i}}</div>
+          <div class="price">₹12,500</div>
+        </div>
+      </a>
+      {%- endfor -%}
+      {%- endfor -%}
+    </div>
+    
+    <div style="text-align:center;margin-top:120px">
+      <a href="/collections/all" class="lf-btn">Discover All</a>
+    </div>
+  </div>
+</div>
+
 {% schema %}
-{"name":"LF Collection","settings":[],"presets":[{"name":"LF Collection"}]}
+{
+  "name": "Luxury Fashion Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Luxury Fashion Grid"
+    }
+  ]
+}
 {% endschema %}
