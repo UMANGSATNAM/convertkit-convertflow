@@ -162,6 +162,8 @@
     if (!e.data || typeof e.data.type !== "string") return;
     if (e.data.type.indexOf("CK_") !== 0) return;
 
+    var secNode, all, matchIdx;
+
     switch (e.data.type) {
       case "CK_INJECT_CSS":
         var styleEl = document.getElementById("__ck_injected_css");
@@ -197,10 +199,10 @@
 
       case "CK_HIDE_SECTION":
         if (e.data.sectionId) {
-          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          secNode = document.getElementById("shopify-section-" + e.data.sectionId);
           if (!secNode) {
-            var all = document.querySelectorAll('[id^="shopify-section-"]');
-            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+            all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (matchIdx = 0; matchIdx < all.length; matchIdx++) {
               if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
                 secNode = all[matchIdx];
                 break;
@@ -245,11 +247,11 @@
 
       case "CK_RELOAD_SECTION":
         if (e.data.sectionId) {
-          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          secNode = document.getElementById("shopify-section-" + e.data.sectionId);
           // Fuzzy match if exact ID not found (e.g. generic schema name used)
           if (!secNode) {
-            var all = document.querySelectorAll('[id^="shopify-section-"]');
-            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+            all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (matchIdx = 0; matchIdx < all.length; matchIdx++) {
               if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
                 secNode = all[matchIdx];
                 break;
@@ -320,10 +322,10 @@
 
       case "CK_SELECT_SECTION":
         if (e.data.sectionId) {
-          var secNode = document.getElementById("shopify-section-" + e.data.sectionId);
+          secNode = document.getElementById("shopify-section-" + e.data.sectionId);
           if (!secNode) {
-            var all = document.querySelectorAll('[id^="shopify-section-"]');
-            for (var matchIdx = 0; matchIdx < all.length; matchIdx++) {
+            all = document.querySelectorAll('[id^="shopify-section-"]');
+            for (matchIdx = 0; matchIdx < all.length; matchIdx++) {
               if (all[matchIdx].id.indexOf(e.data.sectionId) > -1) {
                 secNode = all[matchIdx];
                 break;
