@@ -1,0 +1,37 @@
+<div style="padding:48px 20px 80px;background:var(--pc-almond);border-bottom:1px solid var(--pc-border)"><div style="max-width:1320px;margin:0 auto">
+  <nav style="font-size:12px;font-family:'Outfit',sans-serif;font-weight:700;color:var(--pc-muted);margin-bottom:32px;text-transform:uppercase" aria-label="Breadcrumb"><a href="/" style="color:var(--pc-muted)">Home</a> / <a href="{{ product.collections.first.url }}" style="color:var(--pc-muted)">{{ product.collections.first.title }}</a> / <span style="color:var(--pc-dark)">{{ product.title }}</span></nav>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+    <div data-gallery>
+      <div style="border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--pc-border);aspect-ratio:1;margin-bottom:12px;cursor:zoom-in;display:flex;align-items:center;justify-content:center"><img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" style="width:80%;height:80%;object-fit:contain"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">{%- for img in product.images limit: 6 -%}<div data-thumb data-src="{{ img | image_url: width: 900 }}" style="width:72px;height:72px;border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid {% if forloop.first %}var(--pc-sage){% else %}var(--pc-border){% endif %};transition:border-color .2s;display:flex;align-items:center;justify-content:center;background:#fff"><img src="{{ img | image_url: width: 144 }}" alt="" width="56" height="56" style="width:80%;height:80%;object-fit:contain"></div>{%- endfor -%}</div>
+    </div>
+    <div>
+      <span class="pc-eyebrow" style="margin-bottom:8px">{{ product.vendor }}</span>
+      <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--pc-dark);margin-bottom:12px;letter-spacing:-0.01em">{{ product.title }}</h1>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="color:var(--pc-sage);font-size:12px;letter-spacing:2px">★★★★★</span><span style="font-size:12px;color:var(--pc-muted);font-family:'Outfit',sans-serif;font-weight:700">({{ product.metafields.reviews.rating_count | default: '135' }} botanical reviews)</span></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--pc-border)">
+        <span style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--pc-sage)" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}<span style="font-family:'Outfit',sans-serif;font-size:18px;color:var(--pc-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>{%- endif -%}
+      </div>
+      <!-- Personal Care Badges -->
+      <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap"><span style="padding:8px 14px;background:#fff;border:1px solid var(--pc-sage);border-radius:30px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:800;color:var(--pc-sage)">100% SAGE INFUSED</span><span style="padding:8px 14px;background:#fff;border:1px solid var(--pc-border);border-radius:30px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:800;color:var(--pc-dark)">PARABEN FREE</span><span style="padding:8px 14px;background:#fff;border:1px solid var(--pc-border);border-radius:30px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:800;color:var(--pc-dark)">PH BALANCED</span></div>
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}{%- for option in product.options_with_values -%}<div style="margin-bottom:24px"><label style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--pc-dark);display:block;margin-bottom:10px">{{ option.name }}</label><div style="display:flex;gap:10px;flex-wrap:wrap" data-swatches>{%- for value in option.values -%}<button type="button" data-swatch="{{ value }}" style="padding:12px 24px;border:1px solid {% if option.selected_value == value %}var(--pc-sage){% else %}var(--pc-border){% endif %};background:{% if option.selected_value == value %}var(--pc-sage){% else %}#fff{% endif %};color:{% if option.selected_value == value %}#fff{% else %}var(--pc-dark){% endif %};font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;cursor:pointer;border-radius:30px;transition:all .2s">{{ value }}</button>{%- endfor -%}</div></div>{%- endfor -%}<select name="id" data-variant-select style="display:none">{%- for variant in product.variants -%}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>{%- endfor -%}</select>{%- endunless -%}
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;border:1px solid var(--pc-border);border-radius:30px;background:#fff;overflow:hidden"><button type="button" data-dir="down" style="width:48px;height:54px;background:none;border:none;font-size:18px;cursor:pointer">−</button><input type="number" name="quantity" value="1" min="1" style="width:48px;height:54px;text-align:center;border:none;background:transparent;font-size:14px;font-weight:800;font-family:'Outfit',sans-serif"><button type="button" data-dir="up" style="width:48px;height:54px;background:none;border:none;font-size:18px;cursor:pointer">+</button></div>
+          <button type="submit" class="pc-btn" data-atc style="flex:1;justify-content:center" {% unless product.available %}disabled{% endunless %}>{%- if product.available -%}ADD TO APOTHECARY{%- else -%}OUT OF STOCK{%- endif -%}</button>
+        </div>
+      </form>
+      <!-- Trust List -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--pc-border);background:#fff;border-radius:8px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:800;color:var(--pc-sage)">✓ cold pressed raw herbs</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--pc-border);background:#fff;border-radius:8px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:800;color:var(--pc-dark)">🚚 secure padded shipping</div>
+      </div>
+      <div style="font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;color:var(--pc-muted);font-weight:500">{{ product.description }}</div>
+    </div>
+  </div>
+</div></div>
+{% schema %}
+{"name":"Personal Product","settings":[],"presets":[{"name":"Personal Product"}]}
+{% endschema %}

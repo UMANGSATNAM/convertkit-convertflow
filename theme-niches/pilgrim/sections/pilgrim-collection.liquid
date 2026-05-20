@@ -1,79 +1,54 @@
-<div style="padding:48px 20px 0;background:var(--pilgrim-cream)">
-  <div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:48px">
-    <p class="pilgrim-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</p>
-    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,56px);font-weight:400;color:var(--pilgrim-espresso);margin-bottom:12px">{{ collection.title }}</h1>
-    {%- if collection.description != blank -%}
-    <p style="font-size:16px;color:var(--pilgrim-muted);max-width:560px;margin:0 auto;line-height:1.7">{{ collection.description }}</p>
-    {%- endif -%}
-    <div style="margin-top:20px;font-size:14px;color:var(--pilgrim-muted)">{{ collection.products_count }} products</div>
-  </div>
-</div>
-
-<div style="padding:0 20px 80px;background:#fff">
-  <div style="max-width:1320px;margin:0 auto">
-    <!-- Filters -->
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--pilgrim-border);margin-bottom:32px">
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        {%- for filter in collection.filters -%}
-        <details style="position:relative">
-          <summary style="padding:8px 16px;border:1px solid var(--pilgrim-border);border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;color:var(--pilgrim-espresso);list-style:none;font-family:'DM Sans',sans-serif">{{ filter.label }} ▾</summary>
-          <div style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--pilgrim-border);border-radius:12px;padding:12px;min-width:180px;z-index:10;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
-            {%- for value in filter.values -%}
-            <label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;cursor:pointer;color:var(--pilgrim-text)">
-              <input type="checkbox" name="{{ filter.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
-              {{ value.label }} ({{ value.count }})
-            </label>
-            {%- endfor -%}
-          </div>
-        </details>
-        {%- endfor -%}
-      </div>
-      <div>
-        <select style="padding:8px 16px;border:1px solid var(--pilgrim-border);border-radius:100px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--pilgrim-espresso);background:#fff;cursor:pointer">
-          <option>Sort by: Featured</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-          <option>Newest First</option>
-          <option>Best Selling</option>
-        </select>
-      </div>
+<div style="background:var(--pil-bg);padding:100px 40px;position:relative">
+  <div style="max-width:1400px;margin:0 auto">
+    
+    <div style="text-align:center;margin-bottom:80px">
+      <h2 class="pil-head" style="font-size:48px;margin-bottom:16px">{{ collection.title | default: 'Bestselling Rituals' }}</h2>
+      <p style="font-size:16px;color:var(--pil-muted);max-width:500px;margin:0 auto">Curated formulations designed to elevate your daily self-care routine with nature's purest ingredients.</p>
     </div>
-
-    <!-- Product Grid -->
-    <div class="pilgrim-prod-grid">
-      {%- for product in collection.products -%}
-      <a href="{{ product.url }}" class="pilgrim-prod-card" style="text-decoration:none">
-        <div class="pilgrim-prod-card__img">
-          {%- if product.featured_image != blank -%}
-          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">
+    
+    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:40px 32px">
+      {%- for product in collection.products limit: 8 -%}
+      <a href="{{ product.url }}" class="pil-card">
+        <div class="image-wrapper">
+          <div class="pil-badge">BESTSELLER</div>
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
           {%- else -%}
-          <div style="width:100%;height:100%;background:var(--pilgrim-cream);display:flex;align-items:center;justify-content:center">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--pilgrim-border)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-          </div>
+          <div style="width:100%;height:100%;background:var(--pil-soft);border-radius:180px 180px 10px 10px"></div>
           {%- endif -%}
         </div>
-        <div class="pilgrim-prod-card__info">
-          {%- if product.tags contains 'bestseller' -%}
-          <span class="pilgrim-prod-card__tag">Bestseller</span>
-          {%- endif -%}
-          <div class="pilgrim-prod-card__name">{{ product.title }}</div>
-          <div class="pilgrim-prod-card__price">{{ product.price | money }}</div>
+        <div class="title">{{ product.title }}</div>
+        <div class="price">{{ product.price | money }}</div>
+      </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..4) -%}
+      <a href="#" class="pil-card">
+        <div class="image-wrapper">
+          <div class="pil-badge">VEGAN</div>
+          <div style="width:100%;height:100%;background:var(--pil-soft);border-radius:180px 180px 10px 10px"></div>
         </div>
+        <div class="title">Volcanic Clay Mask V{{i}}</div>
+        <div class="price">₹550</div>
       </a>
       {%- endfor -%}
+      {%- endfor -%}
     </div>
-
-    {%- if paginate.pages > 1 -%}
-    <div style="text-align:center;margin-top:48px">
-      <a href="?page={{ paginate.next.url }}" class="pilgrim-btn pilgrim-btn--outline">Load More</a>
+    
+    <div style="text-align:center;margin-top:80px">
+      <a href="/collections/all" class="pil-btn">View All Products</a>
     </div>
-    {%- endif -%}
   </div>
 </div>
+
 {% schema %}
 {
-  "name":"Pilgrim Collection",
-  "settings":[],
-  "presets":[{"name":"Pilgrim Collection"}]
+  "name": "Pilgrim Organic Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Pilgrim Organic Grid"
+    }
+  ]
 }
 {% endschema %}

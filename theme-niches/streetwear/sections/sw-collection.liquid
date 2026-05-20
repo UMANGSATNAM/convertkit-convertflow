@@ -1,32 +1,64 @@
-<div style="padding:48px 20px 0;background:var(--sw-black)">
-  <div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:48px">
-    <p class="sw-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</p>
-    <h1 style="font-family:'Oswald',sans-serif;font-size:clamp(36px,6vw,72px);font-weight:900;text-transform:uppercase;color:var(--sw-white);margin-bottom:12px;line-height:0.95">{{ collection.title }}</h1>
-    {%- if collection.description != blank -%}<p style="font-size:16px;color:var(--sw-muted);max-width:560px;margin:0 auto">{{ collection.description }}</p>{%- endif -%}
-  </div>
-</div>
-<div style="padding:0 20px 80px;background:var(--sw-black)">
-  <div style="max-width:1320px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--sw-border);margin-bottom:32px">
-      <div style="font-size:13px;color:var(--sw-muted);font-family:'Inter',sans-serif">{{ collection.products_count }} pieces</div>
-      <select style="padding:8px 16px;border:1px solid var(--sw-border);font-size:12px;font-family:'Oswald',sans-serif;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--sw-white);letter-spacing:0.08em">
-        <option>FEATURED</option><option>PRICE: LOW</option><option>PRICE: HIGH</option><option>NEWEST</option>
-      </select>
+<div style="background:var(--sw-bg);padding:100px 60px;border-bottom:2px solid var(--sw-border)">
+  <div style="max-width:1600px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;border-bottom:2px solid var(--sw-border);padding-bottom:24px">
+      <div>
+        <div class="mono-tag" style="margin-bottom:12px">/// ALL GEAR</div>
+        <h2 class="sw-head" style="font-size:80px;color:var(--sw-text);line-height:0.9">{{ collection.title | default: 'THE ARCHIVE' }}</h2>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:14px;color:var(--sw-accent)">
+        [{{ collection.products_count | default: '42' }} ITEMS DETECTED]
+      </div>
     </div>
-    <div class="sw-prod-grid">
-      {%- for product in collection.products -%}
-      <a href="{{ product.url }}" class="sw-prod-card">
-        <div class="sw-prod-card__img">
-          {%- if product.tags contains 'limited' -%}<span class="sw-prod-card__tag">Limited</span>{%- endif -%}
-          {%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">{%- else -%}<div style="width:100%;height:100%;background:var(--sw-grey)"></div>{%- endif -%}
+    
+    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
+      {%- for product in collection.products limit: 12 -%}
+      <a href="{{ product.url }}" class="sw-card" style="display:block;text-decoration:none">
+        {%- if product.compare_at_price > product.price -%}
+        <div class="badge">SALE</div>
+        {%- endif -%}
+        <div class="glitch-hover" style="aspect-ratio:3/4;margin-bottom:24px;display:flex;align-items:center;justify-content:center">
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
+          {%- else -%}
+          <div style="font-family:var(--font-mono);color:var(--sw-muted);text-transform:uppercase">NO_IMG_FOUND</div>
+          {%- endif -%}
         </div>
-        <div class="sw-prod-card__name">{{ product.title }}</div>
-        <div class="sw-prod-card__price">{{ product.price | money }}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="sw-head" style="font-size:24px;color:var(--sw-text);max-width:70%">{{ product.title }}</div>
+          <div style="text-align:right">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--sw-accent)">{{ product.price | money }}</div>
+            {%- if product.compare_at_price > product.price -%}
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--sw-muted);text-decoration:line-through">{{ product.compare_at_price | money }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+        <button class="sw-btn" style="width:100%;margin-top:24px;padding:12px">QUICK_ADD +</button>
       </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..8) -%}
+      <div class="sw-card">
+        <div class="glitch-hover" style="aspect-ratio:3/4;margin-bottom:24px;background:#111"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="sw-head" style="font-size:24px;color:var(--sw-text)">TACTICAL VEST V.{{i}}</div>
+          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--sw-accent)">₹8,999</div>
+        </div>
+        <button class="sw-btn" style="width:100%;margin-top:24px;padding:12px">QUICK_ADD +</button>
+      </div>
+      {%- endfor -%}
       {%- endfor -%}
     </div>
   </div>
 </div>
+
 {% schema %}
-{"name":"SW Collection","settings":[],"presets":[{"name":"SW Collection"}]}
+{
+  "name": "Streetwear Brutalist Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Streetwear Brutalist Grid"
+    }
+  ]
+}
 {% endschema %}

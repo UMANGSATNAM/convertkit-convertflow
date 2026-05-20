@@ -1,55 +1,56 @@
-<div style="padding:48px 20px 0;background:var(--tanishq-ivory)">
-  <div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:48px">
-    <p class="tanishq-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</p>
-    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,56px);font-weight:400;color:var(--tanishq-charcoal);margin-bottom:12px">{{ collection.title }}</h1>
-    {%- if collection.description != blank -%}
-    <p style="font-size:16px;color:var(--tanishq-muted);max-width:560px;margin:0 auto;line-height:1.7">{{ collection.description }}</p>
-    {%- endif -%}
-  </div>
-</div>
-<div style="padding:0 20px 80px;background:#fff">
-  <div style="max-width:1320px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--tanishq-border);margin-bottom:32px">
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        {%- for filter in collection.filters -%}
-        <details style="position:relative">
-          <summary style="padding:8px 16px;border:1px solid var(--tanishq-border);font-size:12px;font-weight:700;cursor:pointer;color:var(--tanishq-charcoal);list-style:none;letter-spacing:0.06em;text-transform:uppercase">{{ filter.label }} ▾</summary>
-          <div style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--tanishq-border);padding:12px;min-width:180px;z-index:10;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
-            {%- for value in filter.values -%}
-            <label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;cursor:pointer">
-              <input type="checkbox" name="{{ filter.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
-              {{ value.label }} ({{ value.count }})
-            </label>
-            {%- endfor -%}
-          </div>
-        </details>
-        {%- endfor -%}
-      </div>
-      <select style="padding:8px 16px;border:1px solid var(--tanishq-border);font-size:12px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer">
-        <option>Featured</option>
-        <option>Price: Low to High</option>
-        <option>Price: High to Low</option>
-        <option>Newest First</option>
-      </select>
+<div style="background:var(--lux-bg);padding:140px 60px">
+  <div style="max-width:1400px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:100px">
+      <div class="lux-overline" style="margin-bottom:24px">{{ collection.products_count | default: '12' }} PIECES</div>
+      <h2 class="lux-head" style="font-size:56px;color:var(--lux-text);margin-bottom:32px">{{ collection.title | default: 'The Vault' }}</h2>
+      <div class="lux-divider"></div>
     </div>
-    <div class="tanishq-prod-grid">
-      {%- for product in collection.products -%}
-      <a href="{{ product.url }}" class="tanishq-prod-card">
-        <div class="tanishq-prod-card__img">
-          {%- if product.featured_image != blank -%}
-          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">
+    
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:80px 40px">
+      {%- for product in collection.products limit: 9 -%}
+      <a href="{{ product.url }}" class="lux-card lux-fade-in" style="animation-delay:{{ forloop.index | times: 0.1 }}s">
+        <div class="image-wrapper">
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}" loading="lazy">
           {%- else -%}
-          <div style="width:100%;height:100%;background:var(--tanishq-cream)"></div>
+          <div style="width:100%;height:100%;background:var(--lux-gold-light)"></div>
           {%- endif -%}
         </div>
-        <div class="tanishq-prod-card__name">{{ product.title }}</div>
-        <div class="tanishq-prod-card__price">{{ product.price | money }}</div>
-        <div class="tanishq-prod-card__meta">{{ product.type }}</div>
+        <div class="content">
+          <div class="title">{{ product.title }}</div>
+          <div class="price">{{ product.price | money }}</div>
+        </div>
+      </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..6) -%}
+      <a href="#" class="lux-card lux-fade-in" style="animation-delay:{{ i | times: 0.1 }}s">
+        <div class="image-wrapper">
+          <div style="width:100%;height:100%;background:var(--lux-gold-light)"></div>
+        </div>
+        <div class="content">
+          <div class="title">Radiant Emerald Ring V.{{i}}</div>
+          <div class="price">₹1,25,000</div>
+        </div>
       </a>
       {%- endfor -%}
+      {%- endfor -%}
+    </div>
+    
+    <div style="text-align:center;margin-top:100px">
+      <a href="/collections/all" class="lux-btn lux-btn-outline">View All Pieces</a>
     </div>
   </div>
 </div>
+
 {% schema %}
-{"name":"Tanishq Collection","settings":[],"presets":[{"name":"Tanishq Collection"}]}
+{
+  "name": "Tanishq Editorial Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Tanishq Editorial Grid"
+    }
+  ]
+}
 {% endschema %}

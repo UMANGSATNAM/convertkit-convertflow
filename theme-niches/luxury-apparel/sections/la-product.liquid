@@ -1,0 +1,37 @@
+<div style="padding:48px 20px 80px;background:var(--la-ivory)"><div style="max-width:1320px;margin:0 auto">
+  <nav style="font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--la-muted);margin-bottom:40px" aria-label="Breadcrumb"><a href="/" style="color:var(--la-muted)">Home</a> / <a href="{{ product.collections.first.url }}" style="color:var(--la-muted)">{{ product.collections.first.title }}</a> / <span style="color:var(--la-dark)">{{ product.title }}</span></nav>
+  <div style="display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:start">
+    <div data-gallery>
+      <div style="border-radius:0px;overflow:hidden;background:#fff;border:1px solid var(--la-border);aspect-ratio:3/4;margin-bottom:12px;cursor:zoom-in"><img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" style="width:100%;height:100%;object-fit:cover"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">{%- for img in product.images limit: 6 -%}<div data-thumb data-src="{{ img | image_url: width: 900 }}" style="width:72px;height:96px;border-radius:0px;overflow:hidden;cursor:pointer;border:1px solid {% if forloop.first %}var(--la-dark){% else %}transparent{% endif %};transition:border-color .2s"><img src="{{ img | image_url: width: 144 }}" alt="" width="72" height="96" style="width:100%;height:100%;object-fit:cover"></div>{%- endfor -%}</div>
+    </div>
+    <div>
+      <span class="la-eyebrow" style="margin-bottom:12px">{{ product.vendor }}</span>
+      <h1 style="font-family:'Playfair Display',serif;font-size:38px;font-weight:400;color:var(--la-dark);margin-bottom:16px;letter-spacing:-0.02em">{{ product.title }}</h1>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px"><span style="color:var(--la-gold);font-size:12px;letter-spacing:2px">★★★★★</span><span style="font-size:11px;color:var(--la-muted);font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em">({{ product.metafields.reviews.rating_count | default: '144' }} CLIENTS)</span></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--la-border)">
+        <span style="font-family:'Inter',sans-serif;font-size:24px;font-weight:600;color:var(--la-gold)" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}<span style="font-family:'Inter',sans-serif;font-size:18px;color:var(--la-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>{%- endif -%}
+      </div>
+      <!-- Couture Technical details -->
+      <div style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap"><span style="padding:8px 16px;background:#fff;border:1px solid var(--la-border);font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em;color:var(--la-dark)">BABY CASHMERE</span><span style="padding:8px 16px;background:#fff;border:1px solid var(--la-border);font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em;color:var(--la-dark)">12-PLY SPUN</span><span style="padding:8px 16px;background:#fff;border:1px solid var(--la-border);font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em;color:var(--la-dark)">MADE IN COMO</span></div>
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}{%- for option in product.options_with_values -%}<div style="margin-bottom:28px"><label style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--la-dark);display:block;margin-bottom:12px">{{ option.name }}</label><div style="display:flex;gap:12px;flex-wrap:wrap" data-swatches>{%- for value in option.values -%}<button type="button" data-swatch="{{ value }}" style="padding:12px 28px;border:1px solid {% if option.selected_value == value %}var(--la-dark){% else %}var(--la-border){% endif %};background:{% if option.selected_value == value %}var(--la-dark){% else %}#fff{% endif %};color:{% if option.selected_value == value %}#fff{% else %}var(--la-dark){% endif %};font-family:'Inter',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.05em;cursor:pointer;border-radius:0px;transition:all .2s">{{ value }}</button>{%- endfor -%}</div></div>{%- endfor -%}<select name="id" data-variant-select style="display:none">{%- for variant in product.variants -%}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>{%- endfor -%}</select>{%- endunless -%}
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;border:1px solid var(--la-border);background:#fff;border-radius:0px"><button type="button" data-dir="down" style="width:48px;height:56px;background:none;border:none;font-size:16px;cursor:pointer">−</button><input type="number" name="quantity" value="1" min="1" style="width:48px;height:56px;text-align:center;border:none;background:transparent;font-size:13px;font-weight:600;font-family:'Inter',sans-serif"><button type="button" data-dir="up" style="width:48px;height:56px;background:none;border:none;font-size:16px;cursor:pointer">+</button></div>
+          <button type="submit" class="la-btn" data-atc style="flex:1;justify-content:center" {% unless product.available %}disabled{% endunless %}>{%- if product.available -%}ACQUIRE SILHOUETTE {%- else -%}OUT OF STOCK{%- endif -%}</button>
+        </div>
+      </form>
+      <!-- Trust List -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:32px 0">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--la-border);background:#fff;font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em;color:var(--la-gold)">✓ complimentary white glove shipping</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--la-border);background:#fff;font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.05em;color:var(--la-dark)">🚚 luxury carbon neutral courier</div>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:14px;line-height:1.8;color:var(--la-muted)">{{ product.description }}</div>
+    </div>
+  </div>
+</div></div>
+{% schema %}
+{"name":"Apparel Product","settings":[],"presets":[{"name":"Apparel Product"}]}
+{% endschema %}

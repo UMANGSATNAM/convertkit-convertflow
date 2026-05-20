@@ -1,0 +1,35 @@
+<div style="padding:48px 20px 80px;background:#fff"><div style="max-width:1320px;margin:0 auto">
+  <nav style="font-size:13px;color:var(--aw-muted);margin-bottom:32px" aria-label="Breadcrumb"><a href="/" style="color:var(--aw-muted)">Home</a> / <a href="{{ product.collections.first.url }}" style="color:var(--aw-muted)">{{ product.collections.first.title }}</a> / <span style="color:var(--aw-black)">{{ product.title }}</span></nav>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+    <div data-gallery><div style="border-radius:16px;overflow:hidden;background:var(--aw-grey);aspect-ratio:3/4;margin-bottom:12px;cursor:zoom-in"><img id="MainProductImg" data-main-img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | escape }}" width="900" style="width:100%;height:100%;object-fit:cover"></div><div style="display:flex;gap:8px;flex-wrap:wrap">{%- for img in product.images limit: 6 -%}<div data-thumb data-src="{{ img | image_url: width: 900 }}" style="width:72px;height:72px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid {% if forloop.first %}var(--aw-electric){% else %}transparent{% endif %};transition:border-color .2s"><img src="{{ img | image_url: width: 144 }}" alt="" width="72" height="72" style="width:100%;height:100%;object-fit:cover"></div>{%- endfor -%}</div></div>
+    <div>
+      {%- if product.tags contains 'new' -%}<span style="display:inline-block;background:var(--aw-coral);color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 14px;border-radius:100px;text-transform:uppercase;margin-bottom:12px">NEW</span>{%- endif -%}
+      <p class="aw-eyebrow" style="margin-bottom:8px">{{ product.vendor }}</p>
+      <h1 style="font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;color:var(--aw-black);margin-bottom:12px">{{ product.title }}</h1>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="color:var(--aw-electric);font-size:15px;letter-spacing:2px">★★★★★</span><span style="font-size:13px;color:var(--aw-muted)">({{ product.metafields.reviews.rating_count | default: '3.2k' }})</span></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--aw-border)">
+        <span style="font-size:28px;font-weight:800;color:var(--aw-black);font-family:'Outfit',sans-serif" data-price>{{ product.price | money }}</span>
+        {%- if product.compare_at_price > product.price -%}<span style="font-size:18px;color:var(--aw-muted);text-decoration:line-through" data-compare-price>{{ product.compare_at_price | money }}</span>{%- endif -%}
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><span style="padding:6px 14px;background:var(--aw-grey);border-radius:100px;font-size:12px;font-weight:600;color:var(--aw-black)">4-Way Stretch</span><span style="padding:6px 14px;background:var(--aw-grey);border-radius:100px;font-size:12px;font-weight:600;color:var(--aw-black)">Moisture-Wicking</span><span style="padding:6px 14px;background:var(--aw-grey);border-radius:100px;font-size:12px;font-weight:600;color:var(--aw-black)">Quick Dry</span></div>
+      <form action="{{ routes.cart_add_url }}" method="post" id="ProductForm">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- unless product.has_only_default_variant -%}{%- for option in product.options_with_values -%}<div style="margin-bottom:20px"><label style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;display:block;margin-bottom:10px;color:var(--aw-black)">{{ option.name }}</label><div style="display:flex;gap:8px;flex-wrap:wrap" data-swatches>{%- for value in option.values -%}<button type="button" data-swatch="{{ value }}" style="padding:10px 20px;border:2px solid {% if option.selected_value == value %}var(--aw-electric){% else %}var(--aw-border){% endif %};background:{% if option.selected_value == value %}var(--aw-electric){% else %}#fff{% endif %};color:{% if option.selected_value == value %}var(--aw-black){% else %}var(--aw-black){% endif %};font-size:13px;font-weight:600;cursor:pointer;border-radius:100px;transition:all .2s">{{ value }}</button>{%- endfor -%}</div></div>{%- endfor -%}<select name="id" data-variant-select style="display:none">{%- for variant in product.variants -%}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>{{ variant.title }}</option>{%- endfor -%}</select>{%- endunless -%}
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;border:1.5px solid var(--aw-border);border-radius:100px;overflow:hidden"><button type="button" data-dir="down" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">−</button><input type="number" name="quantity" value="1" min="1" style="width:48px;height:52px;text-align:center;border:none;font-size:16px;font-weight:700"><button type="button" data-dir="up" style="width:44px;height:52px;background:none;border:none;font-size:20px;cursor:pointer">+</button></div>
+          <button type="submit" class="aw-btn" data-atc style="flex:1;justify-content:center" {% unless product.available %}disabled{% endunless %}>{%- if product.available -%}ADD TO BAG{%- else -%}SOLD OUT{%- endif -%}</button>
+        </div>
+      </form>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--aw-grey);border-radius:12px;font-size:12px;color:var(--aw-black)"><span style="color:var(--aw-success)">✓</span> Squat-Proof</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--aw-grey);border-radius:12px;font-size:12px;color:var(--aw-black)"><span style="color:var(--aw-success)">✓</span> Anti-Odor</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--aw-grey);border-radius:12px;font-size:12px;color:var(--aw-black)"><span style="color:var(--aw-success)">🚚</span> Free Shipping</div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--aw-grey);border-radius:12px;font-size:12px;color:var(--aw-black)"><span style="color:var(--aw-success)">↩</span> Easy Returns</div>
+      </div>
+      <div style="font-size:15px;line-height:1.8;color:var(--aw-muted)">{{ product.description }}</div>
+    </div>
+  </div>
+</div></div>
+{% schema %}
+{"name":"AW Product","settings":[],"presets":[{"name":"AW Product"}]}
+{% endschema %}

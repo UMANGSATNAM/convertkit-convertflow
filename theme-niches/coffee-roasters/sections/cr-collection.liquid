@@ -1,15 +1,64 @@
-<div style="padding:48px 20px 0;background:var(--cr-cream)"><div style="max-width:1320px;margin:0 auto;text-align:center;padding-bottom:48px">
-  <p class="cr-eyebrow" style="margin-bottom:8px">{{ collection.title | upcase }}</p>
-  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,52px);font-weight:400;color:var(--cr-espresso);margin-bottom:12px">{{ collection.title }}</h1>
-  {%- if collection.description != blank -%}<p style="font-size:16px;color:var(--cr-muted);max-width:560px;margin:0 auto">{{ collection.description }}</p>{%- endif -%}
-</div></div>
-<div style="padding:0 20px 80px;background:#fff"><div style="max-width:1320px;margin:0 auto">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--cr-border);margin-bottom:32px">
-    <div style="font-size:14px;color:var(--cr-muted)">{{ collection.products_count }} coffees</div>
-    <select style="padding:8px 16px;border:1px solid var(--cr-border);border-radius:4px;font-size:13px;cursor:pointer"><option>Featured</option><option>Price: Low to High</option><option>Price: High to Low</option><option>Newest</option></select>
+<div style="background:var(--cof-bg);padding:100px 40px">
+  <div style="max-width:1200px;margin:0 auto">
+    
+    <div style="text-align:center;margin-bottom:80px">
+      <div class="cof-stamp" style="margin-bottom:24px">FRESHLY ROASTED</div>
+      <h2 class="cof-head" style="font-size:48px;margin-bottom:16px">{{ collection.title | default: 'Our Coffees' }}</h2>
+      <p style="font-size:16px;color:var(--cof-muted);max-width:600px;margin:0 auto">From bright, floral African coffees to rich, chocolatey South American lots. Roasted to order and shipped within 24 hours.</p>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:40px">
+      {%- for product in collection.products limit: 9 -%}
+      <a href="{{ product.url }}" class="cof-card">
+        <div class="image-wrapper">
+          {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
+          {%- else -%}
+          <div style="width:100%;height:100%;background:#EAE0D5"></div>
+          {%- endif -%}
+        </div>
+        <div class="origin">{{ product.vendor | default: 'Blend' }}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="title">{{ product.title }}</div>
+          <div class="price">{{ product.price | money }}</div>
+        </div>
+        
+        <div style="border-top:1px dashed var(--cof-border);margin-top:16px;padding-top:16px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--cof-muted)">Notes: Caramel, Nut</span>
+          <span style="font-family:var(--font-h);font-weight:700;color:var(--cof-accent);font-size:24px">+</span>
+        </div>
+      </a>
+      {%- else -%}
+      <!-- Demo State -->
+      {%- for i in (1..6) -%}
+      <a href="#" class="cof-card">
+        <div class="image-wrapper">
+          <div style="width:100%;height:100%;background:#EAE0D5"></div>
+        </div>
+        <div class="origin">COLOMBIA</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="title">Finca El Paraiso V{{i}}</div>
+          <div class="price">₹1,200</div>
+        </div>
+        <div style="border-top:1px dashed var(--cof-border);margin-top:16px;padding-top:16px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--cof-muted)">Notes: Strawberry, Cocoa</span>
+          <span style="font-family:var(--font-h);font-weight:700;color:var(--cof-accent);font-size:24px">+</span>
+        </div>
+      </a>
+      {%- endfor -%}
+      {%- endfor -%}
+    </div>
   </div>
-  <div class="cr-prod-grid">{%- for product in collection.products -%}<a href="{{ product.url }}" class="cr-prod-card"><div class="cr-prod-card__img">{%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" width="600" loading="lazy">{%- else -%}<div style="width:100%;height:100%;background:var(--cr-warm)"></div>{%- endif -%}</div><div class="cr-prod-card__name">{{ product.title }}</div><div class="cr-prod-card__price">{{ product.price | money }}</div><div class="cr-prod-card__meta">{{ product.type }}</div></a>{%- endfor -%}</div>
-</div></div>
+</div>
+
 {% schema %}
-{"name":"CR Collection","settings":[],"presets":[{"name":"CR Collection"}]}
+{
+  "name": "Coffee Artisanal Grid",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Coffee Artisanal Grid"
+    }
+  ]
+}
 {% endschema %}
