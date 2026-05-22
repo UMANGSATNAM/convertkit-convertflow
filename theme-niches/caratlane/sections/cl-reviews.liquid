@@ -1,46 +1,100 @@
-<div class="cl-reviews">
-  <div class="cl-section-header">
-    <p class="cl-eyebrow">{{ section.settings.eyebrow }}</p>
-    <h2>{{ section.settings.heading }}</h2>
-  </div>
-  <div class="cl-review-grid">
-    {%- for block in section.blocks -%}
-    <div class="cl-review-card" {{ block.shopify_attributes }}>
-      <div class="cl-review-card__stars">{%- for i in (1..block.settings.rating) -%}★{%- endfor -%}</div>
-      <div class="cl-review-card__text">"{{ block.settings.quote }}"</div>
-      <div class="cl-review-card__author">{{ block.settings.name }}</div>
-      <div class="cl-review-card__meta">{{ block.settings.product }} · {{ block.settings.location }}</div>
+<div style="background:#fff; padding:80px 0; border-top:1px solid #eee;">
+  <div class="page-width" style="max-width:1320px; margin:0 auto; padding:0 24px;">
+    
+    <div style="text-align:center; margin-bottom:48px;">
+      {%- if section.settings.eyebrow != blank -%}
+        <span style="font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#885bb5; margin-bottom:12px; display:block;">
+          {{ section.settings.eyebrow }}
+        </span>
+      {%- endif -%}
+      <h2 style="font-family:'Playfair Display', serif; font-size:clamp(32px, 4vw, 40px); font-weight:700; color:#493161; margin-bottom:12px;">
+        {{ section.settings.heading }}
+      </h2>
     </div>
-    {%- endfor -%}
+
+    <div class="cl-rev-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
+      {%- for block in section.blocks -%}
+        <div style="background:#F6EFFB; border-radius:12px; padding:32px; display:flex; flex-direction:column;" {{ block.shopify_attributes }}>
+          <div style="color:#d1c4e9; margin-bottom:20px; display:flex; gap:4px;">
+            {%- for i in (1..block.settings.rating) -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {%- endfor -%}
+          </div>
+          
+          <p style="font-size:15px; color:#493161; line-height:1.6; margin-bottom:24px; flex-grow:1;">
+            "{{ block.settings.quote }}"
+          </p>
+          
+          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+              <div style="font-size:14px; font-weight:700; color:#493161; margin-bottom:4px;">
+                {{ block.settings.name }}
+              </div>
+              <div style="font-size:12px; color:#885bb5;">
+                {%- if block.settings.location != blank -%}{{ block.settings.location }} &bull; {%- endif -%}
+                {{ block.settings.product }}
+              </div>
+            </div>
+            
+            <div style="width:40px; height:40px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#d1c4e9;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+    
   </div>
+
+  <style>
+    @media (max-width: 1024px) {
+      .cl-rev-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 768px) {
+      .cl-rev-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
 </div>
+
 {% schema %}
 {
-  "name": "CL Reviews",
+  "name": "CaratLane Reviews",
   "settings": [
-    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"HAPPY CUSTOMERS"},
-    {"type":"text","id":"heading","label":"Heading","default":"What Our Community Says"}
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "HAPPY CUSTOMERS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What Our Community Says"
+    }
   ],
   "blocks": [
     {
       "type": "review",
       "name": "Review",
       "settings": [
-        {"type":"range","id":"rating","label":"Rating","min":1,"max":5,"step":1,"default":5},
-        {"type":"textarea","id":"quote","label":"Quote","default":"The Try at Home service was amazing. I could compare designs side by side!"},
-        {"type":"text","id":"name","label":"Name","default":"Aditi S."},
-        {"type":"text","id":"product","label":"Product","default":"Diamond Studs"},
-        {"type":"text","id":"location","label":"Location","default":"Mumbai"}
+        {"type":"range","id":"rating","min":1,"max":5,"step":1,"label":"Rating","default":5},
+        {"type":"textarea","id":"quote","label":"Quote","default":"The Try at Home service was amazing! I could compare 3 designs side by side before choosing my dream ring."},
+        {"type":"text","id":"name","label":"Customer Name","default":"Aditi S."},
+        {"type":"text","id":"location","label":"Location","default":"Mumbai"},
+        {"type":"text","id":"product","label":"Product Bought","default":"Solitaire Ring"}
       ]
     }
   ],
-  "presets": [{
-    "name": "CL Reviews",
-    "blocks": [
-      {"type":"review","settings":{"rating":5,"quote":"The Try at Home service was amazing! I could compare 3 designs side by side before choosing my dream ring.","name":"Aditi S.","product":"Solitaire Ring","location":"Mumbai"}},
-      {"type":"review","settings":{"rating":5,"quote":"Perfect everyday earrings. So lightweight I forget I'm wearing them, yet I get compliments daily!","name":"Riya M.","product":"Diamond Hoops","location":"Bangalore"}},
-      {"type":"review","settings":{"rating":5,"quote":"Gifted the mangalsutra to my wife — the modern design blew her away. CaratLane nailed it.","name":"Vikram P.","product":"Diamond Mangalsutra","location":"Pune"}}
-    ]
-  }]
+  "presets": [
+    {
+      "name": "CaratLane Reviews",
+      "blocks": [
+        {"type":"review","settings":{"rating":5,"quote":"The Try at Home service was amazing! I could compare 3 designs side by side before choosing my dream ring.","name":"Aditi S.","product":"Solitaire Ring","location":"Mumbai"}},
+        {"type":"review","settings":{"rating":5,"quote":"Perfect everyday earrings. So lightweight I forget I'm wearing them, yet I get compliments daily!","name":"Riya M.","product":"Diamond Hoops","location":"Bangalore"}},
+        {"type":"review","settings":{"rating":5,"quote":"Gifted the mangalsutra to my wife — the modern design blew her away. CaratLane nailed it.","name":"Vikram P.","product":"Diamond Mangalsutra","location":"Pune"}}
+      ]
+    }
+  ]
 }
 {% endschema %}

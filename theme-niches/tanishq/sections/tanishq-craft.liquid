@@ -1,56 +1,76 @@
-<div class="tanishq-craft">
-  <div class="tanishq-craft__grid">
-    <div>
-      <p class="tanishq-eyebrow" style="color:var(--tanishq-gold)">{{ section.settings.eyebrow }}</p>
-      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,48px);font-weight:400;color:var(--tanishq-ivory);margin-bottom:20px;line-height:1.15">{{ section.settings.heading }}</h2>
-      <p style="font-size:16px;color:rgba(250,246,239,0.55);line-height:1.8;margin-bottom:40px;max-width:460px">{{ section.settings.body }}</p>
-      <div class="tanishq-craft__stat-grid">
-        {%- for block in section.blocks -%}
-        <div class="tanishq-stat" {{ block.shopify_attributes }}>
-          <div class="tanishq-stat__number">{{ block.settings.number }}</div>
-          <div class="tanishq-stat__label">{{ block.settings.label }}</div>
+<div style="padding:100px 0; background:#1A0F0A; color:#FDFAF3; text-align:center;">
+  <div class="page-width" style="max-width:1000px; margin:0 auto; padding:0 24px;">
+    
+    {%- if section.settings.eyebrow != blank -%}
+      <span style="color:#D4AF37; font-size:12px; font-weight:700; letter-spacing:4px; text-transform:uppercase; margin-bottom:24px; display:block;">
+        {{ section.settings.eyebrow }}
+      </span>
+    {%- endif -%}
+    
+    <h2 style="font-family:'Cormorant Garamond', serif; font-size:clamp(36px, 4vw, 52px); line-height:1.15; margin-bottom:28px;">
+      {{ section.settings.heading | replace: '<em>', '<span style="color:#D4AF37; font-style:italic;">' | replace: '</em>', '</span>' }}
+    </h2>
+    
+    <p style="font-size:16px; line-height:1.8; color:rgba(253, 250, 243, 0.7); margin:0 auto 60px; max-width:700px;">
+      {{ section.settings.body }}
+    </p>
+    
+    <div class="tq-craft-stats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:32px; border-top:1px solid rgba(212, 175, 55, 0.2); padding-top:48px;">
+      {%- for block in section.blocks -%}
+        <div {{ block.shopify_attributes }}>
+          <h3 style="font-family:'Inter', sans-serif; font-size:40px; font-weight:700; color:#D4AF37; margin-bottom:12px;">{{ block.settings.number }}</h3>
+          <span style="font-size:11px; color:rgba(253, 250, 243, 0.5); text-transform:uppercase; letter-spacing:1px; font-weight:600;">{{ block.settings.label }}</span>
         </div>
-        {%- endfor -%}
-      </div>
+      {%- endfor -%}
     </div>
-    <div>
-      {%- if section.settings.image != blank -%}
-      <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.heading | escape }}" width="800" style="width:100%;object-fit:cover" loading="lazy">
-      {%- else -%}
-      <div style="aspect-ratio:4/5;background:linear-gradient(135deg,#2D0A1B,#6B1D3A);display:flex;align-items:center;justify-content:center">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(197,163,85,0.3)" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      {%- endif -%}
-    </div>
+    
   </div>
 </div>
+
 {% schema %}
 {
-  "name": "Tanishq Craftsmanship",
+  "name": "Tanishq Craft Stats",
   "settings": [
-    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"LEGACY OF TRUST"},
-    {"type":"text","id":"heading","label":"Heading","default":"80 Years of Exquisite Craftsmanship"},
-    {"type":"textarea","id":"body","label":"Body","default":"Every Tanishq piece is born from a legacy of excellence — handcrafted by master artisans, certified for purity, and designed to be treasured for generations."},
-    {"type":"image_picker","id":"image","label":"Image"}
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "LEGACY OF TRUST"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "80 Years of <em>Exquisite Craftsmanship</em>",
+      "info": "Use <em> tags to highlight text in Gold color."
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body Text",
+      "default": "Every Tanishq piece is born from a legacy of excellence — handcrafted by master artisans, certified for purity, and designed to be treasured for generations."
+    }
   ],
   "blocks": [
     {
       "type": "stat",
-      "name": "Statistic",
+      "name": "Stat",
       "settings": [
-        {"type":"text","id":"number","label":"Number","default":"400+"},
-        {"type":"text","id":"label","label":"Label","default":"Stores Nationwide"}
+        {"type":"text","id":"number","label":"Number","default":"80+"},
+        {"type":"text","id":"label","label":"Label","default":"Years of Trust"}
       ]
     }
   ],
-  "presets": [{
-    "name": "Tanishq Craftsmanship",
-    "blocks": [
-      {"type":"stat","settings":{"number":"80+","label":"Years of Trust"}},
-      {"type":"stat","settings":{"number":"400+","label":"Stores Nationwide"}},
-      {"type":"stat","settings":{"number":"5000+","label":"Master Artisans"}},
-      {"type":"stat","settings":{"number":"100%","label":"BIS Hallmarked"}}
-    ]
-  }]
+  "presets": [
+    {
+      "name": "Tanishq Craft Stats",
+      "blocks": [
+        {"type":"stat","settings":{"number":"80+","label":"Years of Trust"}},
+        {"type":"stat","settings":{"number":"400+","label":"Stores Nationwide"}},
+        {"type":"stat","settings":{"number":"5000+","label":"Master Artisans"}},
+        {"type":"stat","settings":{"number":"100%","label":"BIS Hallmarked"}}
+      ]
+    }
+  ]
 }
 {% endschema %}

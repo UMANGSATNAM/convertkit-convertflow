@@ -1,30 +1,62 @@
-<div class="pilgrim-science">
-  <div class="pilgrim-science__grid">
+<div style="background:#2A2522; padding:100px 5%; position:relative; overflow:hidden;">
+  <!-- Abstract Shapes -->
+  <div style="position:absolute; top:-20%; right:-10%; width:60vw; height:60vw; background:radial-gradient(circle, rgba(193,127,94,0.15) 0%, rgba(193,127,94,0) 70%); border-radius:50%; pointer-events:none;"></div>
+  
+  <div class="page-width" style="max-width:1440px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; position:relative; z-index:2;">
+    
     <div>
-      <p class="pilgrim-eyebrow" style="color:var(--pilgrim-gold)">{{ section.settings.eyebrow }}</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,48px);font-weight:400;color:var(--pilgrim-cream);margin-bottom:20px;line-height:1.2">{{ section.settings.heading }}</h2>
-      <p style="font-size:16px;color:rgba(245,237,227,0.65);line-height:1.8;margin-bottom:40px;max-width:460px">{{ section.settings.body }}</p>
+      {%- if section.settings.eyebrow != blank -%}
+        <div style="display:inline-flex; background:rgba(193, 127, 94, 0.2); color:#C17F5E; padding:8px 16px; border-radius:30px; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:32px;">
+          {{ section.settings.eyebrow }}
+        </div>
+      {%- endif -%}
+      <h2 style="font-size:clamp(40px, 5vw, 64px); font-weight:800; line-height:1.05; margin-bottom:24px; letter-spacing:-1.5px; color:#FAF6F2;">
+        {{ section.settings.heading | replace: '<em>', '<i style="color:#C17F5E; font-style:italic; font-weight:400;">' | replace: '</em>', '</i>' }}
+      </h2>
+      <p style="font-size:18px; color:rgba(250,246,242,0.7); line-height:1.6; margin-bottom:48px; max-width:480px;">
+        {{ section.settings.body }}
+      </p>
       {%- if section.settings.cta_label != blank -%}
-      <a href="{{ section.settings.cta_url | default: '/pages/ingredients' }}" class="pilgrim-btn" style="background:var(--pilgrim-terracotta)">{{ section.settings.cta_label }}</a>
+        <a href="{{ section.settings.cta_url | default: '/pages/ingredients' }}" style="display:inline-flex; align-items:center; gap:12px; background:#C17F5E; color:#fff; padding:18px 40px; border-radius:50px; font-size:15px; font-weight:700; text-decoration:none; transition:transform 0.3s, background 0.3s;" onmouseover="this.style.background='#A86A4C'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#C17F5E'; this.style.transform='translateY(0)';">
+          {{ section.settings.cta_label }}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
       {%- endif -%}
     </div>
-    <div class="pilgrim-ingredient-list">
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
       {%- for block in section.blocks -%}
-      <div class="pilgrim-ingredient" {{ block.shopify_attributes }}>
-        <div class="pilgrim-ingredient__icon">{{ block.settings.icon }}</div>
-        <div class="pilgrim-ingredient__name">{{ block.settings.title }}</div>
-        <div class="pilgrim-ingredient__desc">{{ block.settings.desc }}</div>
-      </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding:32px; border-radius:24px; backdrop-filter:blur(10px);" {{ block.shopify_attributes }}>
+          <div style="font-size:32px; margin-bottom:20px;">{{ block.settings.icon }}</div>
+          <h3 style="font-size:18px; font-weight:700; color:#FAF6F2; margin-bottom:12px; letter-spacing:-0.5px;">{{ block.settings.title }}</h3>
+          <p style="font-size:14px; color:rgba(250,246,242,0.6); line-height:1.6; margin:0;">{{ block.settings.desc }}</p>
+        </div>
       {%- endfor -%}
     </div>
+    
   </div>
+
+  <style>
+    @media (max-width: 1024px) {
+      .pg-science-grid { grid-template-columns: 1fr !important; gap: 60px !important; }
+    }
+    @media (max-width: 640px) {
+      .pg-science-inner-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
+  <script>
+    // Add classes for media queries inline
+    document.currentScript.previousElementSibling.previousElementSibling.className += " pg-science-grid";
+    document.currentScript.previousElementSibling.previousElementSibling.children[1].className += " pg-science-inner-grid";
+  </script>
 </div>
+
 {% schema %}
 {
   "name": "Pilgrim Science",
   "settings": [
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"THE SCIENCE OF BEAUTY"},
-    {"type":"text","id":"heading","label":"Heading","default":"Global Ingredients, Indian Roots"},
+    {"type":"textarea","id":"heading","label":"Heading","default":"Global Ingredients,<br><em>Indian Roots.</em>"},
     {"type":"textarea","id":"body","label":"Body","default":"We travel the world to discover time-tested beauty rituals and bring them home with the purest, clinically-proven ingredients."},
     {"type":"text","id":"cta_label","label":"CTA Label","default":"Explore Ingredients"},
     {"type":"url","id":"cta_url","label":"CTA URL"}
@@ -36,7 +68,7 @@
       "settings": [
         {"type":"text","id":"icon","label":"Icon/Emoji","default":"🌋"},
         {"type":"text","id":"title","label":"Title","default":"Jeju Volcanic Ash"},
-        {"type":"text","id":"desc","label":"Description","default":"Deep-cleanses pores & absorbs excess sebum for matte, clear skin."}
+        {"type":"textarea","id":"desc","label":"Description","default":"Deep-cleanses pores & absorbs excess sebum for matte, clear skin."}
       ]
     }
   ],

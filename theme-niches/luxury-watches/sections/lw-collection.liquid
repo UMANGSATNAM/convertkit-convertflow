@@ -1,55 +1,92 @@
-<div style="background:var(--lw-bg);padding:100px 60px">
-  <div style="max-width:1400px;margin:0 auto">
+<div style="background:#0A0A0A; padding:120px 24px; border-top:1px solid rgba(255,255,255,0.05);">
+  <div style="max-width:1440px; margin:0 auto;">
     
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:80px;border-bottom:1px solid var(--lw-border);padding-bottom:32px">
-      <div>
-        <div class="lw-spec" style="margin-bottom:12px;color:var(--lw-accent)">{{ collection.products_count | default: '8' }} COMPLICATIONS</div>
-        <h2 class="lw-head" style="font-size:48px">{{ collection.title | default: 'Grand Complications' }}</h2>
-      </div>
+    <div style="text-align:center; margin-bottom:80px;">
+      <h2 style="font-family:'Cinzel', serif; font-size:clamp(32px, 4vw, 48px); font-weight:400; color:#FFFFFF; margin:0 0 16px 0; text-transform:uppercase; letter-spacing:2px;">
+        {{ section.settings.heading }}
+      </h2>
+      <p style="font-family:'Montserrat', sans-serif; font-size:14px; font-weight:300; color:#888888; letter-spacing:1px; margin:0;">
+        {{ section.settings.subheading }}
+      </p>
     </div>
-    
-    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:40px;border-left:1px solid var(--lw-border);border-top:1px solid var(--lw-border)">
-      {%- for product in collection.products limit: 6 -%}
-      <a href="{{ product.url }}" class="lw-card" style="border:none;border-right:1px solid var(--lw-border);border-bottom:1px solid var(--lw-border)">
-        <div class="image-wrapper">
-          {%- if product.featured_image -%}
-          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
-          {%- else -%}
-          <div style="width:100%;height:100%;background:#0D1210"></div>
-          {%- endif -%}
-        </div>
-        <div class="lw-spec" style="margin-bottom:12px">{{ product.vendor | default: 'Automatic' }}</div>
-        <div class="title">{{ product.title }}</div>
-        <div class="price">{{ product.price | money }}</div>
-      </a>
-      {%- else -%}
-      <!-- Demo State -->
-      {%- for i in (1..6) -%}
-      <a href="#" class="lw-card" style="border:none;border-right:1px solid var(--lw-border);border-bottom:1px solid var(--lw-border)">
-        <div class="image-wrapper">
-          <div style="width:100%;height:100%;background:#0D1210"></div>
-        </div>
-        <div class="lw-spec" style="margin-bottom:12px">AUTOMATIC WINDING</div>
-        <div class="title">Ref. 5204R-0{{i}}</div>
-        <div class="price">Price on Request</div>
-      </a>
+
+    <div class="lw-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:2px; background:rgba(255,255,255,0.05);">
+      
+      {%- for i in (1..3) -%}
+        {%- assign img_url = 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=600&q=80' -%}
+        {%- if forloop.index == 2 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1548169874-53ce86f05359?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        {%- if forloop.index == 3 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1587836374828-cb4387860965?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        
+        <a href="#" class="lw-product-card" style="background:#0A0A0A; padding:60px 40px; display:flex; flex-direction:column; align-items:center; text-decoration:none; transition:background 0.4s ease; group">
+          
+          <div style="width:100%; max-width:280px; position:relative; padding-bottom:120%; margin-bottom:40px;">
+            <!-- Subtle glow behind watch -->
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:60%; height:60%; background:radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(0,0,0,0) 70%); border-radius:50%; opacity:0; transition:opacity 0.4s ease;" class="lw-glow"></div>
+            
+            <img src="{{ img_url }}" alt="Watch" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 20px 30px rgba(0,0,0,0.5)); transition:transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);" class="lw-product-img" loading="lazy">
+          </div>
+          
+          <div style="text-align:center;">
+            <div style="font-family:'Montserrat', sans-serif; font-size:10px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#D4AF37; margin-bottom:12px;">
+              {% if forloop.index == 1 %}AUTOMATIC{% elsif forloop.index == 2 %}CHRONOGRAPH{% else %}TOURBILLON{% endif %}
+            </div>
+            
+            <h3 style="font-family:'Cinzel', serif; font-size:20px; font-weight:400; color:#FFFFFF; margin:0 0 16px 0; letter-spacing:1px;">
+              {% if forloop.index == 1 %}The Vanguard{% elsif forloop.index == 2 %}Apex Chrono{% else %}Stellar Infinite{% endif %}
+            </h3>
+            
+            <div style="font-family:'Montserrat', sans-serif; font-size:14px; font-weight:300; color:#888888; transition:color 0.3s ease;" class="lw-price">
+              {% if forloop.index == 1 %}$4,500{% elsif forloop.index == 2 %}$6,200{% else %}$12,800{% endif %}
+            </div>
+          </div>
+          
+        </a>
       {%- endfor -%}
-      {%- endfor -%}
+      
     </div>
     
-    <div style="text-align:center;margin-top:80px">
-      <a href="/collections/all" class="lw-btn">View All Timepieces</a>
+    <div style="text-align:center; margin-top:60px;">
+      <a href="/collections/all" style="display:inline-block; font-family:'Montserrat', sans-serif; font-size:11px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:#FFFFFF; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:6px; transition:all 0.3s ease;" class="lw-link-border">
+        VIEW FULL COLLECTION
+      </a>
     </div>
+
   </div>
+
+  <style>
+    .lw-product-card:hover { background: #111111; }
+    .lw-product-card:hover .lw-product-img { transform: translateY(-10px) scale(1.05); }
+    .lw-product-card:hover .lw-glow { opacity: 1; }
+    .lw-product-card:hover .lw-price { color: #FFFFFF; }
+    .lw-link-border:hover { color: #D4AF37; border-bottom-color: #D4AF37; }
+    
+    @media (max-width: 990px) {
+      .lw-grid { grid-template-columns: 1fr; background: transparent; gap: 40px; }
+      .lw-product-card { padding: 40px 20px; background: #0F0F0F; border-radius: 4px; }
+    }
+  </style>
 </div>
 
 {% schema %}
 {
-  "name": "Horology Grid",
-  "settings": [],
+  "name": "Luxury Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Exceptional Timepieces"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Curated selections from our master horologists."
+    }
+  ],
   "presets": [
     {
-      "name": "Horology Grid"
+      "name": "Luxury Collection"
     }
   ]
 }

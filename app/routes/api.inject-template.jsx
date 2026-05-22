@@ -87,19 +87,70 @@ export const action = async ({ request }) => {
       return json({ success: false, error: `Unknown template: ${templateId}` }, { status: 400 });
     }
 
-    // ── Step 1: Find the active (MAIN) theme ──────────────────────────────
+    // ── Step 1: Find the active (MAIN) theme & check theme limit ──────────
     const themesRes = await admin.graphql(`
-      query { themes(first: 10) { nodes { id name role } } }
+      query { themes(first: 50) { nodes { id name role } } }
     `);
     const { data: themesData } = await themesRes.json();
-    const mainTheme = themesData.themes.nodes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
+    const allThemes = themesData?.themes?.nodes || [];
     
+    if (allThemes.length >= 20) {
+      return json({ 
+        success: false, 
+        error: `Your store already has ${allThemes.length} themes, which reaches/exceeds Shopify's 20-theme limit. Please delete an unused theme in your Shopify Admin before duplicating.` 
+      }, { status: 400 });
+    }
+
+    const mainTheme = allThemes.find((t) => t.role === "MAIN" || (typeof t.role === 'string' && t.role.toLowerCase() === "main"));
     if (!mainTheme) {
       return json({ success: false, error: "No active MAIN theme found on this store." }, { status: 400 });
     }
-    
-    const theme = mainTheme;
-    console.log(`[theme-inject] Injecting template "${templateId}" into MAIN theme: ${theme.name} (${theme.id})`);
+
+    // ── Step 1b: Duplicate the active theme to a preview draft ────────────
+    console.log(`[theme-inject] Duplicating active theme "${mainTheme.name}" (${mainTheme.id})`);
+    const duplicateRes = await admin.graphql(`
+      mutation ThemeDuplicate($id: ID!, $name: String!) {
+        themeDuplicate(id: $id, name: $name) {
+          newTheme {
+            id
+            name
+            role
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `, {
+      variables: {
+        id: mainTheme.id,
+        name: `OmniBuilder - ${tplConfig.label} Draft`
+      }
+    });
+
+    const duplicateResult = await duplicateRes.json();
+    if (duplicateResult.errors && duplicateResult.errors.length > 0) {
+      return json({ 
+        success: false, 
+        error: `Shopify GraphQL Error: ${duplicateResult.errors.map(e => e.message).join(', ')}` 
+      }, { status: 400 });
+    }
+
+    const duplicateErrors = duplicateResult.data?.themeDuplicate?.userErrors || [];
+    if (duplicateErrors.length > 0) {
+      return json({ 
+        success: false, 
+        error: `Failed to duplicate theme: ${duplicateErrors.map(e => e.message).join(', ')}` 
+      }, { status: 400 });
+    }
+
+    const theme = duplicateResult.data?.themeDuplicate?.newTheme;
+    if (!theme) {
+      return json({ success: false, error: "Failed to duplicate active theme. Theme object was not returned." }, { status: 500 });
+    }
+
+    console.log(`[theme-inject] Injecting template "${templateId}" into draft theme: ${theme.name} (${theme.id})`);
     console.log(`[theme-inject] PROJECT_ROOT: ${PROJECT_ROOT}`);
     console.log(`[theme-inject] THEME_BASE_DIR exists: ${fs.existsSync(THEME_BASE_DIR)} (${THEME_BASE_DIR})`);
     console.log(`[theme-inject] THEME_NICHES_DIR exists: ${fs.existsSync(THEME_NICHES_DIR)} (${THEME_NICHES_DIR})`);

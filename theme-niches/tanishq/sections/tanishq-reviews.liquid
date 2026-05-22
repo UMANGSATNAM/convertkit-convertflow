@@ -1,46 +1,96 @@
-<div class="tanishq-reviews">
-  <div class="tanishq-section-header">
-    <p class="tanishq-eyebrow">{{ section.settings.eyebrow }}</p>
-    <h2>{{ section.settings.heading }}</h2>
-  </div>
-  <div class="tanishq-review-grid">
-    {%- for block in section.blocks -%}
-    <div class="tanishq-review-card" {{ block.shopify_attributes }}>
-      <div class="tanishq-review-card__stars">{%- for i in (1..block.settings.rating) -%}★{%- endfor -%}</div>
-      <div class="tanishq-review-card__text">"{{ block.settings.quote }}"</div>
-      <div class="tanishq-review-card__author">{{ block.settings.name }}</div>
-      <div class="tanishq-review-card__meta">{{ block.settings.product }} · {{ block.settings.location }}</div>
+<div style="padding:100px 0; background:#FDFAF3; position:relative;">
+  <div class="page-width" style="max-width:1320px; margin:0 auto; padding:0 24px;">
+    
+    <div style="text-align:center; margin-bottom:64px;">
+      {%- if section.settings.eyebrow != blank -%}
+        <span style="font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:#D4AF37; margin-bottom:16px; display:block;">
+          {{ section.settings.eyebrow }}
+        </span>
+      {%- endif -%}
+      <h2 class="tq-sh-h2" style="font-family:'Cormorant Garamond', serif; font-size:clamp(32px, 4vw, 48px); color:#1A0F0A; margin-bottom:16px; position:relative; display:inline-block; padding-bottom:12px;">
+        {{ section.settings.heading }}
+      </h2>
     </div>
-    {%- endfor -%}
+
+    <div class="tq-rev-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
+      {%- for block in section.blocks -%}
+        <div style="background:#FFFDFC; border:1px solid rgba(212, 175, 55, 0.15); padding:40px 32px; text-align:center;" {{ block.shopify_attributes }}>
+          <div style="color:#D4AF37; margin-bottom:24px; display:flex; justify-content:center; gap:4px;">
+            {%- for i in (1..block.settings.rating) -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {%- endfor -%}
+          </div>
+          
+          <p style="font-family:'Cormorant Garamond', serif; font-size:22px; font-style:italic; color:#1A0F0A; line-height:1.6; margin-bottom:32px;">
+            "{{ block.settings.quote }}"
+          </p>
+          
+          <div style="font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#1A0F0A; margin-bottom:4px;">
+            {{ block.settings.name }}
+          </div>
+          
+          <div style="font-size:11px; color:#7D6B58;">
+            {%- if block.settings.location != blank -%}{{ block.settings.location }} &bull; {%- endif -%}
+            {{ block.settings.product }}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+    
   </div>
+
+  <style>
+    .tq-sh-h2::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 1px; background: #D4AF37;
+    }
+    @media (max-width: 1024px) {
+      .tq-rev-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 768px) {
+      .tq-rev-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
 </div>
+
 {% schema %}
 {
   "name": "Tanishq Reviews",
   "settings": [
-    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"CUSTOMER STORIES"},
-    {"type":"text","id":"heading","label":"Heading","default":"Treasured by Millions"}
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "CUSTOMER STORIES"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Treasured by Millions"
+    }
   ],
   "blocks": [
     {
       "type": "review",
       "name": "Review",
       "settings": [
-        {"type":"range","id":"rating","label":"Rating","min":1,"max":5,"step":1,"default":5},
+        {"type":"range","id":"rating","min":1,"max":5,"step":1,"label":"Rating","default":5},
         {"type":"textarea","id":"quote","label":"Quote","default":"The craftsmanship is unmatched. My wedding necklace from Tanishq is the most beautiful piece I own."},
-        {"type":"text","id":"name","label":"Name","default":"Meera S."},
-        {"type":"text","id":"product","label":"Product","default":"Bridal Necklace Set"},
-        {"type":"text","id":"location","label":"Location","default":"Chennai"}
+        {"type":"text","id":"name","label":"Customer Name","default":"Meera S."},
+        {"type":"text","id":"location","label":"Location","default":"Chennai"},
+        {"type":"text","id":"product","label":"Product Bought","default":"Bridal Necklace Set"}
       ]
     }
   ],
-  "presets": [{
-    "name": "Tanishq Reviews",
-    "blocks": [
-      {"type":"review","settings":{"rating":5,"quote":"The craftsmanship is unmatched. My wedding necklace from Tanishq is the most beautiful piece I own.","name":"Meera S.","product":"Bridal Necklace Set","location":"Chennai"}},
-      {"type":"review","settings":{"rating":5,"quote":"Bought diamond studs for my anniversary. The purity certificate and hallmark give me total confidence.","name":"Rahul D.","product":"Diamond Studs","location":"Pune"}},
-      {"type":"review","settings":{"rating":5,"quote":"Their everyday gold bangles are so elegant. I get compliments every single day at work!","name":"Ananya R.","product":"Gold Bangles","location":"Hyderabad"}}
-    ]
-  }]
+  "presets": [
+    {
+      "name": "Tanishq Reviews",
+      "blocks": [
+        {"type":"review","settings":{"rating":5,"quote":"The craftsmanship is unmatched. My wedding necklace from Tanishq is the most beautiful piece I own.","name":"Meera S.","product":"Bridal Necklace Set","location":"Chennai"}},
+        {"type":"review","settings":{"rating":5,"quote":"Bought diamond studs for my anniversary. The purity certificate and hallmark give me total confidence.","name":"Rahul D.","product":"Diamond Studs","location":"Pune"}},
+        {"type":"review","settings":{"rating":5,"quote":"Their everyday gold bangles are so elegant. I get compliments every single day at work!","name":"Ananya R.","product":"Gold Bangles","location":"Hyderabad"}}
+      ]
+    }
+  ]
 }
 {% endschema %}

@@ -1,63 +1,116 @@
-<div style="background:var(--sw-bg);padding:100px 60px;border-bottom:2px solid var(--sw-border)">
-  <div style="max-width:1600px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;border-bottom:2px solid var(--sw-border);padding-bottom:24px">
-      <div>
-        <div class="mono-tag" style="margin-bottom:12px">/// ALL GEAR</div>
-        <h2 class="sw-head" style="font-size:80px;color:var(--sw-text);line-height:0.9">{{ collection.title | default: 'THE ARCHIVE' }}</h2>
-      </div>
-      <div style="font-family:var(--font-mono);font-size:14px;color:var(--sw-accent)">
-        [{{ collection.products_count | default: '42' }} ITEMS DETECTED]
-      </div>
-    </div>
+<div style="background:#E5E5E5; padding:120px 24px;">
+  <div style="max-width:1440px; margin:0 auto;">
     
-    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
-      {%- for product in collection.products limit: 12 -%}
-      <a href="{{ product.url }}" class="sw-card" style="display:block;text-decoration:none">
-        {%- if product.compare_at_price > product.price -%}
-        <div class="badge">SALE</div>
-        {%- endif -%}
-        <div class="glitch-hover" style="aspect-ratio:3/4;margin-bottom:24px;display:flex;align-items:center;justify-content:center">
-          {%- if product.featured_image -%}
-          <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
-          {%- else -%}
-          <div style="font-family:var(--font-mono);color:var(--sw-muted);text-transform:uppercase">NO_IMG_FOUND</div>
-          {%- endif -%}
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div class="sw-head" style="font-size:24px;color:var(--sw-text);max-width:70%">{{ product.title }}</div>
-          <div style="text-align:right">
-            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--sw-accent)">{{ product.price | money }}</div>
-            {%- if product.compare_at_price > product.price -%}
-            <div style="font-family:var(--font-mono);font-size:12px;color:var(--sw-muted);text-decoration:line-through">{{ product.compare_at_price | money }}</div>
-            {%- endif -%}
-          </div>
-        </div>
-        <button class="sw-btn" style="width:100%;margin-top:24px;padding:12px">QUICK_ADD +</button>
-      </a>
-      {%- else -%}
-      <!-- Demo State -->
-      {%- for i in (1..8) -%}
-      <div class="sw-card">
-        <div class="glitch-hover" style="aspect-ratio:3/4;margin-bottom:24px;background:#111"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div class="sw-head" style="font-size:24px;color:var(--sw-text)">TACTICAL VEST V.{{i}}</div>
-          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--sw-accent)">₹8,999</div>
-        </div>
-        <button class="sw-btn" style="width:100%;margin-top:24px;padding:12px">QUICK_ADD +</button>
-      </div>
-      {%- endfor -%}
-      {%- endfor -%}
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; flex-wrap:wrap; gap:24px;">
+      <h2 style="font-family:'Space Grotesk', sans-serif; font-size:clamp(60px, 8vw, 100px); font-weight:700; color:#000000; margin:0; text-transform:uppercase; line-height:0.9; letter-spacing:-2px;">
+        {{ section.settings.heading }}
+      </h2>
+      
+      {%- if section.settings.cta_label != blank -%}
+        <a href="{{ section.settings.cta_url | default: '/collections/all' }}" style="font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; color:#000000; text-decoration:none; text-transform:uppercase; letter-spacing:2px; padding:12px 24px; border:4px solid #000000; background:#FFFFFF; box-shadow:4px 4px 0px #000000; transition:all 0.2s ease;" class="sw-link-btn">
+          {{ section.settings.cta_label }}
+        </a>
+      {%- endif -%}
     </div>
+
+    <div class="sw-product-grid" style="display:grid; grid-template-columns:repeat({{ section.settings.count | default: 4 }}, 1fr); gap:40px;">
+      
+      {%- assign products_count = section.settings.count | default: 4 -%}
+      {%- for i in (1..products_count) -%}
+        {%- assign idx = forloop.index | modulo: 4 -%}
+        {%- assign img_url = 'https://images.unsplash.com/photo-1523398002811-999aa8d9f1ab?auto=format&fit=crop&w=600&q=80' -%}
+        {%- if idx == 1 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1550614000-4b95dd012eee?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        {%- if idx == 2 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        {%- if idx == 3 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        {%- if idx == 0 -%}{%- assign img_url = 'https://images.unsplash.com/photo-1523398002811-999aa8d9f1ab?auto=format&fit=crop&w=600&q=80' -%}{%- endif -%}
+        
+        <div class="sw-product-card" style="position:relative; display:flex; flex-direction:column; background:#FFFFFF; border:4px solid #000000; box-shadow:8px 8px 0px #000000; transition:all 0.2s ease; group">
+          
+          <a href="#" style="display:block; text-decoration:none; position:relative; overflow:hidden; padding-bottom:120%; background:#E5E5E5; border-bottom:4px solid #000000;">
+            <img src="{{ img_url }}" alt="Product" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease; mix-blend-mode:multiply; filter:grayscale(20%) contrast(120%);" class="sw-product-img" loading="lazy">
+            
+            {% if idx == 1 or idx == 3 %}
+              <div style="position:absolute; top:16px; left:16px; background:#FF3300; color:#000000; font-family:'Space Grotesk', sans-serif; font-size:14px; font-weight:700; text-transform:uppercase; border:2px solid #000000; padding:4px 12px; transform:rotate(-5deg);">
+                {% if idx == 1 %}DROP 004{% else %}RESTOCK{% endif %}
+              </div>
+            {% endif %}
+            
+            <div style="position:absolute; bottom:0; right:0; background:#000000; color:#FFFFFF; font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; padding:12px 24px; border-top:4px solid #000000; border-left:4px solid #000000;">
+              {% if idx == 1 %}$120{% elsif idx == 2 %}$85{% elsif idx == 3 %}$45{% else %}$220{% endif %}
+            </div>
+          </a>
+          
+          <div style="padding:24px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="font-family:'Space Grotesk', sans-serif; font-size:20px; font-weight:700; color:#000000; margin:0 0 8px 0; text-transform:uppercase;">
+                {% if idx == 1 %}Heavyweight Hoodie{% elsif idx == 2 %}Cargo Pants{% elsif idx == 3 %}Logo Tee{% else %}Utility Jacket{% endif %}
+              </h3>
+              <div style="font-family:'Helvetica Neue', sans-serif; font-size:14px; font-weight:500; color:#666666; text-transform:uppercase; letter-spacing:1px;">
+                Color: Black
+              </div>
+            </div>
+            
+            <button style="width:48px; height:48px; background:#000000; color:#FFFFFF; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; font-family:'Space Grotesk', sans-serif; font-size:24px; font-weight:700;" class="sw-add-btn">
+              +
+            </button>
+          </div>
+          
+        </div>
+      {%- endfor -%}
+      
+    </div>
+
   </div>
+
+  <style>
+    .sw-link-btn:hover { background: #000000; color: #FFFFFF; transform: translate(4px, 4px); box-shadow: 0px 0px 0px #FF3300; border-color: #FF3300; }
+    .sw-product-card:hover { transform: translate(-4px, -4px); box-shadow: 12px 12px 0px #FF3300; border-color: #FF3300; }
+    .sw-product-card:hover .sw-product-img { transform: scale(1.05); filter: grayscale(0%) contrast(100%); mix-blend-mode: normal; }
+    .sw-add-btn:hover { background: #FF3300; color: #000000; }
+    
+    @media (max-width: 1024px) {
+      .sw-product-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 40px !important; }
+    }
+    @media (max-width: 640px) {
+      .sw-product-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
 </div>
 
 {% schema %}
 {
-  "name": "Streetwear Brutalist Grid",
-  "settings": [],
+  "name": "Streetwear Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "ARCHIVE"
+    },
+    {
+      "type": "range",
+      "id": "count",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Number of products",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button Label",
+      "default": "VIEW ALL"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button Link"
+    }
+  ],
   "presets": [
     {
-      "name": "Streetwear Brutalist Grid"
+      "name": "Streetwear Collection"
     }
   ]
 }
