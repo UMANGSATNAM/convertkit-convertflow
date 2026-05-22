@@ -1,5 +1,5 @@
 export const TEMPLATE_HTMLS = {
-  "electronics": \`<!DOCTYPE html>
+  "electronics": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -752,7 +752,7 @@ a { text-decoration: none; color: inherit; }
 
 </div>
 `,
-  "outdoor-gear": \`<!DOCTYPE html>
+  "outdoor-gear": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1103,7 +1103,7 @@ a { text-decoration: none; color: inherit; }
 
 </body>
 </html>`,
-  "organic-food": \`<!DOCTYPE html>
+  "organic-food": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1444,7 +1444,7 @@ a { text-decoration: none; color: inherit; }
 
 </body>
 </html>`,
-  "fitness-supplements": \`<!DOCTYPE html>
+  "fitness-supplements": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1788,7 +1788,7 @@ a { text-decoration: none; color: inherit; }
 </footer>
 </body>
 </html>`,
-  "baby-apparel": \`<!DOCTYPE html>
+  "baby-apparel": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2104,7 +2104,7 @@ a { text-decoration: none; color: inherit; }
 
 </body>
 </html>`,
-  "coffee-roasters": \`<!DOCTYPE html>
+  "coffee-roasters": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2423,7 +2423,7 @@ a { text-decoration: none; color: inherit; }
 
 </body>
 </html>`,
-  "beauty-cosmetics": \`<!DOCTYPE html>
+  "beauty-cosmetics": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2733,7 +2733,7 @@ a { text-decoration: none; color: inherit; }
 
 </body>
 </html>`,
-  "jewellery-heritage": \`<!DOCTYPE html>
+  "jewellery-heritage": `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
