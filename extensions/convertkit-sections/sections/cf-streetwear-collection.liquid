@@ -1,144 +1,213 @@
-{% comment %}
-  ConvertFlow — Streetwear Collection Page
-  Grid layout with heavy borders, monochrome aesthetic.
-{% endcomment %}
+{% comment %}ConvertFlow: Streetwear ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #000000; --cf-bg: #ffffff; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
 
-  :root {
-    --sw-primary: {{ section.settings.color_primary | default: '#FF3366' }};
-    --sw-bg: {{ section.settings.color_bg | default: '#0A0A0A' }};
-    --sw-surface: {{ section.settings.color_surface | default: '#121212' }};
-    --sw-text: {{ section.settings.color_text | default: '#FFFFFF' }};
-    --sw-border: rgba(255, 255, 255, 0.15);
-    --sw-font-heading: 'Space Grotesk', sans-serif;
-    --sw-font-mono: 'Space Mono', monospace;
-  }
-
-  .cf-sw-c * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-sw-c { font-family: var(--sw-font-heading); background: var(--sw-bg); color: var(--sw-text); border-top: 1px solid var(--sw-border); }
-  
-  .cf-sw-c-header { padding: 60px 5%; border-bottom: 1px solid var(--sw-border); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
-  .cf-sw-c-header h1 { font-size: clamp(40px, 6vw, 80px); font-weight: 700; text-transform: uppercase; line-height: 1; margin-bottom: 10px; }
-  .cf-sw-c-header p { font-family: var(--sw-font-mono); font-size: 14px; color: #888; max-width: 400px; }
-  
-  .cf-sw-c-meta { font-family: var(--sw-font-mono); font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--sw-primary); }
-  
-  /* Toolbar */
-  .cf-sw-c-toolbar { display: flex; border-bottom: 1px solid var(--sw-border); }
-  .cf-sw-c-filter-group { display: flex; overflow-x: auto; flex: 1; border-right: 1px solid var(--sw-border); }
-  .cf-sw-c-filter { padding: 16px 24px; font-family: var(--sw-font-mono); font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; cursor: pointer; border-right: 1px solid var(--sw-border); white-space: nowrap; transition: all 0.2s; }
-  .cf-sw-c-filter:hover, .cf-sw-c-filter.active { color: var(--sw-text); background: var(--sw-surface); }
-  .cf-sw-c-sort { padding: 16px 24px; font-family: var(--sw-font-mono); font-size: 12px; font-weight: 700; color: var(--sw-text); background: transparent; border: none; text-transform: uppercase; outline: none; cursor: pointer; }
-  
-  /* Grid */
-  .cf-sw-c-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-  
-  .cf-sw-prod { border-right: 1px solid var(--sw-border); border-bottom: 1px solid var(--sw-border); display: flex; flex-direction: column; text-decoration: none; color: var(--sw-text); transition: background 0.3s; position: relative; }
-  .cf-sw-prod:hover { background: var(--sw-surface); }
-  .cf-sw-prod:nth-child(4n) { border-right: none; }
-  
-  .cf-sw-prod-img { aspect-ratio: 4/5; border-bottom: 1px solid var(--sw-border); overflow: hidden; position: relative; }
-  .cf-sw-prod-img img { width: 100%; height: 100%; object-fit: cover; }
-  .cf-sw-prod-badge { position: absolute; top: 12px; left: 12px; background: var(--sw-text); color: var(--sw-bg); font-family: var(--sw-font-mono); font-size: 10px; font-weight: 700; padding: 4px 8px; text-transform: uppercase; }
-  
-  .cf-sw-prod-info { padding: 20px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
-  .cf-sw-prod-title { font-size: 16px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-  .cf-sw-prod-price { font-family: var(--sw-font-mono); font-size: 14px; color: var(--sw-primary); }
-  
-  .cf-sw-c-empty { padding: 100px 20px; text-align: center; color: #888; grid-column: 1 / -1; font-family: var(--sw-font-mono); font-size: 14px; text-transform: uppercase; }
-
-  @media(max-width: 1200px) {
-    .cf-sw-c-grid { grid-template-columns: repeat(3, 1fr); }
-    .cf-sw-prod:nth-child(4n) { border-right: 1px solid var(--sw-border); }
-    .cf-sw-prod:nth-child(3n) { border-right: none; }
-  }
-  @media(max-width: 900px) {
-    .cf-sw-c-grid { grid-template-columns: repeat(2, 1fr); }
-    .cf-sw-prod:nth-child(3n) { border-right: 1px solid var(--sw-border); }
-    .cf-sw-prod:nth-child(2n) { border-right: none; }
-  }
-  @media(max-width: 600px) {
-    .cf-sw-c-grid { grid-template-columns: 1fr; }
-    .cf-sw-prod { border-right: none !important; }
-  }
-{% endstyle %}
-
-<div class="cf-sw-c">
-  <div class="cf-sw-c-header">
-    <div>
-      <h1>{{ collection.title | default: 'COLLECTION [01]' }}</h1>
-      {% if collection.description != blank %}
-        <p>{{ collection.description | strip_html | truncate: 150 }}</p>
-      {% endif %}
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
     </div>
-    <div class="cf-sw-c-meta">ITEMS: {{ collection.products_count | default: 'XX' }}</div>
-  </div>
-  
-  <div class="cf-sw-c-toolbar">
-    <div class="cf-sw-c-filter-group">
-      <div class="cf-sw-c-filter active">ALL</div>
-      <div class="cf-sw-c-filter">T-SHIRTS</div>
-      <div class="cf-sw-c-filter">HOODIES</div>
-      <div class="cf-sw-c-filter">CARGO</div>
-      <div class="cf-sw-c-filter">ACCESSORIES</div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
     </div>
-    <select class="cf-sw-c-sort">
-      <option>SORT: LATEST</option>
-      <option>SORT: PRICE ASC</option>
-      <option>SORT: PRICE DESC</option>
-    </select>
   </div>
-  
-  <div class="cf-sw-c-grid">
-    {% if collection.products.size > 0 %}
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
       {% for product in collection.products %}
-        <a href="{{ product.url }}" class="cf-sw-prod">
-          <div class="cf-sw-prod-img">
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
             {% if product.featured_image %}
-              <img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}">
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
             {% else %}
-              <div style="background:#222; width:100%; height:100%;"></div>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
             {% endif %}
-            
             {% if product.available == false %}
-              <span class="cf-sw-prod-badge" style="background:#444; color:#fff;">SOLD OUT</span>
+              <span class="cfcol-badge">Sold Out</span>
             {% elsif product.compare_at_price > product.price %}
-              <span class="cf-sw-prod-badge">SALE</span>
+              <span class="cfcol-badge">Sale</span>
             {% endif %}
           </div>
-          <div class="cf-sw-prod-info">
-            <div class="cf-sw-prod-title">{{ product.title }}</div>
-            <div class="cf-sw-prod-price">{{ product.price | money }}</div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
+              {% endif %}
+            </div>
           </div>
+          <button class="cfcol-atc">Add to Cart</button>
         </a>
       {% endfor %}
-    {% else %}
-      {% for i in (1..8) %}
-        <a href="#" class="cf-sw-prod">
-          <div class="cf-sw-prod-img"><div style="background:#1a1a1a; width:100%; height:100%;"></div></div>
-          <div class="cf-sw-prod-info">
-            <div class="cf-sw-prod-title">Graphic Tee 0{{ i }}</div>
-            <div class="cf-sw-prod-price">$45.00</div>
-          </div>
-        </a>
-      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
     {% endif %}
-  </div>
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
 </div>
 
 {% schema %}
 {
-  "name": "CF Streetwear Collection",
+  "name": "CF Streetwear Coll",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Accent Color", "default": "#FF3366" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#0A0A0A" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#121212" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#FFFFFF" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
   "presets": [
-    { "name": "CF Streetwear Collection" }
+    {
+      "name": "CF Streetwear Coll"
+    }
   ]
 }
 {% endschema %}

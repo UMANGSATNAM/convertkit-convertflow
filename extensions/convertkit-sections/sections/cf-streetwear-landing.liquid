@@ -1,262 +1,874 @@
-{% comment %} ConvertFlow — Streetwear Landing | Always-Visible Brutalist Bento Grid {% endcomment %}
+{% comment %}ConvertFlow: Streetwear — Landing Page{% endcomment %}
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;700;900&display=swap');
-  .cf-sw*{box-sizing:border-box;margin:0;padding:0}
-  .cf-sw{font-family:'Space Mono',monospace;background:#0A0A0A;color:#F0F0F0;overflow-x:hidden}
+<style>
 
-  /* ═══ TOP BAR ═══ */
-  .cf-sw-top{background:#F0F0F0;color:#0A0A0A;padding:8px 5%;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
-  .cf-sw-top-ticker{display:flex;gap:40px;overflow:hidden}
-  
-  /* ═══ HERO BENTO ═══ */
-  .cf-sw-bento{display:grid;grid-template-columns:1fr 360px;grid-template-rows:70vh 30vh;gap:3px;background:#333}
-  
-  /* Main hero cell */
-  .cf-sw-bento-main{grid-row:span 2;position:relative;overflow:hidden;background:#111}
-  .cf-sw-bento-main img{width:100%;height:100%;object-fit:cover;opacity:.7;transition:transform 8s linear}
-  .cf-sw-bento-main:hover img{transform:scale(1.05)}
-  .cf-sw-bento-main::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,0) 60%)}
-  .cf-sw-bento-main-content{position:absolute;bottom:0;left:0;right:0;padding:40px;z-index:2}
-  .cf-sw-season{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#888;margin-bottom:16px}
-  .cf-sw-h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(64px,8vw,110px);font-weight:900;text-transform:uppercase;line-height:.9;margin-bottom:24px}
-  .cf-sw-h1 span{color:#F0F0F0}
-  .cf-sw-h1 em{font-style:normal;color:transparent;-webkit-text-stroke:2px #F0F0F0;display:block}
-  .cf-sw-drop-info{display:flex;gap:30px;align-items:center;flex-wrap:wrap}
-  .cf-sw-drop-count{font-size:11px;letter-spacing:2px;color:#999;text-transform:uppercase}
-  .cf-sw-drop-count strong{color:#F0F0F0;display:block;font-size:24px;letter-spacing:0}
-  .cf-sw-btn{display:inline-block;padding:14px 30px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;text-decoration:none;border:2px solid #F0F0F0;color:#F0F0F0;transition:all .25s;cursor:pointer;background:transparent}
-  .cf-sw-btn:hover,.cf-sw-btn-fill{background:#F0F0F0;color:#0A0A0A}
-  .cf-sw-btn-fill:hover{background:transparent;color:#F0F0F0}
+:root{--black:#080808;--white:#F5F5F0;--red:#E8292B;--gray:#888;--border:rgba(255,255,255,.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-fxmily:'Barlow',sans-serif;font-size:16px;line-height:1.5;}
 
-  /* Side cells */
-  .cf-sw-bento-top{background:#111;position:relative;overflow:hidden;padding:30px}
-  .cf-sw-bento-top img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
-  .cf-sw-bento-top-content{position:relative;z-index:2}
-  .cf-sw-bento-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px}
-  .cf-sw-bento-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;text-transform:uppercase;line-height:1}
-  .cf-sw-bento-price{font-size:14px;font-weight:700;margin-top:8px;color:#F0F0F0}
-  
-  .cf-sw-bento-bottom{background:#F0F0F0;color:#0A0A0A;padding:30px;display:flex;flex-direction:column;justify-content:space-between}
-  .cf-sw-bento-bottom h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;text-transform:uppercase}
-  .cf-sw-count-badge{background:#0A0A0A;color:#F0F0F0;font-size:11px;font-weight:700;letter-spacing:2px;padding:6px 14px;text-transform:uppercase;display:inline-block}
+/* TICKER */
+.ticker{background:var(--red);padding:9px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;gap:0;animation:ticker 20s linear infinite;}
+.ticker-item{display:inline-flex;align-items:center;padding:0 40px;font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;}
+.ticker-dot{width:5px;height:5px;background:rgba(255,255,255,.5);border-radius:50%;margin-right:40px;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
-  /* ═══ MARQUEE ═══ */
-  .cf-sw-marquee{border-top:2px solid #F0F0F0;border-bottom:2px solid #F0F0F0;overflow:hidden;padding:14px 0;margin:0}
-  .cf-sw-marquee-track{display:inline-flex;animation:sw-marquee 25s linear infinite;white-space:nowrap}
-  .cf-sw-marquee-track span{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:3px;padding:0 50px;color:#F0F0F0}
-  .cf-sw-marquee-track span::after{content:'★';margin-left:50px;color:#555}
-  @keyframes sw-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--black);border-bottom:1px solid var(--border);padding:18px 60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-fxmily:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:var(--white);text-decoration:none;}
+.nav-logo span{color:var(--red);}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--white);}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.nav-icon{color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;transition:color .2s;font-fxmily:'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;}
+.nav-icon:hover{color:var(--white);}
+.nav-cta{background:var(--red);color:var(--white);padding:10px 24px;font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;}
 
-  /* ═══ PRODUCT CARDS ═══ */
-  .cf-sw-products{padding:60px 4%}
-  .cf-sw-prod-header{display:grid;grid-template-columns:1fr auto;align-items:center;margin-bottom:40px;border-bottom:2px solid #F0F0F0;padding-bottom:20px}
-  .cf-sw-prod-header h2{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;text-transform:uppercase;letter-spacing:2px}
-  .cf-sw-prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:#333}
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:92vh;border-bottom:1px solid var(--border);}
+.hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:80px 60px 80px 80px;border-right:1px solid var(--border);position:relative;overflow:hidden;}
+.hero-left::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at bottom left, rgba(232,41,43,.08) 0%, transparent 60%);pointer-events:none;}
+.hero-category{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.hero-category::before{content:'';width:32px;height:1px;background:var(--red);}
+.hero-title{font-fxmily:'Bebas Neue',sans-serif;font-size:clamp(72px,8vw,120px);line-height:.92;letter-spacing:.02em;margin-bottom:24px;}
+.hero-title span{color:var(--red);}
+.hero-desc{font-size:15px;color:var(--gray);line-height:1.7;max-width:380px;margin-bottom:40px;}
+.hero-meta{display:flex;gap:40px;margin-bottom:40px;}
+.meta-item{}
+.meta-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:4px;}
+.meta-val{font-size:20px;font-weight:500;}
+.meta-val.price del{font-size:14px;color:var(--gray);margin-right:4px;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
+.btn-primary{background:var(--white);color:var(--black);padding:16px 44px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.btn-primary:hover{background:var(--red);color:var(--white);}
+.btn-ghost{background:transparent;color:var(--white);padding:16px 44px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;border:1px solid rgba(255,255,255,.3);cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--white);}
+.hero-drops{display:flex;align-items:center;gap:8px;}
+.drop-dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.drop-text{font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;}
 
-  /* Streetwear card: border-heavy, mono font, numbered */
-  .cf-sw-card{background:#111;text-decoration:none;color:#F0F0F0;position:relative;display:flex;flex-direction:column;overflow:hidden}
-  .cf-sw-card-img{aspect-ratio:4/5;overflow:hidden;position:relative}
-  .cf-sw-card-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%);transition:filter .4s,transform .6s}
-  .cf-sw-card:hover .cf-sw-card-img img{filter:grayscale(0%);transform:scale(1.04)}
-  .cf-sw-card-num{position:absolute;top:12px;left:12px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#888;letter-spacing:2px;z-index:2}
-  .cf-sw-card-sold{position:absolute;top:12px;right:12px;background:#F0F0F0;color:#0A0A0A;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;letter-spacing:1px;z-index:2;text-transform:uppercase}
-  .cf-sw-card-info{padding:16px;border-top:2px solid #222}
-  .cf-sw-card-brand{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#555;margin-bottom:6px}
-  .cf-sw-card-title{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;text-transform:uppercase;line-height:1;margin-bottom:10px}
-  .cf-sw-card-footer{display:flex;justify-content:space-between;align-items:center}
-  .cf-sw-card-price{font-size:16px;font-weight:700;letter-spacing:1px}
-  .cf-sw-card-add{background:#F0F0F0;color:#0A0A0A;border:none;padding:6px 14px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:all .2s}
-  .cf-sw-card-add:hover{background:#0A0A0A;color:#F0F0F0;outline:1px solid #F0F0F0}
+.hero-right{position:relative;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;}
+.hero-right::before{content:'MARGA';position:absolute;font-fxmily:'Bebas Neue',sans-serif;font-size:220px;color:rgba(255,255,255,.03);letter-spacing:-.02em;white-space:nowrap;user-select:none;}
+.product-frame{width:72%;aspect-ratio:.67;background:linear-gradient(170deg,#1a1a1a,#222);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;position:relative;}
+.product-frame-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.product-frame-name{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.1em;color:rgba(255,255,255,.5);}
+.product-tag{position:absolute;top:20px;right:20px;background:var(--red);color:var(--white);font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;padding:6px 12px;text-transform:uppercase;}
 
-  /* ═══ EDITORIAL STRIP ═══ */
-  .cf-sw-editorial{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid #222;border-bottom:2px solid #222}
-  .cf-sw-editorial-text{padding:80px 60px;display:flex;flex-direction:column;justify-content:center}
-  .cf-sw-editorial-text .sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#555;margin-bottom:20px}
-  .cf-sw-editorial-text h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(48px,6vw,80px);font-weight:900;text-transform:uppercase;line-height:1;margin-bottom:24px}
-  .cf-sw-editorial-text p{font-size:14px;color:#888;line-height:1.8;max-width:400px;margin-bottom:30px}
-  .cf-sw-editorial-img{background:#111;overflow:hidden;min-height:500px}
-  .cf-sw-editorial-img img{width:100%;height:100%;object-fit:cover;opacity:.8;transition:transform .8s ease}
-  .cf-sw-editorial:hover .cf-sw-editorial-img img{transform:scale(1.04)}
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.stat{padding:28px 40px;border-right:1px solid var(--border);text-align:center;}
+.stat:last-child{border-right:none;}
+.stat-num{font-fxmily:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:.04em;line-height:1;color:var(--white);}
+.stat-num span{color:var(--red);}
+.stat-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-top:4px;}
 
-  @media(max-width:900px){
-    .cf-sw-bento{grid-template-columns:1fr;grid-template-rows:80vh auto auto}
-    .cf-sw-bento-main{grid-row:1}
-    .cf-sw-prod-grid{grid-template-columns:repeat(2,1fr)}
-    .cf-sw-editorial{grid-template-columns:1fr}
-    .cf-sw-editorial-img{min-height:300px}
-    .cf-sw-editorial-text{padding:40px 30px}
-  }
-{% endstyle %}
+/* SECTION */
+.section{padding:80px 80px;}
+.sec-eyebrow{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.18em;color:var(--red);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.sec-eyebrow::before{content:'';width:24px;height:1px;background:var(--red);}
+.sec-title{font-fxmily:'Bebas Neue',sans-serif;font-size:clamp(52px,5vw,80px);line-height:.95;letter-spacing:.03em;margin-bottom:20px;}
+.sec-title span{color:var(--red);}
+.sec-body{font-size:15px;color:var(--gray);max-width:480px;line-height:1.75;margin-bottom:52px;}
 
-<div class="cf-sw">
+/* PRODUCT FEATURES */
+.features-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);}
+.feature-big{padding:48px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between;}
+.feature-big-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--red);text-transform:uppercase;margin-bottom:16px;}
+.feature-big-title{font-fxmily:'Bebas Neue',sans-serif;font-size:52px;line-height:.95;letter-spacing:.03em;margin-bottom:20px;}
+.feature-big-text{font-size:15px;color:var(--gray);line-height:1.7;}
+.feature-list{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
+.feature-item{padding:28px 32px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.feature-item:nth-child(even){border-right:none;}
+.feature-item:nth-last-child(-n+2){border-bottom:none;}
+.feature-num{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;color:var(--red);line-height:1;margin-bottom:8px;}
+.feature-title{font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.08em;font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.feature-text{font-size:13px;color:var(--gray);line-height:1.6;}
 
-  {%- comment -%} TOP BAR {%- endcomment -%}
-  <div class="cf-sw-top">
-    <div>SYSTEM.ON // SS-{{ 'now' | date: '%Y' }}</div>
-    <div class="cf-sw-top-ticker">
-      <span>FREE SHIPPING ₹999+</span>
-      <span>LIMITED DROPS ONLY</span>
-      <span>NEW COLLAB LIVE NOW</span>
+/* SIZE + ATC */
+.atc-section{background:#0F0F0F;padding:80px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.atc-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.atc-product-name{font-fxmily:'Bebas Neue',sans-serif;font-size:56px;line-height:.95;letter-spacing:.03em;margin-bottom:8px;}
+.atc-product-sub{font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em;color:var(--gray);text-transform:uppercase;margin-bottom:32px;}
+.atc-price{font-size:32px;font-weight:500;margin-bottom:8px;}
+.atc-price del{font-size:18px;color:var(--gray);margin-right:8px;}
+.atc-save{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:32px;}
+.size-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:12px;}
+.size-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+.size-btn{width:54px;height:44px;background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white);font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.size-btn:hover,.size-btn.active{border-color:var(--white);background:var(--white);color:var(--black);}
+.size-btn.sold-out{opacity:.3;cursor:not-allowed;text-decoration:line-through;}
+.atc-actions{display:flex;gap:12px;}
+.atc-btn{flex:1;background:var(--white);color:var(--black);padding:18px;font-fxmily:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.14em;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.atc-btn:hover{background:var(--red);color:var(--white);}
+.atc-wish{width:56px;height:56px;background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.atc-wish:hover{border-color:var(--red);color:var(--red);}
+.atc-assurance{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap;}
+.assurance-item{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.08em;color:var(--gray);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+
+/* REVIEWS */
+.reviews{padding:80px;background:#0A0A0A;}
+.reviews-header{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:52px;align-items:center;}
+.rating-display{display:flex;align-items:baseline;gap:16px;}
+.rating-num{font-fxmily:'Bebas Neue',sans-serif;font-size:100px;line-height:.9;color:var(--white);}
+.rating-right{}
+.rating-stars{color:var(--red);font-size:22px;letter-spacing:2px;margin-bottom:4px;}
+.rating-count{font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.review-card{background:var(--black);padding:32px;}
+.review-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.review-stars{color:var(--red);font-size:12px;letter-spacing:2px;}
+.review-verified{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--red);text-transform:uppercase;}
+.review-text{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:20px;}
+.review-author{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.review-author strong{color:var(--white);}
+
+/* FAQ */
+.faq-section{padding:80px;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{padding:22px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-fxmily:'Barlow Condensed',sans-serif;font-size:18px;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
+.faq-q:hover{color:var(--red);}
+.faq-icon{color:var(--red);font-size:24px;transition:transform .3s;user-select:none;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-a p{font-size:15px;color:var(--gray);line-height:1.8;padding-bottom:22px;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-item.open .faq-a{max-height:180px;}
+
+/* FOOTER */
+footer{background:#050505;border-top:1px solid var(--border);padding:56px 80px 28px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:48px;}
+.footer-logo{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.12em;color:var(--white);text-decoration:none;display:block;margin-bottom:14px;}
+.footer-logo span{color:var(--red);}
+.footer-about{font-size:14px;color:var(--gray);line-height:1.7;max-width:260px;}
+.footer-col h4{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:18px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{color:var(--gray);text-decoration:none;font-size:14px;transition:color .2s;}
+.footer-col a:hover{color:var(--white);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.08em;color:var(--gray);text-transform:uppercase;}
+
+/* STICKY */
+.sticky-atc{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--black);border-top:1px solid var(--border);padding:14px 60px;display:none;align-items:center;justify-content:space-between;}
+.sticky-atc.visible{display:flex;}
+.sticky-product{font-fxmily:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;}
+.sticky-price{font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;color:var(--gray);margin-top:2px;}
+.sticky-btn{background:var(--red);color:var(--white);border:none;padding:13px 40px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .section,.atc-section,.reviews,.faq-section,footer{padding:60px 40px;}
+  nav{padding:16px 40px;}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-left{padding:48px 24px;border-right:none;border-bottom:1px solid var(--border);}
+  .hero-right{min-height:280px;order:-1;}
+  nav{padding:14px 24px;}
+  .nav-links{display:none;}
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .stat{border-bottom:1px solid var(--border);}
+  .stat:nth-child(even){border-right:none;}
+  .section,.atc-section,.reviews,.faq-section,footer{padding:48px 24px;}
+  .features-layout{grid-template-columns:1fr;}
+  .feature-big{border-right:none;border-bottom:1px solid var(--border);}
+  .atc-inner{grid-template-columns:1fr;gap:40px;}
+  .reviews-grid{grid-template-columns:1fr;gap:0;}
+  .reviews-header{grid-template-columns:1fr;gap:24px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .footer-grid>div:first-child{grid-column:1/-1;}
+  .footer-bottom{flex-direction:column;gap:8px;}
+  .sticky-atc{padding:12px 24px;}
+  .hero-title{font-size:clamp(60px,14vw,100px);}
+}
+
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+.hero-category,.hero-title,.hero-desc,.hero-meta,.hero-actions,.hero-drops{animation:slideInLeft .6s ease both;}
+.hero-category{animation-delay:.05s;}
+.hero-title{animation-delay:.1s;}
+.hero-desc{animation-delay:.2s;}
+.hero-meta{animation-delay:.28s;}
+.hero-actions{animation-delay:.35s;}
+.hero-drops{animation-delay:.42s;}
+.product-frame{animation:slideInRight .6s ease .1s both;}
+
+</style>
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#000000' }};
+  --cf-bg:{{ section.settings.bg | default: '#ffffff' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#000000' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item">New Drop: The Vagabond Set <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Free Shipping Above ₹500 <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Made in India <span class="ticker-dot"></span></span>
+    <span class="ticker-item">100% Cotton Dobby <span class="ticker-dot"></span></span>
+    <span class="ticker-item">New Drop: The Vagabond Set <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Free Shipping Above ₹500 <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Made in India <span class="ticker-dot"></span></span>
+    <span class="ticker-item">100% Cotton Dobby <span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a data-href="#" class="nav-logo">URB<span>N</span>CO</a>
+  <ul class="nav-links">
+    <li><a data-href="#">Clearance</a></li>
+    <li><a data-href="#">Headwear</a></li>
+    <li><a data-href="#">Clothing</a></li>
+    <li><a data-href="#">Accessories</a></li>
+    <li><a data-href="#">Collabs</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-icon">Search</span>
+    <span class="nav-icon">Cart (0)</span>
+    <button class="nav-cta">{{ section.settings.hero_cta | default: "Shop Now" }}</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-category">New Arrival</div>
+    <h1 class="hero-title">{{ section.settings.hero_h1 | default: 'Streetwear' }}</h1>
+    <p class="hero-desc">Cut from 100% cotton dobby in a wide, unhurried silhouette. Brown and white stripes woven with natural texture and depth. Goes everywhere.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Price</div>
+        <div class="meta-val price">₹1,650</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Fabric</div>
+        <div class="meta-val" style="font-size:16px">100% Cotton Dobby</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Origin</div>
+        <div class="meta-val" style="font-size:16px">Made in India</div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('atc-section').scrollIntoView({behavior:'smooth'})">{{ section.settings.hero_cta2 | default: "View Collection" }}</button>
+      <button class="btn-ghost">Size Guide</button>
+    </div>
+    <div class="hero-drops">
+      <span class="drop-dot"></span>
+      <span class="drop-text">Limited Stock — Selling Fast</span>
     </div>
   </div>
+  <div class="hero-right">{% if section.settings.hero_img != blank %}
+<img src="{{ section.settings.hero_img | image_url: width: 1400 }}" alt="{{ section.settings.hero_h1 }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+{% else %}
+    <div class="product-frame">
+      <div class="product-frame-label">Brown + White</div>
+      <div class="product-frame-name">MARGA</div>
+      <div class="product-frame-label">Cotton Dobby Stripes</div>
+      <div class="product-tag">New Drop</div>
+    </div>
+  {% endif %}</div>
+</section>
 
-  {%- comment -%} HERO BENTO GRID {%- endcomment -%}
-  <div class="cf-sw-bento">
-    <div class="cf-sw-bento-main">
-      {% if section.settings.hero_image != blank %}
-        <img src="{{ section.settings.hero_image | img_url: 'master' }}" alt="Drop">
-      {% else %}
-        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1200&auto=format&fit=crop" alt="Drop">
-      {% endif %}
-      <div class="cf-sw-bento-main-content">
-        <div class="cf-sw-season">{{ section.settings.hero_season | default: '// SS2025 // COLLECTION 03' }}</div>
-        <h1 class="cf-sw-h1">
-          <span>{{ section.settings.hero_line1 | default: 'HARD' }}</span>
-          <em>{{ section.settings.hero_line2 | default: 'CORE' }}</em>
-        </h1>
-        <div class="cf-sw-drop-info">
-          <div class="cf-sw-drop-count">
-            <strong>{{ section.settings.hero_stat | default: '247' }}</strong>
-            Units Remaining
-          </div>
-          <a href="{{ section.settings.hero_btn_url | default: '/collections/all' }}" class="cf-sw-btn cf-sw-btn-fill">
-            {{ section.settings.hero_btn_text | default: 'GRAB THE DROP' }}
-          </a>
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">100<span>%</span></div>
+    <div class="stat-label">Cotton Dobby</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">5<span>+</span></div>
+    <div class="stat-label">Sizes Available</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4.9<span></span></div>
+    <div class="stat-label">Avg. Rating</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">24<span>h</span></div>
+    <div class="stat-label">Fast Dispatch</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="sec-eyebrow">Product Details</div>
+  <h2 class="sec-title">Built for<br><span>Comfort</span></h2>
+  <div class="features-layout">
+    <div class="feature-big">
+      <div>
+        <div class="feature-big-label">The Fabric</div>
+        <div class="feature-big-title">100% Cotton<br>Dobby</div>
+        <div class="feature-big-text" style="color:var(--gray)">Handwoven with natural texture and depth. Breathable, durable, and effortlessly stylish. The kind of fabric that gets better with every wash.</div>
+      </div>
+      <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--border);">
+        <div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:14px;">Colorway</div>
+        <div style="display:flex;gap:10px;">
+          <div style="width:40px;height:40px;background:linear-gradient(135deg,#8B6914,#F5F5F0 50%);border:1px solid rgba(255,255,255,.2);"></div>
         </div>
       </div>
     </div>
-
-    <div class="cf-sw-bento-top">
-      {% if section.settings.bento_img1 != blank %}
-        <img src="{{ section.settings.bento_img1 | img_url: 'master' }}" alt="">
-      {% else %}
-        <img src="https://images.unsplash.com/photo-1556906781-9a412961a28b?w=600&auto=format&fit=crop" alt="">
-      {% endif %}
-      <div class="cf-sw-bento-top-content">
-        <div class="cf-sw-bento-label">Featured Drop</div>
-        <div class="cf-sw-bento-title">{{ section.settings.bento_title1 | default: 'OVERSIZED PARKA' }}</div>
-        <div class="cf-sw-bento-price">{{ section.settings.bento_price1 | default: '₹5,499' }}</div>
+    <div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-num">01</div>
+          <div class="feature-title">Relaxed Fit</div>
+          <div class="feature-text">Wide, unhurried silhouette. Full-length cut for an effortless look.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">02</div>
+          <div class="feature-title">Elasticated Waist</div>
+          <div class="feature-text">Comfort-first waistband. No zipper, pure ease of wear.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">03</div>
+          <div class="feature-title">Deep Side Pockets</div>
+          <div class="feature-text">Two deep pockets — because pockets should actually be pockets.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">04</div>
+          <div class="feature-title">Dobby Stripes</div>
+          <div class="feature-text">Woven-in texture. Not printed, not dyed — built into the fabric itself.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">05</div>
+          <div class="feature-title">Faux Fly Front</div>
+          <div class="feature-text">Clean front aesthetic with a tailored look. Simple, sharp, deliberate.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">06</div>
+          <div class="feature-title">Flag Label Detail</div>
+          <div class="feature-text">The signature UM flag on the hem. Subtle brand. Real identity.</div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="cf-sw-bento-bottom">
-      <div>
-        <div class="cf-sw-bento-label">Collab Series</div>
-        <h3>{{ section.settings.bento_title2 | default: 'UNDER GROUND ARCHIVE' }}</h3>
+<!-- ATC SECTION -->
+<section class="atc-section" id="atc-section">
+  <div class="atc-inner">
+    <div>
+      <div class="atc-product-name">Marga<br>Relaxed Pants</div>
+      <div class="atc-product-sub">Brown + White · Cotton Dobby</div>
+      <div class="atc-price">₹1,650</div>
+      <div class="atc-save">Free Shipping Above ₹500</div>
+      <div class="size-label">Select Size</div>
+      <div class="size-grid">
+        <button class="size-btn">S/28</button>
+        <button class="size-btn active">M/30</button>
+        <button class="size-btn">L/32</button>
+        <button class="size-btn">XL/34</button>
+        <button class="size-btn sold-out">2XL/36</button>
       </div>
-      <a href="{{ section.settings.bento_link2 | default: '/collections/all' }}" class="cf-sw-btn">{{ section.settings.bento_btn2 | default: 'BROWSE →' }}</a>
+      <div class="atc-actions">
+        <button class="atc-btn">Add to Cart</button>
+        <button class="atc-wish"></button>
+      </div>
+      <div class="atc-assurance">
+        <span class="assurance-item"> Free Returns</span>
+        <span class="assurance-item"> COD Available</span>
+        <span class="assurance-item"> Made in India</span>
+      </div>
+    </div>
+    <div>
+      <div class="sec-eyebrow">Care Instructions</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px"></span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Machine Wash</div><div style="font-size:13px;color:var(--gray);">Cold water, gentle cycle. Inside out.</div></div>
+        </div>
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px"></span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Line Dry</div><div style="font-size:13px;color:var(--gray);">Dry in shade. Do not tumble dry.</div></div>
+        </div>
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px"></span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">No Bleach</div><div style="font-size:13px;color:var(--gray);">Avoid bleach and fabric softeners.</div></div>
+        </div>
+      </div>
     </div>
   </div>
+</section>
 
-  {%- comment -%} MARQUEE {%- endcomment -%}
-  <div class="cf-sw-marquee">
-    <div class="cf-sw-marquee-track">
-      {% for i in (1..4) %}
-        <span>ARCHIVE DROP</span><span>OVERSIZED FITS</span><span>COLLAB SERIES</span><span>LIMITED UNITS</span>
-      {% endfor %}
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="reviews-header">
+    <div>
+      <div class="sec-eyebrow">Customer Love</div>
+      <h2 class="sec-title">What They're<br><span>Saying</span></h2>
+    </div>
+    <div class="rating-display">
+      <div class="rating-num">4.9</div>
+      <div class="rating-right">
+        <div class="rating-stars"></div>
+        <div class="rating-count">Based on 312 Reviews</div>
+      </div>
     </div>
   </div>
-
-  {%- comment -%} PRODUCTS {%- endcomment -%}
-  <section class="cf-sw-products">
-    <div class="cf-sw-prod-header">
-      <h2>{{ section.settings.prods_heading | default: 'LATEST DROPS' }}</h2>
-      <a href="{{ section.settings.prods_link | default: '/collections/all' }}" class="cf-sw-btn">ALL DROPS →</a>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars"></div>
+        <div class="review-verified"> Verified</div>
+      </div>
+      <p class="review-text">"Genuinely the most comfortable pair of pants I own. The cotton dobby fabric is insane — breathable, looks elevated, feels like nothing. Wore it to work and then to a dinner the same day."</p>
+      <div class="review-author"><strong>Rohan S.</strong> · Mumbai</div>
     </div>
-    <div class="cf-sw-prod-grid">
-      {% assign coll = section.settings.featured_collection %}
-      {% if coll != blank and coll.products_count > 0 %}
-        {% for p in coll.products limit: 3 %}
-          <div class="cf-sw-card">
-            <a href="{{ p.url }}" style="display:block; text-decoration:none; color:inherit">
-              <div class="cf-sw-card-img">
-                {% if p.featured_image %}<img src="{{ p.featured_image | img_url: '600x' }}" alt="{{ p.title }}">{% endif %}
-                <div class="cf-sw-card-num">{{ forloop.index | prepend: '0' }}</div>
-                {% if p.available == false %}<div class="cf-sw-card-sold">Sold Out</div>{% endif %}
-              </div>
-            </a>
-            <div class="cf-sw-card-info">
-              <div class="cf-sw-card-brand">{{ p.vendor }}</div>
-              <div class="cf-sw-card-title">{{ p.title }}</div>
-              <div class="cf-sw-card-footer">
-                <div class="cf-sw-card-price">{{ p.price | money }}</div>
-                <button class="cf-sw-card-add">+ ADD</button>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        {% assign sw_demo = 'CARGO PARACHUTE PANT,ACID WASH BOMBER,ASYMMETRIC HOODIE' | split: ',' %}
-        {% for name in sw_demo %}
-          <div class="cf-sw-card">
-            <div class="cf-sw-card-img">
-              <div style="width:100%;height:100%;background:#181818"></div>
-              <div class="cf-sw-card-num">0{{ forloop.index }}</div>
-              {% if forloop.last %}<div class="cf-sw-card-sold">Selling Fast</div>{% endif %}
-            </div>
-            <div class="cf-sw-card-info">
-              <div class="cf-sw-card-brand">UNDERGROUND CO.</div>
-              <div class="cf-sw-card-title">{{ name }}</div>
-              <div class="cf-sw-card-footer">
-                <div class="cf-sw-card-price">₹{{ forloop.index | times: 700 | plus: 2299 }}</div>
-                <button class="cf-sw-card-add">+ ADD</button>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% endif %}
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars"></div>
+        <div class="review-verified"> Verified</div>
+      </div>
+      <p class="review-text">"The fit is exactly what it says — relaxed without looking sloppy. The stripes are woven in, not printed, which gives it a premium handmade look. Ordered in all 5 sizes, gave them as gifts."</p>
+      <div class="review-author"><strong>Aditya P.</strong> · Delhi</div>
     </div>
-  </section>
-
-  {%- comment -%} EDITORIAL STRIP {%- endcomment -%}
-  <div class="cf-sw-editorial">
-    <div class="cf-sw-editorial-text">
-      <div class="sub">// THE BRAND</div>
-      <h2>{{ section.settings.editorial_heading | default: 'NOT FOR EVERYONE' }}</h2>
-      <p>{{ section.settings.editorial_text | default: 'We build for those who refuse to blend in. Every stitch, every silhouette is a statement against the ordinary.' }}</p>
-      <a href="{{ section.settings.editorial_url | default: '/pages/about' }}" class="cf-sw-btn">READ THE STORY →</a>
-    </div>
-    <div class="cf-sw-editorial-img">
-      {% if section.settings.editorial_image != blank %}
-        <img src="{{ section.settings.editorial_image | img_url: 'master' }}" alt="Editorial">
-      {% else %}
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop" alt="Editorial">
-      {% endif %}
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars"></div>
+        <div class="review-verified"> Verified</div>
+      </div>
+      <p class="review-text">"Urban Monkey always delivers. The pockets are actually deep — phone, wallet, keys, all fit. The elastic waist makes it so easy. Perfect summer pants. Already on my 2nd pair."</p>
+      <div class="review-author"><strong>Karan T.</strong> · Bangalore</div>
     </div>
   </div>
+</section>
 
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="sec-eyebrow">Questions</div>
+  <h2 class="sec-title" style="max-width:600px;margin-bottom:40px">FAQ</h2>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What sizes are available? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Available in S/28, M/30, L/32, XL/34, and 2XL/36. The model in images is 6 feet tall wearing L. We recommend sizing up if you prefer an even more relaxed fit.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Is the fabric pre-washed? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Yes, the fabric is pre-washed before cutting. Minimal shrinkage expected. Machine wash cold, gentle cycle, line dry in shade for best results.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What is the return/exchange policy? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>We offer 7-day returns and exchanges for unworn items with original tags. Size exchanges are processed within 3–5 business days. Reach out to us on Instagram or email for quick support.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">How long does shipping take? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Orders are dispatched within 24 hours. Delivery takes 3–5 business days pan-India. Free shipping on orders above ₹500. Express delivery available at extra cost.</p></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+
+
+{% if section.settings.show_products and section.settings.prod_col != blank %}
+<div style="background:var(--cf-bg,#ffffff);padding:80px 60px">
+  <div style="text-align:center;margin-bottom:48px">
+    <h2 style="font-size:36px;font-weight:800;margin-bottom:10px">{{ section.settings.prod_heading }}</h2>
+    <p style="font-size:15px;color:#888">{{ section.settings.prod_sub }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;max-width:1400px;margin:0 auto">
+    {% for p in section.settings.prod_col.products limit: section.settings.prod_count %}
+    <a href="{{ p.url }}" style="background:#fff;border:1px solid rgba(0,0,0,.08);text-decoration:none;color:#1a1a1a;display:block;transition:all .3s;overflow:hidden">
+      <div style="aspect-ratio:1;overflow:hidden;position:relative;background:#f5f5f5;display:flex;align-items:center;justify-content:center">
+        {% if p.featured_image %}
+          <img src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        {% else %}
+          <svg width="40" height="40" fill="none" stroke="#ccc" viewBox="0 0 24 24"><path d="M20 7H4l1 12h14z"/></svg>
+        {% endif %}
+        {% if p.available == false %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#000000);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sold Out</span>
+        {% elsif p.compare_at_price > p.price %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#000000);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sale</span>
+        {% endif %}
+      </div>
+      <div style="padding:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cf-accent,#000000);margin-bottom:4px">{{ p.vendor }}</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.4">{{ p.title | truncate: 55 }}</div>
+        <div style="font-size:18px;font-weight:800">{{ p.price | money }}{% if p.compare_at_price > p.price %} <del style="font-size:13px;color:#aaa;font-weight:400">{{ p.compare_at_price | money }}</del>{% endif %}</div>
+        <button style="display:block;width:100%;margin-top:12px;padding:12px;background:var(--cf-accent,#000000);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px;font-family:inherit">Add to Cart</button>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
 </div>
+{% endif %}
+{% if section.settings.show_testi %}
+<div style="padding:80px 60px;background:#fafafa">
+  <h2 style="text-align:center;font-size:36px;font-weight:800;margin-bottom:48px">{{ section.settings.testi_h }}</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1400px;margin:0 auto">
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t1_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#000000)">{{ section.settings.t1_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t2_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#000000)">{{ section.settings.t2_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t3_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#000000)">{{ section.settings.t3_auth }}</div></div>
+  </div>
+</div>
+{% endif %}
+{% if section.settings.show_nl %}
+<div style="padding:80px 60px;background:var(--cf-accent,#000000);text-align:center;color:#fff">
+  <h2 style="font-size:36px;font-weight:800;margin-bottom:12px">{{ section.settings.nl_h }}</h2>
+  <p style="font-size:15px;opacity:.85;margin-bottom:36px">{{ section.settings.nl_sub }}</p>
+  <form action="/contact#contact_form" method="post" style="display:flex;max-width:480px;margin:0 auto">
+    <input type="hidden" name="form_type" value="customer">
+    <input type="hidden" name="utf8" value="&#x2713;">
+    <input type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder }}" required style="flex:1;padding:16px 20px;border:none;font-size:14px;outline:none;font-family:inherit">
+    <button type="submit" style="padding:16px 28px;background:#1a1a1a;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">{{ section.settings.nl_btn }}</button>
+  </form>
+</div>
+{% endif %}
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#000000);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#000000);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#000000);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Streetwear Landing",
+  "name": "CF Streetwear LP",
   "settings": [
-    { "type": "header", "content": "Hero" },
-    { "type": "image_picker", "id": "hero_image", "label": "Hero Background Image" },
-    { "type": "text", "id": "hero_season", "label": "Season Tag", "default": "// SS2025 // COLLECTION 03" },
-    { "type": "text", "id": "hero_line1", "label": "Headline Line 1", "default": "HARD" },
-    { "type": "text", "id": "hero_line2", "label": "Headline Line 2 (Outline)", "default": "CORE" },
-    { "type": "text", "id": "hero_stat", "label": "Units Counter", "default": "247" },
-    { "type": "text", "id": "hero_btn_text", "label": "Hero Button Text", "default": "GRAB THE DROP" },
-    { "type": "url", "id": "hero_btn_url", "label": "Hero Button Link" },
-    { "type": "header", "content": "Bento Side Tiles" },
-    { "type": "image_picker", "id": "bento_img1", "label": "Bento Top Image" },
-    { "type": "text", "id": "bento_title1", "label": "Bento Top Title", "default": "OVERSIZED PARKA" },
-    { "type": "text", "id": "bento_price1", "label": "Bento Top Price", "default": "₹5,499" },
-    { "type": "text", "id": "bento_title2", "label": "Bento Bottom Title", "default": "UNDERGROUND ARCHIVE" },
-    { "type": "text", "id": "bento_btn2", "label": "Bento Bottom Button", "default": "BROWSE →" },
-    { "type": "url", "id": "bento_link2", "label": "Bento Bottom Link" },
-    { "type": "header", "content": "Products" },
-    { "type": "text", "id": "prods_heading", "label": "Products Heading", "default": "LATEST DROPS" },
-    { "type": "url", "id": "prods_link", "label": "View All Link" },
-    { "type": "collection", "id": "featured_collection", "label": "Featured Collection" },
-    { "type": "header", "content": "Editorial Strip" },
-    { "type": "text", "id": "editorial_heading", "label": "Heading", "default": "NOT FOR EVERYONE" },
-    { "type": "textarea", "id": "editorial_text", "label": "Text" },
-    { "type": "image_picker", "id": "editorial_image", "label": "Image" },
-    { "type": "url", "id": "editorial_url", "label": "Link" }
+    {
+      "type": "header",
+      "content": "Brand & Colors"
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Accent Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_col",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Announcement Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ann",
+      "label": "Show Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "ann_text",
+      "label": "Announcement Text",
+      "default": "Free shipping on orders above Rs.999"
+    },
+    {
+      "type": "color",
+      "id": "ann_bg",
+      "label": "Bar Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "ann_color",
+      "label": "Bar Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_tag",
+      "label": "Eyebrow Tag",
+      "default": "New Arrival"
+    },
+    {
+      "type": "text",
+      "id": "hero_h1",
+      "label": "Headline",
+      "default": "Streetwear"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_sub",
+      "label": "Subheading",
+      "default": "Discover our curated collection crafted with quality."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta",
+      "label": "Primary CTA Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "hero_url",
+      "label": "Primary CTA URL"
+    },
+    {
+      "type": "text",
+      "id": "hero_cta2",
+      "label": "Secondary CTA Text",
+      "default": "View Collection"
+    },
+    {
+      "type": "url",
+      "id": "hero_url2",
+      "label": "Secondary CTA URL"
+    },
+    {
+      "type": "header",
+      "content": "Stats Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show Stats",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "stat1_n",
+      "label": "Stat 1 Number",
+      "default": "50,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat1_l",
+      "label": "Stat 1 Label",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "stat2_n",
+      "label": "Stat 2 Number",
+      "default": "4.9 Stars"
+    },
+    {
+      "type": "text",
+      "id": "stat2_l",
+      "label": "Stat 2 Label",
+      "default": "Average Rating"
+    },
+    {
+      "type": "text",
+      "id": "stat3_n",
+      "label": "Stat 3 Number",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "stat3_l",
+      "label": "Stat 3 Label",
+      "default": "Authentic"
+    },
+    {
+      "type": "text",
+      "id": "stat4_n",
+      "label": "Stat 4 Number",
+      "default": "30-Day"
+    },
+    {
+      "type": "text",
+      "id": "stat4_l",
+      "label": "Stat 4 Label",
+      "default": "Easy Returns"
+    },
+    {
+      "type": "header",
+      "content": "Featured Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_products",
+      "label": "Show Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "prod_heading",
+      "label": "Section Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "prod_sub",
+      "label": "Subheading",
+      "default": "Handpicked for you"
+    },
+    {
+      "type": "collection",
+      "id": "prod_col",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "prod_count",
+      "label": "Number of Products",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Testimonials"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_testi",
+      "label": "Show Testimonials",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "testi_h",
+      "label": "Heading",
+      "default": "What Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "t1_text",
+      "label": "Testimonial 1",
+      "default": "Absolutely love the quality!"
+    },
+    {
+      "type": "text",
+      "id": "t1_auth",
+      "label": "Author 1",
+      "default": "Priya S."
+    },
+    {
+      "type": "textarea",
+      "id": "t2_text",
+      "label": "Testimonial 2",
+      "default": "Fast shipping and beautiful packaging."
+    },
+    {
+      "type": "text",
+      "id": "t2_auth",
+      "label": "Author 2",
+      "default": "Rahul M."
+    },
+    {
+      "type": "textarea",
+      "id": "t3_text",
+      "label": "Testimonial 3",
+      "default": "Best purchase this year."
+    },
+    {
+      "type": "text",
+      "id": "t3_auth",
+      "label": "Author 3",
+      "default": "Ananya K."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nl",
+      "label": "Show Newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nl_h",
+      "label": "Heading",
+      "default": "Join Our Community"
+    },
+    {
+      "type": "text",
+      "id": "nl_sub",
+      "label": "Subtext",
+      "default": "Subscribe for exclusive offers and updates."
+    },
+    {
+      "type": "text",
+      "id": "nl_btn",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "nl_placeholder",
+      "label": "Placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_about",
+      "label": "About Text",
+      "default": "Premium Streetwear products. Quality you can trust."
+    },
+    {
+      "type": "header",
+      "content": "Custom Code"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom Liquid Code"
+    }
   ],
-  "presets": [{ "name": "CF Streetwear Landing" }]
+  "presets": [
+    {
+      "name": "CF Streetwear LP"
+    }
+  ]
 }
 {% endschema %}

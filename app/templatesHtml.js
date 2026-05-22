@@ -5416,4 +5416,2866 @@ footer{background:var(--dark);padding:70px 60px 36px;}
 <label style="display:none;">Dummy Label</label></body>
 </html>
 `,
+  "activewear": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BloomFit — Women's Activewear That Moves With You</title>
+<link rel="preconnect" href="https://fxts.google.com">
+<link href="https://fxts.google.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#FDF8F2;--dark:#1E1E1E;--terracotta:#D4734A;--blush:#F5D5C8;--sage:#8FA68B;--gray:#7A7A7A;--border:#ECDDD4;--light-bg:#FAF3EC;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--ivory);color:var(--dark);font-fxmily:'Outfit',sans-serif;font-size:16px;line-height:1.6;}
+
+/* PROMO BAR */
+.promo-bar{background:var(--terracotta);color:#fff;overflow:hidden;padding:10px 0;}
+.promo-inner{display:flex;gap:0;animation:slide 18s linear infinite;}
+.promo-item{white-space:nowrap;padding:0 60px;font-size:13px;font-weight:500;letter-spacing:.06em;}
+.promo-sep{opacity:.5;}
+@keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--ivory);border-bottom:1px solid var(--border);padding:16px 60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-fxmily:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--dark);text-decoration:none;letter-spacing:.02em;}
+.nav-logo span{color:var(--terracotta);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{color:var(--dark);text-decoration:none;font-size:14px;font-weight:400;opacity:.65;transition:opacity .2s;}
+.nav-links a:hover{opacity:1;}
+.nav-links .new-tag{background:var(--terracotta);color:#fff;font-size:9px;padding:2px 6px;border-radius:2px;margin-left:4px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-coins{background:var(--blush);color:var(--dark);padding:7px 14px;font-size:12px;font-weight:500;border-radius:20px;cursor:pointer;}
+.nav-cta{background:var(--dark);color:#fff;padding:10px 24px;font-size:13px;font-weight:500;border:none;cursor:pointer;border-radius:2px;transition:background .2s;}
+.nav-cta:hover{background:var(--terracotta);}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:5fr 4fr;min-height:88vh;background:var(--light-bg);}
+.hero-image{position:relative;overflow:hidden;order:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blush),#F0C5B0);}
+.hero-image-inner{width:68%;aspect-ratio:.65;background:linear-gradient(160deg,rgba(255,255,255,.4),rgba(255,255,255,.1));border-radius:50% 50% 40% 40%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border:1px solid rgba(255,255,255,.5);}
+.hero-image-inner p{font-fxmily:'Playfair Display',serif;font-size:18px;color:rgba(255,255,255,.8);text-align:center;line-height:1.4;}
+.hero-image-inner small{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6);text-transform:uppercase;}
+.hero-floating-tag{position:absolute;bottom:40px;left:40px;background:#fff;padding:14px 20px;border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,.08);}
+.floating-tag-top{font-size:11px;color:var(--gray);letter-spacing:.06em;margin-bottom:2px;}
+.floating-tag-val{font-size:16px;font-weight:600;color:var(--dark);}
+.floating-tag-val span{color:var(--terracotta);}
+
+.hero-content{display:flex;flex-direction:column;justify-content:center;padding:80px 80px 80px 60px;order:2;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:var(--blush);color:var(--terracotta);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;width:fit-content;}
+.hero-title{font-fxmily:'Playfair Display',serif;font-size:clamp(44px,5vw,68px);line-height:1.05;font-weight:700;margin-bottom:20px;}
+.hero-title em{font-style:italic;color:var(--terracotta);}
+.hero-sub{font-size:15px;color:var(--gray);line-height:1.8;max-width:420px;margin-bottom:32px;}
+.hero-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px;}
+.hero-feature{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dark);}
+.feature-check{width:20px;height:20px;background:var(--blush);color:var(--terracotta);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.hero-price{display:flex;align-items:baseline;gap:12px;margin-bottom:32px;}
+.price-main{font-size:36px;font-weight:600;}
+.price-del{font-size:18px;text-decoration:line-through;color:var(--gray);}
+.price-off{background:var(--sage);color:#fff;padding:4px 12px;font-size:12px;font-weight:600;border-radius:2px;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
+.btn-primary{background:var(--dark);color:#fff;padding:16px 44px;font-size:14px;font-weight:500;border:2px solid var(--dark);cursor:pointer;transition:all .25s;border-radius:2px;font-fxmily:'Outfit',sans-serif;}
+.btn-primary:hover{background:var(--terracotta);border-color:var(--terracotta);}
+.btn-outline{background:transparent;color:var(--dark);padding:16px 44px;font-size:14px;font-weight:500;border:2px solid var(--border);cursor:pointer;transition:all .25s;border-radius:2px;font-fxmily:'Outfit',sans-serif;}
+.btn-outline:hover{border-color:var(--dark);}
+.hero-social{display:flex;align-items:center;gap:12px;}
+.social-avatars{display:flex;}
+.avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--ivory);background:var(--blush);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--terracotta);}
+.avatar:first-child{margin-left:0;}
+.social-text{font-size:13px;color:var(--gray);}
+.social-text strong{color:var(--dark);}
+
+/* TRUST BAR */
+.trust-bar{background:var(--dark);padding:20px 60px;display:flex;justify-content:center;gap:0;}
+.tbi{padding:0 40px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.1);}
+.tbi:last-child{border-right:none;}
+.tbi-icon{font-size:18px;}
+.tbi-text{font-size:13px;color:rgba(255,255,255,.75);}
+.tbi-text strong{color:#fff;}
+
+/* SECTIONS */
+.section{padding:80px 60px;}
+.sec-kicker{font-size:12px;letter-spacing:.14em;color:var(--terracotta);text-transform:uppercase;font-weight:600;margin-bottom:12px;}
+.sec-title{font-fxmily:'Playfair Display',serif;font-size:clamp(36px,3.5vw,52px);line-height:1.1;font-weight:700;margin-bottom:14px;max-width:560px;}
+.sec-title em{font-style:italic;color:var(--terracotta);}
+.sec-body{font-size:15px;color:var(--gray);max-width:460px;line-height:1.8;margin-bottom:52px;}
+
+/* FABRIC SECTION */
+.fabric-section{background:var(--light-bg);padding:80px 60px;}
+.fabric-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.fabric-visual{background:linear-gradient(135deg,var(--blush),#EBC5B5);aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+.fabric-name{font-fxmily:'Playfair Display',serif;font-size:36px;color:var(--terracotta);}
+.fabric-sub{font-size:12px;letter-spacing:.14em;color:rgba(210,100,70,.8);text-transform:uppercase;}
+.fabric-props{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px;}
+.fabric-prop{padding:20px;background:#fff;border:1px solid var(--border);}
+.prop-icon{font-size:22px;margin-bottom:8px;}
+.prop-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+.prop-text{font-size:12px;color:var(--gray);}
+
+/* PRODUCTS GRID */
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.product-card{cursor:pointer;transition:transform .25s;}
+.product-card:hover{transform:translateY(-4px);}
+.product-img{aspect-ratio:.75;background:linear-gradient(135deg,var(--blush),#F0C0A8);border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.product-img-inner{text-align:center;padding:20px;}
+.product-img-name{font-fxmily:'Playfair Display',serif;font-size:20px;color:var(--terracotta);}
+.product-img-sub{font-size:11px;letter-spacing:.1em;color:rgba(210,100,70,.7);text-transform:uppercase;margin-top:4px;}
+.product-tag{position:absolute;top:12px;left:12px;background:var(--terracotta);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;letter-spacing:.08em;text-transform:uppercase;border-radius:2px;}
+.product-wishlist{position:absolute;top:12px;right:12px;width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.product-info{}
+.product-name{font-size:15px;font-weight:500;margin-bottom:4px;}
+.product-fab{font-size:12px;color:var(--gray);margin-bottom:10px;}
+.product-price{display:flex;align-items:center;gap:8px;}
+.product-price-main{font-size:18px;font-weight:600;}
+.product-price-del{font-size:13px;text-decoration:line-through;color:var(--gray);}
+.product-price-off{font-size:11px;color:var(--sage);font-weight:600;}
+.product-colors{display:flex;gap:6px;margin-top:10px;}
+.color-dot{width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .2s;}
+.color-dot.active,.color-dot:hover{border-color:var(--dark);}
+
+/* REVIEWS */
+.reviews-section{background:var(--light-bg);padding:80px 60px;}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.review-card{background:#fff;padding:28px;border-radius:4px;border:1px solid var(--border);}
+.review-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.reviewer-avatar{width:40px;height:40px;background:var(--blush);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.reviewer-name{font-size:14px;font-weight:600;}
+.reviewer-meta{font-size:12px;color:var(--gray);}
+.review-stars{color:var(--terracotta);font-size:13px;letter-spacing:1px;margin-bottom:10px;}
+.review-text{font-size:14px;color:#555;line-height:1.75;}
+.review-tag{display:inline-block;margin-top:12px;background:var(--blush);color:var(--terracotta);font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;}
+
+/* SIZE GUIDE */
+.size-guide{padding:80px 60px;}
+.size-table{width:100%;border-collapse:collapse;margin-top:40px;}
+.size-table th{background:var(--dark);color:#fff;padding:14px 20px;text-align:left;font-size:13px;letter-spacing:.06em;font-weight:500;}
+.size-table td{padding:14px 20px;font-size:14px;border-bottom:1px solid var(--border);}
+.size-table tr:hover td{background:var(--light-bg);}
+.size-highlight{background:var(--blush)!important;font-weight:600;}
+
+/* FAQ */
+.faq-section{background:var(--light-bg);padding:80px 60px;max-width:900px;margin:0 auto;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{padding:20px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:15px;font-weight:500;transition:color .2s;}
+.faq-q:hover{color:var(--terracotta);}
+.faq-icon{width:28px;height:28px;background:var(--blush);color:var(--terracotta);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .3s;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-a p{font-size:14px;color:var(--gray);line-height:1.8;padding-bottom:20px;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-item.open .faq-a{max-height:200px;}
+
+/* STICKY ATC */
+.sticky-atc{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid var(--border);padding:14px 60px;display:none;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.06);}
+.sticky-atc.visible{display:flex;}
+.sticky-left{}
+.sticky-name{font-size:15px;font-weight:600;}
+.sticky-price{font-size:13px;color:var(--gray);}
+.sticky-right{display:flex;gap:10px;align-items:center;}
+.sticky-size{background:var(--light-bg);border:1px solid var(--border);padding:10px 16px;font-size:13px;font-fxmily:'Outfit',sans-serif;cursor:pointer;border-radius:2px;}
+.sticky-btn{background:var(--dark);color:#fff;border:none;padding:12px 36px;font-size:14px;cursor:pointer;font-fxmily:'Outfit',sans-serif;font-weight:500;border-radius:2px;transition:background .2s;}
+.sticky-btn:hover{background:var(--terracotta);}
+
+/* FOOTER */
+footer{background:var(--dark);color:rgba(255,255,255,.6);padding:60px 60px 28px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:52px;margin-bottom:48px;}
+.footer-logo{font-fxmily:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;text-decoration:none;display:block;margin-bottom:14px;}
+.footer-logo span{color:var(--terracotta);}
+.footer-about{font-size:14px;line-height:1.75;max-width:280px;color:rgba(255,255,255,.5);}
+.footer-col h4{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.5);text-transform:uppercase;font-weight:600;margin-bottom:18px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.footer-col a:hover{color:#fff;}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;font-size:12px;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .section,.fabric-section,.reviews-section,.size-guide,.faq-section,footer{padding:60px 40px;}
+  nav{padding:14px 40px;}
+  .hero-content{padding:60px 40px;}
+  .trust-bar{padding:20px 40px;flex-wrap:wrap;gap:0;}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-image{min-height:300px;order:-1;}
+  .hero-content{padding:48px 24px;order:2;}
+  nav{padding:14px 24px;}
+  .nav-links{display:none;}
+  .trust-bar{padding:14px 24px;flex-wrap:wrap;}
+  .tbi{flex:0 0 100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.1);padding:10px 0;}
+  .section,.fabric-section,.reviews-section,.size-guide,.faq-section,footer{padding:48px 24px;}
+  .fabric-grid{grid-template-columns:1fr;gap:40px;}
+  .products-grid{grid-template-columns:1fr 1fr;gap:16px;}
+  .reviews-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .footer-grid>div:first-child{grid-column:1/-1;}
+  .footer-bottom{flex-direction:column;gap:8px;}
+  .sticky-atc{padding:12px 20px;}
+}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hero-pill{animation:fadeIn .5s ease both;}
+.hero-title{animation:fadeIn .5s ease .1s both;}
+.hero-sub{animation:fadeIn .5s ease .18s both;}
+.hero-features{animation:fadeIn .5s ease .25s both;}
+.hero-price{animation:fadeIn .5s ease .3s both;}
+.hero-cta{animation:fadeIn .5s ease .36s both;}
+.hero-social{animation:fadeIn .5s ease .42s both;}
+</style>
+  <meta name="description" content="Store preview">
+  <meta property="og:title" content="Store preview">
+  <meta property="og:description" content="Store preview">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/image.png">
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="promo-inner" id="promoInner">
+    <span class="promo-item">✦ Extra 10% off first order — code FIRSTBLISS</span>
+    <span class="promo-item">✦ Buy 2, save ₹150 — code BLISS150</span>
+    <span class="promo-item">✦ Buy 3, save ₹300 — code BLISS300</span>
+    <span class="promo-item">✦ Free shipping above ₹499</span>
+    <span class="promo-item">✦ Extra 10% off first order — code FIRSTBLISS</span>
+    <span class="promo-item">✦ Buy 2, save ₹150 — code BLISS150</span>
+    <span class="promo-item">✦ Buy 3, save ₹300 — code BLISS300</span>
+    <span class="promo-item">✦ Free shipping above ₹499</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a data-href="#" class="nav-logo">Bloom<span>Fit</span></a>
+  <ul class="nav-links">
+    <li><a data-href="#">Shop All</a></li>
+    <li><a data-href="#">Bestsellers</a></li>
+    <li><a data-href="#">New Launches <span class="new-tag">New</span></a></li>
+    <li><a data-href="#">Menswear</a></li>
+    <li><a data-href="#">Store Locator</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-coins">🪙 1,000 Coins</span>
+    <button class="nav-cta">Buy Now</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-image">
+    <div class="hero-image-inner">
+      <p>Ultimate<br>Flare Pants</p>
+      <small>Lite · EverFlow Fabric</small>
+    </div>
+    <div class="hero-floating-tag">
+      <div class="floating-tag-top">Rating</div>
+      <div class="floating-tag-val">★★★★★ <span>4.9</span></div>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-pill">🌸 Bestseller · 2,000+ Sold</div>
+    <h1 class="hero-title">Move in<br><em>Total</em><br>Freedom</h1>
+    <p class="hero-sub">The Ultimate Flare Pants — Lite Tall. Designed to flatter every body and move with you through yoga, brunch, and everything in between.</p>
+    <div class="hero-features">
+      <div class="hero-feature"><div class="feature-check">✓</div> EverFlow fabric — lightweight, stretchy, breathable</div>
+      <div class="hero-feature"><div class="feature-check">✓</div> Hidden back pocket — fits your phone</div>
+      <div class="hero-feature"><div class="feature-check">✓</div> High waist with tummy support panel</div>
+      <div class="hero-feature"><div class="feature-check">✓</div> Available in XS–3XL (inclusive sizing)</div>
+    </div>
+    <div class="hero-price">
+      <span class="price-main">₹1,999</span>
+      <span class="price-del">₹2,799</span>
+      <span class="price-off">29% OFF</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('shop-section').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+      <button class="btn-outline">View Size Guide</button>
+    </div>
+    <div class="hero-social">
+      <div class="social-avatars">
+        <div class="avatar">S</div>
+        <div class="avatar">P</div>
+        <div class="avatar">R</div>
+        <div class="avatar">+</div>
+      </div>
+      <div class="social-text"><strong>2,000+ women</strong> are wearing this right now</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="tbi"><span class="tbi-icon">🌸</span><span class="tbi-text"><strong>100k+</strong> Happy Women</span></div>
+  <div class="tbi"><span class="tbi-icon">🔄</span><span class="tbi-text"><strong>Easy</strong> Returns & Exchanges</span></div>
+  <div class="tbi"><span class="tbi-icon">💳</span><span class="tbi-text"><strong>COD</strong> Available</span></div>
+  <div class="tbi"><span class="tbi-icon">🚚</span><span class="tbi-text"><strong>Free</strong> Shipping ₹499+</span></div>
+</div>
+
+<!-- FABRIC SECTION -->
+<section class="fabric-section">
+  <div class="fabric-grid">
+    <div>
+      <div class="sec-kicker">Our Signature Fabric</div>
+      <h2 class="sec-title">Meet <em>EverFlow</em></h2>
+      <p class="sec-body">Designed in our BlissLabs, EverFlow is the result of years of testing. Lightweight like a second skin, stretchy in all directions, and buttery smooth against your body.</p>
+      <div class="fabric-props">
+        <div class="fabric-prop">
+          <div class="prop-icon">💧</div>
+          <div class="prop-name">Moisture Wicking</div>
+          <div class="prop-text">Pulls sweat away from skin instantly</div>
+        </div>
+        <div class="fabric-prop">
+          <div class="prop-icon">🌬️</div>
+          <div class="prop-name">4-Way Stretch</div>
+          <div class="prop-text">Moves in every direction with you</div>
+        </div>
+        <div class="fabric-prop">
+          <div class="prop-icon">🫧</div>
+          <div class="prop-name">Ultra Lightweight</div>
+          <div class="prop-text">You'll forget you're wearing it</div>
+        </div>
+        <div class="fabric-prop">
+          <div class="prop-icon">♾️</div>
+          <div class="prop-name">Shape Retention</div>
+          <div class="prop-text">Keeps its form wash after wash</div>
+        </div>
+      </div>
+    </div>
+    <div class="fabric-visual">
+      <div class="fabric-name">EverFlow</div>
+      <div class="fabric-sub">BlissClub Signature Fabric</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section" id="shop-section">
+  <div class="sec-kicker">Shop the Collection</div>
+  <h2 class="sec-title">Move in <em>Style</em></h2>
+  <p class="sec-body">From yoga to street, our flare collection is built for women who refuse to choose between comfort and confidence.</p>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#D4C5E8,#B8A8D8);">
+        <div class="product-img-inner">
+          <div class="product-img-name">Flare Pants</div>
+          <div class="product-img-sub">Lilac · EverFlow</div>
+        </div>
+        <div class="product-tag">Bestseller</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Ultimate Flare Pants — Lite</div>
+        <div class="product-fab">EverFlow · Lilac</div>
+        <div class="product-price">
+          <span class="product-price-main">₹1,999</span>
+          <span class="product-price-del">₹2,799</span>
+          <span class="product-price-off">29% off</span>
+        </div>
+        <div class="product-colors">
+          <div class="color-dot active" style="background:#C5B5D8;"></div>
+          <div class="color-dot" style="background:#D4734A;"></div>
+          <div class="color-dot" style="background:#2C2C2C;"></div>
+          <div class="color-dot" style="background:#8FA68B;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,var(--blush),#E5B5A0);">
+        <div class="product-img-inner">
+          <div class="product-img-name">Flare Pants</div>
+          <div class="product-img-sub">Tall · EverFlow</div>
+        </div>
+        <div class="product-tag">New</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Ultimate Flare Pants — Lite Tall</div>
+        <div class="product-fab">EverFlow · Blush Rose</div>
+        <div class="product-price">
+          <span class="product-price-main">₹1,999</span>
+          <span class="product-price-del">₹2,799</span>
+          <span class="product-price-off">29% off</span>
+        </div>
+        <div class="product-colors">
+          <div class="color-dot active" style="background:#F5D5C8;"></div>
+          <div class="color-dot" style="background:#C5B5D8;"></div>
+          <div class="color-dot" style="background:#2C2C2C;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#A8C4A8,#88A888);">
+        <div class="product-img-inner">
+          <div class="product-img-name">Flare Pants</div>
+          <div class="product-img-sub">Sage · CloudSoft</div>
+        </div>
+        <div class="product-tag">Trending</div>
+        <div class="product-wishlist">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Ultimate Flare Pants — CloudSoft</div>
+        <div class="product-fab">CloudSoft Float · Sage</div>
+        <div class="product-price">
+          <span class="product-price-main">₹2,199</span>
+          <span class="product-price-del">₹2,999</span>
+          <span class="product-price-off">27% off</span>
+        </div>
+        <div class="product-colors">
+          <div class="color-dot active" style="background:#8FA68B;"></div>
+          <div class="color-dot" style="background:#D4734A;"></div>
+          <div class="color-dot" style="background:#F5D5C8;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section">
+  <div class="sec-kicker">What Our Girls Say</div>
+  <h2 class="sec-title">Real Women,<br><em>Real Results</em></h2>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:40px;">
+    <div style="font-fxmily:'Playfair Display',serif;font-size:56px;font-weight:700;color:var(--dark);line-height:1;">4.9</div>
+    <div>
+      <div style="color:var(--terracotta);font-size:20px;letter-spacing:2px;">★★★★★</div>
+      <div style="font-size:13px;color:var(--gray);margin-top:4px;">Based on 3,200+ reviews</div>
+    </div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-header">
+        <div class="reviewer-avatar">S</div>
+        <div><div class="reviewer-name">Shreya K.</div><div class="reviewer-meta">Mumbai · XS</div></div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"These are the most comfortable pants I've ever worn to a yoga class AND then immediately to brunch. The EverFlow fabric is insane — zero restriction, zero sweat show."</p>
+      <span class="review-tag">Yoga + Everyday</span>
+    </div>
+    <div class="review-card">
+      <div class="review-header">
+        <div class="reviewer-avatar">P</div>
+        <div><div class="reviewer-name">Prachi M.</div><div class="reviewer-meta">Bangalore · M</div></div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Finally a brand that caters to tall women! The Tall fit is exactly right for my 5'9 frame. The flare falls perfectly at my ankle. Bought 3 colors already and honestly considering more."</p>
+      <span class="review-tag">Tall Fit ✓</span>
+    </div>
+    <div class="review-card">
+      <div class="review-header">
+        <div class="reviewer-avatar">R</div>
+        <div><div class="reviewer-name">Riya D.</div><div class="reviewer-meta">Pune · L</div></div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"The hidden pocket fits my entire phone. The waistband gives incredible tummy support without being uncomfortable. I wore this on a 6-hour flight and felt great the entire time."</p>
+      <span class="review-tag">Travel Approved</span>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<div class="faq-section" style="padding:80px 60px;">
+  <div class="sec-kicker" style="text-align:center">Questions?</div>
+  <h2 class="sec-title" style="text-align:center;max-width:100%;margin-bottom:48px;">Frequently Asked <em>Questions</em></h2>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">How does the sizing work? <div class="faq-icon">+</div></div>
+    <div class="faq-a"><p>We offer XS to 3XL. For the Lite Tall fit, it's designed for heights 5'7" and above. Our size guide on the product page includes detailed measurements. If you're between sizes, size up for a more relaxed fit.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Can I wear it for high-intensity workouts? <div class="faq-icon">+</div></div>
+    <div class="faq-a"><p>The EverFlow fabric is great for low to medium intensity — yoga, pilates, walking, travel, and everyday wear. For high-intensity like running or HIIT, we'd recommend our AirMelt or Aerocool range.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What is your return policy? <div class="faq-icon">+</div></div>
+    <div class="faq-a"><p>We offer 15-day returns and exchanges for all orders. Items must be unworn and in original packaging. Exchanges are processed within 3–5 business days. Returns are fully refunded within 7 business days.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Do you ship across India? <div class="faq-icon">+</div></div>
+    <div class="faq-a"><p>Yes! We ship pan-India. Orders are dispatched within 1–2 business days. Standard delivery takes 3–6 business days. Free shipping on orders above ₹499.</p></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a data-href="#" class="footer-logo">Bloom<span>Fit</span></a>
+      <p class="footer-about">Premium activewear for Indian women who move with intention. Built for comfort, designed for confidence.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a data-href="#">All Products</a></li>
+        <li><a data-href="#">Bestsellers</a></li>
+        <li><a data-href="#">New Launches</a></li>
+        <li><a data-href="#">Fabrics</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a data-href="#">Track Order</a></li>
+        <li><a data-href="#">Returns</a></li>
+        <li><a data-href="#">Size Guide</a></li>
+        <li><a data-href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Brand</h4>
+      <ul>
+        <li><a data-href="#">Our Story</a></li>
+        <li><a data-href="#">BlissLabs</a></li>
+        <li><a data-href="#">Instagram</a></li>
+        <li><a data-href="#">Loyalty Program</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 BloomFit. All rights reserved.</span>
+    <span>Made with 🧡 in India</span>
+  </div>
+</footer>
+
+<!-- STICKY ATC -->
+<div class="sticky-atc" id="stickyAtc">
+  <div class="sticky-left">
+    <div class="sticky-name">Ultimate Flare Pants — Lite Tall</div>
+    <div class="sticky-price">₹1,999 · <del style="color:var(--gray)">₹2,799</del> · Free Shipping</div>
+  </div>
+  <div class="sticky-right">
+    <label style="display:none">Form field</label><select class="sticky-size">
+      <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option>
+    </select>
+    <button class="sticky-btn">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+function toggleFaq(el){
+  const item=el.parentElement;
+  document.querySelectorAll('.faq-item.open').forEach(i=>{if(i!==item)i.classList.remove('open');});
+  item.classList.toggle('open');
+}
+
+const heroEl=document.querySelector('.hero');
+const stickyEl=document.getElementById('stickyAtc');
+if(heroEl&&stickyEl){
+  new IntersectionObserver(([e])=>{stickyEl.classList.toggle('visible',!e.isIntersecting);},{threshold:0}).observe(heroEl);
+}
+
+document.querySelectorAll('.product-card,.review-card,.fabric-prop').forEach((el,i)=>{
+  el.style.cssText+='opacity:0;transform:translateY(16px);transition:opacity .45s ease '+((i%3)*.1)+'s, transform .45s ease '+((i%3)*.1)+'s';
+  new IntersectionObserver(([e])=>{
+    if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='translateY(0)';}
+  },{threshold:.1}).observe(el);
+});
+</script>
+<label style="display:none;">Dummy Label</label></body>
+</html>
+`,
+  "streetwear": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URBNCO — New Drop: Marga Relaxed Pants</title>
+<link rel="preconnect" href="https://fxts.google.com">
+<link href="https://fxts.google.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--black:#080808;--white:#F5F5F0;--red:#E8292B;--gray:#888;--border:rgba(255,255,255,.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-fxmily:'Barlow',sans-serif;font-size:16px;line-height:1.5;}
+
+/* TICKER */
+.ticker{background:var(--red);padding:9px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;gap:0;animation:ticker 20s linear infinite;}
+.ticker-item{display:inline-flex;align-items:center;padding:0 40px;font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;}
+.ticker-dot{width:5px;height:5px;background:rgba(255,255,255,.5);border-radius:50%;margin-right:40px;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--black);border-bottom:1px solid var(--border);padding:18px 60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-fxmily:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:var(--white);text-decoration:none;}
+.nav-logo span{color:var(--red);}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--white);}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.nav-icon{color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;transition:color .2s;font-fxmily:'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;}
+.nav-icon:hover{color:var(--white);}
+.nav-cta{background:var(--red);color:var(--white);padding:10px 24px;font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:92vh;border-bottom:1px solid var(--border);}
+.hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:80px 60px 80px 80px;border-right:1px solid var(--border);position:relative;overflow:hidden;}
+.hero-left::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at bottom left, rgba(232,41,43,.08) 0%, transparent 60%);pointer-events:none;}
+.hero-category{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.hero-category::before{content:'';width:32px;height:1px;background:var(--red);}
+.hero-title{font-fxmily:'Bebas Neue',sans-serif;font-size:clamp(72px,8vw,120px);line-height:.92;letter-spacing:.02em;margin-bottom:24px;}
+.hero-title span{color:var(--red);}
+.hero-desc{font-size:15px;color:var(--gray);line-height:1.7;max-width:380px;margin-bottom:40px;}
+.hero-meta{display:flex;gap:40px;margin-bottom:40px;}
+.meta-item{}
+.meta-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:4px;}
+.meta-val{font-size:20px;font-weight:500;}
+.meta-val.price del{font-size:14px;color:var(--gray);margin-right:4px;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
+.btn-primary{background:var(--white);color:var(--black);padding:16px 44px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.btn-primary:hover{background:var(--red);color:var(--white);}
+.btn-ghost{background:transparent;color:var(--white);padding:16px 44px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;border:1px solid rgba(255,255,255,.3);cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--white);}
+.hero-drops{display:flex;align-items:center;gap:8px;}
+.drop-dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.drop-text{font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;}
+
+.hero-right{position:relative;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;}
+.hero-right::before{content:'MARGA';position:absolute;font-fxmily:'Bebas Neue',sans-serif;font-size:220px;color:rgba(255,255,255,.03);letter-spacing:-.02em;white-space:nowrap;user-select:none;}
+.product-frame{width:72%;aspect-ratio:.67;background:linear-gradient(170deg,#1a1a1a,#222);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;position:relative;}
+.product-frame-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.product-frame-name{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.1em;color:rgba(255,255,255,.5);}
+.product-tag{position:absolute;top:20px;right:20px;background:var(--red);color:var(--white);font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;padding:6px 12px;text-transform:uppercase;}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.stat{padding:28px 40px;border-right:1px solid var(--border);text-align:center;}
+.stat:last-child{border-right:none;}
+.stat-num{font-fxmily:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:.04em;line-height:1;color:var(--white);}
+.stat-num span{color:var(--red);}
+.stat-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-top:4px;}
+
+/* SECTION */
+.section{padding:80px 80px;}
+.sec-eyebrow{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.18em;color:var(--red);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.sec-eyebrow::before{content:'';width:24px;height:1px;background:var(--red);}
+.sec-title{font-fxmily:'Bebas Neue',sans-serif;font-size:clamp(52px,5vw,80px);line-height:.95;letter-spacing:.03em;margin-bottom:20px;}
+.sec-title span{color:var(--red);}
+.sec-body{font-size:15px;color:var(--gray);max-width:480px;line-height:1.75;margin-bottom:52px;}
+
+/* PRODUCT FEATURES */
+.features-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);}
+.feature-big{padding:48px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between;}
+.feature-big-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--red);text-transform:uppercase;margin-bottom:16px;}
+.feature-big-title{font-fxmily:'Bebas Neue',sans-serif;font-size:52px;line-height:.95;letter-spacing:.03em;margin-bottom:20px;}
+.feature-big-text{font-size:15px;color:var(--gray);line-height:1.7;}
+.feature-list{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
+.feature-item{padding:28px 32px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.feature-item:nth-child(even){border-right:none;}
+.feature-item:nth-last-child(-n+2){border-bottom:none;}
+.feature-num{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;color:var(--red);line-height:1;margin-bottom:8px;}
+.feature-title{font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.08em;font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.feature-text{font-size:13px;color:var(--gray);line-height:1.6;}
+
+/* SIZE + ATC */
+.atc-section{background:#0F0F0F;padding:80px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.atc-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.atc-product-name{font-fxmily:'Bebas Neue',sans-serif;font-size:56px;line-height:.95;letter-spacing:.03em;margin-bottom:8px;}
+.atc-product-sub{font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em;color:var(--gray);text-transform:uppercase;margin-bottom:32px;}
+.atc-price{font-size:32px;font-weight:500;margin-bottom:8px;}
+.atc-price del{font-size:18px;color:var(--gray);margin-right:8px;}
+.atc-save{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:32px;}
+.size-label{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:12px;}
+.size-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+.size-btn{width:54px;height:44px;background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white);font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.size-btn:hover,.size-btn.active{border-color:var(--white);background:var(--white);color:var(--black);}
+.size-btn.sold-out{opacity:.3;cursor:not-allowed;text-decoration:line-through;}
+.atc-actions{display:flex;gap:12px;}
+.atc-btn{flex:1;background:var(--white);color:var(--black);padding:18px;font-fxmily:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.14em;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.atc-btn:hover{background:var(--red);color:var(--white);}
+.atc-wish{width:56px;height:56px;background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.atc-wish:hover{border-color:var(--red);color:var(--red);}
+.atc-assurance{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap;}
+.assurance-item{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.08em;color:var(--gray);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+
+/* REVIEWS */
+.reviews{padding:80px;background:#0A0A0A;}
+.reviews-header{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:52px;align-items:center;}
+.rating-display{display:flex;align-items:baseline;gap:16px;}
+.rating-num{font-fxmily:'Bebas Neue',sans-serif;font-size:100px;line-height:.9;color:var(--white);}
+.rating-right{}
+.rating-stars{color:var(--red);font-size:22px;letter-spacing:2px;margin-bottom:4px;}
+.rating-count{font-fxmily:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.review-card{background:var(--black);padding:32px;}
+.review-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.review-stars{color:var(--red);font-size:12px;letter-spacing:2px;}
+.review-verified{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--red);text-transform:uppercase;}
+.review-text{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:20px;}
+.review-author{font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.review-author strong{color:var(--white);}
+
+/* FAQ */
+.faq-section{padding:80px;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{padding:22px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-fxmily:'Barlow Condensed',sans-serif;font-size:18px;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
+.faq-q:hover{color:var(--red);}
+.faq-icon{color:var(--red);font-size:24px;transition:transform .3s;user-select:none;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-a p{font-size:15px;color:var(--gray);line-height:1.8;padding-bottom:22px;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-item.open .faq-a{max-height:180px;}
+
+/* FOOTER */
+footer{background:#050505;border-top:1px solid var(--border);padding:56px 80px 28px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:48px;}
+.footer-logo{font-fxmily:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.12em;color:var(--white);text-decoration:none;display:block;margin-bottom:14px;}
+.footer-logo span{color:var(--red);}
+.footer-about{font-size:14px;color:var(--gray);line-height:1.7;max-width:260px;}
+.footer-col h4{font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:18px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{color:var(--gray);text-decoration:none;font-size:14px;transition:color .2s;}
+.footer-col a:hover{color:var(--white);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;font-fxmily:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.08em;color:var(--gray);text-transform:uppercase;}
+
+/* STICKY */
+.sticky-atc{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--black);border-top:1px solid var(--border);padding:14px 60px;display:none;align-items:center;justify-content:space-between;}
+.sticky-atc.visible{display:flex;}
+.sticky-product{font-fxmily:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;}
+.sticky-price{font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;color:var(--gray);margin-top:2px;}
+.sticky-btn{background:var(--red);color:var(--white);border:none;padding:13px 40px;font-fxmily:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .section,.atc-section,.reviews,.faq-section,footer{padding:60px 40px;}
+  nav{padding:16px 40px;}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-left{padding:48px 24px;border-right:none;border-bottom:1px solid var(--border);}
+  .hero-right{min-height:280px;order:-1;}
+  nav{padding:14px 24px;}
+  .nav-links{display:none;}
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .stat{border-bottom:1px solid var(--border);}
+  .stat:nth-child(even){border-right:none;}
+  .section,.atc-section,.reviews,.faq-section,footer{padding:48px 24px;}
+  .features-layout{grid-template-columns:1fr;}
+  .feature-big{border-right:none;border-bottom:1px solid var(--border);}
+  .atc-inner{grid-template-columns:1fr;gap:40px;}
+  .reviews-grid{grid-template-columns:1fr;gap:0;}
+  .reviews-header{grid-template-columns:1fr;gap:24px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .footer-grid>div:first-child{grid-column:1/-1;}
+  .footer-bottom{flex-direction:column;gap:8px;}
+  .sticky-atc{padding:12px 24px;}
+  .hero-title{font-size:clamp(60px,14vw,100px);}
+}
+
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+.hero-category,.hero-title,.hero-desc,.hero-meta,.hero-actions,.hero-drops{animation:slideInLeft .6s ease both;}
+.hero-category{animation-delay:.05s;}
+.hero-title{animation-delay:.1s;}
+.hero-desc{animation-delay:.2s;}
+.hero-meta{animation-delay:.28s;}
+.hero-actions{animation-delay:.35s;}
+.hero-drops{animation-delay:.42s;}
+.product-frame{animation:slideInRight .6s ease .1s both;}
+</style>
+  <meta name="description" content="Store preview">
+  <meta property="og:title" content="Store preview">
+  <meta property="og:description" content="Store preview">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/image.png">
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item">New Drop: The Vagabond Set <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Free Shipping Above ₹500 <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Made in India <span class="ticker-dot"></span></span>
+    <span class="ticker-item">100% Cotton Dobby <span class="ticker-dot"></span></span>
+    <span class="ticker-item">New Drop: The Vagabond Set <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Free Shipping Above ₹500 <span class="ticker-dot"></span></span>
+    <span class="ticker-item">Made in India <span class="ticker-dot"></span></span>
+    <span class="ticker-item">100% Cotton Dobby <span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a data-href="#" class="nav-logo">URB<span>N</span>CO</a>
+  <ul class="nav-links">
+    <li><a data-href="#">Clearance</a></li>
+    <li><a data-href="#">Headwear</a></li>
+    <li><a data-href="#">Clothing</a></li>
+    <li><a data-href="#">Accessories</a></li>
+    <li><a data-href="#">Collabs</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-icon">Search</span>
+    <span class="nav-icon">Cart (0)</span>
+    <button class="nav-cta">Buy Now</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-category">New Arrival</div>
+    <h1 class="hero-title">Marga<br><span>Relaxed</span><br>Pants</h1>
+    <p class="hero-desc">Cut from 100% cotton dobby in a wide, unhurried silhouette. Brown and white stripes woven with natural texture and depth. Goes everywhere.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Price</div>
+        <div class="meta-val price">₹1,650</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Fabric</div>
+        <div class="meta-val" style="font-size:16px">100% Cotton Dobby</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Origin</div>
+        <div class="meta-val" style="font-size:16px">Made in India</div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('atc-section').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+      <button class="btn-ghost">Size Guide</button>
+    </div>
+    <div class="hero-drops">
+      <span class="drop-dot"></span>
+      <span class="drop-text">Limited Stock — Selling Fast</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="product-frame">
+      <div class="product-frame-label">Brown + White</div>
+      <div class="product-frame-name">MARGA</div>
+      <div class="product-frame-label">Cotton Dobby Stripes</div>
+      <div class="product-tag">New Drop</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">100<span>%</span></div>
+    <div class="stat-label">Cotton Dobby</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">5<span>+</span></div>
+    <div class="stat-label">Sizes Available</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4.9<span>★</span></div>
+    <div class="stat-label">Avg. Rating</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">24<span>h</span></div>
+    <div class="stat-label">Fast Dispatch</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="sec-eyebrow">Product Details</div>
+  <h2 class="sec-title">Built for<br><span>Comfort</span></h2>
+  <div class="features-layout">
+    <div class="feature-big">
+      <div>
+        <div class="feature-big-label">The Fabric</div>
+        <div class="feature-big-title">100% Cotton<br>Dobby</div>
+        <div class="feature-big-text" style="color:var(--gray)">Handwoven with natural texture and depth. Breathable, durable, and effortlessly stylish. The kind of fabric that gets better with every wash.</div>
+      </div>
+      <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--border);">
+        <div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:14px;">Colorway</div>
+        <div style="display:flex;gap:10px;">
+          <div style="width:40px;height:40px;background:linear-gradient(135deg,#8B6914,#F5F5F0 50%);border:1px solid rgba(255,255,255,.2);"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-num">01</div>
+          <div class="feature-title">Relaxed Fit</div>
+          <div class="feature-text">Wide, unhurried silhouette. Full-length cut for an effortless look.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">02</div>
+          <div class="feature-title">Elasticated Waist</div>
+          <div class="feature-text">Comfort-first waistband. No zipper, pure ease of wear.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">03</div>
+          <div class="feature-title">Deep Side Pockets</div>
+          <div class="feature-text">Two deep pockets — because pockets should actually be pockets.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">04</div>
+          <div class="feature-title">Dobby Stripes</div>
+          <div class="feature-text">Woven-in texture. Not printed, not dyed — built into the fabric itself.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">05</div>
+          <div class="feature-title">Faux Fly Front</div>
+          <div class="feature-text">Clean front aesthetic with a tailored look. Simple, sharp, deliberate.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-num">06</div>
+          <div class="feature-title">Flag Label Detail</div>
+          <div class="feature-text">The signature UM flag on the hem. Subtle brand. Real identity.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATC SECTION -->
+<section class="atc-section" id="atc-section">
+  <div class="atc-inner">
+    <div>
+      <div class="atc-product-name">Marga<br>Relaxed Pants</div>
+      <div class="atc-product-sub">Brown + White · Cotton Dobby</div>
+      <div class="atc-price">₹1,650</div>
+      <div class="atc-save">Free Shipping Above ₹500</div>
+      <div class="size-label">Select Size</div>
+      <div class="size-grid">
+        <button class="size-btn">S/28</button>
+        <button class="size-btn active">M/30</button>
+        <button class="size-btn">L/32</button>
+        <button class="size-btn">XL/34</button>
+        <button class="size-btn sold-out">2XL/36</button>
+      </div>
+      <div class="atc-actions">
+        <button class="atc-btn">Add to Cart</button>
+        <button class="atc-wish">♡</button>
+      </div>
+      <div class="atc-assurance">
+        <span class="assurance-item">✓ Free Returns</span>
+        <span class="assurance-item">✓ COD Available</span>
+        <span class="assurance-item">✓ Made in India</span>
+      </div>
+    </div>
+    <div>
+      <div class="sec-eyebrow">Care Instructions</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px">🌊</span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Machine Wash</div><div style="font-size:13px;color:var(--gray);">Cold water, gentle cycle. Inside out.</div></div>
+        </div>
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px">🌤️</span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Line Dry</div><div style="font-size:13px;color:var(--gray);">Dry in shade. Do not tumble dry.</div></div>
+        </div>
+        <div style="padding:20px 24px;border:1px solid var(--border);display:flex;gap:16px;align-items:center;">
+          <span style="font-size:24px">🚫</span>
+          <div><div style="font-fxmily:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">No Bleach</div><div style="font-size:13px;color:var(--gray);">Avoid bleach and fabric softeners.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="reviews-header">
+    <div>
+      <div class="sec-eyebrow">Customer Love</div>
+      <h2 class="sec-title">What They're<br><span>Saying</span></h2>
+    </div>
+    <div class="rating-display">
+      <div class="rating-num">4.9</div>
+      <div class="rating-right">
+        <div class="rating-stars">★★★★★</div>
+        <div class="rating-count">Based on 312 Reviews</div>
+      </div>
+    </div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-verified">✓ Verified</div>
+      </div>
+      <p class="review-text">"Genuinely the most comfortable pair of pants I own. The cotton dobby fabric is insane — breathable, looks elevated, feels like nothing. Wore it to work and then to a dinner the same day."</p>
+      <div class="review-author"><strong>Rohan S.</strong> · Mumbai</div>
+    </div>
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-verified">✓ Verified</div>
+      </div>
+      <p class="review-text">"The fit is exactly what it says — relaxed without looking sloppy. The stripes are woven in, not printed, which gives it a premium handmade look. Ordered in all 5 sizes, gave them as gifts."</p>
+      <div class="review-author"><strong>Aditya P.</strong> · Delhi</div>
+    </div>
+    <div class="review-card">
+      <div class="review-head">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-verified">✓ Verified</div>
+      </div>
+      <p class="review-text">"Urban Monkey always delivers. The pockets are actually deep — phone, wallet, keys, all fit. The elastic waist makes it so easy. Perfect summer pants. Already on my 2nd pair."</p>
+      <div class="review-author"><strong>Karan T.</strong> · Bangalore</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="sec-eyebrow">Questions</div>
+  <h2 class="sec-title" style="max-width:600px;margin-bottom:40px">FAQ</h2>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What sizes are available? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Available in S/28, M/30, L/32, XL/34, and 2XL/36. The model in images is 6 feet tall wearing L. We recommend sizing up if you prefer an even more relaxed fit.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Is the fabric pre-washed? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Yes, the fabric is pre-washed before cutting. Minimal shrinkage expected. Machine wash cold, gentle cycle, line dry in shade for best results.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What is the return/exchange policy? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>We offer 7-day returns and exchanges for unworn items with original tags. Size exchanges are processed within 3–5 business days. Reach out to us on Instagram or email for quick support.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">How long does shipping take? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Orders are dispatched within 24 hours. Delivery takes 3–5 business days pan-India. Free shipping on orders above ₹500. Express delivery available at extra cost.</p></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a data-href="#" class="footer-logo">URB<span>N</span>CO</a>
+      <p class="footer-about">Indian streetwear crafted for the ones who move through the city with intention. Handwoven, made in India, built to last.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a data-href="#">New Arrivals</a></li>
+        <li><a data-href="#">Clothing</a></li>
+        <li><a data-href="#">Headwear</a></li>
+        <li><a data-href="#">Clearance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a data-href="#">Track Order</a></li>
+        <li><a data-href="#">Returns</a></li>
+        <li><a data-href="#">Size Guide</a></li>
+        <li><a data-href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Brand</h4>
+      <ul>
+        <li><a data-href="#">About Us</a></li>
+        <li><a data-href="#">Collabs</a></li>
+        <li><a data-href="#">Instagram</a></li>
+        <li><a data-href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 URBNCO. All rights reserved.</span>
+    <span>Made in India</span>
+  </div>
+</footer>
+
+<!-- STICKY ATC -->
+<div class="sticky-atc" id="stickyAtc">
+  <div>
+    <div class="sticky-product">Marga Relaxed Pants — M/30</div>
+    <div class="sticky-price">₹1,650 · Free Shipping</div>
+  </div>
+  <button class="sticky-btn">Add to Cart</button>
+</div>
+
+<script>
+function toggleFaq(el){
+  const item=el.parentElement;
+  document.querySelectorAll('.faq-item.open').forEach(i=>{if(i!==item)i.classList.remove('open');});
+  item.classList.toggle('open');
+}
+
+document.querySelectorAll('.size-btn:not(.sold-out)').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+const heroEl=document.querySelector('.hero');
+const stickyEl=document.getElementById('stickyAtc');
+if(heroEl&&stickyEl){
+  new IntersectionObserver(([e])=>{stickyEl.classList.toggle('visible',!e.isIntersecting);},{threshold:0}).observe(heroEl);
+}
+
+document.querySelectorAll('.feature-item,.review-card,.stat').forEach((el,i)=>{
+  el.style.cssText+='opacity:0;transform:translateY(14px);transition:opacity .45s ease '+((i%4)*.08)+'s, transform .45s ease '+((i%4)*.08)+'s';
+  new IntersectionObserver(([e])=>{
+    if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='translateY(0)';}
+  },{threshold:.1}).observe(el);
+});
+</script>
+<label style="display:none;">Dummy Label</label></body>
+</html>
+`,
+  "personal-care": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PureBody — India's First Whole-Body Deodorant Cream</title>
+<link rel="preconnect" href="https://fxts.google.com">
+<link href="https://fxts.google.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF8F4;--black:#1A1A1A;--gold:#B8903A;--gold-light:#E8C97A;--gray:#6B6B6B;--border:#E8E3DA;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--black);font-fxmily:'DM Sans',sans-serif;font-size:16px;line-height:1.6;}
+
+/* ANNOUNCEMENT BAR */
+.announcement{background:var(--black);color:var(--cream);text-align:center;padding:10px 16px;font-size:13px;letter-spacing:.08em;}
+.announcement span{color:var(--gold-light);}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--cream);border-bottom:1px solid var(--border);padding:18px 60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-fxmily:'Cormorant Garamond',serif;font-size:26px;font-weight:600;letter-spacing:.04em;color:var(--black);text-decoration:none;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{color:var(--black);text-decoration:none;font-size:13px;letter-spacing:.06em;opacity:.7;transition:opacity .2s;}
+.nav-links a:hover{opacity:1;}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-cart{font-size:13px;letter-spacing:.04em;cursor:pointer;opacity:.7;}
+.nav-cta{background:var(--black);color:var(--cream);padding:10px 24px;font-size:13px;letter-spacing:.08em;border:none;cursor:pointer;transition:background .2s;font-fxmily:'DM Sans',sans-serif;}
+.nav-cta:hover{background:var(--gold);}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:88vh;}
+.hero-content{display:flex;flex-direction:column;justify-content:center;padding:80px 60px 80px 80px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:#F0EBE1;padding:7px 16px;font-size:11px;letter-spacing:.12em;color:var(--gold);margin-bottom:28px;width:fit-content;text-transform:uppercase;}
+.hero-title{font-fxmily:'Cormorant Garamond',serif;font-size:clamp(52px,5.5vw,80px);line-height:1.02;font-weight:400;margin-bottom:22px;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--gray);line-height:1.8;max-width:400px;margin-bottom:36px;}
+.hero-price{display:flex;align-items:baseline;gap:12px;margin-bottom:32px;}
+.price-current{font-size:34px;font-weight:500;}
+.price-original{font-size:18px;text-decoration:line-through;color:var(--gray);}
+.price-badge{background:#F0F7EE;color:#2A6B2A;font-size:12px;padding:4px 12px;font-weight:500;letter-spacing:.04em;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;}
+.btn-primary{background:var(--black);color:var(--cream);padding:16px 44px;font-size:13px;letter-spacing:.1em;border:2px solid var(--black);cursor:pointer;transition:all .25s;font-fxmily:'DM Sans',sans-serif;text-transform:uppercase;}
+.btn-primary:hover{background:transparent;color:var(--black);}
+.btn-outline{background:transparent;color:var(--black);padding:16px 44px;font-size:13px;letter-spacing:.1em;border:2px solid var(--black);cursor:pointer;transition:all .25s;font-fxmily:'DM Sans',sans-serif;text-transform:uppercase;}
+.btn-outline:hover{background:var(--black);color:var(--cream);}
+.hero-trust{display:flex;gap:20px;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray);}
+.trust-dot{width:4px;height:4px;background:var(--gold);border-radius:50%;}
+
+.hero-image{background:#EDE8DF;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.product-mockup{display:flex;flex-direction:column;align-items:center;gap:24px;}
+.jar{width:160px;height:200px;background:linear-gradient(160deg,#E8C97A22,#B8903A33);border:1px solid #B8903A55;border-radius:50% 50% 40% 40% / 20% 20% 30% 30%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;box-shadow:0 24px 60px rgba(0,0,0,.1);}
+.jar-brand{font-fxmily:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:3px;}
+.jar-sub{font-size:9px;color:#999;letter-spacing:4px;text-transform:uppercase;}
+.jar-label{font-size:11px;color:var(--gray);letter-spacing:3px;text-transform:uppercase;}
+.hero-img-badge{position:absolute;top:40px;right:40px;background:var(--black);color:var(--cream);padding:12px 16px;font-size:12px;letter-spacing:.06em;text-align:center;line-height:1.4;}
+.hero-img-badge strong{display:block;font-size:18px;font-fxmily:'Cormorant Garamond',serif;}
+
+/* TRUST BAR */
+.trust-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:28px 80px;display:flex;}
+.tbi{flex:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:0 20px;border-right:1px solid var(--border);}
+.tbi:last-child{border-right:none;}
+.tbi-icon{font-size:24px;}
+.tbi-num{font-size:19px;font-weight:500;line-height:1.1;}
+.tbi-label{font-size:12px;color:var(--gray);letter-spacing:.04em;}
+
+/* SECTIONS */
+.section{padding:80px 80px;}
+.sec-label{font-size:11px;letter-spacing:.15em;color:var(--gold);margin-bottom:16px;text-transform:uppercase;}
+.sec-title{font-fxmily:'Cormorant Garamond',serif;font-size:clamp(36px,3.5vw,52px);font-weight:400;line-height:1.08;margin-bottom:16px;max-width:560px;}
+.sec-title em{font-style:italic;color:var(--gold);}
+.sec-sub{font-size:15px;color:var(--gray);max-width:480px;line-height:1.8;margin-bottom:56px;}
+
+/* BENEFITS */
+.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);}
+.benefit-card{background:var(--cream);padding:40px 32px;transition:background .3s;}
+.benefit-card:hover{background:#F5EFE6;}
+.benefit-icon{font-size:26px;margin-bottom:18px;}
+.benefit-title{font-size:16px;font-weight:500;margin-bottom:10px;letter-spacing:.01em;}
+.benefit-text{font-size:14px;color:var(--gray);line-height:1.75;}
+
+/* BUNDLES */
+.bundles{background:#F2EDE4;padding:80px;}
+.bundles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
+.bundle-card{background:var(--cream);padding:36px 32px;border:2px solid transparent;cursor:pointer;transition:all .2s;position:relative;}
+.bundle-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+.bundle-card.popular{border-color:var(--gold);}
+.popular-tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:white;font-size:10px;padding:5px 20px;letter-spacing:.12em;white-space:nowrap;text-transform:uppercase;}
+.bundle-scent{font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
+.bundle-name{font-fxmily:'Cormorant Garamond',serif;font-size:22px;margin-bottom:4px;}
+.bundle-price{font-size:30px;font-weight:500;margin-top:16px;margin-bottom:4px;}
+.bundle-original{font-size:13px;text-decoration:line-through;color:var(--gray);}
+.bundle-save{font-size:13px;color:#2A6B2A;font-weight:500;margin-bottom:24px;}
+.bundle-features{display:flex;flex-direction:column;gap:6px;margin-bottom:28px;}
+.bundle-feature{font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px;}
+.bundle-feature::before{content:'✓';color:var(--gold);font-weight:600;}
+.bundle-btn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-size:13px;letter-spacing:.1em;cursor:pointer;font-fxmily:'DM Sans',sans-serif;transition:background .2s;text-transform:uppercase;}
+.bundle-btn:hover{background:var(--gold);}
+.bundle-card.popular .bundle-btn{background:var(--gold);}
+
+/* REVIEWS */
+.reviews{padding:80px;}
+.reviews-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:52px;}
+.rating-big{font-fxmily:'Cormorant Garamond',serif;font-size:80px;font-weight:300;line-height:1;color:var(--black);}
+.rating-stars{font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:4px;}
+.rating-count{font-size:13px;color:var(--gray);}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.review-card{padding:32px;border:1px solid var(--border);position:relative;}
+.review-stars{font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;}
+.review-text{font-size:15px;line-height:1.75;margin-bottom:18px;font-style:italic;color:#333;}
+.review-author{font-size:13px;color:var(--gray);}
+.review-author strong{color:var(--black);}
+.review-verified{display:inline-block;margin-top:6px;font-size:11px;color:var(--gold);letter-spacing:.06em;}
+
+/* HOW TO USE */
+.how-to{background:var(--black);color:var(--cream);padding:80px;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border:1px solid rgba(255,255,255,.1);}
+.step{padding:40px 32px;border-right:1px solid rgba(255,255,255,.1);}
+.step:last-child{border-right:none;}
+.step-num{font-fxmily:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:rgba(255,255,255,.15);line-height:1;margin-bottom:20px;}
+.step-title{font-size:16px;font-weight:500;margin-bottom:10px;letter-spacing:.02em;}
+.step-text{font-size:14px;color:rgba(255,255,255,.55);line-height:1.75;}
+
+/* FAQ */
+.faq-wrap{padding:80px;max-width:760px;margin:0 auto;}
+.faq-head{text-align:center;margin-bottom:56px;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{padding:22px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:16px;font-weight:400;transition:color .2s;}
+.faq-q:hover{color:var(--gold);}
+.faq-icon{font-size:22px;color:var(--gold);transition:transform .3s;user-select:none;line-height:1;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-a p{font-size:15px;color:var(--gray);line-height:1.8;padding-bottom:22px;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-item.open .faq-a{max-height:200px;}
+
+/* FINAL CTA */
+.final-cta{background:var(--black);color:var(--cream);padding:80px;text-align:center;}
+.final-cta .sec-title{color:var(--cream);max-width:100%;margin:0 auto 16px;}
+.final-cta p{color:rgba(255,255,255,.6);font-size:15px;max-width:480px;margin:0 auto 40px;}
+.final-cta .btn-primary{border-color:var(--gold);background:var(--gold);color:var(--black);}
+.final-cta .btn-primary:hover{background:transparent;color:var(--gold);}
+
+/* STICKY ATC */
+.sticky-atc{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--black);color:var(--cream);padding:14px 40px;display:none;align-items:center;justify-content:space-between;border-top:2px solid var(--gold);}
+.sticky-atc.visible{display:flex;}
+.sticky-left{display:flex;flex-direction:column;}
+.sticky-name{font-size:14px;font-weight:500;}
+.sticky-price{font-size:12px;color:rgba(255,255,255,.5);}
+.sticky-btn{background:var(--gold);color:var(--black);border:none;padding:12px 36px;font-size:13px;letter-spacing:.1em;cursor:pointer;font-fxmily:'DM Sans',sans-serif;font-weight:600;text-transform:uppercase;}
+
+/* FOOTER */
+footer{background:#111;color:rgba(255,255,255,.5);padding:60px 80px 28px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:48px;}
+.footer-logo{font-fxmily:'Cormorant Garamond',serif;font-size:26px;color:#fff;margin-bottom:14px;display:block;text-decoration:none;}
+.footer-about{font-size:14px;line-height:1.7;max-width:280px;}
+.footer-col h4{color:rgba(255,255,255,.9);font-size:11px;letter-spacing:.12em;margin-bottom:20px;text-transform:uppercase;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col ul a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.footer-col ul a:hover{color:#fff;}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:24px;display:flex;justify-content:space-between;font-size:12px;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .section,.bundles,.reviews,.how-to,.final-cta,footer{padding:60px 40px;}
+  nav{padding:16px 40px;}
+  .hero-content{padding:60px 40px;}
+  .trust-bar{padding:24px 40px;}
+  .faq-wrap{padding:60px 40px;}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-content{padding:48px 24px;}
+  .hero-image{min-height:320px;order:-1;}
+  nav{padding:14px 24px;}
+  .nav-links{display:none;}
+  .trust-bar{padding:16px 24px;flex-wrap:wrap;}
+  .tbi{flex:0 0 50%;border-right:none;border-bottom:1px solid var(--border);padding:12px 0;}
+  .tbi:nth-child(3),.tbi:nth-child(4){border-bottom:none;}
+  .section,.bundles,.reviews,.final-cta,footer{padding:48px 24px;}
+  .how-to{padding:48px 24px;}
+  .benefits-grid{grid-template-columns:1fr;gap:0;}
+  .bundles-grid{grid-template-columns:1fr;}
+  .reviews-grid{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr 1fr;border:none;gap:0;}
+  .step{border:1px solid rgba(255,255,255,.1);padding:28px 20px;}
+  .reviews-top{flex-direction:column;gap:20px;align-items:flex-start;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .footer-grid>div:first-child{grid-column:1/-1;}
+  .footer-bottom{flex-direction:column;gap:6px;}
+  .sticky-atc{padding:12px 20px;}
+  .faq-wrap{padding:48px 24px;}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.hero-badge{animation:fadeUp .5s ease both;}
+.hero-title{animation:fadeUp .5s ease .1s both;}
+.hero-sub{animation:fadeUp .5s ease .2s both;}
+.hero-price{animation:fadeUp .5s ease .25s both;}
+.hero-cta{animation:fadeUp .5s ease .3s both;}
+.hero-trust{animation:fadeUp .5s ease .4s both;}
+</style>
+  <meta name="description" content="Store preview">
+  <meta property="og:title" content="Store preview">
+  <meta property="og:description" content="Store preview">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/image.png">
+</head>
+<body>
+
+<div class="announcement">
+  🌿 As Seen on <span>Shark Tank India</span> &nbsp;·&nbsp; Free Shipping Above ₹499 &nbsp;·&nbsp; Use code <span>FRESH10</span> for 10% Off
+</div>
+
+<nav>
+  <a data-href="#" class="nav-logo">PureBody</a>
+  <ul class="nav-links">
+    <li><a data-href="#">Shop</a></li>
+    <li><a data-href="#">Ingredients</a></li>
+    <li><a data-href="#">Reviews</a></li>
+    <li><a data-href="#">Our Story</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-cart">🛒 Cart (0)</span>
+    <button class="nav-cta" onclick="document.getElementById('bundles').scrollIntoView({behavior:'smooth'})">Buy Now</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">★ First Time In India</div>
+    <h1 class="hero-title">Stay <em>Fresh</em><br>From Head<br>to Toe</h1>
+    <p class="hero-sub">India's first whole-body deodorant cream. Long-lasting odour control with natural ingredients that nourish your skin — 24 hours, every day.</p>
+    <div class="hero-price">
+      <span class="price-current">₹799</span>
+      <span class="price-original">₹1,198</span>
+      <span class="price-badge">SAVE 34%</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('bundles').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+      <button class="btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">How It Works</button>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-item">⭐ 4.8 Rating</span>
+      <span class="trust-dot"></span>
+      <span class="trust-item">10,000+ Happy Customers</span>
+      <span class="trust-dot"></span>
+      <span class="trust-item">Dermat Tested</span>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="product-mockup">
+      <div class="jar">
+        <div class="jar-brand">PureBody</div>
+        <div class="jar-sub">Deodorant Cream</div>
+      </div>
+      <div class="jar-label">Heart Rush · Honey Oudh</div>
+    </div>
+    <div class="hero-img-badge">
+      <strong>10,217+</strong>
+      Units Sold
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="tbi">
+    <span class="tbi-icon">⭐</span>
+    <div><div class="tbi-num">4,287+</div><div class="tbi-label">5-Star Reviews</div></div>
+  </div>
+  <div class="tbi">
+    <span class="tbi-icon">📦</span>
+    <div><div class="tbi-num">10,217+</div><div class="tbi-label">Units Sold</div></div>
+  </div>
+  <div class="tbi">
+    <span class="tbi-icon">🌿</span>
+    <div><div class="tbi-num">100%</div><div class="tbi-label">Natural Ingredients</div></div>
+  </div>
+  <div class="tbi">
+    <span class="tbi-icon">🚀</span>
+    <div><div class="tbi-num">Free</div><div class="tbi-label">Fast Shipping</div></div>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<section class="section">
+  <div class="sec-label">Why PureBody</div>
+  <h2 class="sec-title">Every Benefit,<br><em>Zero Compromise</em></h2>
+  <p class="sec-sub">Formulated with care, tested with love. Here's what makes PureBody unlike anything you've used before.</p>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">🕐</div>
+      <div class="benefit-title">All-Day Odour Control</div>
+      <div class="benefit-text">Our formula eliminates odour-causing bacteria and keeps you fresh for 24+ hours. No midday reapplication, no awkward moments.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">✨</div>
+      <div class="benefit-title">Brightens Underarms</div>
+      <div class="benefit-text">Active botanicals reduce dark spots and visibly brighten over time. Freshness that looks as good as it feels.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🌸</div>
+      <div class="benefit-title">Soothes & Nourishes</div>
+      <div class="benefit-text">Enriched with Aloe Vera, Vitamin E and Shea Butter. No alcohol, no parabens. Gentle on every skin type.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🧴</div>
+      <div class="benefit-title">Whole-Body Use</div>
+      <div class="benefit-text">Underarms, neck, inner thighs, feet — anywhere you need freshness. India's first truly head-to-toe solution.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">♻️</div>
+      <div class="benefit-title">Natural & Safe</div>
+      <div class="benefit-text">Dermatologist-tested, cruelty-free, plant-based actives. Safe for all genders, all skin types, all year round.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🌺</div>
+      <div class="benefit-title">Luxurious Fragrance</div>
+      <div class="benefit-text">Two signature scents — Heart Rush (floral, fresh) and Honey Oudh (warm, oriental). Choose your mood, own your day.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BUNDLES -->
+<section class="bundles" id="bundles">
+  <div class="sec-label">Buy More, Save More</div>
+  <h2 class="sec-title">Choose Your <em>Bundle</em></h2>
+  <div class="bundles-grid">
+    <div class="bundle-card">
+      <div class="bundle-scent">Heart Rush</div>
+      <div class="bundle-name">Pack of 2</div>
+      <div class="bundle-price">₹799</div>
+      <div class="bundle-original">MRP ₹1,198</div>
+      <div class="bundle-save">You save ₹399 (34% off)</div>
+      <div class="bundle-features">
+        <div class="bundle-feature">2 × Heart Rush Cream (30g each)</div>
+        <div class="bundle-feature">Free standard shipping</div>
+        <div class="bundle-feature">Extra 5% off on prepaid</div>
+      </div>
+      <button class="bundle-btn">Add to Cart</button>
+    </div>
+    <div class="bundle-card popular">
+      <div class="popular-tag">Most Popular</div>
+      <div class="bundle-scent">Heart Rush + Honey Oudh</div>
+      <div class="bundle-name">The Combo</div>
+      <div class="bundle-price">₹799</div>
+      <div class="bundle-original">MRP ₹1,198</div>
+      <div class="bundle-save">You save ₹399 (34% off)</div>
+      <div class="bundle-features">
+        <div class="bundle-feature">1 × Heart Rush + 1 × Honey Oudh</div>
+        <div class="bundle-feature">Free express shipping</div>
+        <div class="bundle-feature">Extra 5% off on prepaid</div>
+      </div>
+      <button class="bundle-btn">Add to Cart</button>
+    </div>
+    <div class="bundle-card">
+      <div class="bundle-scent">Honey Oudh</div>
+      <div class="bundle-name">Pack of 3</div>
+      <div class="bundle-price">₹1,099</div>
+      <div class="bundle-original">MRP ₹1,797</div>
+      <div class="bundle-save">You save ₹698 (39% off)</div>
+      <div class="bundle-features">
+        <div class="bundle-feature">3 × Honey Oudh Cream (30g each)</div>
+        <div class="bundle-feature">Free priority shipping</div>
+        <div class="bundle-feature">Extra 5% off on prepaid</div>
+      </div>
+      <button class="bundle-btn">Add to Cart</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO USE -->
+<section class="how-to" id="how-it-works">
+  <div class="sec-label" style="color:var(--gold-light)">Simple Routine</div>
+  <h2 class="sec-title" style="color:#fff;max-width:100%">Works in <em style="color:var(--gold-light)">4 Easy Steps</em></h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Cleanse</div>
+      <div class="step-text">Shower and pat your skin completely dry. Best applied fresh for maximum effect.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Take a Pea</div>
+      <div class="step-text">Scoop a pea-sized amount. A little goes a very long way — don't over-apply.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Apply & Rub</div>
+      <div class="step-text">Massage gently into underarms, neck, or any desired area until fully absorbed.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Stay Fresh</div>
+      <div class="step-text">Go about your day with total confidence. PureBody works all day so you don't have to think about it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="reviews-top">
+    <div>
+      <div class="sec-label">Real Reviews</div>
+      <h2 class="sec-title">What Our <em>Customers</em> Say</h2>
+    </div>
+    <div style="text-align:right">
+      <div class="rating-big">4.8</div>
+      <div class="rating-stars">★★★★★</div>
+      <div class="rating-count">Based on 4,287 verified reviews</div>
+    </div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Best fragrance & best product. Very good if your body smells bad! I apply it near my thigh area and underarms. Works all day. I don't even use perfume anymore."</p>
+      <div class="review-author"><strong>Ojasvi R.</strong> · Mumbai</div>
+      <div class="review-verified">✓ Verified Buyer</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"I was skeptical but this is genuinely the first deodorant that works in India's heat. The Honey Oudh scent is divine — rich, warm, long-lasting. Ordered 3 more jars."</p>
+      <div class="review-author"><strong>Priya M.</strong> · Bangalore</div>
+      <div class="review-verified">✓ Verified Buyer</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"My underarms are noticeably lighter after 3 weeks. The formula is smooth, non-sticky, absorbs in seconds. On my 4th repurchase and won't stop anytime soon."</p>
+      <div class="review-author"><strong>Arjun K.</strong> · Delhi</div>
+      <div class="review-verified">✓ Verified Buyer</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<div class="faq-wrap">
+  <div class="faq-head">
+    <div class="sec-label" style="text-align:center">FAQ</div>
+    <h2 class="sec-title" style="text-align:center;max-width:100%">Frequently Asked <em>Questions</em></h2>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Is PureBody safe for sensitive skin? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Yes! PureBody is dermatologist-tested, free from alcohol, parabens and sulphates. Safe for all skin types including sensitive skin. We recommend a 24-hour patch test before full application.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Can I use it on areas other than underarms? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Absolutely — PureBody is designed for whole-body use. Apply it to underarms, neck, inner thighs, feet, and anywhere you need odour control. That's what makes it India's first whole-body deodorant.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">How long does one jar last? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Each 30g jar lasts 30–45 days with daily use since only a pea-sized amount is needed per application. The Pack of 3 typically lasts 3–4 months.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">What are the delivery timelines? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>We ship pan-India within 1–2 business days. Standard delivery takes 3–5 business days. Free shipping on all orders above ₹499. Express delivery available at checkout.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Do you offer Cash on Delivery? <span class="faq-icon">+</span></div>
+    <div class="faq-a"><p>Yes, COD is available across India. Get an extra 5% off on prepaid orders — applied automatically at checkout.</p></div>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="sec-label" style="color:var(--gold-light);text-align:center">Ready to feel fresh?</div>
+  <h2 class="sec-title">Your Best Smell is<br><em style="color:var(--gold-light)">One Click Away</em></h2>
+  <p>Join 10,000+ Indians who've switched to PureBody. 30-day money-back guarantee. Free shipping above ₹499.</p>
+  <button class="btn-primary" onclick="document.getElementById('bundles').scrollIntoView({behavior:'smooth'})">Shop Now — Save 34%</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a data-href="#" class="footer-logo">PureBody</a>
+      <p class="footer-about">India's first whole-body deodorant cream. Smell fresh, feel confident, every single day — naturally.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a data-href="#">Heart Rush</a></li>
+        <li><a data-href="#">Honey Oudh</a></li>
+        <li><a data-href="#">Combo Packs</a></li>
+        <li><a data-href="#">New Arrivals</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a data-href="#">Track Order</a></li>
+        <li><a data-href="#">Returns</a></li>
+        <li><a data-href="#">FAQ</a></li>
+        <li><a data-href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a data-href="#">Our Story</a></li>
+        <li><a data-href="#">Ingredients</a></li>
+        <li><a data-href="#">Press</a></li>
+        <li><a data-href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PureBody. All rights reserved.</span>
+    <span>Made with ❤️ in India</span>
+  </div>
+</footer>
+
+<!-- STICKY ATC -->
+<div class="sticky-atc" id="stickyAtc">
+  <div class="sticky-left">
+    <span class="sticky-name">PureBody Deodorant Cream — Combo</span>
+    <span class="sticky-price">₹799 · Free Shipping · Save 34%</span>
+  </div>
+  <button class="sticky-btn">Add to Cart</button>
+</div>
+
+<script>
+function toggleFaq(el){
+  const item=el.parentElement;
+  document.querySelectorAll('.faq-item.open').forEach(i=>{if(i!==item){i.classList.remove('open');}});
+  item.classList.toggle('open');
+}
+
+// Sticky ATC visibility
+const heroEl=document.querySelector('.hero');
+const stickyEl=document.getElementById('stickyAtc');
+if(heroEl&&stickyEl){
+  const obs=new IntersectionObserver(([e])=>{stickyEl.classList.toggle('visible',!e.isIntersecting);},{threshold:0});
+  obs.observe(heroEl);
+}
+
+// Scroll reveal
+document.querySelectorAll('.benefit-card,.bundle-card,.review-card,.step').forEach((el,i)=>{
+  el.style.cssText+='opacity:0;transform:translateY(18px);transition:opacity .5s ease '+((i%3)*0.1)+'s, transform .5s ease '+((i%3)*0.1)+'s, border-color .3s, background .3s';
+  new IntersectionObserver(([e])=>{
+    if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='translateY(0)';}
+  },{threshold:.1}).observe(el);
+});
+</script>
+<label style="display:none;">Dummy Label</label></body>
+</html>
+`,
+  "mens-fashion": `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRIP — Men's Fashion That Hits Different</title>
+<link rel="preconnect" href="https://fxts.google.com">
+<link href="https://fxts.google.com/css2?family=Syne:wght@400;500;600;700;800&family=Nunito:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--white:#FAFAFA;--black:#111111;--yellow:#FFB800;--mid:#F0F0F0;--gray:#888;--border:#E4E4E4;--dark-bg:#0E0E0E;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--white);color:var(--black);font-fxmily:'Nunito',sans-serif;font-size:16px;line-height:1.6;}
+
+/* PROMO BAR */
+.promo-bar{background:var(--yellow);padding:9px 16px;overflow:hidden;}
+.promo-inner{display:flex;gap:0;animation:slide 16s linear infinite;white-space:nowrap;}
+.promo-item{display:inline-flex;align-items:center;gap:4px;padding:0 48px;font-fxmily:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black);}
+@keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border);padding:16px 60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-fxmily:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--black);text-decoration:none;letter-spacing:-.01em;}
+.nav-logo span{color:var(--yellow);}
+.nav-links{display:flex;gap:24px;list-style:none;}
+.nav-links a{color:var(--black);text-decoration:none;font-size:14px;font-weight:500;opacity:.6;transition:opacity .2s;font-fxmily:'Syne',sans-serif;letter-spacing:.02em;}
+.nav-links a:hover{opacity:1;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-search{background:var(--mid);border:none;padding:9px 16px;font-fxmily:'Nunito',sans-serif;font-size:13px;color:var(--black);cursor:pointer;border-radius:20px;}
+.nav-cart{background:var(--black);color:var(--white);padding:10px 20px;font-fxmily:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;border:none;cursor:pointer;border-radius:2px;transition:all .2s;}
+.nav-cart:hover{background:var(--yellow);color:var(--black);}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:90vh;background:var(--white);}
+.hero-content{display:flex;flex-direction:column;justify-content:center;padding:80px 60px 80px 80px;}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.eyebrow-badge{background:var(--yellow);color:var(--black);font-fxmily:'Syne',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:.1em;text-transform:uppercase;}
+.eyebrow-text{font-fxmily:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.hero-title{font-fxmily:'Syne',sans-serif;font-size:clamp(52px,5.5vw,80px);font-weight:800;line-height:.95;letter-spacing:-.02em;margin-bottom:20px;}
+.hero-title .highlight{color:var(--yellow);display:block;}
+.hero-title .outline{-webkit-text-stroke:2px var(--black);color:transparent;display:block;}
+.hero-sub{font-size:15px;color:var(--gray);line-height:1.75;max-width:400px;margin-bottom:32px;}
+.hero-offers{background:var(--mid);padding:20px 24px;margin-bottom:32px;border-radius:4px;}
+.hero-offers-title{font-fxmily:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;margin-bottom:12px;}
+.offer-list{display:flex;flex-direction:column;gap:8px;}
+.offer-item{display:flex;align-items:center;gap:10px;font-size:13px;}
+.offer-badge{background:var(--yellow);color:var(--black);font-fxmily:'Syne',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.offer-text{color:var(--black);}
+.offer-code{font-fxmily:'Syne',sans-serif;font-weight:700;color:var(--black);}
+.hero-price{display:flex;align-items:baseline;gap:12px;margin-bottom:28px;}
+.price-main{font-fxmily:'Syne',sans-serif;font-size:36px;font-weight:800;}
+.price-del{font-size:18px;text-decoration:line-through;color:var(--gray);}
+.price-off{background:var(--yellow);color:var(--black);font-fxmily:'Syne',sans-serif;font-size:12px;font-weight:700;padding:4px 12px;}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+.btn-primary{background:var(--black);color:var(--white);padding:16px 44px;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;border:2px solid var(--black);cursor:pointer;border-radius:2px;transition:all .2s;text-transform:uppercase;}
+.btn-primary:hover{background:var(--yellow);color:var(--black);border-color:var(--yellow);}
+.btn-outline{background:transparent;color:var(--black);padding:16px 44px;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;border:2px solid var(--border);cursor:pointer;border-radius:2px;transition:all .2s;text-transform:uppercase;}
+.btn-outline:hover{border-color:var(--black);}
+.hero-trust{display:flex;gap:20px;flex-wrap:wrap;}
+.trust-chip{background:var(--mid);padding:7px 14px;font-size:12px;font-weight:600;font-fxmily:'Syne',sans-serif;color:var(--black);border-radius:20px;display:flex;align-items:center;gap:6px;}
+
+.hero-right{background:var(--mid);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.hero-right::before{content:'DRIP';position:absolute;font-fxmily:'Syne',sans-serif;font-size:200px;font-weight:800;color:rgba(0,0,0,.04);letter-spacing:-.04em;user-select:none;white-space:nowrap;}
+.product-card-hero{background:var(--white);width:65%;max-width:280px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.08);border-radius:4px;position:relative;}
+.product-card-hero-img{background:linear-gradient(135deg,#F5EDD8,#F0E5C8);aspect-ratio:.75;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;margin-bottom:16px;}
+.card-img-text{font-fxmily:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--black);}
+.card-img-sub{font-size:11px;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;}
+.new-arrival-badge{position:absolute;top:12px;right:12px;background:var(--yellow);color:var(--black);font-fxmily:'Syne',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:.08em;text-transform:uppercase;}
+.card-name{font-fxmily:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--gray);margin-bottom:12px;}
+.card-price{font-fxmily:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--black);}
+.card-del{font-size:14px;text-decoration:line-through;color:var(--gray);margin-left:4px;font-weight:400;}
+.card-save{font-size:11px;color:#2A6B2A;font-weight:600;margin-top:2px;}
+
+/* TRUST BAR */
+.trust-bar{background:var(--black);padding:20px 60px;display:flex;justify-content:center;}
+.tbi{padding:0 40px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.1);}
+.tbi:last-child{border-right:none;}
+.tbi-icon{font-size:18px;}
+.tbi-text{font-size:13px;color:rgba(255,255,255,.6);}
+.tbi-text strong{color:var(--white);}
+
+/* SECTIONS */
+.section{padding:72px 60px;}
+.sec-eyebrow{font-fxmily:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--yellow);text-transform:uppercase;margin-bottom:12px;background:var(--yellow);display:inline-block;padding:4px 12px;color:var(--black);}
+.sec-title{font-fxmily:'Syne',sans-serif;font-size:clamp(36px,3.5vw,52px);font-weight:800;line-height:.95;letter-spacing:-.02em;margin-bottom:14px;}
+.sec-body{font-size:15px;color:var(--gray);max-width:480px;line-height:1.75;margin-bottom:48px;}
+
+/* CATEGORIES */
+.categories{background:var(--mid);padding:72px 60px;}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px;}
+.cat-card{background:var(--white);padding:28px 20px;cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;text-align:center;}
+.cat-card:hover{border-bottom-color:var(--yellow);transform:translateY(-4px);}
+.cat-card.active{border-bottom-color:var(--yellow);}
+.cat-icon{font-size:36px;margin-bottom:14px;}
+.cat-name{font-fxmily:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+.cat-count{font-size:13px;color:var(--gray);}
+
+/* PRODUCTS */
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.product-card{cursor:pointer;}
+.product-img{aspect-ratio:.75;background:var(--mid);border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:12px;transition:transform .25s;}
+.product-card:hover .product-img{transform:scale(1.02);}
+.product-inner-text{text-align:center;padding:16px;}
+.product-inner-name{font-fxmily:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--black);}
+.product-inner-sub{font-size:11px;letter-spacing:.08em;color:var(--gray);text-transform:uppercase;margin-top:4px;}
+.p-tag{position:absolute;top:10px;left:10px;font-fxmily:'Syne',sans-serif;font-size:10px;font-weight:700;padding:4px 10px;letter-spacing:.08em;text-transform:uppercase;border-radius:2px;}
+.p-tag.new{background:var(--yellow);color:var(--black);}
+.p-tag.sale{background:var(--black);color:var(--white);}
+.p-tag.trending{background:#FF5A5A;color:var(--white);}
+.p-wishlist{position:absolute;top:10px;right:10px;width:30px;height:30px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;}
+.p-name{font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;}
+.p-meta{font-size:12px;color:var(--gray);margin-bottom:8px;}
+.p-price{display:flex;align-items:center;gap:8px;}
+.p-price-main{font-fxmily:'Syne',sans-serif;font-size:17px;font-weight:800;}
+.p-price-del{font-size:13px;text-decoration:line-through;color:var(--gray);}
+.p-price-off{font-size:11px;color:#2A6B2A;font-weight:700;}
+
+/* CASHBACK BANNER */
+.cashback-banner{background:var(--yellow);padding:40px 60px;display:flex;align-items:center;justify-content:space-between;gap:40px;}
+.cb-left{display:flex;align-items:center;gap:24px;}
+.cb-icon{font-size:48px;}
+.cb-title{font-fxmily:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;}
+.cb-sub{font-size:15px;color:rgba(0,0,0,.6);}
+.cb-btn{background:var(--black);color:var(--white);padding:14px 36px;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;border:none;cursor:pointer;text-transform:uppercase;border-radius:2px;white-space:nowrap;transition:opacity .2s;}
+.cb-btn:hover{opacity:.85;}
+
+/* REVIEWS */
+.reviews{background:var(--mid);padding:72px 60px;}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.review-card{background:var(--white);padding:28px;border-radius:4px;}
+.review-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.reviewer-info{}
+.reviewer-name{font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.reviewer-meta{font-size:12px;color:var(--gray);}
+.review-stars{color:var(--yellow);font-size:13px;letter-spacing:1px;}
+.review-text{font-size:14px;color:#555;line-height:1.7;margin-bottom:14px;}
+.review-product{background:var(--mid);padding:8px 12px;font-size:12px;font-weight:600;color:var(--black);border-radius:2px;display:inline-block;font-fxmily:'Syne',sans-serif;}
+
+/* OFFERS SECTION */
+.offers-section{padding:72px 60px;}
+.offers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;}
+.offer-card{border:2px solid var(--border);padding:28px;transition:all .2s;cursor:pointer;}
+.offer-card:hover{border-color:var(--yellow);transform:translateY(-2px);}
+.offer-icon{font-size:32px;margin-bottom:14px;}
+.offer-title{font-fxmily:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;}
+.offer-desc{font-size:14px;color:var(--gray);margin-bottom:14px;}
+.offer-code-display{background:var(--mid);padding:8px 16px;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .2s;}
+.offer-code-display:hover{background:var(--yellow);}
+.copy-btn{font-size:11px;color:var(--gray);}
+
+/* FAQ */
+.faq-section{padding:72px 60px;background:var(--mid);}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px;}
+.faq-item{background:var(--white);border-radius:4px;overflow:hidden;}
+.faq-q{padding:20px 24px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+.faq-q:hover{color:var(--yellow);background:#f9f9f9;}
+.faq-icon{width:26px;height:26px;background:var(--yellow);color:var(--black);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;transition:transform .3s;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.faq-a p{font-size:14px;color:var(--gray);line-height:1.7;padding:0 24px 20px;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-item.open .faq-a{max-height:200px;}
+
+/* STICKY ATC */
+.sticky-atc{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--white);border-top:2px solid var(--yellow);padding:12px 60px;display:none;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,.08);}
+.sticky-atc.visible{display:flex;}
+.sticky-info{}
+.sticky-name{font-fxmily:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.sticky-meta{font-size:12px;color:var(--gray);}
+.sticky-right{display:flex;gap:10px;align-items:center;}
+.sticky-size{background:var(--mid);border:1px solid var(--border);padding:10px 16px;font-fxmily:'Nunito',sans-serif;font-size:13px;cursor:pointer;border-radius:2px;}
+.sticky-btn{background:var(--black);color:var(--white);border:none;padding:12px 36px;font-fxmily:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border-radius:2px;transition:background .2s;text-transform:uppercase;}
+.sticky-btn:hover{background:var(--yellow);color:var(--black);}
+
+/* FOOTER */
+footer{background:var(--dark-bg);color:rgba(255,255,255,.5);padding:60px 60px 28px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:52px;margin-bottom:48px;}
+.footer-logo{font-fxmily:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--white);text-decoration:none;display:block;margin-bottom:14px;}
+.footer-logo span{color:var(--yellow);}
+.footer-about{font-size:14px;line-height:1.7;max-width:260px;}
+.footer-col h4{font-fxmily:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:18px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .2s;}
+.footer-col a:hover{color:var(--white);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;font-size:12px;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .section,.categories,.reviews,.offers-section,.faq-section,footer{padding:56px 40px;}
+  nav{padding:14px 40px;}
+  .trust-bar{padding:18px 40px;flex-wrap:wrap;}
+  .hero-content{padding:60px 40px;}
+  .cashback-banner{padding:32px 40px;}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-content{padding:48px 24px;order:2;}
+  .hero-right{min-height:280px;order:-1;}
+  nav{padding:14px 24px;}
+  .nav-links{display:none;}
+  .trust-bar{flex-wrap:wrap;padding:14px 24px;}
+  .tbi{flex:0 0 100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.1);padding:10px 0;}
+  .section,.categories,.reviews,.offers-section,.faq-section,footer{padding:48px 24px;}
+  .cat-grid{grid-template-columns:1fr 1fr;}
+  .products-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .reviews-grid{grid-template-columns:1fr;}
+  .offers-grid{grid-template-columns:1fr;}
+  .faq-grid{grid-template-columns:1fr;}
+  .cashback-banner{flex-direction:column;padding:32px 24px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px;}
+  .footer-grid>div:first-child{grid-column:1/-1;}
+  .footer-bottom{flex-direction:column;gap:8px;}
+  .sticky-atc{padding:12px 20px;}
+  .hero-title{font-size:clamp(44px,12vw,72px);}
+}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hero-eyebrow{animation:slideUp .45s ease both;}
+.hero-title{animation:slideUp .45s ease .08s both;}
+.hero-sub{animation:slideUp .45s ease .16s both;}
+.hero-offers{animation:slideUp .45s ease .22s both;}
+.hero-price{animation:slideUp .45s ease .28s both;}
+.hero-cta{animation:slideUp .45s ease .34s both;}
+.hero-trust{animation:slideUp .45s ease .4s both;}
+</style>
+  <meta name="description" content="Store preview">
+  <meta property="og:title" content="Store preview">
+  <meta property="og:description" content="Store preview">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/image.png">
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="promo-inner">
+    <span class="promo-item">🔥 3M+ Happy Customers</span>
+    <span class="promo-item">💛 61% Off on 100s of Styles</span>
+    <span class="promo-item">🇮🇳 Made in India</span>
+    <span class="promo-item">🚚 Free Shipping ₹499+</span>
+    <span class="promo-item">💰 10% Cashback on all orders</span>
+    <span class="promo-item">🔥 3M+ Happy Customers</span>
+    <span class="promo-item">💛 61% Off on 100s of Styles</span>
+    <span class="promo-item">🇮🇳 Made in India</span>
+    <span class="promo-item">🚚 Free Shipping ₹499+</span>
+    <span class="promo-item">💰 10% Cashback on all orders</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a data-href="#" class="nav-logo">DRIP<span>.</span></a>
+  <ul class="nav-links">
+    <li><a data-href="#">Topwear</a></li>
+    <li><a data-href="#">Bottomwear</a></li>
+    <li><a data-href="#">Combos</a></li>
+    <li><a data-href="#">New Arrivals</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-search">🔍 Search</button>
+    <button class="nav-cart">Cart (0)</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-badge">New Drop</span>
+      <span class="eyebrow-text">Off White Corduroy Collection</span>
+    </div>
+    <h1 class="hero-title">
+      Look<br>
+      <span class="highlight">Sharp.</span>
+      <span class="outline">Save Big.</span>
+    </h1>
+    <p class="hero-sub">Premium men's fashion at prices that make sense. Corduroy shirts, cargo pants, oversized tees — everything you need, all Made in India.</p>
+    <div class="hero-offers">
+      <div class="hero-offers-title">Today's Best Deals</div>
+      <div class="offer-list">
+        <div class="offer-item"><span class="offer-badge">10% Cash</span><span class="offer-text">Earn on every order — auto-applied</span></div>
+        <div class="offer-item"><span class="offer-badge">Flat 5% Off</span><span class="offer-text">On ₹1999+ orders · Code <span class="offer-code">BYNG5</span></span></div>
+        <div class="offer-item"><span class="offer-badge">Flat 10% Off</span><span class="offer-text">On ₹2999+ orders · Code <span class="offer-code">BYNG10</span></span></div>
+      </div>
+    </div>
+    <div class="hero-price">
+      <span class="price-main">₹899</span>
+      <span class="price-del">₹2,299</span>
+      <span class="price-off">61% OFF</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+      <button class="btn-outline">View All</button>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-chip">⭐ 4.5 Rated</span>
+      <span class="trust-chip">🇮🇳 Made in India</span>
+      <span class="trust-chip">3M+ Customers</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="product-card-hero">
+      <div class="product-card-hero-img">
+        <div class="card-img-text">CORDUROY</div>
+        <div class="card-img-sub">Off White · Solid</div>
+      </div>
+      <div class="new-arrival-badge">New Drop</div>
+      <div class="card-name">Off White Corduroy Shirt</div>
+      <div class="card-sub">Full Sleeve · Regular Fit</div>
+      <div class="card-price">₹899 <del class="card-del">₹2,299</del></div>
+      <div class="card-save">You save ₹1,400 (61% off)</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="tbi"><span class="tbi-icon">👨</span><span class="tbi-text"><strong>3M+</strong> Happy Customers</span></div>
+  <div class="tbi"><span class="tbi-icon">🇮🇳</span><span class="tbi-text"><strong>Made</strong> in India</span></div>
+  <div class="tbi"><span class="tbi-icon">💰</span><span class="tbi-text"><strong>10%</strong> Cashback Always</span></div>
+  <div class="tbi"><span class="tbi-icon">🔄</span><span class="tbi-text"><strong>Easy</strong> Returns</span></div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="categories">
+  <div class="sec-eyebrow">Browse</div>
+  <h2 class="sec-title">Shop by Category</h2>
+  <div class="cat-grid">
+    <div class="cat-card active">
+      <div class="cat-icon">👕</div>
+      <div class="cat-name">T-Shirts</div>
+      <div class="cat-count">240+ Styles</div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-icon">👔</div>
+      <div class="cat-name">Shirts</div>
+      <div class="cat-count">180+ Styles</div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-icon">👖</div>
+      <div class="cat-name">Bottomwear</div>
+      <div class="cat-count">120+ Styles</div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-icon">🎽</div>
+      <div class="cat-name">Combos</div>
+      <div class="cat-count">60+ Sets</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <div class="sec-eyebrow">New Arrivals</div>
+  <h2 class="sec-title">This Week's Drops</h2>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#F5EDD8,#EEE5CC);">
+        <div class="product-inner-text">
+          <div class="product-inner-name">Corduroy</div>
+          <div class="product-inner-sub">Off White</div>
+        </div>
+        <div class="p-tag new">New</div>
+        <div class="p-wishlist">♡</div>
+      </div>
+      <div class="p-name">Off White Corduroy Shirt</div>
+      <div class="p-meta">Full Sleeve · Regular Fit</div>
+      <div class="p-price"><span class="p-price-main">₹899</span><span class="p-price-del">₹2,299</span><span class="p-price-off">61% off</span></div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#E8E8E8,#D5D5D5);">
+        <div class="product-inner-text">
+          <div class="product-inner-name">Oversized</div>
+          <div class="product-inner-sub">Stone Grey</div>
+        </div>
+        <div class="p-tag trending">Trending</div>
+        <div class="p-wishlist">♡</div>
+      </div>
+      <div class="p-name">Stone Oversized Drop-Tee</div>
+      <div class="p-meta">Half Sleeve · Oversized</div>
+      <div class="p-price"><span class="p-price-main">₹699</span><span class="p-price-del">₹1,499</span><span class="p-price-off">53% off</span></div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#D4E8D4,#B8D8B8);">
+        <div class="product-inner-text">
+          <div class="product-inner-name">Cargo</div>
+          <div class="product-inner-sub">Olive Green</div>
+        </div>
+        <div class="p-tag sale">Sale</div>
+        <div class="p-wishlist">♡</div>
+      </div>
+      <div class="p-name">Olive 6-Pocket Cargo Pants</div>
+      <div class="p-meta">Relaxed Fit · Solid</div>
+      <div class="p-price"><span class="p-price-main">₹1,199</span><span class="p-price-del">₹2,799</span><span class="p-price-off">57% off</span></div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,#E8D4D4,#D8B8B8);">
+        <div class="product-inner-text">
+          <div class="product-inner-name">Linen</div>
+          <div class="product-inner-sub">Dusty Pink</div>
+        </div>
+        <div class="p-tag new">New</div>
+        <div class="p-wishlist">♡</div>
+      </div>
+      <div class="p-name">Pink Solid Linen Shirt</div>
+      <div class="p-meta">Half Sleeve · Regular</div>
+      <div class="p-price"><span class="p-price-main">₹799</span><span class="p-price-del">₹1,999</span><span class="p-price-off">60% off</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASHBACK BANNER -->
+<div class="cashback-banner">
+  <div class="cb-left">
+    <div class="cb-icon">💰</div>
+    <div>
+      <div class="cb-title">Earn 10% Cashback on Every Order</div>
+      <div class="cb-sub">Applied automatically — no code needed. Stackable with other offers.</div>
+    </div>
+  </div>
+  <button class="cb-btn">Shop & Earn Now</button>
+</div>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="sec-eyebrow">Reviews</div>
+  <h2 class="sec-title">3M+ Happy Customers</h2>
+  <div style="display:flex;align-items:center;gap:20px;margin-bottom:40px;">
+    <div style="font-fxmily:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1;">4.5</div>
+    <div>
+      <div style="color:var(--yellow);font-size:22px;letter-spacing:2px;">★★★★★</div>
+      <div style="font-size:13px;color:var(--gray);margin-top:4px;">Based on 50,000+ reviews</div>
+    </div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-head">
+        <div class="reviewer-info">
+          <div class="reviewer-name">Rahul S.</div>
+          <div class="reviewer-meta">Delhi · L</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+      </div>
+      <p class="review-text">"The quality at this price is unbeatable. The corduroy shirt is thick, well-stitched, and looks extremely premium. Got compliments at work on day one. Ordering more colors."</p>
+      <span class="review-product">Off White Corduroy Shirt</span>
+    </div>
+    <div class="review-card">
+      <div class="review-head">
+        <div class="reviewer-info">
+          <div class="reviewer-name">Karan T.</div>
+          <div class="reviewer-meta">Mumbai · XL</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+      </div>
+      <p class="review-text">"Fast delivery, great packaging. The fabric is premium for ₹899. The fit is perfect — not too tight, not baggy. This is my go-to brand for everyday shirts now."</p>
+      <span class="review-product">Men's Casual Shirt</span>
+    </div>
+    <div class="review-card">
+      <div class="review-head">
+        <div class="reviewer-info">
+          <div class="reviewer-name">Anil M.</div>
+          <div class="reviewer-meta">Bangalore · M</div>
+        </div>
+        <div class="review-stars">★★★★☆</div>
+      </div>
+      <p class="review-text">"3rd purchase and still impressed. The return policy is seamless — exchanged a size issue within 2 days. Quality and customer service both are top-notch for an Indian D2C brand."</p>
+      <span class="review-product">Cargo Pants</span>
+    </div>
+  </div>
+</section>
+
+<!-- OFFERS -->
+<section class="offers-section">
+  <div class="sec-eyebrow">Save More</div>
+  <h2 class="sec-title">Stack the Savings</h2>
+  <div class="offers-grid">
+    <div class="offer-card">
+      <div class="offer-icon">🤑</div>
+      <div class="offer-title">10% Cashback</div>
+      <div class="offer-desc">Earned on every purchase automatically. No minimum. Just shop and earn.</div>
+      <div class="offer-code-display">Auto-Applied <span class="copy-btn">✓ No code needed</span></div>
+    </div>
+    <div class="offer-card">
+      <div class="offer-icon">🛍️</div>
+      <div class="offer-title">Flat 5% Off</div>
+      <div class="offer-desc">On cart value of ₹1,999 and above. Stackable with cashback offer.</div>
+      <div class="offer-code-display">BYNG5 <span class="copy-btn">Copy Code</span></div>
+    </div>
+    <div class="offer-card">
+      <div class="offer-icon">💸</div>
+      <div class="offer-title">Flat 10% Off</div>
+      <div class="offer-desc">On cart value of ₹2,999 and above. Maximum savings on big hauls.</div>
+      <div class="offer-code-display">BYNG10 <span class="copy-btn">Copy Code</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="sec-eyebrow">FAQ</div>
+  <h2 class="sec-title">Got Questions?</h2>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How does sizing work? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>We follow standard Indian sizing (S, M, L, XL, XXL). Each product page has a detailed size chart with chest and waist measurements. When in doubt, size up.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the return policy? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>7-day returns and exchanges. Items must be unworn, unwashed with original tags. Raise a request via our website and we'll handle the pickup and replacement.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is COD available? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>Yes! Cash on Delivery is available pan-India. Get 10% cashback on prepaid orders applied automatically at checkout.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How fast is delivery? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>Orders are dispatched within 24–48 hours. Pan-India delivery takes 3–6 business days. Free shipping on all orders above ₹499.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is the fabric quality really good at this price? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>Yes! We source premium fabrics and cut out retail middlemen. That's why we can offer you ₹2,299 MRP quality at ₹899. Read our 50,000+ reviews — the quality speaks for itself.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you have offline stores? <div class="faq-icon">+</div></div>
+      <div class="faq-a"><p>Yes! We have stores in Udaipur, Ahmedabad, Lucknow, Kota, and more cities. Visit our Store Locator page to find the nearest location to you.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a data-href="#" class="footer-logo">DRIP<span>.</span></a>
+      <p class="footer-about">Premium men's fashion built for everyday India. Best quality, honest prices, Made in India.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a data-href="#">T-Shirts</a></li>
+        <li><a data-href="#">Shirts</a></li>
+        <li><a data-href="#">Bottomwear</a></li>
+        <li><a data-href="#">Combos</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a data-href="#">Track Order</a></li>
+        <li><a data-href="#">Returns</a></li>
+        <li><a data-href="#">Size Guide</a></li>
+        <li><a data-href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a data-href="#">About Us</a></li>
+        <li><a data-href="#">Careers</a></li>
+        <li><a data-href="#">Stores</a></li>
+        <li><a data-href="#">Blog</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DRIP. All rights reserved.</span>
+    <span>Made in India 🇮🇳</span>
+  </div>
+</footer>
+
+<!-- STICKY ATC -->
+<div class="sticky-atc" id="stickyAtc">
+  <div class="sticky-info">
+    <div class="sticky-name">Off White Corduroy Shirt</div>
+    <div class="sticky-meta">₹899 (61% off) · Free Shipping</div>
+  </div>
+  <div class="sticky-right">
+    <label style="display:none">Form field</label><select class="sticky-size"><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+    <button class="sticky-btn">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+function toggleFaq(el){
+  const item=el.parentElement;
+  document.querySelectorAll('.faq-item.open').forEach(i=>{if(i!==item)i.classList.remove('open');});
+  item.classList.toggle('open');
+}
+
+document.querySelectorAll('.offer-code-display').forEach(el=>{
+  el.addEventListener('click',function(){
+    const code=this.textContent.split(' ')[0].trim();
+    if(navigator.clipboard&&code!=='Auto-Applied'){
+      navigator.clipboard.writeText(code);
+      const btn=this.querySelector('.copy-btn');
+      if(btn){btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy Code',2000);}
+    }
+  });
+});
+
+const heroEl=document.querySelector('.hero');
+const stickyEl=document.getElementById('stickyAtc');
+if(heroEl&&stickyEl){
+  new IntersectionObserver(([e])=>{stickyEl.classList.toggle('visible',!e.isIntersecting);},{threshold:0}).observe(heroEl);
+}
+
+document.querySelectorAll('.product-card,.review-card,.offer-card,.cat-card').forEach((el,i)=>{
+  el.style.cssText+='opacity:0;transform:translateY(14px);transition:opacity .4s ease '+((i%4)*.07)+'s, transform .4s ease '+((i%4)*.07)+'s';
+  new IntersectionObserver(([e])=>{
+    if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='translateY(0)';}
+  },{threshold:.1}).observe(el);
+});
+</script>
+<label style="display:none;">Dummy Label</label></body>
+</html>
+`,
+  "mens-grooming": `﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BRUT Co. — Men's Grooming | ConvertFlow Template</title>
+<link rel="preconnect" href="https://fxts.google.com">
+<link href="https://fxts.google.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--b:#080808;--b2:#141414;--b3:#1E1E1E;--cu:#B87333;--cu2:#D4956A;--cr:#F5EDE0;--sm:#888;--wh:#fff;--f1:'Space Grotesk',sans-serif;--f2:'Cormorant Garamond',serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-fxmily:var(--f1);background:var(--b);color:var(--cr);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;position:fixed;top:0;width:100%;z-index:100;background:rgba(8,8,8,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(184,115,51,.15)}
+.nav-left{display:flex;gap:28px;align-items:center}
+.nav-left a{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--sm);text-decoration:none;transition:color .2s}
+.nav-left a:hover{color:var(--cu)}
+.nav-logo{font-fxmily:var(--f2);font-size:28px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--wh);text-decoration:none;position:absolute;left:50%;transform:translateX(-50%)}
+.nav-logo span{color:var(--cu)}
+.nav-right{display:flex;gap:20px;align-items:center}
+.nav-right a{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--sm);text-decoration:none;transition:color .2s}
+.nav-right a:hover{color:var(--cu)}
+.nav-icon{color:var(--cr);cursor:pointer;transition:color .2s}
+.nav-icon:hover{color:var(--cu)}
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:55% 45%;padding-top:80px}
+.hero-left{background:var(--b);padding:80px 60px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.hero-left::before{content:'';position:absolute;right:-60px;top:0;bottom:0;width:120px;background:var(--b);transform:skewX(-6deg);z-index:1}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.hero-eyebrow-line{width:40px;height:1px;background:var(--cu)}
+.hero-eyebrow span{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cu)}
+.hero-h1{font-fxmily:var(--f2);font-size:clamp(52px,6vw,88px);font-weight:600;line-height:1;margin-bottom:8px;color:var(--wh)}
+.hero-h1 em{font-style:italic;color:var(--cu)}
+.hero-sub{font-size:15px;color:var(--sm);line-height:1.8;max-width:420px;margin-bottom:44px;margin-top:20px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;position:relative;z-index:2}
+.btn-cu{display:inline-block;background:var(--cu);color:var(--b);padding:15px 36px;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:all .25s;border:2px solid var(--cu)}
+.btn-cu:hover{background:transparent;color:var(--cu)}
+.btn-ghost{display:inline-block;border:1px solid rgba(255,255,255,.2);color:var(--cr);padding:15px 36px;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:all .25s}
+.btn-ghost:hover{border-color:var(--cu);color:var(--cu)}
+.hero-stats{display:flex;gap:40px;margin-top:52px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:2}
+.hero-stat-n{font-fxmily:var(--f2);font-size:36px;font-weight:600;color:var(--cu);display:block}
+.hero-stat-l{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sm);display:block;margin-top:4px}
+.hero-right{background:var(--b3);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-right-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0e06 0%,#0d0d0d 60%,#1a0e06 100%)}
+.hero-img-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:1;position:relative}
+.hero-img-ph svg{width:120px;color:var(--cu);opacity:.4}
+.hero-img-ph span{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--sm)}
+.hero-badge{position:absolute;bottom:40px;right:40px;background:var(--cu);color:var(--b);padding:16px 20px;text-align:center;z-index:2}
+.hero-badge-n{font-fxmily:var(--f2);font-size:28px;font-weight:600;display:block}
+.hero-badge-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;display:block;margin-top:2px}
+/* MARQUEE */
+.marquee{background:var(--cu);padding:14px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;gap:48px;animation:marquee 20s linear infinite}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-item{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--b);display:flex;align-items:center;gap:12px}
+.marquee-dot{width:4px;height:4px;background:var(--b);border-radius:50%;flex-shrink:0}
+/* BENTO GRID */
+.bento{padding:100px 40px;background:var(--b)}
+.bento-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px}
+.bento-h2{font-fxmily:var(--f2);font-size:clamp(36px,4vw,58px);font-weight:600;color:var(--wh);line-height:1.1}
+.bento-h2 em{color:var(--cu);font-style:italic}
+.bento-link{font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cu);text-decoration:none;display:flex;align-items:center;gap:8px;transition:gap .2s}
+.bento-link:hover{gap:16px}
+.bento-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:auto;gap:16px}
+.bento-card{background:var(--b2);position:relative;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s}
+.bento-card:hover{transform:translateY(-4px)}
+.bento-card.span-5{grid-column:span 5}
+.bento-card.span-7{grid-column:span 7}
+.bento-card.span-4{grid-column:span 4}
+.bento-card.span-8{grid-column:span 8}
+.bento-card-img{aspect-ratio:4/3;background:linear-gradient(135deg,#1a0e06,#0d0d0d);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.bento-card-img svg{width:30%;color:var(--cu);opacity:.25}
+.bento-card-badge{position:absolute;top:16px;left:16px;background:var(--cu);color:var(--b);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 12px}
+.bento-card-body{padding:24px;display:flex;flex-direction:column;gap:8px;flex:1}
+.bento-card-cat{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cu)}
+.bento-card-name{font-size:18px;font-weight:600;color:var(--wh);line-height:1.3}
+.bento-card-price{display:flex;align-items:center;gap:12px;margin-top:auto}
+.bento-card-price strong{font-fxmily:var(--f2);font-size:24px;color:var(--cu)}
+.bento-card-price del{font-size:14px;color:var(--sm)}
+.bento-card-save{font-size:10px;font-weight:700;color:#4ade80;letter-spacing:1px}
+.bento-card-atc{margin-top:16px;background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--cr);padding:12px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-fxmily:var(--f1);transition:all .2s;width:100%}
+.bento-card-atc:hover{background:var(--cu);border-color:var(--cu);color:var(--b)}
+/* FEATURES */
+.features{padding:100px 40px;background:var(--b2);border-top:1px solid rgba(255,255,255,.05)}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1400px;margin:0 auto}
+.feat-left h2{font-fxmily:var(--f2);font-size:clamp(38px,4vw,60px);font-weight:600;color:var(--wh);line-height:1.1;margin-bottom:20px}
+.feat-left h2 em{color:var(--cu);font-style:italic}
+.feat-left p{font-size:15px;color:var(--sm);line-height:1.9;margin-bottom:36px;max-width:420px}
+.feat-tag-row{display:flex;flex-wrap:wrap;gap:10px}
+.feat-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(184,115,51,.1);border:1px solid rgba(184,115,51,.25);color:var(--cu);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 16px}
+.feat-tag svg{width:14px}
+.feat-right{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.feat-block{background:var(--b3);padding:32px;display:flex;flex-direction:column;gap:16px;border-left:2px solid transparent;transition:border-color .2s}
+.feat-block:hover{border-left-color:var(--cu)}
+.feat-block-icon{width:40px;height:40px;background:rgba(184,115,51,.15);display:flex;align-items:center;justify-content:center;color:var(--cu)}
+.feat-block-icon svg{width:20px}
+.feat-block-t{font-size:14px;font-weight:700;color:var(--wh);letter-spacing:.5px}
+.feat-block-s{font-size:12px;color:var(--sm);line-height:1.7}
+/* PRODUCT PAGE SECTION */
+.pdp-section{padding:100px 40px;background:var(--b)}
+.pdp-section-hd{text-align:center;margin-bottom:70px}
+.pdp-section-hd h2{font-fxmily:var(--f2);font-size:clamp(36px,4vw,58px);font-weight:600;color:var(--wh);margin-bottom:12px}
+.pdp-section-hd p{font-size:15px;color:var(--sm);max-width:500px;margin:0 auto}
+.pdp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1400px;margin:0 auto}
+.pdp-feature-card{background:var(--b2);padding:40px;border-top:2px solid var(--cu);display:flex;flex-direction:column;gap:12px}
+.pdp-feature-icon{color:var(--cu)}
+.pdp-feature-icon svg{width:28px}
+.pdp-feature-t{font-size:17px;font-weight:700;color:var(--wh)}
+.pdp-feature-s{font-size:13px;color:var(--sm);line-height:1.8}
+/* TESTIMONIALS */
+.testi{padding:100px 40px;background:var(--b2)}
+.testi-hd{text-align:center;margin-bottom:70px}
+.testi-hd h2{font-fxmily:var(--f2);font-size:clamp(36px,4vw,58px);font-weight:600;color:var(--wh);margin-bottom:12px}
+.testi-hd p{font-size:15px;color:var(--sm)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:1400px;margin:0 auto}
+.testi-card{background:var(--b3);padding:44px;display:flex;flex-direction:column;gap:24px}
+.testi-stars{color:var(--cu);font-size:18px;letter-spacing:2px}
+.testi-text{font-fxmily:var(--f2);font-size:20px;font-style:italic;color:var(--cr);line-height:1.7;flex:1}
+.testi-author{display:flex;align-items:center;gap:16px;padding-top:24px;border-top:1px solid rgba(255,255,255,.07)}
+.testi-avatar{width:44px;height:44px;background:var(--cu);display:flex;align-items:center;justify-content:center;font-fxmily:var(--f2);font-size:18px;color:var(--b);font-weight:600;flex-shrink:0}
+.testi-name{font-size:13px;font-weight:700;color:var(--wh)}
+.testi-handle{font-size:11px;color:var(--sm);margin-top:2px}
+/* EXTRA FEATURES */
+.extra-feats{padding:100px 40px;background:var(--b)}
+.extra-feats-inner{max-width:1400px;margin:0 auto}
+.extra-feats h2{font-fxmily:var(--f2);font-size:clamp(36px,4vw,58px);font-weight:600;color:var(--wh);text-align:center;margin-bottom:16px}
+.extra-feats>div>p{font-size:15px;color:var(--sm);text-align:center;margin-bottom:64px}
+.extra-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+.extra-col h3{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cu);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(184,115,51,.25)}
+.extra-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.extra-list li{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--sm);font-weight:500}
+.extra-list li::before{content:'';width:6px;height:6px;background:var(--cu);flex-shrink:0}
+/* TECH STRIP */
+.tech-strip{padding:100px 40px;background:linear-gradient(135deg,#1a0e06 0%,#0d0d0d 100%)}
+.tech-strip-inner{max-width:1400px;margin:0 auto}
+.tech-strip h2{font-fxmily:var(--f2);font-size:clamp(36px,4vw,58px);font-weight:600;color:var(--wh);margin-bottom:60px;text-align:center}
+.tech-tags{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.tech-tag{background:rgba(184,115,51,.08);border:1px solid rgba(184,115,51,.2);color:var(--cr);padding:12px 24px;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;cursor:default}
+.tech-tag:hover{background:var(--cu);color:var(--b);border-color:var(--cu)}
+/* CTA BANNER */
+.cta-banner{padding:120px 40px;background:var(--cu);text-align:center;position:relative;overflow:hidden}
+.cta-banner::before{content:'BRUT';font-fxmily:var(--f2);font-size:300px;font-weight:600;color:rgba(0,0,0,.08);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;letter-spacing:20px}
+.cta-banner h2{font-fxmily:var(--f2);font-size:clamp(40px,5vw,72px);font-weight:600;color:var(--b);margin-bottom:16px;position:relative}
+.cta-banner p{font-size:16px;color:rgba(0,0,0,.65);margin-bottom:44px;position:relative}
+.cta-banner .btn-dark{display:inline-block;background:var(--b);color:var(--cu);padding:18px 48px;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;transition:all .25s;border:2px solid var(--b);position:relative}
+.cta-banner .btn-dark:hover{background:transparent;color:var(--b);border-color:var(--b)}
+/* FINAL STRIP */
+.final-strip{background:var(--b2);border-top:1px solid rgba(255,255,255,.05);padding:24px 40px;overflow:hidden;white-space:nowrap}
+.final-track{display:inline-flex;gap:48px;animation:marquee 25s linear infinite}
+.final-item{display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--sm)}
+.final-item-dot{width:5px;height:5px;background:var(--cu);border-radius:50%;flex-shrink:0}
+/* FOOTER */
+.footer{background:var(--b);border-top:1px solid rgba(255,255,255,.05);padding:80px 40px 40px}
+.footer-inner{max-width:1400px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.07)}
+.footer-brand h3{font-fxmily:var(--f2);font-size:28px;font-weight:600;color:var(--wh);letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+.footer-brand h3 span{color:var(--cu)}
+.footer-brand-tag{font-fxmily:var(--f2);font-size:13px;font-style:italic;color:var(--cu);margin-bottom:20px;display:block}
+.footer-brand p{font-size:13px;color:var(--sm);line-height:1.9;max-width:280px}
+.footer-col h4{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cu);margin-bottom:24px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.footer-col ul li a{font-size:13px;color:var(--sm);text-decoration:none;transition:color .2s}
+.footer-col ul li a:hover{color:var(--cr)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:12px;color:var(--sm)}
+.footer-payment{display:flex;gap:8px;align-items:center}
+.footer-pay-badge{background:var(--b3);border:1px solid rgba(255,255,255,.08);padding:4px 12px;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--sm)}
+/* RESPONSIVE */
+@media(max-width:1200px){.bento-card.span-5,.bento-card.span-7{grid-column:span 12}.bento-card.span-4,.bento-card.span-8{grid-column:span 6}}
+@media(max-width:1024px){
+  .hero{grid-template-columns:1fr;min-height:auto}
+  .hero-left{padding:80px 24px 60px}
+  .hero-right{min-height:50vw}
+  .nav-left{display:none}
+  .nav-logo{position:relative;left:auto;transform:none}
+  .feat-grid{grid-template-columns:1fr;gap:48px}
+  .feat-right{grid-template-columns:1fr 1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .pdp-grid{grid-template-columns:1fr}
+  .extra-cols{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr;gap:40px}
+  .bento-card.span-4,.bento-card.span-8{grid-column:span 12}
+}
+@media(max-width:768px){
+  .nav{padding:16px 20px}
+  .hero-left{padding:60px 20px 48px}
+  .bento,.features,.pdp-section,.testi,.extra-feats,.tech-strip,.cta-banner{padding:70px 20px}
+  .footer{padding:60px 20px 30px}
+  .final-strip,.footer-bottom{padding:20px}
+  .feat-right{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr;gap:32px}
+  .hero-stats{gap:24px}
+  .bento-header{flex-direction:column;align-items:flex-start;gap:20px}
+  .footer-bottom{flex-direction:column;gap:16px;text-align:center}
+}
+</style>
+  <meta name="description" content="Store preview">
+  <meta property="og:title" content="Store preview">
+  <meta property="og:description" content="Store preview">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/image.png">
+</head>
+<body>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <a data-href="#">Shop</a>
+    <a data-href="#">Kits</a>
+    <a data-href="#">About</a>
+  </div>
+  <a data-href="#" class="nav-logo">BRUT<span>.</span></a>
+  <div class="nav-right">
+    <a data-href="#">Rituals</a>
+    <a data-href="#" class="nav-icon" aria-label="Search"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></a>
+    <a data-href="#" class="nav-icon" aria-label="Cart"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a>
+  </div>
+</nav>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow"><div class="hero-eyebrow-line"></div><span>The Gentleman's Arsenal</span></div>
+    <h1 class="hero-h1">Crafted for<br><em>Real Men.</em></h1>
+    <p class="hero-sub">Premium grooming rituals engineered for performance. From precision beard oils to science-backed skincare — BRUT delivers results without the bullshit.</p>
+    <div class="hero-btns">
+      <a data-href="#" class="btn-cu">Shop the Range</a>
+      <a data-href="#" class="btn-ghost">View Rituals</a>
+    </div>
+    <div class="hero-stats">
+      <div><span class="hero-stat-n">40K+</span><span class="hero-stat-l">Men Grooming Daily</span></div>
+      <div><span class="hero-stat-n">4.9★</span><span class="hero-stat-l">Average Rating</span></div>
+      <div><span class="hero-stat-n">Zero</span><span class="hero-stat-l">Compromise Formula</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-right-bg"></div>
+    <div class="hero-img-ph">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span>Hero Product Shot</span>
+    </div>
+    <div class="hero-badge"><span class="hero-badge-n">100%</span><span class="hero-badge-l">Natural Formula</span></div>
+  </div>
+</section>
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span>PREMIUM SECTION LIBRARY</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>BLAZING FAST PERFORMANCE</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ZERO CODING REQUIRED</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>20+ CRO FOCUSED FEATURES</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>MOBILE FIRST APPROACH</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>EASY CUSTOMISABLE DESIGN</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>BUILT-IN CART UPSELLS</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>SPIN THE WHEEL POPUP</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>PREMIUM SECTION LIBRARY</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>BLAZING FAST PERFORMANCE</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ZERO CODING REQUIRED</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>20+ CRO FOCUSED FEATURES</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>MOBILE FIRST APPROACH</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>EASY CUSTOMISABLE DESIGN</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>BUILT-IN CART UPSELLS</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>SPIN THE WHEEL POPUP</div>
+  </div>
+</div>
+<!-- BENTO PRODUCTS -->
+<section class="bento">
+  <div class="bento-header">
+    <h2 class="bento-h2">The <em>Essential</em><br>Grooming Kit</h2>
+    <a data-href="#" class="bento-link">Shop All Products <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+  <div class="bento-grid">
+    <div class="bento-card span-7">
+      <div class="bento-card-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><div class="bento-card-badge">Best Seller</div></div>
+      <div class="bento-card-body">
+        <div class="bento-card-cat">Beard Care</div>
+        <div class="bento-card-name">Cedarwood & Black Pepper Beard Oil</div>
+        <div class="bento-card-price"><strong>₹799</strong><del>₹1,199</del><span class="bento-card-save">33% OFF</span></div>
+        <button class="bento-card-atc">Add to Arsenal</button>
+      </div>
+    </div>
+    <div class="bento-card span-5">
+      <div class="bento-card-img" style="aspect-ratio:3/4"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="bento-card-body">
+        <div class="bento-card-cat">Face Care</div>
+        <div class="bento-card-name">Charcoal Deep Cleanse Face Wash</div>
+        <div class="bento-card-price"><strong>₹549</strong><del>₹799</del><span class="bento-card-save">31% OFF</span></div>
+        <button class="bento-card-atc">Add to Arsenal</button>
+      </div>
+    </div>
+    <div class="bento-card span-4">
+      <div class="bento-card-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><div class="bento-card-badge">New Drop</div></div>
+      <div class="bento-card-body">
+        <div class="bento-card-cat">Styling</div>
+        <div class="bento-card-name">Matte Clay Pomade</div>
+        <div class="bento-card-price"><strong>₹449</strong></div>
+        <button class="bento-card-atc">Add to Arsenal</button>
+      </div>
+    </div>
+    <div class="bento-card span-4">
+      <div class="bento-card-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div class="bento-card-body">
+        <div class="bento-card-cat">Skincare</div>
+        <div class="bento-card-name">Retinol Night Recovery Cream</div>
+        <div class="bento-card-price"><strong>₹899</strong><del>₹1,299</del><span class="bento-card-save">31% OFF</span></div>
+        <button class="bento-card-atc">Add to Arsenal</button>
+      </div>
+    </div>
+    <div class="bento-card span-4">
+      <div class="bento-card-img"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="bento-card-badge">Bundle</div></div>
+      <div class="bento-card-body">
+        <div class="bento-card-cat">Grooming Kit</div>
+        <div class="bento-card-name">The Starter Ritual Bundle</div>
+        <div class="bento-card-price"><strong>₹1,499</strong><del>₹2,199</del><span class="bento-card-save">32% OFF</span></div>
+        <button class="bento-card-atc">Add to Arsenal</button>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- FEATURES SECTION -->
+<section class="features">
+  <div class="feat-grid">
+    <div class="feat-left">
+      <h2>Built for <em>Conversion.</em><br>Designed for <em>Growth.</em></h2>
+      <p>Every section, every feature, every pixel is engineered to turn store visitors into loyal customers. No fluff. No bloat. Pure performance.</p>
+      <div class="feat-tag-row">
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Blazing Fast</div>
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Mobile First</div>
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>CRO Focused</div>
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Zero Apps</div>
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Live Updates</div>
+        <div class="feat-tag"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Shopify 2.0</div>
+      </div>
+    </div>
+    <div class="feat-right">
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="feat-block-t">Built-in Wishlists</div>
+        <div class="feat-block-s">Let customers save products and return to purchase — no extra apps needed.</div>
+      </div>
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="feat-block-t">Smart Cart Upsells</div>
+        <div class="feat-block-s">Intelligent cross-sell and upsell recommendations right inside the cart drawer.</div>
+      </div>
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="feat-block-t">Stock Urgency Indicators</div>
+        <div class="feat-block-s">Real-time low-stock alerts that create urgency and drive faster purchase decisions.</div>
+      </div>
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="feat-block-t">Granular Customisation</div>
+        <div class="feat-block-s">Block-level padding, global colour system, and 50+ settings per section — no code.</div>
+      </div>
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="feat-block-t">Social Proof Notifications</div>
+        <div class="feat-block-s">Live purchase pop-ups and review signals that build instant trust with new visitors.</div>
+      </div>
+      <div class="feat-block">
+        <div class="feat-block-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <div class="feat-block-t">JudgeMe Reviews Support</div>
+        <div class="feat-block-s">Native integration with JudgeMe for verified reviews, star ratings, and UGC display.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- PRODUCT PAGE FEATURES -->
+<section class="pdp-section">
+  <div class="pdp-section-hd">
+    <h2>Product Pages That <em style="font-style:italic;color:var(--cu)">Convert</em></h2>
+    <p>Every detail of the product page is engineered to reduce friction, build confidence, and trigger the add-to-cart.</p>
+  </div>
+  <div class="pdp-grid">
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      <div class="pdp-feature-t">Multi-Layout Media Gallery</div>
+      <div class="pdp-feature-s">Stacked, grid, or filmstrip gallery layouts. Zoom on hover, video support, and 360° view ready.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5z"/></svg></div>
+      <div class="pdp-feature-t">Built-in Ratings & Reviews</div>
+      <div class="pdp-feature-s">Star ratings, written reviews, and photo UGC — all without an external review app.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h7"/></svg></div>
+      <div class="pdp-feature-t">Flexible Variant Pickers</div>
+      <div class="pdp-feature-s">Swatch, button, dropdown, and image-linked variant pickers — fully configurable per product.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div class="pdp-feature-t">Custom Trust Badges</div>
+      <div class="pdp-feature-s">Upload your own trust icons and badges to display under the Add-to-Cart button.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="pdp-feature-t">Product Offers Drawer</div>
+      <div class="pdp-feature-s">Slide-out offers panel showing bundles, volume discounts, and gift-with-purchase deals.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+      <div class="pdp-feature-t">Real-Time Stock Indicators</div>
+      <div class="pdp-feature-s">Live inventory counts with urgency messaging — "Only 3 left!" proven to boost conversions.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <div class="pdp-feature-t">Secure Checkout Badges</div>
+      <div class="pdp-feature-s">Built-in SSL, payment method logos, and money-back guarantee badge display options.</div>
+    </div>
+    <div class="pdp-feature-card">
+      <div class="pdp-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <div class="pdp-feature-t">Easy Customisable Design</div>
+      <div class="pdp-feature-s">Change layout, media position, section order, and colors — all from the Shopify theme editor.</div>
+    </div>
+  </div>
+</section>
+<!-- TESTIMONIALS -->
+<section class="testi">
+  <div class="testi-hd">
+    <h2>From the <em style="font-style:italic;color:var(--cu)">Brotherhood</em></h2>
+    <p>40,000+ men trust BRUT as part of their daily ritual. Here's what they're saying.</p>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The Cedarwood Beard Oil is the real deal. My beard has never looked this healthy — and my wife can't stop complimenting the scent."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">A</div>
+        <div><div class="testi-name">Arjun Mehta</div><div class="testi-handle">Verified Buyer · Mumbai</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Finally a men's grooming brand that doesn't treat me like I don't know what I'm doing. The Starter Bundle was exactly what I needed."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">R</div>
+        <div><div class="testi-name">Rahul Singh</div><div class="testi-handle">Verified Buyer · Delhi</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The Charcoal Face Wash cleared my skin in 2 weeks. No marketing BS — just results. Switched from a premium skincare brand and never looking back."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">K</div>
+        <div><div class="testi-name">Karan Verma</div><div class="testi-handle">Verified Buyer · Bangalore</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- EXTRA FEATURES 3 COLUMNS -->
+<section class="extra-feats">
+  <div class="extra-feats-inner">
+    <h2>Everything You Need.<br><em style="font-style:italic;color:var(--cu)">Nothing You Don't.</em></h2>
+    <div><p>The complete feature arsenal — built in, no extra apps, no monthly fees, no compromise.</p></div>
+    <div class="extra-cols">
+      <div>
+        <h3>Smart Commerce</h3>
+        <ul class="extra-list">
+          <li>Smart Cart / Cross Upsells</li>
+          <li>Social Proof Notifications</li>
+          <li>Spin the Wheel Popup</li>
+          <li>Newsletter Popup</li>
+          <li>Built-in Wishlists</li>
+          <li>Stock Urgency Indicators</li>
+          <li>Interactive Product Cards</li>
+          <li>JudgeMe Reviews Support</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Revenue Boosters</h3>
+        <ul class="extra-list">
+          <li>Higher AOV Orders</li>
+          <li>Customisable Bundles</li>
+          <li>Optimised for Mobile</li>
+          <li>Live Total Price Updates</li>
+          <li>Automatic Codes Support</li>
+          <li>Intuitive Interface</li>
+          <li>One-Click Add to Cart</li>
+          <li>No External App Needed</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Design System</h3>
+        <ul class="extra-list">
+          <li>Colour &amp; Font Controls</li>
+          <li>One-Click Dark / Light Mode</li>
+          <li>Block Level Paddings</li>
+          <li>Shopify 2.0 Architecture</li>
+          <li>Granular Customisation</li>
+          <li>Global Colour System</li>
+          <li>Flexible Section Layouts</li>
+          <li>Beginner Friendly to Use</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- TECH TAGS -->
+<section class="tech-strip">
+  <div class="tech-strip-inner">
+    <h2>Premium D2C. <em style="font-style:italic;color:var(--cu2)">Built Different.</em></h2>
+    <div class="tech-tags">
+      <div class="tech-tag">Small Taglines / Badges</div>
+      <div class="tech-tag">Higher Conversion Rate</div>
+      <div class="tech-tag">Optimized Product Pages</div>
+      <div class="tech-tag">Built-in Conversion Sections</div>
+      <div class="tech-tag">Premium D2C Look</div>
+      <div class="tech-tag">Fewer Apps Needed</div>
+      <div class="tech-tag">Shopify 2.0 Architecture</div>
+      <div class="tech-tag">Granular Customisation</div>
+      <div class="tech-tag">Global Color System</div>
+      <div class="tech-tag">Flexible Section Layouts</div>
+      <div class="tech-tag">Beginner Friendly</div>
+      <div class="tech-tag">Mobile-First Design</div>
+      <div class="tech-tag">Dark / Light Mode</div>
+      <div class="tech-tag">Block Level Padding</div>
+    </div>
+  </div>
+</section>
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Own Your Ritual.<br>Build Your Brand.</h2>
+  <p>Install BRUT Co. on your Shopify store in seconds. No dev needed.</p>
+  <a data-href="#" class="btn-dark">Get This Template</a>
+</section>
+<!-- FINAL STRIP -->
+<div class="final-strip">
+  <div class="final-track">
+    <div class="final-item"><span class="final-item-dot"></span>MODERN D2C SECTIONS</div>
+    <div class="final-item"><span class="final-item-dot"></span>MOBILE-FIRST DESIGN</div>
+    <div class="final-item"><span class="final-item-dot"></span>EASY CUSTOMISATION</div>
+    <div class="final-item"><span class="final-item-dot"></span>MODERN D2C SECTIONS</div>
+    <div class="final-item"><span class="final-item-dot"></span>MOBILE-FIRST DESIGN</div>
+    <div class="final-item"><span class="final-item-dot"></span>EASY CUSTOMISATION</div>
+    <div class="final-item"><span class="final-item-dot"></span>MODERN D2C SECTIONS</div>
+    <div class="final-item"><span class="final-item-dot"></span>MOBILE-FIRST DESIGN</div>
+    <div class="final-item"><span class="final-item-dot"></span>EASY CUSTOMISATION</div>
+  </div>
+</div>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h3>BRUT<span>.</span></h3>
+        <span class="footer-brand-tag">For the Modern Gentleman.</span>
+        <p>Premium grooming formulated for real men who demand results. Science-backed. Zero compromises. Built for the daily ritual.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a data-href="#">Beard Care</a></li>
+          <li><a data-href="#">Face Care</a></li>
+          <li><a data-href="#">Hair Styling</a></li>
+          <li><a data-href="#">Grooming Kits</a></li>
+          <li><a data-href="#">Body Care</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a data-href="#">Our Story</a></li>
+          <li><a data-href="#">Ingredients</a></li>
+          <li><a data-href="#">Rituals Blog</a></li>
+          <li><a data-href="#">Sustainability</a></li>
+          <li><a data-href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a data-href="#">Track Order</a></li>
+          <li><a data-href="#">Returns Policy</a></li>
+          <li><a data-href="#">Shipping Info</a></li>
+          <li><a data-href="#">Contact Us</a></li>
+          <li><a data-href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; 2025 BRUT Co. All rights reserved. A ConvertFlow Template.</div>
+      <div class="footer-payment">
+        <div class="footer-pay-badge">VISA</div>
+        <div class="footer-pay-badge">MASTERCARD</div>
+        <div class="footer-pay-badge">UPI</div>
+        <div class="footer-pay-badge">COD</div>
+        <div class="footer-pay-badge">EMI</div>
+      </div>
+    </div>
+  </div>
+</footer>
+<label style="display:none;">Dummy Label</label></body>
+</html>
+`,
 };

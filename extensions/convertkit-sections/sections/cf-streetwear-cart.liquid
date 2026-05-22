@@ -1,124 +1,102 @@
-{% comment %}
-  ConvertFlow — Streetwear Cart Page
-  Brutalist receipt-style cart layout.
-{% endcomment %}
+{% comment %}ConvertFlow: Streetwear Ã¢â‚¬â€ Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: {{ section.settings.color_accent | default: '#000000' }}; --cf-bg: {{ section.settings.color_bg | default: '#ffffff' }}; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
+.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
+.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
+.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.cfc-empty span { font-size: 14px; }
+.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
+.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.cfc-item:last-child { border-bottom: none; }
+.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
+.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
+.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
+.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
+.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
+.cfc-item-remove:hover { color: #e53e3e; }
+.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+/* Summary */
+.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
+.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
+.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
+.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
+.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
+.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
+.cfc-checkout:hover { opacity: .9; }
+.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
+@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
+</style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
-
-  :root {
-    --sw-primary: {{ section.settings.color_primary | default: '#FF3366' }};
-    --sw-bg: {{ section.settings.color_bg | default: '#0A0A0A' }};
-    --sw-surface: {{ section.settings.color_surface | default: '#121212' }};
-    --sw-text: {{ section.settings.color_text | default: '#FFFFFF' }};
-    --sw-border: rgba(255, 255, 255, 0.15);
-    --sw-font-heading: 'Space Grotesk', sans-serif;
-    --sw-font-mono: 'Space Mono', monospace;
-  }
-
-  .cf-sw-cart * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-sw-cart { font-family: var(--sw-font-heading); background: var(--sw-bg); color: var(--sw-text); min-height: 80vh; border-top: 1px solid var(--sw-border); }
-  
-  .cf-sw-cart-header { padding: 40px 5%; border-bottom: 1px solid var(--sw-border); }
-  .cf-sw-cart-header h1 { font-size: clamp(40px, 6vw, 80px); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
-  .cf-sw-cart-header p { font-family: var(--sw-font-mono); font-size: 12px; color: #888; text-transform: uppercase; }
-  
-  .cf-sw-cart-grid { display: grid; grid-template-columns: 1fr 400px; }
-  
-  /* Items */
-  .cf-sw-c-items { border-right: 1px solid var(--sw-border); }
-  .cf-sw-c-item { display: grid; grid-template-columns: 120px 1fr auto; padding: 30px 5%; border-bottom: 1px solid var(--sw-border); align-items: start; gap: 30px; }
-  .cf-sw-c-item:last-child { border-bottom: none; }
-  
-  .cf-sw-c-img { aspect-ratio: 4/5; background: #111; overflow: hidden; border: 1px solid var(--sw-border); }
-  .cf-sw-c-img img { width: 100%; height: 100%; object-fit: cover; }
-  
-  .cf-sw-c-info { display: flex; flex-direction: column; gap: 10px; }
-  .cf-sw-c-title { font-size: 20px; font-weight: 700; text-transform: uppercase; }
-  .cf-sw-c-var { font-family: var(--sw-font-mono); font-size: 12px; color: #888; text-transform: uppercase; }
-  
-  .cf-sw-c-qty { display: inline-flex; border: 1px solid var(--sw-border); align-items: center; width: fit-content; margin-top: 10px; }
-  .cf-sw-c-qty button { background: var(--sw-surface); border: none; color: var(--sw-text); width: 32px; height: 32px; font-size: 16px; cursor: pointer; }
-  .cf-sw-c-qty span { font-family: var(--sw-font-mono); font-size: 12px; width: 32px; text-align: center; }
-  
-  .cf-sw-c-price { font-family: var(--sw-font-mono); font-size: 20px; color: var(--sw-primary); font-weight: 700; text-align: right; }
-  .cf-sw-c-remove { display: block; font-family: var(--sw-font-mono); font-size: 10px; color: #888; text-transform: uppercase; text-decoration: none; margin-top: 20px; text-align: right; cursor: pointer; }
-  .cf-sw-c-remove:hover { color: var(--sw-primary); }
-  
-  /* Summary */
-  .cf-sw-c-sum { padding: 40px; position: sticky; top: 0; background: var(--sw-bg); }
-  .cf-sw-c-sum h2 { font-size: 24px; font-weight: 700; text-transform: uppercase; margin-bottom: 30px; }
-  
-  .cf-sw-c-row { display: flex; justify-content: space-between; font-family: var(--sw-font-mono); font-size: 13px; color: #888; margin-bottom: 16px; text-transform: uppercase; border-bottom: 1px dashed var(--sw-border); padding-bottom: 8px; }
-  .cf-sw-c-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #fff; margin-top: 30px; margin-bottom: 30px; text-transform: uppercase; }
-  .cf-sw-c-total span:last-child { font-family: var(--sw-font-mono); color: var(--sw-primary); font-size: 24px; }
-  
-  .cf-sw-btn-checkout { display: block; width: 100%; padding: 20px; background: var(--sw-text); color: var(--sw-bg); font-family: var(--sw-font-heading); font-size: 18px; font-weight: 700; text-transform: uppercase; text-align: center; text-decoration: none; transition: background 0.2s; border: none; cursor: pointer; }
-  .cf-sw-btn-checkout:hover { background: var(--sw-primary); color: #000; }
-  
-  .cf-sw-c-empty { padding: 100px 5%; text-align: center; grid-column: 1 / -1; border-bottom: 1px solid var(--sw-border); }
-  .cf-sw-c-empty h2 { font-size: 40px; text-transform: uppercase; margin-bottom: 20px; }
-  .cf-sw-c-empty a { display: inline-block; padding: 16px 32px; border: 1px solid var(--sw-text); color: var(--sw-text); font-family: var(--sw-font-mono); font-size: 12px; font-weight: 700; text-transform: uppercase; text-decoration: none; margin-top: 20px; }
-  .cf-sw-c-empty a:hover { background: var(--sw-text); color: var(--sw-bg); }
-
-  @media(max-width: 1024px) {
-    .cf-sw-cart-grid { grid-template-columns: 1fr; }
-    .cf-sw-c-items { border-right: none; border-bottom: 1px solid var(--sw-border); }
-  }
-  @media(max-width: 600px) {
-    .cf-sw-c-item { grid-template-columns: 80px 1fr; gap: 20px; }
-    .cf-sw-c-price-col { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .cf-sw-c-remove { margin-top: 0; }
-  }
-{% endstyle %}
-
-<div class="cf-sw-cart">
-  <div class="cf-sw-cart-header">
-    <h1>CART [{{ cart.item_count | default: '0' }}]</h1>
-    <p>SESSION ID: {{ section.id | default: 'SW-89420' }}</p>
-  </div>
-  
-  <div class="cf-sw-cart-grid">
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
     {% if cart.item_count == 0 %}
-      <div class="cf-sw-c-empty">
-        <h2>NO ITEMS FOUND</h2>
-        <a href="/collections/all">RETURN TO SHOP</a>
+      <div class="cfc-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Your cart is empty</p>
+        <span>Looks like you haven't added anything yet.</span>
+        <a href="/collections/all">Continue Shopping</a>
       </div>
     {% else %}
-      <div class="cf-sw-c-items">
+      <div class="cfc-items">
         {% for item in cart.items %}
-          <div class="cf-sw-c-item">
-            <div class="cf-sw-c-img">
+          <div class="cfc-item">
+            <div class="cfc-item-img">
               {% if item.image %}
-                <img src="{{ item.image | img_url: '300x' }}" alt="{{ item.title }}">
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
+              {% else %}
+                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
               {% endif %}
             </div>
-            <div class="cf-sw-c-info">
-              <div class="cf-sw-c-title">{{ item.product.title }}</div>
-              {% unless item.variant.title contains 'Default' %}
-                <div class="cf-sw-c-var">VARIANT: {{ item.variant.title }}</div>
-              {% endunless %}
-              <div class="cf-sw-c-var">SKU: {{ item.sku | default: 'N/A' }}</div>
-              <div class="cf-sw-c-qty">
-                <button>-</button><span>{{ item.quantity }}</span><button>+</button>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
               </div>
             </div>
-            <div class="cf-sw-c-price-col">
-              <div class="cf-sw-c-price">{{ item.final_line_price | money }}</div>
-              <a href="{{ item.url_to_remove }}" class="cf-sw-c-remove">[REMOVE]</a>
-            </div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
           </div>
         {% endfor %}
       </div>
-      
-      <div class="cf-sw-c-sum">
-        <h2>ORDER_SUMMARY</h2>
-        <div class="cf-sw-c-row"><span>SUBTOTAL</span> <span>{{ cart.total_price | money }}</span></div>
-        <div class="cf-sw-c-row"><span>SHIPPING</span> <span>TBD</span></div>
-        <div class="cf-sw-c-row"><span>TAXES</span> <span>INCLUDED</span></div>
-        <div class="cf-sw-c-total"><span>TOTAL</span> <span>{{ cart.total_price | money }}</span></div>
-        <a href="/checkout" class="cf-sw-btn-checkout">INITIATE CHECKOUT</a>
-      </div>
+    {% endif %}
+  </div>
+
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢{{ cart.total_discount | money }}</span></div>
+    {% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo">
+      <input type="text" placeholder="Discount code">
+      <button>Apply</button>
+    </div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
+    </div>
     {% endif %}
   </div>
 </div>
@@ -127,13 +105,98 @@
 {
   "name": "CF Streetwear Cart",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Accent Color", "default": "#FF3366" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#0A0A0A" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#121212" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#FFFFFF" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout Ã¢â€ â€™"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
   ],
   "presets": [
-    { "name": "CF Streetwear Cart" }
+    {
+      "name": "CF Streetwear Cart"
+    }
   ]
 }
 {% endschema %}

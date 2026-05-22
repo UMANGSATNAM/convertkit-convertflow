@@ -18,7 +18,12 @@ const files = [
   'lp-mobile-accessories.html',
   'lp-kids-toys.html',
   'lp-home-furniture.html',
-  'lp-food-delivery.html'
+  'lp-food-delivery.html',
+  'lp-activewear.html',
+  'lp-streetwear.html',
+  'lp-personal-care.html',
+  'lp-mens-fashion.html',
+  'lp-mens-grooming.html'
 ];
 
 
