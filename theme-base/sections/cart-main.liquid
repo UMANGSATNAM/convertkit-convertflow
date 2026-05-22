@@ -1,84 +1,223 @@
-{%- if cart.item_count == 0 -%}
-<div class="page-width" style="text-align:center;padding:80px 20px">
-  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="opacity:.3;margin-bottom:24px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
-  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px);margin-bottom:16px">Your cart is empty</h1>
-  <p style="color:var(--c-subtle);margin-bottom:32px">Looks like you haven't added anything yet.</p>
-  <a href="/collections/all" class="btn-primary">Continue Shopping</a>
-</div>
-{%- else -%}
-<div class="page-width" style="padding:40px 20px 80px">
-  <h1 style="font-family:var(--f-heading);font-size:clamp(24px,4vw,40px);margin-bottom:40px">Your Cart ({{ cart.item_count }})</h1>
-  <div style="display:grid;grid-template-columns:1fr 360px;gap:48px" class="cart-grid">
-    <div>
-      {%- for item in cart.items -%}
-      <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;padding:24px 0;border-bottom:1px solid var(--c-border)">
-        <a href="{{ item.url }}">
-          <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.title | escape }}" width="100" height="100" style="border-radius:var(--radius);object-fit:cover;width:100%;aspect-ratio:1">
-        </a>
+<div class="page-width" style="padding:60px 20px 80px" data-section-id="{{ section.id }}">
+  <h1 style="font-family:var(--f-heading);font-size:clamp(28px, 5vw, 40px);margin-bottom:40px;color:var(--c-text);font-weight:700">
+    Your Cart
+  </h1>
+  
+  <cart-page>
+    {%- if cart.item_count == 0 -%}
+      <div style="text-align:center;padding:80px 20px;background:var(--c-subtle-bg, #F9FAFB);border-radius:var(--radius)">
+        <div style="width:80px;height:80px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;color:var(--c-subtle)">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <h2 style="font-family:var(--f-heading);font-size:24px;margin-bottom:16px;color:var(--c-text)">Your cart is empty</h2>
+        <p style="color:var(--c-subtle);margin-bottom:32px">Looks like you haven't added anything yet.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary" style="padding:16px 40px;border-radius:var(--radius);font-size:16px;font-weight:700">Continue Shopping</a>
+      </div>
+    {%- else -%}
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start" class="cart-grid">
+        <!-- Left: Cart Items -->
         <div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
-            <a href="{{ item.url }}" style="font-family:var(--f-heading);font-weight:600;font-size:16px;color:var(--c-text);text-decoration:none">{{ item.product.title }}</a>
-            <span style="font-weight:700;font-size:16px;white-space:nowrap">{{ item.final_line_price | money }}</span>
+          <!-- Desktop Header -->
+          <div style="display:grid;grid-template-columns:1fr 100px 100px;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--c-border);margin-bottom:24px;color:var(--c-subtle);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px" class="hide-mobile">
+            <div>Product</div>
+            <div style="text-align:center">Quantity</div>
+            <div style="text-align:right">Total</div>
           </div>
-          {%- unless item.variant.title == 'Default Title' -%}
-          <p style="font-size:13px;color:var(--c-subtle);margin-bottom:12px">{{ item.variant.title }}</p>
-          {%- endunless -%}
-          <div style="display:flex;align-items:center;gap:16px">
-            <div style="display:flex;align-items:center;border:1px solid var(--c-border);border-radius:var(--radius)">
-              <button onclick="updateQty('{{ item.key }}', {{ item.quantity | minus: 1 }})" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">−</button>
-              <span style="padding:0 12px;font-size:15px;font-weight:600">{{ item.quantity }}</span>
-              <button onclick="updateQty('{{ item.key }}', {{ item.quantity | plus: 1 }})" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">+</button>
+          
+          <div style="display:flex;flex-direction:column;gap:24px">
+            {%- for item in cart.items -%}
+              <div class="cart-item" data-key="{{ item.key }}" style="display:grid;grid-template-columns:120px 1fr auto;gap:24px;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--c-border)">
+                
+                <!-- Image -->
+                <a href="{{ item.url }}" style="display:block;border-radius:var(--radius);overflow:hidden;background:var(--c-border);aspect-ratio:1">
+                  <img src="{{ item.image | image_url: width: 240 }}" alt="{{ item.title | escape }}" style="width:100%;height:100%;object-fit:cover">
+                </a>
+                
+                <!-- Info & Mobile Qty -->
+                <div style="display:flex;flex-direction:column;justify-content:center;height:100%">
+                  <a href="{{ item.url }}" style="font-family:var(--f-heading);font-weight:700;font-size:18px;color:var(--c-text);text-decoration:none;margin-bottom:8px;line-height:1.3">{{ item.product.title }}</a>
+                  
+                  {%- unless item.product.has_only_default_variant -%}
+                    <p style="font-size:14px;color:var(--c-subtle);margin-bottom:12px">{{ item.variant.title }}</p>
+                  {%- endunless -%}
+                  
+                  <div class="cart-item-price-mobile show-mobile" style="font-size:16px;font-weight:700;color:var(--c-accent);margin-bottom:16px;display:none">{{ item.final_line_price | money }}</div>
+                  
+                  <div style="display:flex;align-items:center;gap:16px;margin-top:auto">
+                    <div class="show-mobile" style="display:none;align-items:center;border:1px solid var(--c-border);border-radius:calc(var(--radius) - 2px);background:var(--c-bg)">
+                      <button type="button" class="cart-qty-btn" data-action="minus" data-key="{{ item.key }}" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">−</button>
+                      <input type="number" class="cart-qty-input" data-key="{{ item.key }}" value="{{ item.quantity }}" min="1" style="width:40px;text-align:center;border:none;font-size:14px;font-weight:600;font-family:var(--f-body);background:none;color:var(--c-text)">
+                      <button type="button" class="cart-qty-btn" data-action="plus" data-key="{{ item.key }}" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">+</button>
+                    </div>
+                    
+                    <button type="button" class="cart-remove-btn" data-key="{{ item.key }}" style="font-size:14px;color:var(--c-subtle);text-decoration:underline;background:none;border:none;cursor:pointer;padding:0;font-family:var(--f-body)">Remove</button>
+                  </div>
+                </div>
+
+                <!-- Desktop Qty -->
+                <div class="hide-mobile" style="display:flex;align-items:center;justify-content:center">
+                  <div style="display:flex;align-items:center;border:1px solid var(--c-border);border-radius:calc(var(--radius) - 2px);background:var(--c-bg)">
+                    <button type="button" class="cart-qty-btn" data-action="minus" data-key="{{ item.key }}" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">−</button>
+                    <input type="number" class="cart-qty-input" data-key="{{ item.key }}" value="{{ item.quantity }}" min="1" style="width:40px;text-align:center;border:none;font-size:14px;font-weight:600;font-family:var(--f-body);background:none;color:var(--c-text)">
+                    <button type="button" class="cart-qty-btn" data-action="plus" data-key="{{ item.key }}" style="width:36px;height:36px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--c-text)">+</button>
+                  </div>
+                </div>
+
+                <!-- Desktop Total -->
+                <div class="hide-mobile" style="text-align:right">
+                  <span style="font-weight:700;font-size:18px;color:var(--c-accent)">{{ item.final_line_price | money }}</span>
+                </div>
+                
+              </div>
+            {%- endfor -%}
+          </div>
+          
+          {%- if section.settings.show_note -%}
+            <div style="margin-top:32px;background:var(--c-subtle-bg, #F9FAFB);padding:24px;border-radius:var(--radius);border:1px solid var(--c-border)">
+              <label style="font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Add a note to your order
+              </label>
+              <textarea name="note" form="cart-form" rows="4" placeholder="Special instructions for seller..." style="width:100%;padding:16px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);font-size:14px;resize:vertical;background:#fff;color:var(--c-text);outline:none" onblur="fetch('{{ routes.cart_update_url }}.js', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ note: this.value })})">{{ cart.note }}</textarea>
             </div>
-            <a href="{{ item.url_to_remove }}" style="font-size:13px;color:var(--c-subtle);text-decoration:underline">Remove</a>
+          {%- endif -%}
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div>
+          <div style="background:var(--c-subtle-bg, #F9FAFB);border-radius:var(--radius);padding:32px;position:sticky;top:32px;border:1px solid var(--c-border)">
+            <h2 style="font-family:var(--f-heading);font-size:20px;margin-bottom:24px;font-weight:700;border-bottom:1px solid var(--c-border);padding-bottom:16px">Order Summary</h2>
+            
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:16px;color:var(--c-text)">
+              <span>Subtotal</span>
+              <span style="font-weight:700">{{ cart.total_price | money }}</span>
+            </div>
+            
+            <p style="font-size:13px;color:var(--c-subtle);margin-bottom:32px;line-height:1.5">Taxes and shipping calculated at checkout.</p>
+            
+            {%- if section.settings.show_gift -%}
+              <label style="display:flex;align-items:center;gap:12px;font-size:14px;margin-bottom:24px;cursor:pointer;padding:16px;background:#fff;border:1px solid var(--c-border);border-radius:calc(var(--radius) - 4px)">
+                <input type="checkbox" name="attributes[gift_wrap]" form="cart-form" style="width:20px;height:20px;accent-color:var(--c-accent)">
+                <div>
+                  <div style="font-weight:600">Add Gift Wrapping</div>
+                  <div style="font-size:12px;color:var(--c-subtle)">Include a personalized message</div>
+                </div>
+              </label>
+            {%- endif -%}
+            
+            <form id="cart-form" action="{{ routes.cart_url }}" method="post">
+              <button type="submit" name="checkout" class="btn btn--primary" style="width:100%;height:56px;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;gap:12px">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Proceed to Checkout
+              </button>
+            </form>
+            
+            <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px">
+              <svg width="32" height="20" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="24" rx="4" fill="#E5E7EB"/><path d="M11 12H27M11 12L15 8M11 12L15 16" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg width="32" height="20" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="24" rx="4" fill="#E5E7EB"/><circle cx="19" cy="12" r="5" stroke="#9CA3AF" stroke-width="2"/></svg>
+              <svg width="32" height="20" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="24" rx="4" fill="#E5E7EB"/><path d="M12 8H26M12 12H26M12 16H20" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
           </div>
         </div>
       </div>
-      {%- endfor -%}
-      {%- if section.settings.show_note -%}
-      <div style="margin-top:24px">
-        <label style="font-weight:600;font-size:14px;display:block;margin-bottom:8px">Order Note</label>
-        <textarea name="note" form="cart-form" rows="3" placeholder="Add a note to your order..." style="width:100%;padding:12px;border:1px solid var(--c-border);border-radius:var(--radius);font-family:var(--f-body);font-size:14px;resize:vertical;background:var(--c-bg);color:var(--c-text)">{{ cart.note }}</textarea>
-      </div>
-      {%- endif -%}
-    </div>
-    <div>
-      <div style="background:var(--c-subtle-bg,#f8f8f6);border-radius:calc(var(--radius)*2);padding:32px;position:sticky;top:100px">
-        <h2 style="font-family:var(--f-heading);font-size:20px;margin-bottom:24px">Order Summary</h2>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:15px">
-          <span>Subtotal</span><span style="font-weight:600">{{ cart.total_price | money }}</span>
-        </div>
-        <p style="font-size:13px;color:var(--c-subtle);margin-bottom:24px">Shipping and taxes calculated at checkout.</p>
-        {%- if section.settings.show_gift -%}
-        <label style="display:flex;align-items:center;gap:10px;font-size:14px;margin-bottom:20px;cursor:pointer">
-          <input type="checkbox" name="attributes[gift_wrap]" form="cart-form" style="width:16px;height:16px;accent-color:var(--c-accent)"> Gift wrapping (+₹99)
-        </label>
-        {%- endif -%}
-        <form id="cart-form" action="/checkout" method="post">
-          <button type="submit" class="btn-primary" style="width:100%;padding:16px;font-size:16px">Proceed to Checkout</button>
-        </form>
-        <a href="/collections/all" style="display:block;text-align:center;margin-top:16px;font-size:14px;color:var(--c-subtle);text-decoration:underline">Continue Shopping</a>
-      </div>
-    </div>
-  </div>
+    {%- endif -%}
+  </cart-page>
 </div>
+
 <style>
-@media(max-width:768px){.cart-grid{grid-template-columns:1fr!important}}
-</style>
-<script>
-function updateQty(key, qty) {
-  if (qty < 0) return;
-  fetch('/cart/change.js', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id: key, quantity: qty }) })
-    .then(() => window.location.reload());
+cart-page { display: block; position: relative; }
+.cart-qty-input::-webkit-outer-spin-button, .cart-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+@media (max-width: 768px) {
+  .cart-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: flex !important; }
+  .cart-item { grid-template-columns: 100px 1fr !important; gap: 16px !important; }
+  .cart-item-price-mobile { display: block !important; }
 }
+</style>
+
+<script>
+class CartPage extends HTMLElement {
+  constructor() {
+    super();
+    this.sectionId = document.querySelector('[data-section-id]').dataset.sectionId;
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    this.querySelectorAll('.cart-qty-btn').forEach(btn => {
+      btn.addEventListener('click', this.handleQtyChange.bind(this));
+    });
+    this.querySelectorAll('.cart-remove-btn').forEach(btn => {
+      btn.addEventListener('click', this.handleRemove.bind(this));
+    });
+  }
+
+  async updateCart(updates) {
+    this.style.pointerEvents = 'none';
+    this.style.opacity = '0.7';
+
+    try {
+      const response = await fetch(window.Shopify.routes.root + 'cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates })
+      });
+      if (response.ok) {
+        await this.renderSection();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.style.pointerEvents = 'auto';
+      this.style.opacity = '1';
+    }
+  }
+
+  async renderSection() {
+    try {
+      const response = await fetch(`?sections=${this.sectionId}`);
+      const data = await response.json();
+      const html = new DOMParser().parseFromString(data[this.sectionId], 'text/html');
+      this.innerHTML = html.querySelector('cart-page').innerHTML;
+      this.bindEvents();
+    } catch(e) {
+      console.error('Failed to render cart page', e);
+      window.location.reload();
+    }
+  }
+
+  handleQtyChange(e) {
+    const btn = e.currentTarget;
+    const key = btn.dataset.key;
+    const input = this.querySelector(`.cart-qty-input[data-key="${key}"]`);
+    let qty = parseInt(input.value);
+    
+    if (btn.dataset.action === 'plus') qty++;
+    else if (btn.dataset.action === 'minus') qty--;
+
+    if (qty === 0) {
+      this.updateCart({ [key]: 0 });
+    } else {
+      input.value = qty;
+      this.updateCart({ [key]: qty });
+    }
+  }
+
+  handleRemove(e) {
+    const key = e.currentTarget.dataset.key;
+    this.updateCart({ [key]: 0 });
+  }
+}
+customElements.define('cart-page', CartPage);
 </script>
-{%- endif -%}
+
 {% schema %}
 {
-  "name": "Cart",
+  "name": "Cart Page",
   "settings": [
     { "type": "checkbox", "id": "show_note", "label": "Show order note", "default": true },
-    { "type": "checkbox", "id": "show_gift", "label": "Show gift wrap option", "default": false }
-  ],
-  "presets": [{ "name": "Cart" }]
+    { "type": "checkbox", "id": "show_gift", "label": "Show gift wrap option", "default": true }
+  ]
 }
 {% endschema %}

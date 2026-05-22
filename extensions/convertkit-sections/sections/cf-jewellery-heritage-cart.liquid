@@ -1,136 +1,202 @@
-{% comment %}
-  ConvertFlow — Jewellery Heritage Cart Page
-  Minimalist luxury cart with secure checkout badges.
-{% endcomment %}
+{% comment %}ConvertFlow: Meenakshi Heritage Jewellers Ã¢â‚¬â€ Cart Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: {{ section.settings.color_accent | default: '#8B1A2C' }}; --cf-bg: {{ section.settings.color_bg | default: '#FAF0F0' }}; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.cfc-wrap { max-width: 1200px; margin: 0 auto; padding: 60px; display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start; }
+.cfc-title { font-size: 32px; font-weight: 800; margin-bottom: 32px; color: #1a1a1a; }
+.cfc-empty { text-align:center; padding: 80px 20px; color: #888; }
+.cfc-empty svg { width: 60px; margin-bottom: 20px; color: #ddd; }
+.cfc-empty p { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #333; }
+.cfc-empty span { font-size: 14px; }
+.cfc-empty a { display: inline-block; margin-top: 24px; background: var(--cf-accent); color: #fff; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.cfc-items { display: flex; flex-direction: column; gap: 0; background: #fff; border: 1px solid #e5e7eb; }
+.cfc-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 20px; padding: 24px; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.cfc-item:last-child { border-bottom: none; }
+.cfc-item-img { width: 90px; height: 90px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; }
+.cfc-item-img img { width:100%; height:100%; object-fit:cover; }
+.cfc-item-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfc-item-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.cfc-item-props { font-size: 12px; color: #888; margin-bottom: 12px; }
+.cfc-item-qty { display: flex; align-items: center; gap: 12px; }
+.cfc-item-qty button { width: 28px; height: 28px; border: 1px solid #e5e7eb; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cfc-item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cfc-item-remove { font-size: 11px; color: #aaa; text-decoration: underline; cursor: pointer; transition: color .2s; }
+.cfc-item-remove:hover { color: #e53e3e; }
+.cfc-item-price { font-size: 18px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+/* Summary */
+.cfc-summary { background: #fff; border: 1px solid #e5e7eb; padding: 32px; position: sticky; top: 24px; }
+.cfc-summary h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.cfc-row { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 12px; }
+.cfc-row.total { font-size: 18px; font-weight: 700; color: #1a1a1a; padding-top: 16px; margin-top: 8px; border-top: 1px solid #e5e7eb; }
+.cfc-promo { display: flex; border: 1.5px solid #e5e7eb; overflow: hidden; margin: 20px 0; }
+.cfc-promo input { flex: 1; border: none; padding: 12px 16px; font-size: 14px; outline: none; font-family: inherit; }
+.cfc-promo button { background: var(--cf-accent); color: #fff; border: none; padding: 12px 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cfc-checkout { display: block; width: 100%; background: var(--cf-accent); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; letter-spacing: .5px; transition: opacity .2s; text-decoration: none; }
+.cfc-checkout:hover { opacity: .9; }
+.cfc-trust { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.cfc-trust-i { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+.cfc-trust-i svg { flex-shrink: 0; color: var(--cf-accent); }
+@media(max-width:1024px){ .cfc-wrap { grid-template-columns: 1fr; padding: 30px 20px; gap: 30px; } }
+</style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
-
-  :root {
-    --jh-primary: {{ section.settings.color_primary | default: '#D4AF37' }};
-    --jh-bg: {{ section.settings.color_bg | default: '#FFFFFF' }};
-    --jh-surface: {{ section.settings.color_surface | default: '#FAFAFA' }};
-    --jh-border: rgba(212, 175, 55, 0.3);
-    --jh-text: {{ section.settings.color_text | default: '#222222' }};
-    --jh-font-heading: 'Playfair Display', serif;
-    --jh-font-body: 'Lato', sans-serif;
-  }
-
-  .cf-jh-cart * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-jh-cart { font-family: var(--jh-font-body); background: var(--jh-bg); color: var(--jh-text); min-height: 80vh; padding: 80px 5%; }
-  
-  .cf-jh-cart-wrap { max-width: 1000px; margin: 0 auto; }
-  
-  .cf-jh-cart-h1 { font-family: var(--jh-font-heading); font-size: 48px; font-weight: 400; margin-bottom: 40px; text-align: center; }
-  .cf-jh-cart-h1::after { content: ''; display: block; width: 60px; height: 1px; background: var(--jh-primary); margin: 20px auto 0; }
-  
-  /* Items */
-  .cf-jh-c-items { border-top: 1px solid #eaeaea; }
-  .cf-jh-c-item { display: grid; grid-template-columns: 120px 1fr auto; gap: 30px; padding: 40px 0; border-bottom: 1px solid #eaeaea; align-items: center; }
-  
-  .cf-jh-c-img { aspect-ratio: 1; border: 1px solid #eaeaea; padding: 10px; display: flex; align-items: center; justify-content: center; }
-  .cf-jh-c-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  
-  .cf-jh-c-info h3 { font-family: var(--jh-font-heading); font-size: 22px; font-weight: 400; margin-bottom: 8px; color: var(--jh-text); }
-  .cf-jh-c-var { font-size: 13px; color: #666; margin-bottom: 16px; font-weight: 300; }
-  
-  .cf-jh-c-actions { display: flex; align-items: center; gap: 24px; }
-  .cf-jh-c-qty { display: flex; align-items: center; border: 1px solid #eaeaea; padding: 4px 16px; }
-  .cf-jh-c-qty button { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--jh-text); }
-  .cf-jh-c-qty span { font-size: 14px; margin: 0 16px; }
-  .cf-jh-c-remove { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: color 0.3s; }
-  .cf-jh-c-remove:hover { color: var(--jh-primary); }
-  
-  .cf-jh-c-price { font-family: var(--jh-font-heading); font-size: 20px; color: var(--jh-primary); }
-  
-  /* Summary */
-  .cf-jh-cart-footer { max-width: 400px; margin-left: auto; margin-top: 40px; }
-  .cf-jh-c-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 16px; color: #666; }
-  .cf-jh-c-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 400; color: var(--jh-text); font-family: var(--jh-font-heading); border-top: 1px solid #eaeaea; padding-top: 20px; margin-top: 10px; margin-bottom: 30px; }
-  
-  .cf-jh-btn-checkout {
-    display: block; width: 100%; text-align: center;
-    background: var(--jh-primary); color: #fff; border: none;
-    padding: 18px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
-    text-decoration: none; cursor: pointer; transition: background 0.4s ease;
-  }
-  .cf-jh-btn-checkout:hover { background: var(--jh-text); }
-  
-  .cf-jh-c-secure { text-align: center; margin-top: 20px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .cf-jh-c-secure svg { width: 14px; height: 14px; color: var(--jh-primary); }
-
-  .cf-jh-c-empty { text-align: center; padding: 60px 0; }
-  .cf-jh-c-empty a { display: inline-block; padding: 14px 40px; border: 1px solid var(--jh-primary); color: var(--jh-text); text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px; transition: all 0.3s; }
-  .cf-jh-c-empty a:hover { background: var(--jh-primary); color: #fff; }
-
-  @media(max-width: 768px) {
-    .cf-jh-c-item { grid-template-columns: 80px 1fr; gap: 20px; position: relative; padding: 30px 0; }
-    .cf-jh-c-price { position: absolute; top: 30px; right: 0; }
-    .cf-jh-cart-footer { max-width: 100%; }
-  }
-{% endstyle %}
-
-<div class="cf-jh-cart">
-  <div class="cf-jh-cart-wrap">
-    <h1 class="cf-jh-cart-h1">Your Selection</h1>
-    
+<div class="cfc-wrap">
+  <div>
+    <h1 class="cfc-title">Your Cart ({{ cart.item_count }})</h1>
     {% if cart.item_count == 0 %}
-      <div class="cf-jh-c-empty">
-        <p style="color:#666; margin-bottom:20px; font-size:15px; font-weight:300;">Your exquisite collection is currently empty.</p>
-        <a href="/collections/all">Discover Pieces</a>
+      <div class="cfc-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Your cart is empty</p>
+        <span>Looks like you haven't added anything yet.</span>
+        <a href="/collections/all">Continue Shopping</a>
       </div>
     {% else %}
-      <div class="cf-jh-c-items">
+      <div class="cfc-items">
         {% for item in cart.items %}
-          <div class="cf-jh-c-item">
-            <div class="cf-jh-c-img">
+          <div class="cfc-item">
+            <div class="cfc-item-img">
               {% if item.image %}
-                <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}">
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title }}">
+              {% else %}
+                <svg width="36" height="36" fill="none" stroke="#ccc" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>
               {% endif %}
             </div>
-            <div class="cf-jh-c-info">
-              <h3>{{ item.product.title }}</h3>
-              {% unless item.variant.title contains 'Default' %}
-                <div class="cf-jh-c-var">{{ item.variant.title }}</div>
-              {% endunless %}
-              <div class="cf-jh-c-actions">
-                <div class="cf-jh-c-qty">
-                  <button>-</button><span>{{ item.quantity }}</span><button>+</button>
-                </div>
-                <a href="{{ item.url_to_remove }}" class="cf-jh-c-remove">Remove</a>
+            <div>
+              <div class="cfc-item-vendor">{{ item.vendor }}</div>
+              <div class="cfc-item-name">{{ item.product_title }}</div>
+              <div class="cfc-item-props">{{ item.variant_title }}</div>
+              <div class="cfc-item-qty">
+                <button>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button><span>{{ item.quantity }}</span><button>+</button>
+                <span class="cfc-item-remove">Remove</span>
               </div>
             </div>
-            <div class="cf-jh-c-price">{{ item.final_line_price | money }}</div>
+            <div class="cfc-item-price">{{ item.final_line_price | money }}</div>
           </div>
         {% endfor %}
       </div>
-      
-      <div class="cf-jh-cart-footer">
-        <div class="cf-jh-c-row"><span>Subtotal</span> <span>{{ cart.total_price | money }}</span></div>
-        <div class="cf-jh-c-row"><span>Insured Shipping</span> <span>Complimentary</span></div>
-        <div class="cf-jh-c-total"><span>Total</span> <span>{{ cart.total_price | money }}</span></div>
-        
-        <a href="/checkout" class="cf-jh-btn-checkout">Secure Checkout</a>
-        <div class="cf-jh-c-secure">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          256-Bit SSL Encrypted
-        </div>
-      </div>
+    {% endif %}
+  </div>
+
+  <div class="cfc-summary">
+    <h2>Order Summary</h2>
+    <div class="cfc-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-row"><span>Shipping</span><span>Calculated at checkout</span></div>
+    {% if cart.total_discount > 0 %}
+      <div class="cfc-row" style="color:#16A34A"><span>Discount</span><span>ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢{{ cart.total_discount | money }}</span></div>
+    {% endif %}
+    <div class="cfc-row total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
+    <div class="cfc-promo">
+      <input type="text" placeholder="Discount code">
+      <button>Apply</button>
+    </div>
+    <a href="/checkout" class="cfc-checkout">{{ section.settings.checkout_text }}</a>
+    {% if section.settings.show_trust %}
+    <div class="cfc-trust">
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> {{ section.settings.trust_1 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg> {{ section.settings.trust_2 }}</div>
+      <div class="cfc-trust-i"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> {{ section.settings.trust_3 }}</div>
+    </div>
     {% endif %}
   </div>
 </div>
 
 {% schema %}
 {
-  "name": "CF Jewellery Cart",
+  "name": "CF Meenakshi Heritage Jew",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Gold Accent", "default": "#D4AF37" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#FAFAFA" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#222222" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#8B1A2C"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#FAF0F0"
+    },
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Checkout Button Text",
+      "default": "Proceed to Checkout Ã¢â€ â€™"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show Promo Code Field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "continue_text",
+      "label": "Empty Cart Button Text",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "header",
+      "content": "Trust Signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Secure SSL Checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Free Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Upsell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show Upsell Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell Heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell Collection"
+    }
   ],
   "presets": [
-    { "name": "CF Jewellery Cart" }
+    {
+      "name": "CF Meenakshi Heritage Jew"
+    }
   ]
 }
 {% endschema %}

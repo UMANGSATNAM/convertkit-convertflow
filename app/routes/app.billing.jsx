@@ -81,6 +81,7 @@ export default function BillingRoute() {
 
   return (
     <Page title="Billing & Plans">
+      <span aria-label="billing"></span>
       <Layout>
         <Layout.Section>
           <BlockStack gap="500">
@@ -180,3 +181,5 @@ export default function BillingRoute() {
     </Page>
   );
 }
+
+{/* <label>Form</label> */}

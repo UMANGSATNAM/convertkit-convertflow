@@ -1,129 +1,213 @@
-{% comment %}
-  ConvertFlow — Pet Supplies Collection Page
-  Playful rounded grid with soft pill-shaped filters.
-{% endcomment %}
+{% comment %}ConvertFlow: Pet Supplies ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collection Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --cf-accent: #D35400; --cf-bg: #f9e0d1; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--cf-bg); -webkit-font-smoothing: antialiased; }
+.cfcol-banner { background: var(--cf-accent); color: #fff; padding: 60px; text-align: center; }
+.cfcol-banner h1 { font-size: 48px; font-weight: 800; margin-bottom: 12px; }
+.cfcol-banner p { font-size: 16px; opacity: .7; max-width: 500px; margin: 0 auto; }
+.cfcol-count { font-size: 12px; opacity: .6; margin-top: 8px; }
+.cfcol-body { max-width: 1300px; margin: 0 auto; padding: 60px; }
+.cfcol-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.cfcol-filters { display: flex; gap: 8px; overflow-x: auto; }
+.cfcol-filter { padding: 8px 20px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.cfcol-filter:hover, .cfcol-filter.active { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+.cfcol-sort select { border: 1.5px solid #e5e7eb; padding: 8px 16px; font-size: 13px; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+.cfcol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.cfcol-card { background: #fff; border: 1px solid #e5e7eb; text-decoration: none; color: #1a1a1a; display: block; transition: all .3s; }
+.cfcol-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); transform: translateY(-4px); }
+.cfcol-img { aspect-ratio: 1; background: #f5f3ef; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.cfcol-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+.cfcol-card:hover .cfcol-img img { transform: scale(1.05); }
+.cfcol-img svg { width: 30%; color: var(--cf-accent); opacity: .25; }
+.cfcol-badge { position: absolute; top: 12px; left: 12px; background: var(--cf-accent); color: #fff; padding: 4px 12px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.cfcol-info { padding: 18px; }
+.cfcol-vendor { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cf-accent); margin-bottom: 4px; }
+.cfcol-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+.cfcol-price { display: flex; align-items: center; gap: 10px; }
+.cfcol-price strong { font-size: 18px; font-weight: 700; }
+.cfcol-price del { font-size: 13px; color: #aaa; }
+.cfcol-atc { display: block; width: calc(100% - 36px); margin: 0 18px 18px; background: var(--cf-accent); color: #fff; border: none; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; font-family: inherit; transition: opacity .2s; }
+.cfcol-atc:hover { opacity: .88; }
+.cfcol-empty { text-align: center; padding: 80px 20px; color: #888; }
+.cfcol-pagination { display: flex; justify-content: center; gap: 8px; margin-top: 60px; }
+.cfcol-page { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; color: #333; transition: all .2s; }
+.cfcol-page.active, .cfcol-page:hover { background: var(--cf-accent); color: #fff; border-color: var(--cf-accent); }
+@media(max-width:1024px){ .cfcol-grid { grid-template-columns: repeat(2, 1fr); } .cfcol-body { padding: 40px 20px; } .cfcol-banner { padding: 40px 20px; } .cfcol-banner h1 { font-size: 32px; } }
+</style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
+<div class="cfcol-banner">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description != blank %}
+    <p>{{ collection.description | strip_html | truncate: 160 }}</p>
+  {% endif %}
+  <div class="cfcol-count">{{ collection.products_count }} Products</div>
+</div>
 
-  :root {
-    --pet-primary: {{ section.settings.color_primary | default: '#FF6B35' }};
-    --pet-secondary: {{ section.settings.color_secondary | default: '#FFD166' }};
-    --pet-bg: {{ section.settings.color_bg | default: '#FFF8F0' }};
-    --pet-surface: {{ section.settings.color_surface | default: '#FFFFFF' }};
-    --pet-text: {{ section.settings.color_text | default: '#2B2D42' }};
-    --pet-font-heading: 'Quicksand', sans-serif;
-    --pet-font-body: 'Nunito', sans-serif;
-  }
-
-  .cf-pet-c * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-pet-c { font-family: var(--pet-font-body); background: var(--pet-bg); color: var(--pet-text); }
-  
-  .cf-pet-c-header { background: var(--pet-surface); text-align: center; padding: 60px 5%; border-bottom-left-radius: 60px; border-bottom-right-radius: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); margin-bottom: 40px; position: relative; }
-  .cf-pet-c-header h1 { font-family: var(--pet-font-heading); font-size: clamp(36px, 5vw, 48px); font-weight: 700; color: var(--pet-text); margin-bottom: 12px; }
-  .cf-pet-c-header p { font-size: 16px; color: #666; max-width: 500px; margin: 0 auto; font-weight: 600; }
-  
-  .cf-pet-c-main { max-width: 1400px; margin: 0 auto; padding: 0 5% 80px; }
-  
-  .cf-pet-c-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-  .cf-pet-c-filters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
-  .cf-pet-c-filters::-webkit-scrollbar { display: none; }
-  .cf-pet-c-filter { padding: 10px 24px; background: var(--pet-surface); border: 2px solid #eee; border-radius: 50px; font-family: var(--pet-font-heading); font-weight: 700; font-size: 15px; color: var(--pet-text); cursor: pointer; white-space: nowrap; transition: all 0.3s; }
-  .cf-pet-c-filter:hover, .cf-pet-c-filter.active { border-color: var(--pet-primary); background: var(--pet-primary); color: #fff; box-shadow: 0 5px 15px rgba(255, 107, 53, 0.2); transform: translateY(-2px); }
-  
-  .cf-pet-c-sort select { border: 2px solid #eee; border-radius: 50px; padding: 10px 20px; font-family: var(--pet-font-heading); font-weight: 700; font-size: 15px; color: var(--pet-text); background: var(--pet-surface); outline: none; cursor: pointer; }
-  
-  .cf-pet-c-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-  .cf-pet-prod { text-decoration: none; color: var(--pet-text); background: var(--pet-surface); border-radius: 24px; padding: 20px; transition: transform 0.3s, box-shadow 0.3s; position: relative; }
-  .cf-pet-prod:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); border-bottom: 4px solid var(--pet-primary); margin-bottom: -4px; }
-  
-  .cf-pet-prod-img { aspect-ratio: 1; background: #FFF8F0; border-radius: 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .cf-pet-prod-img img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
-  .cf-pet-prod:hover .cf-pet-prod-img img { transform: scale(1.08); }
-  
-  .cf-pet-prod-tag { position: absolute; top: 10px; left: 10px; background: var(--pet-secondary); color: var(--pet-text); font-family: var(--pet-font-heading); font-weight: 700; font-size: 12px; padding: 4px 12px; border-radius: 20px; z-index: 2; }
-  
-  .cf-pet-prod-title { font-family: var(--pet-font-body); font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--pet-text); }
-  .cf-pet-prod-price { font-family: var(--pet-font-heading); font-size: 20px; color: var(--pet-primary); font-weight: 800; }
-
-  @media(max-width: 1024px) {
-    .cf-pet-c-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media(max-width: 768px) {
-    .cf-pet-c-header { border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
-    .cf-pet-c-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .cf-pet-c-toolbar { flex-direction: column; gap: 20px; align-items: stretch; }
-  }
-{% endstyle %}
-
-<div class="cf-pet-c">
-  <div class="cf-pet-c-header">
-    <h1>{{ collection.title | default: 'All Pet Products' }}</h1>
-    {% if collection.description != blank %}
-      <p>{{ collection.description | strip_html | truncate: 150 }}</p>
-    {% endif %}
-  </div>
-  
-  <div class="cf-pet-c-main">
-    <div class="cf-pet-c-toolbar">
-      <div class="cf-pet-c-filters">
-        <div class="cf-pet-c-filter active">All Supplies</div>
-        <div class="cf-pet-c-filter">Dogs</div>
-        <div class="cf-pet-c-filter">Cats</div>
-        <div class="cf-pet-c-filter">Toys</div>
-        <div class="cf-pet-c-filter">Food & Treats</div>
-      </div>
-      <div class="cf-pet-c-sort">
-        <select>
-          <option>Sort By: Best Selling</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-        </select>
-      </div>
+<div class="cfcol-body">
+  <div class="cfcol-toolbar">
+    <div class="cfcol-filters">
+      <button class="cfcol-filter active">All</button>
+      <button class="cfcol-filter">New Arrivals</button>
+      <button class="cfcol-filter">Best Sellers</button>
+      <button class="cfcol-filter">On Sale</button>
     </div>
-    
-    <div class="cf-pet-c-grid">
-      {% if collection.products.size > 0 %}
-        {% for product in collection.products %}
-          <a href="{{ product.url }}" class="cf-pet-prod">
-            {% if product.tags contains 'new' %}
-              <div class="cf-pet-prod-tag" style="background:var(--pet-primary); color:#fff;">New Arrival</div>
+    <div class="cfcol-sort">
+      <select name="sort_by">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="created-descending">Newest</option>
+      </select>
+    </div>
+  </div>
+
+  {% if collection.products.size > 0 %}
+    <div class="cfcol-grid">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="cfcol-card">
+          <div class="cfcol-img">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy">
+            {% else %}
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
             {% endif %}
-            <div class="cf-pet-prod-img">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
+            {% if product.available == false %}
+              <span class="cfcol-badge">Sold Out</span>
+            {% elsif product.compare_at_price > product.price %}
+              <span class="cfcol-badge">Sale</span>
+            {% endif %}
+          </div>
+          <div class="cfcol-info">
+            <div class="cfcol-vendor">{{ product.vendor }}</div>
+            <div class="cfcol-title">{{ product.title }}</div>
+            <div class="cfcol-price">
+              <strong>{{ product.price | money }}</strong>
+              {% if product.compare_at_price > product.price %}
+                <del>{{ product.compare_at_price | money }}</del>
               {% endif %}
             </div>
-            <div class="cf-pet-prod-title">{{ product.title }}</div>
-            <div class="cf-pet-prod-price">{{ product.price | money }}</div>
-          </a>
-        {% endfor %}
-      {% else %}
-        {% for i in (1..8) %}
-          <a href="#" class="cf-pet-prod">
-            <div class="cf-pet-prod-tag">Best Seller</div>
-            <div class="cf-pet-prod-img"><div style="width:80%; height:80%; background:#f0f0f0; border-radius:50%;"></div></div>
-            <div class="cf-pet-prod-title">Yummy Treats {{ i }}</div>
-            <div class="cf-pet-prod-price">$14.99</div>
-          </a>
-        {% endfor %}
-      {% endif %}
+          </div>
+          <button class="cfcol-atc">Add to Cart</button>
+        </a>
+      {% endfor %}
     </div>
-  </div>
+
+    {% if paginate.pages > 1 %}
+      {% paginate collection.products by 16 %}
+        <div class="cfcol-pagination">
+          {% for page in (1..paginate.pages) %}
+            <a href="{{ paginate | default_pagination | where: 'page', page }}" class="cfcol-page{% if forloop.index == paginate.current_page %} active{% endif %}">{{ page }}</a>
+          {% endfor %}
+        </div>
+      {% endpaginate %}
+    {% endif %}
+  {% else %}
+    <div class="cfcol-empty">No products found in this collection.</div>
+  {% endif %}
 </div>
 
 {% schema %}
 {
-  "name": "CF Pet Supplies Collection",
+  "name": "CF Pet Supplies Coll",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Accent", "default": "#FF6B35" },
-    { "type": "color", "id": "color_secondary", "label": "Secondary Accent", "default": "#FFD166" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#FFF8F0" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#2B2D42" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#D35400"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#f9e0d1"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show Collection Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "label": "Products per Row (Desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Filters & Sort"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show Sort Dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare Price",
+      "default": true
+    }
   ],
   "presets": [
-    { "name": "CF Pet Supplies Collection" }
+    {
+      "name": "CF Pet Supplies Coll"
+    }
   ]
 }
 {% endschema %}

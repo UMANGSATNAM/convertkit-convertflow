@@ -1,176 +1,359 @@
-{% comment %}
-  ConvertFlow — Pet Supplies Product Page
-  Playful product layout with rounded corners and warm tones.
-{% endcomment %}
+{% comment %}ConvertFlow: Pet Supplies ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Product Page{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cf-accent: {{ section.settings.color_accent | default: '#D35400' }};
+  --cf-bg: {{ section.settings.color_bg | default: '#f9e0d1' }};
+  --cf-text: {{ section.settings.color_text | default: '#1a1a1a' }};
+  --cf-font: 'Nunito', sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--cf-font),'Inter',sans-serif;background:var(--cf-bg);color:var(--cf-text);-webkit-font-smoothing:antialiased}
+.cfp-crumb{padding:14px 60px;font-size:12px;color:#888;background:#fff;border-bottom:1px solid #eee}
+.cfp-crumb a{color:#888;text-decoration:none}
+.cfp-crumb span{margin:0 8px}
+.cfp-wrap{max-width:1300px;margin:0 auto;padding:60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.cfp-main-img{background:#f0ece6;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border-radius:4px;overflow:hidden}
+.cfp-main-img img{width:100%;height:100%;object-fit:cover}
+.cfp-main-img svg{width:30%;color:var(--cf-accent);opacity:.3}
+.cfp-thumbs{display:flex;gap:10px}
+.cfp-thumb{width:80px;aspect-ratio:1;background:#e8e4de;border-radius:4px;border:2px solid transparent;cursor:pointer;overflow:hidden}
+.cfp-thumb.active,.cfp-thumb:hover{border-color:var(--cf-accent)}
+.cfp-vendor{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cf-accent);margin-bottom:12px;display:block}
+.cfp-name{font-size:36px;font-weight:700;line-height:1.15;margin-bottom:16px}
+.cfp-rating{display:flex;align-items:center;gap:8px;margin-bottom:20px;color:#888;font-size:13px}
+.cfp-stars{color:#F59E0B;letter-spacing:2px}
+.cfp-price-row{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #e5e7eb}
+.cfp-price{font-size:32px;font-weight:700}
+.cfp-compare{font-size:20px;color:#aaa;text-decoration:line-through}
+.cfp-save{background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.cfp-desc{font-size:15px;color:#555;line-height:1.8;margin-bottom:28px}
+.cfp-label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;color:#333}
+.cfp-variants{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.cfp-var{padding:8px 18px;border:1.5px solid #e5e7eb;background:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:4px;transition:all .2s}
+.cfp-var:hover,.cfp-var.active{border-color:var(--cf-accent);background:var(--cf-accent);color:#fff}
+.cfp-qty-row{display:flex;gap:12px;margin-bottom:12px}
+.cfp-qty{display:flex;align-items:center;border:1.5px solid #e5e7eb;border-radius:4px;overflow:hidden}
+.cfp-qty button{width:40px;height:52px;background:none;border:none;font-size:20px;cursor:pointer;color:#333}
+.cfp-qty span{width:40px;text-align:center;font-size:16px;font-weight:600}
+.cfp-atc{flex:1;background:var(--cf-accent);color:#fff;border:none;padding:16px 32px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:opacity .2s;border-radius:4px}
+.cfp-atc:hover{opacity:.9}
+.cfp-buy-now{display:block;width:100%;background:transparent;color:var(--cf-accent);border:2px solid var(--cf-accent);padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;border-radius:4px;margin-top:8px;transition:all .2s}
+.cfp-buy-now:hover{background:var(--cf-accent);color:#fff}
+.cfp-wishlist{width:52px;height:52px;border:1.5px solid #e5e7eb;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;color:#888;transition:all .2s;flex-shrink:0}
+.cfp-wishlist:hover{border-color:var(--cf-accent);color:var(--cf-accent)}
+.cfp-trust{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px;padding-top:24px;border-top:1px solid #e5e7eb}
+.cfp-trust-item{display:flex;align-items:center;gap:10px;font-size:12px;color:#555;font-weight:500}
+.cfp-trust-icon{color:var(--cf-accent)}
+.cfp-tabs{background:#fff;border-top:1px solid #eee;padding:60px}
+.cfp-tabs-inner{max-width:1300px;margin:0 auto}
+.cfp-tab-nav{display:flex;border-bottom:2px solid #eee;margin-bottom:40px}
+.cfp-tab-btn{padding:14px 28px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.cfp-tab-btn.active{color:var(--cf-accent);border-bottom-color:var(--cf-accent)}
+.cfp-tab-content{display:none;font-size:15px;color:#555;line-height:1.9}
+.cfp-tab-content.active{display:block}
+.cfp-specs-table{width:100%;border-collapse:collapse}
+.cfp-specs-table tr{border-bottom:1px solid #f0f0f0}
+.cfp-specs-table td{padding:12px 0;font-size:14px}
+.cfp-specs-table td:first-child{color:#888;font-weight:500;width:40%}
+.cfp-related{padding:80px 60px;background:#f9f9f9;border-top:1px solid #eee}
+.cfp-related-inner{max-width:1300px;margin:0 auto}
+.cfp-related h2{font-size:28px;font-weight:700;margin-bottom:36px;text-align:center}
+.cfp-related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.cfp-rel-card{background:#fff;border:1px solid #eee;text-decoration:none;color:#1a1a1a;display:block;transition:all .3s;border-radius:4px;overflow:hidden}
+.cfp-rel-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.cfp-rel-img{aspect-ratio:1;background:#f5f3ef;display:flex;align-items:center;justify-content:center}
+.cfp-rel-img img{width:100%;height:100%;object-fit:cover}
+.cfp-rel-img svg{width:30%;color:var(--cf-accent);opacity:.25}
+.cfp-rel-info{padding:16px}
+.cfp-rel-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.cfp-rel-price{font-size:18px;font-weight:700;color:var(--cf-accent)}
+@media(max-width:1024px){.cfp-wrap{grid-template-columns:1fr;padding:30px 20px;gap:30px}.cfp-tabs{padding:40px 20px}.cfp-related{padding:60px 20px}.cfp-related-grid{grid-template-columns:repeat(2,1fr)}.cfp-crumb{padding:12px 20px}}
+</style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
+{% if section.settings.show_breadcrumb %}
+<div class="cfp-crumb">
+  <a href="/">Home</a><span>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº</span>
+  <a href="/collections/{{ product.type | handleize }}">{{ product.type | default: 'Products' }}</a><span>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº</span>
+  {{ product.title }}
+</div>
+{% endif %}
 
-  :root {
-    --pet-primary: {{ section.settings.color_primary | default: '#FF6B35' }};
-    --pet-secondary: {{ section.settings.color_secondary | default: '#FFD166' }};
-    --pet-bg: {{ section.settings.color_bg | default: '#FFF8F0' }};
-    --pet-surface: {{ section.settings.color_surface | default: '#FFFFFF' }};
-    --pet-text: {{ section.settings.color_text | default: '#2B2D42' }};
-    --pet-font-heading: 'Quicksand', sans-serif;
-    --pet-font-body: 'Nunito', sans-serif;
-  }
-
-  .cf-pet-p * { box-sizing: border-box; margin: 0; padding: 0; }
-  .cf-pet-p { font-family: var(--pet-font-body); background: var(--pet-bg); color: var(--pet-text); line-height: 1.6; padding-top: 40px; padding-bottom: 80px; }
-  
-  .cf-pet-p-wrap { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; padding: 0 5%; align-items: start; }
-  
-  /* Gallery */
-  .cf-pet-p-gallery { display: flex; flex-direction: column; gap: 20px; }
-  .cf-pet-p-img-main { background: var(--pet-surface); border-radius: 30px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-  .cf-pet-p-img-main img { width: 100%; height: 100%; object-fit: contain; }
-  .cf-pet-p-thumbs { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; }
-  .cf-pet-p-thumb { flex: 0 0 100px; aspect-ratio: 1; background: var(--pet-surface); border-radius: 16px; padding: 10px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-  .cf-pet-p-thumb:hover, .cf-pet-p-thumb.active { border-color: var(--pet-primary); transform: translateY(-3px); }
-  .cf-pet-p-thumb img { width: 100%; height: 100%; object-fit: contain; }
-  
-  /* Info */
-  .cf-pet-p-info { padding: 40px; background: var(--pet-surface); border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: sticky; top: 40px; }
-  .cf-pet-p-vendor { font-family: var(--pet-font-heading); font-size: 14px; font-weight: 700; color: var(--pet-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-  .cf-pet-p-title { font-family: var(--pet-font-heading); font-size: clamp(32px, 4vw, 42px); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
-  
-  .cf-pet-p-reviews { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; font-weight: 600; font-size: 14px; color: #666; }
-  .cf-pet-p-stars { color: var(--pet-secondary); display: flex; }
-  .cf-pet-p-stars svg { width: 18px; height: 18px; fill: currentColor; }
-  
-  .cf-pet-p-price { font-family: var(--pet-font-heading); font-size: 32px; font-weight: 800; color: var(--pet-primary); margin-bottom: 30px; }
-  
-  .cf-pet-p-desc { font-size: 16px; color: #555; margin-bottom: 30px; font-weight: 600; line-height: 1.7; }
-  
-  /* Options */
-  .cf-pet-p-opt { margin-bottom: 24px; }
-  .cf-pet-p-opt-header { font-family: var(--pet-font-heading); font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; }
-  .cf-pet-p-vals { display: flex; flex-wrap: wrap; gap: 12px; }
-  .cf-pet-p-val { padding: 12px 24px; border-radius: 20px; border: 2px solid #eee; background: #fff; font-family: var(--pet-font-heading); font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; color: var(--pet-text); }
-  .cf-pet-p-val:hover, .cf-pet-p-val.active { border-color: var(--pet-primary); background: #fff0eb; color: var(--pet-primary); }
-  
-  /* Actions */
-  .cf-pet-p-actions { display: grid; grid-template-columns: 120px 1fr; gap: 16px; margin-top: 30px; }
-  .cf-pet-p-qty { display: flex; align-items: center; justify-content: space-between; border: 2px solid #eee; border-radius: 50px; padding: 0 20px; font-weight: 700; font-size: 18px; }
-  .cf-pet-p-qty button { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--pet-primary); font-weight: 700; }
-  .cf-pet-p-add { background: var(--pet-primary); color: #fff; border: none; border-radius: 50px; font-family: var(--pet-font-heading); font-size: 18px; font-weight: 700; padding: 16px; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3); transition: all 0.3s; }
-  .cf-pet-p-add:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255, 107, 53, 0.4); }
-  
-  /* Perks */
-  .cf-pet-p-perks { margin-top: 40px; padding-top: 30px; border-top: 2px dashed #eee; display: flex; flex-direction: column; gap: 16px; }
-  .cf-pet-p-perk { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 14px; color: #555; }
-  .cf-pet-p-perk svg { color: var(--pet-primary); width: 20px; height: 20px; }
-
-  @media(max-width: 900px) {
-    .cf-pet-p-wrap { grid-template-columns: 1fr; gap: 40px; }
-    .cf-pet-p-info { position: static; padding: 30px 20px; }
-    .cf-pet-p-actions { grid-template-columns: 1fr; }
-    .cf-pet-p-qty { padding: 14px 20px; width: 150px; margin: 0 auto; }
-  }
-{% endstyle %}
-
-<div class="cf-pet-p">
-  <div class="cf-pet-p-wrap">
-    
-    <div class="cf-pet-p-gallery">
-      <div class="cf-pet-p-img-main">
-        {% if product.featured_image %}
-          <img src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
-        {% else %}
-          <div style="width:200px; height:200px; background:#fff0eb; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-            <svg width="60" height="60" style="color:var(--pet-primary);" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.5c-4 0-7-2.5-7-6s3-4 7-4 7 .5 7 4-3 6-7 6zm-5-10c-1.5 0-3-1.5-3-3.5s1.5-3.5 3-3.5 3 1.5 3 3.5-1.5 3.5-3 3.5zm10 0c-1.5 0-3-1.5-3-3.5s1.5-3.5 3-3.5 3 1.5 3 3.5-1.5 3.5-3 3.5zm-5-2c-1.5 0-2.5-1-2.5-2.5s1-2.5 2.5-2.5 2.5 1 2.5 2.5-1 2.5-2.5 2.5z"/></svg>
-          </div>
-        {% endif %}
-      </div>
-      <div class="cf-pet-p-thumbs">
-        {% for image in product.images limit:5 %}
-          <div class="cf-pet-p-thumb {% if forloop.first %}active{% endif %}">
-            <img src="{{ image | img_url: '150x' }}" alt="{{ product.title }}">
-          </div>
-        {% endfor %}
-      </div>
+<div class="cfp-wrap">
+  <div class="cfp-gallery">
+    <div class="cfp-main-img" id="cfpMainImg">
+      {% if product.featured_image %}
+        <img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title }}" id="cfpMainImgEl">
+      {% else %}
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+      {% endif %}
     </div>
-    
-    <div class="cf-pet-p-info">
-      <div class="cf-pet-p-vendor">{{ product.vendor | default: 'Happy Paws Co.' }}</div>
-      <h1 class="cf-pet-p-title">{{ product.title | default: 'Premium Salmon Kibble' }}</h1>
-      
-      <div class="cf-pet-p-reviews">
-        <div class="cf-pet-p-stars">
-          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+    <div class="cfp-thumbs">
+      {% for image in product.images limit: 5 %}
+        <div class="cfp-thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('cfpMainImgEl').src='{{ image | image_url: width: 800 }}';document.querySelectorAll('.cfp-thumb').forEach(t=>t.classList.remove('active'));this.classList.add('active')" style="background-image:url('{{ image | image_url: width: 200 }}');background-size:cover;background-position:center"></div>
+      {% else %}
+        <div class="cfp-thumb active"></div>
+        <div class="cfp-thumb"></div>
+        <div class="cfp-thumb"></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="cfp-info">
+    {% if section.settings.show_vendor %}<span class="cfp-vendor">{{ product.vendor }}</span>{% endif %}
+    <h1 class="cfp-name">{{ product.title }}</h1>
+    {% if section.settings.show_rating %}
+    <div class="cfp-rating"><span class="cfp-stars">ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦ÃƒÂ¢Ã‹Å“Ã¢â‚¬Â¦</span> 4.9 Ãƒâ€šÃ‚Â· {{ section.settings.review_count }}</div>
+    {% endif %}
+    <div class="cfp-price-row">
+      <div class="cfp-price">{{ product.price | money }}</div>
+      {% if product.compare_at_price > product.price %}
+        <div class="cfp-compare">{{ product.compare_at_price | money }}</div>
+        <span class="cfp-save">{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round }}% OFF</span>
+      {% endif %}
+    </div>
+
+    <p class="cfp-desc">{{ product.description | strip_html | truncate: 280 }}</p>
+
+    {% unless product.has_only_default_variant %}
+      {% for option in product.options_with_values %}
+        <div class="cfp-label">{{ option.name }}</div>
+        <div class="cfp-variants">
+          {% for value in option.values %}
+            <button class="cfp-var{% if forloop.first %} active{% endif %}">{{ value }}</button>
+          {% endfor %}
         </div>
-        <span>(128 Reviews)</span>
+      {% endfor %}
+    {% endunless %}
+
+    <div class="cfp-qty-row">
+      <div class="cfp-qty">
+        <button onclick="var s=this.nextElementSibling;s.textContent=Math.max(1,+s.textContent-1)">ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢</button>
+        <span>1</span>
+        <button onclick="var s=this.previousElementSibling;s.textContent=+s.textContent+1">+</button>
       </div>
-      
-      <div class="cf-pet-p-price">{{ product.price | money | default: '$34.99' }}</div>
-      
-      <div class="cf-pet-p-desc">
-        {{ product.description | strip_html | truncate: 200 | default: 'Packed with essential Omega-3s and real salmon as the first ingredient. Keep your furry friends coat shiny, joints healthy, and tummy happy!' }}
-      </div>
-      
-      {% unless product.has_only_default_variant %}
-        {% for option in product.options_with_values %}
-          <div class="cf-pet-p-opt">
-            <div class="cf-pet-p-opt-header">
-              <span>Select {{ option.name }}</span>
-            </div>
-            <div class="cf-pet-p-vals">
-              {% for value in option.values %}
-                <button class="cf-pet-p-val {% if forloop.first %}active{% endif %}">{{ value }}</button>
-              {% endfor %}
-            </div>
-          </div>
-        {% endfor %}
-      {% endunless %}
-      
-      {% form 'product', product %}
-        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-        <div class="cf-pet-p-actions">
-          <div class="cf-pet-p-qty">
-            <button type="button">-</button>
-            <span>1</span>
-            <button type="button">+</button>
-          </div>
-          <button type="submit" class="cf-pet-p-add">Add to Cart</button>
-        </div>
-      {% endform %}
-      
-      <div class="cf-pet-p-perks">
-        <div class="cf-pet-p-perk">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-          <span>Free shipping on orders over $50</span>
-        </div>
-        <div class="cf-pet-p-perk">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span>Subscribe & Save 10% Every Month</span>
-        </div>
-        <div class="cf-pet-p-perk">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span>Veterinarian Approved Formula</span>
-        </div>
-      </div>
-      
+      <button class="cfp-atc">{{ section.settings.atc_text }}</button>
+      {% if section.settings.show_wishlist %}
+      <button class="cfp-wishlist" aria-label="Wishlist">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </button>
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_buy_now %}
+    <button class="cfp-buy-now">{{ section.settings.buy_now_text }}</button>
+    {% endif %}
+
+    <div class="cfp-trust">
+      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span> {{ section.settings.trust_1 }}</div>
+      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> {{ section.settings.trust_2 }}</div>
+      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span> {{ section.settings.trust_3 }}</div>
+      <div class="cfp-trust-item"><span class="cfp-trust-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> {{ section.settings.trust_4 }}</div>
     </div>
   </div>
 </div>
+
+<div class="cfp-tabs">
+  <div class="cfp-tabs-inner">
+    <div class="cfp-tab-nav">
+      <button class="cfp-tab-btn active" onclick="cfpTab(this,'Desc')">Description</button>
+      <button class="cfp-tab-btn" onclick="cfpTab(this,'Specs')">Specifications</button>
+      <button class="cfp-tab-btn" onclick="cfpTab(this,'Shipping')">Shipping &amp; Returns</button>
+    </div>
+    <div id="cfpDesc" class="cfp-tab-content active">{{ product.description }}</div>
+    <div id="cfpSpecs" class="cfp-tab-content">
+      <table class="cfp-specs-table">
+        <tr><td>Type</td><td>{{ product.type | default: 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â' }}</td></tr>
+        <tr><td>Vendor</td><td>{{ product.vendor | default: 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â' }}</td></tr>
+        <tr><td>SKU</td><td>{{ product.selected_or_first_available_variant.sku | default: 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â' }}</td></tr>
+        <tr><td>Barcode</td><td>{{ product.selected_or_first_available_variant.barcode | default: 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â' }}</td></tr>
+        <tr><td>Availability</td><td>{% if product.available %}In Stock{% else %}Out of Stock{% endif %}</td></tr>
+        {% for tag in product.tags %}<tr><td>Tag</td><td>{{ tag }}</td></tr>{% endfor %}
+      </table>
+    </div>
+    <div id="cfpShipping" class="cfp-tab-content">
+      <p>Free standard delivery on orders above ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹999. Express delivery available at checkout. Easy 30-day returns on all products.</p>
+    </div>
+  </div>
+</div>
+
+{% if section.settings.show_related and section.settings.related_collection != blank %}
+<div class="cfp-related">
+  <div class="cfp-related-inner">
+    <h2>{{ section.settings.related_heading }}</h2>
+    <div class="cfp-related-grid">
+      {% assign rc = section.settings.related_collection %}
+      {% for p in rc.products limit: section.settings.related_count %}
+      <a href="{{ p.url }}" class="cfp-rel-card">
+        <div class="cfp-rel-img">
+          {% if p.featured_image %}<img src="{{ p.featured_image | image_url: width: 400 }}" alt="{{ p.title }}" loading="lazy">
+          {% else %}<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7H4l1 12h14z"/></svg>{% endif %}
+        </div>
+        <div class="cfp-rel-info">
+          <div class="cfp-rel-name">{{ p.title | truncate: 50 }}</div>
+          <div class="cfp-rel-price">{{ p.price | money }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+function cfpTab(btn, id) {
+  document.querySelectorAll('.cfp-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.cfp-tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cfp'+id).classList.add('active');
+}
+</script>
 
 {% schema %}
 {
   "name": "CF Pet Supplies PDP",
   "settings": [
-    { "type": "color", "id": "color_primary", "label": "Primary Accent", "default": "#FF6B35" },
-    { "type": "color", "id": "color_secondary", "label": "Secondary Accent", "default": "#FFD166" },
-    { "type": "color", "id": "color_bg", "label": "Background", "default": "#FFF8F0" },
-    { "type": "color", "id": "color_surface", "label": "Surface", "default": "#FFFFFF" },
-    { "type": "color", "id": "color_text", "label": "Text", "default": "#2B2D42" }
+    {
+      "type": "header",
+      "content": "Brand Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#D35400"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "#f9e0d1"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Product Page"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show Breadcrumb",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show Rating",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review Count Text",
+      "default": "2,148 reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show Wishlist Button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "atc_text",
+      "label": "Add to Cart Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show Buy Now",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "buy_now_text",
+      "label": "Buy Now Text",
+      "default": "Buy Now"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Badge 1",
+      "default": "Authentic & Certified"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Badge 2",
+      "default": "Free Delivery"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Badge 3",
+      "default": "Easy 30-Day Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_4",
+      "label": "Badge 4",
+      "default": "Secure Checkout"
+    },
+    {
+      "type": "header",
+      "content": "Related Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related",
+      "label": "Show Related Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "related_heading",
+      "label": "Heading",
+      "default": "You May Also Like"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection",
+      "label": "Related Collection"
+    },
+    {
+      "type": "range",
+      "id": "related_count",
+      "label": "Products to Show",
+      "min": 2,
+      "max": 8,
+      "step": 2,
+      "default": 4
+    }
   ],
   "presets": [
-    { "name": "CF Pet Supplies PDP" }
+    {
+      "name": "CF Pet Supplies PDP"
+    }
   ]
 }
 {% endschema %}

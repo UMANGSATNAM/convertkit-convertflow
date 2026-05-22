@@ -1,172 +1,624 @@
-{% comment %} ConvertFlow — Electronics Landing | Always-Visible Tech Grid {% endcomment %}
+{% comment %}ConvertFlow: Tech & Electronics — Landing Page{% endcomment %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
 
-{% style %}
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap');
-  .cf-el*{box-sizing:border-box;margin:0;padding:0}
-  .cf-el{font-family:'Inter',sans-serif;background:#030508;color:#E2E8F0;overflow-x:hidden}
+:root {
+  --bg: #0B0F19;
+  --surface: #131B2C;
+  --surface-hover: #1A243A;
+  --primary: #3B82F6;
+  --primary-glow: rgba(59, 130, 246, 0.5);
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border: #1E293B;
+  --accent: #10B981;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .nav-logo { font-family: 'Space Grotesk', sans-serif; }
 
-  /* ═══ GLOW EFFECTS ═══ */
-  :root{--el-glow:{{ section.settings.color_accent | default: '#00F0FF' }};}
+/* PROMO BAR */
+.promo-bar { background: var(--primary); color: #fff; padding: 10px 0; text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
-  /* ═══ HERO ═══ */
-  .cf-el-hero{position:relative;min-height:90vh;display:flex;align-items:center;padding:0 5%}
-  .cf-el-hero-bg{position:absolute;inset:0;background:radial-gradient(circle at center,rgba(0,240,255,.05) 0%,#030508 70%)}
-  .cf-el-hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.4;mix-blend-mode:luminosity}
-  .cf-el-hero-inner{position:relative;z-index:2;max-width:800px;margin:0 auto;text-align:center}
-  
-  .cf-el-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,240,255,.1);border:1px solid var(--el-glow);color:var(--el-glow);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:30px}
-  .cf-el-badge::before{content:'';width:8px;height:8px;background:var(--el-glow);border-radius:50%;box-shadow:0 0 10px var(--el-glow)}
-  
-  .cf-el-h1{font-family:'Rajdhani',sans-serif;font-size:clamp(48px,8vw,90px);font-weight:700;line-height:1;color:#fff;margin-bottom:24px;text-transform:uppercase;letter-spacing:1px}
-  .cf-el-h1 span{color:var(--el-glow);text-shadow:0 0 20px rgba(0,240,255,.4)}
-  .cf-el-p{font-size:18px;color:#94A3B8;margin-bottom:40px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto}
-  
-  .cf-el-btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 36px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;transition:all .3s}
-  .cf-el-btn-primary{background:var(--el-glow);color:#030508;box-shadow:0 0 20px rgba(0,240,255,.2)}
-  .cf-el-btn-primary:hover{box-shadow:0 0 30px rgba(0,240,255,.5);transform:translateY(-2px)}
-  .cf-el-btn-outline{background:transparent;color:var(--el-glow);border:1px solid var(--el-glow)}
-  .cf-el-btn-outline:hover{background:rgba(0,240,255,.1)}
+/* HEADER / MEGA MENU */
+header { position: sticky; top: 0; z-index: 100; background: rgba(11, 15, 25, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 80px; }
+.nav-logo { font-size: 24px; font-weight: 700; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.nav-logo svg { width: 24px; height: 24px; color: var(--primary); }
+.nav-links { display: flex; gap: 32px; height: 100%; list-style: none; }
+.nav-links li { height: 100%; display: flex; align-items: center; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.2s; font-size: 14px; position: relative; }
+.nav-links a:hover, .nav-links a.active { color: #fff; }
+.MEGA-MENU { display: none; position: absolute; top: 80px; left: 0; width: 100%; background: var(--surface); border-bottom: 1px solid var(--border); padding: 40px; grid-template-columns: repeat(4, 1fr); gap: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+.nav-links li:hover .MEGA-MENU { display: grid; }
+.mega-col h4 { color: #fff; font-size: 14px; margin-bottom: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--primary); }
+.mega-col a { display: block; padding: 8px 0; color: var(--text-muted); font-size: 14px; }
+.mega-col a:hover { color: #fff; padding-left: 5px; }
 
-  /* ═══ TECH SPECS ═══ */
-  .cf-el-specs{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,240,255,.1);border-top:1px solid rgba(0,240,255,.2);border-bottom:1px solid rgba(0,240,255,.2)}
-  .cf-el-spec{background:#030508;padding:30px 20px;text-align:center}
-  .cf-el-spec-icon{color:var(--el-glow);margin-bottom:12px;display:inline-block}
-  .cf-el-spec-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff;text-transform:uppercase}
-  .cf-el-spec-desc{font-size:13px;color:#64748B;margin-top:6px}
+.header-actions { display: flex; gap: 20px; align-items: center; }
+.icon-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+.icon-btn:hover { color: var(--primary); }
 
-  /* ═══ PRODUCTS GRID ═══ */
-  .cf-el-products{padding:100px 5%}
-  .cf-el-section-head{text-align:center;margin-bottom:60px}
-  .cf-el-section-head h2{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,5vw,56px);font-weight:700;color:#fff;text-transform:uppercase}
-  
-  .cf-el-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
-  .cf-el-card{background:#0B1120;border:1px solid #1E293B;border-radius:8px;padding:20px;text-decoration:none;color:#E2E8F0;position:relative;transition:all .3s;overflow:hidden}
-  .cf-el-card:hover{border-color:var(--el-glow);box-shadow:0 10px 30px rgba(0,240,255,.05),inset 0 0 20px rgba(0,240,255,.02);transform:translateY(-5px)}
-  
-  .cf-el-card-img{aspect-ratio:1;background:#030508;border-radius:4px;margin-bottom:20px;padding:20px;display:flex;align-items:center;justify-content:center;position:relative}
-  .cf-el-card-img img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .4s}
-  .cf-el-card:hover .cf-el-card-img img{transform:scale(1.1)}
-  
-  .cf-el-card-badge{position:absolute;top:10px;left:10px;background:rgba(0,240,255,.1);color:var(--el-glow);font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;text-transform:uppercase}
-  
-  .cf-el-card-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:#fff;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cf-el-card-price{font-size:18px;font-weight:700;color:var(--el-glow)}
-  
-  .cf-el-card-btn{width:100%;background:rgba(255,255,255,.05);color:#fff;border:none;padding:12px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;margin-top:16px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:1px}
-  .cf-el-card:hover .cf-el-card-btn{background:var(--el-glow);color:#030508}
+/* HERO */
+.hero { min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 0 40px; }
+.hero-bg { position: absolute; top: 50%; left: 80%; transform: translate(-50%, -50%); width: 800px; height: 800px; background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%); opacity: 0.15; z-index: 0; pointer-events: none; }
+.hero-content { position: relative; z-index: 1; max-width: 600px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 24px; letter-spacing: 1px; text-transform: uppercase; }
+.hero h1 { font-size: 80px; line-height: 1.1; margin-bottom: 24px; font-weight: 700; letter-spacing: -2px; }
+.hero h1 span { color: var(--primary); }
+.hero p { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; max-width: 500px; }
+.btn-primary { background: var(--text); color: var(--bg); padding: 16px 32px; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; border-radius: 4px; transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+.btn-secondary { background: transparent; color: var(--text); padding: 16px 32px; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-left: 16px; }
+.btn-secondary:hover { background: var(--surface); }
 
-  @media(max-width:1024px){
-    .cf-el-specs{grid-template-columns:repeat(2,1fr)}
-    .cf-el-grid{grid-template-columns:repeat(2,1fr)}
-  }
-  @media(max-width:600px){
-    .cf-el-grid{grid-template-columns:1fr}
-    .cf-el-btn{width:100%}
-  }
-{% endstyle %}
+/* STATS */
+.trust-stats { display: flex; gap: 60px; margin-top: 60px; border-top: 1px solid var(--border); padding-top: 40px; }
+.stat-item h4 { font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.stat-item p { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-<div class="cf-el">
+/* PRODUCTS (LIST STYLE) */
+.section { padding: 100px 40px; max-width: 1400px; margin: 0 auto; }
+.section-header { margin-bottom: 60px; text-align: center; }
+.section-header h2 { font-size: 40px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px; }
+.section-header p { color: var(--text-muted); font-size: 16px; max-width: 500px; margin: 0 auto; }
 
-  {%- comment -%} HERO {%- endcomment -%}
-  <section class="cf-el-hero">
-    <div class="cf-el-hero-bg">
-      {% if section.settings.hero_image != blank %}
-        <img src="{{ section.settings.hero_image | img_url: 'master' }}" alt="Tech Hero">
-      {% else %}
-        <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=1600&auto=format&fit=crop" alt="Electronics">
-      {% endif %}
-    </div>
-    <div class="cf-el-hero-inner">
-      <div class="cf-el-badge">{{ section.settings.hero_badge | default: 'SYSTEM.ONLINE' }}</div>
-      <h1 class="cf-el-h1">
-        {{ section.settings.hero_headline | default: 'Next-Gen' }}<br>
-        <span>{{ section.settings.hero_subline | default: 'Hardware' }}</span>
-      </h1>
-      <p class="cf-el-p">{{ section.settings.hero_text | default: 'Experience extreme performance with our latest quantum-engineered components. Built for creators and professionals.' }}</p>
-      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-        <a href="{{ section.settings.btn1_url | default: '/collections/all' }}" class="cf-el-btn cf-el-btn-primary">{{ section.settings.btn1_text | default: 'Shop Components' }}</a>
-        <a href="{{ section.settings.btn2_url | default: '/collections/all' }}" class="cf-el-btn cf-el-btn-outline">{{ section.settings.btn2_text | default: 'View Specs' }}</a>
+.product-list { display: flex; flex-direction: column; gap: 24px; }
+.product-row { display: grid; grid-template-columns: 240px 1fr 300px; gap: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; align-items: center; transition: border-color 0.2s; cursor: pointer; }
+.product-row:hover { border-color: var(--primary); }
+.p-image { width: 100%; aspect-ratio: 1; background: #000; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.p-image svg { width: 64px; height: 64px; color: var(--primary); }
+
+.p-info h3 { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.p-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+.p-specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.spec-box { background: var(--bg); padding: 10px; border-radius: 4px; border: 1px solid var(--border); }
+.spec-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.spec-val { font-size: 14px; font-weight: 600; color: #fff; }
+
+.p-action { text-align: right; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; }
+.p-price { font-size: 32px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 8px; }
+.p-price-old { color: var(--text-muted); text-decoration: line-through; font-size: 16px; margin-bottom: 24px; display: block; }
+.btn-mono { width: 100%; background: var(--text); color: var(--bg); padding: 14px 20px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: opacity 0.2s; }
+.btn-mono:hover { opacity: 0.9; }
+
+/* FEATURES GRID */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.feature-card { background: var(--surface); padding: 40px; border: 1px solid var(--border); border-radius: 8px; text-align: center; }
+.feature-icon { width: 64px; height: 64px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+.feature-icon svg { width: 32px; height: 32px; }
+.feature-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+.feature-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+/* SPEC DENSE FOOTER */
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 80px 40px 40px; }
+.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; max-width: 1400px; margin: 0 auto 60px; }
+.f-brand h4 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.f-brand p { color: var(--text-muted); font-size: 14px; line-height: 1.6; max-width: 300px; margin-bottom: 24px; }
+.f-socials { display: flex; gap: 16px; }
+.f-socials a { color: var(--text-muted); width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.f-socials a:hover { color: #fff; border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+.f-links h5 { color: #fff; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 24px; }
+.f-links ul { list-style: none; }
+.f-links li { margin-bottom: 12px; }
+.f-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+.f-links a:hover { color: var(--primary); }
+
+.footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-top: 40px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+
+/* STICKY ATC */
+.sticky-atc { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); border-top: 1px solid var(--border); padding: 16px 40px; display: none; align-items: center; justify-content: space-between; z-index: 99; transform: translateY(100%); transition: transform 0.4s; }
+.sticky-atc.show { display: flex; transform: translateY(0); }
+.s-atc-l { display: flex; align-items: center; gap: 16px; }
+.s-img { width: 48px; height: 48px; background: #000; border-radius: 4px; }
+.s-info h4 { font-size: 15px; color: #fff; }
+.s-info p { font-size: 13px; color: var(--text-muted); }
+.s-atc-r { display: flex; align-items: center; gap: 24px; }
+.s-price { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+
+/* Responsive */
+@media(max-width: 1024px) {
+  .hero h1 { font-size: 60px; }
+  .product-row { grid-template-columns: 1fr; gap: 24px; }
+  .p-action { text-align: left; align-items: flex-start; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .p-image { aspect-ratio: 2/1; }
+  .features-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { padding: 40px 20px; text-align: center; }
+  .hero h1 { font-size: 40px; }
+  .hero p { margin: 0 auto 32px; }
+  .trust-stats { flex-direction: column; gap: 24px; align-items: center; }
+  .p-specs { grid-template-columns: 1fr; }
+  .btn-secondary { margin-left: 0; margin-top: 16px; width: 100%; }
+}
+
+</style>
+<style>
+:root{
+  --cf-accent:{{ section.settings.accent | default: '#5735db' }};
+  --cf-bg:{{ section.settings.bg | default: '#e9e5f5' }};
+  --cf-text:{{ section.settings.text_col | default: '#1a1a1a' }};
+}
+body{background:var(--cf-bg);color:var(--cf-text);}
+</style>
+
+{% if section.settings.show_ann %}
+<div style="background:{{ section.settings.ann_bg | default: '#5735db' }};color:{{ section.settings.ann_color | default: '#fff' }};text-align:center;padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.3px">
+  {{ section.settings.ann_text }}
+</div>
+{% endif %}
+
+<div class="promo-bar"> Free Express Shipping on orders over $150</div>
+
+<header>
+  <a href="#" class="nav-logo">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+    TechVault
+  </a>
+  <ul class="nav-links">
+    <li>
+      <a href="#" class="active">Audio</a>
+      <div class="MEGA-MENU">
+        <div class="mega-col">
+          <h4>Headphones</h4>
+          <a href="#">Over-Ear Wireless</a>
+          <a href="#">Noise Cancelling</a>
+          <a href="#">Studio Monitors</a>
+          <a href="#">Gaming Headsets</a>
+        </div>
+        <div class="mega-col">
+          <h4>Earbuds</h4>
+          <a href="#">True Wireless</a>
+          <a href="#">Sport Earbuds</a>
+          <a href="#">Audiophile In-Ear</a>
+        </div>
+        <div class="mega-col">
+          <h4>Speakers</h4>
+          <a href="#">Portable Bluetooth</a>
+          <a href="#">Home Theater</a>
+          <a href="#">Soundbars</a>
+        </div>
+        <div class="mega-col">
+          <div style="background:var(--bg);height:100%;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);border:1px dashed var(--border)">Promo Image</div>
+        </div>
       </div>
-    </div>
-  </section>
+    </li>
+    <li><a href="#">Computing</a></li>
+    <li><a href="#">Wearables</a></li>
+    <li><a href="#">Accessories</a></li>
+  </ul>
+  <div class="header-actions">
+    <button class="icon-btn" aria-label="Search">{{ section.settings.hero_cta | default: "Shop Now" }}</button>
+    <button class="icon-btn" aria-label="Cart">{{ section.settings.hero_cta2 | default: "View Collection" }}</button>
+  </div>
+</header>
 
-  {%- comment -%} SPECS GRID {%- endcomment -%}
-  <div class="cf-el-specs">
-    <div class="cf-el-spec">
-      <div class="cf-el-spec-icon">⚡</div>
-      <div class="cf-el-spec-title">Ultra Fast</div><div class="cf-el-spec-desc">Gen 4 Architecture</div>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"></path></svg> Next-Gen Audio Experience</div>
+    <h1>{{ section.settings.hero_h1 | default: 'Tech & Electronics' }}</h1>
+    <p>Engineered with dual-driver precision, adaptive ANC, and 40-hour battery life. The pinnacle of wireless audio has arrived. Experience silence.</p>
+    <div>
+      <button class="btn-primary">Pre-order Now <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></button>
+      <button class="btn-secondary">View Specs</button>
     </div>
-    <div class="cf-el-spec">
-      <div class="cf-el-spec-icon">❄️</div>
-      <div class="cf-el-spec-title">Cryo Cooling</div><div class="cf-el-spec-desc">Liquid Thermal System</div>
-    </div>
-    <div class="cf-el-spec">
-      <div class="cf-el-spec-icon">🛡️</div>
-      <div class="cf-el-spec-title">3-Year Warranty</div><div class="cf-el-spec-desc">Global Hardware Support</div>
-    </div>
-    <div class="cf-el-spec">
-      <div class="cf-el-spec-icon">🎮</div>
-      <div class="cf-el-spec-title">Ray Tracing</div><div class="cf-el-spec-desc">True Real-time Graphics</div>
+    <div class="trust-stats">
+      <div class="stat-item"><h4>40h</h4><p>Playback Time</p></div>
+      <div class="stat-item"><h4>50dB</h4><p>Noise Cancelation</p></div>
+      <div class="stat-item"><h4>Hi-Res</h4><p>Audio Certified</p></div>
     </div>
   </div>
+</section>
 
-  {%- comment -%} PRODUCTS {%- endcomment -%}
-  <section class="cf-el-products">
-    <div class="cf-el-section-head">
-      <h2>{{ section.settings.prods_heading | default: 'Featured Hardware' }}</h2>
-    </div>
-    <div class="cf-el-grid">
-      {% assign coll = section.settings.featured_collection %}
-      {% if coll != blank and coll.products_count > 0 %}
-        {% for p in coll.products limit: 4 %}
-          <a href="{{ p.url }}" class="cf-el-card">
-            <div class="cf-el-card-img">
-              {% if p.featured_image %}<img src="{{ p.featured_image | img_url: '600x' }}" alt="{{ p.title }}">{% endif %}
-              <div class="cf-el-card-badge">IN STOCK</div>
-            </div>
-            <div class="cf-el-card-title">{{ p.title }}</div>
-            <div class="cf-el-card-price">{{ p.price | money }}</div>
-            <button class="cf-el-card-btn">Add to Build</button>
-          </a>
-        {% endfor %}
-      {% else %}
-        {% assign tech_demo = 'Quantum RTX 5090,AeroCool Liquid CPU Cooler,HyperCore 64GB DDR5,Nova Pro Wireless Headset' | split: ',' %}
-        {% for name in tech_demo %}
-          <a href="/collections/all" class="cf-el-card">
-            <div class="cf-el-card-img">
-              <div style="width:80%;height:80%;background:#0B1120;border-radius:4px;box-shadow:0 0 20px rgba(0,0,0,1)"></div>
-              <div class="cf-el-card-badge">IN STOCK</div>
-            </div>
-            <div class="cf-el-card-title">{{ name }}</div>
-            <div class="cf-el-card-price">₹{{ forloop.index | times: 5000 | plus: 15999 }}</div>
-            <button class="cf-el-card-btn">Add to Build</button>
-          </a>
-        {% endfor %}
-      {% endif %}
-    </div>
-  </section>
+<section class="section" id="products">
+  <div class="section-header">
+    <h2>Elite Collection</h2>
+    <p>Compare specifications across our flagship audio devices to find your perfect match.</p>
+  </div>
+  
 
+{% if section.settings.show_products and section.settings.prod_col != blank %}
+<div style="background:var(--cf-bg,#e9e5f5);padding:80px 60px">
+  <div style="text-align:center;margin-bottom:48px">
+    <h2 style="font-size:36px;font-weight:800;margin-bottom:10px">{{ section.settings.prod_heading }}</h2>
+    <p style="font-size:15px;color:#888">{{ section.settings.prod_sub }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;max-width:1400px;margin:0 auto">
+    {% for p in section.settings.prod_col.products limit: section.settings.prod_count %}
+    <a href="{{ p.url }}" style="background:#fff;border:1px solid rgba(0,0,0,.08);text-decoration:none;color:#1a1a1a;display:block;transition:all .3s;overflow:hidden">
+      <div style="aspect-ratio:1;overflow:hidden;position:relative;background:#f5f5f5;display:flex;align-items:center;justify-content:center">
+        {% if p.featured_image %}
+          <img src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        {% else %}
+          <svg width="40" height="40" fill="none" stroke="#ccc" viewBox="0 0 24 24"><path d="M20 7H4l1 12h14z"/></svg>
+        {% endif %}
+        {% if p.available == false %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#5735db);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sold Out</span>
+        {% elsif p.compare_at_price > p.price %}
+          <span style="position:absolute;top:10px;left:10px;background:var(--cf-accent,#5735db);color:#fff;font-size:9px;font-weight:700;padding:4px 10px;letter-spacing:1px;text-transform:uppercase">Sale</span>
+        {% endif %}
+      </div>
+      <div style="padding:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cf-accent,#5735db);margin-bottom:4px">{{ p.vendor }}</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.4">{{ p.title | truncate: 55 }}</div>
+        <div style="font-size:18px;font-weight:800">{{ p.price | money }}{% if p.compare_at_price > p.price %} <del style="font-size:13px;color:#aaa;font-weight:400">{{ p.compare_at_price | money }}</del>{% endif %}</div>
+        <button style="display:block;width:100%;margin-top:12px;padding:12px;background:var(--cf-accent,#5735db);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px;font-family:inherit">Add to Cart</button>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
 </div>
+{% endif %}
+{% if section.settings.show_testi %}
+<div style="padding:80px 60px;background:#fafafa">
+  <h2 style="text-align:center;font-size:36px;font-weight:800;margin-bottom:48px">{{ section.settings.testi_h }}</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1400px;margin:0 auto">
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t1_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#5735db)">{{ section.settings.t1_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t2_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#5735db)">{{ section.settings.t2_auth }}</div></div>
+    <div style="background:#fff;border:1px solid #eee;padding:32px"><p style="font-size:14px;line-height:1.8;color:#555;font-style:italic;margin-bottom:20px">&ldquo;{{ section.settings.t3_text }}&rdquo;</p><div style="font-size:13px;font-weight:700;color:var(--cf-accent,#5735db)">{{ section.settings.t3_auth }}</div></div>
+  </div>
+</div>
+{% endif %}
+{% if section.settings.show_nl %}
+<div style="padding:80px 60px;background:var(--cf-accent,#5735db);text-align:center;color:#fff">
+  <h2 style="font-size:36px;font-weight:800;margin-bottom:12px">{{ section.settings.nl_h }}</h2>
+  <p style="font-size:15px;opacity:.85;margin-bottom:36px">{{ section.settings.nl_sub }}</p>
+  <form action="/contact#contact_form" method="post" style="display:flex;max-width:480px;margin:0 auto">
+    <input type="hidden" name="form_type" value="customer">
+    <input type="hidden" name="utf8" value="&#x2713;">
+    <input type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder }}" required style="flex:1;padding:16px 20px;border:none;font-size:14px;outline:none;font-family:inherit">
+    <button type="submit" style="padding:16px 28px;background:#1a1a1a;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">{{ section.settings.nl_btn }}</button>
+  </form>
+</div>
+{% endif %}
+<footer style="background:#1a1a1a;color:#bbb;padding:60px">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <div>
+      <h3 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:12px">{{ shop.name }}</h3>
+      <p style="font-size:12px;line-height:1.8;color:#888">{{ section.settings.footer_about }}</p>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Shop</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/collections/all" style="color:#888;text-decoration:none;font-size:12px">All Products</a></li>
+        <li style="margin-bottom:8px"><a href="/collections" style="color:#888;text-decoration:none;font-size:12px">Collections</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/about" style="color:#888;text-decoration:none;font-size:12px">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Help</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/shipping-policy" style="color:#888;text-decoration:none;font-size:12px">Shipping</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/refund-policy" style="color:#888;text-decoration:none;font-size:12px">Returns</a></li>
+        <li style="margin-bottom:8px"><a href="/pages/contact" style="color:#888;text-decoration:none;font-size:12px">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:11px;font-weight:700;color:var(--cf-accent,#5735db);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Legal</h4>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:8px"><a href="/policies/privacy-policy" style="color:#888;text-decoration:none;font-size:12px">Privacy</a></li>
+        <li style="margin-bottom:8px"><a href="/policies/terms-of-service" style="color:#888;text-decoration:none;font-size:12px">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#555">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Powered by ConvertFlow</span>
+  </div>
+</footer>
+{% if section.settings.custom_liquid != blank %}{{ section.settings.custom_liquid }}{% endif %}
 
 {% schema %}
 {
-  "name": "CF Electronics Landing",
+  "name": "CF Tech & Electronics LP",
   "settings": [
-    { "type": "color", "id": "color_accent", "label": "Neon Accent Color", "default": "#00F0FF" },
-    { "type": "header", "content": "Hero" },
-    { "type": "image_picker", "id": "hero_image", "label": "Hero Background Image" },
-    { "type": "text", "id": "hero_badge", "label": "Badge Text", "default": "SYSTEM.ONLINE" },
-    { "type": "text", "id": "hero_headline", "label": "Headline Line 1", "default": "Next-Gen" },
-    { "type": "text", "id": "hero_subline", "label": "Headline Line 2 (Glow)", "default": "Hardware" },
-    { "type": "textarea", "id": "hero_text", "label": "Hero Text" },
-    { "type": "text", "id": "btn1_text", "label": "Primary Button Text", "default": "Shop Components" },
-    { "type": "url", "id": "btn1_url", "label": "Primary Button Link" },
-    { "type": "text", "id": "btn2_text", "label": "Secondary Button Text", "default": "View Specs" },
-    { "type": "url", "id": "btn2_url", "label": "Secondary Button Link" },
-    { "type": "header", "content": "Products" },
-    { "type": "text", "id": "prods_heading", "label": "Products Heading", "default": "Featured Hardware" },
-    { "type": "collection", "id": "featured_collection", "label": "Featured Collection" }
+    {
+      "type": "header",
+      "content": "Brand & Colors"
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Accent Color",
+      "default": "#5735db"
+    },
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Background",
+      "default": "#e9e5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_col",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Announcement Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ann",
+      "label": "Show Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "ann_text",
+      "label": "Announcement Text",
+      "default": "Free shipping on orders above Rs.999"
+    },
+    {
+      "type": "color",
+      "id": "ann_bg",
+      "label": "Bar Background",
+      "default": "#5735db"
+    },
+    {
+      "type": "color",
+      "id": "ann_color",
+      "label": "Bar Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_img",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_tag",
+      "label": "Eyebrow Tag",
+      "default": "New Arrival"
+    },
+    {
+      "type": "text",
+      "id": "hero_h1",
+      "label": "Headline",
+      "default": "Tech & Electronics"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_sub",
+      "label": "Subheading",
+      "default": "Discover our curated collection crafted with quality."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta",
+      "label": "Primary CTA Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "hero_url",
+      "label": "Primary CTA URL"
+    },
+    {
+      "type": "text",
+      "id": "hero_cta2",
+      "label": "Secondary CTA Text",
+      "default": "View Collection"
+    },
+    {
+      "type": "url",
+      "id": "hero_url2",
+      "label": "Secondary CTA URL"
+    },
+    {
+      "type": "header",
+      "content": "Stats Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show Stats",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "stat1_n",
+      "label": "Stat 1 Number",
+      "default": "50,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat1_l",
+      "label": "Stat 1 Label",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "stat2_n",
+      "label": "Stat 2 Number",
+      "default": "4.9 Stars"
+    },
+    {
+      "type": "text",
+      "id": "stat2_l",
+      "label": "Stat 2 Label",
+      "default": "Average Rating"
+    },
+    {
+      "type": "text",
+      "id": "stat3_n",
+      "label": "Stat 3 Number",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "stat3_l",
+      "label": "Stat 3 Label",
+      "default": "Authentic"
+    },
+    {
+      "type": "text",
+      "id": "stat4_n",
+      "label": "Stat 4 Number",
+      "default": "30-Day"
+    },
+    {
+      "type": "text",
+      "id": "stat4_l",
+      "label": "Stat 4 Label",
+      "default": "Easy Returns"
+    },
+    {
+      "type": "header",
+      "content": "Featured Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_products",
+      "label": "Show Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "prod_heading",
+      "label": "Section Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "prod_sub",
+      "label": "Subheading",
+      "default": "Handpicked for you"
+    },
+    {
+      "type": "collection",
+      "id": "prod_col",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "prod_count",
+      "label": "Number of Products",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Testimonials"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_testi",
+      "label": "Show Testimonials",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "testi_h",
+      "label": "Heading",
+      "default": "What Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "t1_text",
+      "label": "Testimonial 1",
+      "default": "Absolutely love the quality!"
+    },
+    {
+      "type": "text",
+      "id": "t1_auth",
+      "label": "Author 1",
+      "default": "Priya S."
+    },
+    {
+      "type": "textarea",
+      "id": "t2_text",
+      "label": "Testimonial 2",
+      "default": "Fast shipping and beautiful packaging."
+    },
+    {
+      "type": "text",
+      "id": "t2_auth",
+      "label": "Author 2",
+      "default": "Rahul M."
+    },
+    {
+      "type": "textarea",
+      "id": "t3_text",
+      "label": "Testimonial 3",
+      "default": "Best purchase this year."
+    },
+    {
+      "type": "text",
+      "id": "t3_auth",
+      "label": "Author 3",
+      "default": "Ananya K."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nl",
+      "label": "Show Newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nl_h",
+      "label": "Heading",
+      "default": "Join Our Community"
+    },
+    {
+      "type": "text",
+      "id": "nl_sub",
+      "label": "Subtext",
+      "default": "Subscribe for exclusive offers and updates."
+    },
+    {
+      "type": "text",
+      "id": "nl_btn",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "nl_placeholder",
+      "label": "Placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_about",
+      "label": "About Text",
+      "default": "Premium Tech & Electronics products. Quality you can trust."
+    },
+    {
+      "type": "header",
+      "content": "Custom Code"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom Liquid Code"
+    }
   ],
-  "presets": [{ "name": "CF Electronics Landing" }]
+  "presets": [
+    {
+      "name": "CF Tech & Electronics LP"
+    }
+  ]
 }
 {% endschema %}

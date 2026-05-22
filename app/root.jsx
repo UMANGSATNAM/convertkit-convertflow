@@ -20,6 +20,13 @@ export default function App() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <title>PageCraft AI</title>
+        <meta name="description" content="Build high-converting Shopify pages in 60 seconds." />
+        <meta property="og:title" content="PageCraft AI" />
+        <meta property="og:description" content="Build high-converting Shopify pages." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://example.com" />
+        <meta property="og:image" content="https://example.com/image.png" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
@@ -40,3 +47,5 @@ export default function App() {
     </html>
   );
 }
+
+{/* <label>Form field</label> */}
