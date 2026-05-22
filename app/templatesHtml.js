@@ -139,6 +139,29 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   .p-specs { grid-template-columns: 1fr; }
   .btn-secondary { margin-left: 0; margin-top: 16px; width: 100%; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -501,6 +524,29 @@ footer { padding: 100px 60px 40px; background: var(--text); color: var(--ivory);
   .features-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 40px; }
   .footer-nav { grid-template-columns: 1fr 1fr; gap: 40px; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -833,6 +879,29 @@ footer { background: #2D3748; color: #A0AEC0; padding: 80px 80px 40px; border-ra
   .footer-grid { grid-template-columns: 1fr; gap: 40px; }
   footer { padding: 60px 20px 40px; border-radius: 24px 24px 0 0; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -1192,6 +1261,29 @@ footer { padding: 80px 60px; max-width: 1600px; margin: 0 auto; text-align: cent
   .collections { padding: 80px 20px; }
   .f-links { flex-direction: column; gap: 20px; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -1441,6 +1533,29 @@ footer { background: var(--surface); padding: 80px 40px; border-top: 4px solid v
   .product-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -1781,6 +1896,29 @@ footer { background: #F2F7F4; padding: 80px 60px 40px; margin-top: 60px; }
   .grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 40px; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -2182,6 +2320,29 @@ footer { padding: 80px 40px 40px; background: #000; border-top: 4px solid var(--
   .grid { grid-template-columns: 1fr; }
   .f-grid { grid-template-columns: 1fr; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -2501,6 +2662,29 @@ footer { background: #fff; padding: 80px 60px 40px; margin-top: 60px; border-top
   .f-grid { grid-template-columns: 1fr; gap: 40px; }
   .f-bottom { flex-direction: column; gap: 20px; text-align: center; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -2840,6 +3024,29 @@ footer { background: var(--surface); padding: 80px 60px 40px; border-top: 1px so
   .f-grid { grid-template-columns: 1fr; }
   .f-bottom { flex-direction: column; gap: 16px; text-align: center; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -3192,6 +3399,29 @@ footer { padding: 80px 6vw 40px; background: var(--surface); border-top: 1px sol
   .sticky-atc { flex-direction: column; gap: 16px; padding: 20px 6vw; }
   .sticky-atc .btn-primary { width: 100%; text-align: center; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -3608,6 +3838,29 @@ footer { background: #160A0A; padding: 80px 0 0; color: rgba(255,255,255,0.6); }
   .f-top { grid-template-columns: 1fr; gap: 40px; }
   .f-bottom { flex-direction: column; gap: 16px; }
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -4081,6 +4334,29 @@ footer{background:var(--ink);padding:80px 60px 40px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;height:auto}.hero-content{padding:60px 40px}.hero-content h1{font-size:72px}.prod-grid{grid-template-columns:repeat(2,1fr)}.editorial{grid-template-columns:1fr;height:auto}.f-top{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}nav{display:none}.shop{padding:60px 20px}.cats{flex-wrap:wrap}.cat{min-width:50%}.size-band{flex-direction:column;padding:40px 20px}.f-top{grid-template-columns:1fr;gap:40px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -4284,6 +4560,29 @@ footer{background:var(--sand);padding:80px 60px 40px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto}.hero-r{display:none}.grid{grid-template-columns:repeat(2,1fr)}.sustain{grid-template-columns:1fr}.s-pillars{grid-template-columns:1fr}.f-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}.nav-links{display:none}.hero-l{padding:60px 20px}.hero-l h1{font-size:52px}.shop{padding:60px 20px}.grid{grid-template-columns:1fr}.tabs{padding:16px 20px;overflow-x:auto;flex-wrap:nowrap}.f-grid{grid-template-columns:1fr;gap:40px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -4501,6 +4800,29 @@ footer{background:#1E2E21;padding:80px 60px 40px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-img{display:none}.prod-grid{grid-template-columns:repeat(2,1fr)}.benefits{grid-template-columns:1fr 1fr}.f-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}nav{display:none}.shop{padding:60px 20px}.ingredients{padding:60px 20px}.f-grid{grid-template-columns:1fr}footer{padding:60px 20px 30px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -4700,6 +5022,29 @@ footer{background:#080810;padding:70px 60px 36px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;gap:40px}.hero-visual{display:none}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:0 20px;min-height:auto;padding-top:60px;padding-bottom:60px}.hero-text h1{font-size:52px}.products{padding:60px 20px}.trust{flex-wrap:wrap;gap:40px;padding:40px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -4911,6 +5256,29 @@ footer{background:var(--text);padding:80px 60px 40px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto;padding:80px 40px}.hero-visual{display:none}.cat-grid{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.categories{padding:60px 20px}.cat-grid{grid-template-columns:repeat(2,1fr)}.products{padding:0 20px 60px}.safety{gap:40px;padding:60px 20px}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -5123,6 +5491,29 @@ footer{padding:80px 60px 40px;background:var(--light);border-top:1px solid var(-
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;min-height:auto}.hero-right{display:none}.room-grid{grid-template-columns:1fr 1fr}.room-card:nth-child(1){grid-column:span 2}.grid{grid-template-columns:repeat(2,1fr)}.fg{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:16px 20px}nav{display:none}.hero-left{padding:60px 20px}.hero-left h1{font-size:44px}.rooms{padding:60px 20px}.room-grid{grid-template-columns:1fr}.room-card:nth-child(1){grid-column:span 1}.products{padding:0 20px 60px}.grid{grid-template-columns:1fr}.hiw{padding:60px 20px}.steps{grid-template-columns:1fr;gap:40px}.steps::before{display:none}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -5322,6 +5713,29 @@ footer{background:var(--dark);padding:70px 60px 36px;}
 
 @media(max-width:1024px){.hero{grid-template-columns:1fr;padding:60px 40px;min-height:auto}.hero-visual{display:none}.menu-grid{grid-template-columns:repeat(2,1fr)}.trust{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){header{padding:14px 20px}nav{display:none}.hero{padding:60px 20px}.hero-text h1{font-size:44px}.cuisine{padding:20px}.menu{padding:60px 20px}.menu-grid{grid-template-columns:1fr}.trust{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr;gap:40px}footer{padding:60px 20px 30px}}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -5620,6 +6034,29 @@ footer{background:var(--dark);color:rgba(255,255,255,.6);padding:60px 60px 28px;
 .hero-price{animation:fadeIn .5s ease .3s both;}
 .hero-cta{animation:fadeIn .5s ease .36s both;}
 .hero-social{animation:fadeIn .5s ease .42s both;}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -6172,6 +6609,29 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 80px 2
 .hero-actions{animation-delay:.35s;}
 .hero-drops{animation-delay:.42s;}
 .product-frame{animation:slideInRight .6s ease .1s both;}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -6718,6 +7178,29 @@ footer{background:#111;color:rgba(255,255,255,.5);padding:60px 80px 28px;}
 .hero-price{animation:fadeUp .5s ease .25s both;}
 .hero-cta{animation:fadeUp .5s ease .3s both;}
 .hero-trust{animation:fadeUp .5s ease .4s both;}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -7290,6 +7773,29 @@ footer{background:var(--dark-bg);color:rgba(255,255,255,.5);padding:60px 60px 28
 .hero-price{animation:slideUp .45s ease .28s both;}
 .hero-cta{animation:slideUp .45s ease .34s both;}
 .hero-trust{animation:slideUp .45s ease .4s both;}
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
@@ -7879,6 +8385,29 @@ body{font-fxmily:var(--f1);background:var(--b);color:var(--cr);-webkit-font-smoo
   .bento-header{flex-direction:column;align-items:flex-start;gap:20px}
   .footer-bottom{flex-direction:column;gap:16px;text-align:center}
 }
+
+/* UNIVERSAL MOBILE RESPONSIVENESS INJECTED */
+@media(max-width: 1024px) {
+  .hero, .hero-grid, .split-screen { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .hero-left, .hero-right, .hero-image, .hero-content { width: 100% !important; height: auto !important; padding: 40px 24px !important; }
+  .craft-inner, .f-top, .bridal-grid, .test-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 32px !important; }
+  .prod-scroll { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media(max-width: 768px) {
+  .container, .page-width { padding: 0 16px !important; }
+  header { padding: 0 16px !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;}
+  .header-top { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; gap: 12px !important; text-align: center !important;}
+  .header-left, .header-right { justify-content: center !important; flex-wrap: wrap !important; }
+  .header-nav { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 8px !important; justify-content: flex-start !important;}
+  h1 { font-size: clamp(28px, 8vw, 36px) !important; line-height: 1.2 !important; }
+  h2 { font-size: clamp(24px, 6vw, 28px) !important; }
+  .prod-scroll { grid-template-columns: 1fr !important; }
+  .f-top { grid-template-columns: 1fr !important; }
+  .f-bottom { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
+  .f-bottom-links { justify-content: center !important; flex-wrap: wrap !important; }
+  .btn-primary, .btn-secondary, .b-cta { width: 100% !important; text-align: center !important; }
+}
+
 </style>
   <meta name="description" content="Store preview">
   <meta property="og:title" content="Store preview">
