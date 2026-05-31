@@ -1,1 +1,0 @@
-import fs from 'fs'; const s=JSON.parse(fs.readFileSync('settings-schemas.json','utf8')); const src=fs.readFileSync('build-liquid-sections.js','utf8'); console.log('read ok, src lines:', src.split('\n').length);
