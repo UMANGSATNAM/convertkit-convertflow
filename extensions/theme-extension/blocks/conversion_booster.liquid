@@ -1,0 +1,97 @@
+{% if block.settings.enable_visitor_count %}
+<div class="cf-urgency-block cf-visitor-count" data-base="{{ block.settings.visitor_base }}" style="background: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
+  <span><strong class="cf-count">{{ block.settings.visitor_base }}</strong> people are viewing this right now.</span>
+</div>
+{% endif %}
+
+{% if block.settings.enable_stock_scarcity %}
+  {% assign stock_left = product.selected_or_first_available_variant.inventory_quantity %}
+  {% if stock_left > 0 and stock_left <= block.settings.stock_threshold %}
+  <div class="cf-urgency-block cf-stock-scarcity" style="background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA;">
+    <svg viewBox="0 0 24 24"><path d="M13 1.07V9h7l-9 13v-8H4l9-12.93z" fill="currentColor"/></svg>
+    <span>Hurry! Only <strong>{{ stock_left }}</strong> left in stock.</span>
+  </div>
+  {% endif %}
+{% endif %}
+
+{% if block.settings.enable_countdown %}
+<div class="cf-urgency-block cf-countdown-container" style="background: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }}; justify-content: space-between;">
+  <span style="font-weight: 600;">{{ block.settings.countdown_text }}</span>
+  <div class="cf-countdown-timer" data-initial-time="8100">
+    <div class="cf-countdown-box">
+      <span class="cf-countdown-num cf-hours">02</span>
+      <span class="cf-countdown-label">HRS</span>
+    </div>
+    <span style="font-weight:bold;">:</span>
+    <div class="cf-countdown-box">
+      <span class="cf-countdown-num cf-mins">15</span>
+      <span class="cf-countdown-label">MIN</span>
+    </div>
+    <span style="font-weight:bold;">:</span>
+    <div class="cf-countdown-box">
+      <span class="cf-countdown-num cf-secs">00</span>
+      <span class="cf-countdown-label">SEC</span>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if block.settings.enable_trust_badges %}
+<div class="cf-trust-badges">
+  {% if block.settings.show_cod %}
+  <div class="cf-trust-badge-item">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2H7v-2h2v-2H7V8h2V6h2v2h2v2h-2v2h2v2h-2v2z"/></svg>
+    <span>Cash On Delivery</span>
+  </div>
+  {% endif %}
+  {% if block.settings.show_shipping %}
+  <div class="cf-trust-badge-item">
+    <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+    <span>Free Shipping</span>
+  </div>
+  {% endif %}
+  {% if block.settings.show_returns %}
+  <div class="cf-trust-badge-item">
+    <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+    <span>7-Day Returns</span>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<script src="{{ 'convertflow.js' | asset_url }}" defer></script>
+<link rel="stylesheet" href="{{ 'convertflow.css' | asset_url }}">
+
+{% schema %}
+{
+  "name": "Conversion Booster",
+  "target": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    { "type": "header", "content": "Visitor Count" },
+    { "type": "checkbox", "id": "enable_visitor_count", "label": "Enable Visitor Count", "default": true },
+    { "type": "number", "id": "visitor_base", "label": "Base Visitors", "default": 18 },
+    
+    { "type": "header", "content": "Stock Scarcity" },
+    { "type": "checkbox", "id": "enable_stock_scarcity", "label": "Enable Stock Scarcity", "default": true },
+    { "type": "number", "id": "stock_threshold", "label": "Show when stock is below", "default": 5 },
+    
+    { "type": "header", "content": "Countdown Timer" },
+    { "type": "checkbox", "id": "enable_countdown", "label": "Enable Countdown Timer", "default": true },
+    { "type": "text", "id": "countdown_text", "label": "Countdown Text", "default": "Sale ends in:" },
+    
+    { "type": "header", "content": "Trust Badges" },
+    { "type": "checkbox", "id": "enable_trust_badges", "label": "Enable Trust Badges", "default": true },
+    { "type": "checkbox", "id": "show_cod", "label": "Show COD Badge", "default": true },
+    { "type": "checkbox", "id": "show_shipping", "label": "Show Free Shipping Badge", "default": true },
+    { "type": "checkbox", "id": "show_returns", "label": "Show Returns Badge", "default": true },
+
+    { "type": "header", "content": "Styling" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#f4f4f4" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#333333" }
+  ]
+}
+{% endschema %}
