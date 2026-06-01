@@ -38,10 +38,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   
   const step = parseInt(formData.get("step") as string, 10);
   
-  const merchant = await prisma.merchant.findUnique({
+  let merchant = await prisma.merchant.findUnique({
     where: { shopDomain: session.shop }
   });
-  if (!merchant) throw new Error("Merchant not found");
+  if (!merchant) {
+    merchant = await prisma.merchant.create({
+      data: {
+        shopDomain: session.shop,
+        accessToken: session.accessToken || "",
+      }
+    });
+  }
 
   // If this is the final step
   if (step === 5) {
