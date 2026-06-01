@@ -22,14 +22,14 @@ import prisma from "../db.server";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const merchant = await prisma.merchant.findUnique({
-    where: { shop: session.shop },
+    where: { shopDomain: session.shop },
   });
 
   if (merchant?.onboardingCompleted) {
     return redirect("/app");
   }
 
-  return json({ shop: session.shop, step: merchant?.onboardingStep || 1 });
+  return json({ shopDomain: session.shop, step: merchant?.onboardingStep || 1 });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -57,7 +57,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     await prisma.$transaction([
       prisma.merchant.update({
-        where: { shop: session.shop },
+        where: { shopDomain: session.shop },
         data: {
           niche,
           averageOrderValue: aov,
@@ -104,7 +104,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   // Intermediate save (optional if we want to save state per step)
   await prisma.merchant.update({
-    where: { shop: session.shop },
+    where: { shopDomain: session.shop },
     data: { onboardingStep: step },
   });
 

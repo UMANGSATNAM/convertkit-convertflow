@@ -17,7 +17,7 @@ import { generateMockProfitData } from "../services/profit.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const merchant = await prisma.merchant.findUnique({ where: { shopifyDomain: session.shop } });
+  const merchant = await prisma.merchant.findUnique({ where: { shopDomain: session.shop } });
   
   if (!merchant) return { snapshots: [], stats: {} };
 
@@ -54,7 +54,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const merchant = await prisma.merchant.findUnique({ where: { shopifyDomain: session.shop } });
+  const merchant = await prisma.merchant.findUnique({ where: { shopDomain: session.shop } });
   
   if (merchant) {
     await generateMockProfitData(merchant.id);

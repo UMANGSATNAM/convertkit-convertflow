@@ -7,7 +7,7 @@ export const loader = async ({ request }: any) => {
   const { session } = await authenticate.admin(request);
   
   const merchant = await prisma.merchant.findUnique({
-    where: { shop: session.shop },
+    where: { shopDomain: session.shop },
   });
 
   if (!merchant || !merchant.onboardingCompleted) {
