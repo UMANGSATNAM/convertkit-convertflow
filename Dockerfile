@@ -28,5 +28,6 @@ COPY --from=builder /app/build ./build
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app ./app
+COPY --from=builder /app/server.js ./server.js
 
 CMD ["sh","-c","npx prisma db push --accept-data-loss && npm start"]
