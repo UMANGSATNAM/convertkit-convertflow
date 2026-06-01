@@ -27,20 +27,32 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     take: 50
   });
 
+  const formattedSnapshots = snapshots.map(s => ({
+    ...s,
+    shopifyOrderId: s.shopifyOrderId.toString(), // Convert BigInt for JSON serialization
+    createdAt: s.createdAt.toISOString(),
+    sellingPrice: Number(s.sellingPrice),
+    cogs: Number(s.cogs || 0),
+    shippingCost: Number(s.shippingCost || 0),
+    pgFee: Number(s.pgFee || 0),
+    adSpendAttributed: Number(s.adSpendAttributed || 0),
+    packagingCost: Number(s.packagingCost || 0),
+    rtoBuffer: Number(s.rtoBuffer || 0),
+    netProfit: Number(s.netProfit || 0),
+    netMarginPct: Number(s.netMarginPct || 0),
+    roas: Number(s.roas || 0),
+  }));
+
   // Calculate Aggregates
-  const totalRevenue = snapshots.reduce((acc, s) => acc + s.sellingPrice, 0);
-  const totalProfit = snapshots.reduce((acc, s) => acc + s.netProfit, 0);
-  const totalAdSpend = snapshots.reduce((acc, s) => acc + s.adSpendAttributed, 0);
+  const totalRevenue = formattedSnapshots.reduce((acc, s) => acc + s.sellingPrice, 0);
+  const totalProfit = formattedSnapshots.reduce((acc, s) => acc + s.netProfit, 0);
+  const totalAdSpend = formattedSnapshots.reduce((acc, s) => acc + s.adSpendAttributed, 0);
   
-  const averageMargin = snapshots.length > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+  const averageMargin = formattedSnapshots.length > 0 ? (totalProfit / totalRevenue) * 100 : 0;
   const blendedRoas = totalAdSpend > 0 ? (totalRevenue / totalAdSpend) : 0;
 
   return {
-    snapshots: snapshots.map(s => ({
-      ...s,
-      shopifyOrderId: s.shopifyOrderId.toString(), // Convert BigInt for JSON serialization
-      createdAt: s.createdAt.toISOString()
-    })),
+    snapshots: formattedSnapshots,
     stats: {
       totalRevenue,
       totalProfit,
