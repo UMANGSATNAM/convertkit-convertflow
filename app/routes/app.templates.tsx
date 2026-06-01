@@ -102,7 +102,7 @@ export default function TemplatesPage() {
     setIsInjecting(true);
     fetcher.submit(
       { templateId: activeTemplate.id, customTitle },
-      { method: "post", action: "/api/templates/inject" }
+      { method: "post", action: "/api/templates/inject", encType: "application/json" }
     );
   }, [activeTemplate, customTitle, fetcher]);
 
