@@ -4,7 +4,7 @@ import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 
 export const loader = async ({ request }: any) => {
-  const { session } = await authenticate.admin(request);
+  const { session, redirect } = await authenticate.admin(request);
   
   const merchant = await prisma.merchant.findUnique({
     where: { shopDomain: session.shop },

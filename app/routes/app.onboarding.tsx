@@ -20,7 +20,7 @@ import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, redirect } = await authenticate.admin(request);
   const merchant = await prisma.merchant.findUnique({
     where: { shopDomain: session.shop },
   });
@@ -33,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, redirect } = await authenticate.admin(request);
   const formData = await request.formData();
   
   const step = parseInt(formData.get("step") as string, 10);
