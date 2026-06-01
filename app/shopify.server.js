@@ -8,6 +8,8 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
+import { restResources } from "@shopify/shopify-api/rest/admin/2025-10";
+
 export const PLAN_FREE = 'Free';
 export const PLAN_PRO = 'Pro - $19/mo';
 export const PLAN_ENTERPRISE = 'Enterprise - $49/mo';
@@ -16,6 +18,7 @@ const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
   apiVersion: ApiVersion.October25,
+  restResources,
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",

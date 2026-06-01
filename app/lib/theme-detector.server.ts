@@ -1,6 +1,6 @@
 export async function detectIsStore20(shopify: any, session: any, themeId: string): Promise<boolean> {
   try {
-    const assetsResponse = await shopify.rest.Asset.all({
+    const assetsResponse = await shopify.rest.resources.Asset.all({
       session: session,
       theme_id: themeId,
     });

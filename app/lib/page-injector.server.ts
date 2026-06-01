@@ -28,7 +28,7 @@ export async function injectPageTemplate({
     }
 
     // 2. Fetch merchant's active theme ID
-    const themesResponse = await shopify.rest.Theme.all({ session });
+    const themesResponse = await shopify.rest.resources.Theme.all({ session });
     const activeTheme = themesResponse.data.find((t: any) => t.role === 'main');
 
     if (!activeTheme) {
@@ -51,7 +51,7 @@ export async function injectPageTemplate({
       const templateContent = buildTemplateJSON(template.sectionsConfig);
 
       // 5. Inject JSON template into active theme via Assets API
-      const asset = new shopify.rest.Asset({ session });
+      const asset = new shopify.rest.resources.Asset({ session });
       asset.theme_id = activeTheme.id;
       asset.key = `templates/${templateFileName}`;
       asset.value = JSON.stringify(templateContent, null, 2);
@@ -59,7 +59,7 @@ export async function injectPageTemplate({
     }
 
     // 6. Create the Shopify Page with this template
-    const page = new shopify.rest.Page({ session });
+    const page = new shopify.rest.resources.Page({ session });
     page.title = customTitle;
     page.handle = handle;
     page.published = true;
