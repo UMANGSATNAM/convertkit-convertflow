@@ -9,7 +9,7 @@ import {
   Grid,
   Button
 } from "@shopify/polaris";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
@@ -77,6 +77,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function ProfitDashboard() {
   const { snapshots, stats, merchantId } = useLoaderData<typeof loader>();
   const submit = useSubmit();
+  const navigate = useNavigate();
 
   const handleGenerateData = () => {
     submit({}, { method: "post" });
@@ -90,7 +91,7 @@ export default function ProfitDashboard() {
       subtitle="Connect Razorpay, Shiprocket, and Meta Ads to see your true bottom line."
       primaryAction={{
         content: "Integrations",
-        onAction: () => console.log("Navigate to Integrations")
+        onAction: () => navigate("/app/integrations")
       }}
       secondaryActions={[
         {
