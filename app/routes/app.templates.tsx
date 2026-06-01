@@ -54,7 +54,8 @@ export const loader = async ({ request }: any) => {
 
 export default function TemplatesPage() {
   const { templates, injectedPages, merchantId } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<any>();
+  const injectFetcher = useFetcher<any>();
+  const previewFetcher = useFetcher<any>();
   
   const [selectedNiche, setSelectedNiche] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
@@ -66,10 +67,18 @@ export default function TemplatesPage() {
   
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [activePreviewTemplate, setActivePreviewTemplate] = useState<any>(null);
+  const [isPreviewGenerating, setIsPreviewGenerating] = useState(false);
+  const [previewLiveUrl, setPreviewLiveUrl] = useState<string | null>(null);
 
   const handlePreviewClick = (template: any) => {
     setActivePreviewTemplate(template);
     setPreviewModalOpen(true);
+    setIsPreviewGenerating(true);
+    setPreviewLiveUrl(null);
+    previewFetcher.submit(
+      { templateId: template.id, customTitle: `Preview - ${template.templateName}` },
+      { method: "post", action: "/api/templates/inject", encType: "application/json" }
+    );
   };
 
   const filteredTemplates = templates.filter((t: any) => {
@@ -108,20 +117,31 @@ export default function TemplatesPage() {
   const handleConfirmInject = useCallback(() => {
     if (!activeTemplate || !customTitle) return;
     setIsInjecting(true);
-    fetcher.submit(
+    injectFetcher.submit(
       { templateId: activeTemplate.id, customTitle },
       { method: "post", action: "/api/templates/inject", encType: "application/json" }
     );
-  }, [activeTemplate, customTitle, fetcher]);
+  }, [activeTemplate, customTitle, injectFetcher]);
 
-  // Handle fetcher success
-  if (fetcher.state === "idle" && fetcher.data && isInjecting) {
+  // Handle inject fetcher success
+  if (injectFetcher.state === "idle" && injectFetcher.data && isInjecting) {
     setIsInjecting(false);
     setInjectModalOpen(false);
-    if (fetcher.data.success) {
+    if (injectFetcher.data.success) {
       shopify.toast.show("Page is live!");
     } else {
-      shopify.toast.show(fetcher.data.error || "Injection failed", { isError: true });
+      shopify.toast.show(injectFetcher.data.error || "Injection failed", { isError: true });
+    }
+  }
+
+  // Handle preview fetcher success
+  if (previewFetcher.state === "idle" && previewFetcher.data && isPreviewGenerating) {
+    setIsPreviewGenerating(false);
+    if (previewFetcher.data.success) {
+      setPreviewLiveUrl(previewFetcher.data.liveUrl);
+    } else {
+      shopify.toast.show("Preview generation failed: " + previewFetcher.data.error, { isError: true });
+      setPreviewModalOpen(false);
     }
   }
 
@@ -269,28 +289,45 @@ export default function TemplatesPage() {
         <Modal.Section>
           {activePreviewTemplate && (
             <BlockStack gap="400">
-              {activePreviewTemplate.previewImageUrl && (
-                <img 
-                  src={activePreviewTemplate.previewImageUrl} 
-                  alt="Preview" 
-                  style={{ width: '100%', borderRadius: '8px', maxHeight: '400px', objectFit: 'cover' }} 
-                />
+              {isPreviewGenerating ? (
+                <div style={{ padding: '60px', textAlign: 'center' }}>
+                  <Text variant="headingMd" as="h3">Generating your Live Preview...</Text>
+                  <Text variant="bodyMd" as="p" tone="subdued">We are creating a real page on your store.</Text>
+                </div>
+              ) : previewLiveUrl ? (
+                <div style={{ width: '100%', height: '70vh', borderRadius: '8px', overflow: 'hidden', border: '1px solid #dfe3e8' }}>
+                  <iframe 
+                    src={previewLiveUrl} 
+                    title="Live Preview" 
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                  />
+                </div>
+              ) : (
+                <>
+                  {activePreviewTemplate.previewImageUrl && (
+                    <img 
+                      src={activePreviewTemplate.previewImageUrl} 
+                      alt="Preview" 
+                      style={{ width: '100%', borderRadius: '8px', maxHeight: '400px', objectFit: 'cover' }} 
+                    />
+                  )}
+                  <Text variant="headingMd" as="h3">Included Sections Layout</Text>
+                  <ResourceList
+                    resourceName={{ singular: 'section', plural: 'sections' }}
+                    items={activePreviewTemplate.sectionsConfig?.order || []}
+                    renderItem={(sectionId: string) => {
+                      const sectionData = activePreviewTemplate.sectionsConfig?.sections?.[sectionId as any];
+                      return (
+                        <ResourceItem id={sectionId as string} url="#" onClick={() => {}}>
+                          <Text variant="bodyMd" fontWeight="bold" as="h3">
+                            {sectionData?.type ? sectionData.type.replace(/-/g, ' ').toUpperCase() : sectionId}
+                          </Text>
+                        </ResourceItem>
+                      );
+                    }}
+                  />
+                </>
               )}
-              <Text variant="headingMd" as="h3">Included Sections Layout</Text>
-              <ResourceList
-                resourceName={{ singular: 'section', plural: 'sections' }}
-                items={activePreviewTemplate.sectionsConfig?.order || []}
-                renderItem={(sectionId: string) => {
-                  const sectionData = activePreviewTemplate.sectionsConfig?.sections?.[sectionId as any];
-                  return (
-                    <ResourceItem id={sectionId as string} url="#" onClick={() => {}}>
-                      <Text variant="bodyMd" fontWeight="bold" as="h3">
-                        {sectionData?.type ? sectionData.type.replace(/-/g, ' ').toUpperCase() : sectionId}
-                      </Text>
-                    </ResourceItem>
-                  );
-                }}
-              />
             </BlockStack>
           )}
         </Modal.Section>
