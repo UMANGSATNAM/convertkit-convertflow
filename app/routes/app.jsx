@@ -23,6 +23,7 @@ export default function App() {
         </Link>
         <Link to="/app/templates">Page Templates</Link>
         <Link to="/app/profit">Profit Calculator</Link>
+        <Link to="/app/whatsapp">WhatsApp Recovery</Link>
         <Link to="/app/billing">Billing</Link>
       </NavMenu>
       <Outlet />
