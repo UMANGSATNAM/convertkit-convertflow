@@ -1,19 +1,15 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
-// enough when changing adapters.
-// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-// ─── Shopify Session (required by @shopify/shopify-app-session-storage-prisma) ───
+// Session (required by @shopify/shopify-app-session-storage-prisma)
 model Session {
   id                  String    @id
   shop                String
@@ -34,187 +30,186 @@ model Session {
   refreshTokenExpires DateTime?
 }
 
-// ─── Core App Models ───
+model Merchant {
+  id                      String   @id @default(uuid())
+  shopDomain              String   @unique @map("shop_domain")
+  accessToken             String   @db.Text @map("access_token")
+  plan                    String   @default("starter")
+  niche                   String?
+  onboardingCompleted     Boolean  @default(false) @map("onboarding_completed")
+  onboardingStep          Int      @default(0) @map("onboarding_step")
+  razorpayKeyId           String?  @db.Text @map("razorpay_key_id")
+  razorpayKeySecret       String?  @db.Text @map("razorpay_key_secret")
+  facebookAccessToken     String?  @db.Text @map("facebook_access_token")
+  facebookAdAccountId     String?  @map("facebook_ad_account_id")
+  shiprocketEmail         String?  @db.Text @map("shiprocket_email")
+  shiprocketToken         String?  @db.Text @map("shiprocket_token")
+  whatsappPhoneNumberId   String?  @map("whatsapp_phone_number_id")
+  whatsappAccessToken     String?  @db.Text @map("whatsapp_access_token")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
 
-model Shop {
-  id              String    @id @default(cuid())
-  shopDomain      String    @unique
-  accessToken     String    @db.Text
-  plan            String    @default("free") // free | pro | enterprise
-  installDate     DateTime  @default(now())
-  settings        String?   @db.LongText // JSON
-  lastActiveAt    DateTime?
-  uninstalledAt   DateTime?
+  featureConfigs   FeatureConfig[]
+  reviews          Review[]
+  upsellRules      UpsellRule[]
+  abandonedCarts   AbandonedCart[]
+  profitSnapshots  ProfitSnapshot[]
+  gstInvoices      GstInvoice[]
+  whatsappMessages WhatsappMessage[]
+  injectedPages    InjectedPage[]
 
-  sections        Section[]
-  pages           Page[]
-  themes          Theme[]
-  urgencyTimers   UrgencyTimer[]
-  reviewRequests  ReviewRequest[]
-  analyticsEvents AnalyticsEvent[]
-  extractions     Extraction[]
-  libraryItems    LibraryItem[]
-  pushHistories   PushHistory[]
+  @@map("merchants")
 }
 
-model Section {
-  id        String   @id @default(cuid())
-  shopId    String
-  type      String   // hero, testimonial, faq, etc.
-  name      String
-  config    String?  @db.LongText // JSON
-  position  Int      @default(0)
-  isActive  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
+model FeatureConfig {
+  id         String   @id @default(uuid())
+  merchantId String   @map("merchant_id")
+  featureKey String   @map("feature_key")
+  enabled    Boolean  @default(false)
+  config     Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  merchant   Merchant @relation(fields:[merchantId], references:[id])
+  @@unique([merchantId, featureKey])
+  @@map("feature_configs")
 }
 
-model Page {
-  id             String    @id @default(cuid())
-  shopId         String
-  slug           String
-  title          String
-  pageType       String    @default("landing") // landing | product | collection | homepage | blog | 404 | coming_soon
-  templateId     String?                        // which template was used
-  content        String?   @db.LongText         // JSON block-based sections
-  globalStyles   String?   @db.LongText         // JSON — fonts, colors, spacing
-  status         String    @default("draft")    // draft | published | scheduled
-  shopifyPageId  String?                        // Shopify page ID after publish
-  seoTitle       String?
-  seoDescription String?   @db.Text
-  ogImage        String?   @db.Text
-  publishedAt    DateTime?
-  updatedAt      DateTime  @updatedAt
-  createdAt      DateTime  @default(now())
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@unique([shopId, slug])
-  @@index([shopId])
-  @@index([status])
+model Review {
+  id              String   @id @default(uuid())
+  merchantId      String   @map("merchant_id")
+  productId       BigInt   @map("product_id")
+  authorName      String   @map("author_name")
+  rating          Int
+  title           String?
+  body            String   @db.LongText
+  photoUrls       Json?    @map("photo_urls")
+  videoUrl        String?  @map("video_url")
+  verifiedPurchase Boolean @default(false) @map("verified_purchase")
+  orderId         BigInt?  @map("order_id")
+  status          String   @default("pending")
+  source          String   @default("manual")
+  createdAt       DateTime @default(now()) @map("created_at")
+  merchant        Merchant @relation(fields:[merchantId], references:[id])
+  @@map("reviews")
 }
 
-model Theme {
-  id              String    @id @default(cuid())
-  shopId          String
-  name            String
-  previewImageUrl String?   @db.Text
-  cssVariables    String?   @db.LongText // JSON
-  isActive        Boolean   @default(false)
-  appliedAt       DateTime?
-  createdAt       DateTime  @default(now())
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
+model UpsellRule {
+  id              String   @id @default(uuid())
+  merchantId      String   @map("merchant_id")
+  ruleType        String   @map("rule_type")
+  triggerProductId BigInt  @map("trigger_product_id")
+  offerProductId  BigInt   @map("offer_product_id")
+  discountType    String   @map("discount_type")
+  discountValue   Decimal  @map("discount_value")
+  headline        String?
+  isActive        Boolean  @default(true) @map("is_active")
+  displayOrder    Int      @default(0) @map("display_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+  merchant        Merchant @relation(fields:[merchantId], references:[id])
+  @@map("upsell_rules")
 }
 
-model UrgencyTimer {
-  id           String    @id @default(cuid())
-  shopId       String
-  productId    String?
-  collectionId String?
-  deadline     DateTime?
-  displayType  String    @default("countdown") // countdown | scarcity | banner
-  message      String?   @db.Text
-  isActive     Boolean   @default(false)
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
+model AbandonedCart {
+  id                   String    @id @default(uuid())
+  merchantId           String    @map("merchant_id")
+  shopifyCheckoutToken String    @unique @map("shopify_checkout_token")
+  customerEmail        String?   @map("customer_email")
+  customerPhone        String?   @map("customer_phone")
+  cartTotal            Decimal   @map("cart_total")
+  cartItems            Json      @map("cart_items")
+  recoveryStage        Int       @default(0) @map("recovery_stage")
+  recovered            Boolean   @default(false)
+  recoveredOrderId     BigInt?   @map("recovered_order_id")
+  abandonedAt          DateTime  @map("abandoned_at")
+  lastMessageSentAt    DateTime? @map("last_message_sent_at")
+  merchant             Merchant  @relation(fields:[merchantId], references:[id])
+  @@map("abandoned_carts")
 }
 
-model ReviewRequest {
-  id              String    @id @default(cuid())
-  shopId          String
-  orderId         String?
-  customerId      String?
-  productId       String?
-  status          String    @default("pending") // pending | sent | completed
-  generatedReview String?   @db.LongText
-  sentAt          DateTime?
-  completedAt     DateTime?
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
+model ProfitSnapshot {
+  id                  String   @id @default(uuid())
+  merchantId          String   @map("merchant_id")
+  shopifyOrderId      BigInt   @unique @map("shopify_order_id")
+  sellingPrice        Decimal  @map("selling_price")
+  cogs                Decimal?
+  shippingCost        Decimal? @map("shipping_cost")
+  pgFee               Decimal? @map("pg_fee")
+  adSpendAttributed   Decimal? @map("ad_spend_attributed")
+  packagingCost       Decimal? @map("packaging_cost")
+  rtoBuffer           Decimal? @map("rto_buffer")
+  netProfit           Decimal? @map("net_profit")
+  netMarginPct        Decimal? @map("net_margin_pct")
+  roas                Decimal?
+  orderSource         String?  @map("order_source")
+  createdAt           DateTime @default(now()) @map("created_at")
+  merchant            Merchant @relation(fields:[merchantId], references:[id])
+  @@map("profit_snapshots")
 }
 
-model AnalyticsEvent {
-  id          String   @id @default(cuid())
-  shopId      String
-  eventType   String   // pageview | feature_interact | purchase
-  value       Decimal? @db.Decimal(10, 2)
-  featureName String?
-  sessionId   String?
-  createdAt   DateTime @default(now())
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
-  @@index([createdAt])
+model GstInvoice {
+  id              String    @id @default(uuid())
+  merchantId      String    @map("merchant_id")
+  shopifyOrderId  BigInt    @map("shopify_order_id")
+  invoiceNumber   String    @unique @map("invoice_number")
+  merchantGstin   String?   @map("merchant_gstin")
+  customerGstin   String?   @map("customer_gstin")
+  hsnCodes        Json?     @map("hsn_codes")
+  cgstAmount      Decimal?  @map("cgst_amount")
+  sgstAmount      Decimal?  @map("sgst_amount")
+  igstAmount      Decimal?  @map("igst_amount")
+  totalTax        Decimal?  @map("total_tax")
+  invoiceTotal    Decimal?  @map("invoice_total")
+  pdfUrl          String?   @db.Text @map("pdf_url")
+  emailedAt       DateTime? @map("emailed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  merchant        Merchant  @relation(fields:[merchantId], references:[id])
+  @@map("gst_invoices")
 }
 
-model Extraction {
-  id               String   @id @default(cuid())
-  shopId           String
-  sectionKey       String
-  sectionName      String?
-  rawLiquid        String?  @db.LongText
-  rawCSS           String?  @db.LongText
-  rawSchema        String?  @db.LongText
-  processedLiquid  String?  @db.LongText
-  processedCSS     String?  @db.LongText
-  processedSchema  String?  @db.LongText
-  themeCheckerPass Boolean  @default(false)
-  errors           String?  @db.LongText // JSON
-  createdAt        DateTime @default(now())
-
-  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
+model WhatsappMessage {
+  id                 String    @id @default(uuid())
+  merchantId         String    @map("merchant_id")
+  messageType        String    @map("message_type")
+  toPhone            String    @map("to_phone")
+  templateName       String    @map("template_name")
+  templateVariables  Json?     @map("template_variables")
+  status             String    @default("queued")
+  metaMessageId      String?   @map("meta_message_id")
+  relatedOrderId     BigInt?   @map("related_order_id")
+  sentAt             DateTime? @map("sent_at")
+  deliveredAt        DateTime? @map("delivered_at")
+  readAt             DateTime? @map("read_at")
+  merchant           Merchant  @relation(fields:[merchantId], references:[id])
+  @@map("whatsapp_messages")
 }
 
-model LibraryItem {
-  id              String    @id @default(cuid())
-  shopId          String
-  name            String
-  description     String?   @db.Text
-  tags            String?   @db.Text // comma-separated
-  liquidCode      String?   @db.LongText
-  cssCode         String?   @db.LongText
-  schemaCode      String?   @db.LongText
-  previewImageUrl String?   @db.Text
-  isPublic        Boolean   @default(false)
-  usageCount      Int       @default(0)
-  shareToken      String?   @unique
-  shareExpiresAt  DateTime?
-  createdAt       DateTime  @default(now())
-
-  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  pushHistories PushHistory[]
-
-  @@index([shopId])
+// Page Injection System
+model PageTemplate {
+  id               String         @id @default(uuid())
+  niche            String
+  pageType         String         @map("page_type")
+  templateName     String         @map("template_name")
+  description      String         @db.Text
+  sectionsConfig   Json           @map("sections_config")
+  previewImageUrl  String?        @db.Text @map("preview_image_url")
+  isActive         Boolean        @default(true) @map("is_active")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  injectedPages    InjectedPage[]
+  @@map("page_templates")
 }
 
-model PushHistory {
-  id              String   @id @default(cuid())
-  shopId          String
-  libraryItemId   String
-  targetThemeId   String?
-  targetThemeName String?
-  pushedAt        DateTime @default(now())
-  status          String   @default("pending") // pending | success | failed
-  errorMessage    String?  @db.Text
-  backupLiquid    String?  @db.LongText
-
-  shop        Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  libraryItem LibraryItem @relation(fields: [libraryItemId], references: [id], onDelete: Cascade)
-
-  @@index([shopId])
-  @@index([libraryItemId])
+model InjectedPage {
+  id                  String      @id @default(uuid())
+  merchantId          String      @map("merchant_id")
+  templateId          String      @map("template_id")
+  shopifyPageId       BigInt?     @map("shopify_page_id")
+  shopifyPageHandle   String?     @map("shopify_page_handle")
+  shopifyTemplateFile String?     @map("shopify_template_file")
+  pageTitle           String      @map("page_title")
+  status              String      @default("pending")
+  injectedAt          DateTime?   @map("injected_at")
+  createdAt           DateTime    @default(now()) @map("created_at")
+  merchant            Merchant    @relation(fields:[merchantId], references:[id])
+  template            PageTemplate @relation(fields:[templateId], references:[id])
+  @@map("injected_pages")
 }
