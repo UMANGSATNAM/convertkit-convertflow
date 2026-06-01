@@ -21,6 +21,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
+        <Link to="/app/profit">Profit Calculator</Link>
         <Link to="/app/billing">Billing</Link>
       </NavMenu>
       <Outlet />
