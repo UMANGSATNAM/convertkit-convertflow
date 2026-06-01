@@ -63,6 +63,14 @@ export default function TemplatesPage() {
   const [injectModalOpen, setInjectModalOpen] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<any>(null);
   const [customTitle, setCustomTitle] = useState("");
+  
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [activePreviewTemplate, setActivePreviewTemplate] = useState<any>(null);
+
+  const handlePreviewClick = (template: any) => {
+    setActivePreviewTemplate(template);
+    setPreviewModalOpen(true);
+  };
 
   const filteredTemplates = templates.filter((t: any) => {
     if (selectedNiche !== "all" && t.niche !== selectedNiche) return false;
@@ -157,9 +165,14 @@ export default function TemplatesPage() {
                             <Badge>{template.pageType}</Badge>
                           </InlineStack>
                           <Text variant="bodySm" as="p" tone="subdued">{template.description}</Text>
-                          <Button fullWidth onClick={() => handleInjectClick(template)}>
-                            Add to Store
-                          </Button>
+                          <InlineStack gap="200" wrap={false}>
+                            <div style={{ flex: 1 }}>
+                              <Button fullWidth onClick={() => handlePreviewClick(template)}>Preview</Button>
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <Button fullWidth variant="primary" onClick={() => handleInjectClick(template)}>Add to Store</Button>
+                            </div>
+                          </InlineStack>
                         </BlockStack>
                       </div>
                     </Card>
@@ -245,6 +258,41 @@ export default function TemplatesPage() {
               autoComplete="off"
             />
           </BlockStack>
+        </Modal.Section>
+      </Modal>
+      <Modal
+        open={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        title={activePreviewTemplate?.templateName || "Template Preview"}
+        size="large"
+      >
+        <Modal.Section>
+          {activePreviewTemplate && (
+            <BlockStack gap="400">
+              {activePreviewTemplate.previewImageUrl && (
+                <img 
+                  src={activePreviewTemplate.previewImageUrl} 
+                  alt="Preview" 
+                  style={{ width: '100%', borderRadius: '8px', maxHeight: '400px', objectFit: 'cover' }} 
+                />
+              )}
+              <Text variant="headingMd" as="h3">Included Sections Layout</Text>
+              <ResourceList
+                resourceName={{ singular: 'section', plural: 'sections' }}
+                items={activePreviewTemplate.sectionsConfig?.order || []}
+                renderItem={(sectionId: string) => {
+                  const sectionData = activePreviewTemplate.sectionsConfig?.sections?.[sectionId as any];
+                  return (
+                    <ResourceItem id={sectionId as string} url="#" onClick={() => {}}>
+                      <Text variant="bodyMd" fontWeight="bold" as="h3">
+                        {sectionData?.type ? sectionData.type.replace(/-/g, ' ').toUpperCase() : sectionId}
+                      </Text>
+                    </ResourceItem>
+                  );
+                }}
+              />
+            </BlockStack>
+          )}
         </Modal.Section>
       </Modal>
     </Page>
