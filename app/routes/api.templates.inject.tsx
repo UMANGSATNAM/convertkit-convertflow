@@ -7,7 +7,18 @@ import { injectPageTemplate } from "../lib/page-injector.server";
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const { admin, session } = await authenticate.admin(request);
-    const { templateId, customTitle } = await request.json();
+    const contentType = request.headers.get("content-type") || "";
+    let templateId, customTitle;
+
+    if (contentType.includes("application/json")) {
+      const body = await request.json();
+      templateId = body.templateId;
+      customTitle = body.customTitle;
+    } else {
+      const formData = await request.formData();
+      templateId = formData.get("templateId") as string;
+      customTitle = formData.get("customTitle") as string;
+    }
 
     if (!templateId || !customTitle) {
       return json({ success: false, error: "Missing templateId or customTitle" }, { status: 400 });
