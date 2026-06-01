@@ -37,6 +37,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   
   const step = parseInt(formData.get("step") as string, 10);
+  
+  const merchant = await prisma.merchant.findUnique({
+    where: { shopDomain: session.shop }
+  });
+  if (!merchant) throw new Error("Merchant not found");
 
   // If this is the final step
   if (step === 5) {
@@ -70,32 +75,30 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           themeSecondaryColor: secondaryColor,
         },
       }),
-      // Assuming a feature configuration structure, we'll store them as separate records or JSON
-      // For this implementation, we will assume a generic FeatureConfig table
       prisma.featureConfig.upsert({
-        where: { merchantId_featureName: { merchantId: session.shop, featureName: "countdown_timer" } },
-        update: { isEnabled: useCountdown },
-        create: { merchantId: session.shop, featureName: "countdown_timer", isEnabled: useCountdown, settings: {} }
+        where: { merchantId_featureKey: { merchantId: merchant.id, featureKey: "countdown_timer" } },
+        update: { enabled: useCountdown },
+        create: { merchantId: merchant.id, featureKey: "countdown_timer", enabled: useCountdown, config: {} }
       }),
       prisma.featureConfig.upsert({
-        where: { merchantId_featureName: { merchantId: session.shop, featureName: "stock_scarcity" } },
-        update: { isEnabled: useStockScarcity },
-        create: { merchantId: session.shop, featureName: "stock_scarcity", isEnabled: useStockScarcity, settings: {} }
+        where: { merchantId_featureKey: { merchantId: merchant.id, featureKey: "stock_scarcity" } },
+        update: { enabled: useStockScarcity },
+        create: { merchantId: merchant.id, featureKey: "stock_scarcity", enabled: useStockScarcity, config: {} }
       }),
       prisma.featureConfig.upsert({
-        where: { merchantId_featureName: { merchantId: session.shop, featureName: "sticky_atc" } },
-        update: { isEnabled: useStickyAtc },
-        create: { merchantId: session.shop, featureName: "sticky_atc", isEnabled: useStickyAtc, settings: {} }
+        where: { merchantId_featureKey: { merchantId: merchant.id, featureKey: "sticky_atc" } },
+        update: { enabled: useStickyAtc },
+        create: { merchantId: merchant.id, featureKey: "sticky_atc", enabled: useStickyAtc, config: {} }
       }),
       prisma.featureConfig.upsert({
-        where: { merchantId_featureName: { merchantId: session.shop, featureName: "free_shipping" } },
-        update: { isEnabled: useFreeShipping },
-        create: { merchantId: session.shop, featureName: "free_shipping", isEnabled: useFreeShipping, settings: {} }
+        where: { merchantId_featureKey: { merchantId: merchant.id, featureKey: "free_shipping" } },
+        update: { enabled: useFreeShipping },
+        create: { merchantId: merchant.id, featureKey: "free_shipping", enabled: useFreeShipping, config: {} }
       }),
       prisma.featureConfig.upsert({
-        where: { merchantId_featureName: { merchantId: session.shop, featureName: "trust_badges" } },
-        update: { isEnabled: useTrustBadges },
-        create: { merchantId: session.shop, featureName: "trust_badges", isEnabled: useTrustBadges, settings: {} }
+        where: { merchantId_featureKey: { merchantId: merchant.id, featureKey: "trust_badges" } },
+        update: { enabled: useTrustBadges },
+        create: { merchantId: merchant.id, featureKey: "trust_badges", enabled: useTrustBadges, config: {} }
       })
     ]);
 
