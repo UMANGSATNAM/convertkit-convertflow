@@ -75,7 +75,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           averageOrderValue: aov,
           razorpayKeyId,
           shiprocketEmail,
-          shiprocketPassword,
+          shiprocketToken: shiprocketPassword,
           onboardingStep: 5,
           onboardingCompleted: true,
           themePrimaryColor: primaryColor,
