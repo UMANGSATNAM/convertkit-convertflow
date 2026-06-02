@@ -8,20 +8,28 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     const { admin, session } = await authenticate.admin(request);
     const contentType = request.headers.get("content-type") || "";
-    let templateId, customTitle;
+    let templateId, customTitle, targetThemeId, targetPageType;
 
     if (contentType.includes("application/json")) {
       const body = await request.json();
       templateId = body.templateId;
       customTitle = body.customTitle;
+      targetThemeId = body.targetThemeId;
+      targetPageType = body.targetPageType;
     } else {
       const formData = await request.formData();
       templateId = formData.get("templateId") as string;
       customTitle = formData.get("customTitle") as string;
+      targetThemeId = formData.get("targetThemeId") as string;
+      targetPageType = formData.get("targetPageType") as string;
     }
 
-    if (!templateId || !customTitle) {
-      return json({ success: false, error: "Missing templateId or customTitle" }, { status: 400 });
+    if (!templateId || !targetThemeId || !targetPageType) {
+      return json({ success: false, error: "Missing required parameters" }, { status: 400 });
+    }
+
+    if (targetPageType === "custom" && !customTitle) {
+      return json({ success: false, error: "Missing customTitle for custom page type" }, { status: 400 });
     }
 
     // Get merchant from DB
@@ -38,6 +46,8 @@ export async function action({ request }: ActionFunctionArgs) {
       merchantId: merchant.id,
       templateId,
       customTitle,
+      targetThemeId,
+      targetPageType,
       shopify: admin,
       session,
     });

@@ -21,7 +21,7 @@ import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 
 export const loader = async ({ request }: any) => {
-  const { session } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   
   // Find merchant
   let merchant = await prisma.merchant.findUnique({
@@ -49,11 +49,23 @@ export const loader = async ({ request }: any) => {
     orderBy: { createdAt: 'desc' }
   });
 
-  return json({ templates, injectedPages, merchantId: merchant.id });
+  let themes = [];
+  try {
+    const themesResponse = await admin.rest.resources.Theme.all({ session });
+    themes = themesResponse.data.map((t: any) => ({
+      id: t.id,
+      name: t.name,
+      role: t.role
+    }));
+  } catch (error) {
+    console.error("Failed to fetch themes", error);
+  }
+
+  return json({ templates, injectedPages, merchantId: merchant.id, themes });
 };
 
 export default function TemplatesPage() {
-  const { templates, injectedPages, merchantId } = useLoaderData<typeof loader>();
+  const { templates, injectedPages, merchantId, themes } = useLoaderData<typeof loader>();
   const injectFetcher = useFetcher<any>();
   const previewFetcher = useFetcher<any>();
   
@@ -65,6 +77,10 @@ export default function TemplatesPage() {
   const [activeTemplate, setActiveTemplate] = useState<any>(null);
   const [customTitle, setCustomTitle] = useState("");
   
+  // Theme Injection states
+  const [targetThemeId, setTargetThemeId] = useState<string>("");
+  const [targetPageType, setTargetPageType] = useState<string>("custom");
+
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [activePreviewTemplate, setActivePreviewTemplate] = useState<any>(null);
   const [isPreviewGenerating, setIsPreviewGenerating] = useState(false);
@@ -111,17 +127,32 @@ export default function TemplatesPage() {
   const handleInjectClick = (template: any) => {
     setActiveTemplate(template);
     setCustomTitle(template.templateName);
+    
+    // Default to the active theme if possible
+    const activeTheme = themes?.find((t: any) => t.role === 'main');
+    if (activeTheme) {
+      setTargetThemeId(activeTheme.id.toString());
+    } else if (themes?.length > 0) {
+      setTargetThemeId(themes[0].id.toString());
+    }
+    setTargetPageType("custom");
+    
     setInjectModalOpen(true);
   };
 
   const handleConfirmInject = useCallback(() => {
-    if (!activeTemplate || !customTitle) return;
+    if (!activeTemplate || !targetThemeId) return;
     setIsInjecting(true);
     injectFetcher.submit(
-      { templateId: activeTemplate.id, customTitle },
+      { 
+        templateId: activeTemplate.id, 
+        customTitle: targetPageType === "custom" ? customTitle : "",
+        targetThemeId,
+        targetPageType
+      },
       { method: "post", action: "/api/templates/inject", encType: "application/json" }
     );
-  }, [activeTemplate, customTitle, injectFetcher]);
+  }, [activeTemplate, customTitle, targetThemeId, targetPageType, injectFetcher]);
 
   // Handle inject fetcher success
   if (injectFetcher.state === "idle" && injectFetcher.data && isInjecting) {
@@ -253,9 +284,9 @@ export default function TemplatesPage() {
       <Modal
         open={injectModalOpen}
         onClose={() => setInjectModalOpen(false)}
-        title="Inject Page to Store"
+        title="Inject Template to Store"
         primaryAction={{
-          content: 'Inject Page',
+          content: 'Inject Template',
           onAction: handleConfirmInject,
           loading: isInjecting,
         }}
@@ -269,14 +300,46 @@ export default function TemplatesPage() {
         <Modal.Section>
           <BlockStack gap="400">
             <Text as="p" variant="bodyMd">
-              This will create a new page in your Shopify store using the <strong>{activeTemplate?.templateName}</strong> template.
+              You are about to inject the <strong>{activeTemplate?.templateName}</strong> template. Where should this template be injected?
             </Text>
-            <TextField
-              label="Page Title"
-              value={customTitle}
-              onChange={setCustomTitle}
-              autoComplete="off"
+
+            <Select
+              label="Target Theme"
+              options={(themes || []).map((t: any) => ({
+                label: `${t.name} (${t.role})`,
+                value: t.id.toString(),
+              }))}
+              onChange={setTargetThemeId}
+              value={targetThemeId}
             />
+
+            <Select
+              label="Target Page"
+              options={[
+                { label: "Homepage (index.json)", value: "index" },
+                { label: "Default Product (product.json)", value: "product" },
+                { label: "Default Collection (collection.json)", value: "collection" },
+                { label: "Custom Page (page.custom.json)", value: "custom" },
+              ]}
+              onChange={setTargetPageType}
+              value={targetPageType}
+            />
+
+            {targetPageType === "custom" && (
+              <TextField
+                label="Custom Page Title"
+                value={customTitle}
+                onChange={setCustomTitle}
+                autoComplete="off"
+                helpText="This will create a brand new page rather than overwriting a core template."
+              />
+            )}
+            
+            {targetPageType !== "custom" && (
+              <Banner tone="warning">
+                This will safely back up and overwrite your existing {targetPageType}.json in the selected theme.
+              </Banner>
+            )}
           </BlockStack>
         </Modal.Section>
       </Modal>
