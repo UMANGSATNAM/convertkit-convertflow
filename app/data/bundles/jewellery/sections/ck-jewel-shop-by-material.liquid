@@ -1,0 +1,176 @@
+<div class="ck-shop-material" style="background-color: {{ section.settings.bg_color }}; padding: {{ section.settings.padding_y }}px 20px;">
+  <div class="ck-container">
+    <h2 class="ck-section-title" style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+    
+    <div class="ck-material-grid">
+      {% for block in section.blocks %}
+        <a href="{{ block.settings.link }}" class="ck-material-item">
+          <div class="ck-material-image">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | img_url: '400x400', crop: 'center' }}" alt="{{ block.settings.title }}">
+            {% else %}
+              <div class="ck-placeholder-img"></div>
+            {% endif %}
+          </div>
+          <div class="ck-material-content">
+            <h3 class="ck-material-title" style="color: {{ section.settings.text_color }};">{{ block.settings.title }}</h3>
+            <span class="ck-material-subtitle">{{ block.settings.subtitle }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .ck-shop-material .ck-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .ck-shop-material .ck-section-title {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+  .ck-material-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .ck-material-item {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .ck-material-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  }
+  .ck-material-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+  }
+  .ck-material-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ck-material-content {
+    text-align: center;
+  }
+  .ck-material-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    margin: 0 0 5px 0;
+  }
+  .ck-material-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .ck-placeholder-img {
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+  }
+  
+  @media (max-width: 768px) {
+    .ck-material-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .ck-shop-material .ck-section-title {
+      font-size: 24px;
+      margin-bottom: 25px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "CK Shop by Material",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Shop By Material"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#fafafa"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Vertical Padding",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "material",
+      "name": "Material",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Icon/Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Material Name",
+          "default": "Gold"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "22Kt & 18Kt"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CK Shop by Material",
+      "blocks": [
+        { "type": "material", "settings": { "title": "Gold", "subtitle": "22Kt & 18Kt" } },
+        { "type": "material", "settings": { "title": "Diamond", "subtitle": "Certified" } },
+        { "type": "material", "settings": { "title": "Platinum", "subtitle": "950 Purity" } },
+        { "type": "material", "settings": { "title": "Gemstone", "subtitle": "Precious" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

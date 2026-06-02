@@ -1,0 +1,209 @@
+<div class="ck-product-slider" style="background-color: {{ section.settings.bg_color }}; padding: {{ section.settings.padding_y }}px 20px;">
+  <div class="ck-container">
+    <div class="ck-slider-header">
+      <h2 class="ck-section-title" style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      {% if section.settings.view_all_link != blank %}
+        <a href="{{ section.settings.view_all_link }}" class="ck-view-all" style="color: {{ section.settings.accent_color }};">View All</a>
+      {% endif %}
+    </div>
+    
+    <div class="ck-slider-track">
+      {% assign collection = collections[section.settings.collection] %}
+      {% if collection != blank and collection.products_count > 0 %}
+        {% for product in collection.products limit: 6 %}
+          <div class="ck-product-card">
+            <a href="{{ product.url }}" class="ck-product-image">
+              <img src="{{ product.featured_image | img_url: '400x400', crop: 'center' }}" alt="{{ product.title }}">
+              {% if product.compare_at_price > product.price %}
+                <span class="ck-badge ck-sale-badge" style="background-color: {{ section.settings.accent_color }};">Sale</span>
+              {% endif %}
+            </a>
+            <div class="ck-product-info">
+              <h3 class="ck-product-title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+              <div class="ck-product-price">
+                <span class="ck-price">{{ product.price | money }}</span>
+                {% if product.compare_at_price > product.price %}
+                  <span class="ck-compare-price">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..4) %}
+          <div class="ck-product-card ck-placeholder">
+            <div class="ck-product-image" style="background-color: #f4f4f4;"></div>
+            <div class="ck-product-info">
+              <h3 class="ck-product-title">Sample Product {{ i }}</h3>
+              <div class="ck-product-price">
+                <span class="ck-price">$199.00</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .ck-product-slider .ck-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .ck-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+  }
+  .ck-product-slider .ck-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    margin: 0;
+  }
+  .ck-view-all {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+  }
+  .ck-slider-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    scrollbar-width: none; /* Firefox */
+  }
+  .ck-slider-track::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+  .ck-product-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+  }
+  .ck-product-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  }
+  .ck-product-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    background-color: #f9f9f9;
+  }
+  .ck-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ck-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .ck-product-info {
+    padding: 15px;
+    text-align: center;
+  }
+  .ck-product-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    font-weight: 400;
+  }
+  .ck-product-title a {
+    color: #333;
+    text-decoration: none;
+  }
+  .ck-product-price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #333;
+  }
+  .ck-compare-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    .ck-product-slider .ck-section-title {
+      font-size: 24px;
+    }
+    .ck-product-card {
+      min-width: 220px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "CK Product Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Trending Now"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Badges/Links)",
+      "default": "#B76E79"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Vertical Padding",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "CK Product Slider"
+    }
+  ]
+}
+{% endschema %}
