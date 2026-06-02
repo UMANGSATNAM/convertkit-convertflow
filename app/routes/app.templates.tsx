@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useFetcher } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -9,14 +9,15 @@ import {
   Button,
   Grid,
   Badge,
-  InlineStack
+  InlineStack,
+  Banner
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import { useEffect } from "react";
 
 export const loader = async ({ request }: any) => {
   await authenticate.admin(request);
   
-  // Hardcoded for V1 Phase 1, later can be moved to DB or fs scanning
   const templates = [
     {
       id: "minimal-fashion",
@@ -32,11 +33,29 @@ export const loader = async ({ request }: any) => {
 
 export default function Templates() {
   const { templates } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
+  const fetcher = useFetcher();
+
+  const isInjecting = fetcher.state !== "idle";
+  const successMsg = fetcher.data?.success ? fetcher.data.message : null;
+  const errorMsg = fetcher.data?.error ? fetcher.data.error : null;
 
   return (
     <Page title="Template Library" subtitle="Full-store themes designed for maximum conversions.">
       <Layout>
+        {successMsg && (
+          <Layout.Section>
+            <Banner title="Template Injected Successfully" tone="success">
+              <p>{successMsg}</p>
+            </Banner>
+          </Layout.Section>
+        )}
+        {errorMsg && (
+          <Layout.Section>
+            <Banner title="Injection Failed" tone="critical">
+              <p>{errorMsg}</p>
+            </Banner>
+          </Layout.Section>
+        )}
         <Layout.Section>
           <Grid>
             {templates.map(template => (
@@ -61,13 +80,17 @@ export default function Templates() {
                         {template.description}
                       </Text>
                       <div style={{ marginTop: '0.5rem' }}>
-                        <Button 
-                          variant="primary" 
-                          fullWidth 
-                          onClick={() => navigate(`/app/templates/${template.id}`)}
-                        >
-                          View Details & Apply
-                        </Button>
+                        <fetcher.Form method="post" action="/api/theme/inject">
+                          <input type="hidden" name="templateId" value={template.id} />
+                          <Button 
+                            variant="primary" 
+                            fullWidth 
+                            submit
+                            loading={isInjecting}
+                          >
+                            Apply to Store
+                          </Button>
+                        </fetcher.Form>
                       </div>
                     </BlockStack>
                   </div>
