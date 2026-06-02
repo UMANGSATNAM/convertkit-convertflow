@@ -1,0 +1,183 @@
+<style>
+  .mf-brand-story {
+    display: flex;
+    flex-direction: column;
+    background-color: {{ section.settings.bg_color }};
+  }
+  @media (min-width: 768px) {
+    .mf-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .mf-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+  .mf-bs__image-col {
+    width: 100%;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .mf-bs__image-col {
+      width: 50%;
+    }
+  }
+  .mf-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .mf-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .mf-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .mf-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .mf-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
+  }
+  .mf-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .mf-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .mf-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 35px;
+  }
+  .mf-bs__btn {
+    display: inline-block;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
+    text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .mf-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
+</style>
+
+<section class="mf-brand-story {% if section.settings.image_position == 'right' %}mf-brand-story--reverse{% endif %}">
+  <div class="mf-bs__image-col">
+    <div class="mf-bs__image-wrap">
+      {% if section.settings.image %}
+        <img class="mf-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
+      {% else %}
+        <div class="mf-bs__image" style="background-color: #e0e0e0;"></div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="mf-bs__content-col">
+    <div class="mf-bs__content">
+      <h2 class="mf-bs__title">{{ section.settings.title }}</h2>
+      <div class="mf-bs__text">{{ section.settings.text }}</div>
+      {% if section.settings.btn_label != blank %}
+        <a href="{{ section.settings.btn_link }}" class="mf-bs__btn">{{ section.settings.btn_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MF Brand Story",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "MF Brand Story"
+    }
+  ]
+}
+{% endschema %}

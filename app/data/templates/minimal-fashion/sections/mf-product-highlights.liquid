@@ -1,0 +1,132 @@
+<style>
+  .mf-product-highlights {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .mf-ph__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+  .mf-ph__title {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    font-weight: normal;
+    color: #000;
+    margin: 0;
+  }
+  .mf-ph__link {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #000;
+    text-decoration: underline;
+  }
+  .mf-ph__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .mf-ph__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+    }
+  }
+  .mf-ph-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mf-ph-card__img-wrap {
+    position: relative;
+    padding-bottom: 130%;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+  .mf-ph-card__img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .mf-ph-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .mf-ph-card__price {
+    font-size: 14px;
+    color: #666;
+  }
+</style>
+
+<section class="mf-product-highlights">
+  <div class="mf-ph__header">
+    <h2 class="mf-ph__title">{{ section.settings.title }}</h2>
+    {% if section.settings.collection != blank %}
+      <a href="{{ section.settings.collection.url }}" class="mf-ph__link">View All</a>
+    {% endif %}
+  </div>
+
+  <div class="mf-ph__grid">
+    {% for product in section.settings.collection.products limit: section.settings.limit %}
+      <a href="{{ product.url }}" class="mf-ph-card">
+        <div class="mf-ph-card__img-wrap">
+          <img class="mf-ph-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        </div>
+        <div class="mf-ph-card__title">{{ product.title }}</div>
+        <div class="mf-ph-card__price">{{ product.price | money }}</div>
+      </a>
+    {% else %}
+      {% for i in (1..section.settings.limit) %}
+        <div class="mf-ph-card">
+          <div class="mf-ph-card__img-wrap" style="background: #f4f4f4;"></div>
+          <div class="mf-ph-card__title">Example Product</div>
+          <div class="mf-ph-card__price">$99.00</div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MF Product Highlights",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "MF Product Highlights"
+    }
+  ]
+}
+{% endschema %}

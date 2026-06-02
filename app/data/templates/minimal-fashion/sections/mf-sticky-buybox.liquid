@@ -1,0 +1,202 @@
+<style>
+  .mf-buybox {
+    padding: 40px 5%;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  @media (min-width: 768px) {
+    .mf-buybox {
+      padding: 0 40px;
+      position: sticky;
+      top: 100px;
+    }
+  }
+  .mf-buybox__title {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    font-weight: normal;
+    margin-bottom: 10px;
+  }
+  .mf-buybox__price {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+  .mf-buybox__form {
+    margin-bottom: 40px;
+  }
+  .mf-buybox__variants {
+    margin-bottom: 20px;
+  }
+  .mf-buybox__select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #000;
+    font-family: inherit;
+    font-size: 14px;
+    background: transparent;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10L12 15L17 10" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+  }
+  .mf-buybox__btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .mf-buybox__btn:hover {
+    opacity: 0.8;
+  }
+  .mf-accordion {
+    border-top: 1px solid #eaeaea;
+  }
+  .mf-accordion__item {
+    border-bottom: 1px solid #eaeaea;
+  }
+  .mf-accordion__btn {
+    width: 100%;
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: left;
+  }
+  .mf-accordion__content {
+    display: none;
+    padding-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #444;
+  }
+  /* Fallback without JS - open first one */
+  .mf-accordion__item:first-child .mf-accordion__content {
+    display: block;
+  }
+</style>
+
+<div class="mf-buybox">
+  <h1 class="mf-buybox__title">{{ product.title }}</h1>
+  <div class="mf-buybox__price">{{ product.price | money }}</div>
+
+  {% form 'product', product, class: 'mf-buybox__form' %}
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    
+    {% unless product.has_only_default_variant %}
+      <div class="mf-buybox__variants">
+        <label for="Option-{{ section.id }}" style="display:block; margin-bottom: 5px; font-size:12px; text-transform:uppercase;">Select Option</label>
+        <select id="Option-{{ section.id }}" name="id" class="mf-buybox__select">
+          {% for variant in product.variants %}
+            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
+              {{ variant.title }} - {{ variant.price | money }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endunless %}
+
+    <button type="submit" class="mf-buybox__btn">
+      {% if product.available %}Add to cart{% else %}Sold Out{% endif %}
+    </button>
+  {% endform %}
+
+  <div class="mf-accordion">
+    {% for block in section.blocks %}
+      <div class="mf-accordion__item">
+        <button class="mf-accordion__btn">
+          {{ block.settings.title }}
+          <span>+</span>
+        </button>
+        <div class="mf-accordion__content">
+          {% if block.type == 'description' %}
+            {{ product.description }}
+          {% else %}
+            {{ block.settings.content }}
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.mf-accordion__btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const content = this.nextElementSibling;
+      const isOpen = content.style.display === 'block';
+      
+      // Close all
+      document.querySelectorAll('.mf-accordion__content').forEach(c => c.style.display = 'none');
+      document.querySelectorAll('.mf-accordion__btn span').forEach(s => s.innerText = '+');
+      
+      // Open this if it wasn't open
+      if (!isOpen) {
+        content.style.display = 'block';
+        this.querySelector('span').innerText = '-';
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "MF Sticky Buybox",
+  "tag": "section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "description",
+      "name": "Product Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Description"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text Content",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Shipping & Returns"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        }
+      ]
+    }
+  ],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "MF Sticky Buybox",
+      "blocks": [
+        { "type": "description" },
+        { "type": "text" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,142 @@
+<style>
+  .mf-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: {{ section.settings.bg_color }};
+    border-bottom: 1px solid #eaeaea;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mf-header__logo {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .mf-header__logo img {
+    max-height: {{ section.settings.logo_height }}px;
+    width: auto;
+  }
+  .mf-header__nav {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .mf-header__nav {
+      display: flex;
+      gap: 30px;
+    }
+  }
+  .mf-header__nav a {
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .mf-header__icons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .mf-header__icons svg {
+    width: 20px;
+    height: 20px;
+    fill: {{ section.settings.text_color }};
+  }
+  .mf-cart-count {
+    background-color: #000;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    position: absolute;
+    top: -8px;
+    right: -10px;
+  }
+</style>
+
+<header class="mf-header">
+  <div class="mf-header__mobile-menu-icon" style="display: block;">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+  
+  <nav class="mf-header__nav">
+    {% for link in linklists[section.settings.menu].links %}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {% endfor %}
+  </nav>
+
+  <a href="/" class="mf-header__logo">
+    {% if section.settings.logo %}
+      <img src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name }}">
+    {% else %}
+      {{ shop.name }}
+    {% endif %}
+  </a>
+
+  <div class="mf-header__icons">
+    <a href="/search" class="mf-icon-search">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </a>
+    <a href="/cart" class="mf-icon-cart" style="position: relative;">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.707 15.293C4.077 15.923 4.523 17 5.414 17H17M10 21C10 21.5523 9.55228 22 9 22C8.44772 22 8 21.5523 8 21C8 20.4477 8.44772 20 9 20C9.55228 20 10 20.4477 10 21ZM19 21C19 21.5523 18.5523 22 18 22C17.4477 22 17 21.5523 17 21C17 20.4477 17.4477 20 18 20C18.5523 20 19 20.4477 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      {% if cart.item_count > 0 %}
+        <span class="mf-cart-count">{{ cart.item_count }}</span>
+      {% endif %}
+    </a>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "MF Header",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo Height",
+      "default": 40
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Icon Color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "MF Header"
+    }
+  ]
+}
+{% endschema %}

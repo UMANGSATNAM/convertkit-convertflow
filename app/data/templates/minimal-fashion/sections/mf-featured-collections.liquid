@@ -1,0 +1,142 @@
+<style>
+  .mf-featured-cols {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .mf-featured-cols__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .mf-featured-cols__title {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    font-weight: normal;
+    color: #000;
+  }
+  .mf-featured-cols__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .mf-featured-cols__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .mf-fcol {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    group: item;
+  }
+  .mf-fcol__img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 125%; /* 4:5 aspect ratio */
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .mf-fcol__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+  .mf-fcol:hover .mf-fcol__img {
+    transform: scale(1.05);
+  }
+  .mf-fcol__title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>
+
+<section class="mf-featured-cols">
+  {% if section.settings.title != blank %}
+    <div class="mf-featured-cols__header">
+      <h2 class="mf-featured-cols__title">{{ section.settings.title }}</h2>
+    </div>
+  {% endif %}
+
+  <div class="mf-featured-cols__grid">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.collection.url | default: '#' }}" class="mf-fcol">
+        <div class="mf-fcol__img-wrapper">
+          {% if block.settings.image %}
+            <img class="mf-fcol__img" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}">
+          {% elsif block.settings.collection.image %}
+             <img class="mf-fcol__img" src="{{ block.settings.collection.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}">
+          {% else %}
+            <div class="mf-fcol__img" style="background-color: #eee;"></div>
+          {% endif %}
+        </div>
+        <div class="mf-fcol__title">
+          {{ block.settings.title | default: block.settings.collection.title | default: 'Collection' }}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MF Featured Collections",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "MF Featured Collections",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

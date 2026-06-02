@@ -1,0 +1,50 @@
+<style>
+  .mf-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  @media (min-width: 768px) {
+    .mf-pgallery {
+      gap: 20px;
+    }
+  }
+  .mf-pgallery__item {
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  .mf-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<div class="mf-pgallery">
+  {% for media in product.media %}
+    <div class="mf-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="mf-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'mf-pgallery__img' }}
+      {% endcase %}
+    </div>
+  {% else %}
+    <div class="mf-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "MF Product Gallery",
+  "tag": "section",
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "MF Product Gallery"
+    }
+  ]
+}
+{% endschema %}

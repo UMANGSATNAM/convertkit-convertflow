@@ -1,0 +1,166 @@
+<style>
+  .mf-drawer {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Hidden state */
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background: #fff;
+    z-index: 2000;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    transition: right 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mf-drawer.is-open {
+    right: 0;
+  }
+  .mf-drawer__overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1999;
+    display: none;
+  }
+  .mf-drawer__overlay.is-open {
+    display: block;
+  }
+  .mf-drawer__header {
+    padding: 20px;
+    border-bottom: 1px solid #eaeaea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mf-drawer__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin: 0;
+  }
+  .mf-drawer__close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .mf-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .mf-drawer__item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .mf-drawer__item-img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+  }
+  .mf-drawer__item-details {
+    flex: 1;
+  }
+  .mf-drawer__item-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .mf-drawer__footer {
+    padding: 20px;
+    border-top: 1px solid #eaeaea;
+    background: #fafafa;
+  }
+  .mf-drawer__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .mf-drawer__checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: #000;
+    color: #fff;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .mf-drawer-notes {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #eaeaea;
+    font-family: inherit;
+    font-size: 13px;
+    resize: none;
+  }
+</style>
+
+<!-- In a real OS2.0 theme, this drawer might be triggered by JS from the header -->
+<div class="mf-drawer__overlay" id="CartDrawerOverlay"></div>
+<div class="mf-drawer" id="CartDrawer">
+  <div class="mf-drawer__header">
+    <h2 class="mf-drawer__title">Your Cart</h2>
+    <button class="mf-drawer__close" id="CartDrawerClose">&times;</button>
+  </div>
+  
+  <div class="mf-drawer__body">
+    {% if cart.item_count > 0 %}
+      {% for item in cart.items %}
+        <div class="mf-drawer__item">
+          <img class="mf-drawer__item-img" src="{{ item.image | image_url: width: 160 }}" alt="{{ item.title | escape }}">
+          <div class="mf-drawer__item-details">
+            <div class="mf-drawer__item-title">{{ item.product.title }}</div>
+            <div style="font-size:12px; color:#666; margin-bottom: 10px;">{{ item.variant.title }}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>Qty: {{ item.quantity }}</div>
+              <div>{{ item.final_line_price | money }}</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="text-align:center; padding: 40px 0;">Your cart is currently empty.</p>
+    {% endif %}
+  </div>
+
+  {% if cart.item_count > 0 %}
+    <div class="mf-drawer__footer">
+      {% if section.settings.show_order_notes %}
+        <textarea name="note" class="mf-drawer-notes" placeholder="Order notes..." rows="3">{{ cart.note }}</textarea>
+      {% endif %}
+      <div class="mf-drawer__subtotal">
+        <span>Subtotal</span>
+        <span>{{ cart.total_price | money }}</span>
+      </div>
+      <form action="{{ routes.cart_url }}" method="post" id="cart">
+        <button type="submit" name="checkout" class="mf-drawer__checkout-btn">Checkout</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "MF Drawer Cart",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_order_notes",
+      "label": "Show order notes",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "MF Drawer Cart"
+    }
+  ]
+}
+{% endschema %}

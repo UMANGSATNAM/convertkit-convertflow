@@ -1,0 +1,94 @@
+<style>
+  .mf-cgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .mf-cgrid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 30px;
+    }
+  }
+  .mf-cgrid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mf-cgrid-header select {
+    padding: 8px;
+    border: 1px solid #eaeaea;
+    background: transparent;
+  }
+  .mf-cgrid-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mf-cgrid-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .mf-cgrid-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .mf-cgrid-card__price {
+    font-size: 14px;
+    color: #666;
+  }
+</style>
+
+<div class="mf-cgrid-wrapper">
+  <div class="mf-cgrid-header">
+    <div>{{ collection.products_count }} products</div>
+    <div>
+      <select id="SortBy">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price, low to high</option>
+        <option value="price-descending">Price, high to low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mf-cgrid">
+    {% for product in collection.products limit: section.settings.products_per_page %}
+      <a href="{{ product.url }}" class="mf-cgrid-card">
+        <img class="mf-cgrid-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        <div class="mf-cgrid-card__title">{{ product.title }}</div>
+        <div class="mf-cgrid-card__price">{{ product.price | money }}</div>
+      </a>
+    {% else %}
+      <p>No products found in this collection.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "MF Collection Grid",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "MF Collection Grid"
+    }
+  ]
+}
+{% endschema %}

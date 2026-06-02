@@ -31,188 +31,28 @@ model Session {
 }
 
 model Merchant {
-  id                      String   @id @default(uuid())
-  shopDomain              String   @unique @map("shop_domain")
-  accessToken             String   @db.Text @map("access_token")
-  plan                    String   @default("starter")
-  niche                   String?
-  onboardingCompleted     Boolean  @default(false) @map("onboarding_completed")
-  onboardingStep          Int      @default(0) @map("onboarding_step")
-  razorpayKeyId           String?  @db.Text @map("razorpay_key_id")
-  razorpayKeySecret       String?  @db.Text @map("razorpay_key_secret")
-  facebookAccessToken     String?  @db.Text @map("facebook_access_token")
-  facebookAdAccountId     String?  @map("facebook_ad_account_id")
-  shiprocketEmail         String?  @db.Text @map("shiprocket_email")
-  shiprocketToken         String?  @db.Text @map("shiprocket_token")
-  whatsappPhoneNumberId   String?  @map("whatsapp_phone_number_id")
-  whatsappAccessToken     String?  @db.Text @map("whatsapp_access_token")
-  averageOrderValue       Decimal? @map("average_order_value")
-  themePrimaryColor       String?  @map("theme_primary_color")
-  themeSecondaryColor     String?  @map("theme_secondary_color")
-  createdAt               DateTime @default(now()) @map("created_at")
-  updatedAt               DateTime @updatedAt @map("updated_at")
+  id                  String   @id @default(uuid())
+  shopDomain          String   @unique @map("shop_domain")
+  accessToken         String   @db.Text @map("access_token")
+  plan                String   @default("free")
+  activeThemeId       String?  @map("active_theme_id")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
-  featureConfigs   FeatureConfig[]
-  reviews          Review[]
-  upsellRules      UpsellRule[]
-  abandonedCarts   AbandonedCart[]
-  profitSnapshots  ProfitSnapshot[]
-  gstInvoices      GstInvoice[]
-  whatsappMessages WhatsappMessage[]
-  injectedPages    InjectedPage[]
+  backups             ThemeBackup[]
 
   @@map("merchants")
 }
 
-model FeatureConfig {
-  id         String   @id @default(uuid())
-  merchantId String   @map("merchant_id")
-  featureKey String   @map("feature_key")
-  enabled    Boolean  @default(false)
-  config     Json?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  merchant   Merchant @relation(fields:[merchantId], references:[id])
-  @@unique([merchantId, featureKey])
-  @@map("feature_configs")
-}
+model ThemeBackup {
+  id               String   @id @default(uuid())
+  merchantId       String   @map("merchant_id")
+  shopifyThemeId   String   @map("shopify_theme_id")
+  backupName       String   @map("backup_name")
+  isRestored       Boolean  @default(false) @map("is_restored")
+  createdAt        DateTime @default(now()) @map("created_at")
+  
+  merchant         Merchant @relation(fields:[merchantId], references:[id])
 
-model Review {
-  id              String   @id @default(uuid())
-  merchantId      String   @map("merchant_id")
-  productId       BigInt   @map("product_id")
-  authorName      String   @map("author_name")
-  rating          Int
-  title           String?
-  body            String   @db.LongText
-  photoUrls       Json?    @map("photo_urls")
-  videoUrl        String?  @map("video_url")
-  verifiedPurchase Boolean @default(false) @map("verified_purchase")
-  orderId         BigInt?  @map("order_id")
-  status          String   @default("pending")
-  source          String   @default("manual")
-  createdAt       DateTime @default(now()) @map("created_at")
-  merchant        Merchant @relation(fields:[merchantId], references:[id])
-  @@map("reviews")
-}
-
-model UpsellRule {
-  id              String   @id @default(uuid())
-  merchantId      String   @map("merchant_id")
-  ruleType        String   @map("rule_type")
-  triggerProductId BigInt  @map("trigger_product_id")
-  offerProductId  BigInt   @map("offer_product_id")
-  discountType    String   @map("discount_type")
-  discountValue   Decimal  @map("discount_value")
-  headline        String?
-  isActive        Boolean  @default(true) @map("is_active")
-  displayOrder    Int      @default(0) @map("display_order")
-  createdAt       DateTime @default(now()) @map("created_at")
-  merchant        Merchant @relation(fields:[merchantId], references:[id])
-  @@map("upsell_rules")
-}
-
-model AbandonedCart {
-  id                   String    @id @default(uuid())
-  merchantId           String    @map("merchant_id")
-  shopifyCheckoutToken String    @unique @map("shopify_checkout_token")
-  customerEmail        String?   @map("customer_email")
-  customerPhone        String?   @map("customer_phone")
-  cartTotal            Decimal   @map("cart_total")
-  cartItems            Json      @map("cart_items")
-  recoveryStage        Int       @default(0) @map("recovery_stage")
-  recovered            Boolean   @default(false)
-  recoveredOrderId     BigInt?   @map("recovered_order_id")
-  abandonedAt          DateTime  @map("abandoned_at")
-  lastMessageSentAt    DateTime? @map("last_message_sent_at")
-  merchant             Merchant  @relation(fields:[merchantId], references:[id])
-  @@map("abandoned_carts")
-}
-
-model ProfitSnapshot {
-  id                  String   @id @default(uuid())
-  merchantId          String   @map("merchant_id")
-  shopifyOrderId      BigInt   @unique @map("shopify_order_id")
-  sellingPrice        Decimal  @map("selling_price")
-  cogs                Decimal?
-  shippingCost        Decimal? @map("shipping_cost")
-  pgFee               Decimal? @map("pg_fee")
-  adSpendAttributed   Decimal? @map("ad_spend_attributed")
-  packagingCost       Decimal? @map("packaging_cost")
-  rtoBuffer           Decimal? @map("rto_buffer")
-  netProfit           Decimal? @map("net_profit")
-  netMarginPct        Decimal? @map("net_margin_pct")
-  roas                Decimal?
-  orderSource         String?  @map("order_source")
-  createdAt           DateTime @default(now()) @map("created_at")
-  merchant            Merchant @relation(fields:[merchantId], references:[id])
-  @@map("profit_snapshots")
-}
-
-model GstInvoice {
-  id              String    @id @default(uuid())
-  merchantId      String    @map("merchant_id")
-  shopifyOrderId  BigInt    @map("shopify_order_id")
-  invoiceNumber   String    @unique @map("invoice_number")
-  merchantGstin   String?   @map("merchant_gstin")
-  customerGstin   String?   @map("customer_gstin")
-  hsnCodes        Json?     @map("hsn_codes")
-  cgstAmount      Decimal?  @map("cgst_amount")
-  sgstAmount      Decimal?  @map("sgst_amount")
-  igstAmount      Decimal?  @map("igst_amount")
-  totalTax        Decimal?  @map("total_tax")
-  invoiceTotal    Decimal?  @map("invoice_total")
-  pdfUrl          String?   @db.Text @map("pdf_url")
-  emailedAt       DateTime? @map("emailed_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  merchant        Merchant  @relation(fields:[merchantId], references:[id])
-  @@map("gst_invoices")
-}
-
-model WhatsappMessage {
-  id                 String    @id @default(uuid())
-  merchantId         String    @map("merchant_id")
-  messageType        String    @map("message_type")
-  toPhone            String    @map("to_phone")
-  templateName       String    @map("template_name")
-  templateVariables  Json?     @map("template_variables")
-  status             String    @default("queued")
-  metaMessageId      String?   @map("meta_message_id")
-  relatedOrderId     BigInt?   @map("related_order_id")
-  sentAt             DateTime? @map("sent_at")
-  deliveredAt        DateTime? @map("delivered_at")
-  readAt             DateTime? @map("read_at")
-  merchant           Merchant  @relation(fields:[merchantId], references:[id])
-  @@map("whatsapp_messages")
-}
-
-// Page Injection System
-model PageTemplate {
-  id               String         @id @default(uuid())
-  niche            String
-  pageType         String         @map("page_type")
-  templateName     String         @map("template_name")
-  description      String         @db.Text
-  sectionsConfig   Json           @map("sections_config")
-  previewImageUrl  String?        @db.Text @map("preview_image_url")
-  isActive         Boolean        @default(true) @map("is_active")
-  createdAt        DateTime       @default(now()) @map("created_at")
-  injectedPages    InjectedPage[]
-  @@map("page_templates")
-}
-
-model InjectedPage {
-  id                  String      @id @default(uuid())
-  merchantId          String      @map("merchant_id")
-  templateId          String      @map("template_id")
-  shopifyPageId       BigInt?     @map("shopify_page_id")
-  shopifyPageHandle   String?     @map("shopify_page_handle")
-  shopifyTemplateFile String?     @map("shopify_template_file")
-  pageTitle           String      @map("page_title")
-  status              String      @default("pending")
-  injectedAt          DateTime?   @map("injected_at")
-  createdAt           DateTime    @default(now()) @map("created_at")
-  merchant            Merchant    @relation(fields:[merchantId], references:[id])
-  template            PageTemplate @relation(fields:[templateId], references:[id])
-  @@map("injected_pages")
+  @@map("theme_backups")
 }
