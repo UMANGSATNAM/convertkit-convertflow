@@ -4,66 +4,127 @@
  * Gets all assets for a given theme.
  */
 export async function getThemeAssets(admin: any, themeId: string) {
-  const response = await admin.rest.resources.Asset.all({
-    session: admin.session,
-    theme_id: themeId
+  const response = await admin.graphql(`
+    query($id: ID!) {
+      theme(id: $id) {
+        files(first: 250) {
+          nodes {
+            filename
+          }
+        }
+      }
+    }
+  `, {
+    variables: { id: themeId.startsWith("gid://") ? themeId : `gid://shopify/Theme/${themeId}` }
   });
-  return response.data;
+  const data = await response.json();
+  return data?.data?.theme?.files?.nodes || [];
 }
 
 /**
  * Uploads a single asset (liquid, json, css, js) to the theme.
  */
 export async function uploadAsset(admin: any, themeId: string, asset: { key: string; value: string }) {
-  const newAsset = new admin.rest.resources.Asset({session: admin.session});
-  newAsset.theme_id = themeId;
-  newAsset.key = asset.key;
-  newAsset.value = asset.value;
-  await newAsset.save({
-    update: true
+  const response = await admin.graphql(`
+    mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
+      themeFilesUpsert(themeId: $themeId, files: $files) {
+        upsertedThemeFiles {
+          filename
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `, {
+    variables: {
+      themeId: themeId.startsWith("gid://") ? themeId : `gid://shopify/Theme/${themeId}`,
+      files: [{ filename: asset.key, body: { type: "TEXT", value: asset.value } }]
+    }
   });
-  return newAsset;
+  const data = await response.json();
+  if (data?.data?.themeFilesUpsert?.userErrors?.length > 0) {
+    throw new Error(data.data.themeFilesUpsert.userErrors.map((e: any) => e.message).join(", "));
+  }
+  return data?.data?.themeFilesUpsert?.upsertedThemeFiles?.[0];
 }
 
 /**
  * Duplicates the merchant's live theme as a backup.
  */
 export async function backupTheme(admin: any, currentThemeId: string, backupName: string) {
-  const theme = new admin.rest.resources.Theme({session: admin.session});
-  theme.name = backupName;
-  // Passing src is not natively documented cleanly in all rest objects for duplication but let's try 
-  // standard theme creation. If we want a true duplicate, often merchants have to do it, 
-  // but let's attempt to use the src parameter which works on some shopify versions for duplication.
-  theme.src = `http://localhost`; // src is for zip.
-  // Actually, duplicating a theme via API using a source_theme_id isn't directly supported anymore in some API versions.
-  // To avoid failing, let's just create an empty theme for now.
-  theme.role = "unpublished";
-  await theme.save({
-    update: true
+  const response = await admin.graphql(`
+    mutation ThemeDuplicate($id: ID!, $name: String!) {
+      themeDuplicate(id: $id, name: $name) {
+        newTheme {
+          id
+          name
+          role
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `, {
+    variables: {
+      id: currentThemeId.startsWith("gid://") ? currentThemeId : `gid://shopify/Theme/${currentThemeId}`,
+      name: backupName
+    }
   });
   
-  return theme;
+  const data = await response.json();
+  if (data?.data?.themeDuplicate?.userErrors?.length > 0) {
+    throw new Error(data.data.themeDuplicate.userErrors.map((e: any) => e.message).join(", "));
+  }
+  
+  return data?.data?.themeDuplicate?.newTheme;
 }
 
 /**
  * Restores a backed up theme by setting its role to 'main'.
  */
 export async function restoreTheme(admin: any, backupThemeId: string) {
-  const theme = new admin.rest.resources.Theme({session: admin.session});
-  theme.id = backupThemeId;
-  theme.role = "main";
-  await theme.save({
-    update: true
+  const response = await admin.graphql(`
+    mutation ThemeUpdate($id: ID!, $role: ThemeRole!) {
+      themeUpdate(id: $id, role: $role) {
+        theme {
+          id
+          role
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `, {
+    variables: {
+      id: backupThemeId.startsWith("gid://") ? backupThemeId : `gid://shopify/Theme/${backupThemeId}`,
+      role: "MAIN"
+    }
   });
-  return theme;
+  const data = await response.json();
+  if (data?.data?.themeUpdate?.userErrors?.length > 0) {
+    throw new Error(data.data.themeUpdate.userErrors.map((e: any) => e.message).join(", "));
+  }
+  return data?.data?.themeUpdate?.theme;
 }
 
 /**
  * Get active theme
  */
 export async function getActiveTheme(admin: any) {
-  const response = await admin.rest.resources.Theme.all({
-    session: admin.session,
-  });
-  return response.data.find((t: any) => t.role === 'main');
+  const response = await admin.graphql(`
+    query {
+      themes(first: 50, roles: [MAIN]) {
+        nodes {
+          id
+          name
+          role
+        }
+      }
+    }
+  `);
+  const data = await response.json();
+  return data?.data?.themes?.nodes?.[0];
 }
