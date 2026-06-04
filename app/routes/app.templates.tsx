@@ -36,11 +36,15 @@ export default function Templates() {
   const fetcher = useFetcher();
 
   const isInjecting = fetcher.state !== "idle";
-  const successMsg = fetcher.data?.success ? fetcher.data.message : null;
-  const errorMsg = fetcher.data?.error ? fetcher.data.error : null;
+  const fetcherData = fetcher.data as any;
+  const successMsg = fetcherData?.success ? fetcherData.message : null;
+  const errorMsg = fetcherData?.error ? fetcherData.error : null;
 
   return (
-    <Page title="Template Library" subtitle="Full-store themes designed for maximum conversions.">
+    <Page 
+      title="Store Cloner & Niche Templates" 
+      subtitle="Instantly inject fully-designed niche stores. We automatically fetch and map your existing products and collections to the new design."
+    >
       <Layout>
         {successMsg && (
           <Layout.Section>
@@ -59,36 +63,46 @@ export default function Templates() {
         <Layout.Section>
           <Grid>
             {templates.map(template => (
-              <Grid.Cell key={template.id} columnSpan={{xs: 6, sm: 6, md: 4, lg: 4, xl: 4}}>
+              <Grid.Cell key={template.id} columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>
                 <Card padding="0">
-                  <div style={{ height: '200px', backgroundColor: '#f4f6f8', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', height: '250px', backgroundColor: '#f4f6f8', overflow: 'hidden' }}>
                     <img 
                       src={template.previewImage} 
                       alt={template.name} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+                      onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     />
+                    <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                      <Badge tone="success">Auto-Syncs Products</Badge>
+                    </div>
                   </div>
-                  <div style={{ padding: '1rem' }}>
-                    <BlockStack gap="200">
-                      <Text as="h3" variant="headingMd">{template.name}</Text>
-                      <InlineStack gap="100">
-                        {template.tags.map(tag => (
-                          <Badge key={tag} tone="info">{tag}</Badge>
-                        ))}
-                      </InlineStack>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                  <div style={{ padding: '1.5rem' }}>
+                    <BlockStack gap="300">
+                      <div>
+                        <Text as="h3" variant="headingLg">{template.name}</Text>
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <InlineStack gap="100">
+                            {template.tags.map(tag => (
+                              <Badge key={tag} tone="info">{tag}</Badge>
+                            ))}
+                          </InlineStack>
+                        </div>
+                      </div>
+                      <Text as="p" variant="bodyMd" tone="subdued">
                         {template.description}
                       </Text>
-                      <div style={{ marginTop: '0.5rem' }}>
+                      <div style={{ marginTop: '1rem' }}>
                         <fetcher.Form method="post" action="/api/theme/inject">
                           <input type="hidden" name="templateId" value={template.id} />
                           <Button 
                             variant="primary" 
+                            size="large"
                             fullWidth 
                             submit
                             loading={isInjecting}
                           >
-                            Apply to Store
+                            {isInjecting ? "Cloning & Syncing..." : "1-Click Clone Store"}
                           </Button>
                         </fetcher.Form>
                       </div>
