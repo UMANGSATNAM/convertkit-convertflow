@@ -1,0 +1,42 @@
+<style>
+  .fb-buybox { position: sticky; top: 120px; padding: 40px; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #edf2f7; }
+  .fb-buybox__vendor { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #4CAF50; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .fb-buybox__title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 600; color: #2d3748; line-height: 1.2; margin-bottom: 15px; }
+  .fb-buybox__price { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; color: #2d3748; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+  .fb-buybox__compare { color: #a0aec0; text-decoration: line-through; font-size: 18px; font-weight: 400; }
+  .fb-buybox__variants { margin-bottom: 30px; padding-top: 30px; border-top: 1px dashed #e2e8f0; }
+  .fb-buybox__variant-label { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #4a5568; font-weight: 600; margin-bottom: 10px; display: block; }
+  .fb-buybox__variant-select { width: 100%; padding: 15px 20px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 12px; color: #2d3748; font-family: 'DM Sans', sans-serif; font-size: 16px; cursor: pointer; outline: none; transition: border-color 0.3s; margin-bottom: 20px; font-weight: 500; }
+  .fb-buybox__variant-select:focus { border-color: #4CAF50; }
+  .fb-buybox__add-btn { width: 100%; padding: 20px; background: #4CAF50; color: #fff; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .fb-buybox__add-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.2); }
+  .fb-buybox__meta { margin-top: 30px; padding-top: 20px; border-top: 1px dashed #e2e8f0; display: flex; flex-direction: column; gap: 15px; }
+  .fb-buybox__meta-item { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #718096; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+  .fb-buybox__meta-icon { font-size: 18px; }
+</style>
+<div class="fb-buybox">
+  <div class="fb-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="fb-buybox__title">{{ product.title }}</h1>
+  <div class="fb-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="fb-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="fb-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="fb-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="fb-buybox__variant-select">
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+    <button type="submit" class="fb-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}🛒 Add to Basket{% else %}Sold Out{% endif %}</button>
+  {% endform %}
+  <div class="fb-buybox__meta">
+    <div class="fb-buybox__meta-item"><span class="fb-buybox__meta-icon">🌱</span> 100% Organic & Non-GMO</div>
+    <div class="fb-buybox__meta-item"><span class="fb-buybox__meta-icon">🚜</span> Sourced directly from local farms</div>
+    <div class="fb-buybox__meta-item"><span class="fb-buybox__meta-icon">🚚</span> Next-day delivery available</div>
+  </div>
+</div>
+{% schema %}
+{ "name": "FB Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "FB Sticky Buybox" }] }
+{% endschema %}

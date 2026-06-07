@@ -1,0 +1,45 @@
+<style>
+  .pj-hero { position: relative; width: 100%; padding: 80px 0; min-height: 500px; display: flex; align-items: center; background: {{ section.settings.bg_color }}; overflow: hidden; }
+  .pj-hero__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 2; }
+  @media (max-width: 768px) { .pj-hero__container { grid-template-columns: 1fr; text-align: center; } }
+  .pj-hero__blob { position: absolute; top: -20%; right: -10%; width: 60%; height: 140%; background: {{ section.settings.accent_color }}; opacity: 0.1; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; z-index: 1; animation: morph 8s ease-in-out infinite alternate; }
+  @keyframes morph { 0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } }
+  .pj-hero__image-wrapper { position: relative; }
+  .pj-hero__image { width: 100%; border-radius: 30px; transform: rotate(3deg); box-shadow: 10px 10px 0px {{ section.settings.accent_color }}; transition: transform 0.3s; }
+  .pj-hero__image:hover { transform: rotate(0deg); }
+  .pj-hero__badge { display: inline-block; background: #fff; color: {{ section.settings.accent_color }}; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+  .pj-hero__title { font-family: 'Nunito', sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 900; color: #333; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.5px; }
+  .pj-hero__desc { font-family: 'Nunito', sans-serif; font-size: 18px; color: #666; line-height: 1.6; margin-bottom: 30px; font-weight: 600; }
+  .pj-hero__cta { display: inline-block; background: {{ section.settings.accent_color }}; color: #fff; padding: 16px 36px; border-radius: 30px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; text-decoration: none; transition: all 0.3s; box-shadow: 0 6px 0px rgba(0,0,0,0.1); transform: translateY(-4px); }
+  .pj-hero__cta:hover { transform: translateY(0); box-shadow: 0 2px 0px rgba(0,0,0,0.1); }
+</style>
+<section class="pj-hero">
+  <div class="pj-hero__blob"></div>
+  <div class="pj-hero__container">
+    <div>
+      {% if section.settings.badge != blank %}<div class="pj-hero__badge">{{ section.settings.badge }}</div>{% endif %}
+      <h1 class="pj-hero__title">{{ section.settings.title }}</h1>
+      <p class="pj-hero__desc">{{ section.settings.desc }}</p>
+      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="pj-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
+    </div>
+    <div class="pj-hero__image-wrapper">
+      {% if section.settings.image %}<img class="pj-hero__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" loading="eager">{% else %}<div class="pj-hero__image" style="background:#ddd;aspect-ratio:4/3;"></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PJ Hero", "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "🐾 Wag-Worthy" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Happy Pets, Happy Life" },
+    { "type": "text", "id": "desc", "label": "Description", "default": "Spoil your furry friends with toys, treats, and accessories they'll love." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Now" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fdf8f5" }
+  ],
+  "presets": [{ "name": "PJ Hero" }]
+}
+{% endschema %}

@@ -1,0 +1,39 @@
+<style>
+  .pj-accordion { padding: 50px 0; background: #fff; border-radius: 40px; margin: 20px 0; }
+  .pj-accordion__container { max-width: 900px; margin: 0 auto; padding: 0 30px; }
+  .pj-accordion__title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: #333; margin-bottom: 30px; text-align: center; }
+  .pj-accordion__item { border: 2px solid #eee; border-radius: 20px; margin-bottom: 15px; overflow: hidden; }
+  .pj-accordion__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: #fff; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #333; transition: background 0.3s; }
+  .pj-accordion__trigger:hover { background: #fdf8f5; }
+  .pj-accordion__icon { font-size: 24px; color: #ff9f1c; transition: transform 0.3s; font-weight: 400; background: #fff3e0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .pj-accordion__item.active .pj-accordion__icon { transform: rotate(45deg); background: #ff9f1c; color: #fff; }
+  .pj-accordion__content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #fdf8f5; }
+  .pj-accordion__item.active .pj-accordion__content { max-height: 800px; }
+  .pj-accordion__body { padding: 25px; font-family: 'Nunito', sans-serif; font-size: 16px; line-height: 1.7; color: #666; font-weight: 600; }
+</style>
+<section class="pj-accordion">
+  <div class="pj-accordion__container">
+    <h2 class="pj-accordion__title">{{ section.settings.title }}</h2>
+    {% for block in section.blocks %}
+      <div class="pj-accordion__item" {{ block.shopify_attributes }}>
+        <button class="pj-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">{{ block.settings.heading }}<span class="pj-accordion__icon">+</span></button>
+        <div class="pj-accordion__content"><div class="pj-accordion__body">{{ block.settings.body }}</div></div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PJ Accordion Details", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Good to Know" }],
+  "blocks": [{ "type": "accordion", "name": "Item", "settings": [
+    { "type": "text", "id": "heading", "label": "Question", "default": "Materials" },
+    { "type": "richtext", "id": "body", "label": "Answer", "default": "<p>Made from non-toxic, durable materials.</p>" }
+  ]}],
+  "presets": [{ "name": "PJ Accordion Details", "blocks": [
+    { "type": "accordion", "settings": { "heading": "Materials & Care" }},
+    { "type": "accordion", "settings": { "heading": "Sizing Guide" }},
+    { "type": "accordion", "settings": { "heading": "Shipping & Returns" }}
+  ]}]
+}
+{% endschema %}

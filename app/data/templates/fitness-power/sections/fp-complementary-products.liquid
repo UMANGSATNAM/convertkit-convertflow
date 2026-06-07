@@ -1,0 +1,36 @@
+<style>
+  .fp-comp { padding: 80px 0; background: #0a0a0a; border-top: 1px solid #222; }
+  .fp-comp__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+  .fp-comp__header { text-align: center; margin-bottom: 50px; }
+  .fp-comp__title { font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 900; color: #fff; text-transform: uppercase; margin: 0; letter-spacing: -1px; }
+  .fp-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  @media (max-width: 1024px) { .fp-comp__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .fp-comp__grid { grid-template-columns: 1fr; } }
+  .fp-comp-card { text-decoration: none; display: block; border: 1px solid #222; background: #000; transition: border-color 0.3s; }
+  .fp-comp-card:hover { border-color: #ff2a2a; }
+  .fp-comp-card__img { aspect-ratio: 1; overflow: hidden; background: #111; }
+  .fp-comp-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; opacity: 0.8; }
+  .fp-comp-card:hover .fp-comp-card__img img { transform: scale(1.05); opacity: 1; }
+  .fp-comp-card__info { padding: 15px; }
+  .fp-comp-card__name { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 5px; }
+  .fp-comp-card__price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #ff2a2a; }
+</style>
+<section class="fp-comp">
+  <div class="fp-comp__container">
+    <div class="fp-comp__header"><h2 class="fp-comp__title">{{ section.settings.title }}</h2></div>
+    <div class="fp-comp__grid">
+      {% for product in recommendations.products limit: 4 %}
+        <a href="{{ product.url }}" class="fp-comp-card">
+          <div class="fp-comp-card__img">{% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}</div>
+          <div class="fp-comp-card__info">
+            <div class="fp-comp-card__name">{{ product.title }}</div>
+            <div class="fp-comp-card__price">{{ product.price | money }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "FP Complementary Products", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Complete the Set" }], "presets": [{ "name": "FP Complementary Products" }] }
+{% endschema %}

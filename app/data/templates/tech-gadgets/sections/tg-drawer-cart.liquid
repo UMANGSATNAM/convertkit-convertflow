@@ -1,0 +1,204 @@
+<style>
+  .tg-drawer-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  .tg-drawer-overlay.active { opacity: 1; visibility: visible; }
+  .tg-drawer {
+    position: fixed;
+    top: 0; right: -420px;
+    width: 400px;
+    max-width: 90vw;
+    height: 100%;
+    background: #0d0d16;
+    border-left: 1px solid rgba(0,240,255,0.1);
+    z-index: 1000;
+    transition: right 0.4s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .tg-drawer.active { right: 0; }
+  .tg-drawer__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tg-drawer__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .tg-drawer__close {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  .tg-drawer__close:hover { border-color: #00f0ff; color: #00f0ff; }
+  .tg-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+  }
+  .tg-drawer__empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #555;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  .tg-drawer__item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tg-drawer__item-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    background: #111122;
+    flex-shrink: 0;
+  }
+  .tg-drawer__item-info { flex: 1; }
+  .tg-drawer__item-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #ddd;
+    margin-bottom: 6px;
+  }
+  .tg-drawer__item-price {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .tg-drawer__item-qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tg-drawer__qty-btn {
+    width: 28px;
+    height: 28px;
+    background: #111122;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tg-drawer__qty-val {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    min-width: 20px;
+    text-align: center;
+  }
+  .tg-drawer__footer {
+    padding: 20px 25px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .tg-drawer__total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-family: 'Inter', sans-serif;
+  }
+  .tg-drawer__total-label {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tg-drawer__total-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .tg-drawer__checkout {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: #00f0ff;
+    color: #0a0a0a;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow 0.3s;
+  }
+  .tg-drawer__checkout:hover { box-shadow: 0 0 30px rgba(0,240,255,0.3); }
+</style>
+
+<div class="tg-drawer-overlay" id="tg-cart-overlay" onclick="document.getElementById('tg-cart-drawer').classList.remove('active'); this.classList.remove('active');"></div>
+<aside class="tg-drawer" id="tg-cart-drawer">
+  <div class="tg-drawer__header">
+    <h3 class="tg-drawer__title">Your Cart</h3>
+    <button class="tg-drawer__close" onclick="document.getElementById('tg-cart-drawer').classList.remove('active'); document.getElementById('tg-cart-overlay').classList.remove('active');">✕</button>
+  </div>
+  <div class="tg-drawer__body">
+    {% if cart.item_count == 0 %}
+      <div class="tg-drawer__empty">Your cart is empty</div>
+    {% else %}
+      {% for item in cart.items %}
+        <div class="tg-drawer__item">
+          <img class="tg-drawer__item-img" src="{{ item.image | image_url: width: 140 }}" alt="{{ item.title | escape }}">
+          <div class="tg-drawer__item-info">
+            <div class="tg-drawer__item-name">{{ item.product.title }}</div>
+            <div class="tg-drawer__item-price">{{ item.final_line_price | money }}</div>
+            <div class="tg-drawer__item-qty">
+              <button class="tg-drawer__qty-btn">−</button>
+              <span class="tg-drawer__qty-val">{{ item.quantity }}</span>
+              <button class="tg-drawer__qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if cart.item_count > 0 %}
+    <div class="tg-drawer__footer">
+      <div class="tg-drawer__total">
+        <span class="tg-drawer__total-label">Subtotal</span>
+        <span class="tg-drawer__total-value">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkout" class="tg-drawer__checkout">Checkout</a>
+    </div>
+  {% endif %}
+</aside>
+
+{% schema %}
+{
+  "name": "TG Drawer Cart",
+  "tag": "section",
+  "settings": [],
+  "presets": [{ "name": "TG Drawer Cart" }]
+}
+{% endschema %}

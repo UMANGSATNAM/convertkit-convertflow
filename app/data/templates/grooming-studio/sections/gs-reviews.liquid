@@ -1,0 +1,47 @@
+<style>
+  .gs-reviews { padding: 100px 0; background: #000; border-top: 1px solid #222; }
+  .gs-reviews__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .gs-reviews__header { text-align: center; margin-bottom: 60px; }
+  .gs-reviews__title { font-family: 'Oswald', sans-serif; font-size: 40px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 15px; }
+  .gs-reviews__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  @media (max-width: 900px) { .gs-reviews__grid { grid-template-columns: 1fr; } }
+  .gs-review-card { background: #111; border: 1px solid #333; padding: 30px; }
+  .gs-review-card__stars { color: {{ section.settings.accent_color }}; margin-bottom: 15px; font-size: 18px; letter-spacing: 2px; }
+  .gs-review-card__text { font-family: 'Inter', sans-serif; font-size: 16px; color: #e2e8f0; line-height: 1.6; margin-bottom: 25px; font-style: italic; }
+  .gs-review-card__author { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 500; color: #fff; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+  .gs-review-card__author::before { content: ''; display: block; width: 20px; height: 1px; background: {{ section.settings.accent_color }}; }
+</style>
+<section class="gs-reviews">
+  <div class="gs-reviews__container">
+    <div class="gs-reviews__header">
+      <h2 class="gs-reviews__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="gs-reviews__grid">
+      {% for block in section.blocks %}
+        <div class="gs-review-card" {{ block.shopify_attributes }}>
+          <div class="gs-review-card__stars">★★★★★</div>
+          <p class="gs-review-card__text">"{{ block.settings.text }}"</p>
+          <div class="gs-review-card__author">{{ block.settings.author }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "GS Reviews", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "The Verdict" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+  ],
+  "blocks": [{ "type": "review", "name": "Review", "settings": [
+    { "type": "text", "id": "text", "label": "Text", "default": "Best grooming product I've ever used." },
+    { "type": "text", "id": "author", "label": "Author", "default": "James D." }
+  ]}],
+  "presets": [{ "name": "GS Reviews", "blocks": [
+    { "type": "review", "settings": { "text": "Unmatched quality. The scent is exactly what I was looking for.", "author": "Michael T." }},
+    { "type": "review", "settings": { "text": "Finally, a routine that actually works and doesn't take 20 minutes.", "author": "David R." }},
+    { "type": "review", "settings": { "text": "My barber recommended this. I haven't used anything else since.", "author": "Robert S." }}
+  ]}]
+}
+{% endschema %}

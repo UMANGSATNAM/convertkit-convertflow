@@ -1,0 +1,36 @@
+<style>
+  .pj-header { position: sticky; top: 0; width: 100%; background: #fff; z-index: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  .pj-header__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; height: 90px; display: flex; align-items: center; justify-content: space-between; }
+  .pj-header__nav { display: flex; gap: 30px; }
+  @media (max-width: 900px) { .pj-header__nav { display: none; } }
+  .pj-header__nav a { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #666; text-decoration: none; transition: color 0.3s; position: relative; }
+  .pj-header__nav a:hover { color: {{ section.settings.accent_color }}; }
+  .pj-header__nav a::after { content: ''; position: absolute; width: 0; height: 3px; bottom: -5px; left: 50%; background: {{ section.settings.accent_color }}; transition: all 0.3s; border-radius: 3px; transform: translateX(-50%); }
+  .pj-header__nav a:hover::after { width: 100%; }
+  .pj-header__logo { font-family: 'Nunito', sans-serif; font-size: 28px; color: #333; text-decoration: none; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 8px; }
+  .pj-header__logo span { color: {{ section.settings.accent_color }}; }
+  .pj-header__icons { display: flex; align-items: center; gap: 20px; }
+  .pj-header__icon { background: #fdf8f5; border: none; color: #333; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: all 0.3s; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative; }
+  .pj-header__icon:hover { background: {{ section.settings.accent_color }}; color: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,159,28,0.3); }
+  .pj-header__cart-count { position: absolute; top: -5px; right: -5px; background: #333; color: #fff; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+</style>
+<header class="pj-header">
+  <div class="pj-header__container">
+    <nav class="pj-header__nav">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="pj-header__logo">🐶 {{ section.settings.logo_text | split: ' ' | first }}<span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
+    <div class="pj-header__icons">
+      <a href="/search" class="pj-header__icon">🔍</a>
+      <a href="/account" class="pj-header__icon">👤</a>
+      <button class="pj-header__icon" onclick="document.getElementById('pj-cart-drawer').classList.add('active'); document.getElementById('pj-cart-overlay').classList.add('active');">
+        🛒<span class="pj-header__cart-count">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+{% schema %}
+{ "name": "PJ Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Pets Joy" }, { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" }], "presets": [{ "name": "PJ Header" }] }
+{% endschema %}

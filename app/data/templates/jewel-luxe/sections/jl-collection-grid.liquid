@@ -1,0 +1,30 @@
+<style>
+  .jl-grid { padding: 60px 0; background: #0a0a0a; }
+  .jl-grid__header { margin-bottom: 60px; text-align: center; }
+  .jl-grid__title { font-family: 'Cinzel', serif; font-size: 48px; font-weight: 400; color: #fff; margin-bottom: 15px; }
+  .jl-grid__desc { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #999; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .jl-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  @media (max-width: 900px) { .jl-grid__layout { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  @media (max-width: 600px) { .jl-grid__layout { grid-template-columns: 1fr; } }
+</style>
+<div class="jl-grid">
+  <div class="jl-grid__header">
+    <h1 class="jl-grid__title">{{ collection.title }}</h1>
+    {% if collection.description %}<div class="jl-grid__desc">{{ collection.description }}</div>{% endif %}
+  </div>
+  <div class="jl-grid__layout">
+    {% for product in collection.products %}
+      <a href="{{ product.url }}" class="jl-prod-card">
+        <div class="jl-prod-card__img-wrapper">
+          {% if product.compare_at_price > product.price %}<div class="jl-prod-card__badge">Exclusive</div>{% endif %}
+          <img class="jl-prod-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
+        </div>
+        <h3 class="jl-prod-card__name">{{ product.title }}</h3>
+        <div class="jl-prod-card__price">{% if product.compare_at_price > product.price %}<span class="jl-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{ "name": "JL Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "JL Collection Grid" }] }
+{% endschema %}

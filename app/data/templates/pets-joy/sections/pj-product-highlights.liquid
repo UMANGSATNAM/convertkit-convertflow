@@ -1,0 +1,57 @@
+<style>
+  .pj-highlights { padding: 80px 0; background: {{ section.settings.bg_color }}; }
+  .pj-highlights__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .pj-highlights__header { text-align: center; margin-bottom: 50px; }
+  .pj-highlights__title { font-family: 'Nunito', sans-serif; font-size: 32px; font-weight: 900; color: #333; margin-bottom: 10px; }
+  .pj-highlights__subtitle { font-family: 'Nunito', sans-serif; font-size: 16px; color: #666; font-weight: 600; }
+  .pj-highlights__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+  @media (max-width: 1024px) { .pj-highlights__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .pj-highlights__grid { grid-template-columns: 1fr; } }
+  .pj-prod-card { background: #fff; border-radius: 24px; padding: 15px; text-decoration: none; display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s; position: relative; }
+  .pj-prod-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
+  .pj-prod-card__img { aspect-ratio: 1; border-radius: 16px; overflow: hidden; margin-bottom: 15px; background: #fdf8f5; }
+  .pj-prod-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .pj-prod-card:hover .pj-prod-card__img img { transform: scale(1.05); }
+  .pj-prod-card__badge { position: absolute; top: 25px; left: 25px; background: {{ section.settings.accent_color }}; color: #fff; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 12px; }
+  .pj-prod-card__name { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #333; margin-bottom: 8px; line-height: 1.3; }
+  .pj-prod-card__price { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: {{ section.settings.accent_color }}; }
+  .pj-prod-card__compare { color: #aaa; text-decoration: line-through; font-size: 14px; margin-left: 6px; }
+  .pj-prod-card__btn { display: block; text-align: center; background: #fdf8f5; color: #333; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 10px; border-radius: 12px; margin-top: 15px; transition: background 0.3s; }
+  .pj-prod-card:hover .pj-prod-card__btn { background: {{ section.settings.accent_color }}; color: #fff; }
+</style>
+<section class="pj-highlights">
+  <div class="pj-highlights__container">
+    <div class="pj-highlights__header">
+      <h2 class="pj-highlights__title">{{ section.settings.title }}</h2>
+      <p class="pj-highlights__subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+    <div class="pj-highlights__grid">
+      {% assign col = collections[section.settings.collection] %}
+      {% for product in col.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="pj-prod-card">
+          {% if product.compare_at_price > product.price %}<div class="pj-prod-card__badge">Sale!</div>{% endif %}
+          <div class="pj-prod-card__img">
+            {% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 500 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <h3 class="pj-prod-card__name">{{ product.title }}</h3>
+          <div class="pj-prod-card__price">{{ product.price | money }}{% if product.compare_at_price > product.price %}<span class="pj-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+          <div class="pj-prod-card__btn">Quick View</div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PJ Product Highlights", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Tail-Wagging Favorites" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Our most loved products" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 12, "step": 4, "default": 4 },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#fdf8f5" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" }
+  ],
+  "presets": [{ "name": "PJ Product Highlights" }]
+}
+{% endschema %}

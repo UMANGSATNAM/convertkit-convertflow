@@ -1,0 +1,34 @@
+<style>
+  .fp-header { position: sticky; top: 0; width: 100%; background: #000; z-index: 500; border-bottom: 2px solid #222; }
+  .fp-header__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
+  .fp-header__nav { display: flex; gap: 40px; }
+  @media (max-width: 900px) { .fp-header__nav { display: none; } }
+  .fp-header__nav a { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+  .fp-header__nav a:hover { color: {{ section.settings.accent_color }}; }
+  .fp-header__logo { font-family: 'Inter', sans-serif; font-size: 30px; color: #fff; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
+  .fp-header__logo span { color: {{ section.settings.accent_color }}; }
+  .fp-header__icons { display: flex; align-items: center; gap: 25px; }
+  .fp-header__icon { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; transition: color 0.3s; text-decoration: none; font-weight: 900; }
+  .fp-header__icon:hover { color: {{ section.settings.accent_color }}; }
+  .fp-header__cart-count { background: {{ section.settings.accent_color }}; color: #fff; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 800; padding: 3px 8px; vertical-align: top; margin-left: -5px; }
+</style>
+<header class="fp-header">
+  <div class="fp-header__container">
+    <nav class="fp-header__nav">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="fp-header__logo">{{ section.settings.logo_text | split: ' ' | first }}<span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
+    <div class="fp-header__icons">
+      <a href="/search" class="fp-header__icon">🔍</a>
+      <a href="/account" class="fp-header__icon">👤</a>
+      <button class="fp-header__icon" onclick="document.getElementById('fp-cart-drawer').classList.add('active'); document.getElementById('fp-cart-overlay').classList.add('active');">
+        🛍️<span class="fp-header__cart-count">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+{% schema %}
+{ "name": "FP Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "FITNESS POWER" }, { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff2a2a" }], "presets": [{ "name": "FP Header" }] }
+{% endschema %}

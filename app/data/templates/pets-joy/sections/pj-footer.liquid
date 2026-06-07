@@ -1,0 +1,65 @@
+<style>
+  .pj-footer { background: #fdf8f5; padding: 100px 0 30px; border-top: 3px dashed #eee; margin-top: 60px; }
+  .pj-footer__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .pj-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px; margin-bottom: 60px; }
+  @media (max-width: 900px) { .pj-footer__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .pj-footer__grid { grid-template-columns: 1fr; } }
+  .pj-footer__logo { font-family: 'Nunito', sans-serif; font-size: 32px; color: #333; text-decoration: none; font-weight: 900; letter-spacing: -1px; display: block; margin-bottom: 20px; }
+  .pj-footer__logo span { color: {{ section.settings.accent_color }}; }
+  .pj-footer__desc { font-family: 'Nunito', sans-serif; font-size: 16px; color: #666; line-height: 1.6; max-width: 350px; font-weight: 600; }
+  .pj-footer__title { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 900; color: #333; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; }
+  .pj-footer__links { list-style: none; padding: 0; margin: 0; }
+  .pj-footer__links li { margin-bottom: 12px; }
+  .pj-footer__links a { font-family: 'Nunito', sans-serif; font-size: 15px; color: #666; text-decoration: none; transition: color 0.3s; font-weight: 700; }
+  .pj-footer__links a:hover { color: {{ section.settings.accent_color }}; padding-left: 5px; }
+  .pj-footer__bottom { padding-top: 30px; border-top: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .pj-footer__copy { font-family: 'Nunito', sans-serif; font-size: 14px; color: #888; font-weight: 700; }
+  .pj-footer__socials { display: flex; gap: 15px; }
+  .pj-footer__social { width: 45px; height: 45px; background: #fff; color: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 20px; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .pj-footer__social:hover { background: {{ section.settings.accent_color }}; color: #fff; transform: translateY(-3px); }
+</style>
+<footer class="pj-footer">
+  <div class="pj-footer__container">
+    <div class="pj-footer__grid">
+      <div>
+        <a href="/" class="pj-footer__logo">🐾 {{ section.settings.logo_text | split: ' ' | first }} <span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
+        <p class="pj-footer__desc">{{ section.settings.description }}</p>
+      </div>
+      {% for block in section.blocks %}
+        <div>
+          <h4 class="pj-footer__title">{{ block.settings.title }}</h4>
+          <ul class="pj-footer__links">
+            {% assign links = block.settings.menu | default: linklists.footer-menu %}
+            {% if block.settings.menu != blank %}
+              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="pj-footer__bottom">
+      <span class="pj-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. Spread the Joy.</span>
+      <div class="pj-footer__socials">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="pj-footer__social" target="_blank">IG</a>{% endif %}
+        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" class="pj-footer__social" target="_blank">FB</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+{% schema %}
+{
+  "name": "PJ Footer", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Pets Joy" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Everything your best friend needs to wag, purr, and play." },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "facebook", "label": "Facebook" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" }
+  ],
+  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
+    { "type": "text", "id": "title", "label": "Column Title", "default": "Shop" },
+    { "type": "link_list", "id": "menu", "label": "Menu" }
+  ]}],
+  "presets": [{ "name": "PJ Footer", "blocks": [{ "type": "column", "settings": { "title": "Explore 🦴" }}, { "type": "column", "settings": { "title": "Info ℹ️" }}, { "type": "column", "settings": { "title": "Support 💬" }}] }]
+}
+{% endschema %}

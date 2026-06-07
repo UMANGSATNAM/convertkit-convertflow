@@ -1,0 +1,40 @@
+<style>
+  .pj-collections { padding: 80px 0; background: #fff; }
+  .pj-collections__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; text-align: center; }
+  .pj-collections__title { font-family: 'Nunito', sans-serif; font-size: 36px; font-weight: 900; color: #333; margin-bottom: 50px; }
+  .pj-collections__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+  @media (max-width: 900px) { .pj-collections__grid { grid-template-columns: repeat(2, 1fr); } }
+  .pj-coll-card { text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: transform 0.3s; }
+  .pj-coll-card:hover { transform: translateY(-10px); }
+  .pj-coll-card__image-wrapper { width: 160px; height: 160px; border-radius: 50%; background: {{ section.settings.accent_color }}20; padding: 15px; margin-bottom: 20px; transition: background 0.3s; }
+  .pj-coll-card:hover .pj-coll-card__image-wrapper { background: {{ section.settings.accent_color }}40; }
+  .pj-coll-card__image { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .pj-coll-card__name { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800; color: #333; }
+</style>
+<section class="pj-collections">
+  <div class="pj-collections__container">
+    <h2 class="pj-collections__title">{{ section.settings.title }} 🐾</h2>
+    <div class="pj-collections__grid">
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        <a href="{{ col.url | default: '#' }}" class="pj-coll-card" {{ block.shopify_attributes }}>
+          <div class="pj-coll-card__image-wrapper">
+            {% if col.image %}<img class="pj-coll-card__image" src="{{ col.image | image_url: width: 400 }}" alt="{{ col.title | escape }}" loading="lazy">{% else %}<div class="pj-coll-card__image" style="background:#eee;"></div>{% endif %}
+          </div>
+          <h3 class="pj-coll-card__name">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PJ Featured Collections", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Shop by Category" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#2ec4b6" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Collection", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
+  "presets": [{ "name": "PJ Featured Collections" }]
+}
+{% endschema %}

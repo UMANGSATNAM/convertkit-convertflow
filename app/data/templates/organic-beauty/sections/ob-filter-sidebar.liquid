@@ -1,0 +1,27 @@
+<style>
+  .ob-filter { background: #ffffff; padding: 25px; border-radius: 16px; border: 1px solid #ebe3d5; position: sticky; top: 80px; }
+  .ob-filter__title { font-family: 'Georgia', serif; font-size: 18px; color: #2d2a24; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #ebe3d5; }
+  .ob-filter__group { margin-bottom: 20px; }
+  .ob-filter__group-label { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: #c9a96e; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
+  .ob-filter__option { display: flex; align-items: center; gap: 10px; padding: 6px 0; cursor: pointer; }
+  .ob-filter__checkbox { width: 16px; height: 16px; border: 1px solid #d6c9b4; border-radius: 4px; background: transparent; appearance: none; cursor: pointer; }
+  .ob-filter__checkbox:checked { background: #c9a96e; border-color: #c9a96e; }
+  .ob-filter__option-label { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; }
+  .ob-filter__clear { display: block; width: 100%; padding: 10px; margin-top: 12px; background: transparent; border: 1px solid #ebe3d5; border-radius: 8px; color: #8b7355; font-size: 12px; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+  .ob-filter__clear:hover { border-color: #c9a96e; color: #c9a96e; }
+</style>
+<aside class="ob-filter">
+  <h3 class="ob-filter__title">{{ section.settings.title }}</h3>
+  {% for filter in collection.filters %}
+    <div class="ob-filter__group">
+      <span class="ob-filter__group-label">{{ filter.label }}</span>
+      {% for value in filter.values limit: 8 %}
+        <label class="ob-filter__option"><input type="checkbox" class="ob-filter__checkbox" {% if value.active %}checked{% endif %}><span class="ob-filter__option-label">{{ value.label }} ({{ value.count }})</span></label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <button class="ob-filter__clear" onclick="window.location.href=window.location.pathname">Clear Filters</button>
+</aside>
+{% schema %}
+{ "name": "OB Filter Sidebar", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Refine" }], "presets": [{ "name": "OB Filter Sidebar" }] }
+{% endschema %}

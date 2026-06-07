@@ -1,0 +1,67 @@
+<style>
+  .ob-footer { background: #f0e8dc; padding: 80px 0 30px; border-top: 1px solid #ebe3d5; }
+  .ob-footer__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+  .ob-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 60px; }
+  @media (max-width: 768px) { .ob-footer__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .ob-footer__grid { grid-template-columns: 1fr; } }
+  .ob-footer__brand { margin-bottom: 20px; }
+  .ob-footer__logo { font-family: 'Georgia', serif; font-size: 26px; color: #2d2a24; text-decoration: none; display: block; margin-bottom: 15px; letter-spacing: 1px; }
+  .ob-footer__logo span { color: #c9a96e; }
+  .ob-footer__desc { font-family: 'Inter', sans-serif; font-size: 14px; color: #8b7355; line-height: 1.7; max-width: 320px; }
+  .ob-footer__title { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #2d2a24; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; }
+  .ob-footer__links { list-style: none; padding: 0; margin: 0; }
+  .ob-footer__links li { margin-bottom: 12px; }
+  .ob-footer__links a { font-family: 'Inter', sans-serif; font-size: 14px; color: #8b7355; text-decoration: none; transition: color 0.3s; }
+  .ob-footer__links a:hover { color: #c9a96e; }
+  .ob-footer__bottom { padding-top: 30px; border-top: 1px solid rgba(139, 115, 85, 0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .ob-footer__copy { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; }
+  .ob-footer__socials { display: flex; gap: 15px; }
+  .ob-footer__social { width: 40px; height: 40px; border-radius: 50%; background: #ffffff; color: #8b7355; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+  .ob-footer__social:hover { background: #c9a96e; color: #ffffff; transform: translateY(-3px); }
+</style>
+<footer class="ob-footer">
+  <div class="ob-footer__container">
+    <div class="ob-footer__grid">
+      <div>
+        <div class="ob-footer__brand">
+          <a href="/" class="ob-footer__logo">{{ section.settings.logo_text | split: ' ' | first }} <span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
+          <p class="ob-footer__desc">{{ section.settings.description }}</p>
+        </div>
+      </div>
+      {% for block in section.blocks %}
+        <div>
+          <h4 class="ob-footer__title">{{ block.settings.title }}</h4>
+          <ul class="ob-footer__links">
+            {% assign links = block.settings.menu | default: linklists.footer-menu %}
+            {% if block.settings.menu != blank %}
+              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="ob-footer__bottom">
+      <span class="ob-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. Natural Beauty.</span>
+      <div class="ob-footer__socials">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="ob-footer__social" target="_blank">IG</a>{% endif %}
+        {% if section.settings.tiktok != blank %}<a href="{{ section.settings.tiktok }}" class="ob-footer__social" target="_blank">TK</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+{% schema %}
+{
+  "name": "OB Footer", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Organic Beauty" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Clean, conscious skincare for the modern ritual." },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "tiktok", "label": "TikTok" }
+  ],
+  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
+    { "type": "text", "id": "title", "label": "Column Title", "default": "Shop" },
+    { "type": "link_list", "id": "menu", "label": "Menu" }
+  ]}],
+  "presets": [{ "name": "OB Footer", "blocks": [{ "type": "column", "settings": { "title": "Skincare" }}, { "type": "column", "settings": { "title": "About" }}, { "type": "column", "settings": { "title": "Help" }}] }]
+}
+{% endschema %}

@@ -1,0 +1,111 @@
+<style>
+  .tg-specs {
+    padding: 50px 0;
+    background: #0a0a0a;
+  }
+  .tg-specs__container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 30px;
+  }
+  .tg-specs__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tg-specs__icon { color: #00f0ff; font-size: 20px; }
+  .tg-specs__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .tg-specs__row {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tg-specs__row:hover {
+    background: rgba(0,240,255,0.02);
+  }
+  .tg-specs__label,
+  .tg-specs__value {
+    padding: 14px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  .tg-specs__label {
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    font-weight: 700;
+    width: 40%;
+  }
+  .tg-specs__value {
+    color: #ccc;
+    font-weight: 500;
+  }
+  .tg-specs__badge {
+    display: inline-block;
+    background: rgba(0,240,255,0.1);
+    color: #00f0ff;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+</style>
+
+<section class="tg-specs">
+  <div class="tg-specs__container">
+    <h2 class="tg-specs__title"><span class="tg-specs__icon">⚙️</span> {{ section.settings.title }}</h2>
+    <table class="tg-specs__table">
+      {% for block in section.blocks %}
+        <tr class="tg-specs__row" {{ block.shopify_attributes }}>
+          <td class="tg-specs__label">{{ block.settings.label }}</td>
+          <td class="tg-specs__value">
+            {{ block.settings.value }}
+            {% if block.settings.badge != blank %}
+              <span class="tg-specs__badge">{{ block.settings.badge }}</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TG Tech Specs",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Technical Specifications" }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Specification",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Spec Label", "default": "Processor" },
+        { "type": "text", "id": "value", "label": "Spec Value", "default": "Apple M3 Pro" },
+        { "type": "text", "id": "badge", "label": "Badge (optional)" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "TG Tech Specs",
+    "blocks": [
+      { "type": "spec", "settings": { "label": "Processor", "value": "Apple M3 Pro", "badge": "NEW" }},
+      { "type": "spec", "settings": { "label": "Memory", "value": "16GB Unified RAM" }},
+      { "type": "spec", "settings": { "label": "Storage", "value": "512GB SSD" }},
+      { "type": "spec", "settings": { "label": "Display", "value": "15.3\" Liquid Retina XDR" }},
+      { "type": "spec", "settings": { "label": "Battery", "value": "Up to 22 hours", "badge": "BEST" }}
+    ]
+  }]
+}
+{% endschema %}

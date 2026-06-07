@@ -1,0 +1,43 @@
+<style>
+  .gs-header { position: sticky; top: 0; width: 100%; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 500; }
+  .gs-header__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
+  .gs-header__nav { display: flex; gap: 40px; }
+  @media (max-width: 900px) { .gs-header__nav { display: none; } }
+  .gs-header__nav a { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: color 0.3s; }
+  .gs-header__nav a:hover { color: #fff; }
+  .gs-header__logo { font-family: 'Oswald', sans-serif; font-size: 28px; color: #fff; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+  .gs-header__logo span { color: #d4af37; }
+  .gs-header__icons { display: flex; align-items: center; gap: 20px; }
+  .gs-header__icon { background: none; border: none; color: #a0aec0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: color 0.3s; text-decoration: none; }
+  .gs-header__icon:hover { color: #fff; }
+  .gs-header__cart-btn { position: relative; display: flex; align-items: center; justify-content: center; background: none; border: none; color: #a0aec0; width: 40px; height: 40px; cursor: pointer; transition: color 0.3s; }
+  .gs-header__cart-btn:hover { color: #fff; }
+  .gs-header__cart-count { position: absolute; top: 2px; right: 0; background: #d4af37; color: #000; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+</style>
+<header class="gs-header">
+  <div class="gs-header__container">
+    <nav class="gs-header__nav">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="gs-header__logo">
+      {{ section.settings.logo_text | replace: 'Studio', '<span>Studio</span>' }}
+    </a>
+    <div class="gs-header__icons">
+      <a href="/search" class="gs-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </a>
+      <a href="/account" class="gs-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </a>
+      <button class="gs-header__cart-btn" onclick="document.getElementById('gs-cart-drawer').classList.add('active'); document.getElementById('gs-cart-overlay').classList.add('active');">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="gs-header__cart-count">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+{% schema %}
+{ "name": "GS Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Grooming Studio" }], "presets": [{ "name": "GS Header" }] }
+{% endschema %}

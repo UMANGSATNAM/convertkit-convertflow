@@ -1,0 +1,27 @@
+<style>
+  .fp-filter { background: #0a0a0a; padding: 30px; border: 1px solid #222; position: sticky; top: 80px; }
+  .fp-filter__title { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #222; letter-spacing: -0.5px; }
+  .fp-filter__group { margin-bottom: 25px; }
+  .fp-filter__group-label { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; color: #ff2a2a; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; }
+  .fp-filter__option { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; }
+  .fp-filter__checkbox { width: 18px; height: 18px; border: 2px solid #444; background: transparent; appearance: none; cursor: pointer; outline: none; transition: all 0.2s; }
+  .fp-filter__checkbox:checked { background: #ff2a2a; border-color: #ff2a2a; }
+  .fp-filter__option-label { font-family: 'Inter', sans-serif; font-size: 14px; color: #ccc; font-weight: 500; }
+  .fp-filter__clear { display: block; width: 100%; padding: 15px; margin-top: 20px; background: transparent; border: 2px solid #333; color: #888; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+  .fp-filter__clear:hover { border-color: #ff2a2a; color: #ff2a2a; }
+</style>
+<aside class="fp-filter">
+  <h3 class="fp-filter__title">{{ section.settings.title }}</h3>
+  {% for filter in collection.filters %}
+    <div class="fp-filter__group">
+      <span class="fp-filter__group-label">{{ filter.label }}</span>
+      {% for value in filter.values limit: 8 %}
+        <label class="fp-filter__option"><input type="checkbox" class="fp-filter__checkbox" {% if value.active %}checked{% endif %}><span class="fp-filter__option-label">{{ value.label }} ({{ value.count }})</span></label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <button class="fp-filter__clear" onclick="window.location.href=window.location.pathname">Reset</button>
+</aside>
+{% schema %}
+{ "name": "FP Filter Sidebar", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Filter Gear" }], "presets": [{ "name": "FP Filter Sidebar" }] }
+{% endschema %}

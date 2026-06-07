@@ -1,0 +1,109 @@
+<style>
+  .tg-accordion {
+    padding: 40px 0;
+    background: #0a0a0a;
+  }
+  .tg-accordion__container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 30px;
+  }
+  .tg-accordion__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+  .tg-accordion__item {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tg-accordion__trigger {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+  .tg-accordion__trigger:hover { color: #00f0ff; }
+  .tg-accordion__icon {
+    font-size: 18px;
+    transition: transform 0.3s;
+    color: #00f0ff;
+  }
+  .tg-accordion__item.active .tg-accordion__icon {
+    transform: rotate(45deg);
+  }
+  .tg-accordion__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .tg-accordion__item.active .tg-accordion__content {
+    max-height: 500px;
+  }
+  .tg-accordion__body {
+    padding: 0 0 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #888;
+  }
+</style>
+
+<section class="tg-accordion">
+  <div class="tg-accordion__container">
+    <h2 class="tg-accordion__title">{{ section.settings.title }}</h2>
+    {% for block in section.blocks %}
+      <div class="tg-accordion__item" {{ block.shopify_attributes }}>
+        <button class="tg-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">
+          {{ block.settings.heading }}
+          <span class="tg-accordion__icon">+</span>
+        </button>
+        <div class="tg-accordion__content">
+          <div class="tg-accordion__body">{{ block.settings.body }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TG Accordion Details",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Product Details" }
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Accordion Item",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Question", "default": "Shipping Information" },
+        { "type": "richtext", "id": "body", "label": "Answer", "default": "<p>We ship worldwide with express delivery options available.</p>" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "TG Accordion Details",
+    "blocks": [
+      { "type": "accordion", "settings": { "heading": "Specifications", "body": "<p>Full technical specifications available on request.</p>" }},
+      { "type": "accordion", "settings": { "heading": "Shipping & Returns", "body": "<p>Free shipping on orders over $50. 30-day return policy.</p>" }},
+      { "type": "accordion", "settings": { "heading": "Warranty", "body": "<p>All products come with a 2-year manufacturer warranty.</p>" }}
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,46 @@
+<style>
+  .fb-header { position: sticky; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95); z-index: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.03); backdrop-filter: blur(10px); transition: transform 0.3s; }
+  .fb-header__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
+  .fb-header__nav { display: flex; gap: 35px; }
+  @media (max-width: 900px) { .fb-header__nav { display: none; } }
+  .fb-header__nav a { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4a5568; text-decoration: none; transition: color 0.2s; position: relative; }
+  .fb-header__nav a:hover { color: #4CAF50; }
+  .fb-header__nav a::after { content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px; background: #4CAF50; transition: all 0.3s ease; transform: translateX(-50%); border-radius: 2px; }
+  .fb-header__nav a:hover::after { width: 100%; }
+  .fb-header__logo { font-family: 'Fraunces', serif; font-size: 28px; color: #4CAF50; text-decoration: none; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+  .fb-header__icons { display: flex; align-items: center; gap: 20px; }
+  .fb-header__icon { background: none; border: none; color: #4a5568; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; text-decoration: none; }
+  .fb-header__icon:hover { background: #f7fafc; color: #4CAF50; }
+  .fb-header__cart-btn { position: relative; display: flex; align-items: center; gap: 8px; background: #f7fafc; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: background 0.2s; }
+  .fb-header__cart-btn:hover { background: #edf2f7; }
+  .fb-header__cart-icon { color: #4a5568; width: 20px; height: 20px; }
+  .fb-header__cart-count { background: #4CAF50; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+</style>
+<header class="fb-header">
+  <div class="fb-header__container">
+    <nav class="fb-header__nav">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="fb-header__logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #4CAF50;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      {{ section.settings.logo_text }}
+    </a>
+    <div class="fb-header__icons">
+      <a href="/search" class="fb-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </a>
+      <a href="/account" class="fb-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </a>
+      <button class="fb-header__cart-btn" onclick="document.getElementById('fb-cart-drawer').classList.add('active'); document.getElementById('fb-cart-overlay').classList.add('active');">
+        <svg class="fb-header__cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="fb-header__cart-count">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+{% schema %}
+{ "name": "FB Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "FreshBites" }], "presets": [{ "name": "FB Header" }] }
+{% endschema %}

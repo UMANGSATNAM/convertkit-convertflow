@@ -1,0 +1,50 @@
+<style>
+  .fb-story { padding: 100px 0; background: #ffffff; }
+  .fb-story__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  @media (max-width: 900px) { .fb-story__container { grid-template-columns: 1fr; gap: 50px; text-align: center; } }
+  .fb-story__image-wrapper { position: relative; border-radius: 200px 200px 20px 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08); aspect-ratio: 4/5; }
+  .fb-story__image { width: 100%; height: 100%; object-fit: cover; }
+  .fb-story__badge { position: absolute; bottom: 30px; left: 30px; background: #fff; padding: 20px; border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; color: {{ section.settings.accent_color }}; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+  .fb-story__eyebrow { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: {{ section.settings.accent_color }}; margin-bottom: 15px; display: block; }
+  .fb-story__title { font-family: 'Fraunces', serif; font-size: 42px; font-weight: 600; color: #2d3748; margin-bottom: 25px; line-height: 1.2; }
+  .fb-story__desc { font-family: 'DM Sans', sans-serif; font-size: 16px; color: #718096; line-height: 1.8; margin-bottom: 40px; }
+  .fb-story__features { display: flex; flex-direction: column; gap: 20px; }
+  .fb-story__feature { display: flex; align-items: flex-start; gap: 15px; }
+  .fb-story__feature-icon { width: 24px; height: 24px; color: {{ section.settings.accent_color }}; flex-shrink: 0; }
+  .fb-story__feature-text { font-family: 'DM Sans', sans-serif; font-size: 16px; color: #4a5568; font-weight: 500; }
+</style>
+<section class="fb-story">
+  <div class="fb-story__container">
+    <div class="fb-story__image-wrapper">
+      {% if section.settings.image %}<img class="fb-story__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="Farm Story" loading="lazy">{% else %}<div style="width:100%;height:100%;background:#e2e8f0;"></div>{% endif %}
+      <div class="fb-story__badge">Since<br>1992</div>
+    </div>
+    <div class="fb-story__content">
+      <span class="fb-story__eyebrow">{{ section.settings.subtitle }}</span>
+      <h2 class="fb-story__title">{{ section.settings.title }}</h2>
+      <div class="fb-story__desc">{{ section.settings.text }}</div>
+      <div class="fb-story__features">
+        {% for block in section.blocks %}
+          <div class="fb-story__feature" {{ block.shopify_attributes }}>
+            <svg class="fb-story__feature-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            <span class="fb-story__feature-text">{{ block.settings.text }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FB Farm Story", "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "subtitle", "label": "Eyebrow", "default": "Our Roots" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Rooted in Nature, Grown with Care" },
+    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>We partner directly with independent organic farms to bring you produce that's actually fresh. No long warehouse stays, no artificial preservatives—just real food as nature intended.</p>" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#4CAF50" }
+  ],
+  "blocks": [{ "type": "feature", "name": "Feature", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "100% Certified Organic" }] }],
+  "presets": [{ "name": "FB Farm Story", "blocks": [{ "type": "feature", "settings": { "text": "100% Certified Organic" }}, { "type": "feature", "settings": { "text": "Locally Sourced" }}, { "type": "feature", "settings": { "text": "Sustainable Packaging" }}] }]
+}
+{% endschema %}

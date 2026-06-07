@@ -1,0 +1,42 @@
+<style>
+  .ob-buybox { position: sticky; top: 80px; padding: 30px; background: #ffffff; border-radius: 16px; border: 1px solid #ebe3d5; }
+  .ob-buybox__vendor { font-family: 'Inter', sans-serif; font-size: 11px; color: #c9a96e; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+  .ob-buybox__title { font-family: 'Georgia', serif; font-size: 28px; color: #2d2a24; line-height: 1.2; margin-bottom: 12px; }
+  .ob-buybox__price { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #2d2a24; margin-bottom: 5px; }
+  .ob-buybox__compare { color: #bbb; text-decoration: line-through; font-size: 16px; margin-left: 8px; }
+  .ob-buybox__rating { margin-bottom: 20px; color: #c9a96e; font-size: 14px; letter-spacing: 2px; }
+  .ob-buybox__variants { margin-bottom: 20px; }
+  .ob-buybox__variant-label { font-family: 'Inter', sans-serif; font-size: 12px; color: #8b7355; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+  .ob-buybox__variant-select { width: 100%; padding: 12px 15px; background: #faf5ef; border: 1px solid #ebe3d5; border-radius: 8px; color: #2d2a24; font-family: 'Inter', sans-serif; font-size: 14px; }
+  .ob-buybox__add-btn { width: 100%; padding: 16px; background: #c9a96e; color: #ffffff; border: none; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.3s; margin-bottom: 10px; }
+  .ob-buybox__add-btn:hover { background: #b89555; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,169,110,0.3); }
+  .ob-buybox__meta { margin-top: 18px; padding-top: 18px; border-top: 1px solid #ebe3d5; }
+  .ob-buybox__meta-item { font-family: 'Inter', sans-serif; font-size: 12px; color: #8b7355; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+</style>
+<div class="ob-buybox">
+  <div class="ob-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="ob-buybox__title">{{ product.title }}</h1>
+  <div class="ob-buybox__rating">★★★★★</div>
+  <div class="ob-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="ob-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="ob-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="ob-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="ob-buybox__variant-select">
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+    <button type="submit" class="ob-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Add to Bag{% else %}Sold Out{% endif %}</button>
+  {% endform %}
+  <div class="ob-buybox__meta">
+    <div class="ob-buybox__meta-item">🌿 100% Natural Ingredients</div>
+    <div class="ob-buybox__meta-item">🐰 Cruelty-Free & Vegan</div>
+    <div class="ob-buybox__meta-item">♻️ Sustainable Packaging</div>
+  </div>
+</div>
+{% schema %}
+{ "name": "OB Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "OB Sticky Buybox" }] }
+{% endschema %}

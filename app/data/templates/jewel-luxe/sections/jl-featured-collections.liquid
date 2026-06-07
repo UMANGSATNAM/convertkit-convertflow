@@ -1,0 +1,51 @@
+<style>
+  .jl-collections { padding: 120px 0; background: #0a0a0a; border-top: 1px solid #1a1a1a; }
+  .jl-collections__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .jl-collections__header { text-align: center; margin-bottom: 80px; }
+  .jl-collections__eyebrow { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 4px; color: {{ section.settings.accent_color }}; margin-bottom: 15px; display: block; }
+  .jl-collections__title { font-family: 'Cinzel', serif; font-size: 36px; font-weight: 400; color: #fff; }
+  .jl-collections__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  @media (max-width: 900px) { .jl-collections__grid { grid-template-columns: 1fr; } }
+  .jl-coll-card { text-decoration: none; display: block; position: relative; overflow: hidden; group; }
+  .jl-coll-card__image-wrapper { width: 100%; aspect-ratio: 4/5; overflow: hidden; background: #111; }
+  .jl-coll-card__image { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.8; }
+  .jl-coll-card:hover .jl-coll-card__image { transform: scale(1.08); opacity: 1; }
+  .jl-coll-card__content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px; text-align: center; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); }
+  .jl-coll-card__title { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 400; color: #fff; margin-bottom: 15px; letter-spacing: 2px; }
+  .jl-coll-card__link { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 3px; color: {{ section.settings.accent_color }}; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; display: inline-block; }
+  .jl-coll-card:hover .jl-coll-card__link { opacity: 1; transform: translateY(0); }
+</style>
+<section class="jl-collections">
+  <div class="jl-collections__container">
+    <div class="jl-collections__header">
+      <span class="jl-collections__eyebrow">{{ section.settings.subtitle }}</span>
+      <h2 class="jl-collections__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="jl-collections__grid">
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        <a href="{{ col.url | default: '#' }}" class="jl-coll-card" {{ block.shopify_attributes }}>
+          <div class="jl-coll-card__image-wrapper">
+            {% if col.image %}<img class="jl-coll-card__image" src="{{ col.image | image_url: width: 600 }}" alt="{{ col.title | escape }}" loading="lazy">{% else %}<div class="jl-coll-card__image"></div>{% endif %}
+          </div>
+          <div class="jl-coll-card__content">
+            <h3 class="jl-coll-card__title">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
+            <span class="jl-coll-card__link">Explore Collection</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "JL Featured Collections", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Curated Elegance" },
+    { "type": "text", "id": "subtitle", "label": "Eyebrow", "default": "Discover" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Collection", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
+  "presets": [{ "name": "JL Featured Collections" }]
+}
+{% endschema %}

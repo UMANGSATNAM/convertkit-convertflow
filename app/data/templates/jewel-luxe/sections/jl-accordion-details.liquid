@@ -1,0 +1,35 @@
+<style>
+  .jl-accordion { padding: 40px 0; border-top: 1px solid #1a1a1a; margin-top: 40px; }
+  .jl-accordion__title { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 400; color: #fff; margin-bottom: 30px; }
+  .jl-accordion__item { border-bottom: 1px solid #1a1a1a; }
+  .jl-accordion__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 25px 0; background: transparent; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; color: #fff; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+  .jl-accordion__trigger:hover { color: #d4af37; }
+  .jl-accordion__icon { font-size: 18px; font-weight: 300; transition: transform 0.3s; color: #d4af37; }
+  .jl-accordion__item.active .jl-accordion__icon { transform: rotate(180deg); }
+  .jl-accordion__content { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .jl-accordion__item.active .jl-accordion__content { max-height: 500px; }
+  .jl-accordion__body { padding-bottom: 25px; font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.8; color: #999; font-weight: 300; }
+</style>
+<section class="jl-accordion">
+  <h2 class="jl-accordion__title">{{ section.settings.title }}</h2>
+  {% for block in section.blocks %}
+    <div class="jl-accordion__item" {{ block.shopify_attributes }}>
+      <button class="jl-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">{{ block.settings.heading }}<span class="jl-accordion__icon">↓</span></button>
+      <div class="jl-accordion__content"><div class="jl-accordion__body">{{ block.settings.body }}</div></div>
+    </div>
+  {% endfor %}
+</section>
+{% schema %}
+{
+  "name": "JL Accordion Details", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Specifications" }],
+  "blocks": [{ "type": "accordion", "name": "Item", "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Materials & Care" },
+    { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Crafted from 18k solid gold and ethically sourced diamonds.</p>" }
+  ]}],
+  "presets": [{ "name": "JL Accordion Details", "blocks": [
+    { "type": "accordion", "settings": { "heading": "Details & Gemstones" }},
+    { "type": "accordion", "settings": { "heading": "Delivery & Returns" }}
+  ]}]
+}
+{% endschema %}

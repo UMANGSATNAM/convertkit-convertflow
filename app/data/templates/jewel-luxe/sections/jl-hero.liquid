@@ -1,0 +1,41 @@
+<style>
+  .jl-hero { position: relative; width: 100%; height: 90vh; min-height: 700px; display: flex; align-items: center; justify-content: center; background: {{ section.settings.bg_color }}; overflow: hidden; text-align: center; }
+  .jl-hero__video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+  .jl-hero__video-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.8) 100%); }
+  .jl-hero__image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+  .jl-hero__container { max-width: 1000px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+  .jl-hero__eyebrow { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 400; text-transform: uppercase; letter-spacing: 6px; color: {{ section.settings.accent_color }}; margin-bottom: 25px; display: block; }
+  .jl-hero__title { font-family: 'Cinzel', serif; font-size: clamp(48px, 8vw, 96px); font-weight: 400; color: #fff; line-height: 1.1; margin-bottom: 30px; }
+  .jl-hero__desc { font-family: 'Montserrat', sans-serif; font-size: 16px; color: #ccc; line-height: 1.8; margin-bottom: 50px; font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .jl-hero__cta { display: inline-block; background: transparent; color: {{ section.settings.accent_color }}; padding: 18px 50px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 3px; text-decoration: none; border: 1px solid {{ section.settings.accent_color }}; transition: all 0.5s ease; position: relative; overflow: hidden; }
+  .jl-hero__cta::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: {{ section.settings.accent_color }}; transition: left 0.5s ease; z-index: -1; }
+  .jl-hero__cta:hover::before { left: 0; }
+  .jl-hero__cta:hover { color: #000; }
+</style>
+<section class="jl-hero">
+  <div class="jl-hero__video-wrapper">
+    {% if section.settings.image %}<img class="jl-hero__image" src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="eager">{% else %}<div class="jl-hero__image" style="background:#111;"></div>{% endif %}
+  </div>
+  <div class="jl-hero__container">
+    {% if section.settings.eyebrow != blank %}<span class="jl-hero__eyebrow">{{ section.settings.eyebrow }}</span>{% endif %}
+    <h1 class="jl-hero__title">{{ section.settings.title }}</h1>
+    <p class="jl-hero__desc">{{ section.settings.desc }}</p>
+    {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="jl-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "JL Hero", "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Background Image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Heritage Collection" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Timeless Elegance" },
+    { "type": "text", "id": "desc", "label": "Description", "default": "Crafted with precision. Worn with pride. Discover our latest collection of fine jewellery and luxury timepieces." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Discover" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0a0a0a" }
+  ],
+  "presets": [{ "name": "JL Hero" }]
+}
+{% endschema %}

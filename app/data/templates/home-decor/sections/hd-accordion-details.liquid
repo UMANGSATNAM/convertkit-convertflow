@@ -1,0 +1,35 @@
+<style>
+  .hd-accordion { padding: 40px 0; border-top: 1px solid #eee; margin-top: 40px; }
+  .hd-accordion__title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 400; color: #2c2c2c; margin-bottom: 30px; }
+  .hd-accordion__item { border-bottom: 1px solid #eee; }
+  .hd-accordion__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px 0; background: transparent; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #2c2c2c; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
+  .hd-accordion__trigger:hover { color: #8c7a6b; }
+  .hd-accordion__icon { font-size: 18px; font-weight: 300; transition: transform 0.3s; }
+  .hd-accordion__item.active .hd-accordion__icon { transform: rotate(45deg); }
+  .hd-accordion__content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .hd-accordion__item.active .hd-accordion__content { max-height: 500px; }
+  .hd-accordion__body { padding-bottom: 20px; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.8; color: #666; font-weight: 300; }
+</style>
+<section class="hd-accordion">
+  <h2 class="hd-accordion__title">{{ section.settings.title }}</h2>
+  {% for block in section.blocks %}
+    <div class="hd-accordion__item" {{ block.shopify_attributes }}>
+      <button class="hd-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">{{ block.settings.heading }}<span class="hd-accordion__icon">+</span></button>
+      <div class="hd-accordion__content"><div class="hd-accordion__body">{{ block.settings.body }}</div></div>
+    </div>
+  {% endfor %}
+</section>
+{% schema %}
+{
+  "name": "HD Accordion Details", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Details" }],
+  "blocks": [{ "type": "accordion", "name": "Item", "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Dimensions" },
+    { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Carefully crafted to fit modern spaces perfectly.</p>" }
+  ]}],
+  "presets": [{ "name": "HD Accordion Details", "blocks": [
+    { "type": "accordion", "settings": { "heading": "Details & Care" }},
+    { "type": "accordion", "settings": { "heading": "Shipping" }}
+  ]}]
+}
+{% endschema %}

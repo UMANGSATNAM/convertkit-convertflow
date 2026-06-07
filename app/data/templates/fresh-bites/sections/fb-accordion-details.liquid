@@ -1,0 +1,35 @@
+<style>
+  .fb-accordion { padding: 40px 0; margin-top: 40px; }
+  .fb-accordion__title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; color: #2d3748; margin-bottom: 30px; }
+  .fb-accordion__item { border-bottom: 1px dashed #e2e8f0; }
+  .fb-accordion__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 25px 0; background: transparent; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: #2d3748; transition: color 0.3s; }
+  .fb-accordion__trigger:hover { color: #4CAF50; }
+  .fb-accordion__icon { font-size: 20px; font-weight: 400; transition: transform 0.3s; color: #4CAF50; }
+  .fb-accordion__item.active .fb-accordion__icon { transform: rotate(180deg); }
+  .fb-accordion__content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .fb-accordion__item.active .fb-accordion__content { max-height: 500px; }
+  .fb-accordion__body { padding-bottom: 25px; font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; color: #718096; }
+</style>
+<section class="fb-accordion">
+  <h2 class="fb-accordion__title">{{ section.settings.title }}</h2>
+  {% for block in section.blocks %}
+    <div class="fb-accordion__item" {{ block.shopify_attributes }}>
+      <button class="fb-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">{{ block.settings.heading }}<span class="fb-accordion__icon">↓</span></button>
+      <div class="fb-accordion__content"><div class="fb-accordion__body">{{ block.settings.body }}</div></div>
+    </div>
+  {% endfor %}
+</section>
+{% schema %}
+{
+  "name": "FB Accordion Details", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Product Info" }],
+  "blocks": [{ "type": "accordion", "name": "Item", "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Nutrition Facts" },
+    { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Rich in vitamins, minerals, and antioxidants. Grown without synthetic pesticides.</p>" }
+  ]}],
+  "presets": [{ "name": "FB Accordion Details", "blocks": [
+    { "type": "accordion", "settings": { "heading": "Sourcing & Origins" }},
+    { "type": "accordion", "settings": { "heading": "Storage Instructions" }}
+  ]}]
+}
+{% endschema %}

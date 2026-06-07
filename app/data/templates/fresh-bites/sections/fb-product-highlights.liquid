@@ -1,0 +1,64 @@
+<style>
+  .fb-highlights { padding: 80px 0; background: #fdfdf9; }
+  .fb-highlights__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .fb-highlights__header { text-align: center; margin-bottom: 50px; }
+  .fb-highlights__title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 600; color: #2d3748; margin-bottom: 15px; }
+  .fb-highlights__desc { font-family: 'DM Sans', sans-serif; font-size: 16px; color: #718096; max-width: 600px; margin: 0 auto; }
+  .fb-highlights__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+  @media (max-width: 1024px) { .fb-highlights__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .fb-highlights__grid { grid-template-columns: 1fr; } }
+  .fb-prod-card { display: flex; flex-direction: column; text-decoration: none; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #edf2f7; }
+  .fb-prod-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.06); border-color: #e2e8f0; }
+  .fb-prod-card__img-wrapper { aspect-ratio: 1; overflow: hidden; position: relative; background: #f7fafc; padding: 20px; }
+  .fb-prod-card__img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform 0.5s ease; }
+  .fb-prod-card:hover .fb-prod-card__img { transform: scale(1.08); }
+  .fb-prod-card__badge { position: absolute; top: 15px; left: 15px; background: {{ section.settings.accent_color }}; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+  .fb-prod-card__info { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+  .fb-prod-card__vendor { font-family: 'DM Sans', sans-serif; font-size: 12px; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 600; }
+  .fb-prod-card__name { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 10px; line-height: 1.4; flex: 1; }
+  .fb-prod-card__bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+  .fb-prod-card__price { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: #2d3748; }
+  .fb-prod-card__compare { color: #a0aec0; text-decoration: line-through; font-size: 14px; margin-right: 8px; font-weight: 400; font-family: 'DM Sans', sans-serif; }
+  .fb-prod-card__add { width: 36px; height: 36px; border-radius: 50%; background: #edf2f7; color: #4a5568; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s, color 0.3s; }
+  .fb-prod-card:hover .fb-prod-card__add { background: {{ section.settings.accent_color }}; color: #fff; }
+</style>
+<section class="fb-highlights">
+  <div class="fb-highlights__container">
+    <div class="fb-highlights__header">
+      <h2 class="fb-highlights__title">{{ section.settings.title }}</h2>
+      <p class="fb-highlights__desc">{{ section.settings.subtitle }}</p>
+    </div>
+    <div class="fb-highlights__grid">
+      {% assign col = collections[section.settings.collection] %}
+      {% for product in col.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="fb-prod-card">
+          <div class="fb-prod-card__img-wrapper">
+            {% if product.compare_at_price > product.price %}<div class="fb-prod-card__badge">Sale</div>{% endif %}
+            {% if product.featured_image %}<img class="fb-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <div class="fb-prod-card__info">
+            <div class="fb-prod-card__vendor">{{ product.vendor }}</div>
+            <h3 class="fb-prod-card__name">{{ product.title }}</h3>
+            <div class="fb-prod-card__bottom">
+              <div class="fb-prod-card__price">{% if product.compare_at_price > product.price %}<span class="fb-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+              <div class="fb-prod-card__add">+</div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FB Product Highlights", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Fresh Arrivals" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Harvested today, on your table tomorrow." },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 12, "step": 4, "default": 4 },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#4CAF50" }
+  ],
+  "presets": [{ "name": "FB Product Highlights" }]
+}
+{% endschema %}

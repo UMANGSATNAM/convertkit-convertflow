@@ -1,0 +1,53 @@
+<style>
+  .gs-routine { padding: 100px 0; background: #0a0a0a; border-top: 1px solid #222; }
+  .gs-routine__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .gs-routine__header { text-align: center; margin-bottom: 60px; }
+  .gs-routine__eyebrow { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: {{ section.settings.accent_color }}; margin-bottom: 15px; display: block; }
+  .gs-routine__title { font-family: 'Oswald', sans-serif; font-size: 40px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 20px; }
+  .gs-routine__steps { display: flex; flex-direction: column; gap: 20px; }
+  .gs-routine__step { background: #111; border: 1px solid #333; padding: 30px; display: flex; align-items: center; gap: 30px; transition: border-color 0.3s; }
+  .gs-routine__step:hover { border-color: {{ section.settings.accent_color }}; }
+  @media (max-width: 768px) { .gs-routine__step { flex-direction: column; text-align: center; } }
+  .gs-routine__step-num { font-family: 'Oswald', sans-serif; font-size: 48px; font-weight: 700; color: #333; line-height: 1; }
+  .gs-routine__step-content { flex: 1; }
+  .gs-routine__step-title { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 500; color: #fff; text-transform: uppercase; margin-bottom: 10px; }
+  .gs-routine__step-text { font-family: 'Inter', sans-serif; font-size: 16px; color: #a0aec0; line-height: 1.6; font-weight: 300; }
+</style>
+<section class="gs-routine">
+  <div class="gs-routine__container">
+    <div class="gs-routine__header">
+      <span class="gs-routine__eyebrow">{{ section.settings.subtitle }}</span>
+      <h2 class="gs-routine__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="gs-routine__steps">
+      {% for block in section.blocks %}
+        <div class="gs-routine__step" {{ block.shopify_attributes }}>
+          <div class="gs-routine__step-num">0{{ forloop.index }}</div>
+          <div class="gs-routine__step-content">
+            <h3 class="gs-routine__step-title">{{ block.settings.title }}</h3>
+            <p class="gs-routine__step-text">{{ block.settings.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "GS Routine", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "The System" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "How to Use" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+  ],
+  "blocks": [{ "type": "step", "name": "Step", "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Cleanse" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Start with a clean canvas. Wash thoroughly with warm water." }
+  ]}],
+  "presets": [{ "name": "GS Routine", "blocks": [
+    { "type": "step", "settings": { "title": "Prep", "text": "Apply a hot towel to open pores and soften hair." }},
+    { "type": "step", "settings": { "title": "Apply", "text": "Massage product evenly. Let it sit for 60 seconds." }},
+    { "type": "step", "settings": { "title": "Style", "text": "Comb or style as desired. Finish with cold water to seal." }}
+  ]}]
+}
+{% endschema %}

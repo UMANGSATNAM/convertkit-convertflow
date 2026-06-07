@@ -1,0 +1,38 @@
+<style>
+  .kw-related { padding: 80px 0; background: #fff; border-top: 4px dashed #F7FFF7; margin-top: 40px; }
+  .kw-related__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .kw-related__title { font-family: 'Fredoka One', cursive; font-size: 36px; color: #2d3748; text-align: center; margin-bottom: 50px; }
+  /* Inherit product card styles from featured-products */
+</style>
+<section class="kw-related">
+  <div class="kw-related__container">
+    <h2 class="kw-related__title">{{ section.settings.title }}</h2>
+    <div class="kw-featured__grid">
+      {% assign current_product = product %}
+      {% assign related_collection = current_product.collections.first %}
+      {% if related_collection %}
+        {% assign count = 0 %}
+        {% for prod in related_collection.products %}
+          {% if prod.handle != current_product.handle and count < 4 %}
+            <a href="{{ prod.url }}" class="kw-prod-card">
+              <div class="kw-prod-card__img-wrapper">
+                {% if prod.featured_image %}<img class="kw-prod-card__img" src="{{ prod.featured_image | image_url: width: 400 }}" alt="{{ prod.title | escape }}" loading="lazy">{% endif %}
+              </div>
+              <div class="kw-prod-card__info">
+                <h3 class="kw-prod-card__name">{{ prod.title }}</h3>
+                <div class="kw-prod-card__bottom">
+                  <div class="kw-prod-card__price">{{ prod.price | money }}</div>
+                  <div class="kw-prod-card__add">+</div>
+                </div>
+              </div>
+            </a>
+            {% assign count = count | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "KW Related Toys", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "More Fun Toys 🎲" }], "presets": [{ "name": "KW Related Toys" }] }
+{% endschema %}

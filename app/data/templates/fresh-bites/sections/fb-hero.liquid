@@ -1,0 +1,52 @@
+<style>
+  .fb-hero { width: 100%; min-height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: {{ section.settings.bg_color }}; }
+  .fb-hero__bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+  .fb-hero__overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(253,253,249,0.9) 0%, rgba(253,253,249,0.5) 100%); z-index: 2; }
+  .fb-hero__container { max-width: 1200px; margin: 0 auto; padding: 40px; position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  @media (max-width: 900px) { .fb-hero__container { grid-template-columns: 1fr; text-align: center; } .fb-hero__overlay { background: rgba(253,253,249,0.85); } }
+  .fb-hero__badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: {{ section.settings.accent_color }}; background: rgba(76, 175, 80, 0.1); padding: 8px 16px; border-radius: 30px; margin-bottom: 25px; }
+  .fb-hero__title { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 64px); font-weight: 600; color: #2d3748; line-height: 1.1; margin-bottom: 20px; }
+  .fb-hero__title span { color: {{ section.settings.accent_color }}; }
+  .fb-hero__desc { font-family: 'DM Sans', sans-serif; font-size: 18px; color: #4a5568; line-height: 1.6; margin-bottom: 40px; }
+  .fb-hero__cta { display: inline-flex; align-items: center; justify-content: center; background: {{ section.settings.accent_color }}; color: #fff; padding: 16px 32px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s; }
+  .fb-hero__cta:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.2); }
+  .fb-hero__image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .fb-hero__image-box { border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+  .fb-hero__image-box img { width: 100%; height: 100%; object-fit: cover; }
+  .fb-hero__image-box:first-child { transform: translateY(40px); }
+  @media (max-width: 900px) { .fb-hero__image-grid { display: none; } }
+</style>
+<section class="fb-hero">
+  {% if section.settings.bg_image %}<img class="fb-hero__bg" src="{{ section.settings.bg_image | image_url: width: 2000 }}" alt="" loading="eager">{% endif %}
+  <div class="fb-hero__overlay"></div>
+  <div class="fb-hero__container">
+    <div class="fb-hero__content">
+      <div class="fb-hero__badge">🌿 {{ section.settings.badge }}</div>
+      <h1 class="fb-hero__title">{{ section.settings.title }}</h1>
+      <p class="fb-hero__desc">{{ section.settings.desc }}</p>
+      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="fb-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
+    </div>
+    <div class="fb-hero__image-grid">
+      <div class="fb-hero__image-box">{% if section.settings.img_1 %}<img src="{{ section.settings.img_1 | image_url: width: 600 }}" alt="Fresh produce" loading="eager">{% else %}<div style="background:#e2e8f0;width:100%;padding-top:120%;"></div>{% endif %}</div>
+      <div class="fb-hero__image-box">{% if section.settings.img_2 %}<img src="{{ section.settings.img_2 | image_url: width: 600 }}" alt="Fresh produce" loading="eager">{% else %}<div style="background:#cbd5e0;width:100%;padding-top:120%;"></div>{% endif %}</div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FB Hero", "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "bg_image", "label": "Background Image" },
+    { "type": "image_picker", "id": "img_1", "label": "Grid Image 1" },
+    { "type": "image_picker", "id": "img_2", "label": "Grid Image 2" },
+    { "type": "text", "id": "badge", "label": "Badge Text", "default": "100% Organic Certified" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Farm Fresh to Your Door" },
+    { "type": "text", "id": "desc", "label": "Description", "default": "Sourced daily from local farmers. Taste the difference of truly fresh, organic produce." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Groceries" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#4CAF50" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fdfdf9" }
+  ],
+  "presets": [{ "name": "FB Hero" }]
+}
+{% endschema %}

@@ -1,0 +1,40 @@
+<style>
+  .ob-coll-grid { padding: 60px 0; background: #faf5ef; }
+  .ob-coll-grid__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .ob-coll-grid__header { text-align: center; margin-bottom: 40px; }
+  .ob-coll-grid__title { font-family: 'Georgia', serif; font-size: 32px; color: #2d2a24; margin-bottom: 6px; }
+  .ob-coll-grid__count { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; }
+  .ob-coll-grid__products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+  @media (max-width: 768px) { .ob-coll-grid__products { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .ob-coll-grid__products { grid-template-columns: 1fr; } }
+  .ob-cg-card { text-decoration: none; display: block; }
+  .ob-cg-card__img { aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: #f0e8dc; }
+  .ob-cg-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .ob-cg-card:hover .ob-cg-card__img img { transform: scale(1.05); }
+  .ob-cg-card__name { font-family: 'Georgia', serif; font-size: 15px; color: #2d2a24; margin-bottom: 6px; }
+  .ob-cg-card__price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2d2a24; }
+  .ob-cg-card__compare { color: #bbb; text-decoration: line-through; font-size: 12px; margin-left: 5px; }
+</style>
+<section class="ob-coll-grid">
+  <div class="ob-coll-grid__container">
+    <div class="ob-coll-grid__header">
+      <h1 class="ob-coll-grid__title">{{ collection.title }}</h1>
+      <span class="ob-coll-grid__count">{{ collection.products_count }} products</span>
+    </div>
+    <div class="ob-coll-grid__products">
+      {% paginate collection.products by 12 %}
+        {% for product in collection.products %}
+          <a href="{{ product.url }}" class="ob-cg-card">
+            <div class="ob-cg-card__img">{% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 500 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}</div>
+            <div class="ob-cg-card__name">{{ product.title }}</div>
+            <div class="ob-cg-card__price">{{ product.price | money }}{% if product.compare_at_price > product.price %}<span class="ob-cg-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+          </a>
+        {% endfor %}
+        {% if paginate.pages > 1 %}<div style="text-align:center;margin-top:40px;">{{ paginate | default_pagination }}</div>{% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "OB Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "OB Collection Grid" }] }
+{% endschema %}

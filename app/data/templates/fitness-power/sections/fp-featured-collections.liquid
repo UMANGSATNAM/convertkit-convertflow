@@ -1,0 +1,50 @@
+<style>
+  .fp-collections { padding: 80px 0; background: #000; border-top: 2px solid #111; }
+  .fp-collections__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+  .fp-collections__header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+  .fp-collections__title { font-family: 'Inter', sans-serif; font-size: 40px; font-weight: 900; color: #fff; text-transform: uppercase; margin: 0; line-height: 1; letter-spacing: -1px; }
+  .fp-collections__subtitle { font-family: 'Inter', sans-serif; font-size: 14px; color: {{ section.settings.accent_color }}; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+  .fp-collections__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 900px) { .fp-collections__grid { grid-template-columns: 1fr; } .fp-collections__header { flex-direction: column; align-items: flex-start; gap: 10px; } }
+  .fp-coll-card { position: relative; height: 400px; overflow: hidden; text-decoration: none; display: block; border: 1px solid #222; }
+  .fp-coll-card__image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s; opacity: 0.7; filter: grayscale(50%); }
+  .fp-coll-card:hover .fp-coll-card__image { transform: scale(1.1); opacity: 1; filter: grayscale(0%); }
+  .fp-coll-card__overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+  .fp-coll-card__content { position: absolute; bottom: 30px; left: 30px; }
+  .fp-coll-card__name { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900; color: #fff; text-transform: uppercase; margin: 0 0 5px 0; letter-spacing: -1px; transition: color 0.3s; }
+  .fp-coll-card:hover .fp-coll-card__name { color: {{ section.settings.accent_color }}; }
+  .fp-coll-card__arrow { font-family: 'Inter', sans-serif; font-size: 14px; color: #fff; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+</style>
+<section class="fp-collections">
+  <div class="fp-collections__container">
+    <div class="fp-collections__header">
+      <h2 class="fp-collections__title">{{ section.settings.title }}</h2>
+      <span class="fp-collections__subtitle">{{ section.settings.subtitle }}</span>
+    </div>
+    <div class="fp-collections__grid">
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        <a href="{{ col.url | default: '#' }}" class="fp-coll-card" {{ block.shopify_attributes }}>
+          {% if col.image %}<img class="fp-coll-card__image" src="{{ col.image | image_url: width: 800 }}" alt="{{ col.title | escape }}" loading="lazy">{% else %}<div class="fp-coll-card__image" style="background: #111;"></div>{% endif %}
+          <div class="fp-coll-card__overlay"></div>
+          <div class="fp-coll-card__content">
+            <h3 class="fp-coll-card__name">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
+            <div class="fp-coll-card__arrow">Explore <span>→</span></div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FP Featured Collections", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Gear Up" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Choose Your Arena" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#ff2a2a" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Collection", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
+  "presets": [{ "name": "FP Featured Collections" }]
+}
+{% endschema %}

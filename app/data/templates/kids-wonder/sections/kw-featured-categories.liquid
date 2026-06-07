@@ -1,0 +1,46 @@
+<style>
+  .kw-cats { padding: 80px 0; background: #fff; }
+  .kw-cats__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .kw-cats__header { text-align: center; margin-bottom: 50px; }
+  .kw-cats__title { font-family: 'Fredoka One', cursive; font-size: 36px; color: #2d3748; margin: 0; }
+  .kw-cats__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+  @media (max-width: 900px) { .kw-cats__grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  .kw-cat-card { text-decoration: none; display: flex; flex-direction: column; align-items: center; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .kw-cat-card:hover { transform: translateY(-10px) scale(1.05); z-index: 2; }
+  .kw-cat-card__img-wrap { width: 100%; aspect-ratio: 1; border-radius: 30px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.08); border: 4px solid #fff; position: relative; }
+  .kw-cat-card__img-wrap::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 0 4px rgba(0,0,0,0.05); border-radius: 26px; pointer-events: none; }
+  .kw-cat-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .kw-cat-card:hover .kw-cat-card__img { transform: scale(1.1); }
+  .kw-cat-card__title { font-family: 'Fredoka One', cursive; font-size: 20px; color: #fff; text-align: center; background: {{ section.settings.accent_color }}; padding: 10px 20px; border-radius: 20px; margin-top: -35px; position: relative; z-index: 3; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 3px solid #fff; }
+</style>
+<section class="kw-cats">
+  <div class="kw-cats__container">
+    <div class="kw-cats__header">
+      <h2 class="kw-cats__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="kw-cats__grid">
+      {% assign colors = "FF6B6B,4ECDC4,FFE66D,FF9F1C" | split: "," %}
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        {% assign color_index = forloop.index0 | modulo: 4 %}
+        {% assign current_color = "#" | append: colors[color_index] %}
+        <a href="{{ col.url | default: '#' }}" class="kw-cat-card" {{ block.shopify_attributes }}>
+          <div class="kw-cat-card__img-wrap" style="background: {{ current_color }}22;">
+            {% if col.image %}<img class="kw-cat-card__img" src="{{ col.image | image_url: width: 400 }}" alt="{{ col.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <h3 class="kw-cat-card__title" style="background: {{ current_color }};">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "KW Categories", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Explore by Category 🚀" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Category", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
+  "presets": [{ "name": "KW Categories" }]
+}
+{% endschema %}

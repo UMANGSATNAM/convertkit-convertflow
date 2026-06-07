@@ -1,0 +1,44 @@
+<style>
+  .pj-buybox { position: sticky; top: 100px; padding: 40px; background: #fdf8f5; border-radius: 40px; }
+  .pj-buybox__vendor { font-family: 'Nunito', sans-serif; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: 10px; }
+  .pj-buybox__title { font-family: 'Nunito', sans-serif; font-size: 32px; font-weight: 900; color: #333; line-height: 1.1; margin-bottom: 15px; }
+  .pj-buybox__price { font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900; color: #ff9f1c; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+  .pj-buybox__compare { color: #aaa; text-decoration: line-through; font-size: 18px; font-weight: 700; }
+  .pj-buybox__rating { margin-bottom: 25px; color: #ff9f1c; font-size: 18px; letter-spacing: 2px; }
+  .pj-buybox__variants { margin-bottom: 30px; }
+  .pj-buybox__variant-label { font-family: 'Nunito', sans-serif; font-size: 14px; color: #666; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+  .pj-buybox__variant-select { width: 100%; padding: 15px 20px; background: #fff; border: 2px solid #eee; border-radius: 20px; color: #333; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; outline: none; transition: border-color 0.3s; }
+  .pj-buybox__variant-select:focus { border-color: #ff9f1c; }
+  .pj-buybox__add-btn { width: 100%; padding: 20px; background: #ff9f1c; color: #fff; border: none; border-radius: 40px; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 900; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 25px rgba(255,159,28,0.3); margin-bottom: 15px; }
+  .pj-buybox__add-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,159,28,0.4); }
+  .pj-buybox__meta { margin-top: 30px; padding-top: 25px; border-top: 2px dashed #eee; display: flex; flex-direction: column; gap: 15px; }
+  .pj-buybox__meta-item { font-family: 'Nunito', sans-serif; font-size: 15px; color: #666; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+  .pj-buybox__meta-icon { font-size: 24px; }
+</style>
+<div class="pj-buybox">
+  <div class="pj-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="pj-buybox__title">{{ product.title }}</h1>
+  <div class="pj-buybox__rating">★★★★★ <span style="color:#aaa;font-size:14px;">(42 Happy Pets)</span></div>
+  <div class="pj-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="pj-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="pj-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="pj-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="pj-buybox__variant-select">
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+    <button type="submit" class="pj-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Add to Cart 🐾{% else %}Out of Stock 😿{% endif %}</button>
+  {% endform %}
+  <div class="pj-buybox__meta">
+    <div class="pj-buybox__meta-item"><span class="pj-buybox__meta-icon">🐶</span> Pet Safe Materials</div>
+    <div class="pj-buybox__meta-item"><span class="pj-buybox__meta-icon">🚚</span> Free Shipping over $50</div>
+    <div class="pj-buybox__meta-item"><span class="pj-buybox__meta-icon">❤️</span> 30-Day Happiness Guarantee</div>
+  </div>
+</div>
+{% schema %}
+{ "name": "PJ Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "PJ Sticky Buybox" }] }
+{% endschema %}

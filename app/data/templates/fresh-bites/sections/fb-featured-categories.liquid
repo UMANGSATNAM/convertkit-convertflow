@@ -1,0 +1,45 @@
+<style>
+  .fb-cats { padding: 80px 0; background: #ffffff; }
+  .fb-cats__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .fb-cats__header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+  .fb-cats__title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 600; color: #2d3748; margin: 0; }
+  .fb-cats__link { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: {{ section.settings.accent_color }}; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: gap 0.3s; }
+  .fb-cats__link:hover { gap: 12px; }
+  .fb-cats__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  @media (max-width: 900px) { .fb-cats__grid { grid-template-columns: repeat(2, 1fr); } }
+  .fb-cat-card { text-decoration: none; display: flex; flex-direction: column; align-items: center; padding: 30px; background: #f7fafc; border-radius: 16px; transition: transform 0.3s, background 0.3s; }
+  .fb-cat-card:hover { transform: translateY(-5px); background: #edf2f7; }
+  .fb-cat-card__img-wrapper { width: 120px; height: 120px; border-radius: 50%; overflow: hidden; background: #fff; margin-bottom: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
+  .fb-cat-card__img { width: 100%; height: 100%; object-fit: cover; }
+  .fb-cat-card__title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 600; color: #2d3748; text-align: center; }
+</style>
+<section class="fb-cats">
+  <div class="fb-cats__container">
+    <div class="fb-cats__header">
+      <h2 class="fb-cats__title">{{ section.settings.title }}</h2>
+      <a href="/collections" class="fb-cats__link">View All Categories →</a>
+    </div>
+    <div class="fb-cats__grid">
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        <a href="{{ col.url | default: '#' }}" class="fb-cat-card" {{ block.shopify_attributes }}>
+          <div class="fb-cat-card__img-wrapper">
+            {% if col.image %}<img class="fb-cat-card__img" src="{{ col.image | image_url: width: 300 }}" alt="{{ col.title | escape }}" loading="lazy">{% else %}<div class="fb-cat-card__img" style="background:{{ section.settings.accent_color }}22;"></div>{% endif %}
+          </div>
+          <h3 class="fb-cat-card__title">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FB Categories", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Shop by Category" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#4CAF50" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Category", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
+  "presets": [{ "name": "FB Categories" }]
+}
+{% endschema %}

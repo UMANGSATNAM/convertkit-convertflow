@@ -1,0 +1,39 @@
+<style>
+  .ob-accordion { padding: 40px 0; background: #faf5ef; }
+  .ob-accordion__container { max-width: 800px; margin: 0 auto; padding: 0 30px; }
+  .ob-accordion__title { font-family: 'Georgia', serif; font-size: 22px; color: #2d2a24; margin-bottom: 25px; }
+  .ob-accordion__item { border-bottom: 1px solid #ebe3d5; }
+  .ob-accordion__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2d2a24; }
+  .ob-accordion__trigger:hover { color: #c9a96e; }
+  .ob-accordion__icon { font-size: 16px; color: #c9a96e; transition: transform 0.3s; }
+  .ob-accordion__item.active .ob-accordion__icon { transform: rotate(45deg); }
+  .ob-accordion__content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .ob-accordion__item.active .ob-accordion__content { max-height: 500px; }
+  .ob-accordion__body { padding: 0 0 18px; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.8; color: #8b7355; }
+</style>
+<section class="ob-accordion">
+  <div class="ob-accordion__container">
+    <h2 class="ob-accordion__title">{{ section.settings.title }}</h2>
+    {% for block in section.blocks %}
+      <div class="ob-accordion__item" {{ block.shopify_attributes }}>
+        <button class="ob-accordion__trigger" onclick="this.parentElement.classList.toggle('active')">{{ block.settings.heading }}<span class="ob-accordion__icon">+</span></button>
+        <div class="ob-accordion__content"><div class="ob-accordion__body">{{ block.settings.body }}</div></div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "OB Accordion Details", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Product Details" }],
+  "blocks": [{ "type": "accordion", "name": "Item", "settings": [
+    { "type": "text", "id": "heading", "label": "Question", "default": "How to Use" },
+    { "type": "richtext", "id": "body", "label": "Answer", "default": "<p>Apply a small amount to clean skin morning and night.</p>" }
+  ]}],
+  "presets": [{ "name": "OB Accordion Details", "blocks": [
+    { "type": "accordion", "settings": { "heading": "How to Use" }},
+    { "type": "accordion", "settings": { "heading": "Ingredients" }},
+    { "type": "accordion", "settings": { "heading": "Shipping & Returns" }}
+  ]}]
+}
+{% endschema %}

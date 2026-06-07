@@ -1,0 +1,36 @@
+<style>
+  .fb-grid { padding: 60px 0; background: #ffffff; }
+  .fb-grid__header { margin-bottom: 50px; text-align: center; }
+  .fb-grid__title { font-family: 'Fraunces', serif; font-size: 42px; font-weight: 600; color: #2d3748; margin-bottom: 15px; }
+  .fb-grid__desc { font-family: 'DM Sans', sans-serif; font-size: 16px; color: #718096; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .fb-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  @media (max-width: 900px) { .fb-grid__layout { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  @media (max-width: 600px) { .fb-grid__layout { grid-template-columns: 1fr; } }
+</style>
+<div class="fb-grid">
+  <div class="fb-grid__header">
+    <h1 class="fb-grid__title">{{ collection.title }}</h1>
+    {% if collection.description %}<div class="fb-grid__desc">{{ collection.description }}</div>{% endif %}
+  </div>
+  <div class="fb-grid__layout">
+    {% for product in collection.products %}
+      <a href="{{ product.url }}" class="fb-prod-card">
+        <div class="fb-prod-card__img-wrapper">
+          {% if product.compare_at_price > product.price %}<div class="fb-prod-card__badge">Sale</div>{% endif %}
+          <img class="fb-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">
+        </div>
+        <div class="fb-prod-card__info">
+          <div class="fb-prod-card__vendor">{{ product.vendor }}</div>
+          <h3 class="fb-prod-card__name">{{ product.title }}</h3>
+          <div class="fb-prod-card__bottom">
+            <div class="fb-prod-card__price">{% if product.compare_at_price > product.price %}<span class="fb-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+            <div class="fb-prod-card__add">+</div>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{ "name": "FB Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "FB Collection Grid" }] }
+{% endschema %}

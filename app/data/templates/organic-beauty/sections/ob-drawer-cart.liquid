@@ -1,0 +1,65 @@
+<style>
+  .ob-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45,42,36,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+  .ob-drawer-overlay.active { opacity: 1; visibility: visible; }
+  .ob-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100%; background: #faf5ef; z-index: 1000; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+  .ob-drawer.active { right: 0; }
+  .ob-drawer__header { display: flex; justify-content: space-between; align-items: center; padding: 25px; border-bottom: 1px solid #ebe3d5; }
+  .ob-drawer__title { font-family: 'Georgia', serif; font-size: 20px; color: #2d2a24; margin: 0; }
+  .ob-drawer__close { background: none; border: none; color: #8b7355; width: 36px; height: 36px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
+  .ob-drawer__close:hover { transform: rotate(90deg); color: #2d2a24; }
+  .ob-drawer__body { flex: 1; overflow-y: auto; padding: 25px; }
+  .ob-drawer__empty { text-align: center; padding: 60px 20px; color: #8b7355; font-family: 'Inter', sans-serif; font-size: 14px; }
+  .ob-drawer__item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #ebe3d5; }
+  .ob-drawer__item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; background: #f0e8dc; }
+  .ob-drawer__item-info { flex: 1; }
+  .ob-drawer__item-name { font-family: 'Georgia', serif; font-size: 15px; color: #2d2a24; margin-bottom: 4px; }
+  .ob-drawer__item-price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #8b7355; margin-bottom: 8px; }
+  .ob-drawer__item-qty { display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid #ebe3d5; border-radius: 20px; padding: 2px 8px; width: fit-content; }
+  .ob-drawer__qty-btn { width: 24px; height: 24px; background: none; border: none; color: #8b7355; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .ob-drawer__qty-val { font-family: 'Inter', sans-serif; font-size: 13px; color: #2d2a24; min-width: 20px; text-align: center; }
+  .ob-drawer__footer { padding: 25px; background: #ffffff; border-top: 1px solid #ebe3d5; }
+  .ob-drawer__total { display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .ob-drawer__total-label { font-family: 'Georgia', serif; font-size: 16px; color: #2d2a24; }
+  .ob-drawer__total-value { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; color: #2d2a24; }
+  .ob-drawer__checkout { display: block; width: 100%; padding: 16px; background: #c9a96e; color: #ffffff; border: none; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.3s; }
+  .ob-drawer__checkout:hover { background: #b89555; }
+</style>
+<div class="ob-drawer-overlay" id="ob-cart-overlay" onclick="document.getElementById('ob-cart-drawer').classList.remove('active'); this.classList.remove('active');"></div>
+<aside class="ob-drawer" id="ob-cart-drawer">
+  <div class="ob-drawer__header">
+    <h3 class="ob-drawer__title">Your Bag</h3>
+    <button class="ob-drawer__close" onclick="document.getElementById('ob-cart-drawer').classList.remove('active'); document.getElementById('ob-cart-overlay').classList.remove('active');">✕</button>
+  </div>
+  <div class="ob-drawer__body">
+    {% if cart.item_count == 0 %}
+      <div class="ob-drawer__empty">Your bag is empty. Time to glow up!</div>
+    {% else %}
+      {% for item in cart.items %}
+        <div class="ob-drawer__item">
+          <img class="ob-drawer__item-img" src="{{ item.image | image_url: width: 160 }}" alt="{{ item.title | escape }}">
+          <div class="ob-drawer__item-info">
+            <div class="ob-drawer__item-name">{{ item.product.title }}</div>
+            <div class="ob-drawer__item-price">{{ item.final_line_price | money }}</div>
+            <div class="ob-drawer__item-qty">
+              <button class="ob-drawer__qty-btn">−</button>
+              <span class="ob-drawer__qty-val">{{ item.quantity }}</span>
+              <button class="ob-drawer__qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if cart.item_count > 0 %}
+    <div class="ob-drawer__footer">
+      <div class="ob-drawer__total">
+        <span class="ob-drawer__total-label">Subtotal</span>
+        <span class="ob-drawer__total-value">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkout" class="ob-drawer__checkout">Checkout</a>
+    </div>
+  {% endif %}
+</aside>
+{% schema %}
+{ "name": "OB Drawer Cart", "tag": "section", "settings": [], "presets": [{ "name": "OB Drawer Cart" }] }
+{% endschema %}

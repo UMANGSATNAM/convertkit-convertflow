@@ -1,0 +1,37 @@
+<style>
+  .kw-collection { padding: 40px 0 80px; }
+  .kw-collection__header { margin-bottom: 40px; }
+  .kw-collection__title { font-family: 'Fredoka One', cursive; font-size: 42px; color: #2d3748; margin-bottom: 15px; }
+  .kw-collection__desc { font-family: 'Nunito', sans-serif; font-size: 18px; color: #4a5568; max-width: 600px; font-weight: 600; }
+  .kw-collection__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  @media (max-width: 1024px) { .kw-collection__grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  @media (max-width: 600px) { .kw-collection__grid { grid-template-columns: 1fr; } }
+</style>
+<section class="kw-collection">
+  <div class="kw-collection__header">
+    <h1 class="kw-collection__title">{{ collection.title }}</h1>
+    {% if collection.description != blank %}<div class="kw-collection__desc">{{ collection.description }}</div>{% endif %}
+  </div>
+  <div class="kw-collection__grid">
+    {% for product in collection.products %}
+      <a href="{{ product.url }}" class="kw-prod-card">
+        <div class="kw-prod-card__img-wrapper">
+          {% if product.compare_at_price > product.price %}<div class="kw-prod-card__badge">Sale!</div>{% endif %}
+          {% if product.featured_image %}<img class="kw-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+        </div>
+        <div class="kw-prod-card__info">
+          <h3 class="kw-prod-card__name">{{ product.title }}</h3>
+          <div class="kw-prod-card__bottom">
+            <div class="kw-prod-card__price">{{ product.price | money }}</div>
+            <div class="kw-prod-card__add">+</div>
+          </div>
+        </div>
+      </a>
+    {% else %}
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px; font-family: 'Nunito', sans-serif; font-size: 18px; color: #718096; font-weight: 700;">No toys found here! Check another category. 🧸</div>
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{ "name": "KW Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "KW Collection Grid" }] }
+{% endschema %}

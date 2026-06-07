@@ -1,0 +1,43 @@
+<style>
+  .kw-header { position: sticky; top: 0; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 4px dashed #F7FFF7; z-index: 500; }
+  .kw-header__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; height: 90px; display: flex; align-items: center; justify-content: space-between; }
+  .kw-header__nav { display: flex; gap: 30px; }
+  @media (max-width: 900px) { .kw-header__nav { display: none; } }
+  .kw-header__nav a { font-family: 'Fredoka One', cursive; font-size: 16px; color: #4a5568; text-decoration: none; transition: color 0.3s, transform 0.2s; padding: 10px 15px; border-radius: 20px; }
+  .kw-header__nav a:hover { color: #fff; background: #FF6B6B; transform: scale(1.05) rotate(-2deg); }
+  .kw-header__logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: #FF6B6B; text-decoration: none; display: flex; align-items: center; gap: 10px; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+  .kw-header__logo span { color: #4ECDC4; }
+  .kw-header__icons { display: flex; align-items: center; gap: 15px; }
+  .kw-header__icon { background: #F7FFF7; border: 3px solid #fff; color: #4a5568; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: all 0.3s; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .kw-header__icon:hover { transform: translateY(-3px) scale(1.1); color: #FF6B6B; border-color: #FFE66D; }
+  .kw-header__cart-btn { position: relative; background: #4ECDC4; border: 3px solid #fff; color: #fff; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(78,205,196,0.3); }
+  .kw-header__cart-btn:hover { transform: translateY(-3px) scale(1.1) rotate(5deg); background: #FF6B6B; box-shadow: 0 5px 15px rgba(255,107,107,0.3); }
+  .kw-header__cart-count { position: absolute; top: -5px; right: -5px; background: #FFE66D; color: #2d3748; font-family: 'Fredoka One', cursive; font-size: 12px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+</style>
+<header class="kw-header">
+  <div class="kw-header__container">
+    <nav class="kw-header__nav">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <a href="/" class="kw-header__logo">
+      🎈 {{ section.settings.logo_text | replace: 'Wonder', '<span>Wonder</span>' }}
+    </a>
+    <div class="kw-header__icons">
+      <a href="/search" class="kw-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </a>
+      <a href="/account" class="kw-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </a>
+      <button class="kw-header__cart-btn" onclick="document.getElementById('kw-cart-drawer').classList.add('active'); document.getElementById('kw-cart-overlay').classList.add('active');">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="kw-header__cart-count">{{ cart.item_count }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+{% schema %}
+{ "name": "KW Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Kids Wonder" }], "presets": [{ "name": "KW Header" }] }
+{% endschema %}

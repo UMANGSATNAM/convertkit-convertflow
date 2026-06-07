@@ -1,0 +1,54 @@
+<style>
+  .ob-collections { padding: 80px 0; background: {{ section.settings.bg_color }}; }
+  .ob-collections__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .ob-collections__header { text-align: center; margin-bottom: 50px; }
+  .ob-collections__title { font-family: 'Georgia', serif; font-size: 36px; color: #2d2a24; margin-bottom: 10px; }
+  .ob-collections__subtitle { font-family: 'Inter', sans-serif; font-size: 14px; color: #8b7355; }
+  .ob-collections__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+  @media (max-width: 768px) { .ob-collections__grid { grid-template-columns: 1fr; } }
+  .ob-coll-card { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3/4; text-decoration: none; display: block; }
+  .ob-coll-card__image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+  .ob-coll-card:hover .ob-coll-card__image { transform: scale(1.06); }
+  .ob-coll-card__content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(transparent, rgba(45,42,36,0.7)); }
+  .ob-coll-card__name { font-family: 'Georgia', serif; font-size: 24px; color: #fff; margin-bottom: 5px; }
+  .ob-coll-card__count { font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+</style>
+<section class="ob-collections">
+  <div class="ob-collections__container">
+    <div class="ob-collections__header">
+      <h2 class="ob-collections__title">{{ section.settings.title }}</h2>
+      <p class="ob-collections__subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+    <div class="ob-collections__grid">
+      {% for block in section.blocks %}
+        {% assign col = collections[block.settings.collection] %}
+        <a href="{{ col.url | default: '#' }}" class="ob-coll-card" {{ block.shopify_attributes }}>
+          {% if col.image %}
+            <img class="ob-coll-card__image" src="{{ col.image | image_url: width: 800 }}" alt="{{ col.title | escape }}" loading="lazy">
+          {% else %}
+            <div class="ob-coll-card__image" style="background: linear-gradient(135deg, #f0e8dc, #faf5ef);"></div>
+          {% endif %}
+          <div class="ob-coll-card__content">
+            <h3 class="ob-coll-card__name">{{ block.settings.title | default: col.title | default: 'Collection' }}</h3>
+            <span class="ob-coll-card__count">{{ col.products_count | default: 0 }} Products</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "OB Featured Collections", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Shop by Concern" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Find what your skin needs" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#faf5ef" }
+  ],
+  "blocks": [{ "type": "collection", "name": "Collection", "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "text", "id": "title", "label": "Override Title" }
+  ]}],
+  "presets": [{ "name": "OB Featured Collections" }]
+}
+{% endschema %}

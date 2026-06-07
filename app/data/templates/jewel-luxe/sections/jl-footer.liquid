@@ -1,0 +1,63 @@
+<style>
+  .jl-footer { background: #050505; padding: 100px 0 40px; border-top: 1px solid #1a1a1a; margin-top: 0; }
+  .jl-footer__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .jl-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 80px; }
+  @media (max-width: 900px) { .jl-footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  @media (max-width: 600px) { .jl-footer__grid { grid-template-columns: 1fr; } }
+  .jl-footer__logo { font-family: 'Cinzel', serif; font-size: 24px; color: #fff; text-decoration: none; font-weight: 400; letter-spacing: 4px; display: block; margin-bottom: 20px; text-transform: uppercase; }
+  .jl-footer__desc { font-family: 'Montserrat', sans-serif; font-size: 13px; color: #999; line-height: 1.8; max-width: 300px; font-weight: 300; }
+  .jl-footer__title { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 3px; color: #d4af37; margin-bottom: 25px; }
+  .jl-footer__links { list-style: none; padding: 0; margin: 0; }
+  .jl-footer__links li { margin-bottom: 15px; }
+  .jl-footer__links a { font-family: 'Montserrat', sans-serif; font-size: 13px; color: #999; text-decoration: none; transition: color 0.3s; font-weight: 300; }
+  .jl-footer__links a:hover { color: #fff; }
+  .jl-footer__bottom { padding-top: 40px; border-top: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .jl-footer__copy { font-family: 'Montserrat', sans-serif; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+  .jl-footer__socials { display: flex; gap: 25px; }
+  .jl-footer__social { color: #999; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+  .jl-footer__social:hover { color: #d4af37; }
+</style>
+<footer class="jl-footer">
+  <div class="jl-footer__container">
+    <div class="jl-footer__grid">
+      <div>
+        <a href="/" class="jl-footer__logo">{{ section.settings.logo_text }}</a>
+        <p class="jl-footer__desc">{{ section.settings.description }}</p>
+      </div>
+      {% for block in section.blocks %}
+        <div>
+          <h4 class="jl-footer__title">{{ block.settings.title }}</h4>
+          <ul class="jl-footer__links">
+            {% assign links = block.settings.menu | default: linklists.footer-menu %}
+            {% if block.settings.menu != blank %}
+              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="jl-footer__bottom">
+      <span class="jl-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. ALL RIGHTS RESERVED.</span>
+      <div class="jl-footer__socials">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="jl-footer__social" target="_blank">Instagram</a>{% endif %}
+        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" class="jl-footer__social" target="_blank">Facebook</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+{% schema %}
+{
+  "name": "JL Footer", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "LUXE" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Crafting timeless elegance for the modern connoisseur." },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "facebook", "label": "Facebook" }
+  ],
+  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
+    { "type": "text", "id": "title", "label": "Column Title", "default": "Explore" },
+    { "type": "link_list", "id": "menu", "label": "Menu" }
+  ]}],
+  "presets": [{ "name": "JL Footer", "blocks": [{ "type": "column", "settings": { "title": "Boutique" }}, { "type": "column", "settings": { "title": "Services" }}, { "type": "column", "settings": { "title": "Maison" }}] }]
+}
+{% endschema %}

@@ -1,0 +1,65 @@
+<style>
+  .kw-footer { background: #4ECDC4; padding: 100px 0 40px; border-top: 4px dashed #fff; margin-top: 60px; position: relative; overflow: hidden; }
+  .kw-footer::before { content: ''; position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: rgba(255,255,255,0.2); border-radius: 50%; filter: blur(20px); pointer-events: none; }
+  .kw-footer__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+  .kw-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; margin-bottom: 60px; }
+  @media (max-width: 1024px) { .kw-footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  @media (max-width: 600px) { .kw-footer__grid { grid-template-columns: 1fr; } }
+  .kw-footer__logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: #fff; text-decoration: none; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+  .kw-footer__logo span { color: #FFE66D; }
+  .kw-footer__desc { font-family: 'Nunito', sans-serif; font-size: 16px; color: #fff; line-height: 1.6; max-width: 320px; font-weight: 700; }
+  .kw-footer__title { font-family: 'Fredoka One', cursive; font-size: 20px; color: #fff; margin-bottom: 25px; text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+  .kw-footer__links { list-style: none; padding: 0; margin: 0; }
+  .kw-footer__links li { margin-bottom: 15px; }
+  .kw-footer__links a { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.9); text-decoration: none; transition: color 0.3s, transform 0.2s; display: inline-block; }
+  .kw-footer__links a:hover { color: #FFE66D; transform: translateX(5px); }
+  .kw-footer__bottom { padding-top: 30px; border-top: 4px dashed rgba(255,255,255,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .kw-footer__copy { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.9); }
+  .kw-footer__socials { display: flex; gap: 15px; }
+  .kw-footer__social { background: #fff; color: #4ECDC4; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.3s; font-family: 'Fredoka One', cursive; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .kw-footer__social:hover { transform: translateY(-5px) scale(1.1) rotate(10deg); background: #FFE66D; color: #2d3748; }
+</style>
+<footer class="kw-footer">
+  <div class="kw-footer__container">
+    <div class="kw-footer__grid">
+      <div>
+        <a href="/" class="kw-footer__logo">🎈 {{ section.settings.logo_text | replace: 'Wonder', '<span>Wonder</span>' }}</a>
+        <p class="kw-footer__desc">{{ section.settings.description }}</p>
+      </div>
+      {% for block in section.blocks %}
+        <div>
+          <h4 class="kw-footer__title">{{ block.settings.title }}</h4>
+          <ul class="kw-footer__links">
+            {% assign links = block.settings.menu | default: linklists.footer-menu %}
+            {% if block.settings.menu != blank %}
+              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="kw-footer__bottom">
+      <span class="kw-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. Spread the Joy! ✨</span>
+      <div class="kw-footer__socials">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="kw-footer__social" target="_blank">In</a>{% endif %}
+        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" class="kw-footer__social" target="_blank">Fb</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+{% schema %}
+{
+  "name": "KW Footer", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Kids Wonder" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Making childhood magical with toys that inspire creativity and learning." },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "facebook", "label": "Facebook" }
+  ],
+  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
+    { "type": "text", "id": "title", "label": "Column Title", "default": "Shop Toys" },
+    { "type": "link_list", "id": "menu", "label": "Menu" }
+  ]}],
+  "presets": [{ "name": "KW Footer", "blocks": [{ "type": "column", "settings": { "title": "Ages" }}, { "type": "column", "settings": { "title": "Help & Info" }}, { "type": "column", "settings": { "title": "About Us" }}] }]
+}
+{% endschema %}

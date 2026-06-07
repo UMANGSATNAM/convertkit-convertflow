@@ -1,0 +1,53 @@
+<style>
+  .jl-highlights { padding: 120px 0; background: #0a0a0a; border-top: 1px solid #1a1a1a; }
+  .jl-highlights__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .jl-highlights__header { text-align: center; margin-bottom: 80px; }
+  .jl-highlights__eyebrow { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 4px; color: {{ section.settings.accent_color }}; margin-bottom: 15px; display: block; }
+  .jl-highlights__title { font-family: 'Cinzel', serif; font-size: 36px; font-weight: 400; color: #fff; }
+  .jl-highlights__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+  @media (max-width: 1024px) { .jl-highlights__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .jl-highlights__grid { grid-template-columns: 1fr; } }
+  .jl-prod-card { display: block; text-decoration: none; position: relative; text-align: center; }
+  .jl-prod-card__img-wrapper { aspect-ratio: 1; overflow: hidden; background: #111; margin-bottom: 25px; position: relative; border: 1px solid transparent; transition: border-color 0.4s ease; }
+  .jl-prod-card:hover .jl-prod-card__img-wrapper { border-color: #333; }
+  .jl-prod-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease, filter 0.4s ease; filter: brightness(0.9); }
+  .jl-prod-card:hover .jl-prod-card__img { transform: scale(1.05); filter: brightness(1.1); }
+  .jl-prod-card__badge { position: absolute; top: 15px; left: 15px; background: transparent; color: {{ section.settings.accent_color }}; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; border: 1px solid {{ section.settings.accent_color }}; padding: 4px 10px; }
+  .jl-prod-card__name { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 400; color: #fff; margin-bottom: 10px; letter-spacing: 1px; }
+  .jl-prod-card__price { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 300; color: #ccc; }
+  .jl-prod-card__compare { color: #666; text-decoration: line-through; margin-right: 8px; }
+</style>
+<section class="jl-highlights">
+  <div class="jl-highlights__container">
+    <div class="jl-highlights__header">
+      <span class="jl-highlights__eyebrow">{{ section.settings.subtitle }}</span>
+      <h2 class="jl-highlights__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="jl-highlights__grid">
+      {% assign col = collections[section.settings.collection] %}
+      {% for product in col.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="jl-prod-card">
+          <div class="jl-prod-card__img-wrapper">
+            {% if product.compare_at_price > product.price %}<div class="jl-prod-card__badge">Exclusive</div>{% endif %}
+            {% if product.featured_image %}<img class="jl-prod-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <h3 class="jl-prod-card__name">{{ product.title }}</h3>
+          <div class="jl-prod-card__price">{% if product.compare_at_price > product.price %}<span class="jl-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "JL Product Highlights", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "The Signature Collection" },
+    { "type": "text", "id": "subtitle", "label": "Eyebrow", "default": "Exquisite Craftsmanship" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 12, "step": 4, "default": 4 },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+  ],
+  "presets": [{ "name": "JL Product Highlights" }]
+}
+{% endschema %}

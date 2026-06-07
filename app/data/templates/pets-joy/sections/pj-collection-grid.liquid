@@ -1,0 +1,37 @@
+<style>
+  .pj-grid { padding: 40px 0; background: #fff; }
+  .pj-grid__header { margin-bottom: 40px; }
+  .pj-grid__title { font-family: 'Nunito', sans-serif; font-size: 40px; font-weight: 900; color: #333; margin-bottom: 10px; }
+  .pj-grid__desc { font-family: 'Nunito', sans-serif; font-size: 16px; color: #666; }
+  .pj-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  @media (max-width: 900px) { .pj-grid__layout { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .pj-grid__layout { grid-template-columns: 1fr; } }
+  .pj-card { text-decoration: none; display: block; border-radius: 30px; background: #fdf8f5; padding: 20px; transition: transform 0.3s; position: relative; }
+  .pj-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+  .pj-card__img { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; margin-bottom: 15px; }
+  .pj-card__info { display: flex; flex-direction: column; gap: 5px; }
+  .pj-card__title { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #333; line-height: 1.2; }
+  .pj-card__price { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #ff9f1c; }
+  .pj-card__badge { position: absolute; top: 30px; left: 30px; background: #2ec4b6; color: #fff; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 12px; }
+</style>
+<div class="pj-grid">
+  <div class="pj-grid__header">
+    <h1 class="pj-grid__title">{{ collection.title }}</h1>
+    {% if collection.description %}<div class="pj-grid__desc">{{ collection.description }}</div>{% endif %}
+  </div>
+  <div class="pj-grid__layout">
+    {% for product in collection.products %}
+      <a href="{{ product.url }}" class="pj-card">
+        {% if product.compare_at_price > product.price %}<div class="pj-card__badge">Sale!</div>{% endif %}
+        <img class="pj-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">
+        <div class="pj-card__info">
+          <h3 class="pj-card__title">{{ product.title }}</h3>
+          <div class="pj-card__price">{{ product.price | money }}</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{ "name": "PJ Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "PJ Collection Grid" }] }
+{% endschema %}

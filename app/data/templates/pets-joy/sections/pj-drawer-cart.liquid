@@ -1,0 +1,66 @@
+<style>
+  .pj-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s; backdrop-filter: blur(4px); }
+  .pj-drawer-overlay.active { opacity: 1; visibility: visible; }
+  .pj-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100%; background: #fff; z-index: 1000; transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1); border-top-left-radius: 40px; border-bottom-left-radius: 40px; overflow: hidden; }
+  .pj-drawer.active { right: 0; }
+  .pj-drawer__header { display: flex; justify-content: space-between; align-items: center; padding: 30px; background: #fdf8f5; border-bottom: 2px dashed #eee; }
+  .pj-drawer__title { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 900; color: #333; margin: 0; display: flex; align-items: center; gap: 10px; }
+  .pj-drawer__close { background: #fff; border: none; color: #333; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; font-weight: 900; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .pj-drawer__close:hover { background: #ff9f1c; color: #fff; transform: rotate(90deg); }
+  .pj-drawer__body { flex: 1; overflow-y: auto; padding: 30px; }
+  .pj-drawer__empty { text-align: center; padding: 60px 20px; color: #666; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700; }
+  .pj-drawer__item { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid #f0f0f0; }
+  .pj-drawer__item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 16px; background: #fdf8f5; }
+  .pj-drawer__item-info { flex: 1; }
+  .pj-drawer__item-name { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #333; margin-bottom: 5px; }
+  .pj-drawer__item-price { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #ff9f1c; margin-bottom: 10px; }
+  .pj-drawer__item-qty { display: inline-flex; align-items: center; background: #fdf8f5; border-radius: 20px; padding: 2px 5px; }
+  .pj-drawer__qty-btn { width: 26px; height: 26px; background: #fff; border-radius: 50%; border: none; color: #333; cursor: pointer; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .pj-drawer__qty-btn:hover { background: #ff9f1c; color: #fff; }
+  .pj-drawer__qty-val { font-family: 'Nunito', sans-serif; font-size: 14px; color: #333; font-weight: 800; min-width: 26px; text-align: center; }
+  .pj-drawer__footer { padding: 30px; background: #fdf8f5; border-top: 2px dashed #eee; }
+  .pj-drawer__total { display: flex; justify-content: space-between; margin-bottom: 25px; }
+  .pj-drawer__total-label { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #333; }
+  .pj-drawer__total-value { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; color: #ff9f1c; }
+  .pj-drawer__checkout { display: block; width: 100%; padding: 18px; background: #ff9f1c; color: #fff; border: none; border-radius: 30px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; text-transform: uppercase; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.3s; box-shadow: 0 8px 20px rgba(255,159,28,0.3); }
+  .pj-drawer__checkout:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(255,159,28,0.4); }
+</style>
+<div class="pj-drawer-overlay" id="pj-cart-overlay" onclick="document.getElementById('pj-cart-drawer').classList.remove('active'); this.classList.remove('active');"></div>
+<aside class="pj-drawer" id="pj-cart-drawer">
+  <div class="pj-drawer__header">
+    <h3 class="pj-drawer__title"><span>🛒</span> Your Cart</h3>
+    <button class="pj-drawer__close" onclick="document.getElementById('pj-cart-drawer').classList.remove('active'); document.getElementById('pj-cart-overlay').classList.remove('active');">✕</button>
+  </div>
+  <div class="pj-drawer__body">
+    {% if cart.item_count == 0 %}
+      <div class="pj-drawer__empty">Your cart is empty. 😿<br><br>Let's find something for your furry friend!</div>
+    {% else %}
+      {% for item in cart.items %}
+        <div class="pj-drawer__item">
+          <img class="pj-drawer__item-img" src="{{ item.image | image_url: width: 160 }}" alt="{{ item.title | escape }}">
+          <div class="pj-drawer__item-info">
+            <div class="pj-drawer__item-name">{{ item.product.title }}</div>
+            <div class="pj-drawer__item-price">{{ item.final_line_price | money }}</div>
+            <div class="pj-drawer__item-qty">
+              <button class="pj-drawer__qty-btn">−</button>
+              <span class="pj-drawer__qty-val">{{ item.quantity }}</span>
+              <button class="pj-drawer__qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if cart.item_count > 0 %}
+    <div class="pj-drawer__footer">
+      <div class="pj-drawer__total">
+        <span class="pj-drawer__total-label">Subtotal</span>
+        <span class="pj-drawer__total-value">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkout" class="pj-drawer__checkout">Checkout 🐾</a>
+    </div>
+  {% endif %}
+</aside>
+{% schema %}
+{ "name": "PJ Drawer Cart", "tag": "section", "settings": [], "presets": [{ "name": "PJ Drawer Cart" }] }
+{% endschema %}

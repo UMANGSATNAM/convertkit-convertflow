@@ -1,0 +1,42 @@
+<style>
+  .gs-buybox { position: sticky; top: 120px; padding: 40px; background: #1a1a1a; border: 1px solid #333; }
+  .gs-buybox__vendor { font-family: 'Inter', sans-serif; font-size: 12px; color: #718096; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: 500; }
+  .gs-buybox__title { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 700; color: #fff; text-transform: uppercase; line-height: 1.1; margin-bottom: 15px; }
+  .gs-buybox__price { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #fff; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+  .gs-buybox__compare { color: #718096; text-decoration: line-through; font-size: 18px; }
+  .gs-buybox__variants { margin-bottom: 30px; padding-top: 30px; border-top: 1px solid #333; }
+  .gs-buybox__variant-label { font-family: 'Inter', sans-serif; font-size: 12px; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; font-weight: 600; }
+  .gs-buybox__variant-select { width: 100%; padding: 15px 20px; background: #000; border: 1px solid #333; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; cursor: pointer; outline: none; transition: border-color 0.3s; margin-bottom: 20px; text-transform: uppercase; }
+  .gs-buybox__variant-select:focus { border-color: #d4af37; }
+  .gs-buybox__add-btn { width: 100%; padding: 20px; background: #d4af37; color: #000; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .gs-buybox__add-btn:hover { background: #fff; }
+  .gs-buybox__meta { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 15px; }
+  .gs-buybox__meta-item { font-family: 'Inter', sans-serif; font-size: 13px; color: #a0aec0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .gs-buybox__meta-icon { color: #d4af37; }
+</style>
+<div class="gs-buybox">
+  <div class="gs-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="gs-buybox__title">{{ product.title }}</h1>
+  <div class="gs-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="gs-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="gs-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="gs-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="gs-buybox__variant-select">
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+    <button type="submit" class="gs-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Add to Cart{% else %}Sold Out{% endif %}</button>
+  {% endform %}
+  <div class="gs-buybox__meta">
+    <div class="gs-buybox__meta-item"><svg class="gs-buybox__meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Barber Approved</div>
+    <div class="gs-buybox__meta-item"><svg class="gs-buybox__meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Free US Shipping Over $50</div>
+    <div class="gs-buybox__meta-item"><svg class="gs-buybox__meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 30-Day Guarantee</div>
+  </div>
+</div>
+{% schema %}
+{ "name": "GS Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "GS Sticky Buybox" }] }
+{% endschema %}

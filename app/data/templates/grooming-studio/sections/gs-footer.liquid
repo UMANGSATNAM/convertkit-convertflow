@@ -1,0 +1,64 @@
+<style>
+  .gs-footer { background: #000; padding: 100px 0 40px; border-top: 1px solid #222; }
+  .gs-footer__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .gs-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; margin-bottom: 60px; }
+  @media (max-width: 1024px) { .gs-footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  @media (max-width: 600px) { .gs-footer__grid { grid-template-columns: 1fr; } }
+  .gs-footer__logo { font-family: 'Oswald', sans-serif; font-size: 28px; color: #fff; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block; }
+  .gs-footer__logo span { color: #d4af37; }
+  .gs-footer__desc { font-family: 'Inter', sans-serif; font-size: 14px; color: #718096; line-height: 1.6; max-width: 320px; font-weight: 300; }
+  .gs-footer__title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 500; color: #fff; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+  .gs-footer__links { list-style: none; padding: 0; margin: 0; }
+  .gs-footer__links li { margin-bottom: 15px; }
+  .gs-footer__links a { font-family: 'Inter', sans-serif; font-size: 14px; color: #a0aec0; text-decoration: none; transition: color 0.3s; }
+  .gs-footer__links a:hover { color: #d4af37; }
+  .gs-footer__bottom { padding-top: 30px; border-top: 1px solid #222; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .gs-footer__copy { font-family: 'Inter', sans-serif; font-size: 13px; color: #718096; }
+  .gs-footer__socials { display: flex; gap: 20px; }
+  .gs-footer__social { color: #a0aec0; text-decoration: none; transition: color 0.3s; font-family: 'Inter', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+  .gs-footer__social:hover { color: #d4af37; }
+</style>
+<footer class="gs-footer">
+  <div class="gs-footer__container">
+    <div class="gs-footer__grid">
+      <div>
+        <a href="/" class="gs-footer__logo">{{ section.settings.logo_text | replace: 'Studio', '<span>Studio</span>' }}</a>
+        <p class="gs-footer__desc">{{ section.settings.description }}</p>
+      </div>
+      {% for block in section.blocks %}
+        <div>
+          <h4 class="gs-footer__title">{{ block.settings.title }}</h4>
+          <ul class="gs-footer__links">
+            {% assign links = block.settings.menu | default: linklists.footer-menu %}
+            {% if block.settings.menu != blank %}
+              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="gs-footer__bottom">
+      <span class="gs-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+      <div class="gs-footer__socials">
+        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="gs-footer__social" target="_blank">Instagram</a>{% endif %}
+        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" class="gs-footer__social" target="_blank">Facebook</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+{% schema %}
+{
+  "name": "GS Footer", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Grooming Studio" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Built on the foundation of traditional barbering, our products are engineered for the modern man." },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "facebook", "label": "Facebook" }
+  ],
+  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
+    { "type": "text", "id": "title", "label": "Column Title", "default": "Shop" },
+    { "type": "link_list", "id": "menu", "label": "Menu" }
+  ]}],
+  "presets": [{ "name": "GS Footer", "blocks": [{ "type": "column", "settings": { "title": "Products" }}, { "type": "column", "settings": { "title": "Information" }}, { "type": "column", "settings": { "title": "Support" }}] }]
+}
+{% endschema %}

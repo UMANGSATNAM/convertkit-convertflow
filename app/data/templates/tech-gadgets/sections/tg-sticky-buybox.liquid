@@ -1,0 +1,164 @@
+<style>
+  .tg-buybox {
+    position: sticky;
+    top: 80px;
+    padding: 30px;
+    background: #111122;
+    border: 1px solid rgba(0,240,255,0.1);
+  }
+  .tg-buybox__vendor {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: {{ section.settings.accent_color }};
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+  .tg-buybox__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 15px;
+  }
+  .tg-buybox__price {
+    font-family: 'Inter', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 5px;
+  }
+  .tg-buybox__compare {
+    font-size: 16px;
+    color: #666;
+    text-decoration: line-through;
+    margin-left: 10px;
+  }
+  .tg-buybox__save {
+    display: inline-block;
+    background: rgba(0,240,255,0.1);
+    color: {{ section.settings.accent_color }};
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+  .tg-buybox__variants {
+    margin-bottom: 25px;
+  }
+  .tg-buybox__variant-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .tg-buybox__variant-select {
+    width: 100%;
+    padding: 12px 15px;
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+  .tg-buybox__variant-select:focus {
+    border-color: {{ section.settings.accent_color }};
+  }
+  .tg-buybox__add-btn {
+    width: 100%;
+    padding: 16px;
+    background: {{ section.settings.accent_color }};
+    color: #0a0a0a;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+  }
+  .tg-buybox__add-btn:hover {
+    box-shadow: 0 0 30px {{ section.settings.accent_color }}40;
+  }
+  .tg-buybox__meta {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .tg-buybox__meta-item {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tg-buybox__meta-icon {
+    color: {{ section.settings.accent_color }};
+    font-size: 14px;
+  }
+</style>
+
+<div class="tg-buybox">
+  <div class="tg-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="tg-buybox__title">{{ product.title }}</h1>
+  <div class="tg-buybox__price">
+    {{ product.selected_or_first_available_variant.price | money }}
+    {% if product.compare_at_price > product.price %}
+      <span class="tg-buybox__compare">{{ product.compare_at_price | money }}</span>
+    {% endif %}
+  </div>
+  {% if product.compare_at_price > product.price %}
+    {% assign savings = product.compare_at_price | minus: product.price %}
+    <div class="tg-buybox__save">SAVE {{ savings | money }}</div>
+  {% endif %}
+
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="tg-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="tg-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="tg-buybox__variant-select">
+            {% for variant in product.variants %}
+              <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
+                {{ variant.title }} - {{ variant.price | money }}
+              </option>
+            {% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    {% endunless %}
+    <button type="submit" class="tg-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>
+      {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+    </button>
+  {% endform %}
+
+  <div class="tg-buybox__meta">
+    <div class="tg-buybox__meta-item"><span class="tg-buybox__meta-icon">⚡</span> Free express shipping</div>
+    <div class="tg-buybox__meta-item"><span class="tg-buybox__meta-icon">🔒</span> Secure checkout</div>
+    <div class="tg-buybox__meta-item"><span class="tg-buybox__meta-icon">↩️</span> 30-day returns</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "TG Sticky Buybox",
+  "tag": "section",
+  "settings": [
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#00f0ff" }
+  ],
+  "presets": [{ "name": "TG Sticky Buybox" }]
+}
+{% endschema %}

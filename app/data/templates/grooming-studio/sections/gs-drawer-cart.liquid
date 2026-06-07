@@ -1,0 +1,68 @@
+<style>
+  .gs-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+  .gs-drawer-overlay.active { opacity: 1; visibility: visible; }
+  .gs-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100%; background: #111; border-left: 1px solid #333; z-index: 1000; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+  .gs-drawer.active { right: 0; }
+  .gs-drawer__header { display: flex; justify-content: space-between; align-items: center; padding: 30px; border-bottom: 1px solid #222; }
+  .gs-drawer__title { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 500; color: #fff; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+  .gs-drawer__close { background: transparent; border: 1px solid #333; color: #a0aec0; width: 36px; height: 36px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+  .gs-drawer__close:hover { border-color: #d4af37; color: #d4af37; }
+  .gs-drawer__body { flex: 1; overflow-y: auto; padding: 30px; }
+  .gs-drawer__empty { text-align: center; padding: 60px 20px; color: #718096; font-family: 'Inter', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .gs-drawer__item { display: flex; gap: 20px; padding: 20px; background: #1a1a1a; border: 1px solid #222; margin-bottom: 15px; }
+  .gs-drawer__item-img { width: 70px; height: 70px; object-fit: contain; background: #0a0a0a; border: 1px solid #333; }
+  .gs-drawer__item-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .gs-drawer__item-name { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 500; color: #fff; margin-bottom: 5px; text-transform: uppercase; }
+  .gs-drawer__item-price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #a0aec0; margin-bottom: 10px; }
+  .gs-drawer__item-qty { display: flex; align-items: center; border: 1px solid #333; width: fit-content; }
+  .gs-drawer__qty-btn { width: 28px; height: 28px; background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; transition: background 0.2s; }
+  .gs-drawer__qty-btn:hover { background: #333; }
+  .gs-drawer__qty-val { font-family: 'Inter', sans-serif; font-size: 14px; color: #fff; min-width: 30px; text-align: center; border-left: 1px solid #333; border-right: 1px solid #333; height: 28px; line-height: 28px; }
+  .gs-drawer__footer { padding: 30px; background: #111; border-top: 1px solid #222; }
+  .gs-drawer__total { display: flex; justify-content: space-between; margin-bottom: 25px; align-items: center; }
+  .gs-drawer__total-label { font-family: 'Inter', sans-serif; font-size: 14px; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; }
+  .gs-drawer__total-value { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 500; color: #fff; }
+  .gs-drawer__checkout { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 18px; background: #d4af37; color: #000; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: none; transition: background 0.3s; }
+  .gs-drawer__checkout:hover { background: #fff; }
+</style>
+<div class="gs-drawer-overlay" id="gs-cart-overlay" onclick="document.getElementById('gs-cart-drawer').classList.remove('active'); this.classList.remove('active');"></div>
+<aside class="gs-drawer" id="gs-cart-drawer">
+  <div class="gs-drawer__header">
+    <h3 class="gs-drawer__title">Your Gear</h3>
+    <button class="gs-drawer__close" onclick="document.getElementById('gs-cart-drawer').classList.remove('active'); document.getElementById('gs-cart-overlay').classList.remove('active');">✕</button>
+  </div>
+  <div class="gs-drawer__body">
+    {% if cart.item_count == 0 %}
+      <div class="gs-drawer__empty">Your kit is empty.<br><br>Add some essentials.</div>
+    {% else %}
+      {% for item in cart.items %}
+        <div class="gs-drawer__item">
+          <img class="gs-drawer__item-img" src="{{ item.image | image_url: width: 140 }}" alt="{{ item.title | escape }}">
+          <div class="gs-drawer__item-info">
+            <div>
+              <div class="gs-drawer__item-name">{{ item.product.title }}</div>
+              <div class="gs-drawer__item-price">{{ item.final_line_price | money }}</div>
+            </div>
+            <div class="gs-drawer__item-qty">
+              <button class="gs-drawer__qty-btn">−</button>
+              <div class="gs-drawer__qty-val">{{ item.quantity }}</div>
+              <button class="gs-drawer__qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if cart.item_count > 0 %}
+    <div class="gs-drawer__footer">
+      <div class="gs-drawer__total">
+        <span class="gs-drawer__total-label">Subtotal</span>
+        <span class="gs-drawer__total-value">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkout" class="gs-drawer__checkout">Secure Checkout</a>
+    </div>
+  {% endif %}
+</aside>
+{% schema %}
+{ "name": "GS Drawer Cart", "tag": "section", "settings": [], "presets": [{ "name": "GS Drawer Cart" }] }
+{% endschema %}

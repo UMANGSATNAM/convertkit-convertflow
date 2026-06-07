@@ -1,0 +1,48 @@
+<style>
+  .ob-ingredients { padding: 60px 0; background: #ffffff; }
+  .ob-ingredients__container { max-width: 1000px; margin: 0 auto; padding: 0 30px; text-align: center; }
+  .ob-ingredients__icon { font-size: 30px; margin-bottom: 15px; color: #c9a96e; }
+  .ob-ingredients__title { font-family: 'Georgia', serif; font-size: 28px; color: #2d2a24; margin-bottom: 40px; }
+  .ob-ingredients__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  @media (max-width: 768px) { .ob-ingredients__grid { grid-template-columns: 1fr; } }
+  .ob-ingredients__card { padding: 30px 20px; background: #faf5ef; border-radius: 16px; transition: transform 0.3s; }
+  .ob-ingredients__card:hover { transform: translateY(-5px); }
+  .ob-ingredients__card-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; background: #e8ddd0; display: inline-block; }
+  .ob-ingredients__card-title { font-family: 'Georgia', serif; font-size: 18px; color: #2d2a24; margin-bottom: 10px; }
+  .ob-ingredients__card-desc { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; line-height: 1.6; }
+</style>
+<section class="ob-ingredients">
+  <div class="ob-ingredients__container">
+    <div class="ob-ingredients__icon">✨</div>
+    <h2 class="ob-ingredients__title">{{ section.settings.title }}</h2>
+    <div class="ob-ingredients__grid">
+      {% for block in section.blocks %}
+        <div class="ob-ingredients__card" {{ block.shopify_attributes }}>
+          {% if block.settings.image %}
+            <img src="{{ block.settings.image | image_url: width: 150 }}" alt="{{ block.settings.title | escape }}" class="ob-ingredients__card-img">
+          {% else %}
+            <div class="ob-ingredients__card-img"></div>
+          {% endif %}
+          <h3 class="ob-ingredients__card-title">{{ block.settings.title }}</h3>
+          <p class="ob-ingredients__card-desc">{{ block.settings.desc }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "OB Key Ingredients", "tag": "section",
+  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Hero Ingredients" }],
+  "blocks": [{ "type": "ingredient", "name": "Ingredient", "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "title", "label": "Name", "default": "Hyaluronic Acid" },
+    { "type": "textarea", "id": "desc", "label": "Description", "default": "Deeply hydrates and plumps the skin for a youthful glow." }
+  ]}],
+  "presets": [{ "name": "OB Key Ingredients", "blocks": [
+    { "type": "ingredient", "settings": { "title": "Vitamin C", "desc": "Brightens complexion and evens out skin tone." }},
+    { "type": "ingredient", "settings": { "title": "Squalane", "desc": "Locks in essential moisture without feeling heavy." }},
+    { "type": "ingredient", "settings": { "title": "Rosehip Oil", "desc": "Rich in antioxidants to protect and repair." }}
+  ] }]
+}
+{% endschema %}

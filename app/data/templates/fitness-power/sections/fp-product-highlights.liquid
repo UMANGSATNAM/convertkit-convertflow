@@ -1,0 +1,56 @@
+<style>
+  .fp-highlights { padding: 100px 0; background: #000; border-top: 1px solid #222; }
+  .fp-highlights__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+  .fp-highlights__header { text-align: center; margin-bottom: 60px; }
+  .fp-highlights__eyebrow { font-family: 'Inter', sans-serif; font-size: 14px; color: {{ section.settings.accent_color }}; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; }
+  .fp-highlights__title { font-family: 'Inter', sans-serif; font-size: 48px; font-weight: 900; color: #fff; text-transform: uppercase; margin: 0; line-height: 1; letter-spacing: -2px; }
+  .fp-highlights__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+  @media (max-width: 1024px) { .fp-highlights__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .fp-highlights__grid { grid-template-columns: 1fr; } }
+  .fp-prod-card { text-decoration: none; display: block; background: #0a0a0a; border: 1px solid #222; transition: all 0.3s; position: relative; }
+  .fp-prod-card:hover { border-color: {{ section.settings.accent_color }}; transform: translateY(-5px); }
+  .fp-prod-card__img { aspect-ratio: 1; overflow: hidden; background: #111; position: relative; }
+  .fp-prod-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; opacity: 0.8; }
+  .fp-prod-card:hover .fp-prod-card__img img { transform: scale(1.1); opacity: 1; }
+  .fp-prod-card__badge { position: absolute; top: 10px; left: 10px; background: {{ section.settings.accent_color }}; color: #fff; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .fp-prod-card__info { padding: 20px; }
+  .fp-prod-card__name { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: -0.5px; }
+  .fp-prod-card__price { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #aaa; display: flex; align-items: center; gap: 10px; }
+  .fp-prod-card__compare { color: #555; text-decoration: line-through; font-size: 14px; }
+</style>
+<section class="fp-highlights">
+  <div class="fp-highlights__container">
+    <div class="fp-highlights__header">
+      <span class="fp-highlights__eyebrow">{{ section.settings.subtitle }}</span>
+      <h2 class="fp-highlights__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="fp-highlights__grid">
+      {% assign col = collections[section.settings.collection] %}
+      {% for product in col.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="fp-prod-card">
+          <div class="fp-prod-card__img">
+            {% if product.compare_at_price > product.price %}<div class="fp-prod-card__badge">Sale</div>{% endif %}
+            {% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <div class="fp-prod-card__info">
+            <h3 class="fp-prod-card__name">{{ product.title }}</h3>
+            <div class="fp-prod-card__price">{{ product.price | money }}{% if product.compare_at_price > product.price %}<span class="fp-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FP Product Highlights", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Top Performers" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Best Sellers" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 12, "step": 4, "default": 4 },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff2a2a" }
+  ],
+  "presets": [{ "name": "FP Product Highlights" }]
+}
+{% endschema %}

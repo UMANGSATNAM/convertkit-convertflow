@@ -1,0 +1,40 @@
+<style>
+  .pj-comp { padding: 60px 0; background: #fff; border-top: 2px dashed #eee; }
+  .pj-comp__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .pj-comp__title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: #333; margin-bottom: 30px; text-align: center; }
+  .pj-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  @media (max-width: 900px) { .pj-comp__grid { grid-template-columns: repeat(2, 1fr); } }
+  .pj-comp-card { text-decoration: none; display: block; background: #fdf8f5; border-radius: 20px; padding: 15px; transition: transform 0.3s; }
+  .pj-comp-card:hover { transform: translateY(-5px); }
+  .pj-comp-card__img { aspect-ratio: 1; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
+  .pj-comp-card__img img { width: 100%; height: 100%; object-fit: cover; }
+  .pj-comp-card__info { text-align: center; }
+  .pj-comp-card__title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #333; margin-bottom: 5px; }
+  .pj-comp-card__price { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #ff9f1c; }
+</style>
+<section class="pj-comp">
+  <div class="pj-comp__container">
+    <h2 class="pj-comp__title">{{ section.settings.title }}</h2>
+    <div class="pj-comp__grid">
+      {% for product in recommendations.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="pj-comp-card">
+          <div class="pj-comp-card__img"><img src="{{ product.featured_image | image_url: width: 300 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
+          <div class="pj-comp-card__info">
+            <div class="pj-comp-card__title">{{ product.title }}</div>
+            <div class="pj-comp-card__price">{{ product.price | money }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "PJ Complementary", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Perfect Pairs" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 8, "step": 4, "default": 4 }
+  ],
+  "presets": [{ "name": "PJ Complementary" }]
+}
+{% endschema %}

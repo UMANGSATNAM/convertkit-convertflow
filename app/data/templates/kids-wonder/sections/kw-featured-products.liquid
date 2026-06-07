@@ -1,0 +1,57 @@
+<style>
+  .kw-featured { padding: 80px 0; background: #F7FFF7; }
+  .kw-featured__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  .kw-featured__header { text-align: center; margin-bottom: 50px; }
+  .kw-featured__title { font-family: 'Fredoka One', cursive; font-size: 42px; color: #2d3748; margin-bottom: 15px; }
+  .kw-featured__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+  @media (max-width: 1024px) { .kw-featured__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .kw-featured__grid { grid-template-columns: 1fr; } }
+  .kw-prod-card { display: flex; flex-direction: column; text-decoration: none; background: #fff; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; position: relative; border: 3px solid #fff; }
+  .kw-prod-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: #4ECDC4; z-index: 2; }
+  .kw-prod-card__img-wrapper { aspect-ratio: 1; overflow: hidden; position: relative; background: #F7FFF7; padding: 20px; }
+  .kw-prod-card__img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform 0.5s ease; }
+  .kw-prod-card:hover .kw-prod-card__img { transform: scale(1.1) rotate(2deg); }
+  .kw-prod-card__badge { position: absolute; top: 15px; left: 15px; background: #FF6B6B; color: #fff; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(255,107,107,0.3); z-index: 2; transform: rotate(-5deg); }
+  .kw-prod-card__info { padding: 25px; display: flex; flex-direction: column; flex: 1; background: #fff; }
+  .kw-prod-card__name { font-family: 'Fredoka One', cursive; font-size: 18px; color: #2d3748; margin-bottom: 10px; line-height: 1.3; }
+  .kw-prod-card__bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+  .kw-prod-card__price { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; color: #FF6B6B; }
+  .kw-prod-card__add { width: 44px; height: 44px; border-radius: 50%; background: #FFE66D; color: #2d3748; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: background 0.3s, transform 0.2s; font-weight: 800; box-shadow: 0 4px 10px rgba(255,230,109,0.4); }
+  .kw-prod-card:hover .kw-prod-card__add { background: #4ECDC4; color: #fff; transform: scale(1.1) rotate(90deg); box-shadow: 0 4px 10px rgba(78,205,196,0.4); }
+</style>
+<section class="kw-featured">
+  <div class="kw-featured__container">
+    <div class="kw-featured__header">
+      <h2 class="kw-featured__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="kw-featured__grid">
+      {% assign col = collections[section.settings.collection] %}
+      {% for product in col.products limit: section.settings.limit %}
+        <a href="{{ product.url }}" class="kw-prod-card">
+          <div class="kw-prod-card__img-wrapper">
+            {% if product.compare_at_price > product.price %}<div class="kw-prod-card__badge">Sale!</div>{% endif %}
+            {% if product.featured_image %}<img class="kw-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
+          </div>
+          <div class="kw-prod-card__info">
+            <h3 class="kw-prod-card__name">{{ product.title }}</h3>
+            <div class="kw-prod-card__bottom">
+              <div class="kw-prod-card__price">{{ product.price | money }}</div>
+              <div class="kw-prod-card__add">+</div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "KW Featured Products", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Top Toys of the Week 🌟" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 12, "step": 4, "default": 4 }
+  ],
+  "presets": [{ "name": "KW Featured Products" }]
+}
+{% endschema %}

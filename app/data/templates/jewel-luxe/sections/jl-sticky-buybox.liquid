@@ -1,0 +1,42 @@
+<style>
+  .jl-buybox { position: sticky; top: 120px; padding: 40px; background: #0a0a0a; border: 1px solid #1a1a1a; }
+  .jl-buybox__vendor { font-family: 'Montserrat', sans-serif; font-size: 11px; color: #d4af37; text-transform: uppercase; letter-spacing: 3px; font-weight: 500; margin-bottom: 20px; }
+  .jl-buybox__title { font-family: 'Cinzel', serif; font-size: 32px; font-weight: 400; color: #fff; line-height: 1.2; margin-bottom: 15px; }
+  .jl-buybox__price { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 300; color: #fff; margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+  .jl-buybox__compare { color: #666; text-decoration: line-through; font-size: 16px; }
+  .jl-buybox__variants { margin-bottom: 30px; border-top: 1px solid #1a1a1a; padding-top: 30px; }
+  .jl-buybox__variant-label { font-family: 'Montserrat', sans-serif; font-size: 11px; color: #999; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
+  .jl-buybox__variant-select { width: 100%; padding: 15px; background: #111; border: 1px solid #222; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px; cursor: pointer; outline: none; transition: border-color 0.3s; margin-bottom: 20px; }
+  .jl-buybox__variant-select:focus { border-color: #d4af37; }
+  .jl-buybox__add-btn { width: 100%; padding: 20px; background: #d4af37; color: #000; border: none; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: opacity 0.3s; }
+  .jl-buybox__add-btn:hover { opacity: 0.9; }
+  .jl-buybox__meta { margin-top: 30px; padding-top: 20px; border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; gap: 15px; }
+  .jl-buybox__meta-item { font-family: 'Montserrat', sans-serif; font-size: 12px; color: #999; display: flex; align-items: center; gap: 10px; }
+  .jl-buybox__meta-icon { font-size: 14px; color: #d4af37; }
+</style>
+<div class="jl-buybox">
+  <div class="jl-buybox__vendor">{{ product.vendor }}</div>
+  <h1 class="jl-buybox__title">{{ product.title }}</h1>
+  <div class="jl-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="jl-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
+  {% form 'product', product %}
+    {% unless product.has_only_default_variant %}
+      <div class="jl-buybox__variants">
+        {% for option in product.options_with_values %}
+          <label class="jl-buybox__variant-label">{{ option.name }}</label>
+          <select name="id" class="jl-buybox__variant-select">
+            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
+          </select>
+        {% endfor %}
+      </div>
+    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
+    <button type="submit" class="jl-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Add to Cart{% else %}Out of Stock{% endif %}</button>
+  {% endform %}
+  <div class="jl-buybox__meta">
+    <div class="jl-buybox__meta-item"><span class="jl-buybox__meta-icon">✦</span> Secure Delivery via Courier</div>
+    <div class="jl-buybox__meta-item"><span class="jl-buybox__meta-icon">✦</span> Authenticity Guaranteed</div>
+    <div class="jl-buybox__meta-item"><span class="jl-buybox__meta-icon">✦</span> Complimentary Engraving Available</div>
+  </div>
+</div>
+{% schema %}
+{ "name": "JL Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "JL Sticky Buybox" }] }
+{% endschema %}

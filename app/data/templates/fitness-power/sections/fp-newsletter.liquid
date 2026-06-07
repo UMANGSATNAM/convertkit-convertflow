@@ -1,0 +1,38 @@
+<style>
+  .fp-newsletter { padding: 100px 0; background: #ff2a2a; position: relative; overflow: hidden; }
+  .fp-newsletter::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px); z-index: 1; }
+  .fp-newsletter__container { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; padding: 0 30px; text-align: center; }
+  .fp-newsletter__title { font-family: 'Inter', sans-serif; font-size: clamp(36px, 5vw, 54px); font-weight: 900; color: #fff; text-transform: uppercase; margin: 0 0 15px 0; line-height: 1; letter-spacing: -1px; }
+  .fp-newsletter__text { font-family: 'Inter', sans-serif; font-size: 16px; color: #fff; margin-bottom: 40px; font-weight: 600; }
+  .fp-newsletter__form { display: flex; max-width: 500px; margin: 0 auto; }
+  @media (max-width: 600px) { .fp-newsletter__form { flex-direction: column; gap: 10px; } }
+  .fp-newsletter__input { flex: 1; padding: 18px 25px; background: #000; border: none; font-family: 'Inter', sans-serif; font-size: 15px; color: #fff; outline: none; text-transform: uppercase; }
+  .fp-newsletter__input::placeholder { color: #555; }
+  .fp-newsletter__btn { padding: 18px 30px; background: #fff; color: #ff2a2a; border: none; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s; }
+  .fp-newsletter__btn:hover { background: #000; color: #fff; }
+</style>
+<section class="fp-newsletter">
+  <div class="fp-newsletter__container">
+    <h2 class="fp-newsletter__title">{{ section.settings.title }}</h2>
+    <div class="fp-newsletter__text">{{ section.settings.text }}</div>
+    {% form 'customer' %}
+      <div class="fp-newsletter__form">
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <input type="email" name="contact[email]" class="fp-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
+        <button type="submit" class="fp-newsletter__btn">{{ section.settings.btn_label }}</button>
+      </div>
+    {% endform %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FP Newsletter", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Squad" },
+    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Sign up for exclusive drops and workout tips.</p>" },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Email Address" },
+    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" }
+  ],
+  "presets": [{ "name": "FP Newsletter" }]
+}
+{% endschema %}

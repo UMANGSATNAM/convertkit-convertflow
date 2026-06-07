@@ -1,0 +1,69 @@
+<style>
+  .kw-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45,55,72,0.4); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+  .kw-drawer-overlay.active { opacity: 1; visibility: visible; }
+  .kw-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100%; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 1000; transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; border-top-left-radius: 40px; border-bottom-left-radius: 40px; }
+  .kw-drawer.active { right: 0; }
+  .kw-drawer__header { display: flex; justify-content: space-between; align-items: center; padding: 30px; border-bottom: 4px dashed #F7FFF7; background: #FFE66D; border-top-left-radius: 40px; }
+  .kw-drawer__title { font-family: 'Fredoka One', cursive; font-size: 28px; color: #2d3748; margin: 0; }
+  .kw-drawer__close { background: #fff; border: none; color: #FF6B6B; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; font-family: 'Nunito', sans-serif; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .kw-drawer__close:hover { transform: rotate(90deg) scale(1.1); }
+  .kw-drawer__body { flex: 1; overflow-y: auto; padding: 30px; background: #fff; }
+  .kw-drawer__empty { text-align: center; padding: 60px 20px; font-family: 'Nunito', sans-serif; font-size: 18px; color: #718096; font-weight: 700; }
+  .kw-drawer__item { display: flex; gap: 20px; padding: 20px; background: #F7FFF7; border-radius: 20px; margin-bottom: 15px; border: 3px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.03); transition: transform 0.2s; }
+  .kw-drawer__item:hover { transform: translateY(-3px); border-color: #4ECDC4; }
+  .kw-drawer__item-img { width: 80px; height: 80px; object-fit: contain; background: #fff; border-radius: 15px; padding: 5px; }
+  .kw-drawer__item-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .kw-drawer__item-name { font-family: 'Fredoka One', cursive; font-size: 16px; color: #2d3748; margin-bottom: 5px; line-height: 1.2; }
+  .kw-drawer__item-price { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #FF6B6B; margin-bottom: 10px; }
+  .kw-drawer__item-qty { display: flex; align-items: center; background: #fff; border-radius: 15px; width: fit-content; padding: 2px; }
+  .kw-drawer__qty-btn { width: 28px; height: 28px; background: #FFE66D; border: none; border-radius: 10px; color: #2d3748; cursor: pointer; font-family: 'Fredoka One', cursive; transition: background 0.2s; }
+  .kw-drawer__qty-btn:hover { background: #FF6B6B; color: #fff; }
+  .kw-drawer__qty-val { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; color: #2d3748; min-width: 30px; text-align: center; }
+  .kw-drawer__footer { padding: 30px; background: #F7FFF7; border-top: 4px dashed #fff; border-bottom-left-radius: 40px; }
+  .kw-drawer__total { display: flex; justify-content: space-between; margin-bottom: 25px; align-items: center; }
+  .kw-drawer__total-label { font-family: 'Nunito', sans-serif; font-size: 18px; color: #4a5568; font-weight: 800; }
+  .kw-drawer__total-value { font-family: 'Fredoka One', cursive; font-size: 28px; color: #FF6B6B; }
+  .kw-drawer__checkout { display: flex; align-items: center; justify-content: center; width: 100%; padding: 20px; background: #4ECDC4; color: #fff; border: none; border-radius: 30px; font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 20px rgba(78,205,196,0.3); }
+  .kw-drawer__checkout:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(78,205,196,0.4); }
+</style>
+<div class="kw-drawer-overlay" id="kw-cart-overlay" onclick="document.getElementById('kw-cart-drawer').classList.remove('active'); this.classList.remove('active');"></div>
+<aside class="kw-drawer" id="kw-cart-drawer">
+  <div class="kw-drawer__header">
+    <h3 class="kw-drawer__title">Magic Bag 🎁</h3>
+    <button class="kw-drawer__close" onclick="document.getElementById('kw-cart-drawer').classList.remove('active'); document.getElementById('kw-cart-overlay').classList.remove('active');">✕</button>
+  </div>
+  <div class="kw-drawer__body">
+    {% if cart.item_count == 0 %}
+      <div class="kw-drawer__empty">Oh no! Your bag is empty.<br><br>Let's go find some toys! 🎈</div>
+    {% else %}
+      {% for item in cart.items %}
+        <div class="kw-drawer__item">
+          <img class="kw-drawer__item-img" src="{{ item.image | image_url: width: 160 }}" alt="{{ item.title | escape }}">
+          <div class="kw-drawer__item-info">
+            <div>
+              <div class="kw-drawer__item-name">{{ item.product.title }}</div>
+              <div class="kw-drawer__item-price">{{ item.final_line_price | money }}</div>
+            </div>
+            <div class="kw-drawer__item-qty">
+              <button class="kw-drawer__qty-btn">−</button>
+              <div class="kw-drawer__qty-val">{{ item.quantity }}</div>
+              <button class="kw-drawer__qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% if cart.item_count > 0 %}
+    <div class="kw-drawer__footer">
+      <div class="kw-drawer__total">
+        <span class="kw-drawer__total-label">Subtotal</span>
+        <span class="kw-drawer__total-value">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkout" class="kw-drawer__checkout">Checkout Now 🚀</a>
+    </div>
+  {% endif %}
+</aside>
+{% schema %}
+{ "name": "KW Drawer Cart", "tag": "section", "settings": [], "presets": [{ "name": "KW Drawer Cart" }] }
+{% endschema %}

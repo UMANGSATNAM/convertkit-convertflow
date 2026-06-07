@@ -1,0 +1,51 @@
+<style>
+  .fp-guide { padding: 100px 0; background: #000; border-top: 1px solid #222; }
+  .fp-guide__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; text-align: center; }
+  .fp-guide__eyebrow { font-family: 'Inter', sans-serif; font-size: 14px; color: {{ section.settings.accent_color }}; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
+  .fp-guide__title { font-family: 'Inter', sans-serif; font-size: 48px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 50px; letter-spacing: -2px; }
+  .fp-guide__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: left; }
+  @media (max-width: 900px) { .fp-guide__grid { grid-template-columns: 1fr; } }
+  .fp-guide__card { background: #0a0a0a; border: 1px solid #222; padding: 40px; position: relative; overflow: hidden; transition: all 0.3s; }
+  .fp-guide__card:hover { border-color: {{ section.settings.accent_color }}; transform: translateY(-5px); }
+  .fp-guide__step { font-family: 'Inter', sans-serif; font-size: 80px; font-weight: 900; color: #111; position: absolute; top: 10px; right: 20px; line-height: 1; z-index: 0; transition: color 0.3s; }
+  .fp-guide__card:hover .fp-guide__step { color: #222; }
+  .fp-guide__card-content { position: relative; z-index: 1; }
+  .fp-guide__card-title { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 15px; letter-spacing: -0.5px; }
+  .fp-guide__card-desc { font-family: 'Inter', sans-serif; font-size: 15px; color: #aaa; line-height: 1.6; font-weight: 500; }
+</style>
+<section class="fp-guide">
+  <div class="fp-guide__container">
+    <span class="fp-guide__eyebrow">{{ section.settings.subtitle }}</span>
+    <h2 class="fp-guide__title">{{ section.settings.title }}</h2>
+    <div class="fp-guide__grid">
+      {% for block in section.blocks %}
+        <div class="fp-guide__card" {{ block.shopify_attributes }}>
+          <div class="fp-guide__step">{{ forloop.index }}</div>
+          <div class="fp-guide__card-content">
+            <h3 class="fp-guide__card-title">{{ block.settings.title }}</h3>
+            <p class="fp-guide__card-desc">{{ block.settings.desc }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FP Workout Guide", "tag": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "How to Use" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "The Protocol" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff2a2a" }
+  ],
+  "blocks": [{ "type": "step", "name": "Step", "settings": [
+    { "type": "text", "id": "title", "label": "Step Title", "default": "Pre-Workout" },
+    { "type": "textarea", "id": "desc", "label": "Description", "default": "Take 20 minutes before training to maximize energy and focus." }
+  ]}],
+  "presets": [{ "name": "FP Workout Guide", "blocks": [
+    { "type": "step", "settings": { "title": "Prep", "desc": "Mix one scoop with 8oz of water 30 mins before training." }},
+    { "type": "step", "settings": { "title": "Perform", "desc": "Experience sustained energy and peak power output during your session." }},
+    { "type": "step", "settings": { "title": "Recover", "desc": "Follow up with protein to rebuild muscle tissue faster." }}
+  ] }]
+}
+{% endschema %}

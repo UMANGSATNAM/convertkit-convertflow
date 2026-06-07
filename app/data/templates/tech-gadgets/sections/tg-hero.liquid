@@ -1,0 +1,143 @@
+<style>
+  .tg-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #0a0a0a;
+  }
+  .tg-hero__image {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    filter: brightness(0.4) contrast(1.2);
+  }
+  .tg-hero__overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(10,10,10,0.9) 0%, rgba(26,26,46,0.7) 50%, rgba(0,240,255,0.1) 100%);
+    z-index: 2;
+  }
+  .tg-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 30px;
+  }
+  .tg-hero__badge {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: {{ section.settings.accent_color }};
+    border: 1px solid {{ section.settings.accent_color }};
+    padding: 6px 20px;
+    margin-bottom: 30px;
+    animation: tg-pulse 2s ease-in-out infinite;
+  }
+  .tg-hero__title {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(36px, 7vw, 80px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+  }
+  .tg-hero__title span {
+    color: {{ section.settings.accent_color }};
+    text-shadow: 0 0 30px {{ section.settings.accent_color }}40;
+  }
+  .tg-hero__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #a0a0a0;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tg-hero__cta {
+    display: inline-block;
+    background: {{ section.settings.accent_color }};
+    color: #0a0a0a;
+    padding: 16px 48px;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 25px {{ section.settings.accent_color }}40;
+  }
+  .tg-hero__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px {{ section.settings.accent_color }}60;
+  }
+  .tg-hero__grid-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  @keyframes tg-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+</style>
+
+<section class="tg-hero">
+  {% if section.settings.image %}
+    <img class="tg-hero__image" src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="eager">
+  {% endif %}
+  <div class="tg-hero__grid-bg"></div>
+  <div class="tg-hero__overlay"></div>
+  <div class="tg-hero__content">
+    {% if section.settings.badge != blank %}
+      <div class="tg-hero__badge">{{ section.settings.badge }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
+      <h1 class="tg-hero__title">{{ section.settings.title }}</h1>
+    {% endif %}
+    {% if section.settings.subtitle != blank %}
+      <p class="tg-hero__subtitle">{{ section.settings.subtitle }}</p>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="tg-hero__cta">{{ section.settings.btn_label }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TG Hero Banner",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Background Image" },
+    { "type": "text", "id": "badge", "label": "Badge Text", "default": "New Release" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Next-Gen Tech" },
+    { "type": "text", "id": "subtitle", "label": "Subheading", "default": "Discover cutting-edge electronics engineered for the future" },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Now" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#00f0ff" }
+  ],
+  "presets": [{ "name": "TG Hero Banner" }]
+}
+{% endschema %}

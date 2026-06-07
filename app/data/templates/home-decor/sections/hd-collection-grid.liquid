@@ -1,0 +1,32 @@
+<style>
+  .hd-grid { padding: 60px 0; background: #ffffff; }
+  .hd-grid__header { margin-bottom: 60px; text-align: center; }
+  .hd-grid__title { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 400; color: #2c2c2c; margin-bottom: 15px; }
+  .hd-grid__desc { font-family: 'Inter', sans-serif; font-size: 16px; color: #666; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .hd-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  @media (max-width: 900px) { .hd-grid__layout { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  @media (max-width: 600px) { .hd-grid__layout { grid-template-columns: 1fr; } }
+</style>
+<div class="hd-grid">
+  <div class="hd-grid__header">
+    <h1 class="hd-grid__title">{{ collection.title }}</h1>
+    {% if collection.description %}<div class="hd-grid__desc">{{ collection.description }}</div>{% endif %}
+  </div>
+  <div class="hd-grid__layout">
+    {% for product in collection.products %}
+      <a href="{{ product.url }}" class="hd-prod-card">
+        <div class="hd-prod-card__img-wrapper">
+          {% if product.compare_at_price > product.price %}<div class="hd-prod-card__badge">Sale</div>{% endif %}
+          <img class="hd-prod-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
+        </div>
+        <div class="hd-prod-card__info">
+          <h3 class="hd-prod-card__name">{{ product.title }}</h3>
+          <div class="hd-prod-card__price">{% if product.compare_at_price > product.price %}<span class="hd-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{ "name": "HD Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "HD Collection Grid" }] }
+{% endschema %}

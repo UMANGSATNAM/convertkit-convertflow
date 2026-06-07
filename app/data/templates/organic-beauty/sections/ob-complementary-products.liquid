@@ -1,0 +1,30 @@
+<style>
+  .ob-comp { padding: 60px 0; background: #faf5ef; }
+  .ob-comp__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+  .ob-comp__title { font-family: 'Georgia', serif; font-size: 24px; color: #2d2a24; text-align: center; margin-bottom: 35px; }
+  .ob-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  @media (max-width: 768px) { .ob-comp__grid { grid-template-columns: repeat(2, 1fr); } }
+  .ob-comp-card { text-decoration: none; display: block; }
+  .ob-comp-card__img { aspect-ratio: 1; border-radius: 12px; overflow: hidden; margin-bottom: 12px; background: #f0e8dc; }
+  .ob-comp-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+  .ob-comp-card:hover .ob-comp-card__img img { transform: scale(1.05); }
+  .ob-comp-card__name { font-family: 'Inter', sans-serif; font-size: 13px; color: #2d2a24; margin-bottom: 4px; }
+  .ob-comp-card__price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2d2a24; }
+</style>
+<section class="ob-comp">
+  <div class="ob-comp__container">
+    <h2 class="ob-comp__title">{{ section.settings.title }}</h2>
+    <div class="ob-comp__grid">
+      {% for product in recommendations.products limit: 4 %}
+        <a href="{{ product.url }}" class="ob-comp-card">
+          <div class="ob-comp-card__img">{% if product.featured_image %}<img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}</div>
+          <div class="ob-comp-card__name">{{ product.title }}</div>
+          <div class="ob-comp-card__price">{{ product.price | money }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "OB Complementary Products", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Complete Your Routine" }], "presets": [{ "name": "OB Complementary Products" }] }
+{% endschema %}
