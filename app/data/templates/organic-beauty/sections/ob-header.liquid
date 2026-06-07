@@ -1,34 +1,239 @@
 <style>
-  .ob-header { position: sticky; top: 0; width: 100%; background: rgba(250, 245, 239, 0.95); backdrop-filter: blur(10px); z-index: 500; border-bottom: 1px solid rgba(201, 169, 110, 0.2); }
-  .ob-header__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
-  .ob-header__nav { display: flex; gap: 30px; }
-  @media (max-width: 768px) { .ob-header__nav { display: none; } }
-  .ob-header__nav a { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #2d2a24; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
-  .ob-header__nav a:hover { color: #c9a96e; }
-  .ob-header__logo { font-family: 'Georgia', serif; font-size: 24px; color: #2d2a24; text-decoration: none; font-weight: normal; letter-spacing: 2px; }
-  .ob-header__logo span { color: #c9a96e; }
-  .ob-header__icons { display: flex; align-items: center; gap: 20px; }
-  .ob-header__icon { background: none; border: none; color: #2d2a24; font-size: 20px; cursor: pointer; transition: color 0.3s; text-decoration: none; }
-  .ob-header__icon:hover { color: #c9a96e; }
-  .ob-header__cart-count { background: #c9a96e; color: #fff; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; vertical-align: top; margin-left: -5px; }
+  :root {
+    --ob-font-serif: 'Playfair Display', serif;
+    --ob-font-sans: 'Inter', sans-serif;
+    --ob-color-bg: #ffffff;
+    --ob-color-text: #000000;
+    --ob-color-subdued: #666666;
+    --ob-color-border: #eeeeee;
+    --ob-color-accent: #f5f5f5;
+    --ob-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  body {
+    font-family: var(--ob-font-sans);
+    color: var(--ob-color-text);
+    background: var(--ob-color-bg);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fade-in Animation Classes */
+  .ob-animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ob-animate-fade-up.ob-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee Announcement Bar */
+  .ob-announcement {
+    background: #000;
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1000;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .ob-announcement__track {
+    display: flex;
+    white-space: nowrap;
+    animation: ob-marquee 20s linear infinite;
+  }
+  .ob-announcement__track:hover {
+    animation-play-state: paused;
+  }
+  .ob-announcement__item {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes ob-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glassmorphism Header */
+  .ob-header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    transition: var(--ob-transition);
+  }
+  .ob-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--ob-transition);
+  }
+  .ob-header.ob-scrolled {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+  .ob-header__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--ob-transition);
+  }
+  .ob-header.ob-scrolled .ob-header__container {
+    padding: 10px 40px;
+  }
+  .ob-nav {
+    display: flex;
+    gap: 40px;
+  }
+  .ob-nav a {
+    text-decoration: none;
+    color: var(--ob-color-text);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .ob-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: var(--ob-transition);
+  }
+  .ob-nav a:hover::after {
+    width: 100%;
+  }
+  .ob-logo {
+    font-family: var(--ob-font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .ob-icons {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .ob-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #000;
+    transition: transform 0.3s ease;
+  }
+  .ob-icon-btn:hover {
+    transform: scale(1.1);
+  }
+  .ob-cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .ob-nav { display: none; }
+    .ob-header__container { padding: 15px 20px; }
+  }
 </style>
-<header class="ob-header">
-  <div class="ob-header__container">
-    <nav class="ob-header__nav">
-      {% for link in linklists.main-menu.links %}
-        <a href="{{ link.url }}">{{ link.title }}</a>
-      {% endfor %}
-    </nav>
-    <a href="/" class="ob-header__logo">{{ section.settings.logo_text | split: ' ' | first }} <span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
-    <div class="ob-header__icons">
-      <a href="/search" class="ob-header__icon">🔍</a>
-      <a href="/account" class="ob-header__icon">👤</a>
-      <button class="ob-header__icon" onclick="document.getElementById('ob-cart-drawer').classList.add('active'); document.getElementById('ob-cart-overlay').classList.add('active');">
-        🛍️<span class="ob-header__cart-count">{{ cart.item_count }}</span>
-      </button>
+
+<div class="ob-header-wrapper">
+  <!-- Announcement Bar -->
+  <div class="ob-announcement">
+    <div class="ob-announcement__track">
+      <div class="ob-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="ob-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="ob-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="ob-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="ob-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="ob-announcement__item">🏆 10,000+ Five Star Reviews</div>
     </div>
   </div>
-</header>
+
+  <header class="ob-header" id="ob-header">
+    <div class="ob-header__container">
+      <nav class="ob-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      
+      <a href="/" class="ob-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      
+      <div class="ob-icons">
+        <button class="ob-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="ob-icon-btn" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="ob-icon-btn" onclick="document.getElementById('ob-cart-drawer').classList.add('active'); document.getElementById('ob-cart-overlay').classList.add('active');">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="ob-cart-count">{{ cart.item_count }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('ob-header');
+    if (window.scrollY > 50) {
+      header.classList.add('ob-scrolled');
+    } else {
+      header.classList.remove('ob-scrolled');
+    }
+
+    // Scroll Animations
+    const elements = document.querySelectorAll('.ob-animate-fade-up');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.classList.add('ob-in-view');
+      }
+    });
+  });
+</script>
+
 {% schema %}
-{ "name": "OB Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Organic Beauty" }], "presets": [{ "name": "OB Header" }] }
+{
+  "name": "Premium Header",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
+  ]
+}
 {% endschema %}

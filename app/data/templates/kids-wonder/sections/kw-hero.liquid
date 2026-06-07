@@ -1,46 +1,207 @@
 <style>
-  .kw-hero { padding: 40px; background: #F7FFF7; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
-  .kw-hero__container { max-width: 1200px; margin: 0 auto; background: {{ section.settings.bg_color }}; border-radius: 40px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
-  @media (max-width: 900px) { .kw-hero__container { grid-template-columns: 1fr; border-radius: 30px; } }
-  .kw-hero__content { padding: 80px; position: relative; z-index: 2; }
-  @media (max-width: 900px) { .kw-hero__content { padding: 50px 30px; text-align: center; } }
-  .kw-hero__badge { display: inline-block; background: #fff; color: #FF6B6B; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 10px 20px; border-radius: 30px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(255,107,107,0.15); transform: rotate(-3deg); }
-  .kw-hero__title { font-family: 'Fredoka One', cursive; font-size: clamp(40px, 6vw, 64px); color: #2d3748; line-height: 1.1; margin-bottom: 25px; text-shadow: 2px 2px 0px #fff; }
-  .kw-hero__desc { font-family: 'Nunito', sans-serif; font-size: 20px; color: #4a5568; line-height: 1.5; margin-bottom: 40px; font-weight: 600; }
-  .kw-hero__cta { display: inline-flex; align-items: center; justify-content: center; background: #FF6B6B; color: #fff; padding: 20px 40px; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; border-radius: 30px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 15px 30px rgba(255,107,107,0.3); border: 4px solid #fff; }
-  .kw-hero__cta:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 40px rgba(255,107,107,0.4); }
-  .kw-hero__image-wrap { height: 100%; position: relative; min-height: 500px; }
-  .kw-hero__image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; right: 0; }
-  .kw-hero__shape { position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: #FFE66D; border-radius: 50%; opacity: 0.5; z-index: 1; filter: blur(40px); }
-  .kw-hero__shape2 { position: absolute; bottom: -50px; left: -50px; width: 300px; height: 300px; background: #4ECDC4; border-radius: 50%; opacity: 0.4; z-index: 1; filter: blur(50px); }
+  .kw-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .kw-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%; /* For parallax */
+    object-fit: cover;
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .kw-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+  .kw-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    z-index: 2;
+  }
+  .kw-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    max-width: 900px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .kw-hero__subtitle {
+    font-family: var(--kw-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: kw-hero-fade 1s forwards 0.3s;
+  }
+  .kw-hero__title {
+    font-family: var(--kw-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: kw-hero-fade 1s forwards 0.5s;
+  }
+  .kw-hero__btn {
+    display: inline-block;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    padding: 18px 50px;
+    text-decoration: none;
+    font-family: var(--kw-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: kw-hero-fade 1s forwards 0.7s;
+  }
+  .kw-hero__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes kw-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="kw-hero">
-  <div class="kw-hero__container">
-    <div class="kw-hero__shape"></div>
-    <div class="kw-hero__shape2"></div>
-    <div class="kw-hero__content">
-      <div class="kw-hero__badge">{{ section.settings.badge }}</div>
+
+<section class="kw-hero" id="kw-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="kw-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="kw-hero__media kw-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
+  {% else %}
+    <div class="kw-hero__media" style="background-color: #222;"></div>
+  {% endif %}
+  
+  <div class="kw-hero__overlay"></div>
+  
+  <div class="kw-hero__content">
+    {% if section.settings.subtitle != blank %}
+      <div class="kw-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
       <h1 class="kw-hero__title">{{ section.settings.title }}</h1>
-      <p class="kw-hero__desc">{{ section.settings.desc }}</p>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="kw-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
-    </div>
-    <div class="kw-hero__image-wrap">
-      {% if section.settings.image %}<img class="kw-hero__image" src="{{ section.settings.image | image_url: width: 1000 }}" alt="Hero Image" loading="eager">{% else %}<div class="kw-hero__image" style="background: url('https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=1000&q=80') center/cover;"></div>{% endif %}
-    </div>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="kw-hero__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
   </div>
 </section>
+
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.kw-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "KW Hero", "tag": "section",
+  "name": "Premium Hero",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "badge", "label": "Badge Text", "default": "🎉 New Arrivals!" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Play, Learn & Grow" },
-    { "type": "text", "id": "desc", "label": "Description", "default": "Discover toys that spark imagination and bring endless smiles." },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Toys" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "bg_color", "label": "Card Background", "default": "#E8F4F8" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The New Standard"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Elevate Your Aesthetic"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "KW Hero" }]
+  "presets": [
+    {
+      "name": "Premium Hero"
+    }
+  ]
 }
 {% endschema %}

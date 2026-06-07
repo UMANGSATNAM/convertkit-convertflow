@@ -1,40 +1,207 @@
 <style>
-  .gs-hero { width: 100%; min-height: 90vh; display: flex; align-items: center; position: relative; overflow: hidden; background: #000; }
-  .gs-hero__bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; z-index: 1; }
-  .gs-hero__overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(17,17,17,1) 0%, rgba(17,17,17,0.4) 100%); z-index: 2; }
-  .gs-hero__container { max-width: 1200px; margin: 0 auto; padding: 40px; position: relative; z-index: 3; width: 100%; }
-  .gs-hero__content { max-width: 600px; }
-  .gs-hero__badge { display: inline-flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: {{ section.settings.accent_color }}; margin-bottom: 25px; }
-  .gs-hero__badge::before { content: ''; display: block; width: 30px; height: 1px; background: {{ section.settings.accent_color }}; }
-  .gs-hero__title { font-family: 'Oswald', sans-serif; font-size: clamp(50px, 8vw, 80px); font-weight: 700; color: #fff; line-height: 1.05; margin-bottom: 25px; text-transform: uppercase; }
-  .gs-hero__desc { font-family: 'Inter', sans-serif; font-size: 18px; color: #a0aec0; line-height: 1.6; margin-bottom: 40px; font-weight: 300; }
-  .gs-hero__cta { display: inline-flex; align-items: center; justify-content: center; background: {{ section.settings.accent_color }}; color: #000; padding: 18px 40px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; transition: background 0.3s, transform 0.2s; }
-  .gs-hero__cta:hover { background: #fff; transform: translateY(-2px); }
+  .gs-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .gs-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%; /* For parallax */
+    object-fit: cover;
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .gs-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+  .gs-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    z-index: 2;
+  }
+  .gs-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    max-width: 900px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gs-hero__subtitle {
+    font-family: var(--gs-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: gs-hero-fade 1s forwards 0.3s;
+  }
+  .gs-hero__title {
+    font-family: var(--gs-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: gs-hero-fade 1s forwards 0.5s;
+  }
+  .gs-hero__btn {
+    display: inline-block;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    padding: 18px 50px;
+    text-decoration: none;
+    font-family: var(--gs-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: gs-hero-fade 1s forwards 0.7s;
+  }
+  .gs-hero__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes gs-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="gs-hero">
-  {% if section.settings.bg_image %}<img class="gs-hero__bg" src="{{ section.settings.bg_image | image_url: width: 2000 }}" alt="" loading="eager">{% else %}<div class="gs-hero__bg" style="background: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=2000&q=80') center/cover;"></div>{% endif %}
+
+<section class="gs-hero" id="gs-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="gs-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="gs-hero__media gs-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
+  {% else %}
+    <div class="gs-hero__media" style="background-color: #222;"></div>
+  {% endif %}
+  
   <div class="gs-hero__overlay"></div>
-  <div class="gs-hero__container">
-    <div class="gs-hero__content">
-      <div class="gs-hero__badge">{{ section.settings.badge }}</div>
+  
+  <div class="gs-hero__content">
+    {% if section.settings.subtitle != blank %}
+      <div class="gs-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
       <h1 class="gs-hero__title">{{ section.settings.title }}</h1>
-      <p class="gs-hero__desc">{{ section.settings.desc }}</p>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="gs-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
-    </div>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="gs-hero__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
   </div>
 </section>
+
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.gs-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "GS Hero", "tag": "section",
+  "name": "Premium Hero",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "bg_image", "label": "Background Image" },
-    { "type": "text", "id": "badge", "label": "Badge Text", "default": "Premium Care" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Refine Your Routine" },
-    { "type": "text", "id": "desc", "label": "Description", "default": "Professional grade grooming essentials built for the modern man. Precision, quality, and performance." },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Collection" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The New Standard"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Elevate Your Aesthetic"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "GS Hero" }]
+  "presets": [
+    {
+      "name": "Premium Hero"
+    }
+  ]
 }
 {% endschema %}

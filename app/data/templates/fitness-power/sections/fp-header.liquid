@@ -1,34 +1,239 @@
 <style>
-  .fp-header { position: sticky; top: 0; width: 100%; background: #000; z-index: 500; border-bottom: 2px solid #222; }
-  .fp-header__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
-  .fp-header__nav { display: flex; gap: 40px; }
-  @media (max-width: 900px) { .fp-header__nav { display: none; } }
-  .fp-header__nav a { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
-  .fp-header__nav a:hover { color: {{ section.settings.accent_color }}; }
-  .fp-header__logo { font-family: 'Inter', sans-serif; font-size: 30px; color: #fff; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
-  .fp-header__logo span { color: {{ section.settings.accent_color }}; }
-  .fp-header__icons { display: flex; align-items: center; gap: 25px; }
-  .fp-header__icon { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; transition: color 0.3s; text-decoration: none; font-weight: 900; }
-  .fp-header__icon:hover { color: {{ section.settings.accent_color }}; }
-  .fp-header__cart-count { background: {{ section.settings.accent_color }}; color: #fff; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 800; padding: 3px 8px; vertical-align: top; margin-left: -5px; }
+  :root {
+    --fp-font-serif: 'Playfair Display', serif;
+    --fp-font-sans: 'Inter', sans-serif;
+    --fp-color-bg: #ffffff;
+    --fp-color-text: #000000;
+    --fp-color-subdued: #666666;
+    --fp-color-border: #eeeeee;
+    --fp-color-accent: #f5f5f5;
+    --fp-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  body {
+    font-family: var(--fp-font-sans);
+    color: var(--fp-color-text);
+    background: var(--fp-color-bg);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fade-in Animation Classes */
+  .fp-animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fp-animate-fade-up.fp-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee Announcement Bar */
+  .fp-announcement {
+    background: #000;
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1000;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .fp-announcement__track {
+    display: flex;
+    white-space: nowrap;
+    animation: fp-marquee 20s linear infinite;
+  }
+  .fp-announcement__track:hover {
+    animation-play-state: paused;
+  }
+  .fp-announcement__item {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes fp-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glassmorphism Header */
+  .fp-header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    transition: var(--fp-transition);
+  }
+  .fp-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--fp-transition);
+  }
+  .fp-header.fp-scrolled {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+  .fp-header__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--fp-transition);
+  }
+  .fp-header.fp-scrolled .fp-header__container {
+    padding: 10px 40px;
+  }
+  .fp-nav {
+    display: flex;
+    gap: 40px;
+  }
+  .fp-nav a {
+    text-decoration: none;
+    color: var(--fp-color-text);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .fp-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: var(--fp-transition);
+  }
+  .fp-nav a:hover::after {
+    width: 100%;
+  }
+  .fp-logo {
+    font-family: var(--fp-font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .fp-icons {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .fp-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #000;
+    transition: transform 0.3s ease;
+  }
+  .fp-icon-btn:hover {
+    transform: scale(1.1);
+  }
+  .fp-cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .fp-nav { display: none; }
+    .fp-header__container { padding: 15px 20px; }
+  }
 </style>
-<header class="fp-header">
-  <div class="fp-header__container">
-    <nav class="fp-header__nav">
-      {% for link in linklists.main-menu.links %}
-        <a href="{{ link.url }}">{{ link.title }}</a>
-      {% endfor %}
-    </nav>
-    <a href="/" class="fp-header__logo">{{ section.settings.logo_text | split: ' ' | first }}<span>{{ section.settings.logo_text | split: ' ' | last }}</span></a>
-    <div class="fp-header__icons">
-      <a href="/search" class="fp-header__icon">🔍</a>
-      <a href="/account" class="fp-header__icon">👤</a>
-      <button class="fp-header__icon" onclick="document.getElementById('fp-cart-drawer').classList.add('active'); document.getElementById('fp-cart-overlay').classList.add('active');">
-        🛍️<span class="fp-header__cart-count">{{ cart.item_count }}</span>
-      </button>
+
+<div class="fp-header-wrapper">
+  <!-- Announcement Bar -->
+  <div class="fp-announcement">
+    <div class="fp-announcement__track">
+      <div class="fp-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="fp-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="fp-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="fp-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="fp-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="fp-announcement__item">🏆 10,000+ Five Star Reviews</div>
     </div>
   </div>
-</header>
+
+  <header class="fp-header" id="fp-header">
+    <div class="fp-header__container">
+      <nav class="fp-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      
+      <a href="/" class="fp-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      
+      <div class="fp-icons">
+        <button class="fp-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="fp-icon-btn" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="fp-icon-btn" onclick="document.getElementById('fp-cart-drawer').classList.add('active'); document.getElementById('fp-cart-overlay').classList.add('active');">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="fp-cart-count">{{ cart.item_count }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('fp-header');
+    if (window.scrollY > 50) {
+      header.classList.add('fp-scrolled');
+    } else {
+      header.classList.remove('fp-scrolled');
+    }
+
+    // Scroll Animations
+    const elements = document.querySelectorAll('.fp-animate-fade-up');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.classList.add('fp-in-view');
+      }
+    });
+  });
+</script>
+
 {% schema %}
-{ "name": "FP Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "FITNESS POWER" }, { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff2a2a" }], "presets": [{ "name": "FP Header" }] }
+{
+  "name": "Premium Header",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
+  ]
+}
 {% endschema %}

@@ -2,21 +2,35 @@
   .mf-hero {
     position: relative;
     width: 100%;
-    height: 80vh;
-    min-height: 500px;
+    height: 90vh;
+    min-height: 600px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
   }
-  .mf-hero__image {
+  .mf-hero__media {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 120%; /* For parallax */
     object-fit: cover;
     z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .mf-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
   }
   .mf-hero__overlay {
     position: absolute;
@@ -24,7 +38,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.2);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
     z-index: 2;
   }
   .mf-hero__content {
@@ -32,53 +46,82 @@
     z-index: 3;
     text-align: center;
     color: {{ section.settings.text_color }};
-    max-width: 800px;
+    max-width: 900px;
     padding: 0 20px;
-  }
-  .mf-hero__title {
-    font-family: 'Georgia', serif;
-    font-size: clamp(40px, 6vw, 80px);
-    font-weight: normal;
-    line-height: 1.1;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .mf-hero__subtitle {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
+    font-family: var(--mf-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: mf-hero-fade 1s forwards 0.3s;
+  }
+  .mf-hero__title {
+    font-family: var(--mf-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: mf-hero-fade 1s forwards 0.5s;
   }
   .mf-hero__btn {
     display: inline-block;
     background-color: {{ section.settings.btn_bg_color }};
     color: {{ section.settings.btn_text_color }};
-    padding: 15px 40px;
+    padding: 18px 50px;
     text-decoration: none;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-family: var(--mf-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: opacity 0.3s ease;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: mf-hero-fade 1s forwards 0.7s;
   }
   .mf-hero__btn:hover {
-    opacity: 0.8;
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes mf-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
-<section class="mf-hero">
-  {% if section.settings.image %}
-    <img class="mf-hero__image" src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}">
+<section class="mf-hero" id="mf-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="mf-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="mf-hero__media mf-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
   {% else %}
-    <div class="mf-hero__image" style="background-color: #ddd;"></div>
+    <div class="mf-hero__media" style="background-color: #222;"></div>
   {% endif %}
+  
   <div class="mf-hero__overlay"></div>
+  
   <div class="mf-hero__content">
-    {% if section.settings.title != blank %}
-      <h1 class="mf-hero__title">{{ section.settings.title }}</h1>
-    {% endif %}
     {% if section.settings.subtitle != blank %}
       <div class="mf-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
+      <h1 class="mf-hero__title">{{ section.settings.title }}</h1>
     {% endif %}
     {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
       <a href="{{ section.settings.btn_link }}" class="mf-hero__btn">{{ section.settings.btn_label }}</a>
@@ -86,9 +129,20 @@
   </div>
 </section>
 
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.mf-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "MF Hero",
+  "name": "Premium Hero",
   "tag": "section",
   "settings": [
     {
@@ -98,21 +152,27 @@
     },
     {
       "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "New Collection"
+      "default": "The New Standard"
     },
     {
       "type": "text",
       "id": "subtitle",
       "label": "Subheading",
-      "default": "Discover the latest editorial pieces"
+      "default": "Elevate Your Aesthetic"
     },
     {
       "type": "text",
       "id": "btn_label",
       "label": "Button Label",
-      "default": "Shop Now"
+      "default": "Shop Collection"
     },
     {
       "type": "url",
@@ -140,7 +200,7 @@
   ],
   "presets": [
     {
-      "name": "MF Hero"
+      "name": "Premium Hero"
     }
   ]
 }

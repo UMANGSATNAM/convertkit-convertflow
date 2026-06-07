@@ -1,46 +1,239 @@
 <style>
-  .fb-header { position: sticky; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95); z-index: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.03); backdrop-filter: blur(10px); transition: transform 0.3s; }
-  .fb-header__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
-  .fb-header__nav { display: flex; gap: 35px; }
-  @media (max-width: 900px) { .fb-header__nav { display: none; } }
-  .fb-header__nav a { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4a5568; text-decoration: none; transition: color 0.2s; position: relative; }
-  .fb-header__nav a:hover { color: #4CAF50; }
-  .fb-header__nav a::after { content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px; background: #4CAF50; transition: all 0.3s ease; transform: translateX(-50%); border-radius: 2px; }
-  .fb-header__nav a:hover::after { width: 100%; }
-  .fb-header__logo { font-family: 'Fraunces', serif; font-size: 28px; color: #4CAF50; text-decoration: none; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-  .fb-header__icons { display: flex; align-items: center; gap: 20px; }
-  .fb-header__icon { background: none; border: none; color: #4a5568; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; text-decoration: none; }
-  .fb-header__icon:hover { background: #f7fafc; color: #4CAF50; }
-  .fb-header__cart-btn { position: relative; display: flex; align-items: center; gap: 8px; background: #f7fafc; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: background 0.2s; }
-  .fb-header__cart-btn:hover { background: #edf2f7; }
-  .fb-header__cart-icon { color: #4a5568; width: 20px; height: 20px; }
-  .fb-header__cart-count { background: #4CAF50; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  :root {
+    --fb-font-serif: 'Playfair Display', serif;
+    --fb-font-sans: 'Inter', sans-serif;
+    --fb-color-bg: #ffffff;
+    --fb-color-text: #000000;
+    --fb-color-subdued: #666666;
+    --fb-color-border: #eeeeee;
+    --fb-color-accent: #f5f5f5;
+    --fb-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  body {
+    font-family: var(--fb-font-sans);
+    color: var(--fb-color-text);
+    background: var(--fb-color-bg);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fade-in Animation Classes */
+  .fb-animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fb-animate-fade-up.fb-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee Announcement Bar */
+  .fb-announcement {
+    background: #000;
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1000;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .fb-announcement__track {
+    display: flex;
+    white-space: nowrap;
+    animation: fb-marquee 20s linear infinite;
+  }
+  .fb-announcement__track:hover {
+    animation-play-state: paused;
+  }
+  .fb-announcement__item {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes fb-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glassmorphism Header */
+  .fb-header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    transition: var(--fb-transition);
+  }
+  .fb-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--fb-transition);
+  }
+  .fb-header.fb-scrolled {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+  .fb-header__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--fb-transition);
+  }
+  .fb-header.fb-scrolled .fb-header__container {
+    padding: 10px 40px;
+  }
+  .fb-nav {
+    display: flex;
+    gap: 40px;
+  }
+  .fb-nav a {
+    text-decoration: none;
+    color: var(--fb-color-text);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .fb-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: var(--fb-transition);
+  }
+  .fb-nav a:hover::after {
+    width: 100%;
+  }
+  .fb-logo {
+    font-family: var(--fb-font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .fb-icons {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .fb-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #000;
+    transition: transform 0.3s ease;
+  }
+  .fb-icon-btn:hover {
+    transform: scale(1.1);
+  }
+  .fb-cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .fb-nav { display: none; }
+    .fb-header__container { padding: 15px 20px; }
+  }
 </style>
-<header class="fb-header">
-  <div class="fb-header__container">
-    <nav class="fb-header__nav">
-      {% for link in linklists.main-menu.links %}
-        <a href="{{ link.url }}">{{ link.title }}</a>
-      {% endfor %}
-    </nav>
-    <a href="/" class="fb-header__logo">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #4CAF50;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-      {{ section.settings.logo_text }}
-    </a>
-    <div class="fb-header__icons">
-      <a href="/search" class="fb-header__icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </a>
-      <a href="/account" class="fb-header__icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      </a>
-      <button class="fb-header__cart-btn" onclick="document.getElementById('fb-cart-drawer').classList.add('active'); document.getElementById('fb-cart-overlay').classList.add('active');">
-        <svg class="fb-header__cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-        <span class="fb-header__cart-count">{{ cart.item_count }}</span>
-      </button>
+
+<div class="fb-header-wrapper">
+  <!-- Announcement Bar -->
+  <div class="fb-announcement">
+    <div class="fb-announcement__track">
+      <div class="fb-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="fb-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="fb-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="fb-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="fb-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="fb-announcement__item">🏆 10,000+ Five Star Reviews</div>
     </div>
   </div>
-</header>
+
+  <header class="fb-header" id="fb-header">
+    <div class="fb-header__container">
+      <nav class="fb-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      
+      <a href="/" class="fb-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      
+      <div class="fb-icons">
+        <button class="fb-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="fb-icon-btn" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="fb-icon-btn" onclick="document.getElementById('fb-cart-drawer').classList.add('active'); document.getElementById('fb-cart-overlay').classList.add('active');">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="fb-cart-count">{{ cart.item_count }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('fb-header');
+    if (window.scrollY > 50) {
+      header.classList.add('fb-scrolled');
+    } else {
+      header.classList.remove('fb-scrolled');
+    }
+
+    // Scroll Animations
+    const elements = document.querySelectorAll('.fb-animate-fade-up');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.classList.add('fb-in-view');
+      }
+    });
+  });
+</script>
+
 {% schema %}
-{ "name": "FB Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "FreshBites" }], "presets": [{ "name": "FB Header" }] }
+{
+  "name": "Premium Header",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
+  ]
+}
 {% endschema %}

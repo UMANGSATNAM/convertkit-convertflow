@@ -1,52 +1,207 @@
 <style>
-  .fb-hero { width: 100%; min-height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: {{ section.settings.bg_color }}; }
-  .fb-hero__bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-  .fb-hero__overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(253,253,249,0.9) 0%, rgba(253,253,249,0.5) 100%); z-index: 2; }
-  .fb-hero__container { max-width: 1200px; margin: 0 auto; padding: 40px; position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  @media (max-width: 900px) { .fb-hero__container { grid-template-columns: 1fr; text-align: center; } .fb-hero__overlay { background: rgba(253,253,249,0.85); } }
-  .fb-hero__badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: {{ section.settings.accent_color }}; background: rgba(76, 175, 80, 0.1); padding: 8px 16px; border-radius: 30px; margin-bottom: 25px; }
-  .fb-hero__title { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 64px); font-weight: 600; color: #2d3748; line-height: 1.1; margin-bottom: 20px; }
-  .fb-hero__title span { color: {{ section.settings.accent_color }}; }
-  .fb-hero__desc { font-family: 'DM Sans', sans-serif; font-size: 18px; color: #4a5568; line-height: 1.6; margin-bottom: 40px; }
-  .fb-hero__cta { display: inline-flex; align-items: center; justify-content: center; background: {{ section.settings.accent_color }}; color: #fff; padding: 16px 32px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s; }
-  .fb-hero__cta:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.2); }
-  .fb-hero__image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .fb-hero__image-box { border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-  .fb-hero__image-box img { width: 100%; height: 100%; object-fit: cover; }
-  .fb-hero__image-box:first-child { transform: translateY(40px); }
-  @media (max-width: 900px) { .fb-hero__image-grid { display: none; } }
+  .fb-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .fb-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%; /* For parallax */
+    object-fit: cover;
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .fb-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+  .fb-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    z-index: 2;
+  }
+  .fb-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    max-width: 900px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .fb-hero__subtitle {
+    font-family: var(--fb-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fb-hero-fade 1s forwards 0.3s;
+  }
+  .fb-hero__title {
+    font-family: var(--fb-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fb-hero-fade 1s forwards 0.5s;
+  }
+  .fb-hero__btn {
+    display: inline-block;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    padding: 18px 50px;
+    text-decoration: none;
+    font-family: var(--fb-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fb-hero-fade 1s forwards 0.7s;
+  }
+  .fb-hero__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes fb-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="fb-hero">
-  {% if section.settings.bg_image %}<img class="fb-hero__bg" src="{{ section.settings.bg_image | image_url: width: 2000 }}" alt="" loading="eager">{% endif %}
+
+<section class="fb-hero" id="fb-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="fb-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="fb-hero__media fb-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
+  {% else %}
+    <div class="fb-hero__media" style="background-color: #222;"></div>
+  {% endif %}
+  
   <div class="fb-hero__overlay"></div>
-  <div class="fb-hero__container">
-    <div class="fb-hero__content">
-      <div class="fb-hero__badge">🌿 {{ section.settings.badge }}</div>
+  
+  <div class="fb-hero__content">
+    {% if section.settings.subtitle != blank %}
+      <div class="fb-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
       <h1 class="fb-hero__title">{{ section.settings.title }}</h1>
-      <p class="fb-hero__desc">{{ section.settings.desc }}</p>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="fb-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
-    </div>
-    <div class="fb-hero__image-grid">
-      <div class="fb-hero__image-box">{% if section.settings.img_1 %}<img src="{{ section.settings.img_1 | image_url: width: 600 }}" alt="Fresh produce" loading="eager">{% else %}<div style="background:#e2e8f0;width:100%;padding-top:120%;"></div>{% endif %}</div>
-      <div class="fb-hero__image-box">{% if section.settings.img_2 %}<img src="{{ section.settings.img_2 | image_url: width: 600 }}" alt="Fresh produce" loading="eager">{% else %}<div style="background:#cbd5e0;width:100%;padding-top:120%;"></div>{% endif %}</div>
-    </div>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="fb-hero__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
   </div>
 </section>
+
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.fb-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "FB Hero", "tag": "section",
+  "name": "Premium Hero",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "bg_image", "label": "Background Image" },
-    { "type": "image_picker", "id": "img_1", "label": "Grid Image 1" },
-    { "type": "image_picker", "id": "img_2", "label": "Grid Image 2" },
-    { "type": "text", "id": "badge", "label": "Badge Text", "default": "100% Organic Certified" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Farm Fresh to Your Door" },
-    { "type": "text", "id": "desc", "label": "Description", "default": "Sourced daily from local farmers. Taste the difference of truly fresh, organic produce." },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Groceries" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#4CAF50" },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fdfdf9" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The New Standard"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Elevate Your Aesthetic"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "FB Hero" }]
+  "presets": [
+    {
+      "name": "Premium Hero"
+    }
+  ]
 }
 {% endschema %}

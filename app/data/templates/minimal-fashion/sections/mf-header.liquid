@@ -1,142 +1,239 @@
 <style>
-  .mf-header {
+  :root {
+    --mf-font-serif: 'Playfair Display', serif;
+    --mf-font-sans: 'Inter', sans-serif;
+    --mf-color-bg: #ffffff;
+    --mf-color-text: #000000;
+    --mf-color-subdued: #666666;
+    --mf-color-border: #eeeeee;
+    --mf-color-accent: #f5f5f5;
+    --mf-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  body {
+    font-family: var(--mf-font-sans);
+    color: var(--mf-color-text);
+    background: var(--mf-color-bg);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fade-in Animation Classes */
+  .mf-animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .mf-animate-fade-up.mf-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee Announcement Bar */
+  .mf-announcement {
+    background: #000;
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1000;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .mf-announcement__track {
+    display: flex;
+    white-space: nowrap;
+    animation: mf-marquee 20s linear infinite;
+  }
+  .mf-announcement__track:hover {
+    animation-play-state: paused;
+  }
+  .mf-announcement__item {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes mf-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glassmorphism Header */
+  .mf-header-wrapper {
     position: sticky;
     top: 0;
-    z-index: 1000;
-    background-color: {{ section.settings.bg_color }};
-    border-bottom: 1px solid #eaeaea;
-    padding: 15px 5%;
+    z-index: 900;
+    transition: var(--mf-transition);
+  }
+  .mf-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--mf-transition);
+  }
+  .mf-header.mf-scrolled {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+  .mf-header__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 40px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    transition: var(--mf-transition);
   }
-  .mf-header__logo {
-    font-family: 'Georgia', serif;
-    font-size: 24px;
-    font-weight: bold;
-    color: {{ section.settings.text_color }};
-    text-decoration: none;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  .mf-header.mf-scrolled .mf-header__container {
+    padding: 10px 40px;
   }
-  .mf-header__logo img {
-    max-height: {{ section.settings.logo_height }}px;
-    width: auto;
-  }
-  .mf-header__nav {
-    display: none;
-  }
-  @media (min-width: 768px) {
-    .mf-header__nav {
-      display: flex;
-      gap: 30px;
-    }
-  }
-  .mf-header__nav a {
-    color: {{ section.settings.text_color }};
-    text-decoration: none;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .mf-header__icons {
+  .mf-nav {
     display: flex;
-    gap: 20px;
+    gap: 40px;
+  }
+  .mf-nav a {
+    text-decoration: none;
+    color: var(--mf-color-text);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .mf-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: var(--mf-transition);
+  }
+  .mf-nav a:hover::after {
+    width: 100%;
+  }
+  .mf-logo {
+    font-family: var(--mf-font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .mf-icons {
+    display: flex;
+    gap: 24px;
     align-items: center;
   }
-  .mf-header__icons svg {
-    width: 20px;
-    height: 20px;
-    fill: {{ section.settings.text_color }};
+  .mf-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #000;
+    transition: transform 0.3s ease;
+  }
+  .mf-icon-btn:hover {
+    transform: scale(1.1);
   }
   .mf-cart-count {
-    background-color: #000;
-    color: #fff;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 50%;
     position: absolute;
     top: -8px;
     right: -10px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .mf-nav { display: none; }
+    .mf-header__container { padding: 15px 20px; }
   }
 </style>
 
-<header class="mf-header">
-  <div class="mf-header__mobile-menu-icon" style="display: block;">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+<div class="mf-header-wrapper">
+  <!-- Announcement Bar -->
+  <div class="mf-announcement">
+    <div class="mf-announcement__track">
+      <div class="mf-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="mf-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="mf-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="mf-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="mf-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="mf-announcement__item">🏆 10,000+ Five Star Reviews</div>
+    </div>
   </div>
-  
-  <nav class="mf-header__nav">
-    {% for link in linklists[section.settings.menu].links %}
-      <a href="{{ link.url }}">{{ link.title }}</a>
-    {% endfor %}
-  </nav>
 
-  <a href="/" class="mf-header__logo">
-    {% if section.settings.logo %}
-      <img src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name }}">
-    {% else %}
-      {{ shop.name }}
-    {% endif %}
-  </a>
+  <header class="mf-header" id="mf-header">
+    <div class="mf-header__container">
+      <nav class="mf-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      
+      <a href="/" class="mf-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      
+      <div class="mf-icons">
+        <button class="mf-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="mf-icon-btn" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="mf-icon-btn" onclick="document.getElementById('mf-cart-drawer').classList.add('active'); document.getElementById('mf-cart-overlay').classList.add('active');">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="mf-cart-count">{{ cart.item_count }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
 
-  <div class="mf-header__icons">
-    <a href="/search" class="mf-icon-search">
-      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    </a>
-    <a href="/cart" class="mf-icon-cart" style="position: relative;">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.707 15.293C4.077 15.923 4.523 17 5.414 17H17M10 21C10 21.5523 9.55228 22 9 22C8.44772 22 8 21.5523 8 21C8 20.4477 8.44772 20 9 20C9.55228 20 10 20.4477 10 21ZM19 21C19 21.5523 18.5523 22 18 22C17.4477 22 17 21.5523 17 21C17 20.4477 17.4477 20 18 20C18.5523 20 19 20.4477 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      {% if cart.item_count > 0 %}
-        <span class="mf-cart-count">{{ cart.item_count }}</span>
-      {% endif %}
-    </a>
-  </div>
-</header>
+<script>
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('mf-header');
+    if (window.scrollY > 50) {
+      header.classList.add('mf-scrolled');
+    } else {
+      header.classList.remove('mf-scrolled');
+    }
+
+    // Scroll Animations
+    const elements = document.querySelectorAll('.mf-animate-fade-up');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.classList.add('mf-in-view');
+      }
+    });
+  });
+</script>
 
 {% schema %}
 {
-  "name": "MF Header",
+  "name": "Premium Header",
   "tag": "section",
   "settings": [
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Logo Image"
-    },
-    {
-      "type": "range",
-      "id": "logo_height",
-      "min": 20,
-      "max": 100,
-      "step": 5,
-      "unit": "px",
-      "label": "Logo Height",
-      "default": 40
-    },
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Main Menu",
-      "default": "main-menu"
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text & Icon Color",
-      "default": "#000000"
-    }
-  ],
-  "presets": [
-    {
-      "name": "MF Header"
-    }
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
   ]
 }
 {% endschema %}

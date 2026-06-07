@@ -1,202 +1,203 @@
 <style>
-  .mf-buybox {
-    padding: 40px 5%;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-  @media (min-width: 768px) {
-    .mf-buybox {
-      padding: 0 40px;
-      position: sticky;
-      top: 100px;
-    }
-  }
-  .mf-buybox__title {
-    font-family: 'Georgia', serif;
-    font-size: 32px;
-    font-weight: normal;
-    margin-bottom: 10px;
-  }
-  .mf-buybox__price {
-    font-size: 18px;
-    margin-bottom: 30px;
-  }
-  .mf-buybox__form {
-    margin-bottom: 40px;
-  }
-  .mf-buybox__variants {
-    margin-bottom: 20px;
-  }
-  .mf-buybox__select {
+  .mf-sticky-buybox {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    padding: 12px;
-    border: 1px solid #000;
-    font-family: inherit;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 900;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  .mf-sticky-buybox.mf-visible {
+    transform: translateY(0);
+  }
+  .mf-sticky-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .mf-sticky-img {
+    width: 50px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  .mf-sticky-text h4 {
+    margin: 0 0 4px 0;
     font-size: 14px;
-    background: transparent;
-    border-radius: 0;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10L12 15L17 10" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 20px;
+    font-weight: 500;
   }
-  .mf-buybox__btn {
-    width: 100%;
-    padding: 15px;
-    background-color: #000;
+  .mf-sticky-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+  }
+  .mf-sticky-price s {
+    color: #999;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+  .mf-sticky-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Urgency & Scarcity */
+  .mf-urgency-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .mf-urgency-text {
+    font-size: 11px;
+    color: #d93025;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: mf-pulse 2s infinite;
+  }
+  .mf-urgency-dot {
+    width: 6px;
+    height: 6px;
+    background: #d93025;
+    border-radius: 50%;
+  }
+  @keyframes mf-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  .mf-sticky-btn {
+    background: #000;
     color: #fff;
     border: none;
-    font-family: inherit;
-    text-transform: uppercase;
+    padding: 14px 40px;
+    font-size: 13px;
     letter-spacing: 1px;
-    cursor: pointer;
-    transition: opacity 0.3s;
-  }
-  .mf-buybox__btn:hover {
-    opacity: 0.8;
-  }
-  .mf-accordion {
-    border-top: 1px solid #eaeaea;
-  }
-  .mf-accordion__item {
-    border-bottom: 1px solid #eaeaea;
-  }
-  .mf-accordion__btn {
-    width: 100%;
-    padding: 20px 0;
-    display: flex;
-    justify-content: space-between;
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 14px;
     text-transform: uppercase;
+    font-weight: 500;
     cursor: pointer;
-    text-align: left;
+    transition: background 0.3s ease;
+    border-radius: 2px;
   }
-  .mf-accordion__content {
-    display: none;
-    padding-bottom: 20px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #444;
+  .mf-sticky-btn:hover {
+    background: #333;
   }
-  /* Fallback without JS - open first one */
-  .mf-accordion__item:first-child .mf-accordion__content {
-    display: block;
+
+  /* Trust Badges below buy button */
+  .mf-trust-badges {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .mf-trust-badges svg {
+    width: 24px;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
+    .mf-sticky-info { display: none; }
+    .mf-sticky-actions { width: 100%; flex-direction: column; gap: 10px; align-items: center; }
+    .mf-sticky-btn { width: 100%; padding: 16px; }
+    .mf-urgency-wrapper { align-items: center; width: 100%; }
   }
 </style>
 
-<div class="mf-buybox">
-  <h1 class="mf-buybox__title">{{ product.title }}</h1>
-  <div class="mf-buybox__price">{{ product.price | money }}</div>
+<div class="mf-sticky-buybox" id="mf-sticky-buybox">
+  <div class="mf-sticky-info">
+    {% if product.featured_image %}
+      <img src="{{ product.featured_image | img_url: '100x' }}" alt="{{ product.title }}" class="mf-sticky-img">
+    {% endif %}
+    <div class="mf-sticky-text">
+      <h4>{{ product.title }}</h4>
+      <div class="mf-sticky-price">
+        {{ product.price | money }}
+        {% if product.compare_at_price > product.price %}
+          <s>{{ product.compare_at_price | money }}</s>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-  {% form 'product', product, class: 'mf-buybox__form' %}
-    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+  <div class="mf-sticky-actions">
+    <div class="mf-urgency-wrapper">
+      <div class="mf-urgency-text">
+        <span class="mf-urgency-dot"></span>
+        High Demand: Only <span id="mf-scarcity-count">3</span> left!
+      </div>
+      <div style="font-size: 10px; color: #666; margin-top: 4px;">
+        🔥 <span id="mf-live-viewers">12</span> people are viewing this
+      </div>
+    </div>
     
-    {% unless product.has_only_default_variant %}
-      <div class="mf-buybox__variants">
-        <label for="Option-{{ section.id }}" style="display:block; margin-bottom: 5px; font-size:12px; text-transform:uppercase;">Select Option</label>
-        <select id="Option-{{ section.id }}" name="id" class="mf-buybox__select">
-          {% for variant in product.variants %}
-            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
-              {{ variant.title }} - {{ variant.price | money }}
-            </option>
-          {% endfor %}
-        </select>
+    <div>
+      <button class="mf-sticky-btn" onclick="document.querySelector('.mf-add-to-cart').click();">
+        Add to Bag - {{ product.price | money }}
+      </button>
+      <div class="mf-trust-badges">
+        <!-- SVG Secure Checkout -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visa"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#FFF" opacity=".2"/><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#1434CB"/><path d="M28.3 5.9l-1.4 8.6h-2.7l1.4-8.6h2.7zm-9.3 0h-2.2c-.4 0-.8.2-1 .6l-3.1 7.4-1.5-7.4c-.1-.3-.2-.5-.5-.6H8.1l2.4 8.6h2.8l3.6-8.6zm13.1 8.6l-1.3-6.2c-.1-.4-.5-.6-.9-.6h-3.1c-.2 0-.4.1-.5.3l-2.4 6.5h2.8l.5-1.5h3.5l.3 1.5h1.1zm-3.5-3.6l1-3 1 3h-2zm-11.4 3.6h2.7l1.7-8.6h-2.7l-1.7 8.6z" fill="#FFF"/></svg>
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mastercard"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#1A1F71"/><path d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.3 3-3.4 3-5.7z" fill="#FF5F00"/><path d="M14.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#EB001B"/><path d="M29.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#F79E1B"/></svg>
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Apple Pay"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"/><path d="M19.1 11.4c0-1.6.8-3.1 2.2-3.9-1-1-2.4-1.3-3.1-1.3-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.6 2.2 2.7 2.1 1.1-.1 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2.1 1.9-1 2.6-2.1.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.2-.8-2.2-3.3zm-1.8-5c.6-.7 1-1.7.9-2.7-.8.1-1.9.6-2.5 1.4-.5.6-1 1.6-.9 2.6.9.1 1.9-.5 2.5-1.3z" fill="#FFF"/></svg>
       </div>
-    {% endunless %}
-
-    <button type="submit" class="mf-buybox__btn">
-      {% if product.available %}Add to cart{% else %}Sold Out{% endif %}
-    </button>
-  {% endform %}
-
-  <div class="mf-accordion">
-    {% for block in section.blocks %}
-      <div class="mf-accordion__item">
-        <button class="mf-accordion__btn">
-          {{ block.settings.title }}
-          <span>+</span>
-        </button>
-        <div class="mf-accordion__content">
-          {% if block.type == 'description' %}
-            {{ product.description }}
-          {% else %}
-            {{ block.settings.content }}
-          {% endif %}
-        </div>
-      </div>
-    {% endfor %}
+    </div>
   </div>
 </div>
 
 <script>
-  document.querySelectorAll('.mf-accordion__btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const content = this.nextElementSibling;
-      const isOpen = content.style.display === 'block';
-      
-      // Close all
-      document.querySelectorAll('.mf-accordion__content').forEach(c => c.style.display = 'none');
-      document.querySelectorAll('.mf-accordion__btn span').forEach(s => s.innerText = '+');
-      
-      // Open this if it wasn't open
-      if (!isOpen) {
-        content.style.display = 'block';
-        this.querySelector('span').innerText = '-';
-      }
-    });
+  // Sticky Buybox logic
+  window.addEventListener('scroll', () => {
+    const buybox = document.getElementById('mf-sticky-buybox');
+    const mainAddToCart = document.querySelector('.mf-add-to-cart');
+    if (!mainAddToCart) return;
+
+    const rect = mainAddToCart.getBoundingClientRect();
+    if (rect.bottom < 0) {
+      buybox.classList.add('mf-visible');
+    } else {
+      buybox.classList.remove('mf-visible');
+    }
   });
+
+  // Faux Scarcity Generator (Randomizes between 2 and 7)
+  const scarcityEl = document.getElementById('mf-scarcity-count');
+  if (scarcityEl) {
+    const randomCount = Math.floor(Math.random() * 6) + 2;
+    scarcityEl.innerText = randomCount;
+  }
+
+  // Live Viewers Generator (Randomizes between 8 and 35)
+  const viewersEl = document.getElementById('mf-live-viewers');
+  if (viewersEl) {
+    const randomViewers = Math.floor(Math.random() * 28) + 8;
+    viewersEl.innerText = randomViewers;
+    
+    // Simulate viewers changing slightly
+    setInterval(() => {
+      const change = Math.random() > 0.5 ? 1 : -1;
+      let current = parseInt(viewersEl.innerText);
+      if (current + change > 5) viewersEl.innerText = current + change;
+    }, 7000);
+  }
 </script>
 
 {% schema %}
 {
-  "name": "MF Sticky Buybox",
+  "name": "Sticky Buybox (Premium)",
   "tag": "section",
-  "settings": [],
-  "blocks": [
-    {
-      "type": "description",
-      "name": "Product Description",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Heading",
-          "default": "Description"
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "name": "Text Content",
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Heading",
-          "default": "Shipping & Returns"
-        },
-        {
-          "type": "richtext",
-          "id": "content",
-          "label": "Content"
-        }
-      ]
-    }
-  ],
-  "templates": ["product"],
-  "presets": [
-    {
-      "name": "MF Sticky Buybox",
-      "blocks": [
-        { "type": "description" },
-        { "type": "text" }
-      ]
-    }
-  ]
+  "settings": []
 }
 {% endschema %}

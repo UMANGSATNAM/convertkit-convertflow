@@ -1,43 +1,239 @@
 <style>
-  .gs-header { position: sticky; top: 0; width: 100%; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 500; }
-  .gs-header__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; height: 80px; display: flex; align-items: center; justify-content: space-between; }
-  .gs-header__nav { display: flex; gap: 40px; }
-  @media (max-width: 900px) { .gs-header__nav { display: none; } }
-  .gs-header__nav a { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: color 0.3s; }
-  .gs-header__nav a:hover { color: #fff; }
-  .gs-header__logo { font-family: 'Oswald', sans-serif; font-size: 28px; color: #fff; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
-  .gs-header__logo span { color: #d4af37; }
-  .gs-header__icons { display: flex; align-items: center; gap: 20px; }
-  .gs-header__icon { background: none; border: none; color: #a0aec0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: color 0.3s; text-decoration: none; }
-  .gs-header__icon:hover { color: #fff; }
-  .gs-header__cart-btn { position: relative; display: flex; align-items: center; justify-content: center; background: none; border: none; color: #a0aec0; width: 40px; height: 40px; cursor: pointer; transition: color 0.3s; }
-  .gs-header__cart-btn:hover { color: #fff; }
-  .gs-header__cart-count { position: absolute; top: 2px; right: 0; background: #d4af37; color: #000; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  :root {
+    --gs-font-serif: 'Playfair Display', serif;
+    --gs-font-sans: 'Inter', sans-serif;
+    --gs-color-bg: #ffffff;
+    --gs-color-text: #000000;
+    --gs-color-subdued: #666666;
+    --gs-color-border: #eeeeee;
+    --gs-color-accent: #f5f5f5;
+    --gs-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  body {
+    font-family: var(--gs-font-sans);
+    color: var(--gs-color-text);
+    background: var(--gs-color-bg);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fade-in Animation Classes */
+  .gs-animate-fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gs-animate-fade-up.gs-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee Announcement Bar */
+  .gs-announcement {
+    background: #000;
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1000;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .gs-announcement__track {
+    display: flex;
+    white-space: nowrap;
+    animation: gs-marquee 20s linear infinite;
+  }
+  .gs-announcement__track:hover {
+    animation-play-state: paused;
+  }
+  .gs-announcement__item {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  @keyframes gs-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glassmorphism Header */
+  .gs-header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    transition: var(--gs-transition);
+  }
+  .gs-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: var(--gs-transition);
+  }
+  .gs-header.gs-scrolled {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+  .gs-header__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--gs-transition);
+  }
+  .gs-header.gs-scrolled .gs-header__container {
+    padding: 10px 40px;
+  }
+  .gs-nav {
+    display: flex;
+    gap: 40px;
+  }
+  .gs-nav a {
+    text-decoration: none;
+    color: var(--gs-color-text);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .gs-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: var(--gs-transition);
+  }
+  .gs-nav a:hover::after {
+    width: 100%;
+  }
+  .gs-logo {
+    font-family: var(--gs-font-serif);
+    font-size: 28px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+  .gs-icons {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .gs-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #000;
+    transition: transform 0.3s ease;
+  }
+  .gs-icon-btn:hover {
+    transform: scale(1.1);
+  }
+  .gs-cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .gs-nav { display: none; }
+    .gs-header__container { padding: 15px 20px; }
+  }
 </style>
-<header class="gs-header">
-  <div class="gs-header__container">
-    <nav class="gs-header__nav">
-      {% for link in linklists.main-menu.links %}
-        <a href="{{ link.url }}">{{ link.title }}</a>
-      {% endfor %}
-    </nav>
-    <a href="/" class="gs-header__logo">
-      {{ section.settings.logo_text | replace: 'Studio', '<span>Studio</span>' }}
-    </a>
-    <div class="gs-header__icons">
-      <a href="/search" class="gs-header__icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </a>
-      <a href="/account" class="gs-header__icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      </a>
-      <button class="gs-header__cart-btn" onclick="document.getElementById('gs-cart-drawer').classList.add('active'); document.getElementById('gs-cart-overlay').classList.add('active');">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-        <span class="gs-header__cart-count">{{ cart.item_count }}</span>
-      </button>
+
+<div class="gs-header-wrapper">
+  <!-- Announcement Bar -->
+  <div class="gs-announcement">
+    <div class="gs-announcement__track">
+      <div class="gs-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="gs-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="gs-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="gs-announcement__item">✨ Free Worldwide Shipping Over $150</div>
+      <div class="gs-announcement__item">🖤 30-Day Free Returns</div>
+      <div class="gs-announcement__item">🏆 10,000+ Five Star Reviews</div>
     </div>
   </div>
-</header>
+
+  <header class="gs-header" id="gs-header">
+    <div class="gs-header__container">
+      <nav class="gs-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      
+      <a href="/" class="gs-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      
+      <div class="gs-icons">
+        <button class="gs-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button class="gs-icon-btn" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="gs-icon-btn" onclick="document.getElementById('gs-cart-drawer').classList.add('active'); document.getElementById('gs-cart-overlay').classList.add('active');">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="gs-cart-count">{{ cart.item_count }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('gs-header');
+    if (window.scrollY > 50) {
+      header.classList.add('gs-scrolled');
+    } else {
+      header.classList.remove('gs-scrolled');
+    }
+
+    // Scroll Animations
+    const elements = document.querySelectorAll('.gs-animate-fade-up');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.classList.add('gs-in-view');
+      }
+    });
+  });
+</script>
+
 {% schema %}
-{ "name": "GS Header", "tag": "section", "settings": [{ "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Grooming Studio" }], "presets": [{ "name": "GS Header" }] }
+{
+  "name": "Premium Header",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
+  ]
+}
 {% endschema %}

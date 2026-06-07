@@ -1,42 +1,207 @@
 <style>
-  .hd-hero { position: relative; width: 100%; height: 85vh; min-height: 600px; display: flex; align-items: center; background: {{ section.settings.bg_color }}; overflow: hidden; }
-  .hd-hero__image-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-  .hd-hero__image-wrapper::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(250, 249, 248, 0.9) 0%, rgba(250, 249, 248, 0.4) 50%, rgba(250, 249, 248, 0.1) 100%); }
-  .hd-hero__image { width: 100%; height: 100%; object-fit: cover; }
-  .hd-hero__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; width: 100%; position: relative; z-index: 2; }
-  .hd-hero__content { max-width: 600px; }
-  .hd-hero__eyebrow { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 4px; color: {{ section.settings.accent_color }}; margin-bottom: 20px; display: block; }
-  .hd-hero__title { font-family: 'Playfair Display', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; color: #2c2c2c; line-height: 1.1; margin-bottom: 30px; }
-  .hd-hero__desc { font-family: 'Inter', sans-serif; font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 40px; font-weight: 300; }
-  .hd-hero__cta { display: inline-block; background: {{ section.settings.accent_color }}; color: #fff; padding: 18px 40px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: all 0.4s; border: 1px solid {{ section.settings.accent_color }}; }
-  .hd-hero__cta:hover { background: transparent; color: {{ section.settings.accent_color }}; }
+  .hd-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hd-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%; /* For parallax */
+    object-fit: cover;
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .hd-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+  .hd-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    z-index: 2;
+  }
+  .hd-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    max-width: 900px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hd-hero__subtitle {
+    font-family: var(--hd-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hd-hero-fade 1s forwards 0.3s;
+  }
+  .hd-hero__title {
+    font-family: var(--hd-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hd-hero-fade 1s forwards 0.5s;
+  }
+  .hd-hero__btn {
+    display: inline-block;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    padding: 18px 50px;
+    text-decoration: none;
+    font-family: var(--hd-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hd-hero-fade 1s forwards 0.7s;
+  }
+  .hd-hero__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes hd-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="hd-hero">
-  <div class="hd-hero__image-wrapper">
-    {% if section.settings.image %}<img class="hd-hero__image" src="{{ section.settings.image | image_url: width: 1800 }}" alt="{{ section.settings.title | escape }}" loading="eager">{% else %}<div class="hd-hero__image" style="background:#ddd;"></div>{% endif %}
-  </div>
-  <div class="hd-hero__container">
-    <div class="hd-hero__content">
-      {% if section.settings.eyebrow != blank %}<span class="hd-hero__eyebrow">{{ section.settings.eyebrow }}</span>{% endif %}
+
+<section class="hd-hero" id="hd-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="hd-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="hd-hero__media hd-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
+  {% else %}
+    <div class="hd-hero__media" style="background-color: #222;"></div>
+  {% endif %}
+  
+  <div class="hd-hero__overlay"></div>
+  
+  <div class="hd-hero__content">
+    {% if section.settings.subtitle != blank %}
+      <div class="hd-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
       <h1 class="hd-hero__title">{{ section.settings.title }}</h1>
-      <p class="hd-hero__desc">{{ section.settings.desc }}</p>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="hd-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
-    </div>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="hd-hero__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
   </div>
 </section>
+
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.hd-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "HD Hero", "tag": "section",
+  "name": "Premium Hero",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Background Image" },
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "New Collection" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Elevate Your Space" },
-    { "type": "text", "id": "desc", "label": "Description", "default": "Discover curated pieces that bring warmth, elegance, and modern minimalism to every room." },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Explore Collection" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#8c7a6b" },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#faf9f8" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The New Standard"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Elevate Your Aesthetic"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "HD Hero" }]
+  "presets": [
+    {
+      "name": "Premium Hero"
+    }
+  ]
 }
 {% endschema %}
