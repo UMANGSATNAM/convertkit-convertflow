@@ -1,172 +1,231 @@
 <style>
-  .tg-highlights {
-    padding: 80px 0;
+  .tg-product-highlights {
+    padding: 100px 5%;
     background-color: {{ section.settings.bg_color }};
   }
-  .tg-highlights__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
-  }
-  .tg-highlights__header {
+  .tg-ph__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 50px;
-    border-bottom: 1px solid rgba(0,240,255,0.1);
-    padding-bottom: 20px;
+    margin-bottom: 60px;
   }
-  .tg-highlights__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
+  .tg-ph__title {
+    font-family: var(--tg-font-serif, 'Georgia', serif);
+    font-size: 38px;
+    font-weight: 400;
+    color: #000;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+  .tg-ph__link {
+    font-family: var(--tg-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 1px;
-  }
-  .tg-highlights__link {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: {{ section.settings.accent_color }};
+    color: #000;
     text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: opacity 0.3s;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
   }
-  .tg-highlights__link:hover { opacity: 0.7; }
-  .tg-highlights__grid {
+  .tg-ph__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 1px;
+    background: #000;
+    transform: scaleX(1);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tg-ph__link:hover::after {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .tg-ph__grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  @media (max-width: 1024px) {
-    .tg-highlights__grid { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 768px) {
+    .tg-ph__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
   }
-  @media (max-width: 600px) {
-    .tg-highlights__grid { grid-template-columns: 1fr; }
-  }
-  .tg-product-card {
-    background: #111122;
-    border: 1px solid rgba(0,240,255,0.08);
-    transition: all 0.4s ease;
-    text-decoration: none;
-    color: inherit;
+  .tg-ph-card {
     display: block;
-  }
-  .tg-product-card:hover {
-    border-color: {{ section.settings.accent_color }};
-    transform: translateY(-4px);
-    box-shadow: 0 10px 40px rgba(0,240,255,0.1);
-  }
-  .tg-product-card__image-wrap {
+    text-decoration: none;
+    color: #000;
+    font-family: var(--tg-font-sans, 'Inter', sans-serif);
     position: relative;
-    aspect-ratio: 1;
+    group: hover;
+  }
+  .tg-ph-card__img-wrap {
+    position: relative;
+    padding-bottom: 130%;
+    margin-bottom: 20px;
     overflow: hidden;
-    background: #0d0d1a;
+    background: #f8f8f8;
   }
-  .tg-product-card__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  .tg-product-card:hover .tg-product-card__image {
-    transform: scale(1.08);
-  }
-  .tg-product-card__badge {
+  .tg-ph-card__img {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    background: {{ section.settings.accent_color }};
-    color: #0a0a0a;
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    font-weight: 800;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  }
+  .tg-ph-card__img--hover {
+    opacity: 0;
+    z-index: 2;
+  }
+  .tg-ph-card:hover .tg-ph-card__img--main {
+    transform: scale(1.05);
+  }
+  .tg-ph-card:hover .tg-ph-card__img--hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  .tg-ph-card__quick-add {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(5px);
+    color: #000;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 12px;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
-    padding: 4px 10px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    border: none;
+    cursor: pointer;
   }
-  .tg-product-card__info {
-    padding: 20px;
+  .tg-ph-card:hover .tg-ph-card__quick-add {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .tg-product-card__vendor {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: {{ section.settings.accent_color }};
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 6px;
+  .tg-ph-card__quick-add:hover {
+    background: #000;
+    color: #fff;
   }
-  .tg-product-card__name {
-    font-family: 'Inter', sans-serif;
+
+  .tg-ph-card__info {
+    text-align: left;
+  }
+  .tg-ph-card__title {
     font-size: 15px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 10px;
-    line-height: 1.3;
+    margin-bottom: 8px;
+    font-weight: 400;
   }
-  .tg-product-card__price {
-    font-family: 'Inter', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: #ffffff;
+  .tg-ph-card__reviews {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+    color: #000;
   }
-  .tg-product-card__compare {
-    font-size: 13px;
-    color: #666;
-    text-decoration: line-through;
-    margin-left: 8px;
+  .tg-ph-card__reviews svg {
+    width: 12px; height: 12px;
+  }
+  .tg-ph-card__price {
+    font-size: 14px;
+    font-weight: 500;
   }
 </style>
 
-<section class="tg-highlights">
-  <div class="tg-highlights__container">
-    <div class="tg-highlights__header">
-      <h2 class="tg-highlights__title">{{ section.settings.title }}</h2>
-      {% if section.settings.collection != blank %}
-        <a href="{{ collections[section.settings.collection].url }}" class="tg-highlights__link">View All →</a>
-      {% endif %}
-    </div>
-    <div class="tg-highlights__grid">
-      {% assign col = collections[section.settings.collection] %}
-      {% assign limit = section.settings.limit | default: 4 %}
-      {% for product in col.products limit: limit %}
-        <a href="{{ product.url }}" class="tg-product-card">
-          <div class="tg-product-card__image-wrap">
-            {% if product.featured_image %}
-              <img class="tg-product-card__image" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
-            {% endif %}
-            {% if product.compare_at_price > product.price %}
-              <span class="tg-product-card__badge">Sale</span>
-            {% endif %}
+<section class="tg-product-highlights tg-animate-fade-up">
+  <div class="tg-ph__header">
+    <h2 class="tg-ph__title">{{ section.settings.title }}</h2>
+    {% if section.settings.collection != blank %}
+      <a href="{{ section.settings.collection.url }}" class="tg-ph__link">View Collection</a>
+    {% endif %}
+  </div>
+
+  <div class="tg-ph__grid">
+    {% for product in section.settings.collection.products limit: section.settings.limit %}
+      <a href="{{ product.url }}" class="tg-ph-card">
+        <div class="tg-ph-card__img-wrap">
+          <img class="tg-ph-card__img tg-ph-card__img--main" src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title | escape }}">
+          {% if product.images[1] %}
+            <img class="tg-ph-card__img tg-ph-card__img--hover" src="{{ product.images[1] | img_url: '600x' }}" alt="{{ product.title | escape }}">
+          {% endif %}
+          <button class="tg-ph-card__quick-add" onclick="event.preventDefault(); document.querySelector('.tg-add-to-cart').click();">Quick Add</button>
+        </div>
+        <div class="tg-ph-card__info">
+          <div class="tg-ph-card__reviews">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {% endfor %}
+            <span style="font-size: 11px; margin-left: 4px; color: #666;">(12)</span>
           </div>
-          <div class="tg-product-card__info">
-            <div class="tg-product-card__vendor">{{ product.vendor }}</div>
-            <h3 class="tg-product-card__name">{{ product.title }}</h3>
-            <div class="tg-product-card__price">
-              {{ product.price | money }}
-              {% if product.compare_at_price > product.price %}
-                <span class="tg-product-card__compare">{{ product.compare_at_price | money }}</span>
-              {% endif %}
-            </div>
+          <div class="tg-ph-card__title">{{ product.title }}</div>
+          <div class="tg-ph-card__price">{{ product.price | money }}</div>
+        </div>
+      </a>
+    {% else %}
+      {% for i in (1..section.settings.limit) %}
+        <div class="tg-ph-card">
+          <div class="tg-ph-card__img-wrap">
+            <button class="tg-ph-card__quick-add">Quick Add</button>
           </div>
-        </a>
+          <div class="tg-ph-card__info">
+             <div class="tg-ph-card__reviews">
+                {% for i in (1..5) %}
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {% endfor %}
+              </div>
+            <div class="tg-ph-card__title">The Classic Edit</div>
+            <div class="tg-ph-card__price">$120.00</div>
+          </div>
+        </div>
       {% endfor %}
-    </div>
+    {% endfor %}
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "TG Product Highlights",
+  "name": "Premium Highlights",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Featured Gear" },
-    { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "limit", "label": "Products to Show", "min": 2, "max": 12, "step": 1, "default": 4 },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0d0d16" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#00f0ff" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "TG Product Highlights" }]
+  "presets": [
+    {
+      "name": "Premium Highlights"
+    }
+  ]
 }
 {% endschema %}

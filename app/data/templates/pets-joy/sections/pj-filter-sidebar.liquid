@@ -1,34 +1,91 @@
 <style>
-  .pj-sidebar { padding: 40px 30px 40px 0; }
-  .pj-sidebar__title { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
-  .pj-sidebar__group { margin-bottom: 30px; }
-  .pj-sidebar__group-title { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #333; margin-bottom: 15px; }
-  .pj-sidebar__list { list-style: none; padding: 0; margin: 0; }
-  .pj-sidebar__item { margin-bottom: 12px; }
-  .pj-sidebar__label { display: flex; align-items: center; gap: 12px; font-family: 'Nunito', sans-serif; font-size: 15px; color: #666; cursor: pointer; font-weight: 600; }
-  .pj-sidebar__checkbox { appearance: none; width: 22px; height: 22px; border: 2px solid #ddd; border-radius: 6px; outline: none; cursor: pointer; transition: all 0.2s; position: relative; }
-  .pj-sidebar__checkbox:checked { background: #ff9f1c; border-color: #ff9f1c; }
-  .pj-sidebar__checkbox:checked::after { content: '✓'; position: absolute; color: #fff; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; }
+  .pj-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .pj-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .pj-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .pj-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .pj-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .pj-filter-list li {
+    margin-bottom: 10px;
+  }
+  .pj-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .pj-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="pj-sidebar">
-  <div class="pj-sidebar__title"><span>🔍</span> Filter By</div>
-  <div class="pj-sidebar__group">
-    <div class="pj-sidebar__group-title">Pet Type</div>
-    <ul class="pj-sidebar__list">
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> Dogs 🐶</label></li>
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> Cats 🐱</label></li>
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> Small Pets 🐹</label></li>
-    </ul>
-  </div>
-  <div class="pj-sidebar__group">
-    <div class="pj-sidebar__group-title">Price Range</div>
-    <ul class="pj-sidebar__list">
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> Under $25</label></li>
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> $25 - $50</label></li>
-      <li class="pj-sidebar__item"><label class="pj-sidebar__label"><input type="checkbox" class="pj-sidebar__checkbox"> Over $50</label></li>
-    </ul>
-  </div>
-</aside>
+
+<div class="pj-sidebar">
+  <h2 class="pj-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="pj-filter-group">
+        <div class="pj-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="pj-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "PJ Filter Sidebar", "tag": "section", "settings": [], "presets": [{ "name": "PJ Filter Sidebar" }] }
+{
+  "name": "PJ Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "PJ Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

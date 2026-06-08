@@ -1,54 +1,231 @@
 <style>
-  .ob-highlights { padding: 80px 0; background: {{ section.settings.bg_color }}; }
-  .ob-highlights__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
-  .ob-highlights__header { text-align: center; margin-bottom: 50px; }
-  .ob-highlights__title { font-family: 'Georgia', serif; font-size: 32px; color: #2d2a24; margin-bottom: 8px; }
-  .ob-highlights__subtitle { font-family: 'Inter', sans-serif; font-size: 14px; color: #8b7355; }
-  .ob-highlights__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
-  @media (max-width: 1024px) { .ob-highlights__grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px) { .ob-highlights__grid { grid-template-columns: 1fr; } }
-  .ob-prod-card { text-decoration: none; display: block; }
-  .ob-prod-card__img { aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; margin-bottom: 15px; background: #f0e8dc; }
-  .ob-prod-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-  .ob-prod-card:hover .ob-prod-card__img img { transform: scale(1.05); }
-  .ob-prod-card__vendor { font-family: 'Inter', sans-serif; font-size: 11px; color: #c9a96e; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-  .ob-prod-card__name { font-family: 'Georgia', serif; font-size: 16px; color: #2d2a24; margin-bottom: 8px; line-height: 1.3; }
-  .ob-prod-card__price { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; color: #2d2a24; }
-  .ob-prod-card__compare { color: #bbb; text-decoration: line-through; margin-left: 6px; font-size: 13px; }
+  .ob-product-highlights {
+    padding: 100px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .ob-ph__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+  .ob-ph__title {
+    font-family: var(--ob-font-serif, 'Georgia', serif);
+    font-size: 38px;
+    font-weight: 400;
+    color: #000;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+  .ob-ph__link {
+    font-family: var(--ob-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #000;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 4px;
+    font-weight: 500;
+  }
+  .ob-ph__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 1px;
+    background: #000;
+    transform: scaleX(1);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ob-ph__link:hover::after {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .ob-ph__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .ob-ph__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+  }
+  .ob-ph-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: var(--ob-font-sans, 'Inter', sans-serif);
+    position: relative;
+    group: hover;
+  }
+  .ob-ph-card__img-wrap {
+    position: relative;
+    padding-bottom: 130%;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background: #f8f8f8;
+  }
+  .ob-ph-card__img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  }
+  .ob-ph-card__img--hover {
+    opacity: 0;
+    z-index: 2;
+  }
+  .ob-ph-card:hover .ob-ph-card__img--main {
+    transform: scale(1.05);
+  }
+  .ob-ph-card:hover .ob-ph-card__img--hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  .ob-ph-card__quick-add {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(5px);
+    color: #000;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    border: none;
+    cursor: pointer;
+  }
+  .ob-ph-card:hover .ob-ph-card__quick-add {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .ob-ph-card__quick-add:hover {
+    background: #000;
+    color: #fff;
+  }
+
+  .ob-ph-card__info {
+    text-align: left;
+  }
+  .ob-ph-card__title {
+    font-size: 15px;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .ob-ph-card__reviews {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+    color: #000;
+  }
+  .ob-ph-card__reviews svg {
+    width: 12px; height: 12px;
+  }
+  .ob-ph-card__price {
+    font-size: 14px;
+    font-weight: 500;
+  }
 </style>
-<section class="ob-highlights">
-  <div class="ob-highlights__container">
-    <div class="ob-highlights__header">
-      <h2 class="ob-highlights__title">{{ section.settings.title }}</h2>
-      <p class="ob-highlights__subtitle">{{ section.settings.subtitle }}</p>
-    </div>
-    <div class="ob-highlights__grid">
-      {% assign col = collections[section.settings.collection] %}
-      {% for product in col.products limit: section.settings.limit %}
-        <a href="{{ product.url }}" class="ob-prod-card">
-          <div class="ob-prod-card__img">
-            {% if product.featured_image %}
-              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
-            {% endif %}
+
+<section class="ob-product-highlights ob-animate-fade-up">
+  <div class="ob-ph__header">
+    <h2 class="ob-ph__title">{{ section.settings.title }}</h2>
+    {% if section.settings.collection != blank %}
+      <a href="{{ section.settings.collection.url }}" class="ob-ph__link">View Collection</a>
+    {% endif %}
+  </div>
+
+  <div class="ob-ph__grid">
+    {% for product in section.settings.collection.products limit: section.settings.limit %}
+      <a href="{{ product.url }}" class="ob-ph-card">
+        <div class="ob-ph-card__img-wrap">
+          <img class="ob-ph-card__img ob-ph-card__img--main" src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title | escape }}">
+          {% if product.images[1] %}
+            <img class="ob-ph-card__img ob-ph-card__img--hover" src="{{ product.images[1] | img_url: '600x' }}" alt="{{ product.title | escape }}">
+          {% endif %}
+          <button class="ob-ph-card__quick-add" onclick="event.preventDefault(); document.querySelector('.ob-add-to-cart').click();">Quick Add</button>
+        </div>
+        <div class="ob-ph-card__info">
+          <div class="ob-ph-card__reviews">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {% endfor %}
+            <span style="font-size: 11px; margin-left: 4px; color: #666;">(12)</span>
           </div>
-          <div class="ob-prod-card__vendor">{{ product.vendor }}</div>
-          <h3 class="ob-prod-card__name">{{ product.title }}</h3>
-          <div class="ob-prod-card__price">{{ product.price | money }}{% if product.compare_at_price > product.price %}<span class="ob-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
-        </a>
+          <div class="ob-ph-card__title">{{ product.title }}</div>
+          <div class="ob-ph-card__price">{{ product.price | money }}</div>
+        </div>
+      </a>
+    {% else %}
+      {% for i in (1..section.settings.limit) %}
+        <div class="ob-ph-card">
+          <div class="ob-ph-card__img-wrap">
+            <button class="ob-ph-card__quick-add">Quick Add</button>
+          </div>
+          <div class="ob-ph-card__info">
+             <div class="ob-ph-card__reviews">
+                {% for i in (1..5) %}
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {% endfor %}
+              </div>
+            <div class="ob-ph-card__title">The Classic Edit</div>
+            <div class="ob-ph-card__price">$120.00</div>
+          </div>
+        </div>
       {% endfor %}
-    </div>
+    {% endfor %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "OB Product Highlights", "tag": "section",
+  "name": "Premium Highlights",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Bestsellers" },
-    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Loved by thousands" },
-    { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "limit", "label": "Products", "min": 2, "max": 12, "step": 1, "default": 4 },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "OB Product Highlights" }]
+  "presets": [
+    {
+      "name": "Premium Highlights"
+    }
+  ]
 }
 {% endschema %}

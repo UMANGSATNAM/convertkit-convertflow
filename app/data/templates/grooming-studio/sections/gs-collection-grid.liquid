@@ -1,36 +1,94 @@
 <style>
-  .gs-grid { padding: 60px 0; background: #111; }
-  .gs-grid__header { margin-bottom: 60px; text-align: center; }
-  .gs-grid__title { font-family: 'Oswald', sans-serif; font-size: 48px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 15px; }
-  .gs-grid__desc { font-family: 'Inter', sans-serif; font-size: 16px; color: #a0aec0; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-  .gs-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-  @media (max-width: 900px) { .gs-grid__layout { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-  @media (max-width: 600px) { .gs-grid__layout { grid-template-columns: 1fr; } }
+  .gs-cgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .gs-cgrid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 30px;
+    }
+  }
+  .gs-cgrid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .gs-cgrid-header select {
+    padding: 8px;
+    border: 1px solid #eaeaea;
+    background: transparent;
+  }
+  .gs-cgrid-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .gs-cgrid-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .gs-cgrid-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .gs-cgrid-card__price {
+    font-size: 14px;
+    color: #666;
+  }
 </style>
-<div class="gs-grid">
-  <div class="gs-grid__header">
-    <h1 class="gs-grid__title">{{ collection.title }}</h1>
-    {% if collection.description %}<div class="gs-grid__desc">{{ collection.description }}</div>{% endif %}
+
+<div class="gs-cgrid-wrapper">
+  <div class="gs-cgrid-header">
+    <div>{{ collection.products_count }} products</div>
+    <div>
+      <select id="SortBy">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price, low to high</option>
+        <option value="price-descending">Price, high to low</option>
+      </select>
+    </div>
   </div>
-  <div class="gs-grid__layout">
-    {% for product in collection.products %}
-      <a href="{{ product.url }}" class="gs-prod-card">
-        <div class="gs-prod-card__img-wrapper">
-          {% if product.compare_at_price > product.price %}<div class="gs-prod-card__badge">Sale</div>{% endif %}
-          <img class="gs-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">
-        </div>
-        <div class="gs-prod-card__info">
-          <div class="gs-prod-card__vendor">{{ product.vendor }}</div>
-          <h3 class="gs-prod-card__name">{{ product.title }}</h3>
-          <div class="gs-prod-card__bottom">
-            <div class="gs-prod-card__price">{{ product.price | money }}</div>
-            <div class="gs-prod-card__add"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
-          </div>
-        </div>
+
+  <div class="gs-cgrid">
+    {% for product in collection.products limit: section.settings.products_per_page %}
+      <a href="{{ product.url }}" class="gs-cgrid-card">
+        <img class="gs-cgrid-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        <div class="gs-cgrid-card__title">{{ product.title }}</div>
+        <div class="gs-cgrid-card__price">{{ product.price | money }}</div>
       </a>
+    {% else %}
+      <p>No products found in this collection.</p>
     {% endfor %}
   </div>
 </div>
+
 {% schema %}
-{ "name": "GS Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "GS Collection Grid" }] }
+{
+  "name": "GS Collection Grid",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "GS Collection Grid"
+    }
+  ]
+}
 {% endschema %}

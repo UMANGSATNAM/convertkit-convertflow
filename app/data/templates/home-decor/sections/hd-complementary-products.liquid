@@ -1,37 +1,104 @@
 <style>
-  .hd-comp { padding: 80px 0; background: #faf9f8; }
-  .hd-comp__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  .hd-comp__title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: #2c2c2c; margin-bottom: 40px; text-align: center; }
-  .hd-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-  @media (max-width: 900px) { .hd-comp__grid { grid-template-columns: repeat(2, 1fr); } }
-  .hd-comp-card { text-decoration: none; display: block; }
-  .hd-comp-card__img-wrapper { aspect-ratio: 4/5; overflow: hidden; background: #eee; margin-bottom: 15px; }
-  .hd-comp-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-  .hd-comp-card:hover .hd-comp-card__img { transform: scale(1.05); }
-  .hd-comp-card__title { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: #2c2c2c; margin-bottom: 5px; }
-  .hd-comp-card__price { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #666; }
+  .hd-complementary {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .hd-comp__title {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hd-comp__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .hd-comp__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .hd-comp-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .hd-comp-card__img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  .hd-comp-card__title {
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .hd-comp-card__price {
+    font-size: 13px;
+    color: #666;
+  }
 </style>
-<section class="hd-comp">
-  <div class="hd-comp__container">
-    <h2 class="hd-comp__title">{{ section.settings.title }}</h2>
-    <div class="hd-comp__grid">
-      {% for product in recommendations.products limit: section.settings.limit %}
-        <a href="{{ product.url }}" class="hd-comp-card">
-          <div class="hd-comp-card__img-wrapper"><img class="hd-comp-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
-          <div class="hd-comp-card__title">{{ product.title }}</div>
-          <div class="hd-comp-card__price">{{ product.price | money }}</div>
+
+<section class="hd-complementary">
+  <h2 class="hd-comp__title">{{ section.settings.title }}</h2>
+  
+  <div class="hd-comp__grid">
+    {% assign count = 0 %}
+    {% for related in collections.all.products limit: section.settings.limit %}
+      {% if related.id != product.id %}
+        {% assign count = count | plus: 1 %}
+        <a href="{{ related.url }}" class="hd-comp-card">
+          <img class="hd-comp-card__img" src="{{ related.featured_image | image_url: width: 400 }}" alt="{{ related.title | escape }}">
+          <div class="hd-comp-card__title">{{ related.title }}</div>
+          <div class="hd-comp-card__price">{{ related.price | money }}</div>
         </a>
-      {% endfor %}
-    </div>
+      {% endif %}
+    {% endfor %}
+    
+    {% if count == 0 %}
+      <p style="text-align:center; grid-column: 1/-1;">No complementary products found.</p>
+    {% endif %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "HD Complementary", "tag": "section",
+  "name": "HD Complementary",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Pairs Well With" },
-    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 8, "step": 4, "default": 4 }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Complete The Look"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Limit",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "HD Complementary" }]
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "HD Complementary"
+    }
+  ]
 }
 {% endschema %}

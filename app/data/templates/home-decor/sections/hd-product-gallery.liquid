@@ -1,25 +1,50 @@
 <style>
-  .hd-gallery { padding: 40px 0; }
-  .hd-gallery__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  .hd-gallery__main { width: 100%; aspect-ratio: 4/5; overflow: hidden; background: #faf9f8; margin-bottom: 20px; }
-  .hd-gallery__main img { width: 100%; height: 100%; object-fit: cover; }
-  .hd-gallery__thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-  .hd-gallery__thumb { aspect-ratio: 1; overflow: hidden; background: #faf9f8; cursor: pointer; opacity: 0.6; transition: opacity 0.3s; }
-  .hd-gallery__thumb:hover, .hd-gallery__thumb.active { opacity: 1; }
-  .hd-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .hd-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  @media (min-width: 768px) {
+    .hd-pgallery {
+      gap: 20px;
+    }
+  }
+  .hd-pgallery__item {
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  .hd-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 </style>
-<section class="hd-gallery">
-  <div class="hd-gallery__container">
-    <div class="hd-gallery__main">
-      <img src="{{ product.featured_image | image_url: width: 1000 }}" alt="{{ product.title | escape }}" id="hd-main-img">
+
+<div class="hd-pgallery">
+  {% for media in product.media %}
+    <div class="hd-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="hd-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'hd-pgallery__img' }}
+      {% endcase %}
     </div>
-    <div class="hd-gallery__thumbs">
-      {% for image in product.images %}
-        <div class="hd-gallery__thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('hd-main-img').src='{{ image | image_url: width: 1000 }}'; document.querySelectorAll('.hd-gallery__thumb').forEach(t=>t.classList.remove('active')); this.classList.add('active');"><img src="{{ image | image_url: width: 200 }}" alt="{{ image.alt | escape }}" loading="lazy"></div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+  {% else %}
+    <div class="hd-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
+
 {% schema %}
-{ "name": "HD Product Gallery", "tag": "section", "settings": [], "presets": [{ "name": "HD Product Gallery" }] }
+{
+  "name": "HD Product Gallery",
+  "tag": "section",
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "HD Product Gallery"
+    }
+  ]
+}
 {% endschema %}

@@ -1,41 +1,130 @@
 <style>
-  .pj-newsletter { padding: 80px 0; background: {{ section.settings.accent_color }}; position: relative; overflow: hidden; }
-  .pj-newsletter__container { max-width: 600px; margin: 0 auto; padding: 0 30px; text-align: center; position: relative; z-index: 2; }
-  .pj-newsletter__icon { font-size: 48px; margin-bottom: 10px; }
-  .pj-newsletter__title { font-family: 'Nunito', sans-serif; font-size: 36px; font-weight: 900; color: #fff; margin-bottom: 15px; }
-  .pj-newsletter__text { font-family: 'Nunito', sans-serif; font-size: 16px; color: rgba(255,255,255,0.9); margin-bottom: 30px; font-weight: 600; }
-  .pj-newsletter__form { display: flex; background: #fff; border-radius: 40px; padding: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-  @media (max-width: 600px) { .pj-newsletter__form { flex-direction: column; background: transparent; box-shadow: none; gap: 10px; padding: 0; } }
-  .pj-newsletter__input { flex: 1; padding: 15px 25px; border: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 16px; color: #333; outline: none; }
-  @media (max-width: 600px) { .pj-newsletter__input { background: #fff; border-radius: 30px; } }
-  .pj-newsletter__input::placeholder { color: #aaa; }
-  .pj-newsletter__btn { padding: 15px 30px; background: #333; color: #fff; border: none; border-radius: 35px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; transition: background 0.3s; }
-  .pj-newsletter__btn:hover { background: #111; }
+  .pj-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .pj-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .pj-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .pj-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .pj-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .pj-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .pj-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .pj-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .pj-nl__input:focus {
+      outline: none;
+    }
+  }
+  .pj-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .pj-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .pj-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .pj-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="pj-newsletter">
-  <div class="pj-newsletter__container">
-    <div class="pj-newsletter__icon">💌</div>
-    <h2 class="pj-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="pj-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="pj-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="pj-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="pj-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="pj-nl__inner">
+    <h2 class="pj-nl__title">{{ section.settings.title }}</h2>
+    <div class="pj-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'pj-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="pj-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="pj-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "PJ Newsletter", "tag": "section",
+  "name": "PJ Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Pack!" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Sign up for pawsome deals and pet tips.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Enter your email" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "PJ Newsletter" }]
+  "presets": [
+    {
+      "name": "PJ Newsletter"
+    }
+  ]
 }
 {% endschema %}

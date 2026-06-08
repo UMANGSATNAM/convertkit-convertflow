@@ -1,34 +1,91 @@
 <style>
-  .hd-sidebar { padding: 60px 40px 60px 0; border-right: 1px solid #eee; }
-  .hd-sidebar__group { margin-bottom: 40px; }
-  .hd-sidebar__title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: #2c2c2c; margin-bottom: 20px; }
-  .hd-sidebar__list { list-style: none; padding: 0; margin: 0; }
-  .hd-sidebar__item { margin-bottom: 15px; }
-  .hd-sidebar__label { display: flex; align-items: center; gap: 15px; font-family: 'Inter', sans-serif; font-size: 14px; color: #555; cursor: pointer; transition: color 0.3s; }
-  .hd-sidebar__label:hover { color: #2c2c2c; }
-  .hd-sidebar__checkbox { appearance: none; width: 16px; height: 16px; border: 1px solid #ccc; outline: none; cursor: pointer; transition: all 0.2s; position: relative; border-radius: 0; }
-  .hd-sidebar__checkbox:checked { background: #2c2c2c; border-color: #2c2c2c; }
-  .hd-sidebar__checkbox:checked::after { content: ''; position: absolute; top: 2px; left: 5px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .hd-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .hd-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .hd-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .hd-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .hd-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .hd-filter-list li {
+    margin-bottom: 10px;
+  }
+  .hd-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .hd-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="hd-sidebar">
-  <div class="hd-sidebar__group">
-    <div class="hd-sidebar__title">Category</div>
-    <ul class="hd-sidebar__list">
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Furniture</label></li>
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Lighting</label></li>
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Textiles</label></li>
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Decor Objects</label></li>
-    </ul>
-  </div>
-  <div class="hd-sidebar__group">
-    <div class="hd-sidebar__title">Material</div>
-    <ul class="hd-sidebar__list">
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Wood</label></li>
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Ceramic</label></li>
-      <li class="hd-sidebar__item"><label class="hd-sidebar__label"><input type="checkbox" class="hd-sidebar__checkbox"> Linen</label></li>
-    </ul>
-  </div>
-</aside>
+
+<div class="hd-sidebar">
+  <h2 class="hd-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="hd-filter-group">
+        <div class="hd-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="hd-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "HD Filter Sidebar", "tag": "section", "settings": [], "presets": [{ "name": "HD Filter Sidebar" }] }
+{
+  "name": "HD Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "HD Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

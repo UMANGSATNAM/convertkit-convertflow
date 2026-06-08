@@ -1,41 +1,183 @@
 <style>
-  .ob-brand { padding: 100px 0; background: {{ section.settings.bg_color }}; }
-  .ob-brand__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  @media (max-width: 768px) { .ob-brand__container { grid-template-columns: 1fr; } }
-  .ob-brand__image { width: 100%; border-radius: 20px; aspect-ratio: 4/5; object-fit: cover; }
-  .ob-brand__eyebrow { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: {{ section.settings.accent_color }}; margin-bottom: 15px; }
-  .ob-brand__title { font-family: 'Georgia', serif; font-size: 36px; color: #2d2a24; line-height: 1.2; margin-bottom: 20px; }
-  .ob-brand__text { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.8; color: #8b7355; margin-bottom: 30px; }
-  .ob-brand__btn { display: inline-block; background: transparent; border: 2px solid {{ section.settings.accent_color }}; color: {{ section.settings.accent_color }}; padding: 12px 35px; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.3s; }
-  .ob-brand__btn:hover { background: {{ section.settings.accent_color }}; color: #fff; }
+  .ob-brand-story {
+    display: flex;
+    flex-direction: column;
+    background-color: {{ section.settings.bg_color }};
+  }
+  @media (min-width: 768px) {
+    .ob-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .ob-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+  .ob-bs__image-col {
+    width: 100%;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .ob-bs__image-col {
+      width: 50%;
+    }
+  }
+  .ob-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .ob-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .ob-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .ob-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .ob-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
+  }
+  .ob-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .ob-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .ob-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 35px;
+  }
+  .ob-bs__btn {
+    display: inline-block;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
+    text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .ob-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
 </style>
-<section class="ob-brand">
-  <div class="ob-brand__container" style="{% if section.settings.image_position == 'right' %}direction: rtl;{% endif %}">
-    <div style="direction: ltr;">
-      {% if section.settings.image %}<img class="ob-brand__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" loading="lazy">{% else %}<div class="ob-brand__image" style="background: linear-gradient(135deg, #f0e8dc, #e8ddd0);"></div>{% endif %}
+
+<section class="ob-brand-story {% if section.settings.image_position == 'right' %}ob-brand-story--reverse{% endif %}">
+  <div class="ob-bs__image-col">
+    <div class="ob-bs__image-wrap">
+      {% if section.settings.image %}
+        <img class="ob-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
+      {% else %}
+        <div class="ob-bs__image" style="background-color: #e0e0e0;"></div>
+      {% endif %}
     </div>
-    <div style="direction: ltr;">
-      <div class="ob-brand__eyebrow">{{ section.settings.label }}</div>
-      <h2 class="ob-brand__title">{{ section.settings.title }}</h2>
-      <div class="ob-brand__text">{{ section.settings.text }}</div>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="ob-brand__btn">{{ section.settings.btn_label }}</a>{% endif %}
+  </div>
+  
+  <div class="ob-bs__content-col">
+    <div class="ob-bs__content">
+      <h2 class="ob-bs__title">{{ section.settings.title }}</h2>
+      <div class="ob-bs__text">{{ section.settings.text }}</div>
+      {% if section.settings.btn_label != blank %}
+        <a href="{{ section.settings.btn_link }}" class="ob-bs__btn">{{ section.settings.btn_label }}</a>
+      {% endif %}
     </div>
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "OB Brand Story", "tag": "section",
+  "name": "OB Brand Story",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "select", "id": "image_position", "label": "Image Position", "options": [{"value":"left","label":"Left"},{"value":"right","label":"Right"}], "default": "left" },
-    { "type": "text", "id": "label", "label": "Label", "default": "Our Story" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Rooted in Nature" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Every ingredient is ethically sourced, cruelty-free, and chosen for its proven benefits. We believe beauty should be kind—to you and the earth.</p>" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Our Philosophy" },
-    { "type": "url", "id": "btn_link", "label": "Link" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#faf5ef" },
-    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#c9a96e" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "OB Brand Story" }]
+  "presets": [
+    {
+      "name": "OB Brand Story"
+    }
+  ]
 }
 {% endschema %}

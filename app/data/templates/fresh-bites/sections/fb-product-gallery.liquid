@@ -1,27 +1,50 @@
 <style>
-  .fb-gallery { padding: 40px 0; background: #ffffff; }
-  .fb-gallery__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; flex-direction: column; gap: 20px; }
-  .fb-gallery__main { width: 100%; aspect-ratio: 1; background: #f7fafc; border-radius: 24px; overflow: hidden; }
-  .fb-gallery__main img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
-  .fb-gallery__thumbs { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
-  .fb-gallery__thumbs::-webkit-scrollbar { height: 6px; }
-  .fb-gallery__thumbs::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-  .fb-gallery__thumb { width: 100px; height: 100px; flex-shrink: 0; background: #f7fafc; border-radius: 16px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.3s; overflow: hidden; }
-  .fb-gallery__thumb:hover, .fb-gallery__thumb.active { border-color: #4CAF50; }
-  .fb-gallery__thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .fb-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  @media (min-width: 768px) {
+    .fb-pgallery {
+      gap: 20px;
+    }
+  }
+  .fb-pgallery__item {
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  .fb-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 </style>
-<section class="fb-gallery">
-  <div class="fb-gallery__container">
-    <div class="fb-gallery__main">
-      <img src="{{ product.featured_image | image_url: width: 1200 }}" alt="{{ product.title | escape }}" id="fb-main-img">
+
+<div class="fb-pgallery">
+  {% for media in product.media %}
+    <div class="fb-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="fb-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'fb-pgallery__img' }}
+      {% endcase %}
     </div>
-    <div class="fb-gallery__thumbs">
-      {% for image in product.images %}
-        <div class="fb-gallery__thumb {% if forloop.first %}active{% endif %}" onclick="document.getElementById('fb-main-img').src='{{ image | image_url: width: 1200 }}'; document.querySelectorAll('.fb-gallery__thumb').forEach(t=>t.classList.remove('active')); this.classList.add('active');"><img src="{{ image | image_url: width: 200 }}" alt="{{ image.alt | escape }}" loading="lazy"></div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+  {% else %}
+    <div class="fb-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
+
 {% schema %}
-{ "name": "FB Product Gallery", "tag": "section", "settings": [], "presets": [{ "name": "FB Product Gallery" }] }
+{
+  "name": "FB Product Gallery",
+  "tag": "section",
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "FB Product Gallery"
+    }
+  ]
+}
 {% endschema %}

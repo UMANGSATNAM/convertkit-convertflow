@@ -1,30 +1,94 @@
 <style>
-  .jl-grid { padding: 60px 0; background: #0a0a0a; }
-  .jl-grid__header { margin-bottom: 60px; text-align: center; }
-  .jl-grid__title { font-family: 'Cinzel', serif; font-size: 48px; font-weight: 400; color: #fff; margin-bottom: 15px; }
-  .jl-grid__desc { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #999; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-  .jl-grid__layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-  @media (max-width: 900px) { .jl-grid__layout { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-  @media (max-width: 600px) { .jl-grid__layout { grid-template-columns: 1fr; } }
+  .jl-cgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .jl-cgrid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 30px;
+    }
+  }
+  .jl-cgrid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .jl-cgrid-header select {
+    padding: 8px;
+    border: 1px solid #eaeaea;
+    background: transparent;
+  }
+  .jl-cgrid-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .jl-cgrid-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .jl-cgrid-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .jl-cgrid-card__price {
+    font-size: 14px;
+    color: #666;
+  }
 </style>
-<div class="jl-grid">
-  <div class="jl-grid__header">
-    <h1 class="jl-grid__title">{{ collection.title }}</h1>
-    {% if collection.description %}<div class="jl-grid__desc">{{ collection.description }}</div>{% endif %}
+
+<div class="jl-cgrid-wrapper">
+  <div class="jl-cgrid-header">
+    <div>{{ collection.products_count }} products</div>
+    <div>
+      <select id="SortBy">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price, low to high</option>
+        <option value="price-descending">Price, high to low</option>
+      </select>
+    </div>
   </div>
-  <div class="jl-grid__layout">
-    {% for product in collection.products %}
-      <a href="{{ product.url }}" class="jl-prod-card">
-        <div class="jl-prod-card__img-wrapper">
-          {% if product.compare_at_price > product.price %}<div class="jl-prod-card__badge">Exclusive</div>{% endif %}
-          <img class="jl-prod-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
-        </div>
-        <h3 class="jl-prod-card__name">{{ product.title }}</h3>
-        <div class="jl-prod-card__price">{% if product.compare_at_price > product.price %}<span class="jl-prod-card__compare">{{ product.compare_at_price | money }}</span>{% endif %}{{ product.price | money }}</div>
+
+  <div class="jl-cgrid">
+    {% for product in collection.products limit: section.settings.products_per_page %}
+      <a href="{{ product.url }}" class="jl-cgrid-card">
+        <img class="jl-cgrid-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        <div class="jl-cgrid-card__title">{{ product.title }}</div>
+        <div class="jl-cgrid-card__price">{{ product.price | money }}</div>
       </a>
+    {% else %}
+      <p>No products found in this collection.</p>
     {% endfor %}
   </div>
 </div>
+
 {% schema %}
-{ "name": "JL Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "JL Collection Grid" }] }
+{
+  "name": "JL Collection Grid",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "JL Collection Grid"
+    }
+  ]
+}
 {% endschema %}

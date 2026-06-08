@@ -1,105 +1,108 @@
 <style>
-  .tg-brand {
-    padding: 100px 0;
+  .tg-brand-story {
+    display: flex;
+    flex-direction: column;
     background-color: {{ section.settings.bg_color }};
-    overflow: hidden;
   }
-  .tg-brand__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
+  @media (min-width: 768px) {
+    .tg-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .tg-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
   }
-  @media (max-width: 768px) {
-    .tg-brand__container { grid-template-columns: 1fr; }
-  }
-  .tg-brand__image-wrap {
-    position: relative;
-  }
-  .tg-brand__image-wrap::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    right: 20px;
-    bottom: 20px;
-    border: 1px solid {{ section.settings.accent_color }}30;
-    z-index: 0;
-  }
-  .tg-brand__image {
-    position: relative;
-    z-index: 1;
+  .tg-bs__image-col {
     width: 100%;
-    aspect-ratio: 4/3;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .tg-bs__image-col {
+      width: 50%;
+    }
+  }
+  .tg-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .tg-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .tg-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     object-fit: cover;
-    filter: contrast(1.1);
   }
-  .tg-brand__content {
-    padding: 20px 0;
+  .tg-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .tg-brand__label {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: {{ section.settings.accent_color }};
-    margin-bottom: 20px;
+  @media (min-width: 768px) {
+    .tg-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
   }
-  .tg-brand__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 38px;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1.2;
+  .tg-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .tg-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
     margin-bottom: 25px;
+    line-height: 1.2;
   }
-  .tg-brand__text {
-    font-family: 'Inter', sans-serif;
+  .tg-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 15px;
-    line-height: 1.8;
-    color: #888;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
     margin-bottom: 35px;
   }
-  .tg-brand__btn {
+  .tg-bs__btn {
     display: inline-block;
-    background: transparent;
-    color: {{ section.settings.accent_color }};
-    border: 1px solid {{ section.settings.accent_color }};
-    padding: 14px 40px;
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
     text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
   }
-  .tg-brand__btn:hover {
-    background: {{ section.settings.accent_color }};
-    color: #0a0a0a;
-    box-shadow: 0 0 25px {{ section.settings.accent_color }}30;
+  .tg-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
   }
 </style>
 
-<section class="tg-brand">
-  <div class="tg-brand__container" style="{% if section.settings.image_position == 'right' %}direction: rtl;{% endif %}">
-    <div class="tg-brand__image-wrap" style="direction: ltr;">
+<section class="tg-brand-story {% if section.settings.image_position == 'right' %}tg-brand-story--reverse{% endif %}">
+  <div class="tg-bs__image-col">
+    <div class="tg-bs__image-wrap">
       {% if section.settings.image %}
-        <img class="tg-brand__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" loading="lazy">
+        <img class="tg-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
       {% else %}
-        <div class="tg-brand__image" style="background: linear-gradient(135deg, #1a1a2e, #0a0a0a);"></div>
+        <div class="tg-bs__image" style="background-color: #e0e0e0;"></div>
       {% endif %}
     </div>
-    <div class="tg-brand__content" style="direction: ltr;">
-      <div class="tg-brand__label">{{ section.settings.label }}</div>
-      <h2 class="tg-brand__title">{{ section.settings.title }}</h2>
-      <div class="tg-brand__text">{{ section.settings.text }}</div>
+  </div>
+  
+  <div class="tg-bs__content-col">
+    <div class="tg-bs__content">
+      <h2 class="tg-bs__title">{{ section.settings.title }}</h2>
+      <div class="tg-bs__text">{{ section.settings.text }}</div>
       {% if section.settings.btn_label != blank %}
-        <a href="{{ section.settings.btn_link }}" class="tg-brand__btn">{{ section.settings.btn_label }}</a>
+        <a href="{{ section.settings.btn_link }}" class="tg-bs__btn">{{ section.settings.btn_label }}</a>
       {% endif %}
     </div>
   </div>
@@ -110,19 +113,71 @@
   "name": "TG Brand Story",
   "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "select", "id": "image_position", "label": "Image Position", "options": [
-      { "value": "left", "label": "Left" },
-      { "value": "right", "label": "Right" }
-    ], "default": "left" },
-    { "type": "text", "id": "label", "label": "Label", "default": "Our Mission" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Engineering Tomorrow" },
-    { "type": "richtext", "id": "text", "label": "Body Text", "default": "<p>We source and curate the most innovative electronics from around the globe, ensuring every product meets our rigorous standards for performance and design.</p>" },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Learn More" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0a0a0a" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#00f0ff" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "TG Brand Story" }]
+  "presets": [
+    {
+      "name": "TG Brand Story"
+    }
+  ]
 }
 {% endschema %}

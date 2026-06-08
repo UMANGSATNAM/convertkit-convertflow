@@ -1,0 +1,183 @@
+<style>
+  .gs-brand-story {
+    display: flex;
+    flex-direction: column;
+    background-color: {{ section.settings.bg_color }};
+  }
+  @media (min-width: 768px) {
+    .gs-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .gs-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+  .gs-bs__image-col {
+    width: 100%;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .gs-bs__image-col {
+      width: 50%;
+    }
+  }
+  .gs-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .gs-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .gs-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .gs-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .gs-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
+  }
+  .gs-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .gs-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .gs-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 35px;
+  }
+  .gs-bs__btn {
+    display: inline-block;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
+    text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .gs-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
+</style>
+
+<section class="gs-brand-story {% if section.settings.image_position == 'right' %}gs-brand-story--reverse{% endif %}">
+  <div class="gs-bs__image-col">
+    <div class="gs-bs__image-wrap">
+      {% if section.settings.image %}
+        <img class="gs-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
+      {% else %}
+        <div class="gs-bs__image" style="background-color: #e0e0e0;"></div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="gs-bs__content-col">
+    <div class="gs-bs__content">
+      <h2 class="gs-bs__title">{{ section.settings.title }}</h2>
+      <div class="gs-bs__text">{{ section.settings.text }}</div>
+      {% if section.settings.btn_label != blank %}
+        <a href="{{ section.settings.btn_link }}" class="gs-bs__btn">{{ section.settings.btn_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "GS Brand Story",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "GS Brand Story"
+    }
+  ]
+}
+{% endschema %}

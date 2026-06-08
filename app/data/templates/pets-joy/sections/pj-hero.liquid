@@ -1,45 +1,207 @@
 <style>
-  .pj-hero { position: relative; width: 100%; padding: 80px 0; min-height: 500px; display: flex; align-items: center; background: {{ section.settings.bg_color }}; overflow: hidden; }
-  .pj-hero__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 2; }
-  @media (max-width: 768px) { .pj-hero__container { grid-template-columns: 1fr; text-align: center; } }
-  .pj-hero__blob { position: absolute; top: -20%; right: -10%; width: 60%; height: 140%; background: {{ section.settings.accent_color }}; opacity: 0.1; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; z-index: 1; animation: morph 8s ease-in-out infinite alternate; }
-  @keyframes morph { 0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } }
-  .pj-hero__image-wrapper { position: relative; }
-  .pj-hero__image { width: 100%; border-radius: 30px; transform: rotate(3deg); box-shadow: 10px 10px 0px {{ section.settings.accent_color }}; transition: transform 0.3s; }
-  .pj-hero__image:hover { transform: rotate(0deg); }
-  .pj-hero__badge { display: inline-block; background: #fff; color: {{ section.settings.accent_color }}; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-  .pj-hero__title { font-family: 'Nunito', sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 900; color: #333; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.5px; }
-  .pj-hero__desc { font-family: 'Nunito', sans-serif; font-size: 18px; color: #666; line-height: 1.6; margin-bottom: 30px; font-weight: 600; }
-  .pj-hero__cta { display: inline-block; background: {{ section.settings.accent_color }}; color: #fff; padding: 16px 36px; border-radius: 30px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; text-decoration: none; transition: all 0.3s; box-shadow: 0 6px 0px rgba(0,0,0,0.1); transform: translateY(-4px); }
-  .pj-hero__cta:hover { transform: translateY(0); box-shadow: 0 2px 0px rgba(0,0,0,0.1); }
+  .pj-hero {
+    position: relative;
+    width: 100%;
+    height: 90vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .pj-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%; /* For parallax */
+    object-fit: cover;
+    z-index: 1;
+    transform: translateY(0);
+    transition: transform 0.1s linear;
+  }
+  .pj-hero__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+  .pj-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    z-index: 2;
+  }
+  .pj-hero__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    max-width: 900px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .pj-hero__subtitle {
+    font-family: var(--pj-font-sans, 'Inter', sans-serif);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: pj-hero-fade 1s forwards 0.3s;
+  }
+  .pj-hero__title {
+    font-family: var(--pj-font-serif, 'Georgia', serif);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0 0 40px 0;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: pj-hero-fade 1s forwards 0.5s;
+  }
+  .pj-hero__btn {
+    display: inline-block;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    padding: 18px 50px;
+    text-decoration: none;
+    font-family: var(--pj-font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: pj-hero-fade 1s forwards 0.7s;
+  }
+  .pj-hero__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.btn_bg_color }};
+  }
+
+  @keyframes pj-hero-fade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="pj-hero">
-  <div class="pj-hero__blob"></div>
-  <div class="pj-hero__container">
-    <div>
-      {% if section.settings.badge != blank %}<div class="pj-hero__badge">{{ section.settings.badge }}</div>{% endif %}
+
+<section class="pj-hero" id="pj-hero-{{ section.id }}">
+  {% if section.settings.video_url != blank %}
+    <video class="pj-hero__video" autoplay muted loop playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% elsif section.settings.image %}
+    <img class="pj-hero__media pj-hero-parallax" src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ section.settings.title | escape }}">
+  {% else %}
+    <div class="pj-hero__media" style="background-color: #222;"></div>
+  {% endif %}
+  
+  <div class="pj-hero__overlay"></div>
+  
+  <div class="pj-hero__content">
+    {% if section.settings.subtitle != blank %}
+      <div class="pj-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {% endif %}
+    {% if section.settings.title != blank %}
       <h1 class="pj-hero__title">{{ section.settings.title }}</h1>
-      <p class="pj-hero__desc">{{ section.settings.desc }}</p>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="pj-hero__cta">{{ section.settings.btn_label }}</a>{% endif %}
-    </div>
-    <div class="pj-hero__image-wrapper">
-      {% if section.settings.image %}<img class="pj-hero__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" loading="eager">{% else %}<div class="pj-hero__image" style="background:#ddd;aspect-ratio:4/3;"></div>{% endif %}
-    </div>
+    {% endif %}
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="pj-hero__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
   </div>
 </section>
+
+<script>
+  // Simple Parallax Effect
+  window.addEventListener('scroll', () => {
+    const parallaxImages = document.querySelectorAll('.pj-hero-parallax');
+    const scrollPosition = window.pageYOffset;
+    parallaxImages.forEach(img => {
+      img.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "PJ Hero", "tag": "section",
+  "name": "Premium Hero",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "badge", "label": "Badge", "default": "🐾 Wag-Worthy" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Happy Pets, Happy Life" },
-    { "type": "text", "id": "desc", "label": "Description", "default": "Spoil your furry friends with toys, treats, and accessories they'll love." },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Shop Now" },
-    { "type": "url", "id": "btn_link", "label": "Button Link" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fdf8f5" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background Video URL (MP4)",
+      "info": "Overrides image if provided."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The New Standard"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Elevate Your Aesthetic"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "PJ Hero" }]
+  "presets": [
+    {
+      "name": "Premium Hero"
+    }
+  ]
 }
 {% endschema %}

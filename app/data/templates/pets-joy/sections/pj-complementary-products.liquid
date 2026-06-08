@@ -1,40 +1,104 @@
 <style>
-  .pj-comp { padding: 60px 0; background: #fff; border-top: 2px dashed #eee; }
-  .pj-comp__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
-  .pj-comp__title { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 900; color: #333; margin-bottom: 30px; text-align: center; }
-  .pj-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  @media (max-width: 900px) { .pj-comp__grid { grid-template-columns: repeat(2, 1fr); } }
-  .pj-comp-card { text-decoration: none; display: block; background: #fdf8f5; border-radius: 20px; padding: 15px; transition: transform 0.3s; }
-  .pj-comp-card:hover { transform: translateY(-5px); }
-  .pj-comp-card__img { aspect-ratio: 1; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
-  .pj-comp-card__img img { width: 100%; height: 100%; object-fit: cover; }
-  .pj-comp-card__info { text-align: center; }
-  .pj-comp-card__title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #333; margin-bottom: 5px; }
-  .pj-comp-card__price { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #ff9f1c; }
+  .pj-complementary {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .pj-comp__title {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .pj-comp__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .pj-comp__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .pj-comp-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .pj-comp-card__img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  .pj-comp-card__title {
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .pj-comp-card__price {
+    font-size: 13px;
+    color: #666;
+  }
 </style>
-<section class="pj-comp">
-  <div class="pj-comp__container">
-    <h2 class="pj-comp__title">{{ section.settings.title }}</h2>
-    <div class="pj-comp__grid">
-      {% for product in recommendations.products limit: section.settings.limit %}
-        <a href="{{ product.url }}" class="pj-comp-card">
-          <div class="pj-comp-card__img"><img src="{{ product.featured_image | image_url: width: 300 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
-          <div class="pj-comp-card__info">
-            <div class="pj-comp-card__title">{{ product.title }}</div>
-            <div class="pj-comp-card__price">{{ product.price | money }}</div>
-          </div>
+
+<section class="pj-complementary">
+  <h2 class="pj-comp__title">{{ section.settings.title }}</h2>
+  
+  <div class="pj-comp__grid">
+    {% assign count = 0 %}
+    {% for related in collections.all.products limit: section.settings.limit %}
+      {% if related.id != product.id %}
+        {% assign count = count | plus: 1 %}
+        <a href="{{ related.url }}" class="pj-comp-card">
+          <img class="pj-comp-card__img" src="{{ related.featured_image | image_url: width: 400 }}" alt="{{ related.title | escape }}">
+          <div class="pj-comp-card__title">{{ related.title }}</div>
+          <div class="pj-comp-card__price">{{ related.price | money }}</div>
         </a>
-      {% endfor %}
-    </div>
+      {% endif %}
+    {% endfor %}
+    
+    {% if count == 0 %}
+      <p style="text-align:center; grid-column: 1/-1;">No complementary products found.</p>
+    {% endif %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "PJ Complementary", "tag": "section",
+  "name": "PJ Complementary",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Perfect Pairs" },
-    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 8, "step": 4, "default": 4 }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Complete The Look"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Limit",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "PJ Complementary" }]
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "PJ Complementary"
+    }
+  ]
 }
 {% endschema %}

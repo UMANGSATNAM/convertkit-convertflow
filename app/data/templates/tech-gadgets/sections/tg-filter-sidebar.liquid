@@ -1,142 +1,91 @@
 <style>
-  .tg-filter {
-    background: #0d0d16;
-    padding: 25px;
-    border: 1px solid rgba(0,240,255,0.08);
-    position: sticky;
-    top: 80px;
+  .tg-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  .tg-filter__title {
-    font-family: 'Inter', sans-serif;
+  .tg-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .tg-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .tg-filter-group__title {
     font-size: 14px;
-    font-weight: 700;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .tg-filter__group {
-    margin-bottom: 25px;
-  }
-  .tg-filter__group-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: #00f0ff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-    display: block;
-  }
-  .tg-filter__option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    cursor: pointer;
-  }
-  .tg-filter__checkbox {
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: transparent;
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-    position: relative;
-  }
-  .tg-filter__checkbox:checked {
-    background: #00f0ff;
-    border-color: #00f0ff;
-  }
-  .tg-filter__checkbox:checked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #0a0a0a;
-    font-size: 10px;
-    font-weight: bold;
-  }
-  .tg-filter__option-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: #999;
-    transition: color 0.2s;
-  }
-  .tg-filter__option:hover .tg-filter__option-label { color: #fff; }
-  .tg-filter__price-range {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .tg-filter__price-input {
-    flex: 1;
-    padding: 8px 10px;
-    background: #0a0a0a;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    outline: none;
-  }
-  .tg-filter__price-input:focus { border-color: #00f0ff; }
-  .tg-filter__sep { color: #444; font-size: 12px; }
-  .tg-filter__clear {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #999;
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s;
+    margin-bottom: 15px;
+    font-weight: bold;
   }
-  .tg-filter__clear:hover {
-    border-color: #00f0ff;
-    color: #00f0ff;
+  .tg-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tg-filter-list li {
+    margin-bottom: 10px;
+  }
+  .tg-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .tg-filter-list input {
+    margin-right: 10px;
   }
 </style>
 
-<aside class="tg-filter">
-  <h3 class="tg-filter__title">{{ section.settings.title }}</h3>
-  {% for filter in collection.filters %}
-    <div class="tg-filter__group">
-      <span class="tg-filter__group-label">{{ filter.label }}</span>
-      {% if filter.type == 'price_range' %}
-        <div class="tg-filter__price-range">
-          <input type="number" class="tg-filter__price-input" placeholder="Min" min="0">
-          <span class="tg-filter__sep">—</span>
-          <input type="number" class="tg-filter__price-input" placeholder="Max" min="0">
-        </div>
-      {% else %}
-        {% for value in filter.values limit: 8 %}
-          <label class="tg-filter__option">
-            <input type="checkbox" class="tg-filter__checkbox" {% if value.active %}checked{% endif %}>
-            <span class="tg-filter__option-label">{{ value.label }} ({{ value.count }})</span>
-          </label>
-        {% endfor %}
-      {% endif %}
-    </div>
-  {% endfor %}
-  <button class="tg-filter__clear" onclick="window.location.href=window.location.pathname">Clear All</button>
-</aside>
+<div class="tg-sidebar">
+  <h2 class="tg-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="tg-filter-group">
+        <div class="tg-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="tg-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
 
 {% schema %}
 {
   "name": "TG Filter Sidebar",
   "tag": "section",
-  "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Filters" }
-  ],
-  "presets": [{ "name": "TG Filter Sidebar" }]
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "TG Filter Sidebar"
+    }
+  ]
 }
 {% endschema %}

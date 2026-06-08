@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 
-let prisma;
+let prisma: PrismaClient;
 
 if (process.env.NODE_ENV !== "production") {
-  if (!global.__prisma) {
-    global.__prisma = new PrismaClient();
+  if (!(global as any).__prisma) {
+    (global as any).__prisma = new PrismaClient();
   }
-  prisma = global.__prisma;
+  prisma = (global as any).__prisma;
 } else {
   prisma = new PrismaClient();
 }

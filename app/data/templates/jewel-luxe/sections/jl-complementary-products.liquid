@@ -1,38 +1,104 @@
 <style>
-  .jl-comp { padding: 80px 0; background: #050505; border-top: 1px solid #1a1a1a; }
-  .jl-comp__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  .jl-comp__title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 400; color: #fff; margin-bottom: 40px; text-align: center; }
-  .jl-comp__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-  @media (max-width: 900px) { .jl-comp__grid { grid-template-columns: repeat(2, 1fr); } }
-  .jl-comp-card { text-decoration: none; display: block; text-align: center; }
-  .jl-comp-card__img-wrapper { aspect-ratio: 1; overflow: hidden; background: #111; margin-bottom: 15px; border: 1px solid transparent; transition: border-color 0.4s ease; }
-  .jl-comp-card:hover .jl-comp-card__img-wrapper { border-color: #333; }
-  .jl-comp-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; filter: brightness(0.9); }
-  .jl-comp-card:hover .jl-comp-card__img { transform: scale(1.05); filter: brightness(1.1); }
-  .jl-comp-card__title { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 400; color: #fff; margin-bottom: 5px; letter-spacing: 1px; }
-  .jl-comp-card__price { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; color: #999; }
+  .jl-complementary {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .jl-comp__title {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .jl-comp__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .jl-comp__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .jl-comp-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .jl-comp-card__img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  .jl-comp-card__title {
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .jl-comp-card__price {
+    font-size: 13px;
+    color: #666;
+  }
 </style>
-<section class="jl-comp">
-  <div class="jl-comp__container">
-    <h2 class="jl-comp__title">{{ section.settings.title }}</h2>
-    <div class="jl-comp__grid">
-      {% for product in recommendations.products limit: section.settings.limit %}
-        <a href="{{ product.url }}" class="jl-comp-card">
-          <div class="jl-comp-card__img-wrapper"><img class="jl-comp-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
-          <div class="jl-comp-card__title">{{ product.title }}</div>
-          <div class="jl-comp-card__price">{{ product.price | money }}</div>
+
+<section class="jl-complementary">
+  <h2 class="jl-comp__title">{{ section.settings.title }}</h2>
+  
+  <div class="jl-comp__grid">
+    {% assign count = 0 %}
+    {% for related in collections.all.products limit: section.settings.limit %}
+      {% if related.id != product.id %}
+        {% assign count = count | plus: 1 %}
+        <a href="{{ related.url }}" class="jl-comp-card">
+          <img class="jl-comp-card__img" src="{{ related.featured_image | image_url: width: 400 }}" alt="{{ related.title | escape }}">
+          <div class="jl-comp-card__title">{{ related.title }}</div>
+          <div class="jl-comp-card__price">{{ related.price | money }}</div>
         </a>
-      {% endfor %}
-    </div>
+      {% endif %}
+    {% endfor %}
+    
+    {% if count == 0 %}
+      <p style="text-align:center; grid-column: 1/-1;">No complementary products found.</p>
+    {% endif %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "JL Complementary", "tag": "section",
+  "name": "JL Complementary",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Complete The Look" },
-    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 8, "step": 4, "default": 4 }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Complete The Look"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Limit",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "JL Complementary" }]
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "JL Complementary"
+    }
+  ]
 }
 {% endschema %}

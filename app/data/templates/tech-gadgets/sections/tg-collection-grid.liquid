@@ -1,148 +1,94 @@
 <style>
-  .tg-coll-grid {
-    padding: 60px 0;
-    background: #0a0a0a;
+  .tg-cgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
-  .tg-coll-grid__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
+  @media (min-width: 768px) {
+    .tg-cgrid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 30px;
+    }
   }
-  .tg-coll-grid__header {
+  .tg-cgrid-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  .tg-coll-grid__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    color: #fff;
-    text-transform: uppercase;
+  .tg-cgrid-header select {
+    padding: 8px;
+    border: 1px solid #eaeaea;
+    background: transparent;
   }
-  .tg-coll-grid__count {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: #666;
-  }
-  .tg-coll-grid__products {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
-  @media (max-width: 1024px) {
-    .tg-coll-grid__products { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 600px) {
-    .tg-coll-grid__products { grid-template-columns: 1fr; }
-  }
-  .tg-coll-card {
-    background: #111122;
-    border: 1px solid rgba(0,240,255,0.06);
-    text-decoration: none;
+  .tg-cgrid-card {
     display: block;
-    transition: all 0.3s ease;
-  }
-  .tg-coll-card:hover {
-    border-color: #00f0ff;
-    transform: translateY(-3px);
-  }
-  .tg-coll-card__img {
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: #0d0d1a;
-  }
-  .tg-coll-card__img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s;
-  }
-  .tg-coll-card:hover .tg-coll-card__img img { transform: scale(1.06); }
-  .tg-coll-card__info { padding: 16px; }
-  .tg-coll-card__name {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #ddd;
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-  .tg-coll-card__price {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    color: #fff;
-  }
-  .tg-coll-card__compare {
-    color: #666;
-    text-decoration: line-through;
-    font-size: 13px;
-    margin-left: 6px;
-  }
-  .tg-coll-grid__pagination {
-    text-align: center;
-    margin-top: 40px;
-  }
-  .tg-coll-grid__pagination a {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 0 4px;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #999;
     text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    transition: all 0.3s;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  .tg-coll-grid__pagination a:hover,
-  .tg-coll-grid__pagination a.active {
-    border-color: #00f0ff;
-    color: #00f0ff;
+  .tg-cgrid-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .tg-cgrid-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .tg-cgrid-card__price {
+    font-size: 14px;
+    color: #666;
   }
 </style>
 
-<section class="tg-coll-grid">
-  <div class="tg-coll-grid__container">
-    <div class="tg-coll-grid__header">
-      <h1 class="tg-coll-grid__title">{{ collection.title }}</h1>
-      <span class="tg-coll-grid__count">{{ collection.products_count }} Products</span>
-    </div>
-    <div class="tg-coll-grid__products">
-      {% paginate collection.products by 12 %}
-        {% for product in collection.products %}
-          <a href="{{ product.url }}" class="tg-coll-card">
-            <div class="tg-coll-card__img">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | image_url: width: 500 }}" alt="{{ product.title | escape }}" loading="lazy">
-              {% endif %}
-            </div>
-            <div class="tg-coll-card__info">
-              <div class="tg-coll-card__name">{{ product.title }}</div>
-              <div class="tg-coll-card__price">
-                {{ product.price | money }}
-                {% if product.compare_at_price > product.price %}
-                  <span class="tg-coll-card__compare">{{ product.compare_at_price | money }}</span>
-                {% endif %}
-              </div>
-            </div>
-          </a>
-        {% endfor %}
-        {% if paginate.pages > 1 %}
-          <div class="tg-coll-grid__pagination">
-            {{ paginate | default_pagination }}
-          </div>
-        {% endif %}
-      {% endpaginate %}
+<div class="tg-cgrid-wrapper">
+  <div class="tg-cgrid-header">
+    <div>{{ collection.products_count }} products</div>
+    <div>
+      <select id="SortBy">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price, low to high</option>
+        <option value="price-descending">Price, high to low</option>
+      </select>
     </div>
   </div>
-</section>
+
+  <div class="tg-cgrid">
+    {% for product in collection.products limit: section.settings.products_per_page %}
+      <a href="{{ product.url }}" class="tg-cgrid-card">
+        <img class="tg-cgrid-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        <div class="tg-cgrid-card__title">{{ product.title }}</div>
+        <div class="tg-cgrid-card__price">{{ product.price | money }}</div>
+      </a>
+    {% else %}
+      <p>No products found in this collection.</p>
+    {% endfor %}
+  </div>
+</div>
 
 {% schema %}
 {
   "name": "TG Collection Grid",
   "tag": "section",
-  "settings": [],
-  "presets": [{ "name": "TG Collection Grid" }]
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "TG Collection Grid"
+    }
+  ]
 }
 {% endschema %}

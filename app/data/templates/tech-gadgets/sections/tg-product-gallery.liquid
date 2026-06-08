@@ -1,68 +1,50 @@
 <style>
-  .tg-gallery {
-    padding: 60px 0;
-    background: #0a0a0a;
+  .tg-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .tg-gallery__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
+  @media (min-width: 768px) {
+    .tg-pgallery {
+      gap: 20px;
+    }
   }
-  .tg-gallery__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    color: #fff;
-    text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  .tg-gallery__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 4px;
-  }
-  .tg-gallery__item {
-    aspect-ratio: 1;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-  }
-  .tg-gallery__item img {
+  .tg-pgallery__item {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: all 0.4s ease;
-    filter: brightness(0.8);
+    background-color: #f4f4f4;
   }
-  .tg-gallery__item:hover img {
-    transform: scale(1.1);
-    filter: brightness(1);
+  .tg-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 </style>
 
-<section class="tg-gallery">
-  <div class="tg-gallery__container">
-    {% if section.settings.title != blank %}
-      <h2 class="tg-gallery__title">{{ section.settings.title }}</h2>
-    {% endif %}
-    <div class="tg-gallery__grid">
-      {% for image in product.images %}
-        <div class="tg-gallery__item">
-          <img src="{{ image | image_url: width: 400 }}" alt="{{ image.alt | escape }}" loading="lazy">
-        </div>
-      {% endfor %}
+<div class="tg-pgallery">
+  {% for media in product.media %}
+    <div class="tg-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="tg-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'tg-pgallery__img' }}
+      {% endcase %}
     </div>
-  </div>
-</section>
+  {% else %}
+    <div class="tg-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
 
 {% schema %}
 {
   "name": "TG Product Gallery",
   "tag": "section",
-  "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Product Gallery" }
-  ],
-  "presets": [{ "name": "TG Product Gallery" }]
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "TG Product Gallery"
+    }
+  ]
 }
 {% endschema %}

@@ -145,7 +145,7 @@ export default function WhatsappConfigPage() {
                 <DataTable
                   columnContentTypes={['text', 'text', 'numeric', 'text']}
                   headings={['Customer', 'Phone', 'Cart Value', 'Status']}
-                  rows={abandonedCarts.map(cart => [
+                  rows={abandonedCarts.map((cart: any) => [
                     cart.customerEmail || "Unknown",
                     cart.customerPhone || "N/A",
                     `₹${cart.cartTotal}`,
@@ -169,7 +169,7 @@ export default function WhatsappConfigPage() {
                 <DataTable
                   columnContentTypes={['text', 'text', 'text', 'text']}
                   headings={['Date', 'To', 'Template', 'Status']}
-                  rows={messages.map(msg => [
+                  rows={messages.map((msg: any) => [
                     new Date(msg.sentAt || new Date()).toLocaleString(),
                     msg.toPhone,
                     msg.templateName,

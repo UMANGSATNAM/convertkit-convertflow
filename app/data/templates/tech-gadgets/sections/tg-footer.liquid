@@ -1,50 +1,33 @@
 <style>
   .tg-footer {
-    background: #070710;
-    border-top: 1px solid rgba(0,240,255,0.08);
-    padding: 60px 0 30px;
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    padding: 60px 5%;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  .tg-footer__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
-  }
-  .tg-footer__grid {
+  .tg-footer__inner {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 40px;
-    margin-bottom: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  @media (max-width: 768px) {
-    .tg-footer__grid { grid-template-columns: 1fr 1fr; }
+  @media (min-width: 768px) {
+    .tg-footer__inner {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
-  @media (max-width: 480px) {
-    .tg-footer__grid { grid-template-columns: 1fr; }
-  }
-  .tg-footer__brand-name {
-    font-family: 'Inter', sans-serif;
-    font-size: 20px;
-    font-weight: 900;
-    color: #ffffff;
+  .tg-footer__heading {
+    font-family: 'Georgia', serif;
+    font-size: 16px;
+    font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 15px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
   }
-  .tg-footer__brand-name span { color: #00f0ff; }
-  .tg-footer__brand-desc {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    line-height: 1.7;
-    color: #555;
-    max-width: 300px;
-  }
-  .tg-footer__col-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: #00f0ff;
-    text-transform: uppercase;
-    letter-spacing: 3px;
+  .tg-footer__text {
+    font-size: 14px;
+    line-height: 1.6;
     margin-bottom: 20px;
   }
   .tg-footer__links {
@@ -52,87 +35,61 @@
     padding: 0;
     margin: 0;
   }
-  .tg-footer__links li { margin-bottom: 10px; }
+  .tg-footer__links li {
+    margin-bottom: 10px;
+  }
   .tg-footer__links a {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: #777;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  .tg-footer__links a:hover { color: #ffffff; }
-  .tg-footer__bottom {
-    padding-top: 25px;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  .tg-footer__copy {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: #444;
-  }
-  .tg-footer__socials {
-    display: flex;
-    gap: 15px;
-  }
-  .tg-footer__social {
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
+    color: {{ section.settings.text_color }};
     text-decoration: none;
     font-size: 14px;
-    transition: all 0.3s;
+    transition: opacity 0.3s;
   }
-  .tg-footer__social:hover {
-    border-color: #00f0ff;
-    color: #00f0ff;
+  .tg-footer__links a:hover {
+    opacity: 0.7;
+  }
+  .tg-footer__bottom {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  @media (min-width: 768px) {
+    .tg-footer__bottom {
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 </style>
 
 <footer class="tg-footer">
-  <div class="tg-footer__container">
-    <div class="tg-footer__grid">
-      <div>
-        <div class="tg-footer__brand-name">{{ section.settings.logo_text }}<span>.</span></div>
-        <p class="tg-footer__brand-desc">{{ section.settings.description }}</p>
-      </div>
-      {% for block in section.blocks %}
-        {% if block.type == 'column' %}
-          <div>
-            <h4 class="tg-footer__col-title">{{ block.settings.title }}</h4>
+  <div class="tg-footer__inner">
+    {% for block in section.blocks %}
+      <div class="tg-footer__column">
+        {% if block.settings.heading != blank %}
+          <div class="tg-footer__heading">{{ block.settings.heading }}</div>
+        {% endif %}
+        
+        {% case block.type %}
+          {% when 'text' %}
+            <div class="tg-footer__text">{{ block.settings.text }}</div>
+          
+          {% when 'link_list' %}
             <ul class="tg-footer__links">
-              {% assign links = block.settings.menu | default: linklists.footer-menu %}
-              {% if block.settings.menu != blank %}
-                {% for link in linklists[block.settings.menu].links %}
-                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                {% endfor %}
-              {% endif %}
+              {% for link in linklists[block.settings.menu].links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
             </ul>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    <div class="tg-footer__bottom">
-      <span class="tg-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
-      <div class="tg-footer__socials">
-        {% if section.settings.twitter != blank %}
-          <a href="{{ section.settings.twitter }}" class="tg-footer__social" target="_blank">𝕏</a>
-        {% endif %}
-        {% if section.settings.instagram != blank %}
-          <a href="{{ section.settings.instagram }}" class="tg-footer__social" target="_blank">IG</a>
-        {% endif %}
-        {% if section.settings.youtube != blank %}
-          <a href="{{ section.settings.youtube }}" class="tg-footer__social" target="_blank">YT</a>
-        {% endif %}
+        {% endcase %}
       </div>
+    {% endfor %}
+  </div>
+
+  <div class="tg-footer__bottom">
+    <div class="tg-footer__copyright">
+      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
     </div>
   </div>
 </footer>
@@ -142,29 +99,64 @@
   "name": "TG Footer",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "TechStore" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Premium electronics and cutting-edge gadgets, curated for the modern tech enthusiast." },
-    { "type": "url", "id": "twitter", "label": "Twitter/X URL" },
-    { "type": "url", "id": "instagram", "label": "Instagram URL" },
-    { "type": "url", "id": "youtube", "label": "YouTube URL" }
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
   "blocks": [
     {
-      "type": "column",
-      "name": "Link Column",
+      "type": "link_list",
+      "name": "Menu",
       "settings": [
-        { "type": "text", "id": "title", "label": "Column Title", "default": "Shop" },
-        { "type": "link_list", "id": "menu", "label": "Menu" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Quick links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About Us"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Share store details, promotions, or brand content with your customers."
+        }
       ]
     }
   ],
-  "presets": [{
-    "name": "TG Footer",
-    "blocks": [
-      { "type": "column", "settings": { "title": "Shop" }},
-      { "type": "column", "settings": { "title": "Support" }},
-      { "type": "column", "settings": { "title": "Company" }}
-    ]
-  }]
+  "presets": [
+    {
+      "name": "TG Footer",
+      "blocks": [
+        { "type": "link_list" },
+        { "type": "text" }
+      ]
+    }
+  ]
 }
 {% endschema %}

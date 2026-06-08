@@ -1,35 +1,91 @@
 <style>
-  .fb-sidebar { padding: 60px 40px 60px 0; border-right: 1px dashed #e2e8f0; }
-  .fb-sidebar__group { margin-bottom: 40px; }
-  .fb-sidebar__title { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; color: #2d3748; margin-bottom: 20px; }
-  .fb-sidebar__list { list-style: none; padding: 0; margin: 0; }
-  .fb-sidebar__item { margin-bottom: 12px; }
-  .fb-sidebar__label { display: flex; align-items: center; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #4a5568; cursor: pointer; transition: color 0.3s; font-weight: 500; }
-  .fb-sidebar__label:hover { color: #4CAF50; }
-  .fb-sidebar__checkbox { appearance: none; width: 20px; height: 20px; border: 2px solid #cbd5e0; border-radius: 6px; outline: none; cursor: pointer; transition: all 0.2s; position: relative; background: #fff; }
-  .fb-sidebar__checkbox:checked { background: #4CAF50; border-color: #4CAF50; }
-  .fb-sidebar__checkbox:checked::after { content: ''; position: absolute; top: 2px; left: 6px; width: 4px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .fb-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .fb-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .fb-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .fb-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .fb-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .fb-filter-list li {
+    margin-bottom: 10px;
+  }
+  .fb-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .fb-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="fb-sidebar">
-  <div class="fb-sidebar__group">
-    <div class="fb-sidebar__title">Dietary</div>
-    <ul class="fb-sidebar__list">
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Organic</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Gluten-Free</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Vegan</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Keto</label></li>
-    </ul>
-  </div>
-  <div class="fb-sidebar__group">
-    <div class="fb-sidebar__title">Categories</div>
-    <ul class="fb-sidebar__list">
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Produce</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Dairy</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Bakery</label></li>
-      <li class="fb-sidebar__item"><label class="fb-sidebar__label"><input type="checkbox" class="fb-sidebar__checkbox"> Pantry</label></li>
-    </ul>
-  </div>
-</aside>
+
+<div class="fb-sidebar">
+  <h2 class="fb-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="fb-filter-group">
+        <div class="fb-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="fb-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "FB Filter Sidebar", "tag": "section", "settings": [], "presets": [{ "name": "FB Filter Sidebar" }] }
+{
+  "name": "FB Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "FB Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

@@ -1,20 +1,50 @@
 <style>
-  .fp-gallery { padding: 40px 0; background: #000; }
-  .fp-gallery__container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
-  .fp-gallery__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-  .fp-gallery__item { aspect-ratio: 4/5; overflow: hidden; background: #111; cursor: pointer; border: 1px solid #222; }
-  .fp-gallery__item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; opacity: 0.8; filter: contrast(1.1); }
-  .fp-gallery__item:hover img { transform: scale(1.05); opacity: 1; }
+  .fp-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  @media (min-width: 768px) {
+    .fp-pgallery {
+      gap: 20px;
+    }
+  }
+  .fp-pgallery__item {
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  .fp-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 </style>
-<section class="fp-gallery">
-  <div class="fp-gallery__container">
-    <div class="fp-gallery__grid">
-      {% for image in product.images %}
-        <div class="fp-gallery__item"><img src="{{ image | image_url: width: 600 }}" alt="{{ image.alt | escape }}" loading="lazy"></div>
-      {% endfor %}
+
+<div class="fp-pgallery">
+  {% for media in product.media %}
+    <div class="fp-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="fp-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'fp-pgallery__img' }}
+      {% endcase %}
     </div>
-  </div>
-</section>
+  {% else %}
+    <div class="fp-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
+
 {% schema %}
-{ "name": "FP Product Gallery", "tag": "section", "settings": [], "presets": [{ "name": "FP Product Gallery" }] }
+{
+  "name": "FP Product Gallery",
+  "tag": "section",
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "FP Product Gallery"
+    }
+  ]
+}
 {% endschema %}

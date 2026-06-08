@@ -1,34 +1,91 @@
 <style>
-  .gs-sidebar { padding: 60px 40px 60px 0; border-right: 1px solid #222; }
-  .gs-sidebar__group { margin-bottom: 40px; }
-  .gs-sidebar__title { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-  .gs-sidebar__list { list-style: none; padding: 0; margin: 0; }
-  .gs-sidebar__item { margin-bottom: 12px; }
-  .gs-sidebar__label { display: flex; align-items: center; gap: 12px; font-family: 'Inter', sans-serif; font-size: 14px; color: #a0aec0; cursor: pointer; transition: color 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-  .gs-sidebar__label:hover { color: #d4af37; }
-  .gs-sidebar__checkbox { appearance: none; width: 16px; height: 16px; border: 1px solid #444; outline: none; cursor: pointer; transition: all 0.2s; position: relative; background: #111; }
-  .gs-sidebar__checkbox:checked { background: #d4af37; border-color: #d4af37; }
-  .gs-sidebar__checkbox:checked::after { content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px; border: solid #000; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .gs-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .gs-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .gs-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .gs-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .gs-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .gs-filter-list li {
+    margin-bottom: 10px;
+  }
+  .gs-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .gs-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="gs-sidebar">
-  <div class="gs-sidebar__group">
-    <div class="gs-sidebar__title">Categories</div>
-    <ul class="gs-sidebar__list">
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Beard Care</label></li>
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Hair Styling</label></li>
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Skincare</label></li>
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Tools</label></li>
-    </ul>
-  </div>
-  <div class="gs-sidebar__group">
-    <div class="gs-sidebar__title">Hair Type</div>
-    <ul class="gs-sidebar__list">
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Straight</label></li>
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Wavy</label></li>
-      <li class="gs-sidebar__item"><label class="gs-sidebar__label"><input type="checkbox" class="gs-sidebar__checkbox"> Curly</label></li>
-    </ul>
-  </div>
-</aside>
+
+<div class="gs-sidebar">
+  <h2 class="gs-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="gs-filter-group">
+        <div class="gs-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="gs-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "GS Filter Sidebar", "tag": "section", "settings": [], "presets": [{ "name": "GS Filter Sidebar" }] }
+{
+  "name": "GS Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "GS Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

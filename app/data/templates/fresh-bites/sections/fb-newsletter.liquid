@@ -1,40 +1,130 @@
 <style>
-  .fb-newsletter { padding: 100px 0; background: {{ section.settings.bg_color }}; position: relative; overflow: hidden; }
-  .fb-newsletter::before { content: ''; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-  .fb-newsletter::after { content: ''; position: absolute; bottom: -50px; right: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-  .fb-newsletter__container { max-width: 600px; margin: 0 auto; padding: 0 40px; text-align: center; position: relative; z-index: 2; }
-  .fb-newsletter__title { font-family: 'Fraunces', serif; font-size: 40px; font-weight: 600; color: #fff; margin-bottom: 20px; line-height: 1.2; }
-  .fb-newsletter__text { font-family: 'DM Sans', sans-serif; font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 40px; }
-  .fb-newsletter__form { display: flex; gap: 10px; }
-  @media (max-width: 600px) { .fb-newsletter__form { flex-direction: column; } }
-  .fb-newsletter__input { flex: 1; padding: 18px 24px; border: none; border-radius: 8px; background: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; color: #2d3748; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-  .fb-newsletter__input::placeholder { color: #a0aec0; }
-  .fb-newsletter__btn { padding: 18px 32px; background: #2d3748; color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s, background 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-  .fb-newsletter__btn:hover { transform: translateY(-2px); background: #1a202c; }
+  .fb-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .fb-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .fb-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .fb-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .fb-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .fb-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .fb-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .fb-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .fb-nl__input:focus {
+      outline: none;
+    }
+  }
+  .fb-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .fb-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .fb-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .fb-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="fb-newsletter">
-  <div class="fb-newsletter__container">
-    <h2 class="fb-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="fb-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="fb-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="fb-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="fb-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="fb-nl__inner">
+    <h2 class="fb-nl__title">{{ section.settings.title }}</h2>
+    <div class="fb-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'fb-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="fb-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="fb-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "FB Newsletter", "tag": "section",
+  "name": "FB Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Get 15% Off Your First Order" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Join our community for weekly recipes, farm updates, and exclusive offers.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Enter your email" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#4CAF50" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "FB Newsletter" }]
+  "presets": [
+    {
+      "name": "FB Newsletter"
+    }
+  ]
 }
 {% endschema %}

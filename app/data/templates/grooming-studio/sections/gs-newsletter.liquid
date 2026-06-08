@@ -1,39 +1,130 @@
 <style>
-  .gs-newsletter { padding: 100px 0; background: #000; border-top: 1px solid #222; text-align: center; }
-  .gs-newsletter__container { max-width: 600px; margin: 0 auto; padding: 0 40px; }
-  .gs-newsletter__title { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; }
-  .gs-newsletter__text { font-family: 'Inter', sans-serif; font-size: 16px; color: #a0aec0; margin-bottom: 40px; font-weight: 300; }
-  .gs-newsletter__form { display: flex; gap: 0; border: 1px solid #333; }
-  @media (max-width: 600px) { .gs-newsletter__form { flex-direction: column; border: none; gap: 15px; } }
-  .gs-newsletter__input { flex: 1; padding: 18px 24px; border: none; background: #111; font-family: 'Inter', sans-serif; font-size: 14px; color: #fff; outline: none; text-transform: uppercase; letter-spacing: 1px; }
-  @media (max-width: 600px) { .gs-newsletter__input { border: 1px solid #333; } }
-  .gs-newsletter__input::placeholder { color: #555; }
-  .gs-newsletter__btn { padding: 18px 40px; background: {{ section.settings.accent_color }}; color: #000; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: background 0.3s; }
-  .gs-newsletter__btn:hover { background: #fff; }
+  .gs-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .gs-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .gs-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .gs-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .gs-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .gs-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .gs-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .gs-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .gs-nl__input:focus {
+      outline: none;
+    }
+  }
+  .gs-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .gs-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .gs-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .gs-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="gs-newsletter">
-  <div class="gs-newsletter__container">
-    <h2 class="gs-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="gs-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="gs-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="gs-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="gs-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="gs-nl__inner">
+    <h2 class="gs-nl__title">{{ section.settings.title }}</h2>
+    <div class="gs-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'gs-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="gs-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="gs-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "GS Newsletter", "tag": "section",
+  "name": "GS Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Club" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Subscribe for exclusive drops, grooming tips, and 10% off your first order.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Enter email address" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "GS Newsletter" }]
+  "presets": [
+    {
+      "name": "GS Newsletter"
+    }
+  ]
 }
 {% endschema %}

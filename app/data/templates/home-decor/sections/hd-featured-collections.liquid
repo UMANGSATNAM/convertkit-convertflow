@@ -1,46 +1,142 @@
 <style>
-  .hd-collections { padding: 100px 0; background: #faf9f8; }
-  .hd-collections__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  .hd-collections__header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
-  .hd-collections__title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 400; color: #2c2c2c; }
-  .hd-collections__link { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; color: {{ section.settings.accent_color }}; text-decoration: none; position: relative; }
-  .hd-collections__link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 1px; background: {{ section.settings.accent_color }}; transition: width 0.3s; }
-  .hd-collections__link:hover::after { width: 0; }
-  .hd-collections__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-  @media (max-width: 900px) { .hd-collections__grid { grid-template-columns: 1fr; } .hd-collections__header { flex-direction: column; align-items: flex-start; gap: 20px; } }
-  .hd-coll-card { text-decoration: none; display: block; group; }
-  .hd-coll-card__image-wrapper { width: 100%; aspect-ratio: 3/4; overflow: hidden; margin-bottom: 25px; background: #eee; }
-  .hd-coll-card__image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .hd-coll-card:hover .hd-coll-card__image { transform: scale(1.05); }
-  .hd-coll-card__title { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; color: #2c2c2c; text-align: center; }
+  .hd-featured-cols {
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .hd-featured-cols__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .hd-featured-cols__title {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    font-weight: normal;
+    color: #000;
+  }
+  .hd-featured-cols__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .hd-featured-cols__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .hd-fcol {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    group: item;
+  }
+  .hd-fcol__img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 125%; /* 4:5 aspect ratio */
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .hd-fcol__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+  .hd-fcol:hover .hd-fcol__img {
+    transform: scale(1.05);
+  }
+  .hd-fcol__title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+  }
 </style>
-<section class="hd-collections">
-  <div class="hd-collections__container">
-    <div class="hd-collections__header">
-      <h2 class="hd-collections__title">{{ section.settings.title }}</h2>
-      <a href="/collections" class="hd-collections__link">View All Categories</a>
+
+<section class="hd-featured-cols">
+  {% if section.settings.title != blank %}
+    <div class="hd-featured-cols__header">
+      <h2 class="hd-featured-cols__title">{{ section.settings.title }}</h2>
     </div>
-    <div class="hd-collections__grid">
-      {% for block in section.blocks %}
-        {% assign col = collections[block.settings.collection] %}
-        <a href="{{ col.url | default: '#' }}" class="hd-coll-card" {{ block.shopify_attributes }}>
-          <div class="hd-coll-card__image-wrapper">
-            {% if col.image %}<img class="hd-coll-card__image" src="{{ col.image | image_url: width: 600 }}" alt="{{ col.title | escape }}" loading="lazy">{% else %}<div class="hd-coll-card__image"></div>{% endif %}
-          </div>
-          <h3 class="hd-coll-card__title">{{ block.settings.title | default: col.title | default: 'Category' }}</h3>
-        </a>
-      {% endfor %}
-    </div>
+  {% endif %}
+
+  <div class="hd-featured-cols__grid">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.collection.url | default: '#' }}" class="hd-fcol">
+        <div class="hd-fcol__img-wrapper">
+          {% if block.settings.image %}
+            <img class="hd-fcol__img" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}">
+          {% elsif block.settings.collection.image %}
+             <img class="hd-fcol__img" src="{{ block.settings.collection.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}">
+          {% else %}
+            <div class="hd-fcol__img" style="background-color: #eee;"></div>
+          {% endif %}
+        </div>
+        <div class="hd-fcol__title">
+          {{ block.settings.title | default: block.settings.collection.title | default: 'Collection' }}
+        </div>
+      </a>
+    {% endfor %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "HD Featured Collections", "tag": "section",
+  "name": "HD Featured Collections",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Curated Spaces" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#8c7a6b" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "blocks": [{ "type": "collection", "name": "Collection", "settings": [{ "type": "collection", "id": "collection", "label": "Collection" }, { "type": "text", "id": "title", "label": "Override Title" }] }],
-  "presets": [{ "name": "HD Featured Collections" }]
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HD Featured Collections",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
 }
 {% endschema %}

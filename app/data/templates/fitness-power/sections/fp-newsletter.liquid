@@ -1,38 +1,130 @@
 <style>
-  .fp-newsletter { padding: 100px 0; background: #ff2a2a; position: relative; overflow: hidden; }
-  .fp-newsletter::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px); z-index: 1; }
-  .fp-newsletter__container { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; padding: 0 30px; text-align: center; }
-  .fp-newsletter__title { font-family: 'Inter', sans-serif; font-size: clamp(36px, 5vw, 54px); font-weight: 900; color: #fff; text-transform: uppercase; margin: 0 0 15px 0; line-height: 1; letter-spacing: -1px; }
-  .fp-newsletter__text { font-family: 'Inter', sans-serif; font-size: 16px; color: #fff; margin-bottom: 40px; font-weight: 600; }
-  .fp-newsletter__form { display: flex; max-width: 500px; margin: 0 auto; }
-  @media (max-width: 600px) { .fp-newsletter__form { flex-direction: column; gap: 10px; } }
-  .fp-newsletter__input { flex: 1; padding: 18px 25px; background: #000; border: none; font-family: 'Inter', sans-serif; font-size: 15px; color: #fff; outline: none; text-transform: uppercase; }
-  .fp-newsletter__input::placeholder { color: #555; }
-  .fp-newsletter__btn { padding: 18px 30px; background: #fff; color: #ff2a2a; border: none; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s; }
-  .fp-newsletter__btn:hover { background: #000; color: #fff; }
+  .fp-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .fp-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .fp-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .fp-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .fp-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .fp-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .fp-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .fp-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .fp-nl__input:focus {
+      outline: none;
+    }
+  }
+  .fp-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .fp-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .fp-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .fp-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="fp-newsletter">
-  <div class="fp-newsletter__container">
-    <h2 class="fp-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="fp-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="fp-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="fp-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="fp-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="fp-nl__inner">
+    <h2 class="fp-nl__title">{{ section.settings.title }}</h2>
+    <div class="fp-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'fp-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="fp-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="fp-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "FP Newsletter", "tag": "section",
+  "name": "FP Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Squad" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Sign up for exclusive drops and workout tips.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Email Address" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "FP Newsletter" }]
+  "presets": [
+    {
+      "name": "FP Newsletter"
+    }
+  ]
 }
 {% endschema %}

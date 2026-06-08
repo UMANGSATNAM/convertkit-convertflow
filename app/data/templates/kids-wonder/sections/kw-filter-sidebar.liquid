@@ -1,35 +1,91 @@
 <style>
-  .kw-sidebar { padding: 40px 40px 40px 0; }
-  .kw-sidebar__group { margin-bottom: 40px; background: #F7FFF7; padding: 25px; border-radius: 30px; border: 3px solid #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
-  .kw-sidebar__title { font-family: 'Fredoka One', cursive; font-size: 20px; color: #2d3748; margin-bottom: 20px; }
-  .kw-sidebar__list { list-style: none; padding: 0; margin: 0; }
-  .kw-sidebar__item { margin-bottom: 12px; }
-  .kw-sidebar__label { display: flex; align-items: center; gap: 12px; font-family: 'Nunito', sans-serif; font-size: 16px; color: #4a5568; cursor: pointer; transition: color 0.3s; font-weight: 700; }
-  .kw-sidebar__label:hover { color: #FF6B6B; }
-  .kw-sidebar__checkbox { appearance: none; width: 20px; height: 20px; border: 3px solid #cbd5e0; border-radius: 6px; outline: none; cursor: pointer; transition: all 0.2s; position: relative; background: #fff; }
-  .kw-sidebar__checkbox:checked { background: #FF6B6B; border-color: #FF6B6B; }
-  .kw-sidebar__checkbox:checked::after { content: ''; position: absolute; top: 2px; left: 5px; width: 4px; height: 8px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+  .kw-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .kw-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .kw-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .kw-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .kw-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .kw-filter-list li {
+    margin-bottom: 10px;
+  }
+  .kw-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .kw-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="kw-sidebar">
-  <div class="kw-sidebar__group">
-    <div class="kw-sidebar__title">Ages 🎂</div>
-    <ul class="kw-sidebar__list">
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> 0-2 Years</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> 3-5 Years</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> 6-8 Years</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> 9+ Years</label></li>
-    </ul>
-  </div>
-  <div class="kw-sidebar__group">
-    <div class="kw-sidebar__title">Toy Type 🧩</div>
-    <ul class="kw-sidebar__list">
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> Educational</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> Creative</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> Outdoor Play</label></li>
-      <li class="kw-sidebar__item"><label class="kw-sidebar__label"><input type="checkbox" class="kw-sidebar__checkbox"> Puzzles</label></li>
-    </ul>
-  </div>
-</aside>
+
+<div class="kw-sidebar">
+  <h2 class="kw-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="kw-filter-group">
+        <div class="kw-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="kw-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "KW Filter Sidebar", "tag": "section", "settings": [], "presets": [{ "name": "KW Filter Sidebar" }] }
+{
+  "name": "KW Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "KW Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

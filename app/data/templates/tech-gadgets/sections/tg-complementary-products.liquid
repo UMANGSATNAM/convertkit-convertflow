@@ -1,101 +1,104 @@
 <style>
   .tg-complementary {
-    padding: 60px 0;
-    background: #0d0d16;
+    padding: 80px 5%;
+    background-color: {{ section.settings.bg_color }};
   }
-  .tg-complementary__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
-  }
-  .tg-complementary__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 30px;
+  .tg-comp__title {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: normal;
     text-align: center;
+    margin-bottom: 40px;
   }
-  .tg-complementary__grid {
+  .tg-comp__grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  @media (max-width: 768px) {
-    .tg-complementary__grid { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 768px) {
+    .tg-comp__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
   .tg-comp-card {
-    background: #111122;
-    border: 1px solid rgba(0,240,255,0.05);
-    text-decoration: none;
     display: block;
-    transition: all 0.3s ease;
-  }
-  .tg-comp-card:hover {
-    border-color: rgba(0,240,255,0.2);
-    transform: translateY(-3px);
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
   .tg-comp-card__img {
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: #0a0a15;
-  }
-  .tg-comp-card__img img {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4/5;
     object-fit: cover;
-    transition: transform 0.4s;
+    margin-bottom: 10px;
   }
-  .tg-comp-card:hover .tg-comp-card__img img { transform: scale(1.05); }
-  .tg-comp-card__info { padding: 14px; }
-  .tg-comp-card__name {
-    font-family: 'Inter', sans-serif;
+  .tg-comp-card__title {
     font-size: 13px;
-    color: #ccc;
-    margin-bottom: 6px;
-    line-height: 1.3;
+    text-transform: uppercase;
+    margin-bottom: 5px;
   }
   .tg-comp-card__price {
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
+    font-size: 13px;
+    color: #666;
   }
 </style>
 
 <section class="tg-complementary">
-  <div class="tg-complementary__container">
-    <h2 class="tg-complementary__title">{{ section.settings.title }}</h2>
-    <div class="tg-complementary__grid">
-      {% assign rec = recommendations.products %}
-      {% if rec.size > 0 %}
-        {% for product in rec limit: 4 %}
-          <a href="{{ product.url }}" class="tg-comp-card">
-            <div class="tg-comp-card__img">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">
-              {% endif %}
-            </div>
-            <div class="tg-comp-card__info">
-              <div class="tg-comp-card__name">{{ product.title }}</div>
-              <div class="tg-comp-card__price">{{ product.price | money }}</div>
-            </div>
-          </a>
-        {% endfor %}
+  <h2 class="tg-comp__title">{{ section.settings.title }}</h2>
+  
+  <div class="tg-comp__grid">
+    {% assign count = 0 %}
+    {% for related in collections.all.products limit: section.settings.limit %}
+      {% if related.id != product.id %}
+        {% assign count = count | plus: 1 %}
+        <a href="{{ related.url }}" class="tg-comp-card">
+          <img class="tg-comp-card__img" src="{{ related.featured_image | image_url: width: 400 }}" alt="{{ related.title | escape }}">
+          <div class="tg-comp-card__title">{{ related.title }}</div>
+          <div class="tg-comp-card__price">{{ related.price | money }}</div>
+        </a>
       {% endif %}
-    </div>
+    {% endfor %}
+    
+    {% if count == 0 %}
+      <p style="text-align:center; grid-column: 1/-1;">No complementary products found.</p>
+    {% endif %}
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "TG Complementary Products",
+  "name": "TG Complementary",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "You Might Also Like" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Complete The Look"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Limit",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
   ],
-  "presets": [{ "name": "TG Complementary Products" }]
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "TG Complementary"
+    }
+  ]
 }
 {% endschema %}

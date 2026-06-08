@@ -1,39 +1,130 @@
 <style>
-  .ob-newsletter { padding: 80px 0; background: linear-gradient(135deg, #f0e8dc 0%, #faf5ef 100%); }
-  .ob-newsletter__container { max-width: 550px; margin: 0 auto; padding: 0 30px; text-align: center; }
-  .ob-newsletter__icon { font-size: 36px; margin-bottom: 15px; }
-  .ob-newsletter__title { font-family: 'Georgia', serif; font-size: 30px; color: #2d2a24; margin-bottom: 12px; }
-  .ob-newsletter__text { font-family: 'Inter', sans-serif; font-size: 14px; color: #8b7355; line-height: 1.7; margin-bottom: 30px; }
-  .ob-newsletter__form { display: flex; gap: 0; max-width: 450px; margin: 0 auto; border-radius: 30px; overflow: hidden; border: 1px solid #d6c9b4; }
-  @media (max-width: 600px) { .ob-newsletter__form { flex-direction: column; border-radius: 12px; } }
-  .ob-newsletter__input { flex: 1; padding: 14px 22px; background: #ffffff; border: none; font-family: 'Inter', sans-serif; font-size: 14px; color: #2d2a24; outline: none; }
-  .ob-newsletter__input::placeholder { color: #bbb; }
-  .ob-newsletter__btn { padding: 14px 28px; background: #c9a96e; color: #fff; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
-  .ob-newsletter__btn:hover { background: #b89555; }
+  .ob-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .ob-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .ob-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .ob-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .ob-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .ob-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .ob-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .ob-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .ob-nl__input:focus {
+      outline: none;
+    }
+  }
+  .ob-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .ob-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .ob-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .ob-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="ob-newsletter">
-  <div class="ob-newsletter__container">
-    <div class="ob-newsletter__icon">🌿</div>
-    <h2 class="ob-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="ob-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="ob-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="ob-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="ob-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="ob-nl__inner">
+    <h2 class="ob-nl__title">{{ section.settings.title }}</h2>
+    <div class="ob-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'ob-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="ob-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="ob-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "OB Newsletter", "tag": "section",
+  "name": "OB Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Glow Club" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Get skincare tips, early access to launches, and exclusive offers delivered to your inbox.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Your email address" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Join" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "OB Newsletter" }]
+  "presets": [
+    {
+      "name": "OB Newsletter"
+    }
+  ]
 }
 {% endschema %}

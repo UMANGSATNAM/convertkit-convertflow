@@ -1,43 +1,183 @@
 <style>
-  .pj-brand { padding: 100px 0; background: {{ section.settings.bg_color }}; overflow: hidden; }
-  .pj-brand__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  @media (max-width: 900px) { .pj-brand__container { grid-template-columns: 1fr; text-align: center; } }
-  .pj-brand__image-wrapper { position: relative; }
-  .pj-brand__image { width: 100%; border-radius: 40px; transform: rotate(-3deg); box-shadow: -15px 15px 0px {{ section.settings.accent_color }}40; position: relative; z-index: 2; transition: transform 0.4s; }
-  .pj-brand__image:hover { transform: rotate(0); }
-  .pj-brand__eyebrow { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: {{ section.settings.accent_color }}; margin-bottom: 15px; }
-  .pj-brand__title { font-family: 'Nunito', sans-serif; font-size: clamp(32px, 4vw, 48px); font-weight: 900; color: #333; line-height: 1.1; margin-bottom: 25px; }
-  .pj-brand__text { font-family: 'Nunito', sans-serif; font-size: 16px; color: #666; line-height: 1.7; margin-bottom: 35px; font-weight: 600; }
-  .pj-brand__btn { display: inline-block; background: #fff; color: {{ section.settings.accent_color }}; padding: 15px 35px; border-radius: 30px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; text-decoration: none; border: 2px solid {{ section.settings.accent_color }}; transition: all 0.3s; }
-  .pj-brand__btn:hover { background: {{ section.settings.accent_color }}; color: #fff; transform: translateY(-3px); box-shadow: 0 6px 15px {{ section.settings.accent_color }}40; }
+  .pj-brand-story {
+    display: flex;
+    flex-direction: column;
+    background-color: {{ section.settings.bg_color }};
+  }
+  @media (min-width: 768px) {
+    .pj-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .pj-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+  .pj-bs__image-col {
+    width: 100%;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .pj-bs__image-col {
+      width: 50%;
+    }
+  }
+  .pj-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .pj-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .pj-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .pj-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .pj-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
+  }
+  .pj-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .pj-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .pj-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 35px;
+  }
+  .pj-bs__btn {
+    display: inline-block;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
+    text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .pj-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
 </style>
-<section class="pj-brand">
-  <div class="pj-brand__container" style="{% if section.settings.image_position == 'right' %}direction: rtl;{% endif %}">
-    <div class="pj-brand__image-wrapper" style="direction: ltr;">
-      {% if section.settings.image %}<img class="pj-brand__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" loading="lazy">{% else %}<div class="pj-brand__image" style="background:#eee;aspect-ratio:4/3;"></div>{% endif %}
+
+<section class="pj-brand-story {% if section.settings.image_position == 'right' %}pj-brand-story--reverse{% endif %}">
+  <div class="pj-bs__image-col">
+    <div class="pj-bs__image-wrap">
+      {% if section.settings.image %}
+        <img class="pj-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
+      {% else %}
+        <div class="pj-bs__image" style="background-color: #e0e0e0;"></div>
+      {% endif %}
     </div>
-    <div style="direction: ltr;">
-      <div class="pj-brand__eyebrow">{{ section.settings.label }}</div>
-      <h2 class="pj-brand__title">{{ section.settings.title }}</h2>
-      <div class="pj-brand__text">{{ section.settings.text }}</div>
-      {% if section.settings.btn_label != blank %}<a href="{{ section.settings.btn_link }}" class="pj-brand__btn">{{ section.settings.btn_label }}</a>{% endif %}
+  </div>
+  
+  <div class="pj-bs__content-col">
+    <div class="pj-bs__content">
+      <h2 class="pj-bs__title">{{ section.settings.title }}</h2>
+      <div class="pj-bs__text">{{ section.settings.text }}</div>
+      {% if section.settings.btn_label != blank %}
+        <a href="{{ section.settings.btn_link }}" class="pj-bs__btn">{{ section.settings.btn_label }}</a>
+      {% endif %}
     </div>
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "PJ Brand Story", "tag": "section",
+  "name": "PJ Brand Story",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "select", "id": "image_position", "label": "Image Position", "options": [{"value":"left","label":"Left"},{"value":"right","label":"Right"}], "default": "left" },
-    { "type": "text", "id": "label", "label": "Label", "default": "Our Pack" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "Passionate About Pets" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>We believe every pet deserves the absolute best. That's why we meticulously source safe, fun, and healthy products for your best friends.</p>" },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Learn More" },
-    { "type": "url", "id": "btn_link", "label": "Link" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#ff9f1c" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "PJ Brand Story" }]
+  "presets": [
+    {
+      "name": "PJ Brand Story"
+    }
+  ]
 }
 {% endschema %}

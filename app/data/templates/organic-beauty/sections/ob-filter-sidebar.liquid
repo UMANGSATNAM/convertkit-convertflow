@@ -1,27 +1,91 @@
 <style>
-  .ob-filter { background: #ffffff; padding: 25px; border-radius: 16px; border: 1px solid #ebe3d5; position: sticky; top: 80px; }
-  .ob-filter__title { font-family: 'Georgia', serif; font-size: 18px; color: #2d2a24; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #ebe3d5; }
-  .ob-filter__group { margin-bottom: 20px; }
-  .ob-filter__group-label { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: #c9a96e; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
-  .ob-filter__option { display: flex; align-items: center; gap: 10px; padding: 6px 0; cursor: pointer; }
-  .ob-filter__checkbox { width: 16px; height: 16px; border: 1px solid #d6c9b4; border-radius: 4px; background: transparent; appearance: none; cursor: pointer; }
-  .ob-filter__checkbox:checked { background: #c9a96e; border-color: #c9a96e; }
-  .ob-filter__option-label { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; }
-  .ob-filter__clear { display: block; width: 100%; padding: 10px; margin-top: 12px; background: transparent; border: 1px solid #ebe3d5; border-radius: 8px; color: #8b7355; font-size: 12px; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
-  .ob-filter__clear:hover { border-color: #c9a96e; color: #c9a96e; }
+  .ob-sidebar {
+    padding-right: 40px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .ob-sidebar__title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .ob-filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+  }
+  .ob-filter-group__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .ob-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .ob-filter-list li {
+    margin-bottom: 10px;
+  }
+  .ob-filter-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .ob-filter-list input {
+    margin-right: 10px;
+  }
 </style>
-<aside class="ob-filter">
-  <h3 class="ob-filter__title">{{ section.settings.title }}</h3>
-  {% for filter in collection.filters %}
-    <div class="ob-filter__group">
-      <span class="ob-filter__group-label">{{ filter.label }}</span>
-      {% for value in filter.values limit: 8 %}
-        <label class="ob-filter__option"><input type="checkbox" class="ob-filter__checkbox" {% if value.active %}checked{% endif %}><span class="ob-filter__option-label">{{ value.label }} ({{ value.count }})</span></label>
-      {% endfor %}
-    </div>
-  {% endfor %}
-  <button class="ob-filter__clear" onclick="window.location.href=window.location.pathname">Clear Filters</button>
-</aside>
+
+<div class="ob-sidebar">
+  <h2 class="ob-sidebar__title">Filters</h2>
+  
+  <form id="CollectionFiltersForm">
+    {% for filter in collection.filters %}
+      <div class="ob-filter-group">
+        <div class="ob-filter-group__title">{{ filter.label }}</div>
+        
+        {% case filter.type %}
+          {% when 'list' %}
+            <ul class="ob-filter-list">
+              {% for value in filter.values %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          {% when 'price_range' %}
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="number" name="{{ filter.min_value.param_name }}" placeholder="Min" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+              <span>-</span>
+              <input type="number" name="{{ filter.max_value.param_name }}" placeholder="Max" style="width:100%; padding:8px; border:1px solid #eaeaea;">
+            </div>
+        {% endcase %}
+      </div>
+    {% endfor %}
+    
+    <button type="submit" style="width:100%; padding: 12px; background:#000; color:#fff; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">Apply Filters</button>
+  </form>
+</div>
+
 {% schema %}
-{ "name": "OB Filter Sidebar", "tag": "section", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Refine" }], "presets": [{ "name": "OB Filter Sidebar" }] }
+{
+  "name": "OB Filter Sidebar",
+  "tag": "section",
+  "settings": [],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "OB Filter Sidebar"
+    }
+  ]
+}
 {% endschema %}

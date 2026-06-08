@@ -1,20 +1,50 @@
 <style>
-  .ob-gallery { padding: 40px 0; background: #faf5ef; }
-  .ob-gallery__container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
-  .ob-gallery__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-  .ob-gallery__item { aspect-ratio: 1; overflow: hidden; border-radius: 12px; cursor: pointer; }
-  .ob-gallery__item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
-  .ob-gallery__item:hover img { transform: scale(1.06); }
+  .ob-pgallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  @media (min-width: 768px) {
+    .ob-pgallery {
+      gap: 20px;
+    }
+  }
+  .ob-pgallery__item {
+    width: 100%;
+    background-color: #f4f4f4;
+  }
+  .ob-pgallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 </style>
-<section class="ob-gallery">
-  <div class="ob-gallery__container">
-    <div class="ob-gallery__grid">
-      {% for image in product.images %}
-        <div class="ob-gallery__item"><img src="{{ image | image_url: width: 500 }}" alt="{{ image.alt | escape }}" loading="lazy"></div>
-      {% endfor %}
+
+<div class="ob-pgallery">
+  {% for media in product.media %}
+    <div class="ob-pgallery__item">
+      {% case media.media_type %}
+        {% when 'image' %}
+          <img class="ob-pgallery__img" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}">
+        {% when 'video' %}
+          {{ media | video_tag: controls: true, class: 'ob-pgallery__img' }}
+      {% endcase %}
     </div>
-  </div>
-</section>
+  {% else %}
+    <div class="ob-pgallery__item" style="padding: 100px; text-align: center;">No Images</div>
+  {% endfor %}
+</div>
+
 {% schema %}
-{ "name": "OB Product Gallery", "tag": "section", "settings": [], "presets": [{ "name": "OB Product Gallery" }] }
+{
+  "name": "OB Product Gallery",
+  "tag": "section",
+  "settings": [],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "OB Product Gallery"
+    }
+  ]
+}
 {% endschema %}

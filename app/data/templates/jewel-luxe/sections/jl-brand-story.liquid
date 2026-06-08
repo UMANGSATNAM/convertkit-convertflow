@@ -1,40 +1,183 @@
 <style>
-  .jl-story { padding: 120px 0; background: #0a0a0a; border-top: 1px solid #1a1a1a; display: flex; align-items: center; }
-  .jl-story__container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  @media (max-width: 900px) { .jl-story__container { grid-template-columns: 1fr; gap: 40px; text-align: center; } }
-  .jl-story__image-wrapper { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #111; }
-  .jl-story__image-wrapper::before { content: ''; position: absolute; top: -10px; left: -10px; right: 10px; bottom: 10px; border: 1px solid {{ section.settings.accent_color }}; opacity: 0.3; z-index: 0; }
-  .jl-story__image { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1; filter: grayscale(20%); }
-  .jl-story__content { position: relative; z-index: 2; }
-  .jl-story__eyebrow { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 4px; color: {{ section.settings.accent_color }}; margin-bottom: 20px; display: block; }
-  .jl-story__title { font-family: 'Cinzel', serif; font-size: 42px; font-weight: 400; color: #fff; margin-bottom: 30px; line-height: 1.2; }
-  .jl-story__desc { font-family: 'Montserrat', sans-serif; font-size: 15px; color: #ccc; line-height: 1.9; margin-bottom: 40px; font-weight: 300; }
-  .jl-story__signature { font-family: 'Cinzel', serif; font-size: 20px; color: #fff; font-style: italic; }
+  .jl-brand-story {
+    display: flex;
+    flex-direction: column;
+    background-color: {{ section.settings.bg_color }};
+  }
+  @media (min-width: 768px) {
+    .jl-brand-story {
+      flex-direction: row;
+      align-items: center;
+    }
+    .jl-brand-story--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+  .jl-bs__image-col {
+    width: 100%;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .jl-bs__image-col {
+      width: 50%;
+    }
+  }
+  .jl-bs__image-wrap {
+    position: relative;
+    padding-bottom: 120%;
+  }
+  @media (min-width: 768px) {
+    .jl-bs__image-wrap {
+      padding-bottom: 100%;
+    }
+  }
+  .jl-bs__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .jl-bs__content-col {
+    width: 100%;
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .jl-bs__content-col {
+      width: 50%;
+      padding: 80px 8%;
+    }
+  }
+  .jl-bs__content {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+  .jl-bs__title {
+    font-family: 'Georgia', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .jl-bs__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 35px;
+  }
+  .jl-bs__btn {
+    display: inline-block;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    padding: 12px 30px;
+    text-decoration: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .jl-bs__btn:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
 </style>
-<section class="jl-story">
-  <div class="jl-story__container">
-    <div class="jl-story__image-wrapper">
-      {% if section.settings.image %}<img class="jl-story__image" src="{{ section.settings.image | image_url: width: 800 }}" alt="Brand Story" loading="lazy">{% else %}<div style="width:100%;height:100%;background:#222;"></div>{% endif %}
+
+<section class="jl-brand-story {% if section.settings.image_position == 'right' %}jl-brand-story--reverse{% endif %}">
+  <div class="jl-bs__image-col">
+    <div class="jl-bs__image-wrap">
+      {% if section.settings.image %}
+        <img class="jl-bs__image" src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}">
+      {% else %}
+        <div class="jl-bs__image" style="background-color: #e0e0e0;"></div>
+      {% endif %}
     </div>
-    <div class="jl-story__content">
-      <span class="jl-story__eyebrow">{{ section.settings.subtitle }}</span>
-      <h2 class="jl-story__title">{{ section.settings.title }}</h2>
-      <div class="jl-story__desc">{{ section.settings.text }}</div>
-      {% if section.settings.signature != blank %}<div class="jl-story__signature">{{ section.settings.signature }}</div>{% endif %}
+  </div>
+  
+  <div class="jl-bs__content-col">
+    <div class="jl-bs__content">
+      <h2 class="jl-bs__title">{{ section.settings.title }}</h2>
+      <div class="jl-bs__text">{{ section.settings.text }}</div>
+      {% if section.settings.btn_label != blank %}
+        <a href="{{ section.settings.btn_link }}" class="jl-bs__btn">{{ section.settings.btn_label }}</a>
+      {% endif %}
     </div>
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "JL Brand Story", "tag": "section",
+  "name": "JL Brand Story",
+  "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "subtitle", "label": "Eyebrow", "default": "Our Heritage" },
-    { "type": "text", "id": "title", "label": "Heading", "default": "A Legacy of Perfection" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Since 1924, our master artisans have been meticulously crafting pieces that transcend time. We believe true luxury is found in the details—the flawless cut of a diamond, the warm glow of ethically sourced gold, and the precise movement of a mechanical caliber.</p>" },
-    { "type": "text", "id": "signature", "label": "Signature", "default": "The Founders" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#d4af37" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share details about your brand's origins, materials, or vision for the future.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read More"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "JL Brand Story" }]
+  "presets": [
+    {
+      "name": "JL Brand Story"
+    }
+  ]
 }
 {% endschema %}

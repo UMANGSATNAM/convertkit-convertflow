@@ -5,17 +5,17 @@ import prisma from "../db.server";
 
 // Generic Background Jobs Queue
 export const backgroundJobsQueue = new Queue("background-jobs", {
-  connection: redis,
+  connection: redis as any,
 });
 
 // Webhooks Queue
 export const webhooksQueue = new Queue("webhooks", {
-  connection: redis,
+  connection: redis as any,
 });
 
 // WhatsApp Jobs Queue
 export const whatsappQueue = new Queue("whatsapp-jobs", {
-  connection: redis,
+  connection: redis as any,
 });
 
 // Create workers if needed
@@ -24,7 +24,7 @@ const backgroundJobsWorker = new Worker(
   async (job) => {
     console.log(`Processing background job ${job.id} of type ${job.name}`);
   },
-  { connection: redis }
+  { connection: redis as any }
 );
 
 const webhooksWorker = new Worker(
@@ -32,7 +32,7 @@ const webhooksWorker = new Worker(
   async (job) => {
     console.log(`Processing webhook job ${job.id} of type ${job.name}`);
   },
-  { connection: redis }
+  { connection: redis as any }
 );
 
 const whatsappWorker = new Worker(
@@ -124,7 +124,7 @@ const whatsappWorker = new Worker(
       }
     }
   },
-  { connection: redis }
+  { connection: redis as any }
 );
 
 whatsappWorker.on("completed", (job) => {

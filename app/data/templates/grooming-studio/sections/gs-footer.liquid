@@ -1,64 +1,162 @@
 <style>
-  .gs-footer { background: #000; padding: 100px 0 40px; border-top: 1px solid #222; }
-  .gs-footer__container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  .gs-footer__grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; margin-bottom: 60px; }
-  @media (max-width: 1024px) { .gs-footer__grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
-  @media (max-width: 600px) { .gs-footer__grid { grid-template-columns: 1fr; } }
-  .gs-footer__logo { font-family: 'Oswald', sans-serif; font-size: 28px; color: #fff; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block; }
-  .gs-footer__logo span { color: #d4af37; }
-  .gs-footer__desc { font-family: 'Inter', sans-serif; font-size: 14px; color: #718096; line-height: 1.6; max-width: 320px; font-weight: 300; }
-  .gs-footer__title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 500; color: #fff; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
-  .gs-footer__links { list-style: none; padding: 0; margin: 0; }
-  .gs-footer__links li { margin-bottom: 15px; }
-  .gs-footer__links a { font-family: 'Inter', sans-serif; font-size: 14px; color: #a0aec0; text-decoration: none; transition: color 0.3s; }
-  .gs-footer__links a:hover { color: #d4af37; }
-  .gs-footer__bottom { padding-top: 30px; border-top: 1px solid #222; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-  .gs-footer__copy { font-family: 'Inter', sans-serif; font-size: 13px; color: #718096; }
-  .gs-footer__socials { display: flex; gap: 20px; }
-  .gs-footer__social { color: #a0aec0; text-decoration: none; transition: color 0.3s; font-family: 'Inter', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
-  .gs-footer__social:hover { color: #d4af37; }
+  .gs-footer {
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    padding: 60px 5%;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .gs-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .gs-footer__inner {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .gs-footer__heading {
+    font-family: 'Georgia', serif;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+  .gs-footer__text {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .gs-footer__links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .gs-footer__links li {
+    margin-bottom: 10px;
+  }
+  .gs-footer__links a {
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    font-size: 14px;
+    transition: opacity 0.3s;
+  }
+  .gs-footer__links a:hover {
+    opacity: 0.7;
+  }
+  .gs-footer__bottom {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  @media (min-width: 768px) {
+    .gs-footer__bottom {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
 </style>
+
 <footer class="gs-footer">
-  <div class="gs-footer__container">
-    <div class="gs-footer__grid">
-      <div>
-        <a href="/" class="gs-footer__logo">{{ section.settings.logo_text | replace: 'Studio', '<span>Studio</span>' }}</a>
-        <p class="gs-footer__desc">{{ section.settings.description }}</p>
+  <div class="gs-footer__inner">
+    {% for block in section.blocks %}
+      <div class="gs-footer__column">
+        {% if block.settings.heading != blank %}
+          <div class="gs-footer__heading">{{ block.settings.heading }}</div>
+        {% endif %}
+        
+        {% case block.type %}
+          {% when 'text' %}
+            <div class="gs-footer__text">{{ block.settings.text }}</div>
+          
+          {% when 'link_list' %}
+            <ul class="gs-footer__links">
+              {% for link in linklists[block.settings.menu].links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+        {% endcase %}
       </div>
-      {% for block in section.blocks %}
-        <div>
-          <h4 class="gs-footer__title">{{ block.settings.title }}</h4>
-          <ul class="gs-footer__links">
-            {% assign links = block.settings.menu | default: linklists.footer-menu %}
-            {% if block.settings.menu != blank %}
-              {% for link in linklists[block.settings.menu].links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
-            {% endif %}
-          </ul>
-        </div>
-      {% endfor %}
-    </div>
-    <div class="gs-footer__bottom">
-      <span class="gs-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
-      <div class="gs-footer__socials">
-        {% if section.settings.instagram != blank %}<a href="{{ section.settings.instagram }}" class="gs-footer__social" target="_blank">Instagram</a>{% endif %}
-        {% if section.settings.facebook != blank %}<a href="{{ section.settings.facebook }}" class="gs-footer__social" target="_blank">Facebook</a>{% endif %}
-      </div>
+    {% endfor %}
+  </div>
+
+  <div class="gs-footer__bottom">
+    <div class="gs-footer__copyright">
+      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
     </div>
   </div>
 </footer>
+
 {% schema %}
 {
-  "name": "GS Footer", "tag": "section",
+  "name": "GS Footer",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "Grooming Studio" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Built on the foundation of traditional barbering, our products are engineered for the modern man." },
-    { "type": "url", "id": "instagram", "label": "Instagram" },
-    { "type": "url", "id": "facebook", "label": "Facebook" }
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "blocks": [{ "type": "column", "name": "Link Column", "settings": [
-    { "type": "text", "id": "title", "label": "Column Title", "default": "Shop" },
-    { "type": "link_list", "id": "menu", "label": "Menu" }
-  ]}],
-  "presets": [{ "name": "GS Footer", "blocks": [{ "type": "column", "settings": { "title": "Products" }}, { "type": "column", "settings": { "title": "Information" }}, { "type": "column", "settings": { "title": "Support" }}] }]
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Quick links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About Us"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Share store details, promotions, or brand content with your customers."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "GS Footer",
+      "blocks": [
+        { "type": "link_list" },
+        { "type": "text" }
+      ]
+    }
+  ]
 }
 {% endschema %}

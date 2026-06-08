@@ -1,42 +1,203 @@
 <style>
-  .ob-buybox { position: sticky; top: 80px; padding: 30px; background: #ffffff; border-radius: 16px; border: 1px solid #ebe3d5; }
-  .ob-buybox__vendor { font-family: 'Inter', sans-serif; font-size: 11px; color: #c9a96e; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
-  .ob-buybox__title { font-family: 'Georgia', serif; font-size: 28px; color: #2d2a24; line-height: 1.2; margin-bottom: 12px; }
-  .ob-buybox__price { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #2d2a24; margin-bottom: 5px; }
-  .ob-buybox__compare { color: #bbb; text-decoration: line-through; font-size: 16px; margin-left: 8px; }
-  .ob-buybox__rating { margin-bottom: 20px; color: #c9a96e; font-size: 14px; letter-spacing: 2px; }
-  .ob-buybox__variants { margin-bottom: 20px; }
-  .ob-buybox__variant-label { font-family: 'Inter', sans-serif; font-size: 12px; color: #8b7355; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
-  .ob-buybox__variant-select { width: 100%; padding: 12px 15px; background: #faf5ef; border: 1px solid #ebe3d5; border-radius: 8px; color: #2d2a24; font-family: 'Inter', sans-serif; font-size: 14px; }
-  .ob-buybox__add-btn { width: 100%; padding: 16px; background: #c9a96e; color: #ffffff; border: none; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.3s; margin-bottom: 10px; }
-  .ob-buybox__add-btn:hover { background: #b89555; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,169,110,0.3); }
-  .ob-buybox__meta { margin-top: 18px; padding-top: 18px; border-top: 1px solid #ebe3d5; }
-  .ob-buybox__meta-item { font-family: 'Inter', sans-serif; font-size: 12px; color: #8b7355; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .ob-sticky-buybox {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 900;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  .ob-sticky-buybox.ob-visible {
+    transform: translateY(0);
+  }
+  .ob-sticky-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .ob-sticky-img {
+    width: 50px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  .ob-sticky-text h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .ob-sticky-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+  }
+  .ob-sticky-price s {
+    color: #999;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+  .ob-sticky-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Urgency & Scarcity */
+  .ob-urgency-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .ob-urgency-text {
+    font-size: 11px;
+    color: #d93025;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: ob-pulse 2s infinite;
+  }
+  .ob-urgency-dot {
+    width: 6px;
+    height: 6px;
+    background: #d93025;
+    border-radius: 50%;
+  }
+  @keyframes ob-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  .ob-sticky-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border-radius: 2px;
+  }
+  .ob-sticky-btn:hover {
+    background: #333;
+  }
+
+  /* Trust Badges below buy button */
+  .ob-trust-badges {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .ob-trust-badges svg {
+    width: 24px;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
+    .ob-sticky-info { display: none; }
+    .ob-sticky-actions { width: 100%; flex-direction: column; gap: 10px; align-items: center; }
+    .ob-sticky-btn { width: 100%; padding: 16px; }
+    .ob-urgency-wrapper { align-items: center; width: 100%; }
+  }
 </style>
-<div class="ob-buybox">
-  <div class="ob-buybox__vendor">{{ product.vendor }}</div>
-  <h1 class="ob-buybox__title">{{ product.title }}</h1>
-  <div class="ob-buybox__rating">★★★★★</div>
-  <div class="ob-buybox__price">{{ product.selected_or_first_available_variant.price | money }}{% if product.compare_at_price > product.price %}<span class="ob-buybox__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>
-  {% form 'product', product %}
-    {% unless product.has_only_default_variant %}
-      <div class="ob-buybox__variants">
-        {% for option in product.options_with_values %}
-          <label class="ob-buybox__variant-label">{{ option.name }}</label>
-          <select name="id" class="ob-buybox__variant-select">
-            {% for variant in product.variants %}<option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>{% endfor %}
-          </select>
-        {% endfor %}
+
+<div class="ob-sticky-buybox" id="ob-sticky-buybox">
+  <div class="ob-sticky-info">
+    {% if product.featured_image %}
+      <img src="{{ product.featured_image | img_url: '100x' }}" alt="{{ product.title }}" class="ob-sticky-img">
+    {% endif %}
+    <div class="ob-sticky-text">
+      <h4>{{ product.title }}</h4>
+      <div class="ob-sticky-price">
+        {{ product.price | money }}
+        {% if product.compare_at_price > product.price %}
+          <s>{{ product.compare_at_price | money }}</s>
+        {% endif %}
       </div>
-    {% else %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{% endunless %}
-    <button type="submit" class="ob-buybox__add-btn" {% unless product.available %}disabled{% endunless %}>{% if product.available %}Add to Bag{% else %}Sold Out{% endif %}</button>
-  {% endform %}
-  <div class="ob-buybox__meta">
-    <div class="ob-buybox__meta-item">🌿 100% Natural Ingredients</div>
-    <div class="ob-buybox__meta-item">🐰 Cruelty-Free & Vegan</div>
-    <div class="ob-buybox__meta-item">♻️ Sustainable Packaging</div>
+    </div>
+  </div>
+
+  <div class="ob-sticky-actions">
+    <div class="ob-urgency-wrapper">
+      <div class="ob-urgency-text">
+        <span class="ob-urgency-dot"></span>
+        High Demand: Only <span id="ob-scarcity-count">3</span> left!
+      </div>
+      <div style="font-size: 10px; color: #666; margin-top: 4px;">
+        🔥 <span id="ob-live-viewers">12</span> people are viewing this
+      </div>
+    </div>
+    
+    <div>
+      <button class="ob-sticky-btn" onclick="document.querySelector('.ob-add-to-cart').click();">
+        Add to Bag - {{ product.price | money }}
+      </button>
+      <div class="ob-trust-badges">
+        <!-- SVG Secure Checkout -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visa"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#FFF" opacity=".2"/><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#1434CB"/><path d="M28.3 5.9l-1.4 8.6h-2.7l1.4-8.6h2.7zm-9.3 0h-2.2c-.4 0-.8.2-1 .6l-3.1 7.4-1.5-7.4c-.1-.3-.2-.5-.5-.6H8.1l2.4 8.6h2.8l3.6-8.6zm13.1 8.6l-1.3-6.2c-.1-.4-.5-.6-.9-.6h-3.1c-.2 0-.4.1-.5.3l-2.4 6.5h2.8l.5-1.5h3.5l.3 1.5h1.1zm-3.5-3.6l1-3 1 3h-2zm-11.4 3.6h2.7l1.7-8.6h-2.7l-1.7 8.6z" fill="#FFF"/></svg>
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mastercard"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#1A1F71"/><path d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.3 3-3.4 3-5.7z" fill="#FF5F00"/><path d="M14.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#EB001B"/><path d="M29.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#F79E1B"/></svg>
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Apple Pay"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"/><path d="M19.1 11.4c0-1.6.8-3.1 2.2-3.9-1-1-2.4-1.3-3.1-1.3-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.6 2.2 2.7 2.1 1.1-.1 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2.1 1.9-1 2.6-2.1.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.2-.8-2.2-3.3zm-1.8-5c.6-.7 1-1.7.9-2.7-.8.1-1.9.6-2.5 1.4-.5.6-1 1.6-.9 2.6.9.1 1.9-.5 2.5-1.3z" fill="#FFF"/></svg>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  // Sticky Buybox logic
+  window.addEventListener('scroll', () => {
+    const buybox = document.getElementById('ob-sticky-buybox');
+    const mainAddToCart = document.querySelector('.ob-add-to-cart');
+    if (!mainAddToCart) return;
+
+    const rect = mainAddToCart.getBoundingClientRect();
+    if (rect.bottom < 0) {
+      buybox.classList.add('ob-visible');
+    } else {
+      buybox.classList.remove('ob-visible');
+    }
+  });
+
+  // Faux Scarcity Generator (Randomizes between 2 and 7)
+  const scarcityEl = document.getElementById('ob-scarcity-count');
+  if (scarcityEl) {
+    const randomCount = Math.floor(Math.random() * 6) + 2;
+    scarcityEl.innerText = randomCount;
+  }
+
+  // Live Viewers Generator (Randomizes between 8 and 35)
+  const viewersEl = document.getElementById('ob-live-viewers');
+  if (viewersEl) {
+    const randomViewers = Math.floor(Math.random() * 28) + 8;
+    viewersEl.innerText = randomViewers;
+    
+    // Simulate viewers changing slightly
+    setInterval(() => {
+      const change = Math.random() > 0.5 ? 1 : -1;
+      let current = parseInt(viewersEl.innerText);
+      if (current + change > 5) viewersEl.innerText = current + change;
+    }, 7000);
+  }
+</script>
+
 {% schema %}
-{ "name": "OB Sticky Buybox", "tag": "section", "settings": [], "presets": [{ "name": "OB Sticky Buybox" }] }
+{
+  "name": "Sticky Buybox (Premium)",
+  "tag": "section",
+  "settings": []
+}
 {% endschema %}

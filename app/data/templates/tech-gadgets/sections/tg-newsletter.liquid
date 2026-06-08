@@ -1,99 +1,92 @@
 <style>
   .tg-newsletter {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 100%);
-    position: relative;
-    overflow: hidden;
-  }
-  .tg-newsletter::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image:
-      linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  .tg-newsletter__container {
-    max-width: 650px;
-    margin: 0 auto;
-    padding: 0 30px;
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
     text-align: center;
-    position: relative;
-    z-index: 1;
   }
-  .tg-newsletter__icon {
-    font-size: 40px;
-    margin-bottom: 20px;
+  .tg-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
   }
-  .tg-newsletter__title {
-    font-family: 'Inter', sans-serif;
-    font-size: 30px;
-    font-weight: 800;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  .tg-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
     margin-bottom: 15px;
   }
-  .tg-newsletter__text {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #888;
-    line-height: 1.7;
-    margin-bottom: 35px;
+  .tg-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
   }
-  .tg-newsletter__form {
+  .tg-nl__form {
     display: flex;
-    gap: 0;
-    max-width: 500px;
-    margin: 0 auto;
+    flex-direction: column;
+    gap: 15px;
   }
-  @media (max-width: 600px) {
-    .tg-newsletter__form { flex-direction: column; gap: 12px; }
+  @media (min-width: 600px) {
+    .tg-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
   }
-  .tg-newsletter__input {
+  .tg-nl__input {
     flex: 1;
-    padding: 14px 20px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(0,240,255,0.2);
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
   }
-  .tg-newsletter__input::placeholder { color: #555; }
-  .tg-newsletter__input:focus { border-color: {{ section.settings.accent_color }}; }
-  .tg-newsletter__btn {
-    padding: 14px 30px;
-    background: {{ section.settings.accent_color }};
-    color: #0a0a0a;
+  @media (min-width: 600px) {
+    .tg-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .tg-nl__input:focus {
+      outline: none;
+    }
+  }
+  .tg-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
     border: none;
-    font-family: 'Inter', sans-serif;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 13px;
-    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s;
   }
-  .tg-newsletter__btn:hover {
-    box-shadow: 0 0 25px {{ section.settings.accent_color }}40;
+  .tg-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .tg-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .tg-nl__btn:hover {
+      opacity: 0.5;
+    }
   }
 </style>
 
 <section class="tg-newsletter">
-  <div class="tg-newsletter__container">
-    <div class="tg-newsletter__icon">⚡</div>
-    <h2 class="tg-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="tg-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="tg-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="tg-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="tg-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="tg-nl__inner">
+    <h2 class="tg-nl__title">{{ section.settings.title }}</h2>
+    <div class="tg-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'tg-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="tg-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="tg-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
@@ -103,12 +96,35 @@
   "name": "TG Newsletter",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Get Early Access" },
-    { "type": "richtext", "id": "text", "label": "Body Text", "default": "<p>Be the first to know about new product launches, exclusive deals, and tech insights.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Input Placeholder", "default": "Enter your email" },
-    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Subscribe" },
-    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#00f0ff" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "TG Newsletter" }]
+  "presets": [
+    {
+      "name": "TG Newsletter"
+    }
+  ]
 }
 {% endschema %}

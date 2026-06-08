@@ -1,37 +1,94 @@
 <style>
-  .kw-collection { padding: 40px 0 80px; }
-  .kw-collection__header { margin-bottom: 40px; }
-  .kw-collection__title { font-family: 'Fredoka One', cursive; font-size: 42px; color: #2d3748; margin-bottom: 15px; }
-  .kw-collection__desc { font-family: 'Nunito', sans-serif; font-size: 18px; color: #4a5568; max-width: 600px; font-weight: 600; }
-  .kw-collection__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-  @media (max-width: 1024px) { .kw-collection__grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-  @media (max-width: 600px) { .kw-collection__grid { grid-template-columns: 1fr; } }
+  .kw-cgrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 768px) {
+    .kw-cgrid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 30px;
+    }
+  }
+  .kw-cgrid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .kw-cgrid-header select {
+    padding: 8px;
+    border: 1px solid #eaeaea;
+    background: transparent;
+  }
+  .kw-cgrid-card {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .kw-cgrid-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  .kw-cgrid-card__title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .kw-cgrid-card__price {
+    font-size: 14px;
+    color: #666;
+  }
 </style>
-<section class="kw-collection">
-  <div class="kw-collection__header">
-    <h1 class="kw-collection__title">{{ collection.title }}</h1>
-    {% if collection.description != blank %}<div class="kw-collection__desc">{{ collection.description }}</div>{% endif %}
+
+<div class="kw-cgrid-wrapper">
+  <div class="kw-cgrid-header">
+    <div>{{ collection.products_count }} products</div>
+    <div>
+      <select id="SortBy">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price, low to high</option>
+        <option value="price-descending">Price, high to low</option>
+      </select>
+    </div>
   </div>
-  <div class="kw-collection__grid">
-    {% for product in collection.products %}
-      <a href="{{ product.url }}" class="kw-prod-card">
-        <div class="kw-prod-card__img-wrapper">
-          {% if product.compare_at_price > product.price %}<div class="kw-prod-card__badge">Sale!</div>{% endif %}
-          {% if product.featured_image %}<img class="kw-prod-card__img" src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title | escape }}" loading="lazy">{% endif %}
-        </div>
-        <div class="kw-prod-card__info">
-          <h3 class="kw-prod-card__name">{{ product.title }}</h3>
-          <div class="kw-prod-card__bottom">
-            <div class="kw-prod-card__price">{{ product.price | money }}</div>
-            <div class="kw-prod-card__add">+</div>
-          </div>
-        </div>
+
+  <div class="kw-cgrid">
+    {% for product in collection.products limit: section.settings.products_per_page %}
+      <a href="{{ product.url }}" class="kw-cgrid-card">
+        <img class="kw-cgrid-card__img" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}">
+        <div class="kw-cgrid-card__title">{{ product.title }}</div>
+        <div class="kw-cgrid-card__price">{{ product.price | money }}</div>
       </a>
     {% else %}
-      <div style="grid-column: 1/-1; text-align: center; padding: 60px; font-family: 'Nunito', sans-serif; font-size: 18px; color: #718096; font-weight: 700;">No toys found here! Check another category. 🧸</div>
+      <p>No products found in this collection.</p>
     {% endfor %}
   </div>
-</section>
+</div>
+
 {% schema %}
-{ "name": "KW Collection Grid", "tag": "section", "settings": [], "presets": [{ "name": "KW Collection Grid" }] }
+{
+  "name": "KW Collection Grid",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "templates": ["collection"],
+  "presets": [
+    {
+      "name": "KW Collection Grid"
+    }
+  ]
+}
 {% endschema %}

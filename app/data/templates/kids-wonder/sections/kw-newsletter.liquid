@@ -1,40 +1,130 @@
 <style>
-  .kw-newsletter { padding: 100px 0; background: #FFE66D; position: relative; overflow: hidden; text-align: center; }
-  .kw-newsletter::before { content: ''; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(10px); }
-  .kw-newsletter::after { content: ''; position: absolute; bottom: -50px; right: -50px; width: 300px; height: 300px; background: rgba(255,107,107,0.2); border-radius: 50%; filter: blur(20px); }
-  .kw-newsletter__container { max-width: 600px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
-  .kw-newsletter__title { font-family: 'Fredoka One', cursive; font-size: 40px; color: #2d3748; margin-bottom: 20px; line-height: 1.2; text-shadow: 2px 2px 0px #fff; }
-  .kw-newsletter__text { font-family: 'Nunito', sans-serif; font-size: 18px; color: #4a5568; margin-bottom: 40px; font-weight: 700; }
-  .kw-newsletter__form { display: flex; gap: 15px; }
-  @media (max-width: 600px) { .kw-newsletter__form { flex-direction: column; } }
-  .kw-newsletter__input { flex: 1; padding: 20px 30px; border: 4px solid #fff; border-radius: 30px; background: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; color: #2d3748; outline: none; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-  .kw-newsletter__input::placeholder { color: #a0aec0; }
-  .kw-newsletter__input:focus { border-color: #FF6B6B; }
-  .kw-newsletter__btn { padding: 20px 40px; background: #FF6B6B; color: #fff; border: 4px solid #fff; border-radius: 30px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 20px rgba(255,107,107,0.2); }
-  .kw-newsletter__btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 15px 30px rgba(255,107,107,0.3); }
+  .kw-newsletter {
+    background-color: {{ section.settings.bg_color }};
+    padding: 100px 5%;
+    text-align: center;
+  }
+  .kw-nl__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .kw-nl__title {
+    font-family: 'Georgia', serif;
+    font-size: 36px;
+    font-weight: normal;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 15px;
+  }
+  .kw-nl__text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: {{ section.settings.text_color }};
+    margin-bottom: 40px;
+  }
+  .kw-nl__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  @media (min-width: 600px) {
+    .kw-nl__form {
+      flex-direction: row;
+      border-bottom: 1px solid {{ section.settings.text_color }};
+      gap: 0;
+      padding-bottom: 5px;
+    }
+  }
+  .kw-nl__input {
+    flex: 1;
+    border: 1px solid {{ section.settings.text_color }};
+    background: transparent;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color }};
+  }
+  @media (min-width: 600px) {
+    .kw-nl__input {
+      border: none;
+      padding: 10px 0;
+    }
+    .kw-nl__input:focus {
+      outline: none;
+    }
+  }
+  .kw-nl__btn {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .kw-nl__btn:hover {
+    opacity: 0.8;
+  }
+  @media (min-width: 600px) {
+    .kw-nl__btn {
+      background-color: transparent;
+      color: {{ section.settings.text_color }};
+      padding: 10px 20px;
+    }
+    .kw-nl__btn:hover {
+      opacity: 0.5;
+    }
+  }
 </style>
+
 <section class="kw-newsletter">
-  <div class="kw-newsletter__container">
-    <h2 class="kw-newsletter__title">{{ section.settings.title }}</h2>
-    <div class="kw-newsletter__text">{{ section.settings.text }}</div>
-    {% form 'customer' %}
-      <div class="kw-newsletter__form">
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <input type="email" name="contact[email]" class="kw-newsletter__input" placeholder="{{ section.settings.placeholder }}" required>
-        <button type="submit" class="kw-newsletter__btn">{{ section.settings.btn_label }}</button>
-      </div>
+  <div class="kw-nl__inner">
+    <h2 class="kw-nl__title">{{ section.settings.title }}</h2>
+    <div class="kw-nl__text">{{ section.settings.text }}</div>
+    
+    {% form 'customer', class: 'kw-nl__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="kw-nl__input" placeholder="Your email address" required>
+      <button type="submit" class="kw-nl__btn">Subscribe</button>
     {% endform %}
   </div>
 </section>
+
 {% schema %}
 {
-  "name": "KW Newsletter", "tag": "section",
+  "name": "KW Newsletter",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "Join the Fun! 🎈" },
-    { "type": "richtext", "id": "text", "label": "Body", "default": "<p>Sign up for magical updates, secret sales, and a special birthday treat.</p>" },
-    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Enter parents email..." },
-    { "type": "text", "id": "btn_label", "label": "Button", "default": "Subscribe" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the List"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Sign up to get the latest on sales, new releases and more.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
   ],
-  "presets": [{ "name": "KW Newsletter" }]
+  "presets": [
+    {
+      "name": "KW Newsletter"
+    }
+  ]
 }
 {% endschema %}
