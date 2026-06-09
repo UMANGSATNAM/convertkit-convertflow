@@ -1,0 +1,297 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Courier+Prime&display=swap');
+
+  .mf-drop {
+    --bg-white: #ffffff;
+    --bg-gray: #f3f3f3;
+    --ink: #000000;
+    --signal-red: #ff3e3e;
+    --border-thick: 2px solid #000000;
+    
+    padding: 80px 5%;
+    background-color: var(--bg-white);
+    color: var(--ink);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .mf-drop__container {
+    max-width: 1000px;
+    margin: 0 auto;
+    border: var(--border-thick);
+    background-color: var(--bg-gray);
+    box-shadow: 8px 8px 0px var(--ink);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .mf-drop__badge {
+    position: absolute;
+    top: -16px;
+    left: 40px;
+    background-color: var(--signal-red);
+    color: var(--bg-white);
+    border: var(--border-thick);
+    padding: 6px 16px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .mf-drop__subtitle {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    color: var(--signal-red);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .mf-drop__title {
+    font-size: clamp(34px, 5vw, 48px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 0.95;
+    margin: 0 0 35px 0;
+  }
+
+  /* Countdown Boxes */
+  .mf-drop__timer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 45px;
+    flex-wrap: wrap;
+  }
+
+  .mf-drop__time-box {
+    background-color: var(--bg-white);
+    border: var(--border-thick);
+    box-shadow: 4px 4px 0px var(--ink);
+    width: 90px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mf-drop__time-box:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0px var(--ink);
+  }
+
+  .mf-drop__time-val {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .mf-drop__time-lbl {
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--signal-red);
+    margin-top: 4px;
+    font-weight: 700;
+  }
+
+  /* Form sign up */
+  .mf-drop__form-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .mf-drop__form-title {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .mf-drop__form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  @media (min-width: 576px) {
+    .mf-drop__form {
+      flex-direction: row;
+      gap: 0;
+    }
+  }
+
+  .mf-drop__input {
+    flex-grow: 1;
+    border: var(--border-thick);
+    border-radius: 0px;
+    padding: 14px 20px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Courier Prime', monospace;
+    background-color: var(--bg-white);
+    color: var(--ink);
+  }
+
+  .mf-drop__input:focus {
+    background-color: var(--bg-gray);
+  }
+
+  .mf-drop__btn {
+    background-color: var(--ink);
+    color: var(--bg-white);
+    border: var(--border-thick);
+    border-radius: 0px;
+    padding: 14px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  @media (min-width: 576px) {
+    .mf-drop__btn {
+      border-left: none;
+    }
+  }
+
+  .mf-drop__btn:hover {
+    background-color: var(--signal-red);
+    color: var(--bg-white);
+  }
+
+  .mf-drop__success {
+    display: none;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    color: var(--signal-red);
+    margin-top: 15px;
+    font-weight: 700;
+  }
+</style>
+
+<section class="mf-drop" id="mf-drop-{{ section.id }}">
+  <div class="mf-drop__container">
+    <div class="mf-drop__badge">STOCK ALERT // EXCLUSIVE</div>
+    
+    <span class="mf-drop__subtitle">{{ section.settings.subtitle }}</span>
+    <h2 class="mf-drop__title">{{ section.settings.title }}</h2>
+
+    <!-- Countdown Timer elements -->
+    <div class="mf-drop__timer">
+      <div class="mf-drop__time-box">
+        <span class="mf-drop__time-val" id="days-{{ section.id }}">02</span>
+        <span class="mf-drop__time-lbl">DAYS</span>
+      </div>
+      <div class="mf-drop__time-box">
+        <span class="mf-drop__time-val" id="hours-{{ section.id }}">14</span>
+        <span class="mf-drop__time-lbl">HRS</span>
+      </div>
+      <div class="mf-drop__time-box">
+        <span class="mf-drop__time-val" id="mins-{{ section.id }}">38</span>
+        <span class="mf-drop__time-lbl">MINS</span>
+      </div>
+      <div class="mf-drop__time-box">
+        <span class="mf-drop__time-val" id="secs-{{ section.id }}">05</span>
+        <span class="mf-drop__time-lbl">SECS</span>
+      </div>
+    </div>
+
+    <!-- Waitlist signup -->
+    <div class="mf-drop__form-container">
+      <span class="mf-drop__form-title">// REGISTER FOR SECURE PRE-LAUNCH ACCESS</span>
+      <form class="mf-drop__form" id="waitlist-form-{{ section.id }}" onsubmit="event.preventDefault(); document.getElementById('waitlist-success-{{ section.id }}').style.display='block'; this.reset();">
+        <input 
+          type="email" 
+          class="mf-drop__input" 
+          placeholder="ENTER_EMAIL_ADDRESS" 
+          required
+        >
+        <button type="submit" class="mf-drop__btn">Get Notified</button>
+      </form>
+      <div class="mf-drop__success" id="waitlist-success-{{ section.id }}">
+        >> REGISTRATION CONFIRMED. YOU ARE ON THE LINE.
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Set mock future drop date: 2 days, 14 hours, 38 mins in future
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 2);
+    targetDate.setHours(targetDate.getHours() + 14);
+    targetDate.setMinutes(targetDate.getMinutes() + 38);
+
+    const dEl = document.getElementById("days-{{ section.id }}");
+    const hEl = document.getElementById("hours-{{ section.id }}");
+    const mEl = document.getElementById("mins-{{ section.id }}");
+    const sEl = document.getElementById("secs-{{ section.id }}");
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const diff = targetDate.getTime() - now;
+
+      if (diff <= 0) {
+        clearInterval(interval);
+        if(dEl) dEl.textContent = "00";
+        if(hEl) hEl.textContent = "00";
+        if(mEl) mEl.textContent = "00";
+        if(sEl) sEl.textContent = "00";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if(dEl) dEl.textContent = String(days).padStart(2, '0');
+      if(hEl) hEl.textContent = String(hours).padStart(2, '0');
+      if(mEl) mEl.textContent = String(mins).padStart(2, '0');
+      if(sEl) sEl.textContent = String(secs).padStart(2, '0');
+    }
+
+    const interval = setInterval(updateTimer, 1000);
+    updateTimer();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Drop Countdown Timer",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "NEXT DROP COUNTDOWN"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "VOLT//SERIES_03"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Drop Countdown Timer"
+    }
+  ]
+}
+{% endschema %}

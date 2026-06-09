@@ -1,351 +1,948 @@
 <style>
-  .mf-product-main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-  }
-  
-  /* Gallery Side (Left) */
-  .mf-product-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: sticky;
-    top: 100px;
-    height: max-content;
-  }
-  .mf-product-gallery__main img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-    object-fit: cover;
-    background: #f8f8f8;
-  }
-  .mf-product-gallery__thumbnails {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  .mf-product-gallery__thumbnails img {
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: border-color 0.3s;
-  }
-  .mf-product-gallery__thumbnails img:hover {
-    border-color: #000;
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Courier+Prime:wght@400;700&display=swap');
+
+  .mf-pdp {
+    --bg-white: #ffffff;
+    --bg-gray: #f3f3f3;
+    --ink: #000000;
+    --signal-red: #ff3e3e;
+    --border-thick: 2px solid #000000;
+    
+    background-color: var(--bg-white);
+    color: var(--ink);
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 60px 5%;
   }
 
-  /* Info Side (Right) */
-  .mf-product-info {
+  .mf-pdp__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .mf-pdp__container {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 60px;
+    }
+  }
+
+  /* Gallery CSS */
+  .mf-pdp__gallery {
+    position: sticky;
+    top: 30px;
+  }
+
+  .mf-pdp__main-image-wrapper {
+    background-color: var(--bg-gray);
+    border: var(--border-thick);
+    box-shadow: 6px 6px 0px var(--ink);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .mf-pdp__main-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .mf-pdp__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .mf-pdp__thumb {
+    background-color: var(--bg-gray);
+    border: var(--border-thick);
+    box-shadow: 3px 3px 0px var(--ink);
+    padding: 8px;
+    cursor: pointer;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mf-pdp__thumb:hover, .mf-pdp__thumb.is-active {
+    border-color: var(--signal-red);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--ink);
+  }
+
+  .mf-pdp__thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* Info/Buy-Box CSS */
+  .mf-pdp__info {
     display: flex;
     flex-direction: column;
   }
-  .mf-product-vendor {
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
+
+  .mf-pdp__vendor {
+    font-family: 'Courier Prime', monospace;
     font-size: 13px;
-    color: #666;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+    color: var(--signal-red);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
   }
-  .mf-product-title {
-    font-family: var(--mf-font-serif, 'Georgia', serif);
-    font-size: clamp(32px, 4vw, 48px);
-    line-height: 1.1;
-    margin: 0 0 15px 0;
-    font-weight: 400;
+
+  .mf-pdp__title {
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    margin: 0 0 16px 0;
   }
-  .mf-product-rating {
+
+  /* Ratings */
+  .mf-pdp__rating-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 25px;
-    font-size: 14px;
-    color: #222;
+    margin-bottom: 24px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    font-weight: 700;
   }
-  .mf-product-rating svg {
+
+  .mf-pdp__stars {
+    display: flex;
+    gap: 2px;
+    color: var(--signal-red);
+  }
+
+  .mf-pdp__stars svg {
     width: 16px;
-    fill: #000;
+    height: 16px;
+    fill: currentColor;
   }
-  .mf-product-price {
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 24px;
-    font-weight: 600;
+
+  /* Price Area */
+  .mf-pdp__price-area {
     margin-bottom: 30px;
+  }
+
+  .mf-pdp__price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .mf-pdp__price {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .mf-pdp__compare-price {
+    font-size: 20px;
+    color: var(--signal-red);
+    text-decoration: line-through;
+    font-weight: 500;
+  }
+
+  .mf-pdp__tax-notice {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    margin-top: 4px;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  /* Variant Size Pills */
+  .mf-pdp__option-group {
+    margin-bottom: 24px;
+  }
+
+  .mf-pdp__option-title {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .mf-pdp__size-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+
+  .mf-pdp__size-pill {
+    background-color: var(--bg-white);
+    border: var(--border-thick);
+    box-shadow: 2px 2px 0px var(--ink);
+    padding: 12px 0;
+    font-family: 'Courier Prime', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 0px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .mf-pdp__size-pill:hover:not(:disabled) {
+    border-color: var(--signal-red);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px var(--ink);
+  }
+
+  .mf-pdp__size-pill.is-active {
+    background-color: var(--ink);
+    color: var(--bg-white);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .mf-pdp__size-pill:disabled {
+    opacity: 0.25;
+    background-image: linear-gradient(45deg, transparent 48%, var(--ink) 48%, var(--ink) 52%, transparent 52%);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Subscribe & Save Panel */
+  .mf-pdp__subscription-panel {
+    border: var(--border-thick);
+    border-radius: 0px;
+    background-color: var(--bg-white);
+    margin-bottom: 30px;
+    box-shadow: 4px 4px 0px var(--ink);
+  }
+
+  .mf-pdp__sub-option {
+    padding: 16px 20px;
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .mf-pdp__sub-option:not(:last-child) {
+    border-bottom: var(--border-thick);
+  }
+
+  .mf-pdp__sub-option:hover {
+    background-color: var(--bg-gray);
+  }
+
+  .mf-pdp__sub-option.is-active {
+    background-color: var(--bg-gray);
+  }
+
+  .mf-pdp__radio-wrapper {
+    margin-top: 2px;
+  }
+
+  .mf-pdp__radio {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: var(--border-thick);
+    border-radius: 0%;
+    outline: none;
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
+    background-color: var(--bg-white);
+    cursor: pointer;
   }
-  .mf-product-price s {
-    color: #999;
-    font-size: 18px;
-    font-weight: 400;
+
+  .mf-pdp__radio:checked {
+    background-color: var(--signal-red);
   }
-  
-  /* Add to Cart Area */
-  .mf-product-form {
-    margin-bottom: 40px;
+
+  .mf-pdp__sub-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
-  .mf-product-variants {
-    margin-bottom: 25px;
+
+  .mf-pdp__sub-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
   }
-  .mf-product-variant-label {
+
+  .mf-pdp__sub-discount-text {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    color: var(--signal-red);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .mf-pdp__sub-frequency {
+    margin-top: 10px;
+    display: none;
+  }
+
+  .mf-pdp__sub-option.is-active .mf-pdp__sub-frequency {
     display: block;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 10px;
+  }
+
+  .mf-pdp__sub-select {
+    padding: 8px 12px;
+    border-radius: 0px;
+    border: var(--border-thick);
+    background-color: var(--bg-white);
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+    max-width: 240px;
+  }
+
+  /* CTAs & Badges */
+  .mf-pdp__btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 35px;
+  }
+
+  .mf-pdp__atc {
+    background-color: var(--ink);
+    color: var(--bg-white);
+    border: var(--border-thick);
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px var(--signal-red);
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mf-pdp__atc:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--signal-red);
+    background-color: var(--signal-red);
+    color: var(--bg-white);
+  }
+
+  .mf-pdp__whatsapp {
+    background-color: var(--bg-white);
+    color: var(--ink);
+    border: var(--border-thick);
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px var(--ink);
+    padding: 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-  .mf-product-variant-select {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    background: #fff;
-    cursor: pointer;
+
+  .mf-pdp__whatsapp:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--ink);
+    background-color: var(--bg-gray);
   }
-  .mf-add-to-cart {
-    width: 100%;
-    padding: 18px;
-    background: #000;
-    color: #fff;
-    border: none;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.3s;
-    border-radius: 2px;
+
+  .mf-pdp__whatsapp svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
   }
-  .mf-add-to-cart:hover {
-    background: #333;
-  }
-  
-  /* Trust Badges & Urgency */
-  .mf-product-trust {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .mf-product-badges {
-    display: flex;
-    gap: 15px;
-    opacity: 0.5;
-  }
-  .mf-product-badges svg {
-    height: 24px;
-    width: auto;
-  }
-  .mf-product-urgency {
-    display: flex;
+
+  /* COD Badge */
+  .mf-pdp__cod-badge {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
+    background-color: var(--bg-gray);
+    color: var(--ink);
+    border: var(--border-thick);
+    box-shadow: 3px 3px 0px var(--ink);
+    padding: 8px 16px;
+    border-radius: 0px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    align-self: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .mf-pdp__cod-badge svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  /* Specifications Table */
+  .mf-pdp__specs-card {
+    border: var(--border-thick);
+    background-color: var(--bg-gray);
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 4px 4px 0px var(--ink);
+  }
+
+  .mf-pdp__specs-title {
+    font-family: 'Courier Prime', monospace;
     font-size: 13px;
-    color: #d93025;
-    font-weight: 500;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 16px;
+    display: block;
   }
-  .mf-product-urgency-dot {
-    width: 8px;
-    height: 8px;
-    background: #d93025;
-    border-radius: 50%;
-    animation: mf-pulse 2s infinite;
+
+  .mf-pdp__spec-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed var(--ink);
+    padding-bottom: 6px;
   }
-  
-  /* Accordion Details */
-  .mf-product-accordion {
-    border-top: 1px solid #eee;
+
+  .mf-pdp__spec-label {
+    font-weight: 700;
+    color: var(--signal-red);
   }
-  .mf-accordion-item {
-    border-bottom: 1px solid #eee;
+
+  .mf-pdp__spec-val {
+    font-weight: 700;
+    color: var(--ink);
   }
-  .mf-accordion-btn {
+
+  /* Pincode Checker */
+  .mf-pdp__pincode-card {
+    border: var(--border-thick);
+    background-color: var(--bg-white);
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 4px 4px 0px var(--ink);
+  }
+
+  .mf-pdp__pincode-title {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .mf-pdp__pincode-form {
+    display: flex;
+    gap: 0;
+  }
+
+  .mf-pdp__pincode-input {
+    flex-grow: 1;
+    padding: 10px 16px;
+    border-radius: 0px;
+    border: var(--border-thick);
+    background-color: var(--bg-white);
+    font-family: 'Courier Prime', monospace;
+    font-size: 13.5px;
+    outline: none;
+    color: var(--ink);
+  }
+
+  .mf-pdp__pincode-btn {
+    background-color: var(--ink);
+    color: var(--bg-white);
+    border: var(--border-thick);
+    border-left: none;
+    border-radius: 0px;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mf-pdp__pincode-btn:hover {
+    background-color: var(--signal-red);
+    color: var(--bg-white);
+  }
+
+  .mf-pdp__pincode-result {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12.5px;
+    margin-top: 10px;
+    display: none;
+    font-weight: 700;
+  }
+
+  .mf-pdp__pincode-result.is-success {
+    display: block;
+    color: var(--ink);
+    border-left: 4px solid var(--ink);
+    padding-left: 8px;
+  }
+
+  .mf-pdp__pincode-result.is-error {
+    display: block;
+    color: var(--signal-red);
+    border-left: 4px solid var(--signal-red);
+    padding-left: 8px;
+  }
+
+  /* Accordion details */
+  .mf-pdp__accordion {
+    border-top: var(--border-thick);
+  }
+
+  .mf-pdp__accordion-item {
+    border-bottom: var(--border-thick);
+  }
+
+  .mf-pdp__accordion-btn {
     width: 100%;
-    padding: 20px 0;
+    padding: 18px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: none;
     border: none;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    font-weight: 500;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
     cursor: pointer;
-  }
-  .mf-accordion-content {
-    padding-bottom: 20px;
-    font-family: var(--mf-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    line-height: 1.6;
-    color: #555;
-    display: none;
+    color: var(--ink);
   }
 
-  @media (max-width: 900px) {
-    .mf-product-main {
-      grid-template-columns: 1fr;
-      gap: 30px;
-      padding: 20px;
-    }
-    .mf-product-gallery {
-      position: static;
-    }
+  .mf-pdp__accordion-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+  }
+
+  .mf-pdp__accordion-btn.is-active svg {
+    transform: rotate(180deg);
+  }
+
+  .mf-pdp__accordion-content {
+    display: none;
+    padding-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.85;
   }
 </style>
 
-<div class="mf-product-main">
-  <!-- LEFT: Gallery -->
-  <div class="mf-product-gallery">
-    <div class="mf-product-gallery__main">
-      {% if product.featured_image %}
-        <img src="{{ product.featured_image | img_url: '1000x' }}" alt="{{ product.title }}">
-      {% else %}
-        <div style="width:100%; aspect-ratio:3/4; background:#eee; display:flex; align-items:center; justify-content:center;">Product Image</div>
-      {% endif %}
-    </div>
-    {% if product.images.size > 1 %}
-      <div class="mf-product-gallery__thumbnails">
-        {% for image in product.images limit: 4 %}
-          <img src="{{ image | img_url: '200x' }}" alt="{{ product.title }}">
-        {% endfor %}
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- RIGHT: Info -->
-  <div class="mf-product-info">
-    <div class="mf-product-vendor">{{ product.vendor | default: "Premium Brand" }}</div>
-    <h1 class="mf-product-title">{{ product.title | default: "Premium Product Name" }}</h1>
+<section class="mf-pdp" id="mf-pdp-{{ section.id }}">
+  <div class="mf-pdp__container">
     
-    <div class="mf-product-rating">
-      <div style="display:flex;gap:2px;">
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-      </div>
-      <span>(128 Reviews)</span>
-    </div>
-
-    <div class="mf-product-price">
-      {% if product %}
-        {{ product.selected_or_first_available_variant.price | money }}
-        {% if product.compare_at_price > product.price %}
-          <s>{{ product.compare_at_price | money }}</s>
+    <!-- LEFT COLUMN: Image Gallery -->
+    <div class="mf-pdp__gallery">
+      <div class="mf-pdp__main-image-wrapper">
+        {% if product.featured_image %}
+          <img class="mf-pdp__main-image" id="main-image-{{ section.id }}" src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}">
+        {% else %}
+          <!-- Standard placeholder SVG for brutalist sneaker -->
+          <svg class="mf-pdp__main-image" id="main-image-{{ section.id }}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="#f3f3f3" />
+            <!-- Sneaker outline visual -->
+            <path d="M20 70l20-30h15l15 15h15v15H20z" fill="none" stroke="#000000" stroke-width="2" />
+            <line x1="20" y1="70" x2="85" y2="70" stroke="#ff3e3e" stroke-width="3" />
+          </svg>
         {% endif %}
-      {% else %}
-        $120.00 <s>$150.00</s>
-      {% endif %}
-    </div>
+      </div>
 
-    <div class="mf-product-form">
-      {% if product %}
-        {% form 'product', product %}
-          {% unless product.has_only_default_variant %}
-            <div class="mf-product-variants">
-              {% for option in product.options_with_values %}
-                <label class="mf-product-variant-label">{{ option.name }}</label>
-                <select name="id" class="mf-product-variant-select">
-                  {% for variant in product.variants %}
-                    <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
-                      {{ variant.title }} - {{ variant.price | money }}
-                    </option>
-                  {% endfor %}
-                </select>
-              {% endfor %}
+      <div class="mf-pdp__thumbnails">
+        {% if product.images.size > 1 %}
+          {% for image in product.images limit: 4 %}
+            <div class="mf-pdp__thumb {% if forloop.first %}is-active{% endif %}" data-url="{{ image | image_url: width: 800 }}">
+              <img src="{{ image | image_url: width: 150 }}" alt="{{ product.title | escape }}">
             </div>
-          {% else %}
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-          {% endunless %}
-          <button type="submit" class="mf-add-to-cart" {% unless product.available %}disabled{% endunless %}>
-            {% if product.available %}Add to Bag{% else %}Sold Out{% endif %}
-          </button>
-        {% endform %}
-      {% else %}
-        <button type="button" class="mf-add-to-cart">Add to Bag</button>
-      {% endif %}
-
-      <div class="mf-product-trust">
-        <div class="mf-product-urgency">
-          <span class="mf-product-urgency-dot"></span>
-          Selling fast! Only <span id="mf-inventory-count">4</span> left in stock.
-        </div>
-        <div class="mf-product-badges">
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#FFF" opacity=".2"/><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#1434CB"/><path d="M28.3 5.9l-1.4 8.6h-2.7l1.4-8.6h2.7zm-9.3 0h-2.2c-.4 0-.8.2-1 .6l-3.1 7.4-1.5-7.4c-.1-.3-.2-.5-.5-.6H8.1l2.4 8.6h2.8l3.6-8.6zm13.1 8.6l-1.3-6.2c-.1-.4-.5-.6-.9-.6h-3.1c-.2 0-.4.1-.5.3l-2.4 6.5h2.8l.5-1.5h3.5l.3 1.5h1.1zm-3.5-3.6l1-3 1 3h-2zm-11.4 3.6h2.7l1.7-8.6h-2.7l-1.7 8.6z" fill="#FFF"/></svg>
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#1A1F71"/><path d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.3 3-3.4 3-5.7z" fill="#FF5F00"/><path d="M14.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#EB001B"/><path d="M29.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#F79E1B"/></svg>
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"/><path d="M19.1 11.4c0-1.6.8-3.1 2.2-3.9-1-1-2.4-1.3-3.1-1.3-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.6 2.2 2.7 2.1 1.1-.1 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2.1 1.9-1 2.6-2.1.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.2-.8-2.2-3.3zm-1.8-5c.6-.7 1-1.7.9-2.7-.8.1-1.9.6-2.5 1.4-.5.6-1 1.6-.9 2.6.9.1 1.9-.5 2.5-1.3z" fill="#FFF"/></svg>
-        </div>
+          {% endfor %}
+        {% else %}
+          <div class="mf-pdp__thumb is-active" data-url="mock-1">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+          </div>
+          <div class="mf-pdp__thumb" data-url="mock-2">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+          </div>
+          <div class="mf-pdp__thumb" data-url="mock-3">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4"/></svg>
+          </div>
+        {% endif %}
       </div>
     </div>
 
-    <div class="mf-product-accordion">
-      <div class="mf-accordion-item">
-        <button class="mf-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Product Description <span>+</span>
-        </button>
-        <div class="mf-accordion-content" style="display:block;">
-          {{ product.description | default: "Premium quality materials engineered for excellence. Experience true luxury with our signature design." }}
+    <!-- RIGHT COLUMN: Buy-Box details -->
+    <div class="mf-pdp__info">
+      <span class="mf-pdp__vendor">// BRAND: {{ product.vendor | default: "VOLT° LABS" }}</span>
+      <h1 class="mf-pdp__title">{{ product.title | default: "VOLT AIR-03 SNEAKER" }}</h1>
+
+      <!-- Ratings -->
+      <div class="mf-pdp__rating-row">
+        <div class="mf-pdp__stars">
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </div>
+        <span>[142 REVIEWS // VERIFIED]</span>
+      </div>
+
+      <!-- Pricing -->
+      <div class="mf-pdp__price-area">
+        <div class="mf-pdp__price-container">
+          <span class="mf-pdp__price" id="pdp-price-val-{{ section.id }}">
+            {% if product %}
+              {{ product.selected_or_first_available_variant.price | money }}
+            {% else %}
+              ₹14,999
+            {% endif %}
+          </span>
+          <span class="mf-pdp__compare-price" id="pdp-compare-val-{{ section.id }}">
+            {% if product.compare_at_price > product.price %}
+              {{ product.compare_at_price | money }}
+            {% else %}
+              ₹17,499
+            {% endif %}
+          </span>
+        </div>
+        <div class="mf-pdp__tax-notice">// PRICE INCLUSIVE OF GST / TAXES</div>
+      </div>
+
+      <!-- COD Badge -->
+      <div class="mf-pdp__cod-badge">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
+        </svg>
+        COD AVAILABLE // SHIPPED FROM INDIA
+      </div>
+
+      {% form 'product', product, class: 'mf-pdp__form' %}
+        <!-- Size Grid options -->
+        <div class="mf-pdp__option-group">
+          <span class="mf-pdp__option-title">// SELECT SIZE [UK GRID]</span>
+          <div class="mf-pdp__size-grid">
+            <button type="button" class="mf-pdp__size-pill" data-price="14999" data-compare="17499">6</button>
+            <button type="button" class="mf-pdp__size-pill" data-price="14999" data-compare="17499">7</button>
+            <button type="button" class="mf-pdp__size-pill" disabled>8</button>
+            <button type="button" class="mf-pdp__size-pill is-active" data-price="14999" data-compare="17499">9</button>
+            <button type="button" class="mf-pdp__size-pill" disabled>10</button>
+            <button type="button" class="mf-pdp__size-pill" data-price="14999" data-compare="17499">11</button>
+          </div>
+          <input type="hidden" name="id" id="variant-id-{{ section.id }}" value="{{ product.selected_or_first_available_variant.id | default: '87654321' }}">
+        </div>
+
+        <!-- Subscribe & Save Options -->
+        <div class="mf-pdp__subscription-panel">
+          
+          <!-- One Time Drop -->
+          <div class="mf-pdp__sub-option is-active" id="sub-one-time-{{ section.id }}">
+            <div class="mf-pdp__radio-wrapper">
+              <input type="radio" name="purchase_type" class="mf-pdp__radio" checked id="radio-ot-{{ section.id }}">
+            </div>
+            <div class="mf-pdp__sub-details">
+              <div class="mf-pdp__sub-label-row">
+                <span>ONE-TIME DROP</span>
+                <span class="mf-pdp__sub-price" id="ot-price-display-{{ section.id }}">₹14,999</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auto-Drop (Subscribe) -->
+          <div class="mf-pdp__sub-option" id="sub-recurring-{{ section.id }}">
+            <div class="mf-pdp__radio-wrapper">
+              <input type="radio" name="purchase_type" class="mf-pdp__radio" id="radio-rec-{{ section.id }}">
+            </div>
+            <div class="mf-pdp__sub-details">
+              <div class="mf-pdp__sub-label-row">
+                <span>AUTO-DROP (SAVE 15%)</span>
+                <span class="mf-pdp__sub-price" id="rec-price-display-{{ section.id }}">₹12,749</span>
+              </div>
+              <span class="mf-pdp__sub-discount-text">15% SAVED ON EVERY AUTO-RELEASE</span>
+              
+              <!-- Frequency select -->
+              <div class="mf-pdp__sub-frequency">
+                <select class="mf-pdp__sub-select">
+                  <option>RELEASE EVERY 30 DAYS (RECOMMENDED)</option>
+                  <option>RELEASE EVERY 45 DAYS</option>
+                  <option>RELEASE EVERY 60 DAYS</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CTAs -->
+        <div class="mf-pdp__btn-group">
+          <button type="submit" class="mf-pdp__atc" id="mf-atc-btn-{{ section.id }}">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3z"/>
+            </svg>
+            ADD TO BAG
+          </button>
+          
+          <a href="https://wa.me/919999999999?text=Hi!%20I%20have%20an%20enquiry%20about%20your%20VOLT%20AIR-03%20SNEAKER." target="_blank" class="mf-pdp__whatsapp">
+            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L3.2 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6z"/>
+            </svg>
+            // TEXT_OUR_LINE (WHATSAPP_ENQUIRY)
+          </a>
+        </div>
+      {% endform %}
+
+      <!-- Specifications Table -->
+      <div class="mf-pdp__specs-card">
+        <span class="mf-pdp__specs-title">// TECHNICAL_SPECIFICATIONS</span>
+        <div class="mf-pdp__spec-row">
+          <span class="mf-pdp__spec-label">[MIDSOLE]</span>
+          <span class="mf-pdp__spec-val">VULCANIZED RUBBER</span>
+        </div>
+        <div class="mf-pdp__spec-row">
+          <span class="mf-pdp__spec-label">[UPPER]</span>
+          <span class="mf-pdp__spec-val">DISTRESSED SUEDE + MESH</span>
+        </div>
+        <div class="mf-pdp__spec-row">
+          <span class="mf-pdp__spec-label">[DROP]</span>
+          <span class="mf-pdp__spec-val">8 MM</span>
+        </div>
+        <div class="mf-pdp__spec-row">
+          <span class="mf-pdp__spec-label">[AUTHENTICITY]</span>
+          <span class="mf-pdp__spec-val">100% VERIFIED LEGIT</span>
+        </div>
+        <div class="mf-pdp__spec-row">
+          <span class="mf-pdp__spec-label">[SHIPS-IN]</span>
+          <span class="mf-pdp__spec-val">24 HOURS (DHL EXPRESS)</span>
         </div>
       </div>
-      <div class="mf-accordion-item">
-        <button class="mf-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Shipping & Returns <span>+</span>
-        </button>
-        <div class="mf-accordion-content">
-          Free standard shipping on orders over $150. Returns accepted within 14 days of delivery.
+
+      <!-- Pincode Checker Card -->
+      <div class="mf-pdp__pincode-card">
+        <span class="mf-pdp__pincode-title">// DELIVERY_LOCATION_VERIFICATION</span>
+        <div class="mf-pdp__pincode-form">
+          <input type="text" class="mf-pdp__pincode-input" id="pincode-input-{{ section.id }}" placeholder="ENTER_PINCODE_6_DIGIT" maxlength="6">
+          <button type="button" class="mf-pdp__pincode-btn" id="pincode-btn-{{ section.id }}">CHECK</button>
         </div>
+        <div class="mf-pdp__pincode-result" id="pincode-result-{{ section.id }}"></div>
       </div>
-      <div class="mf-accordion-item">
-        <button class="mf-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Materials & Care <span>+</span>
-        </button>
-        <div class="mf-accordion-content">
-          Handle with care. Wipe clean with a soft, dry cloth. Store in the provided dust bag when not in use.
+
+      <!-- Accordion description details -->
+      <div class="mf-pdp__accordion">
+        
+        <div class="mf-pdp__accordion-item">
+          <button type="button" class="mf-pdp__accordion-btn">
+            // DESCRIPTION
+            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="mf-pdp__accordion-content" style="display: block;">
+            <p>High-end brutalist footwear designed for heavy city wear. Featuring distressed gray suede, reinforced double-stitching, offset panel cuts, and signature serial stamp. Verified legitimate drop release.</p>
+          </div>
         </div>
+
+        <div class="mf-pdp__accordion-item">
+          <button type="button" class="mf-pdp__accordion-btn">
+            // SHIPPING_RETURNS
+            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="mf-pdp__accordion-content">
+            <p>Free priority express shipping on all orders in India. Every shipment is double-boxed. Returns accepted within 7 days of delivery in pristine, unworn packaging with original seals intact.</p>
+          </div>
+        </div>
+
+        <div class="mf-pdp__accordion-item">
+          <button type="button" class="mf-pdp__accordion-btn">
+            // VERIFICATION_PROCESS
+            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="mf-pdp__accordion-content">
+            <p>Each pair undergoes a rigorous physical appraisal by our expert verification team. Stitched seams, materials, soles, labels, and boxes are inspected under close detail. A signed NFC validation tag is attached upon approval.</p>
+          </div>
+        </div>
+
       </div>
+
     </div>
 
   </div>
-</div>
+</section>
 
 <script>
-  // Simple Scarcity Generator
-  document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('mf-inventory-count');
-    if (el) {
-      el.innerText = Math.floor(Math.random() * 5) + 2;
+  document.addEventListener("DOMContentLoaded", function() {
+    const pdp = document.getElementById("mf-pdp-{{ section.id }}");
+    if (!pdp) return;
+
+    // Gallery switching
+    const mainImage = pdp.querySelector("#main-image-{{ section.id }}");
+    const thumbs = pdp.querySelectorAll(".mf-pdp__thumb");
+
+    thumbs.forEach(thumb => {
+      thumb.addEventListener("click", () => {
+        const url = thumb.getAttribute("data-url");
+        thumbs.forEach(t => t.classList.remove("is-active"));
+        thumb.classList.add("is-active");
+
+        if (url && url !== "mock-1" && url !== "mock-2" && url !== "mock-3") {
+          mainImage.src = url;
+        }
+      });
+    });
+
+    // Variant pricing updates
+    const sizePills = pdp.querySelectorAll(".mf-pdp__size-pill:not(:disabled)");
+    const priceVal = pdp.getElementById("pdp-price-val-{{ section.id }}");
+    const compareVal = pdp.getElementById("pdp-compare-val-{{ section.id }}");
+    const otPriceDisplay = pdp.getElementById("ot-price-display-{{ section.id }}");
+    const recPriceDisplay = pdp.getElementById("rec-price-display-{{ section.id }}");
+
+    let currentBasePrice = 14999;
+    let currentComparePrice = 17499;
+    let isSubscribed = false;
+
+    function updatePriceUI() {
+      let activePrice = currentBasePrice;
+      if (isSubscribed) {
+        activePrice = Math.round(currentBasePrice * 0.85); // 15% discount
+      }
+
+      priceVal.textContent = `₹${activePrice.toLocaleString("en-IN")}`;
+      compareVal.textContent = `₹${currentComparePrice.toLocaleString("en-IN")}`;
+      
+      otPriceDisplay.textContent = `₹${currentBasePrice.toLocaleString("en-IN")}`;
+      recPriceDisplay.textContent = `₹${Math.round(currentBasePrice * 0.85).toLocaleString("en-IN")}`;
     }
+
+    sizePills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        sizePills.forEach(p => p.classList.remove("is-active"));
+        pill.classList.add("is-active");
+
+        currentBasePrice = parseFloat(pill.getAttribute("data-price"));
+        currentComparePrice = parseFloat(pill.getAttribute("data-compare"));
+
+        updatePriceUI();
+      });
+    });
+
+    // Subscriptions logic
+    const optionOt = pdp.getElementById("sub-one-time-{{ section.id }}");
+    const optionRec = pdp.getElementById("sub-recurring-{{ section.id }}");
+    const radioOt = pdp.getElementById("radio-ot-{{ section.id }}");
+    const radioRec = pdp.getElementById("radio-rec-{{ section.id }}");
+
+    function selectPurchaseType(subscribe) {
+      isSubscribed = subscribe;
+      if (subscribe) {
+        optionOt.classList.remove("is-active");
+        optionRec.classList.add("is-active");
+        radioOt.checked = false;
+        radioRec.checked = true;
+      } else {
+        optionOt.classList.add("is-active");
+        optionRec.classList.remove("is-active");
+        radioOt.checked = true;
+        radioRec.checked = false;
+      }
+      updatePriceUI();
+    }
+
+    optionOt.addEventListener("click", () => selectPurchaseType(false));
+    optionRec.addEventListener("click", () => selectPurchaseType(true));
+
+    // Pincode Checker logic
+    const pinBtn = pdp.getElementById("pincode-btn-{{ section.id }}");
+    const pinInput = pdp.getElementById("pincode-input-{{ section.id }}");
+    const pinResult = pdp.getElementById("pincode-result-{{ section.id }}");
+
+    if (pinBtn && pinInput && pinResult) {
+      pinBtn.addEventListener("click", () => {
+        const pin = pinInput.value.trim();
+        if (/^\d{6}$/.test(pin)) {
+          const prefix = pin.substring(0, 3);
+          if (["110", "400", "560", "600", "700", "500"].includes(prefix)) {
+            pinResult.className = "mf-pdp__pincode-result is-success";
+            pinResult.textContent = ">> EXPRESS DELIVER CONFIRMED: 48 HOURS (COD AVAILABLE)";
+          } else {
+            pinResult.className = "mf-pdp__pincode-result is-success";
+            pinResult.textContent = ">> STANDARD DELIVER CONFIRMED: 4-5 DAYS (COD AVAILABLE)";
+          }
+        } else {
+          pinResult.className = "mf-pdp__pincode-result is-error";
+          pinResult.textContent = ">> ERROR: INVALID PINCODE SCHEMA.";
+        }
+      });
+    }
+
+    // Accordions
+    const accordionBtns = pdp.querySelectorAll(".mf-pdp__accordion-btn");
+    accordionBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const content = btn.nextElementSibling;
+        const isActive = btn.classList.contains("is-active");
+
+        // Close all
+        accordionBtns.forEach(b => {
+          b.classList.remove("is-active");
+          b.nextElementSibling.style.display = "none";
+        });
+
+        // Toggle clicked
+        if (!isActive) {
+          btn.classList.add("is-active");
+          content.style.display = "block";
+        }
+      });
+    });
   });
 </script>
 
 {% schema %}
 {
-  "name": "Premium Product Main",
+  "name": "Streetwear Product Main",
   "tag": "section",
   "settings": [],
   "presets": [
     {
-      "name": "Premium Product Main"
+      "name": "Streetwear Product Main"
     }
   ]
 }
