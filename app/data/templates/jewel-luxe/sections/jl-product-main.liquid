@@ -1,351 +1,685 @@
 <style>
-  .jl-product-main {
-    max-width: 1400px;
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap');
+
+  .jl-product-section {
+    --ivory: #f7f3ec;
+    --paper: #fdfbf7;
+    --ink: #1c1a17;
+    --gold: #a8884f;
+    --gold-soft: #c9b489;
+    --line: #e4ddd0;
+    --muted: #8b8479;
+
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    padding: 60px 0;
+  }
+  .jl-product-container {
+    max-width: 1300px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 0 5%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
-  
-  /* Gallery Side (Left) */
-  .jl-product-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: sticky;
-    top: 100px;
-    height: max-content;
-  }
-  .jl-product-gallery__main img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-    object-fit: cover;
-    background: #f8f8f8;
-  }
-  .jl-product-gallery__thumbnails {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  .jl-product-gallery__thumbnails img {
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: border-color 0.3s;
-  }
-  .jl-product-gallery__thumbnails img:hover {
-    border-color: #000;
+  @media (min-width: 992px) {
+    .jl-product-container {
+      grid-template-columns: 1.1fr 1fr;
+      gap: 70px;
+    }
   }
 
-  /* Info Side (Right) */
-  .jl-product-info {
-    display: flex;
-    flex-direction: column;
+  /* Left Side: Gallery */
+  .jl-gallery {
+    position: sticky;
+    top: 40px;
+    height: max-content;
   }
-  .jl-product-vendor {
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 13px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+  .jl-gallery__main-wrapper {
+    position: relative;
+    border: 1px solid var(--line);
+    background-color: var(--ivory);
+    overflow: hidden;
+    margin-bottom: 16px;
+    cursor: zoom-in;
   }
-  .jl-product-title {
-    font-family: var(--jl-font-serif, 'Georgia', serif);
-    font-size: clamp(32px, 4vw, 48px);
-    line-height: 1.1;
-    margin: 0 0 15px 0;
-    font-weight: 400;
-  }
-  .jl-product-rating {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 25px;
-    font-size: 14px;
-    color: #222;
-  }
-  .jl-product-rating svg {
-    width: 16px;
-    fill: #000;
-  }
-  .jl-product-price {
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  .jl-product-price s {
-    color: #999;
-    font-size: 18px;
-    font-weight: 400;
-  }
-  
-  /* Add to Cart Area */
-  .jl-product-form {
-    margin-bottom: 40px;
-  }
-  .jl-product-variants {
-    margin-bottom: 25px;
-  }
-  .jl-product-variant-label {
+  .jl-gallery__main-image {
+    width: 100%;
+    height: auto;
     display: block;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    transition: transform 0.5s ease;
   }
-  .jl-product-variant-select {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    background: #fff;
+  .jl-gallery__main-image:hover {
+    transform: scale(1.06);
+  }
+  .jl-gallery__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .jl-gallery__thumb {
+    border: 1px solid var(--line);
+    background-color: var(--ivory);
     cursor: pointer;
+    padding: 4px;
+    transition: border-color 0.3s ease;
   }
-  .jl-add-to-cart {
+  .jl-gallery__thumb.is-active,
+  .jl-gallery__thumb:hover {
+    border-color: var(--gold);
+  }
+  .jl-gallery__thumb img {
     width: 100%;
-    padding: 18px;
-    background: #000;
-    color: #fff;
-    border: none;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.3s;
-    border-radius: 2px;
+    height: auto;
+    display: block;
+    object-fit: cover;
   }
-  .jl-add-to-cart:hover {
-    background: #333;
-  }
-  
-  /* Trust Badges & Urgency */
-  .jl-product-trust {
-    margin-top: 15px;
+
+  /* Right Side: Product Details */
+  .jl-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 10px;
   }
-  .jl-product-badges {
-    display: flex;
-    gap: 15px;
-    opacity: 0.5;
-  }
-  .jl-product-badges svg {
-    height: 24px;
-    width: auto;
-  }
-  .jl-product-urgency {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 13px;
-    color: #d93025;
+  .jl-info__vendor {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--gold);
     font-weight: 500;
+    margin-bottom: 12px;
   }
-  .jl-product-urgency-dot {
-    width: 8px;
-    height: 8px;
-    background: #d93025;
-    border-radius: 50%;
-    animation: jl-pulse 2s infinite;
+  .jl-info__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 16px 0;
+  }
+  .jl-info__price-box {
+    margin-bottom: 24px;
+  }
+  .jl-info__price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .jl-info__price s {
+    font-size: 18px;
+    color: var(--muted);
+  }
+  .jl-info__tax-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
   }
   
-  /* Accordion Details */
-  .jl-product-accordion {
-    border-top: 1px solid #eee;
+  /* Variant Swatches & Selectors */
+  .jl-option {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
   }
-  .jl-accordion-item {
-    border-bottom: 1px solid #eee;
-  }
-  .jl-accordion-btn {
-    width: 100%;
-    padding: 20px 0;
+  .jl-option__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: none;
-    border: none;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .jl-option__label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
     font-weight: 500;
+  }
+  .jl-option__value {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .jl-option__sizeguide {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  /* Metal Round Swatches */
+  .jl-swatches {
+    display: flex;
+    gap: 12px;
+  }
+  .jl-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 2px;
+    transition: all 0.3s ease;
+  }
+  .jl-swatch.is-selected {
+    border-color: var(--gold);
+  }
+  .jl-swatch__inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+  
+  /* Size Grid Buttons */
+  .jl-sizes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .jl-size-btn {
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    padding: 10px 0;
+    text-align: center;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .jl-size-btn:hover,
+  .jl-size-btn.is-selected {
+    border-color: var(--gold);
+  }
+  .jl-size-btn.is-selected {
+    outline: 1px solid var(--gold);
+    background-color: var(--ivory);
+  }
+  
+  /* Actions */
+  .jl-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .jl-actions__buttons {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 12px;
+  }
+  .jl-btn {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0;
+  }
+  .jl-btn--primary {
+    background-color: var(--ink);
+    color: #ffffff;
+    border: none;
+  }
+  .jl-btn--primary:hover {
+    background-color: var(--gold);
+  }
+  .jl-btn--whatsapp {
+    background-color: var(--paper);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .jl-btn--whatsapp:hover {
+    background-color: var(--ivory);
+  }
+  .jl-btn--whatsapp svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+  .jl-actions__cod-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .jl-actions__cod-badge svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  /* Pincode Serviceability Checker */
+  .jl-pincode {
+    border: 1px solid var(--line);
+    background-color: var(--ivory);
+    padding: 20px;
+    margin-bottom: 32px;
+  }
+  .jl-pincode__title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+  }
+  .jl-pincode__form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .jl-pincode__input {
+    flex-grow: 1;
+    padding: 10px 12px;
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 13px;
+    outline: none;
+  }
+  .jl-pincode__input:focus {
+    border-color: var(--gold);
+  }
+  .jl-pincode__btn {
+    background-color: var(--ink);
+    color: #ffffff;
+    border: none;
+    padding: 0 20px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
   }
-  .jl-accordion-content {
-    padding-bottom: 20px;
-    font-family: var(--jl-font-sans, 'Inter', sans-serif);
-    font-size: 14px;
-    line-height: 1.6;
-    color: #555;
+  .jl-pincode__btn:hover {
+    background-color: var(--gold);
+  }
+  .jl-pincode__result {
+    font-size: 12px;
+    line-height: 1.4;
     display: none;
   }
+  .jl-pincode__result.is-success {
+    color: #2e7d32;
+  }
+  .jl-pincode__result.is-error {
+    color: #c62828;
+  }
 
-  @media (max-width: 900px) {
-    .jl-product-main {
-      grid-template-columns: 1fr;
-      gap: 30px;
-      padding: 20px;
-    }
-    .jl-product-gallery {
-      position: static;
-    }
+  /* GIA/BIS Trust Badges */
+  .jl-trust {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 0;
+  }
+  .jl-trust__item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .jl-trust__icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+  .jl-trust__icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+  }
+  .jl-trust__text {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+  }
+
+  /* Accordion Details */
+  .jl-accordion {
+    border-top: 1px solid var(--line);
+  }
+  .jl-accordion__item {
+    border-bottom: 1px solid var(--line);
+  }
+  .jl-accordion__trigger {
+    width: 100%;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .jl-accordion__icon {
+    width: 12px;
+    height: 12px;
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+  .jl-accordion__icon::before,
+  .jl-accordion__icon::after {
+    content: '';
+    position: absolute;
+    background-color: var(--gold);
+  }
+  .jl-accordion__icon::before {
+    top: 5px;
+    left: 0;
+    width: 12px;
+    height: 1.5px;
+  }
+  .jl-accordion__icon::after {
+    top: 0;
+    left: 5px;
+    width: 1.5px;
+    height: 12px;
+    transition: transform 0.3s ease;
+  }
+  .jl-accordion__item.is-active .jl-accordion__icon::after {
+    transform: scaleY(0);
+  }
+  .jl-accordion__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .jl-accordion__content-inner {
+    padding-bottom: 16px;
   }
 </style>
 
-<div class="jl-product-main">
-  <!-- LEFT: Gallery -->
-  <div class="jl-product-gallery">
-    <div class="jl-product-gallery__main">
-      {% if product.featured_image %}
-        <img src="{{ product.featured_image | img_url: '1000x' }}" alt="{{ product.title }}">
-      {% else %}
-        <div style="width:100%; aspect-ratio:3/4; background:#eee; display:flex; align-items:center; justify-content:center;">Product Image</div>
-      {% endif %}
-    </div>
-    {% if product.images.size > 1 %}
-      <div class="jl-product-gallery__thumbnails">
-        {% for image in product.images limit: 4 %}
-          <img src="{{ image | img_url: '200x' }}" alt="{{ product.title }}">
-        {% endfor %}
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- RIGHT: Info -->
-  <div class="jl-product-info">
-    <div class="jl-product-vendor">{{ product.vendor | default: "Premium Brand" }}</div>
-    <h1 class="jl-product-title">{{ product.title | default: "Premium Product Name" }}</h1>
-    
-    <div class="jl-product-rating">
-      <div style="display:flex;gap:2px;">
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-      </div>
-      <span>(128 Reviews)</span>
-    </div>
-
-    <div class="jl-product-price">
-      {% if product %}
-        {{ product.selected_or_first_available_variant.price | money }}
-        {% if product.compare_at_price > product.price %}
-          <s>{{ product.compare_at_price | money }}</s>
+<section class="jl-product-section" id="jl-product-{{ section.id }}">
+  <div class="jl-product-container">
+    <!-- LEFT: Gallery -->
+    <div class="jl-gallery">
+      <div class="jl-gallery__main-wrapper">
+        {% if product.featured_image %}
+          <img class="jl-gallery__main-image" id="main-image-{{ section.id }}" src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}">
+        {% else %}
+          <div style="width:100%; aspect-ratio:1; background-color:var(--ivory); display:flex; align-items:center; justify-content:center;">
+            <span style="font-size:12px; text-transform:uppercase; letter-spacing:2px; color:var(--gold);">Lumière Studio</span>
+          </div>
         {% endif %}
-      {% else %}
-        $120.00 <s>$150.00</s>
-      {% endif %}
-    </div>
-
-    <div class="jl-product-form">
-      {% if product %}
-        {% form 'product', product %}
-          {% unless product.has_only_default_variant %}
-            <div class="jl-product-variants">
-              {% for option in product.options_with_values %}
-                <label class="jl-product-variant-label">{{ option.name }}</label>
-                <select name="id" class="jl-product-variant-select">
-                  {% for variant in product.variants %}
-                    <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
-                      {{ variant.title }} - {{ variant.price | money }}
-                    </option>
-                  {% endfor %}
-                </select>
-              {% endfor %}
+      </div>
+      
+      {% if product.images.size > 1 %}
+        <div class="jl-gallery__thumbnails">
+          {% for image in product.images limit: 4 %}
+            <div class="jl-gallery__thumb {% if forloop.first %}is-active{% endif %}" data-src="{{ image | img_url: '800x' }}">
+              <img src="{{ image | img_url: '200x' }}" alt="{{ product.title }}">
             </div>
-          {% else %}
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-          {% endunless %}
-          <button type="submit" class="jl-add-to-cart" {% unless product.available %}disabled{% endunless %}>
-            {% if product.available %}Add to Bag{% else %}Sold Out{% endif %}
-          </button>
-        {% endform %}
-      {% else %}
-        <button type="button" class="jl-add-to-cart">Add to Bag</button>
+          {% endfor %}
+        </div>
       {% endif %}
-
-      <div class="jl-product-trust">
-        <div class="jl-product-urgency">
-          <span class="jl-product-urgency-dot"></span>
-          Selling fast! Only <span id="jl-inventory-count">4</span> left in stock.
-        </div>
-        <div class="jl-product-badges">
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#FFF" opacity=".2"/><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#1434CB"/><path d="M28.3 5.9l-1.4 8.6h-2.7l1.4-8.6h2.7zm-9.3 0h-2.2c-.4 0-.8.2-1 .6l-3.1 7.4-1.5-7.4c-.1-.3-.2-.5-.5-.6H8.1l2.4 8.6h2.8l3.6-8.6zm13.1 8.6l-1.3-6.2c-.1-.4-.5-.6-.9-.6h-3.1c-.2 0-.4.1-.5.3l-2.4 6.5h2.8l.5-1.5h3.5l.3 1.5h1.1zm-3.5-3.6l1-3 1 3h-2zm-11.4 3.6h2.7l1.7-8.6h-2.7l-1.7 8.6z" fill="#FFF"/></svg>
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#1A1F71"/><path d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.3 3-3.4 3-5.7z" fill="#FF5F00"/><path d="M14.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#EB001B"/><path d="M29.5 17.7c-2.4 0-4.5-1.2-5.7-3 1.3-1.8 3.4-3 5.7-3s4.5 1.2 5.7 3c-1.3 1.8-3.4 3-5.7 3z" fill="#F79E1B"/></svg>
-          <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"/><path d="M19.1 11.4c0-1.6.8-3.1 2.2-3.9-1-1-2.4-1.3-3.1-1.3-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.6 2.2 2.7 2.1 1.1-.1 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2.1 1.9-1 2.6-2.1.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.2-.8-2.2-3.3zm-1.8-5c.6-.7 1-1.7.9-2.7-.8.1-1.9.6-2.5 1.4-.5.6-1 1.6-.9 2.6.9.1 1.9-.5 2.5-1.3z" fill="#FFF"/></svg>
-        </div>
-      </div>
     </div>
 
-    <div class="jl-product-accordion">
-      <div class="jl-accordion-item">
-        <button class="jl-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Product Description <span>+</span>
-        </button>
-        <div class="jl-accordion-content" style="display:block;">
-          {{ product.description | default: "Premium quality materials engineered for excellence. Experience true luxury with our signature design." }}
+    <!-- RIGHT: Info Details -->
+    <div class="jl-info">
+      <span class="jl-info__vendor">{{ product.vendor | default: "Lumière Atelier" }}</span>
+      <h1 class="jl-info__title">{{ product.title | default: "The Solitaire Diamond Ring" }}</h1>
+      
+      <div class="jl-info__price-box">
+        <div class="jl-info__price">
+          {% if product %}
+            {{ product.selected_or_first_available_variant.price | money }}
+            {% if product.compare_at_price > product.price %}
+              <s>{{ product.compare_at_price | money }}</s>
+            {% endif %}
+          {% else %}
+            ₹1,45,000 s<s>₹1,75,000</s>
+          {% endif %}
         </div>
+        <span class="jl-info__tax-note">Inclusive of all GST & domestic duties</span>
       </div>
-      <div class="jl-accordion-item">
-        <button class="jl-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Shipping & Returns <span>+</span>
-        </button>
-        <div class="jl-accordion-content">
-          Free standard shipping on orders over $150. Returns accepted within 14 days of delivery.
-        </div>
-      </div>
-      <div class="jl-accordion-item">
-        <button class="jl-accordion-btn" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
-          Materials & Care <span>+</span>
-        </button>
-        <div class="jl-accordion-content">
-          Handle with care. Wipe clean with a soft, dry cloth. Store in the provided dust bag when not in use.
-        </div>
-      </div>
-    </div>
 
+      <!-- Metal Customization swatch -->
+      <div class="jl-option">
+        <div class="jl-option__header">
+          <span class="jl-option__label">Metal Finish</span>
+          <span class="jl-option__value" id="selected-metal-{{ section.id }}">18k Yellow Gold</span>
+        </div>
+        <div class="jl-swatches">
+          <div class="jl-swatch is-selected" data-metal="18k Yellow Gold">
+            <div class="jl-swatch__inner" style="background-color: #e6c9a8;"></div>
+          </div>
+          <div class="jl-swatch" data-metal="18k Rose Gold">
+            <div class="jl-swatch__inner" style="background-color: #eab49f;"></div>
+          </div>
+          <div class="jl-swatch" data-metal="18k White Gold">
+            <div class="jl-swatch__inner" style="background-color: #e2e4e1;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ring Size Button Grid -->
+      <div class="jl-option">
+        <div class="jl-option__header">
+          <span class="jl-option__label">Ring Size (UK)</span>
+          <span class="jl-option__sizeguide">Size Guide</span>
+        </div>
+        <div class="jl-sizes">
+          <div class="jl-size-btn is-selected" data-size="9">9</div>
+          <div class="jl-size-btn" data-size="10">10</div>
+          <div class="jl-size-btn" data-size="11">11</div>
+          <div class="jl-size-btn" data-size="12">12</div>
+          <div class="jl-size-btn" data-size="13">13</div>
+        </div>
+      </div>
+
+      <!-- Buy & Share Actions -->
+      <div class="jl-actions">
+        <div class="jl-actions__buttons">
+          <button type="button" class="jl-btn jl-btn--primary">Add to Bag</button>
+          
+          <a href="https://wa.me/919999999999?text=Hi,%20I'm%20interested%20in%20the%20Lumiere%20Fine%20Jewellery%20Solitaire%20Ring" class="jl-btn jl-btn--whatsapp" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24">
+              <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.233-1.371a9.924 9.924 0 0 0 4.777 1.22h.005c5.507 0 9.991-4.478 9.992-9.986 0-2.67-1.037-5.178-2.924-7.065A9.925 9.925 0 0 0 12.012 2zm5.834 14.17c-.254.715-1.472 1.393-2.015 1.482-.49.08-1.129.138-3.239-.743-2.697-1.125-4.417-3.87-4.551-4.05-.134-.18-1.002-1.34-1.002-2.553 0-1.213.623-1.81.846-2.055.223-.246.49-.308.654-.308.163 0 .326.002.468.008.148.006.347-.056.543.418.2.484.686 1.674.747 1.797.06.123.1.267.018.43-.082.163-.123.267-.245.41-.122.143-.258.32-.367.43-.123.123-.25.257-.107.502.143.245.635 1.05 1.363 1.697.937.834 1.728 1.093 1.973 1.216.246.123.388.102.532-.061.144-.163.623-.728.788-.973.165-.246.33-.205.556-.123.227.082 1.436.677 1.681.8.246.123.41.184.47.287.06.102.06.594-.194 1.309z"/>
+            </svg>
+            Enquire
+          </a>
+        </div>
+        
+        <div class="jl-actions__cod-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM11 7h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>
+          Cash on Delivery (COD) Available
+        </div>
+      </div>
+
+      <!-- PINcode Serviceability Checker -->
+      <div class="jl-pincode">
+        <h3 class="jl-pincode__title">Check Delivery Serviceability</h3>
+        <div class="jl-pincode__form">
+          <input type="text" class="jl-pincode__input" id="pincode-input-{{ section.id }}" placeholder="Enter 6-digit Pincode" maxlength="6">
+          <button type="button" class="jl-pincode__btn" id="pincode-btn-{{ section.id }}">Check</button>
+        </div>
+        <div class="jl-pincode__result" id="pincode-result-{{ section.id }}"></div>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="jl-trust">
+        <div class="jl-trust__item">
+          <div class="jl-trust__icon">
+            <svg viewBox="0 0 24 24" stroke-width="1.5"><polygon points="12 2 15 8.5 22 9.5 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.5 9 8.5 12 2"/></svg>
+          </div>
+          <span class="jl-trust__text">GIA Certified</span>
+        </div>
+        
+        <div class="jl-trust__item">
+          <div class="jl-trust__icon">
+            <svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <span class="jl-trust__text">BIS Hallmarked</span>
+        </div>
+        
+        <div class="jl-trust__item">
+          <div class="jl-trust__icon">
+            <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="jl-trust__text">Lifetime Care</span>
+        </div>
+      </div>
+
+      <!-- Product Description / Details / Returns Accordion -->
+      <div class="jl-accordion">
+        <div class="jl-accordion__item">
+          <button class="jl-accordion__trigger" type="button">
+            <span>The Details</span>
+            <span class="jl-accordion__icon"></span>
+          </button>
+          <div class="jl-accordion__content">
+            <div class="jl-accordion__content-inner">
+              <p>Carat Weight: 1.05ct · Color Grade: F · Clarity: VVS1. Certified conflict-free natural diamond. Set in BIS-hallmarked 18k solid gold.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="jl-accordion__item">
+          <button class="jl-accordion__trigger" type="button">
+            <span>Shipping & Insured Transit</span>
+            <span class="jl-accordion__icon"></span>
+          </button>
+          <div class="jl-accordion__content">
+            <div class="jl-accordion__content-inner">
+              <p>Complimentary fully-insured express shipping across India. Every parcel is hand-delivered in a secure tamper-proof metal box wrapper.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="jl-accordion__item">
+          <button class="jl-accordion__trigger" type="button">
+            <span>Returns & Lifetime Care</span>
+            <span class="jl-accordion__icon"></span>
+          </button>
+          <div class="jl-accordion__content">
+            <div class="jl-accordion__content-inner">
+              <p>14-day complimentary returns. We offer a lifetime buyback and exchange policy along with free annual polishing, resizing, and detailing services.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
+</section>
 
 <script>
-  // Simple Scarcity Generator
-  document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('jl-inventory-count');
-    if (el) {
-      el.innerText = Math.floor(Math.random() * 5) + 2;
+  document.addEventListener("DOMContentLoaded", function() {
+    const mainImg = document.getElementById("main-image-{{ section.id }}");
+    const thumbs = document.querySelectorAll("#jl-product-{{ section.id }} .jl-gallery__thumb");
+    const swatches = document.querySelectorAll("#jl-product-{{ section.id }} .jl-swatch");
+    const selectedMetalText = document.getElementById("selected-metal-{{ section.id }}");
+    const sizeBtns = document.querySelectorAll("#jl-product-{{ section.id }} .jl-size-btn");
+    
+    // Thumbnail Swapping
+    thumbs.forEach(thumb => {
+      thumb.addEventListener("click", () => {
+        thumbs.forEach(x => x.classList.remove("is-active"));
+        thumb.classList.add("is-active");
+        if (mainImg) {
+          mainImg.src = thumb.getAttribute("data-src");
+        }
+      });
+    });
+
+    // Metal Swatch Selection
+    swatches.forEach(swatch => {
+      swatch.addEventListener("click", () => {
+        swatches.forEach(x => x.classList.remove("is-selected"));
+        swatch.classList.add("is-selected");
+        const metal = swatch.getAttribute("data-metal");
+        if (selectedMetalText) {
+          selectedMetalText.textContent = metal;
+        }
+      });
+    });
+
+    // Size Selection
+    sizeBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        sizeBtns.forEach(x => x.classList.remove("is-selected"));
+        btn.classList.add("is-selected");
+      });
+    });
+
+    // Pincode Checker JS logic
+    const pinBtn = document.getElementById("pincode-btn-{{ section.id }}");
+    const pinInput = document.getElementById("pincode-input-{{ section.id }}");
+    const pinResult = document.getElementById("pincode-result-{{ section.id }}");
+
+    if (pinBtn && pinInput && pinResult) {
+      pinBtn.addEventListener("click", () => {
+        const val = pinInput.value.trim();
+        if (/^\d{6}$/.test(val)) {
+          pinResult.style.display = "block";
+          pinResult.className = "jl-pincode__result is-success";
+          pinResult.innerHTML = "✓ Delivery available in 2-4 days (COD Available)";
+        } else {
+          pinResult.style.display = "block";
+          pinResult.className = "jl-pincode__result is-error";
+          pinResult.innerHTML = "Please enter a valid 6-digit Pincode.";
+        }
+      });
     }
+
+    // Collapsible Accordions
+    const accordionTriggers = document.querySelectorAll("#jl-product-{{ section.id }} .jl-accordion__trigger");
+    accordionTriggers.forEach(trigger => {
+      trigger.addEventListener("click", () => {
+        const item = trigger.closest(".jl-accordion__item");
+        const content = item.querySelector(".jl-accordion__content");
+        const isOpen = item.classList.contains("is-active");
+
+        // Close all
+        document.querySelectorAll("#jl-product-{{ section.id }} .jl-accordion__item").forEach(otherItem => {
+          otherItem.classList.remove("is-active");
+          otherItem.querySelector(".jl-accordion__content").style.maxHeight = null;
+        });
+
+        // Toggle current
+        if (!isOpen) {
+          item.classList.add("is-active");
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      });
+    });
   });
 </script>
 
 {% schema %}
 {
-  "name": "Premium Product Main",
+  "name": "Product Main (Lumiere)",
   "tag": "section",
   "settings": [],
   "presets": [
     {
-      "name": "Premium Product Main"
+      "name": "Product Main (Lumiere)"
     }
   ]
 }

@@ -1,48 +1,404 @@
 <style>
-  .ob-ingredients { padding: 60px 0; background: #ffffff; }
-  .ob-ingredients__container { max-width: 1000px; margin: 0 auto; padding: 0 30px; text-align: center; }
-  .ob-ingredients__icon { font-size: 30px; margin-bottom: 15px; color: #c9a96e; }
-  .ob-ingredients__title { font-family: 'Georgia', serif; font-size: 28px; color: #2d2a24; margin-bottom: 40px; }
-  .ob-ingredients__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-  @media (max-width: 768px) { .ob-ingredients__grid { grid-template-columns: 1fr; } }
-  .ob-ingredients__card { padding: 30px 20px; background: #faf5ef; border-radius: 16px; transition: transform 0.3s; }
-  .ob-ingredients__card:hover { transform: translateY(-5px); }
-  .ob-ingredients__card-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; background: #e8ddd0; display: inline-block; }
-  .ob-ingredients__card-title { font-family: 'Georgia', serif; font-size: 18px; color: #2d2a24; margin-bottom: 10px; }
-  .ob-ingredients__card-desc { font-family: 'Inter', sans-serif; font-size: 13px; color: #8b7355; line-height: 1.6; }
+  .ob-ingredients {
+    --bg-cream: #f4efe6;
+    --brand-sage: #8a9a7b;
+    --brand-sage-dark: #707f63;
+    --surface-light: #faf8f5;
+    --surface-sand: #e9e3d5;
+    --text-charcoal: #2d302b;
+    --text-muted: #6e726b;
+    --border-soft: #dfd8cb;
+
+    padding: 80px 5%;
+    background-color: var(--bg-cream);
+    color: var(--text-charcoal);
+    font-family: 'Jost', sans-serif;
+  }
+
+  .ob-ingredients__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ob-ingredients__header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px auto;
+  }
+
+  .ob-ingredients__subtitle {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--brand-sage-dark);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .ob-ingredients__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 42px);
+    font-weight: 400;
+    margin: 0 0 16px 0;
+    line-height: 1.25;
+  }
+
+  .ob-ingredients__desc {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Interactive Spotlight Grid */
+  .ob-ingredients__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  @media (min-width: 768px) {
+    .ob-ingredients__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .ob-ingredients__card {
+    background-color: var(--surface-light);
+    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    padding: 40px 30px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  }
+
+  .ob-ingredients__card:hover {
+    transform: translateY(-6px);
+    border-color: var(--brand-sage);
+    box-shadow: 0 12px 30px rgba(138, 154, 123, 0.08);
+  }
+
+  .ob-ingredients__icon-container {
+    width: 60px;
+    height: 60px;
+    background-color: var(--bg-cream);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-sage);
+    margin-bottom: 24px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .ob-ingredients__card:hover .ob-ingredients__icon-container {
+    background-color: var(--brand-sage);
+    color: #ffffff;
+  }
+
+  .ob-ingredients__icon-container svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+  }
+
+  .ob-ingredients__card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+  }
+
+  .ob-ingredients__tag {
+    display: inline-block;
+    background-color: var(--surface-sand);
+    color: var(--brand-sage-dark);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .ob-ingredients__card-desc {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+    transition: color 0.3s ease;
+  }
+
+  /* Interactive Detailed Panel on Click */
+  .ob-ingredients__detail-panel {
+    grid-column: 1 / -1;
+    background-color: var(--surface-sand);
+    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    padding: 40px;
+    margin-top: 20px;
+    display: none;
+    align-items: center;
+    gap: 40px;
+    animation: ob-slide-down 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .ob-ingredients__detail-panel.is-active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 768px) {
+    .ob-ingredients__detail-panel.is-active {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .ob-ingredients__detail-visual {
+    background-color: var(--surface-light);
+    border-radius: 20px;
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-sage);
+    border: 1px solid var(--border-soft);
+  }
+
+  .ob-ingredients__detail-visual svg {
+    width: 80px;
+    height: 80px;
+    fill: currentColor;
+  }
+
+  .ob-ingredients__detail-info {
+    text-align: left;
+  }
+
+  .ob-ingredients__detail-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin: 0 0 8px 0;
+  }
+
+  .ob-ingredients__detail-source {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--brand-sage-dark);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .ob-ingredients__detail-text {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text-charcoal);
+    margin-bottom: 24px;
+  }
+
+  .ob-ingredients__detail-benefits {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .ob-ingredients__benefit-pill {
+    background-color: var(--surface-light);
+    border: 1px solid var(--border-soft);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ob-ingredients__benefit-pill svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--brand-sage);
+  }
+
+  @keyframes ob-slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
-<section class="ob-ingredients">
+
+<section class="ob-ingredients" id="ob-ingredients-{{ section.id }}">
   <div class="ob-ingredients__container">
-    <div class="ob-ingredients__icon">✨</div>
-    <h2 class="ob-ingredients__title">{{ section.settings.title }}</h2>
+    <div class="ob-ingredients__header">
+      <span class="ob-ingredients__subtitle">Botanical Actives</span>
+      <h2 class="ob-ingredients__title">{{ section.settings.title }}</h2>
+      <p class="ob-ingredients__desc">We extract the purest elements of nature and back them with clinical science to deliver real, noticeable skincare results.</p>
+    </div>
+
     <div class="ob-ingredients__grid">
-      {% for block in section.blocks %}
-        <div class="ob-ingredients__card" {{ block.shopify_attributes }}>
-          {% if block.settings.image %}
-            <img src="{{ block.settings.image | image_url: width: 150 }}" alt="{{ block.settings.title | escape }}" class="ob-ingredients__card-img">
-          {% else %}
-            <div class="ob-ingredients__card-img"></div>
-          {% endif %}
-          <h3 class="ob-ingredients__card-title">{{ block.settings.title }}</h3>
-          <p class="ob-ingredients__card-desc">{{ block.settings.desc }}</p>
+      <!-- Ingredient 1 -->
+      <div class="ob-ingredients__card" data-index="0">
+        <div class="ob-ingredients__icon-container">
+          <!-- Leaf / Plant SVG -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 8C8 10 5.9 16.17 6.03 20c3.83.13 10-2 12-11 .8 2.2.4 4.9-.9 6.8l1.4 1.4c2.2-2.8 2.5-6.9 1.5-10.2L17 8zM10.5 14c0-2.48 2.02-4.5 4.5-4.5.3 0 .6.03.9.08-1.5 3.3-3.6 5.4-6.9 6.9.05-.3.08-.6.08-.9-.5-2.02-2.52-4.08-4.58-4.58v1.98C5.55 17 8 19 11.5 20c-1-.95-1-2.95-1-6z"/>
+          </svg>
         </div>
-      {% endfor %}
+        <h3 class="ob-ingredients__card-title">Gotu Kola</h3>
+        <span class="ob-ingredients__tag">Firming & Healing</span>
+        <p class="ob-ingredients__card-desc">An ancient ayurvedic herb known as the "herb of longevity" that stimulates collagen and accelerates healing.</p>
+      </div>
+
+      <!-- Ingredient 2 -->
+      <div class="ob-ingredients__card" data-index="1">
+        <div class="ob-ingredients__icon-container">
+          <!-- Drops SVG -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0zM12 20a6 6 0 1 0-4.24-1.76L12 20zm0-15.17l-3.54 3.54a4 4 0 1 0 7.07 0L12 4.83z"/>
+          </svg>
+        </div>
+        <h3 class="ob-ingredients__card-title">Hyaluronic Acid</h3>
+        <span class="ob-ingredients__tag">Hydration Plumping</span>
+        <p class="ob-ingredients__card-desc">Naturally derived macromolecule that holds 1000x its weight in water, saturating deep skin cells.</p>
+      </div>
+
+      <!-- Ingredient 3 -->
+      <div class="ob-ingredients__card" data-index="2">
+        <div class="ob-ingredients__icon-container">
+          <!-- Flower/Rosehip SVG -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.07 19.58 10.47 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+          </svg>
+        </div>
+        <h3 class="ob-ingredients__card-title">Rosehip Seed Oil</h3>
+        <span class="ob-ingredients__tag">Brightening & Repair</span>
+        <p class="ob-ingredients__card-desc">Cold-pressed organic oil packed with Vitamin A and essential fatty acids that actively brightens skin tone.</p>
+      </div>
+
+      <!-- Detail Panel -->
+      <div class="ob-ingredients__detail-panel" id="ob-ingredient-detail-{{ section.id }}">
+        <div class="ob-ingredients__detail-visual" id="ob-detail-svg-{{ section.id }}">
+          <!-- Dyn SVG -->
+        </div>
+        <div class="ob-ingredients__detail-info">
+          <h3 class="ob-ingredients__detail-name" id="ob-detail-name-{{ section.id }}">Gotu Kola</h3>
+          <span class="ob-ingredients__detail-source" id="ob-detail-source-{{ section.id }}">Source: Centella Asiatica Leaves</span>
+          <p class="ob-ingredients__detail-text" id="ob-detail-text-{{ section.id }}">Detailed explanation goes here.</p>
+          
+          <div class="ob-ingredients__detail-benefits" id="ob-detail-benefits-{{ section.id }}">
+            <!-- Benefits Pille -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const section = document.getElementById("ob-ingredients-{{ section.id }}");
+    if (!section) return;
+
+    const cards = section.querySelectorAll(".ob-ingredients__card");
+    const detailPanel = section.getElementById("ob-ingredient-detail-{{ section.id }}");
+    const dName = section.getElementById("ob-detail-name-{{ section.id }}");
+    const dSource = section.getElementById("ob-detail-source-{{ section.id }}");
+    const dText = section.getElementById("ob-detail-text-{{ section.id }}");
+    const dSvg = section.getElementById("ob-detail-svg-{{ section.id }}");
+    const dBenefits = section.getElementById("ob-detail-benefits-{{ section.id }}");
+
+    const data = [
+      {
+        name: "Gotu Kola",
+        source: "Source: Centella Asiatica Leaves (Himalayas)",
+        text: "Gotu Kola is highly revered in traditional medicine for its outstanding skin-regenerative benefits. It stimulates type I collagen production, which firm up skin elasticity. It contains active compounds called triterpenoids that strengthen skin cells, accelerate skin wound recovery, and reinforce moisture containment.",
+        svg: `<svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 6.03 20c3.83.13 10-2 12-11 .8 2.2.4 4.9-.9 6.8l1.4 1.4c2.2-2.8 2.5-6.9 1.5-10.2L17 8zM10.5 14c0-2.48 2.02-4.5 4.5-4.5.3 0 .6.03.9.08-1.5 3.3-3.6 5.4-6.9 6.9.05-.3.08-.6.08-.9-.5-2.02-2.52-4.08-4.58-4.58v1.98C5.55 17 8 19 11.5 20c-1-.95-1-2.95-1-6z"/></svg>`,
+        benefits: ["Stimulates Collagen", "Accelerates Healing", "Strengthens Barrier"]
+      },
+      {
+        name: "Hyaluronic Acid",
+        source: "Source: Fermented Botanical Wheat",
+        text: "Our Hyaluronic Acid is obtained through organic wheat fermentation. Featuring multi-molecular weights, it penetrates deep past the stratum corneum to saturate skin cells, locking in immediate dewiness, plumping up micro-creases, and ensuring a radiant, smooth skin canvas that stays hydrated all day.",
+        svg: `<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0zM12 20a6 6 0 1 0-4.24-1.76L12 20zm0-15.17l-3.54 3.54a4 4 0 1 0 7.07 0L12 4.83z"/></svg>`,
+        benefits: ["1000x Hydration", "Smooths Creases", "Plumps Skin Cells"]
+      },
+      {
+        name: "Rosehip Seed Oil",
+        source: "Source: Cold-Pressed Rosehip Fruit (Andes Mountains)",
+        text: "Cold-pressed to preserve cellular integrity, our organic Rosehip Seed Oil is a powerhouse of trans-retinoic acid (Vitamin A) and Omega fatty acids. It targets dark spots, visibly brightens skin complexion, and repairs sun damage, while remaining lightweight and fast-absorbing.",
+        svg: `<svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.07 19.58 10.47 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>`,
+        benefits: ["Brightens Skin Complexion", "Vitamin A Retinoids", "Repairs Sun Damage"]
+      }
+    ];
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        const index = parseInt(card.getAttribute("data-index"));
+        const item = data[index];
+
+        // Highlight card
+        cards.forEach(c => c.style.borderColor = "");
+        card.style.borderColor = "var(--brand-sage)";
+
+        // Populate details
+        dName.textContent = item.name;
+        dSource.textContent = item.source;
+        dText.textContent = item.text;
+        dSvg.innerHTML = item.svg;
+
+        // Render benefits
+        dBenefits.innerHTML = "";
+        item.benefits.forEach(b => {
+          const pill = document.createElement("div");
+          pill.className = "ob-ingredients__benefit-pill";
+          pill.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            ${b}
+          `;
+          dBenefits.appendChild(pill);
+        });
+
+        // Show panel
+        detailPanel.classList.add("is-active");
+        
+        // Scroll into view gently
+        detailPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "OB Key Ingredients", "tag": "section",
-  "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Hero Ingredients" }],
-  "blocks": [{ "type": "ingredient", "name": "Ingredient", "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "title", "label": "Name", "default": "Hyaluronic Acid" },
-    { "type": "textarea", "id": "desc", "label": "Description", "default": "Deeply hydrates and plumps the skin for a youthful glow." }
-  ]}],
-  "presets": [{ "name": "OB Key Ingredients", "blocks": [
-    { "type": "ingredient", "settings": { "title": "Vitamin C", "desc": "Brightens complexion and evens out skin tone." }},
-    { "type": "ingredient", "settings": { "title": "Squalane", "desc": "Locks in essential moisture without feeling heavy." }},
-    { "type": "ingredient", "settings": { "title": "Rosehip Oil", "desc": "Rich in antioxidants to protect and repair." }}
-  ] }]
+  "name": "Ingredients Spotlight",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Botanical Active Ingredients"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ingredients Spotlight"
+    }
+  ]
 }
 {% endschema %}

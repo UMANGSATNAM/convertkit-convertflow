@@ -1,0 +1,605 @@
+<style>
+  .ob-bundle {
+    --bg-cream: #f4efe6;
+    --brand-sage: #8a9a7b;
+    --brand-sage-dark: #707f63;
+    --surface-light: #faf8f5;
+    --surface-sand: #e9e3d5;
+    --text-charcoal: #2d302b;
+    --text-muted: #6e726b;
+    --border-soft: #dfd8cb;
+    --gold: #c9a96e;
+
+    padding: 80px 5%;
+    background-color: var(--surface-light);
+    color: var(--text-charcoal);
+    font-family: 'Jost', sans-serif;
+  }
+
+  .ob-bundle__container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .ob-bundle__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .ob-bundle__subtitle {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--brand-sage-dark);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .ob-bundle__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 42px);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* Skin Type Tabs */
+  .ob-bundle__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .ob-bundle__tab-btn {
+    background-color: var(--bg-cream);
+    border: 1px solid var(--border-soft);
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 30px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+  }
+
+  .ob-bundle__tab-btn:hover {
+    border-color: var(--brand-sage);
+    color: var(--brand-sage-dark);
+  }
+
+  .ob-bundle__tab-btn.is-active {
+    background-color: var(--brand-sage);
+    color: #ffffff;
+    border-color: var(--brand-sage);
+  }
+
+  /* Bundle Builder Layout */
+  .ob-bundle__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  @media (min-width: 992px) {
+    .ob-bundle__layout {
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 50px;
+    }
+  }
+
+  /* Products Grid */
+  .ob-bundle__products-wrapper {
+    display: none;
+  }
+
+  .ob-bundle__products-wrapper.is-active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ob-bundle__item {
+    background-color: var(--bg-cream);
+    border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ob-bundle__item:hover {
+    border-color: var(--brand-sage);
+  }
+
+  .ob-bundle__item-checkbox-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ob-bundle__checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--border-soft);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ob-bundle__checkbox:checked {
+    background-color: var(--brand-sage);
+    border-color: var(--brand-sage);
+  }
+
+  .ob-bundle__checkbox:checked::after {
+    content: "";
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    transform: rotate(-45deg) translate(1px, -1px);
+    display: block;
+  }
+
+  .ob-bundle__item-img-container {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    background-color: var(--surface-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-sage-dark);
+    border: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+
+  .ob-bundle__item-img-container svg {
+    width: 32px;
+    height: 32px;
+    fill: currentColor;
+  }
+
+  .ob-bundle__item-details {
+    flex-grow: 1;
+  }
+
+  .ob-bundle__item-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+  }
+
+  .ob-bundle__item-price {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--brand-sage-dark);
+  }
+
+  /* Summary Card */
+  .ob-bundle__summary {
+    background-color: var(--bg-cream);
+    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    padding: 35px 30px;
+    position: sticky;
+    top: 40px;
+  }
+
+  .ob-bundle__summary-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 15px;
+  }
+
+  .ob-bundle__summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .ob-bundle__summary-row.is-discount {
+    color: var(--brand-sage-dark);
+    font-weight: 500;
+  }
+
+  .ob-bundle__summary-row.is-total {
+    border-top: 1px solid var(--border-soft);
+    padding-top: 15px;
+    margin-top: 15px;
+    font-size: 18px;
+    color: var(--text-charcoal);
+    font-weight: 600;
+  }
+
+  .ob-bundle__cta {
+    width: 100%;
+    background-color: var(--brand-sage-dark);
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .ob-bundle__cta:hover {
+    background-color: var(--brand-sage);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(112, 127, 99, 0.24);
+  }
+
+  .ob-bundle__cta:disabled {
+    background-color: var(--border-soft);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .ob-bundle__success-msg {
+    margin-top: 15px;
+    font-size: 13px;
+    color: var(--brand-sage-dark);
+    text-align: center;
+    display: none;
+    animation: ob-fade-in 0.4s ease forwards;
+  }
+</style>
+
+<section class="ob-bundle" id="ob-bundle-{{ section.id }}">
+  <div class="ob-bundle__container">
+    <div class="ob-bundle__header">
+      <span class="ob-bundle__subtitle">{{ section.settings.subtitle }}</span>
+      <h2 class="ob-bundle__title">{{ section.settings.title }}</h2>
+    </div>
+
+    <!-- Concern Tabs -->
+    <div class="ob-bundle__tabs">
+      <button type="button" class="ob-bundle__tab-btn is-active" data-concern="dry-{{ section.id }}">Dry Skin</button>
+      <button type="button" class="ob-bundle__tab-btn" data-concern="oily-{{ section.id }}">Oily/Combination</button>
+      <button type="button" class="ob-bundle__tab-btn" data-concern="sensitive-{{ section.id }}">Sensitive Skin</button>
+    </div>
+
+    <div class="ob-bundle__layout">
+      <!-- PRODUCTS PANEL -->
+      <div class="ob-bundle__products-panel">
+        
+        <!-- Dry Skin Bundle -->
+        <div class="ob-bundle__products-wrapper is-active" id="dry-{{ section.id }}">
+          <!-- Item 1 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="750">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <!-- Cream Bottle SVG -->
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 8h-1V5c0-1.65-1.35-3-3-3H9C7.35 2 6 3.35 6 5v3H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8 5c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v3H8V5zm11 15H5V10h14v10z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Gentle Milky Cleanser</h3>
+              <div class="ob-bundle__item-price">₹750</div>
+            </div>
+          </div>
+          <!-- Item 2 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="1250">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <!-- Pipette Dropper SVG -->
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Intensive Hydration Rosehip Serum</h3>
+              <div class="ob-bundle__item-price">₹1,250</div>
+            </div>
+          </div>
+          <!-- Item 3 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="950">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <!-- Jar SVG -->
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3-9h6c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Deep Moisture Barrier Cream</h3>
+              <div class="ob-bundle__item-price">₹950</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Oily Skin Bundle -->
+        <div class="ob-bundle__products-wrapper" id="oily-{{ section.id }}">
+          <!-- Item 1 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="690">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 8h-1V5c0-1.65-1.35-3-3-3H9C7.35 2 6 3.35 6 5v3H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8 5c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v3H8V5zm11 15H5V10h14v10z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Purifying Clay-to-Foam Cleanser</h3>
+              <div class="ob-bundle__item-price">₹690</div>
+            </div>
+          </div>
+          <!-- Item 2 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="1100">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Salicylic Clarifying Control Serum</h3>
+              <div class="ob-bundle__item-price">₹1,100</div>
+            </div>
+          </div>
+          <!-- Item 3 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="890">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3-9h6c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Lightweight Hydrating Water Gel</h3>
+              <div class="ob-bundle__item-price">₹890</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensitive Skin Bundle -->
+        <div class="ob-bundle__products-wrapper" id="sensitive-{{ section.id }}">
+          <!-- Item 1 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="790">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 8h-1V5c0-1.65-1.35-3-3-3H9C7.35 2 6 3.35 6 5v3H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8 5c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v3H8V5zm11 15H5V10h14v10z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Soothing Oat Milk Cleanser</h3>
+              <div class="ob-bundle__item-price">₹790</div>
+            </div>
+          </div>
+          <!-- Item 2 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="1300">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Chamomile Calming Barrier Serum</h3>
+              <div class="ob-bundle__item-price">₹1,300</div>
+            </div>
+          </div>
+          <!-- Item 3 -->
+          <div class="ob-bundle__item">
+            <div class="ob-bundle__item-checkbox-wrapper">
+              <input type="checkbox" class="ob-bundle__checkbox" checked data-price="990">
+            </div>
+            <div class="ob-bundle__item-img-container">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3-9h6c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/>
+              </svg>
+            </div>
+            <div class="ob-bundle__item-details">
+              <h3 class="ob-bundle__item-title">Cica-Ceramide Repair Lotion</h3>
+              <div class="ob-bundle__item-price">₹990</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUMMARY PANEL -->
+      <div class="ob-bundle__summary">
+        <h3 class="ob-bundle__summary-title">Bundle Summary</h3>
+        <div class="ob-bundle__summary-row">
+          <span>Selected Items</span>
+          <span id="bundle-qty-{{ section.id }}">3 of 3</span>
+        </div>
+        <div class="ob-bundle__summary-row">
+          <span>Subtotal</span>
+          <span id="bundle-subtotal-{{ section.id }}">₹2,950</span>
+        </div>
+        <div class="ob-bundle__summary-row is-discount">
+          <span>Bundle Discount (15% Save)</span>
+          <span id="bundle-discount-{{ section.id }}">-₹443</span>
+        </div>
+        <div class="ob-bundle__summary-row is-total">
+          <span>Total Price</span>
+          <span id="bundle-total-{{ section.id }}">₹2,507</span>
+        </div>
+
+        <button type="button" class="ob-bundle__cta" id="bundle-cta-{{ section.id }}">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm8-3H15v3h3.5c.83 0 1.5.67 1.5 1.5V22h2V10.5c0-2.48-2.02-4.5-4.5-4.5z"/>
+          </svg>
+          Add Routine to Bag
+        </button>
+        
+        <div class="ob-bundle__success-msg" id="bundle-success-{{ section.id }}">
+          Routine successfully added to your bag!
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const container = document.getElementById("ob-bundle-{{ section.id }}");
+    if (!container) return;
+
+    const tabButtons = container.querySelectorAll(".ob-bundle__tab-btn");
+    const productWrappers = container.querySelectorAll(".ob-bundle__products-wrapper");
+    const qtyText = container.getElementById("bundle-qty-{{ section.id }}");
+    const subtotalText = container.getElementById("bundle-subtotal-{{ section.id }}");
+    const discountText = container.getElementById("bundle-discount-{{ section.id }}");
+    const totalText = container.getElementById("bundle-total-{{ section.id }}");
+    const ctaButton = container.getElementById("bundle-cta-{{ section.id }}");
+    const successMsg = container.getElementById("bundle-success-{{ section.id }}");
+
+    function updateSummary() {
+      // Find the currently active panel
+      const activePanel = container.querySelector(".ob-bundle__products-wrapper.is-active");
+      if (!activePanel) return;
+
+      const checkboxes = activePanel.querySelectorAll(".ob-bundle__checkbox");
+      let count = 0;
+      let totalCount = checkboxes.length;
+      let subtotal = 0;
+
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          count++;
+          subtotal += parseFloat(cb.getAttribute("data-price"));
+        }
+      });
+
+      const discount = Math.round(subtotal * 0.15);
+      const total = subtotal - discount;
+
+      qtyText.textContent = `${count} of ${totalCount}`;
+      subtotalText.textContent = `₹${subtotal.toLocaleString("en-IN")}`;
+      discountText.textContent = `-₹${discount.toLocaleString("en-IN")}`;
+      totalText.textContent = `₹${total.toLocaleString("en-IN")}`;
+
+      if (count === 0) {
+        ctaButton.disabled = true;
+        totalText.textContent = "₹0";
+      } else {
+        ctaButton.disabled = false;
+      }
+    }
+
+    // Toggle Panels
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const concern = btn.getAttribute("data-concern");
+
+        tabButtons.forEach(b => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+
+        productWrappers.forEach(wrap => {
+          if (wrap.id === concern) {
+            wrap.classList.add("is-active");
+          } else {
+            wrap.classList.remove("is-active");
+          }
+        });
+
+        // Hide success message on switch
+        successMsg.style.display = "none";
+
+        updateSummary();
+      });
+    });
+
+    // Handle checkboxes
+    container.addEventListener("change", function(e) {
+      if (e.target && e.target.classList.contains("ob-bundle__checkbox")) {
+        updateSummary();
+      }
+    });
+
+    // Add to Cart Simulation
+    ctaButton.addEventListener("click", () => {
+      ctaButton.disabled = true;
+      const originalText = ctaButton.innerHTML;
+      ctaButton.textContent = "Adding...";
+
+      setTimeout(() => {
+        ctaButton.disabled = false;
+        ctaButton.innerHTML = originalText;
+        successMsg.style.display = "block";
+      }, 800);
+    });
+
+    // Initial update
+    updateSummary();
+  });
+</script>
+{% schema %}
+{
+  "name": "Skincare Bundle Builder",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Build Your Skincare Routine"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Tailored to Your Skin Concern"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Skincare Bundle Builder"
+    }
+  ]
+}
+{% endschema %}
