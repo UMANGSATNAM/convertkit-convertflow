@@ -58,7 +58,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     const sectionFiles = await fs.readdir(sectionsDir);
     for (const file of sectionFiles) {
-      if (file.endsWith(".liquid")) {
+      if (file.endsWith(".liquid") || file.endsWith(".json")) {
         const content = await fs.readFile(path.join(sectionsDir, file), "utf8");
         await uploadAsset(admin, activeTheme.id.toString(), {
           key: `sections/${file}`,
@@ -81,20 +81,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
               for (const key of Object.keys(parsed.sections)) {
                 const section = parsed.sections[key];
                 
-                // Map Featured Collections blocks
-                if (section.type === "mf-featured-collections" && collections.length >= 3) {
+                // Map Featured Collections blocks (prefix-agnostic)
+                if (section.type?.endsWith("-featured-collections") && collections.length >= 3) {
                   if (section.blocks?.col_1) section.blocks.col_1.settings.collection = collections[0].handle;
                   if (section.blocks?.col_2) section.blocks.col_2.settings.collection = collections[1].handle;
                   if (section.blocks?.col_3) section.blocks.col_3.settings.collection = collections[2].handle;
                 }
                 
-                // Map Product Highlights (Grid)
-                if (section.type === "mf-product-highlights" && collections.length >= 1) {
+                // Map Product Highlights (Grid) (prefix-agnostic)
+                if (section.type?.endsWith("-product-highlights") && collections.length >= 1) {
                   section.settings.collection = collections[0].handle;
                 }
                 
-                // Map Hero Buttons
-                if (section.type === "mf-hero" && collections.length >= 1) {
+                // Map Hero Buttons (prefix-agnostic)
+                if (section.type?.endsWith("-hero") && collections.length >= 1) {
                   section.settings.btn_link = `shopify://collections/${collections[0].handle}`;
                 }
               }

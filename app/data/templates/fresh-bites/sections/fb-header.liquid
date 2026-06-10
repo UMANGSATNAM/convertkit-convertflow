@@ -1,37 +1,12 @@
 <style>
   :root {
-    --fb-font-serif: 'Playfair Display', serif;
     --fb-font-sans: 'Inter', sans-serif;
-    --fb-color-bg: #ffffff;
-    --fb-color-text: #000000;
-    --fb-color-subdued: #666666;
-    --fb-color-border: #eeeeee;
-    --fb-color-accent: #f5f5f5;
     --fb-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
-  body {
-    font-family: var(--fb-font-sans);
-    color: var(--fb-color-text);
-    background: var(--fb-color-bg);
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* Fade-in Animation Classes */
-  .fb-animate-fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .fb-animate-fade-up.fb-in-view {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Marquee Announcement Bar */
+  /* Announcement Bar */
   .fb-announcement {
-    background: #000;
+    background: #4caf50;
     color: #fff;
     padding: 10px 0;
     overflow: hidden;
@@ -40,45 +15,41 @@
     font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
   }
   .fb-announcement__track {
     display: flex;
     white-space: nowrap;
     animation: fb-marquee 20s linear infinite;
   }
-  .fb-announcement__track:hover {
-    animation-play-state: paused;
-  }
   .fb-announcement__item {
     padding: 0 40px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
   }
   @keyframes fb-marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
 
-  /* Glassmorphism Header */
+  /* Header */
   .fb-header-wrapper {
     position: sticky;
     top: 0;
     z-index: 900;
-    transition: var(--fb-transition);
   }
   .fb-header {
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(0,0,0,0.05);
     transition: var(--fb-transition);
   }
+  .fb-header.dark-mode {
+    background: rgba(10, 10, 10, 0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
   .fb-header.fb-scrolled {
-    padding: 10px 0;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    padding: 5px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   }
   .fb-header__container {
     max-width: 1440px;
@@ -92,74 +63,106 @@
   .fb-header.fb-scrolled .fb-header__container {
     padding: 10px 40px;
   }
+  
+  /* Navigation & Mega Menu */
   .fb-nav {
     display: flex;
-    gap: 40px;
+    gap: 35px;
   }
-  .fb-nav a {
-    text-decoration: none;
-    color: var(--fb-color-text);
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  .fb-nav-item {
     position: relative;
-    padding-bottom: 4px;
-    font-weight: 500;
   }
-  .fb-nav a::after {
+  .fb-nav-link {
+    text-decoration: none;
+    color: inherit;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-bottom: 5px;
+    position: relative;
+  }
+  .fb-nav-link::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #000;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: #4caf50;
     transition: var(--fb-transition);
   }
-  .fb-nav a:hover::after {
+  .fb-nav-link:hover::after {
     width: 100%;
   }
-  .fb-logo {
-    font-family: var(--fb-font-serif);
-    font-size: 28px;
-    font-weight: 400;
-    text-decoration: none;
-    color: #000;
-    letter-spacing: -0.5px;
+  
+  .fb-mega-menu {
+    position: absolute;
+    top: 100%;
+    left: -50px;
+    width: 600px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--fb-transition);
+    pointer-events: none;
   }
+  .fb-header.dark-mode .fb-mega-menu {
+    background: #111;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    border: 1px solid #222;
+  }
+  .fb-nav-item:hover .fb-mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Logo */
+  .fb-logo {
+    font-size: 24px;
+    font-weight: 800;
+    text-decoration: none;
+    color: inherit;
+    letter-spacing: 2px;
+  }
+  
+  /* Icons */
   .fb-icons {
     display: flex;
-    gap: 24px;
+    gap: 20px;
     align-items: center;
   }
   .fb-icon-btn {
     background: none;
     border: none;
     cursor: pointer;
+    color: inherit;
+    transition: transform 0.3s;
     position: relative;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    color: #000;
-    transition: transform 0.3s ease;
   }
   .fb-icon-btn:hover {
     transform: scale(1.1);
+    color: #4caf50;
   }
   .fb-cart-count {
     position: absolute;
-    top: -8px;
-    right: -10px;
-    background: #000;
+    top: -8px; right: -10px;
+    background: #4caf50;
     color: #fff;
     font-size: 10px;
-    width: 18px;
-    height: 18px;
+    width: 18px; height: 18px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   @media (max-width: 768px) {
@@ -169,39 +172,50 @@
 </style>
 
 <div class="fb-header-wrapper">
-  <!-- Announcement Bar -->
   <div class="fb-announcement">
     <div class="fb-announcement__track">
-      <div class="fb-announcement__item">✨ Free Worldwide Shipping Over $150</div>
-      <div class="fb-announcement__item">🖤 30-Day Free Returns</div>
-      <div class="fb-announcement__item">🏆 10,000+ Five Star Reviews</div>
-      <!-- Duplicate for infinite scroll -->
-      <div class="fb-announcement__item">✨ Free Worldwide Shipping Over $150</div>
-      <div class="fb-announcement__item">🖤 30-Day Free Returns</div>
-      <div class="fb-announcement__item">🏆 10,000+ Five Star Reviews</div>
+      <div class="fb-announcement__item">✨ Premium Design. Exceptional Quality. Free Shipping Worldwide. ✨</div>
+      <div class="fb-announcement__item">✨ Premium Design. Exceptional Quality. Free Shipping Worldwide. ✨</div>
+      <div class="fb-announcement__item">✨ Premium Design. Exceptional Quality. Free Shipping Worldwide. ✨</div>
     </div>
   </div>
 
-  <header class="fb-header" id="fb-header">
+  <header class="fb-header {% if section.settings.dark_mode %}dark-mode{% endif %}" id="fb-header">
     <div class="fb-header__container">
+      
+      <div class="fb-mobile-menu-btn" style="display:none;">
+         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </div>
+
       <nav class="fb-nav">
         {% for link in linklists.main-menu.links %}
-          <a href="{{ link.url }}">{{ link.title }}</a>
+          <div class="fb-nav-item">
+            <a href="{{ link.url }}" class="fb-nav-link">{{ link.title }}</a>
+            {% if link.links.size > 0 %}
+              <div class="fb-mega-menu">
+                {% for child_link in link.links %}
+                  <div>
+                    <a href="{{ child_link.url }}" style="font-weight: 600; text-decoration: none; color: inherit; display: block; margin-bottom: 10px;">{{ child_link.title }}</a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
         {% endfor %}
       </nav>
       
-      <a href="/" class="fb-logo">{{ section.settings.logo_text | default: "ATELIER" }}</a>
+      <a href="/" class="fb-logo">{{ section.settings.logo_text | default: "BRAND" }}</a>
       
       <div class="fb-icons">
         <button class="fb-icon-btn" aria-label="Search">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
         <button class="fb-icon-btn" aria-label="Account">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </button>
         <button class="fb-icon-btn" onclick="document.getElementById('fb-cart-drawer').classList.add('active'); document.getElementById('fb-cart-overlay').classList.add('active');">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-          <span class="fb-cart-count">{{ cart.item_count }}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="fb-cart-count">{{ cart.item_count | default: 0 }}</span>
         </button>
       </div>
     </div>
@@ -216,15 +230,6 @@
     } else {
       header.classList.remove('fb-scrolled');
     }
-
-    // Scroll Animations
-    const elements = document.querySelectorAll('.fb-animate-fade-up');
-    elements.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 50) {
-        el.classList.add('fb-in-view');
-      }
-    });
   });
 </script>
 
@@ -233,7 +238,8 @@
   "name": "Premium Header",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "ATELIER" }
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "BRAND" },
+    { "type": "checkbox", "id": "dark_mode", "label": "Enable Dark Mode", "default": false }
   ]
 }
 {% endschema %}

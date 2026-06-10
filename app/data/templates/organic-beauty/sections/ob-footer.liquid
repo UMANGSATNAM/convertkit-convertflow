@@ -1,162 +1,147 @@
 <style>
   .ob-footer {
-    background-color: {{ section.settings.bg_color }};
-    color: {{ section.settings.text_color }};
-    padding: 60px 5%;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--ob-color-bg, #0a0a0a);
+    color: var(--ob-color-text, #fff);
+    padding: 80px 40px 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-family: var(--ob-font-sans, sans-serif);
   }
-  .ob-footer__inner {
+  .ob-footer-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 40px;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
   }
-  @media (min-width: 768px) {
-    .ob-footer__inner {
-      grid-template-columns: repeat(4, 1fr);
-    }
+  .ob-footer-brand {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
   }
-  .ob-footer__heading {
-    font-family: 'Georgia', serif;
-    font-size: 16px;
-    font-weight: bold;
+  .ob-footer-title {
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 20px;
+    color: #8fbc8f;
   }
-  .ob-footer__text {
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  .ob-footer__links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .ob-footer__links li {
-    margin-bottom: 10px;
-  }
-  .ob-footer__links a {
-    color: {{ section.settings.text_color }};
+  .ob-footer-link {
+    display: block;
+    color: inherit;
     text-decoration: none;
+    margin-bottom: 12px;
+    opacity: 0.7;
+    transition: all 0.3s;
     font-size: 14px;
+  }
+  .ob-footer-link:hover {
+    opacity: 1;
+    transform: translateX(5px);
+    color: #8fbc8f;
+  }
+  .ob-newsletter-form {
+    display: flex;
+    margin-top: 20px;
+  }
+  .ob-newsletter-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: inherit;
+    border-radius: 4px 0 0 4px;
+  }
+  .ob-newsletter-btn {
+    padding: 12px 24px;
+    background: #8fbc8f;
+    color: #000;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
     transition: opacity 0.3s;
   }
-  .ob-footer__links a:hover {
-    opacity: 0.7;
+  .ob-newsletter-btn:hover {
+    opacity: 0.9;
   }
-  .ob-footer__bottom {
-    margin-top: 60px;
+  .ob-footer-bottom {
+    max-width: 1440px;
+    margin: 60px auto 0;
     padding-top: 20px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(255,255,255,0.1);
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    font-size: 12px;
+    opacity: 0.5;
   }
-  @media (min-width: 768px) {
-    .ob-footer__bottom {
-      flex-direction: row;
-      justify-content: space-between;
-    }
+  .ob-payment-icons {
+    display: flex;
+    gap: 10px;
+  }
+  @media (max-width: 900px) {
+    .ob-footer-grid { grid-template-columns: 1fr; }
+    .ob-footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
   }
 </style>
 
 <footer class="ob-footer">
-  <div class="ob-footer__inner">
-    {% for block in section.blocks %}
-      <div class="ob-footer__column">
-        {% if block.settings.heading != blank %}
-          <div class="ob-footer__heading">{{ block.settings.heading }}</div>
-        {% endif %}
-        
-        {% case block.type %}
-          {% when 'text' %}
-            <div class="ob-footer__text">{{ block.settings.text }}</div>
-          
-          {% when 'link_list' %}
-            <ul class="ob-footer__links">
-              {% for link in linklists[block.settings.menu].links %}
-                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-              {% endfor %}
-            </ul>
-        {% endcase %}
-      </div>
-    {% endfor %}
-  </div>
+  <div class="ob-footer-grid">
+    <div>
+      <div class="ob-footer-brand">{{ section.settings.logo_text | default: 'BRAND' }}</div>
+      <p style="opacity: 0.7; font-size: 14px; max-width: 300px;">{{ section.settings.about_text | default: 'Crafting premium experiences through innovative design and exceptional quality.' }}</p>
+      
+      <form class="ob-newsletter-form">
+        <input type="email" class="ob-newsletter-input" placeholder="Join our newsletter">
+        <button type="submit" class="ob-newsletter-btn">→</button>
+      </form>
+    </div>
+    
+    <div>
+      <h4 class="ob-footer-title">Shop</h4>
+      {% for link in linklists.footer.links %}
+        <a href="{{ link.url }}" class="ob-footer-link">{{ link.title }}</a>
+      {% endfor %}
+      <a href="#" class="ob-footer-link">New Arrivals</a>
+      <a href="#" class="ob-footer-link">Best Sellers</a>
+      <a href="#" class="ob-footer-link">Collections</a>
+    </div>
 
-  <div class="ob-footer__bottom">
-    <div class="ob-footer__copyright">
-      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
+    <div>
+      <h4 class="ob-footer-title">Support</h4>
+      <a href="#" class="ob-footer-link">Contact Us</a>
+      <a href="#" class="ob-footer-link">FAQ</a>
+      <a href="#" class="ob-footer-link">Shipping & Returns</a>
+      <a href="#" class="ob-footer-link">Track Order</a>
+    </div>
+
+    <div>
+      <h4 class="ob-footer-title">Social</h4>
+      <a href="#" class="ob-footer-link">Instagram</a>
+      <a href="#" class="ob-footer-link">TikTok</a>
+      <a href="#" class="ob-footer-link">Twitter</a>
+    </div>
+  </div>
+  
+  <div class="ob-footer-bottom">
+    <div>&copy; {{ 'now' | date: '%Y' }} {{ section.settings.logo_text | default: 'BRAND' }}. All rights reserved.</div>
+    <div class="ob-payment-icons">
+      <!-- Visa SVG -->
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="currentColor"><path d="M10.5 4.5l-2.5 11h-3l1.5-11h4zm8.5 0c-1 0-2 .5-2 1.5s1.5 1.5 1.5 2.5-1 1.5-2 1.5-1.5-.5-1.5-.5l-.5 2.5c.5.5 1.5.5 2.5.5 2 0 3.5-1 3.5-3 0-1.5-1.5-2-1.5-2.5s1-1 2-1h1.5l-1-2.5c-.5-.5-1.5-.5-2.5-.5zm6.5 0l-2 7.5-1-7.5h-3l2.5 11h3l3.5-11h-3z"/></svg>
+      <!-- Mastercard SVG -->
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="currentColor"><circle cx="10" cy="10" r="6"/><circle cx="20" cy="10" r="6"/></svg>
     </div>
   </div>
 </footer>
 
 {% schema %}
 {
-  "name": "OB Footer",
+  "name": "Premium Footer",
   "tag": "section",
   "settings": [
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#f4f4f4"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text Color",
-      "default": "#000000"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "link_list",
-      "name": "Menu",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "Quick links"
-        },
-        {
-          "type": "link_list",
-          "id": "menu",
-          "label": "Menu"
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "name": "Text",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "About Us"
-        },
-        {
-          "type": "textarea",
-          "id": "text",
-          "label": "Text",
-          "default": "Share store details, promotions, or brand content with your customers."
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "OB Footer",
-      "blocks": [
-        { "type": "link_list" },
-        { "type": "text" }
-      ]
-    }
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "BRAND" },
+    { "type": "textarea", "id": "about_text", "label": "About Text" }
   ]
 }
 {% endschema %}

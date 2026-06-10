@@ -1,162 +1,147 @@
 <style>
   .gs-footer {
-    background-color: {{ section.settings.bg_color }};
-    color: {{ section.settings.text_color }};
-    padding: 60px 5%;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--gs-color-bg, #0a0a0a);
+    color: var(--gs-color-text, #fff);
+    padding: 80px 40px 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-family: var(--gs-font-sans, sans-serif);
   }
-  .gs-footer__inner {
+  .gs-footer-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 40px;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
   }
-  @media (min-width: 768px) {
-    .gs-footer__inner {
-      grid-template-columns: repeat(4, 1fr);
-    }
+  .gs-footer-brand {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
   }
-  .gs-footer__heading {
-    font-family: 'Georgia', serif;
-    font-size: 16px;
-    font-weight: bold;
+  .gs-footer-title {
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 20px;
+    color: #8b4513;
   }
-  .gs-footer__text {
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  .gs-footer__links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .gs-footer__links li {
-    margin-bottom: 10px;
-  }
-  .gs-footer__links a {
-    color: {{ section.settings.text_color }};
+  .gs-footer-link {
+    display: block;
+    color: inherit;
     text-decoration: none;
+    margin-bottom: 12px;
+    opacity: 0.7;
+    transition: all 0.3s;
     font-size: 14px;
+  }
+  .gs-footer-link:hover {
+    opacity: 1;
+    transform: translateX(5px);
+    color: #8b4513;
+  }
+  .gs-newsletter-form {
+    display: flex;
+    margin-top: 20px;
+  }
+  .gs-newsletter-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: inherit;
+    border-radius: 4px 0 0 4px;
+  }
+  .gs-newsletter-btn {
+    padding: 12px 24px;
+    background: #8b4513;
+    color: #000;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
     transition: opacity 0.3s;
   }
-  .gs-footer__links a:hover {
-    opacity: 0.7;
+  .gs-newsletter-btn:hover {
+    opacity: 0.9;
   }
-  .gs-footer__bottom {
-    margin-top: 60px;
+  .gs-footer-bottom {
+    max-width: 1440px;
+    margin: 60px auto 0;
     padding-top: 20px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(255,255,255,0.1);
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    font-size: 12px;
+    opacity: 0.5;
   }
-  @media (min-width: 768px) {
-    .gs-footer__bottom {
-      flex-direction: row;
-      justify-content: space-between;
-    }
+  .gs-payment-icons {
+    display: flex;
+    gap: 10px;
+  }
+  @media (max-width: 900px) {
+    .gs-footer-grid { grid-template-columns: 1fr; }
+    .gs-footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
   }
 </style>
 
 <footer class="gs-footer">
-  <div class="gs-footer__inner">
-    {% for block in section.blocks %}
-      <div class="gs-footer__column">
-        {% if block.settings.heading != blank %}
-          <div class="gs-footer__heading">{{ block.settings.heading }}</div>
-        {% endif %}
-        
-        {% case block.type %}
-          {% when 'text' %}
-            <div class="gs-footer__text">{{ block.settings.text }}</div>
-          
-          {% when 'link_list' %}
-            <ul class="gs-footer__links">
-              {% for link in linklists[block.settings.menu].links %}
-                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-              {% endfor %}
-            </ul>
-        {% endcase %}
-      </div>
-    {% endfor %}
-  </div>
+  <div class="gs-footer-grid">
+    <div>
+      <div class="gs-footer-brand">{{ section.settings.logo_text | default: 'BRAND' }}</div>
+      <p style="opacity: 0.7; font-size: 14px; max-width: 300px;">{{ section.settings.about_text | default: 'Crafting premium experiences through innovative design and exceptional quality.' }}</p>
+      
+      <form class="gs-newsletter-form">
+        <input type="email" class="gs-newsletter-input" placeholder="Join our newsletter">
+        <button type="submit" class="gs-newsletter-btn">→</button>
+      </form>
+    </div>
+    
+    <div>
+      <h4 class="gs-footer-title">Shop</h4>
+      {% for link in linklists.footer.links %}
+        <a href="{{ link.url }}" class="gs-footer-link">{{ link.title }}</a>
+      {% endfor %}
+      <a href="#" class="gs-footer-link">New Arrivals</a>
+      <a href="#" class="gs-footer-link">Best Sellers</a>
+      <a href="#" class="gs-footer-link">Collections</a>
+    </div>
 
-  <div class="gs-footer__bottom">
-    <div class="gs-footer__copyright">
-      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
+    <div>
+      <h4 class="gs-footer-title">Support</h4>
+      <a href="#" class="gs-footer-link">Contact Us</a>
+      <a href="#" class="gs-footer-link">FAQ</a>
+      <a href="#" class="gs-footer-link">Shipping & Returns</a>
+      <a href="#" class="gs-footer-link">Track Order</a>
+    </div>
+
+    <div>
+      <h4 class="gs-footer-title">Social</h4>
+      <a href="#" class="gs-footer-link">Instagram</a>
+      <a href="#" class="gs-footer-link">TikTok</a>
+      <a href="#" class="gs-footer-link">Twitter</a>
+    </div>
+  </div>
+  
+  <div class="gs-footer-bottom">
+    <div>&copy; {{ 'now' | date: '%Y' }} {{ section.settings.logo_text | default: 'BRAND' }}. All rights reserved.</div>
+    <div class="gs-payment-icons">
+      <!-- Visa SVG -->
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="currentColor"><path d="M10.5 4.5l-2.5 11h-3l1.5-11h4zm8.5 0c-1 0-2 .5-2 1.5s1.5 1.5 1.5 2.5-1 1.5-2 1.5-1.5-.5-1.5-.5l-.5 2.5c.5.5 1.5.5 2.5.5 2 0 3.5-1 3.5-3 0-1.5-1.5-2-1.5-2.5s1-1 2-1h1.5l-1-2.5c-.5-.5-1.5-.5-2.5-.5zm6.5 0l-2 7.5-1-7.5h-3l2.5 11h3l3.5-11h-3z"/></svg>
+      <!-- Mastercard SVG -->
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="currentColor"><circle cx="10" cy="10" r="6"/><circle cx="20" cy="10" r="6"/></svg>
     </div>
   </div>
 </footer>
 
 {% schema %}
 {
-  "name": "GS Footer",
+  "name": "Premium Footer",
   "tag": "section",
   "settings": [
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#f4f4f4"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text Color",
-      "default": "#000000"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "link_list",
-      "name": "Menu",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "Quick links"
-        },
-        {
-          "type": "link_list",
-          "id": "menu",
-          "label": "Menu"
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "name": "Text",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "About Us"
-        },
-        {
-          "type": "textarea",
-          "id": "text",
-          "label": "Text",
-          "default": "Share store details, promotions, or brand content with your customers."
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "GS Footer",
-      "blocks": [
-        { "type": "link_list" },
-        { "type": "text" }
-      ]
-    }
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "BRAND" },
+    { "type": "textarea", "id": "about_text", "label": "About Text" }
   ]
 }
 {% endschema %}
