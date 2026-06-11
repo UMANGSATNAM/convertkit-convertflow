@@ -5,11 +5,21 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { processUserMessage } from "../services/ai/assistant.server";
 
+import { authenticate } from "../shopify.server";
+import prisma from "../db.server";
+
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.upsert({
+    where: { shopDomain: session.shop },
+    update: {},
+    create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
+  });
+
   const formData = await request.formData();
   const message = formData.get("message") as string;
   
-  const response = await processUserMessage("mock_shop_id", message);
+  const response = await processUserMessage(shop.id, message);
   return json({ response });
 };
 

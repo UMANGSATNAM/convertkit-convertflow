@@ -5,10 +5,15 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
 
+import { authenticate } from "../shopify.server";
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // Fetch existing toolkit settings from DB
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  if (!shop) return json({ configs: {} });
+
   const configs = await prisma.toolkitFeature.findMany({
-    where: { shopId: "mock_shop_id" } // TODO: get from session
+    where: { shopId: shop.id }
   });
   
   const map = configs.reduce((acc, curr) => ({ ...acc, [curr.feature]: curr.enabled }), {});
@@ -16,14 +21,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.upsert({
+    where: { shopDomain: session.shop },
+    update: {},
+    create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
+  });
+
   const formData = await request.formData();
   const feature = formData.get("feature") as any;
   const enabled = formData.get("enabled") === "true";
   
   await prisma.toolkitFeature.upsert({
-    where: { shopId_feature: { shopId: "mock_shop_id", feature } },
+    where: { shopId_feature: { shopId: shop.id, feature } },
     update: { enabled },
-    create: { shopId: "mock_shop_id", feature, enabled, config: {} }
+    create: { shopId: shop.id, feature, enabled, config: {} }
   });
   
   return json({ success: true });

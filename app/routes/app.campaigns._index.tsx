@@ -6,15 +6,28 @@ import { json } from "@remix-run/node";
 import prisma from "../db.server";
 import { writeTemplate } from "../services/theme-engine/index";
 
+import { authenticate } from "../shopify.server";
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  if (!shop) return json({ campaigns: [] });
+
   const campaigns = await prisma.campaignPage.findMany({
-    where: { shopId: "mock_shop_id" },
+    where: { shopId: shop.id },
     orderBy: { createdAt: "desc" }
   });
   return json({ campaigns });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.upsert({
+    where: { shopDomain: session.shop },
+    update: {},
+    create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
+  });
+
   const formData = await request.formData();
   const templateKey = formData.get("templateKey") as string;
   const title = formData.get("title") as string;
@@ -36,7 +49,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   await prisma.campaignPage.create({
     data: {
-      shopId: "mock_shop_id",
+      shopId: shop.id,
       templateKey,
       title,
       handle,

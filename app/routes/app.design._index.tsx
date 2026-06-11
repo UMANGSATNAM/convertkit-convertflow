@@ -6,10 +6,15 @@ import { json } from "@remix-run/node";
 import prisma from "../db.server";
 import { patchSettings, restoreSnapshot } from "../services/theme-engine/index";
 
+import { authenticate } from "../shopify.server";
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const shopId = "mock_shop_id";
+  const { session } = await authenticate.admin(request);
+  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  if (!shop) return json({ snapshots: [] });
+
   const snapshots = await prisma.themeSnapshot.findMany({
-    where: { shopId, kind: "SETTINGS" },
+    where: { shopId: shop.id, kind: "SETTINGS" },
     orderBy: { createdAt: "desc" },
     take: 10
   });
