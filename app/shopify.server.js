@@ -13,6 +13,7 @@ import { restResources } from "@shopify/shopify-api/rest/admin/2025-10";
 export const PLAN_FREE = 'FREE';
 export const PLAN_GROWTH = 'GROWTH';
 export const PLAN_PRO = 'PRO';
+export const PLAN_ENTERPRISE = 'ENTERPRISE';
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -32,6 +33,11 @@ const shopify = shopifyApp({
     },
     [PLAN_PRO]: {
       amount: 24.99,
+      currencyCode: 'USD',
+      interval: BillingInterval.Every30Days,
+    },
+    [PLAN_ENTERPRISE]: {
+      amount: 49.00,
       currencyCode: 'USD',
       interval: BillingInterval.Every30Days,
     },
