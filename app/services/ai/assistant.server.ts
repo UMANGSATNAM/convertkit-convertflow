@@ -3,7 +3,13 @@ import prisma from "../../db.server";
 import { applyAutoFix } from "../health/fixers.server";
 import { patchSettings } from "../theme-engine/index";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "mock" });
+const anthropic = new Anthropic({ 
+  apiKey: process.env.ANTHROPIC_API_KEY 
+});
+
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.warn("WARNING: ANTHROPIC_API_KEY is not set. AI Assistant features will fail.");
+}
 
 export const tools = [
   {
