@@ -103,7 +103,7 @@ export async function injectPageTemplate({
     try {
       const sectionsConfig = template.sectionsConfig as any;
       if (sectionsConfig && sectionsConfig.sections) {
-        for (const [sectionKey, sectionData] of Object.entries(sectionsConfig.sections)) {
+        for (const sectionData of Object.values(sectionsConfig.sections)) {
           const type = (sectionData as any).type;
           if (!type) continue;
           

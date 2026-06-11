@@ -30,134 +30,185 @@ model Session {
   refreshTokenExpires DateTime?
 }
 
-model Merchant {
-  id                    String   @id @default(uuid())
-  shopDomain            String   @unique @map("shop_domain")
-  accessToken           String   @db.Text @map("access_token")
-  plan                  String   @default("free")
-  activeThemeId         String?  @map("active_theme_id")
-  whatsappPhoneNumberId String?  @map("whatsapp_phone_number_id")
-  whatsappAccessToken   String?  @db.Text @map("whatsapp_access_token")
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
+model Shop {
+  id              String   @id @default(cuid())
+  shopDomain      String   @unique
+  accessToken     String   @db.Text // encrypted
+  email           String?
+  plan            Plan     @default(FREE)
+  planActivatedAt DateTime?
+  trialEndsAt     DateTime?
+  nicheId         String?
+  brandConfig     Json?    // {storeName, logoUrl, colors:{primary,secondary,accent}, fontPair, whatsapp, city, state, gstin?}
+  language        String   @default("en") // assistant + email language: en | hi | hinglish
+  onboardedAt     DateTime?
+  uninstalledAt   DateTime? // retained 30 days then purged (shop/redact)
+  createdAt       DateTime @default(now())
 
-  backups             ThemeBackup[]
-  injectedPages       InjectedPage[]
-  abandonedCarts      AbandonedCart[]
-  whatsappMessages    WhatsappMessage[]
-  profitSnapshots     ProfitSnapshot[]
-
-  @@map("merchants")
+  generations       StoreGeneration[]
+  installedSections InstalledSection[]
+  toolkitConfigs    ToolkitFeature[]
+  campaigns         CampaignPage[]
+  healthReports     HealthReport[]
+  snapshots         ThemeSnapshot[]
+  aiActions         AiActionLog[]
+  usage             UsageCounter[]
 }
 
-model ThemeBackup {
-  id               String   @id @default(uuid())
-  merchantId       String   @map("merchant_id")
-  shopifyThemeId   String   @map("shopify_theme_id")
-  backupName       String   @map("backup_name")
-  isRestored       Boolean  @default(false) @map("is_restored")
-  createdAt        DateTime @default(now()) @map("created_at")
-  
-  merchant         Merchant @relation(fields:[merchantId], references:[id])
-
-  @@map("theme_backups")
+model StoreGeneration {
+  id          String    @id @default(cuid())
+  shopId      String
+  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  nicheId     String
+  catalogMode CatalogMode // DEMO | CSV | EMPTY
+  status      GenStatus
+  currentStep String?
+  themeId     String?
+  log         Json      // [{ts, step, status, detail}]
+  error       Json?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
 }
 
-model PageTemplate {
-  id              String   @id @default(uuid())
-  niche           String
-  pageType        String   @map("page_type")
-  templateName    String   @map("template_name")
-  description     String   @db.Text
-  previewImageUrl String?  @map("preview_image_url") @db.Text
-  sectionsConfig  Json     @map("sections_config")
-  isActive        Boolean  @default(true) @map("is_active")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-
-  injectedPages   InjectedPage[]
-
-  @@map("page_templates")
+model Niche {
+  id            String   @id
+  name          String
+  nameHi        String
+  themeZipUrl   String
+  themeVersion  String
+  previewImages Json     // String[] doesn't work well in all MySQL versions, using Json for arrays
+  demoCatalogUrl String  // R2 JSON manifest
+  pagesPreset   Json
+  menusPreset   Json
+  settingsBase  Json
+  palettePresets Json    // [{name, primary, secondary, accent}]
+  fontPairs     Json     // [{name, heading, body}]
+  campaignFit   Json     // which campaign templates suit this niche
 }
 
-model InjectedPage {
-  id                  String   @id @default(uuid())
-  merchantId          String   @map("merchant_id")
-  templateId          String   @map("template_id")
-  shopifyPageId       BigInt?  @map("shopify_page_id")
-  shopifyPageHandle   String   @map("shopify_page_handle")
-  shopifyTemplateFile String   @map("shopify_template_file")
-  pageTitle           String   @map("page_title")
-  status              String   @default("published")
-  injectedAt          DateTime @default(now()) @map("injected_at")
-  createdAt           DateTime @default(now()) @map("created_at")
-
-  merchant            Merchant     @relation(fields:[merchantId], references:[id])
-  template            PageTemplate @relation(fields:[templateId], references:[id])
-
-  @@map("injected_pages")
+model InstalledSection {
+  id         String   @id @default(cuid())
+  shopId     String
+  shop       Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sectionKey String   // catalog key e.g. "hero-festive-banner"
+  themeId    String
+  addedVia   String   // GALLERY | AI | GENERATOR
+  createdAt  DateTime @default(now())
 }
 
-model AbandonedCart {
-  id                   String    @id @default(uuid())
-  merchantId           String    @map("merchant_id")
-  customerEmail        String?   @map("customer_email")
-  customerPhone        String?   @map("customer_phone")
-  cartTotal            Float     @map("cart_total")
-  shopifyCheckoutToken String?   @map("shopify_checkout_token")
-  recovered            Boolean   @default(false)
-  recoveryStage        Int       @default(0) @map("recovery_stage")
-  lastMessageSentAt    DateTime? @map("last_message_sent_at")
-  abandonedAt          DateTime  @default(now()) @map("abandoned_at")
+model ToolkitFeature {
+  id       String  @id @default(cuid())
+  shopId   String
+  shop     Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  feature  Feature // STICKY_ATC, COUNTDOWN, ANNOUNCEMENT, etc
+  enabled  Boolean @default(false)
+  config   Json
 
-  merchant             Merchant  @relation(fields:[merchantId], references:[id])
-
-  @@map("abandoned_carts")
+  @@unique([shopId, feature])
 }
 
-model WhatsappMessage {
-  id                String    @id @default(uuid())
-  merchantId        String    @map("merchant_id")
-  messageType       String    @map("message_type")
-  toPhone           String    @map("to_phone")
-  templateName      String    @map("template_name")
-  templateVariables String?   @db.Text @map("template_variables")
-  status            String
-  metaMessageId     String?   @map("meta_message_id")
-  sentAt            DateTime? @map("sent_at")
-  relatedOrderId    BigInt?   @map("related_order_id")
-  createdAt         DateTime  @default(now()) @map("created_at")
+model PincodeZone {
+  id      String @id @default(cuid())
+  shopId  String
+  pincode String
+  cod     Boolean
+  etaDays Int?
 
-  merchant          Merchant  @relation(fields:[merchantId], references:[id])
-
-  @@map("whatsapp_messages")
+  @@unique([shopId, pincode])
+  @@index([shopId])
 }
 
-model Order {
-  id        String   @id @default(uuid())
-  shop      String
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("orders")
+model CampaignPage {
+  id          String   @id @default(cuid())
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  templateKey String   // diwali | eoss | new-launch | wedding | rakhi | valentines | national-sale
+  title       String
+  handle      String
+  pageId      String?
+  themeTemplate String? // templates/page.campaign-xxx.json
+  productIds  Json     // String[] 
+  offer       Json     // {headline, sub, endsAt, discountCode?}
+  status      String   // DRAFT | PUBLISHED | ARCHIVED
+  autoArchive Boolean  @default(true)
+  createdAt   DateTime @default(now())
 }
 
-model ProfitSnapshot {
-  id                String   @id @default(uuid())
-  merchantId        String   @map("merchant_id")
-  shopifyOrderId    BigInt   @map("shopify_order_id")
-  sellingPrice      Float    @map("selling_price")
-  cogs              Float
-  shippingCost      Float    @map("shipping_cost")
-  pgFee             Float    @map("pg_fee")
-  adSpendAttributed Float    @map("ad_spend_attributed")
-  packagingCost     Float    @map("packaging_cost")
-  rtoBuffer         Float    @map("rto_buffer")
-  netProfit         Float    @map("net_profit")
-  netMarginPct      Float    @map("net_margin_pct")
-  roas              Float
-  createdAt         DateTime @default(now()) @map("created_at")
+model HealthReport {
+  id        String   @id @default(cuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  score     Int
+  issues    Json     // [{key, severity, target, detail, autoFixable, fixedAt?}]
+  trigger   String   // CRON | MANUAL | POST_FIX
+  createdAt DateTime @default(now())
+}
 
-  merchant          Merchant @relation(fields:[merchantId], references:[id])
+model ThemeSnapshot {
+  id        String   @id @default(cuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  themeId   String
+  kind      String   // SETTINGS | TEMPLATE | ASSET
+  path      String
+  r2Key     String   // snapshot content in R2
+  reason    String   // DESIGN_STUDIO | AI | HEALTH_FIX | CAMPAIGN
+  createdAt DateTime @default(now())
+}
 
-  @@map("profit_snapshots")
+model AiActionLog {
+  id        String   @id @default(cuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  prompt    String   @db.Text
+  tools     Json     // tool calls proposed
+  applied   Boolean
+  result    Json?
+  tokensIn  Int
+  tokensOut Int
+  createdAt DateTime @default(now())
+}
+
+model UsageCounter {
+  id      String @id @default(cuid())
+  shopId  String
+  shop    Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  metric  String // AI_ACTIONS, GENERATIONS, CAMPAIGNS_LIVE
+  period  String // YYYY-MM
+  count   Int    @default(0)
+
+  @@unique([shopId, metric, period])
+}
+
+enum Plan { 
+  FREE 
+  GROWTH 
+  PRO 
+}
+enum GenStatus { 
+  QUEUED 
+  INSTALLING_THEME 
+  IMPORTING_PRODUCTS 
+  CREATING_COLLECTIONS 
+  CREATING_PAGES 
+  CREATING_MENUS 
+  PATCHING_SETTINGS 
+  PUBLISHING 
+  DONE 
+  FAILED 
+}
+enum CatalogMode { 
+  DEMO 
+  CSV 
+  EMPTY 
+}
+enum Feature { 
+  STICKY_ATC 
+  COUNTDOWN 
+  ANNOUNCEMENT 
+  SIZE_CHART 
+  PINCODE 
+  WHATSAPP 
+  BUNDLES 
+  TRUST_BADGES 
 }

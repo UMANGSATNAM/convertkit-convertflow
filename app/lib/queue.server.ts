@@ -19,7 +19,7 @@ export const whatsappQueue = new Queue("whatsapp-jobs", {
 });
 
 // Create workers if needed
-const backgroundJobsWorker = new Worker(
+new Worker(
   "background-jobs",
   async (job) => {
     console.log(`Processing background job ${job.id} of type ${job.name}`);
@@ -27,7 +27,7 @@ const backgroundJobsWorker = new Worker(
   { connection: redis as any }
 );
 
-const webhooksWorker = new Worker(
+new Worker(
   "webhooks",
   async (job) => {
     console.log(`Processing webhook job ${job.id} of type ${job.name}`);
@@ -74,7 +74,7 @@ const whatsappWorker = new Worker(
       
       if (templateName) {
         try {
-          const checkoutUrl = `https://${cart.merchant.shopDomain}/cart/${cart.shopifyCheckoutToken}`;
+          // const checkoutUrl = `https://${cart.merchant.shopDomain}/cart/${cart.shopifyCheckoutToken}`;
           // In a real scenario, this checkout URL would be constructed directly from Shopify's checkout URL stored in DB
           
           await sendWhatsappMessage(
