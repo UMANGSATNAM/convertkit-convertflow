@@ -9,16 +9,29 @@ import { json } from "@remix-run/node";
 import prisma from "../db.server";
 import { generatorQueue } from "../services/queue.server";
 
+import { authenticate } from "../shopify.server";
+
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const { session } = await authenticate.admin(request);
+  
+  // Ensure Shop exists
+  const shop = await prisma.shop.upsert({
+    where: { shopDomain: session.shop },
+    update: {},
+    create: {
+      shopDomain: session.shop,
+      accessToken: session.accessToken || "",
+    }
+  });
+
   const formData = await request.formData();
-  const shopId = formData.get("shopId") as string;
   const nicheId = formData.get("nicheId") as string;
   const catalogMode = formData.get("catalogMode") as "DEMO" | "CSV" | "EMPTY";
   
   // 1. Create Generation Record
   const generation = await prisma.storeGeneration.create({
     data: {
-      shopId,
+      shopId: shop.id,
       nicheId,
       catalogMode,
       status: "QUEUED",
