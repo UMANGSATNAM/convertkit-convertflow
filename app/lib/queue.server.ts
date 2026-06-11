@@ -1,5 +1,5 @@
 import { Queue, Worker } from "bullmq";
-import { redis } from "./redis.server";
+import { redis } from "../services/redis.server";
 import { sendWhatsappMessage } from "../services/integrations/whatsapp.server";
 import prisma from "../db.server";
 
