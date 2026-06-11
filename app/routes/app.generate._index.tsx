@@ -3,7 +3,7 @@ import {
   Page, Layout, Card, Text, Button, BlockStack, 
   InlineStack, ProgressBar, RadioButton, TextField, FormLayout 
 } from "@shopify/polaris";
-import { useSubmit, useActionData, useNavigation } from "@remix-run/react";
+import { useSubmit, useActionData, useNavigation, useRouteError } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
@@ -137,6 +137,28 @@ export default function GenerateStore() {
               </BlockStack>
             </Card>
           )}
+        </Layout.Section>
+      </Layout>
+    </Page>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return (
+    <Page title="StoreForge Generator">
+      <Layout>
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="400">
+              <Text as="h2" variant="headingLg" tone="critical">Application Error</Text>
+              <Text as="p">Something went wrong while processing your request.</Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                {error instanceof Error ? error.message : JSON.stringify(error)}
+              </Text>
+            </BlockStack>
+          </Card>
         </Layout.Section>
       </Layout>
     </Page>
