@@ -21,6 +21,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Dashboard
         </Link>
+        <Link to="/app/generator">Generator</Link>
         <Link to="/app/templates">Template Library</Link>
         <Link to="/app/settings">Settings</Link>
       </NavMenu>

@@ -1,123 +1,99 @@
 import { Worker } from "bullmq";
 import { redis } from "../redis.server";
-import prisma from "../../db.server";
-import { installTheme, publishTheme, patchSettings } from "../theme-engine/index";
-import { graphqlRequest } from "../shopify-api.server";
+import { prisma } from "../../db.server";
+import { installTheme, patchSettings, publishTheme } from "../theme-engine/index";
+import { importCatalog } from "./catalog.server";
+import { createNavigationAndPages } from "./navigation.server";
 
-export const generatorWorker = new Worker(
-  "generator",
-  async (job) => {
-    const { generationId } = job.data;
-    console.log(`Starting generation job for ID: ${generationId}`);
-    
-    let generation = await prisma.storeGeneration.findUnique({
-      where: { id: generationId },
-      include: { shop: true }
-    });
+// Keep track of the worker instance
+let generatorWorker: Worker | undefined;
 
-    if (!generation) throw new Error("Generation record not found");
+export function initGeneratorWorker() {
+  if (generatorWorker) return;
 
-    const updateStatus = async (step: string, status: "IN_PROGRESS" | "DONE" | "FAILED", detail: string) => {
-      const logs = (generation?.log as any[]) || [];
-      logs.push({ ts: Date.now(), step, status, detail });
-      
-      await prisma.storeGeneration.update({
+  generatorWorker = new Worker(
+    "generator",
+    async (job) => {
+      const { generationId } = job.data;
+      const gen = await prisma.storeGeneration.findUnique({
         where: { id: generationId },
-        data: { 
-          currentStep: step,
-          log: logs
-        }
+        include: { shop: true }
       });
-      console.log(`[GENERATOR] Step: ${step} | Status: ${status} | ${detail}`);
-    };
 
-    try {
-      // Step 1: INSTALLING_THEME
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "INSTALLING_THEME" }});
-      await updateStatus("INSTALLING_THEME", "IN_PROGRESS", "Patching active theme...");
-      
-      const themeId = "active";
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { themeId } });
-      await updateStatus("INSTALLING_THEME", "DONE", `Using active theme`);
+      if (!gen) throw new Error("Generation record not found");
+      const shop = gen.shop;
 
-      // Step 2: IMPORTING_PRODUCTS
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "IMPORTING_PRODUCTS" }});
-      await updateStatus("IMPORTING_PRODUCTS", "IN_PROGRESS", `Mode: ${generation.catalogMode}`);
-      
-      if (generation.catalogMode === "DEMO") {
-        const productMutation = `
-          mutation CreateProduct($input: ProductInput!) {
-            productCreate(input: $input) {
-              product { id }
-              userErrors { field message }
+      try {
+        const updateStatus = async (status: any, logMsg: string) => {
+          const currentLog = gen.log as any[];
+          await prisma.storeGeneration.update({
+            where: { id: generationId },
+            data: {
+              status,
+              log: [...currentLog, { time: new Date().toISOString(), msg: logMsg }]
             }
-          }
-        `;
-        // Create a couple of demo products
-        await graphqlRequest(generation.shop.shopDomain, generation.shop.accessToken, productMutation, {
-          input: { title: "Demo Product 1", status: "ACTIVE", vendor: "StoreForge" }
-        });
-        await graphqlRequest(generation.shop.shopDomain, generation.shop.accessToken, productMutation, {
-          input: { title: "Demo Product 2", status: "ACTIVE", vendor: "StoreForge" }
-        });
-        await updateStatus("IMPORTING_PRODUCTS", "DONE", "Imported demo products");
-      } else {
-        await updateStatus("IMPORTING_PRODUCTS", "DONE", "Skipped product import");
-      }
+          });
+        };
 
-      // Step 3: CREATING_COLLECTIONS
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "CREATING_COLLECTIONS" }});
-      await updateStatus("CREATING_COLLECTIONS", "IN_PROGRESS", "Setting up smart collections...");
-      await updateStatus("CREATING_COLLECTIONS", "DONE", "Created collections");
+        const niche = await prisma.niche.findUnique({ where: { id: gen.nicheId } });
+        if (!niche) throw new Error("Niche not found");
 
-      // Step 4: CREATING_PAGES
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "CREATING_PAGES" }});
-      await updateStatus("CREATING_PAGES", "IN_PROGRESS", "Creating policy and info pages...");
-      
-      const pageMutation = `
-        mutation CreatePage($page: PageCreateInput!) {
-          pageCreate(page: $page) {
-            page { id }
-            userErrors { field message }
-          }
+        // 1. INSTALLING_THEME
+        await updateStatus("INSTALLING_THEME", "Downloading and installing base theme...");
+        const themeId = await installTheme(shop, niche.themeZipUrl, `StoreForge ${niche.name}`);
+        
+        await prisma.storeGeneration.update({
+          where: { id: generationId },
+          data: { themeId }
+        });
+
+        // 2. IMPORTING_PRODUCTS & CREATING_COLLECTIONS
+        await updateStatus("IMPORTING_PRODUCTS", "Importing demo products and collections...");
+        if (gen.catalogMode === "DEMO") {
+          await importCatalog(shop, niche.demoCatalogUrl);
         }
-      `;
-      await graphqlRequest(generation.shop.shopDomain, generation.shop.accessToken, pageMutation, {
-        page: { title: "About Us", body: "<p>Welcome to our store, generated by StoreForge.</p>" }
-      });
-      await updateStatus("CREATING_PAGES", "DONE", "Created pages");
+        
+        // 3. CREATING_PAGES & CREATING_MENUS
+        await updateStatus("CREATING_PAGES", "Creating pages and navigation menus...");
+        await createNavigationAndPages(shop, niche);
 
-      // Step 5: CREATING_MENUS
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "CREATING_MENUS" }});
-      await updateStatus("CREATING_MENUS", "IN_PROGRESS", "Configuring navigation...");
-      await updateStatus("CREATING_MENUS", "DONE", "Menus updated");
+        // 4. PATCHING_SETTINGS
+        await updateStatus("PATCHING_SETTINGS", "Applying brand colors and typography...");
+        await patchSettings(shop, themeId, niche.settingsBase as any);
 
-      // Step 6: PATCHING_SETTINGS
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "PATCHING_SETTINGS" }});
-      await updateStatus("PATCHING_SETTINGS", "IN_PROGRESS", "Applying brand colors and fonts...");
-      await patchSettings(generation.shop, "active", { colors_solid_button_labels: "#000000" }, "GENERATOR");
-      await updateStatus("PATCHING_SETTINGS", "DONE", "Settings patched");
+        // 5. PUBLISHING
+        await updateStatus("PUBLISHING", "Publishing final storefront...");
+        await publishTheme(shop, themeId);
 
-      // Step 7: PUBLISHING
-      await prisma.storeGeneration.update({ where: { id: generationId }, data: { status: "PUBLISHING" }});
-      await updateStatus("PUBLISHING", "IN_PROGRESS", "Publishing live theme...");
-      // Already editing active theme
-      await updateStatus("PUBLISHING", "DONE", "Theme published");
+        // 6. DONE
+        await prisma.storeGeneration.update({
+          where: { id: generationId },
+          data: {
+            status: "DONE",
+            completedAt: new Date(),
+            log: [...(gen.log as any[]), { time: new Date().toISOString(), msg: "Generation completed successfully!" }]
+          }
+        });
 
-      // Final DONE
-      await prisma.storeGeneration.update({ 
-        where: { id: generationId }, 
-        data: { status: "DONE", completedAt: new Date() }
-      });
-      console.log(`Generation ${generationId} completed successfully.`);
+      } catch (error: any) {
+        await prisma.storeGeneration.update({
+          where: { id: generationId },
+          data: {
+            status: "FAILED",
+            error: { message: error.message, stack: error.stack },
+            log: [...(gen.log as any[]), { time: new Date().toISOString(), msg: `FAILED: ${error.message}` }]
+          }
+        });
+        throw error;
+      }
+    },
+    { connection: redis as any }
+  );
 
-    } catch (error: any) {
-      console.error(`Generation ${generationId} failed:`, error);
-      await prisma.storeGeneration.update({ 
-        where: { id: generationId }, 
-        data: { status: "FAILED", error: error.message }
-      });
-    }
-  },
-  { connection: redis as any }
-);
+  console.log("🛠️  Store Generator Worker initialized.");
+}
+
+// Auto-start the worker if we are not in a purely test environment
+if (process.env.NODE_ENV !== "test") {
+  initGeneratorWorker();
+}

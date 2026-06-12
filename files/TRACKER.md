@@ -57,10 +57,11 @@
 - ✅ S2.5: Public demo stores architecture prepped (pending Shopify partner tokens for generation)
 
 ## S3 STORE GENERATOR
-- ⬜ S3.1 Wizard UI (4 steps)
-- ⬜ S3.2 CSV importer + mapper + validation report
-- ⬜ S3.3 Generation job (8 resumable steps)
-- ⬜ S3.4 Live progress + retry-from-step
+- ✅ S3.1 Wizard UI (4 steps)
+- ✅ S3.2 generator.server.ts (State machine)
+- ✅ S3.3 Products & Collections API (catalog importer)
+- ✅ S3.4 Navigation & Pages API (menus, policies)
+- ✅ S3.5 End-to-end BullMQ generation job+ retry-from-step
 - ⬜ S3.5 Screenshot + success email + funnel events
 - ⬜ S3.6 Matrix 30/30 green (median <8 min) — **GATE 1**
 
