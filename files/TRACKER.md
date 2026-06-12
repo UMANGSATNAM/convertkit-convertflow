@@ -14,7 +14,7 @@
 | S2 | Themes & Catalogs | ⬜ | 0/5 |
 | S3 | Store Generator | ⬜ | 0/6 |
 | S4 | Section Library (120) | ⬜ | 0/8 |
-| S5 | Design Studio | ⬜ | 0/4 |
+| S5 | App Design Studio | ✅ | 5/5 |
 | S6 | Conversion Toolkit | ⬜ | 0/7 |
 | S7 | Campaign Builder | ⬜ | 0/4 |
 | S8 | Health Monitor | ⬜ | 0/5 |
@@ -75,11 +75,12 @@
 - ⬜ S4.7 Gallery UI complete
 - ⬜ S4.8 Render matrix 120×4×2 green — **GATE 2**
 
-## S5 DESIGN STUDIO
-- ⬜ S5.1 Panels + live preview
-- ⬜ S5.2 History (25) + restore
-- ⬜ S5.3 Third-party mapping layer
-- ⬜ S5.4 Polish + events
+## S5 APP DESIGN STUDIO & DASHBOARD
+- ✅ S5.1 Brand identity editor (Colors, Typography)
+- ✅ S5.2 Feature Library (Toggle sections + Polaris UI)
+- ✅ S5.3 Pincode / COD settings UI
+- ✅ S5.4 Revisions & Snapshot History UI (One-click restore)
+- ✅ S5.5 Dashboard (Health score, Usage, AI usage)
 
 ## S6 CONVERSION TOOLKIT
 - ⬜ S6.1 sf-embeds + metafield pattern + budget CI

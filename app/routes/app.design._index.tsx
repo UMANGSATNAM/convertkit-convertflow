@@ -9,17 +9,7 @@ import { patchSettings, restoreSnapshot } from "../services/theme-engine/index";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  if (!shop) return json({ snapshots: [] });
-
-  const snapshots = await prisma.themeSnapshot.findMany({
-    where: { shopId: shop.id, kind: "SETTINGS" },
-    orderBy: { createdAt: "desc" },
-    take: 10
-  });
-
-  return json({ snapshots });
+  return json({});
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -38,18 +28,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     
     return json({ success: true });
   }
-  
-  if (intent === "restore") {
-    const snapshotId = formData.get("snapshotId") as string;
-    // await restoreSnapshot(mockShop, snapshotId);
-    return json({ success: true });
-  }
-
   return json({ error: "Invalid intent" }, { status: 400 });
 };
 
 export default function DesignStudio() {
-  const { snapshots } = useLoaderData<typeof loader>();
   const submit = useSubmit();
 
   const [primaryColor, setPrimaryColor] = useState({ hue: 200, brightness: 1, saturation: 1 });
@@ -61,13 +43,6 @@ export default function DesignStudio() {
     // Convert HSB to Hex/RGB conceptually
     formData.append("primary", "#000000"); 
     formData.append("font", font);
-    submit(formData, { method: "post" });
-  };
-
-  const handleRestore = (snapshotId: string) => {
-    const formData = new FormData();
-    formData.append("intent", "restore");
-    formData.append("snapshotId", snapshotId);
     submit(formData, { method: "post" });
   };
 
@@ -98,17 +73,8 @@ export default function DesignStudio() {
 
           <Card>
             <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">History (Undo)</Text>
-              {snapshots.length === 0 ? (
-                <Text as="p">No snapshots yet.</Text>
-              ) : (
-                snapshots.map((s) => (
-                  <InlineStack key={s.id} align="space-between">
-                    <Text as="p">{new Date(s.createdAt).toLocaleString()}</Text>
-                    <Button size="micro" onClick={() => handleRestore(s.id)}>Restore</Button>
-                  </InlineStack>
-                ))
-              )}
+              <Text as="h2" variant="headingMd">Tip</Text>
+              <Text as="p">Any changes made here will automatically create a Theme Snapshot backup before applying.</Text>
             </BlockStack>
           </Card>
         </Layout.Section>
