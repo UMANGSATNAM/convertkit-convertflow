@@ -74,7 +74,7 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
         const data = await response.json();
         
         // Handle GraphQL specific rate limiting
-        if (data.errors && data.errors.some((e: any) => e.extensions?.code === 'THROTTLED')) {
+        if (data.errors && Array.isArray(data.errors) && data.errors.some((e: any) => e.extensions?.code === 'THROTTLED')) {
           const delay = Math.pow(2, attempt) * 500 + Math.random() * 500;
           await sleep(delay);
           attempt++;
@@ -82,7 +82,8 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
         }
 
         if (data.errors) {
-          throw new Error(`Shopify GraphQL Error: ${data.errors[0].message}`);
+          const errMsg = Array.isArray(data.errors) ? data.errors[0]?.message : (typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors));
+          throw new Error(`Shopify API Error: ${errMsg}`);
         }
 
         return data;

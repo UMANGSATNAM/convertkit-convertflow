@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useSubmit, useNavigation } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigation, useRevalidator } from "@remix-run/react";
+import { useEffect } from "react";
 import {
   Page,
   Layout,
@@ -44,7 +45,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (actionType === "START_GENERATION") {
     const shop = await prisma.shop.upsert({
       where: { shopDomain: session.shop },
-      update: {},
+      update: { accessToken: session.accessToken || "" },
       create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
     });
 
@@ -73,6 +74,7 @@ export default function Generator() {
   const navigation = useNavigation();
   
   const isSubmitting = navigation.state === "submitting";
+  const revalidator = useRevalidator();
 
   const [step, setStep] = useState(1);
   const [selectedNiche, setSelectedNiche] = useState(niches[0]?.id || "");
@@ -85,6 +87,15 @@ export default function Generator() {
   };
 
   const isGenerating = activeGen && !["DONE", "FAILED"].includes(activeGen.status);
+
+  useEffect(() => {
+    if (isGenerating) {
+      const interval = setInterval(() => {
+        revalidator.revalidate();
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isGenerating, revalidator]);
 
   if (isGenerating) {
     return (
@@ -112,6 +123,12 @@ export default function Generator() {
           {activeGen?.status === "DONE" && (
             <Banner tone="success" title="Store Generation Complete!">
               <p>Your store has been successfully generated using the {activeGen.nicheId} niche!</p>
+            </Banner>
+          )}
+
+          {activeGen?.status === "FAILED" && (
+            <Banner tone="critical" title="Generation Failed">
+              <p>An error occurred while generating the store. Please try again. ({activeGen.error?.message || "Unknown error"})</p>
             </Banner>
           )}
 
