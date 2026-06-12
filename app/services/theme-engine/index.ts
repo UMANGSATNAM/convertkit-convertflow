@@ -1,56 +1,123 @@
 import { createSnapshot, fetchSnapshotContent } from "./snapshot.server";
-import { restRequest } from "../shopify-api.server";
+import { graphqlRequest, restRequest } from "../shopify-api.server";
+import { validateSettingsPatch, validateTemplateStructure } from "./validators.server";
+import crypto from "crypto";
 
 async function getActiveThemeId(shopDomain: string, accessToken: string) {
   const data = await restRequest(shopDomain, accessToken, "GET", "themes.json");
   const activeTheme = data.themes.find((t: any) => t.role === "main");
   if (!activeTheme) throw new Error("No active theme found");
-  return activeTheme.id;
+  return activeTheme.id.toString();
 }
 
-async function uploadAsset(shop: any, themeId: string, key: string, value: string) {
+/**
+ * Calculates MD5 checksum of a string
+ */
+function calculateChecksum(content: string): string {
+  return crypto.createHash("md5").update(content).digest("hex");
+}
+
+export async function uploadAsset(shop: any, themeId: string, key: string, value: string) {
   const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
+  
+  // themeFilesUpsert using GraphQL is safer, but REST is fine for single files. 
+  // We'll use REST here for simplicity of single file upload, but could use themeFilesUpsert
   await restRequest(shop.shopDomain, shop.accessToken, "PUT", `themes/${actualThemeId}/assets.json`, {
     asset: { key, value }
-  });
+  }, true); // serialize mutations
 }
 
-// We will use the Shopify Admin API for these actions
-export async function installTheme(shop: any, nicheId: string, brandConfig: any): Promise<{ themeId: string }> {
-  // 1. Trigger Theme Create via ZIP URL from Niche
-  // 2. Poll until processing is complete
-  console.log(`Installing theme for niche: ${nicheId}`);
-  // Mock return
-  return { themeId: "mock_theme_123" };
+export async function installTheme(shop: any, nicheId: string, sourceUrl: string): Promise<{ themeId: string }> {
+  console.log(`Installing theme for niche: ${nicheId} from ${sourceUrl}`);
+  
+  const query = `
+    mutation themeCreate($source: URL!) {
+      themeCreate(source: $source) {
+        theme {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { source: sourceUrl }, true);
+  if (data.themeCreate?.userErrors?.length > 0) {
+    throw new Error(`Failed to create theme: ${data.themeCreate.userErrors[0].message}`);
+  }
+
+  const themeIdGid = data.themeCreate.theme.id;
+  const themeId = themeIdGid.split('/').pop();
+
+  // Poll until processing is complete
+  const pollQuery = `
+    query getTheme($id: ID!) {
+      theme(id: $id) {
+        processing
+      }
+    }
+  `;
+
+  const startTime = Date.now();
+  const timeoutMs = 5 * 60 * 1000; // 5 minutes
+
+  while (Date.now() - startTime < timeoutMs) {
+    const pollData = await graphqlRequest(shop.shopDomain, shop.accessToken, pollQuery, { id: themeIdGid });
+    if (!pollData.theme?.processing) {
+      return { themeId };
+    }
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+
+  throw new Error("Theme creation timed out");
 }
 
 export async function publishTheme(shop: any, themeId: string) {
   console.log(`Publishing theme: ${themeId}`);
-  // Call Shopify themePublish API
+  const query = `
+    mutation themePublish($id: ID!) {
+      themePublish(id: $id) {
+        theme {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { id: `gid://shopify/Theme/${themeId}` }, true);
+  if (data.themePublish?.userErrors?.length > 0) {
+    throw new Error(`Failed to publish theme: ${data.themePublish.userErrors[0].message}`);
+  }
 }
 
 export async function patchSettings(shop: any, themeId: string, patch: any, reason: string = "API"): Promise<{ snapshotId: string }> {
   console.log(`Patching settings for theme: ${themeId}`);
   
-  // 1. Read existing settings_data.json
+  // 1. Validate Patch
+  await validateSettingsPatch(shop, themeId, patch);
+
+  // 2. Read existing
   const existingSettings = await readFile(shop, themeId, "config/settings_data.json");
   
-  // 2. Snapshot old settings
+  // 3. Snapshot
   const snapshot = await createSnapshot(shop.id, themeId, "SETTINGS", "config/settings_data.json", existingSettings, reason);
   
-  // 3. Deep-merge patch
+  // 4. Merge
   const parsedSettings = existingSettings ? JSON.parse(existingSettings) : { current: {} };
-  
-  // Shopify Dawn stores colors in parsedSettings.current
   const newSettings = { ...parsedSettings };
   if (!newSettings.current) newSettings.current = {};
   
-  // Apply patches
   for (const [key, value] of Object.entries(patch)) {
     newSettings.current[key] = value;
   }
   
-  // 4. Write back
+  // 5. Write
   await uploadAsset(shop, themeId, "config/settings_data.json", JSON.stringify(newSettings, null, 2));
   
   return { snapshotId: snapshot.id };
@@ -58,15 +125,21 @@ export async function patchSettings(shop: any, themeId: string, patch: any, reas
 
 export async function writeTemplate(shop: any, themeId: string, path: string, jsonContent: any, reason: string = "API"): Promise<{ snapshotId: string }> {
   console.log(`Writing template ${path} to theme: ${themeId}`);
+  
+  // 1. Validate structure
+  validateTemplateStructure(jsonContent);
+
   let existingContent = "{}";
   try {
     existingContent = await readFile(shop, themeId, path);
   } catch (e) {
-    console.log("Template doesn't exist yet, creating new one.");
+    // Template might not exist yet
   }
   
+  // 2. Snapshot
   const snapshot = await createSnapshot(shop.id, themeId, "TEMPLATE", path, existingContent, reason);
   
+  // 3. Write
   await uploadAsset(shop, themeId, path, JSON.stringify(jsonContent, null, 2));
   
   return { snapshotId: snapshot.id };
@@ -74,22 +147,32 @@ export async function writeTemplate(shop: any, themeId: string, path: string, js
 
 export async function readFile(shop: any, themeId: string, path: string): Promise<string> {
   const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
-  const data = await restRequest(shop.shopDomain, shop.accessToken, "GET", `themes/${actualThemeId}/assets.json?asset[key]=${path}`);
-  return data.asset?.value || "{}";
+  
+  try {
+    const data = await restRequest(shop.shopDomain, shop.accessToken, "GET", `themes/${actualThemeId}/assets.json?asset[key]=${path}`);
+    return data.asset?.value || "{}";
+  } catch (e: any) {
+    if (e.message.includes("404")) return "{}";
+    throw e;
+  }
 }
 
-export async function restoreSnapshot(shop: any, snapshotId: string) {
-  // 1. Find snapshot in DB
-  // 2. Fetch content from R2
-  // 3. uploadAsset(shop, themeId, path, content)
+export async function restoreSnapshot(shop: any, themeId: string, path: string, r2Key: string) {
+  console.log(`Restoring snapshot ${r2Key} for ${path}`);
+  const content = await fetchSnapshotContent(r2Key);
+  await uploadAsset(shop, themeId, path, content);
 }
 
-export async function scanAssets(shop: any, themeId: string): Promise<any> {
-  // Call Shopify Asset list API to check sizes, etc.
-  return { totalSize: 1024, files: [] };
+export async function scanAssets(shop: any, themeId: string): Promise<{ totalSize: number, files: any[] }> {
+  const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
+  const data = await restRequest(shop.shopDomain, shop.accessToken, "GET", `themes/${actualThemeId}/assets.json`);
+  
+  const files = data.assets || [];
+  const totalSize = files.reduce((acc: number, f: any) => acc + (f.size || 0), 0);
+  
+  return { totalSize, files };
 }
 
-export function addAppBlockDeepLink(themeId: string, blockHandle: string, target: string): string {
-  // Construct Shopify deep link url for the theme editor
-  return `https://admin.shopify.com/store/placeholder/themes/${themeId}/editor?addAppBlockId=${blockHandle}&target=${target}`;
+export function addAppBlockDeepLink(shopDomain: string, themeId: string, blockHandle: string, target: string = "template"): string {
+  return `https://${shopDomain}/admin/themes/${themeId}/editor?addAppBlockId=${blockHandle}&target=${target}`;
 }

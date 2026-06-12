@@ -10,7 +10,7 @@
 | Stage | Name | Status | Progress |
 |---|---|---|---|
 | S0 | Foundation | ✅ | 9/9 |
-| S1 | Theme Engine | ⬜ | 0/9 |
+| S1 | Theme Engine | ✅ | 9/9 |
 | S2 | Themes & Catalogs | ⬜ | 0/5 |
 | S3 | Store Generator | ⬜ | 0/6 |
 | S4 | Section Library (120) | ⬜ | 0/8 |
@@ -39,15 +39,15 @@
 - ✅ S0.9 All lifecycle/GDPR webhooks
 
 ## S1 THEME ENGINE
-- ⬜ S1.1 GraphQL wrapper (cost-aware, per-shop queue)
-- ⬜ S1.2 installTheme (ZIP → poll → ready)
-- ⬜ S1.3 readFile / upsert helpers
-- ⬜ S1.4 Settings validator
-- ⬜ S1.5 Template validator
-- ⬜ S1.6 Snapshot service (R2, 25-deep)
-- ⬜ S1.7 patchSettings
-- ⬜ S1.8 writeTemplate / restore / scanAssets / deepLink
-- ⬜ S1.9 Chaos test suite green
+- ✅ S1.1 GraphQL wrapper (cost-aware, per-shop queue)
+- ✅ S1.2 installTheme (ZIP → poll → ready)
+- ✅ S1.3 readFile / upsert helpers
+- ✅ S1.4 Settings validator
+- ✅ S1.5 Template validator
+- ✅ S1.6 Snapshot service (R2, 25-deep)
+- ✅ S1.7 patchSettings
+- ✅ S1.8 writeTemplate / restore / scanAssets / deepLink
+- ✅ S1.9 Chaos test suite green
 
 ## S2 THEMES & CATALOGS
 - ⬜ S2.1 theme-validator CLI in CI
