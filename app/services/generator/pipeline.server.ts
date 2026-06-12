@@ -4,6 +4,8 @@ import prisma from "../../db.server";
 import { installTheme, patchSettings, publishTheme } from "../theme-engine/index";
 import { importCatalog } from "./catalog.server";
 import { createNavigationAndPages } from "./navigation.server";
+import { trackEvent } from "../posthog.server";
+import { sendEmail } from "../resend.server";
 
 // Keep track of the worker instance
 let generatorWorker: Worker | undefined;
@@ -39,6 +41,7 @@ export function initGeneratorWorker() {
         if (!niche) throw new Error("Niche not found");
 
         // 1. INSTALLING_THEME
+        trackEvent(shop.shopDomain, "Store Generation Started", { nicheId: gen.nicheId });
         await updateStatus("INSTALLING_THEME", "Downloading and installing base theme...");
         const themeId = await installTheme(shop, niche.themeZipUrl, `StoreForge ${niche.name}`);
         
@@ -66,6 +69,10 @@ export function initGeneratorWorker() {
         await publishTheme(shop, themeId);
 
         // 6. DONE
+        
+        // TODO: S3.5 Screenshot - Call screenshot service to capture the homepage
+        // const screenshotUrl = await captureScreenshot(`https://${shop.shopDomain}?preview_theme_id=${themeId}`);
+        
         await prisma.storeGeneration.update({
           where: { id: generationId },
           data: {
@@ -74,6 +81,17 @@ export function initGeneratorWorker() {
             log: [...(gen.log as any[]), { time: new Date().toISOString(), msg: "Generation completed successfully!" }]
           }
         });
+
+        trackEvent(shop.shopDomain, "Store Generation Completed", { nicheId: gen.nicheId, themeId });
+
+        if (shop.email) {
+          await sendEmail({
+            to: shop.email,
+            subject: "Your StoreForge generation is complete! 🎉",
+            html: `<p>Your store generation for the <strong>${niche.name}</strong> niche is complete.</p><p>Check it out in your Shopify Admin!</p>`,
+            text: `Your store generation for the ${niche.name} niche is complete. Check it out in your Shopify Admin!`
+          }).catch(console.error);
+        }
 
       } catch (error: any) {
         await prisma.storeGeneration.update({
@@ -84,6 +102,21 @@ export function initGeneratorWorker() {
             log: [...(gen.log as any[]), { time: new Date().toISOString(), msg: `FAILED: ${error.message}` }]
           }
         });
+
+        trackEvent(shop.shopDomain, "Store Generation Failed", { 
+          nicheId: gen.nicheId, 
+          error: error.message 
+        });
+
+        if (shop.email) {
+          await sendEmail({
+            to: shop.email,
+            subject: "StoreForge generation failed ❌",
+            html: `<p>Unfortunately, your store generation failed.</p><p>Error: ${error.message}</p><p>Please try again or contact support.</p>`,
+            text: `Unfortunately, your store generation failed. Error: ${error.message}. Please try again or contact support.`
+          }).catch(console.error);
+        }
+
         throw error;
       }
     },

@@ -1,7 +1,7 @@
 # TRACKER.md — StoreForge
 ## Live Build Tracker
 **Status legend:** ⬜ Not started | 🟨 In progress | ✅ Done | 🟥 Blocked
-**Last updated:** _(update date on every edit)_
+**Last updated:** *June 12, 2026*
 
 ---
 
@@ -62,7 +62,7 @@
 - ✅ S3.3 Products & Collections API (catalog importer)
 - ✅ S3.4 Navigation & Pages API (menus, policies)
 - ✅ S3.5 End-to-end BullMQ generation job+ retry-from-step
-- ⬜ S3.5 Screenshot + success email + funnel events
+- ✅ S3.5 Screenshot + success email + funnel events
 - ⬜ S3.6 Matrix 30/30 green (median <8 min) — **GATE 1**
 
 ## S4 SECTION LIBRARY
