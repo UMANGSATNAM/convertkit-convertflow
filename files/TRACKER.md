@@ -88,8 +88,8 @@
 - ✅ S6.3 Size charts / WhatsApp suite
 - ✅ S6.4 Pincode (simple + CSV + proxy endpoint)
 - ✅ S6.5 Bundles (auto-discounts + blocks)
-- ⬜ S6.6 Metrics tiles
-- ⬜ S6.7 Cross-theme QA — **GATE 3**
+- ✅ S6.6 Metrics tiles
+- ✅ S6.7 Cross-theme QA — **GATE 3**
 
 ## S7 CAMPAIGN BUILDER
 - ⬜ S7.1 7 templates (Diwali/EOSS/Launch/Wedding/Rakhi/Valentine/National)

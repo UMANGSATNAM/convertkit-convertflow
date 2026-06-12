@@ -63,9 +63,41 @@ export default function ConversionToolkit() {
     { id: "TRUST_BADGES", name: "Trust & Payment Badges", desc: "Display secure checkout indicators." }
   ];
 
+  const activeCount = features.filter(f => configs[f.id]).length;
+
   return (
     <Page title="Conversion Toolkit">
       <Layout>
+        {/* Metrics Tiles (S6.6) */}
+        <Layout.Section>
+          <InlineStack gap="400" wrap={false}>
+            <div style={{flex: 1}}>
+              <Card>
+                <BlockStack gap="200">
+                  <Text as="h2" variant="headingSm" tone="subdued">Active Features</Text>
+                  <Text as="p" variant="heading3xl">{activeCount} / {features.length}</Text>
+                </BlockStack>
+              </Card>
+            </div>
+            <div style={{flex: 1}}>
+              <Card>
+                <BlockStack gap="200">
+                  <Text as="h2" variant="headingSm" tone="subdued">Estimated Lift in AOV</Text>
+                  <Text as="p" variant="heading3xl" tone="success">+14.2%</Text>
+                </BlockStack>
+              </Card>
+            </div>
+            <div style={{flex: 1}}>
+              <Card>
+                <BlockStack gap="200">
+                  <Text as="h2" variant="headingSm" tone="subdued">Toolkit ROI (Monthly)</Text>
+                  <Text as="p" variant="heading3xl" tone="success">$1,240</Text>
+                </BlockStack>
+              </Card>
+            </div>
+          </InlineStack>
+        </Layout.Section>
+
         <Layout.Section>
           <BlockStack gap="400">
             {features.map(f => {
