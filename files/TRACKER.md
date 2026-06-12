@@ -66,14 +66,14 @@
 - ✅ S3.6 Matrix 30/30 green (median <8 min) — **GATE 1**
 
 ## S4 SECTION LIBRARY
-- ⬜ S4.1 sf-sections scaffold + budget CI
-- ⬜ S4.2 Batch A (30): Hero + Product display — __/30
-- ⬜ S4.3 Batch B (30): Trust + Content — __/30
-- ⬜ S4.4 Batch C (30): Conversion + — __/30
-- ⬜ S4.5 Batch D (30): Utility + India + PRO custom — __/30
-- ⬜ S4.6 Catalog seed + thumbnails ×120
-- ⬜ S4.7 Gallery UI complete
-- ⬜ S4.8 Render matrix 120×4×2 green — **GATE 2**
+- ✅ S4.1 sf-sections scaffold + budget CI
+- ✅ S4.2 Batch A (30): Hero + Product display — 30/30
+- ✅ S4.3 Batch B (30): Trust + Content — 30/30
+- ✅ S4.4 Batch C (30): Conversion + — 30/30
+- ✅ S4.5 Batch D (30): Utility + India + PRO custom — 30/30
+- ✅ S4.6 Catalog seed + thumbnails ×120
+- ✅ S4.7 Gallery UI complete
+- ✅ S4.8 Render matrix 120×4×2 green — **GATE 2**
 
 ## S5 APP DESIGN STUDIO & DASHBOARD
 - ✅ S5.1 Brand identity editor (Colors, Typography)

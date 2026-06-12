@@ -1,19 +1,45 @@
-<div class="sf-product-section" id="sf-product-8">
-  <!-- Placeholder for Product Block 8 -->
-  <h2 style="color: {{ section.settings.heading_color }}">{{ section.settings.title }}</h2>
-  {% if section.settings.show_button %}
-    <a href="#" class="sf-btn">Click Here</a>
+<div class="sf-product-section compare" id="product-8" style="padding: 60px 20px; background-color: {{ section.settings.bg_color }};">
+  <div style="text-align: center; margin-bottom: 40px;">
+    <h2 style="font-size: 2.2rem; color: {{ section.settings.heading_color }};">{{ section.settings.title }}</h2>
+  </div>
+  
+  {% if section.settings.product != blank %}
+    {% assign product = all_products[section.settings.product] %}
+    <div style="display: flex; gap: 40px; align-items: center; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 300px;">
+        <img src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
+      </div>
+      <div style="flex: 1; min-width: 300px; padding: 20px;">
+        <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: {{ section.settings.heading_color }};">{{ product.title }}</h3>
+        <p style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: {{ section.settings.primary_color }};">{{ product.price | money }}</p>
+        <div style="margin-bottom: 30px; line-height: 1.6; color: #666;">
+          {{ product.description | strip_html | truncatewords: 30 }}
+        </div>
+        <form action="/cart/add" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+          <button type="submit" style="width: 100%; padding: 15px; background-color: {{ section.settings.primary_color }}; color: #fff; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">
+            Add to Cart
+          </button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">
+      <p style="font-size: 1.2rem; color: #888;">Select a product in the theme editor to view.</p>
+    </div>
   {% endif %}
 </div>
 
 {% schema %}
 {
-  "name": "Product Block 8",
+  "name": "Product Comparison",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Title", "default": "Product Block 8" },
+    { "type": "text", "id": "title", "label": "Section Title", "default": "Product Comparison" },
+    { "type": "product", "id": "product", "label": "Select Product" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
     { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "checkbox", "id": "show_button", "label": "Show Button", "default": true }
+    { "type": "color", "id": "primary_color", "label": "Primary Color", "default": "#000000" }
   ]
 }
 {% endschema %}
