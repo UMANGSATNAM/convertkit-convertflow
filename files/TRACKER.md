@@ -87,7 +87,7 @@
 - ✅ S6.2 Sticky ATC / Countdown / Announcement / Trust badges
 - ✅ S6.3 Size charts / WhatsApp suite
 - ✅ S6.4 Pincode (simple + CSV + proxy endpoint)
-- ⬜ S6.5 Bundles (auto-discounts + blocks)
+- ✅ S6.5 Bundles (auto-discounts + blocks)
 - ⬜ S6.6 Metrics tiles
 - ⬜ S6.7 Cross-theme QA — **GATE 3**
 

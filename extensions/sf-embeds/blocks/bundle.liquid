@@ -1,0 +1,155 @@
+{% if block.settings.enabled %}
+<div class="sf-bundles-widget" id="sf-bundles-{{ block.id }}" style="margin: 20px 0; padding: 15px; border: 1px solid #e1e3e5; border-radius: 8px;">
+  <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.1em;">{{ block.settings.title }}</h3>
+  
+  <div id="sf-bundle-loading-{{ block.id }}" style="text-align: center; color: #666;">
+    Loading recommendations...
+  </div>
+  
+  <div id="sf-bundle-content-{{ block.id }}" style="display: none;">
+    <div id="sf-bundle-items-{{ block.id }}" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
+      <!-- Main Product (Always checked) -->
+      <div class="sf-bundle-item" style="flex: 0 0 auto; width: 120px;">
+        <img src="{{ product.featured_image | img_url: '200x200' }}" alt="{{ product.title | escape }}" style="width: 100%; height: auto; border-radius: 4px;">
+        <label style="display: flex; align-items: start; gap: 5px; font-size: 0.85em; margin-top: 8px; cursor: pointer;">
+          <input type="checkbox" class="sf-bundle-checkbox" value="{{ product.selected_or_first_available_variant.id }}" data-price="{{ product.price }}" checked disabled>
+          <span><strong>This item:</strong> <br>{{ product.title }}</span>
+        </label>
+      </div>
+      <!-- Dynamic Recommendations will be injected here -->
+    </div>
+
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span style="font-size: 0.9em; color: #666;">Total Price:</span><br>
+        <strong id="sf-bundle-total-{{ block.id }}" style="font-size: 1.2em;">{{ product.price | money }}</strong>
+      </div>
+      <button id="sf-bundle-add-{{ block.id }}" style="background-color: {{ block.settings.button_bg_color }}; color: {{ block.settings.button_text_color }}; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        Add Bundle to Cart
+      </button>
+    </div>
+    
+    {% if block.settings.discount_message != blank %}
+      <p style="margin-top: 10px; margin-bottom: 0; font-size: 0.85em; color: #d32f2f; text-align: center;">
+        {{ block.settings.discount_message }}
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const productId = {{ product.id | json }};
+  const baseUrl = window.Shopify.routes.root || '/';
+  const limit = {{ block.settings.recommendation_limit | default: 2 }};
+  
+  fetch(`${baseUrl}recommendations/products.json?product_id=${productId}&limit=${limit}&intent=complementary`)
+    .then(response => response.json())
+    .then(({ products }) => {
+      if (products.length > 0) {
+        document.getElementById(`sf-bundle-loading-{{ block.id }}`).style.display = 'none';
+        document.getElementById(`sf-bundle-content-{{ block.id }}`).style.display = 'block';
+        
+        const itemsContainer = document.getElementById(`sf-bundle-items-{{ block.id }}`);
+        
+        products.forEach(product => {
+          const price = product.price; // in cents
+          const priceFormatted = (price / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' }); // Fallback simple format
+          
+          const itemHtml = `
+            <div style="display: flex; align-items: center; color: #999; padding: 0 5px;">+</div>
+            <div class="sf-bundle-item" style="flex: 0 0 auto; width: 120px;">
+              <img src="${product.featured_image}" alt="${product.title}" style="width: 100%; height: auto; border-radius: 4px;">
+              <label style="display: flex; align-items: start; gap: 5px; font-size: 0.85em; margin-top: 8px; cursor: pointer;">
+                <input type="checkbox" class="sf-bundle-checkbox" value="${product.variants[0].id}" data-price="${price}" checked>
+                <span>${product.title}<br><strong>$${(price/100).toFixed(2)}</strong></span>
+              </label>
+            </div>
+          `;
+          itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+        });
+
+        // Setup price calculation
+        const checkboxes = document.querySelectorAll(`#sf-bundle-items-{{ block.id }} .sf-bundle-checkbox`);
+        const totalEl = document.getElementById(`sf-bundle-total-{{ block.id }}`);
+        
+        function updateTotal() {
+          let total = 0;
+          checkboxes.forEach(cb => {
+            if (cb.checked) {
+              total += parseInt(cb.getAttribute('data-price'));
+            }
+          });
+          // Simple format for demo, real stores should use their currency formatter
+          totalEl.innerHTML = '$' + (total / 100).toFixed(2);
+        }
+
+        checkboxes.forEach(cb => cb.addEventListener('change', updateTotal));
+        updateTotal();
+
+        // Setup Add to Cart
+        document.getElementById(`sf-bundle-add-{{ block.id }}`).addEventListener('click', function(e) {
+          e.preventDefault();
+          const btn = this;
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Adding...';
+          btn.disabled = true;
+
+          const itemsToAdd = [];
+          checkboxes.forEach(cb => {
+            if (cb.checked) {
+              itemsToAdd.push({
+                id: cb.value,
+                quantity: 1
+              });
+            }
+          });
+
+          fetch(`${baseUrl}cart/add.js`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: itemsToAdd })
+          })
+          .then(res => res.json())
+          .then(() => {
+            btn.innerHTML = 'Added!';
+            setTimeout(() => {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+              // Redirect to cart or open drawer
+              window.location.href = `${baseUrl}cart`;
+            }, 1000);
+          })
+          .catch(err => {
+            console.error('Error adding bundle to cart', err);
+            btn.innerHTML = 'Error';
+            btn.disabled = false;
+          });
+        });
+      } else {
+        // No recommendations found, hide widget
+        document.getElementById(`sf-bundles-{{ block.id }}`).style.display = 'none';
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching recommendations', err);
+      document.getElementById(`sf-bundles-{{ block.id }}`).style.display = 'none';
+    });
+});
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "FBT Bundles",
+  "target": "section",
+  "settings": [
+    { "type": "checkbox", "id": "enabled", "label": "Enable", "default": true },
+    { "type": "text", "id": "title", "label": "Title", "default": "Frequently Bought Together" },
+    { "type": "range", "id": "recommendation_limit", "min": 1, "max": 4, "step": 1, "label": "Number of products", "default": 2 },
+    { "type": "text", "id": "discount_message", "label": "Discount Message", "default": "Add all 3 to unlock a 10% auto-discount at checkout!" },
+    { "type": "color", "id": "button_bg_color", "label": "Button Background Color", "default": "#000000" },
+    { "type": "color", "id": "button_text_color", "label": "Button Text Color", "default": "#ffffff" }
+  ]
+}
+{% endschema %}
