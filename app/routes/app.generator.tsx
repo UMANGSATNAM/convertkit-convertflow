@@ -23,11 +23,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
   const niches = await prisma.niche.findMany({ where: { active: true } });
   
+  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  
   // Check if there is an active generation
-  const activeGen = await prisma.storeGeneration.findFirst({
-    where: { shopId: session.shop },
+  const activeGen = shop ? await prisma.storeGeneration.findFirst({
+    where: { shopId: shop.id },
     orderBy: { createdAt: "desc" },
-  });
+  }) : null;
 
   return json({ niches, activeGen });
 }
@@ -40,10 +42,16 @@ export async function action({ request }: ActionFunctionArgs) {
   const actionType = formData.get("actionType") as string;
 
   if (actionType === "START_GENERATION") {
+    const shop = await prisma.shop.upsert({
+      where: { shopDomain: session.shop },
+      update: {},
+      create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
+    });
+
     // 1. Create generation record
     const gen = await prisma.storeGeneration.create({
       data: {
-        shopId: session.shop,
+        shopId: shop.id,
         nicheId,
         catalogMode: "DEMO",
         status: "QUEUED",
