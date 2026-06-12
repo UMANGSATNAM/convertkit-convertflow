@@ -39,20 +39,23 @@ model Shop {
   planActivatedAt DateTime?
   trialEndsAt     DateTime?
   nicheId         String?
-  brandConfig     Json?    // {storeName, logoUrl, colors:{primary,secondary,accent}, fontPair, whatsapp, city, state, gstin?}
-  language        String   @default("en") // assistant + email language: en | hi | hinglish
+  brandConfig     Json?    
+  language        String   @default("en") 
   onboardedAt     DateTime?
-  uninstalledAt   DateTime? // retained 30 days then purged (shop/redact)
+  uninstalledAt   DateTime? 
   createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   generations       StoreGeneration[]
   installedSections InstalledSection[]
-  toolkitConfigs    ToolkitFeature[]
+  toolkitFeatures   ToolkitFeature[]
+  pincodeZones      PincodeZone[]
   campaigns         CampaignPage[]
   healthReports     HealthReport[]
   snapshots         ThemeSnapshot[]
   aiActions         AiActionLog[]
   usage             UsageCounter[]
+  integrations      Integration[]
 }
 
 model StoreGeneration {
@@ -60,14 +63,17 @@ model StoreGeneration {
   shopId      String
   shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
   nicheId     String
-  catalogMode CatalogMode // DEMO | CSV | EMPTY
-  status      GenStatus
+  catalogMode CatalogMode 
+  status      GenStatus @default(QUEUED)
   currentStep String?
   themeId     String?
-  log         Json      // [{ts, step, status, detail}]
+  log         Json      @default("[]")
+  stepState   Json      @default("{}")
   error       Json?
   createdAt   DateTime  @default(now())
   completedAt DateTime?
+
+  @@index([shopId, createdAt])
 }
 
 model Niche {
@@ -76,62 +82,85 @@ model Niche {
   nameHi        String
   themeZipUrl   String
   themeVersion  String
-  previewImages Json     // String[] doesn't work well in all MySQL versions, using Json for arrays
-  demoCatalogUrl String  // R2 JSON manifest
+  previewImages Json     
+  demoStoreUrl  String
+  demoCatalogUrl String  
   pagesPreset   Json
   menusPreset   Json
   settingsBase  Json
-  palettePresets Json    // [{name, primary, secondary, accent}]
-  fontPairs     Json     // [{name, heading, body}]
-  campaignFit   Json     // which campaign templates suit this niche
+  palettePresets Json    
+  fontPairs     Json     
+  campaignFit   Json     
+  active        Boolean  @default(true)
+}
+
+model SectionCatalog {
+  key        String   @id        
+  name       String
+  nameHi     String
+  category   Category
+  goalTags   Json     
+  nicheTags  Json     
+  planMin    Plan     @default(FREE)
+  thumbUrl   String
+  previewUrl String
+  blockHandle String  
+  version    String
+  active     Boolean  @default(true)
 }
 
 model InstalledSection {
   id         String   @id @default(cuid())
   shopId     String
   shop       Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  sectionKey String   // catalog key e.g. "hero-festive-banner"
+  sectionKey String   
   themeId    String
-  addedVia   String   // GALLERY | AI | GENERATOR
+  addedVia   AddedVia
   createdAt  DateTime @default(now())
+
+  @@index([shopId])
 }
 
 model ToolkitFeature {
   id       String  @id @default(cuid())
   shopId   String
   shop     Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  feature  Feature // STICKY_ATC, COUNTDOWN, ANNOUNCEMENT, etc
+  feature  Feature 
   enabled  Boolean @default(false)
-  config   Json
+  config   Json    @default("{}")
 
   @@unique([shopId, feature])
 }
 
 model PincodeZone {
-  id      String @id @default(cuid())
   shopId  String
   pincode String
-  cod     Boolean
+  cod     Boolean @default(true)
   etaDays Int?
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
-  @@unique([shopId, pincode])
-  @@index([shopId])
+  @@id([shopId, pincode])
 }
 
 model CampaignPage {
-  id          String   @id @default(cuid())
-  shopId      String
-  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  templateKey String   // diwali | eoss | new-launch | wedding | rakhi | valentines | national-sale
-  title       String
-  handle      String
-  pageId      String?
-  themeTemplate String? // templates/page.campaign-xxx.json
-  productIds  Json     // String[] 
-  offer       Json     // {headline, sub, endsAt, discountCode?}
-  status      String   // DRAFT | PUBLISHED | ARCHIVED
-  autoArchive Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id            String   @id @default(cuid())
+  shopId        String
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  templateKey   String   
+  title         String
+  handle        String
+  pageId        String?
+  themeTemplate String? 
+  productIds    Json     
+  collectionIds Json?
+  offer         Json     
+  status        CampaignStatus @default(DRAFT)
+  autoArchive   Boolean  @default(true)
+  publishedAt   DateTime?
+  archivedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@unique([shopId, handle])
 }
 
 model HealthReport {
@@ -139,9 +168,11 @@ model HealthReport {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   score     Int
-  issues    Json     // [{key, severity, target, detail, autoFixable, fixedAt?}]
-  trigger   String   // CRON | MANUAL | POST_FIX
+  issues    Json     
+  trigger   ScanTrigger
   createdAt DateTime @default(now())
+
+  @@index([shopId, createdAt])
 }
 
 model ThemeSnapshot {
@@ -149,11 +180,15 @@ model ThemeSnapshot {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   themeId   String
-  kind      String   // SETTINGS | TEMPLATE | ASSET
+  kind      SnapKind   
   path      String
-  r2Key     String   // snapshot content in R2
-  reason    String   // DESIGN_STUDIO | AI | HEALTH_FIX | CAMPAIGN
+  r2Key     String   
+  checksum  String   @default("")
+  reason    SnapReason   
+  actor     Actor    @default(SYSTEM)
   createdAt DateTime @default(now())
+
+  @@index([shopId, createdAt])
 }
 
 model AiActionLog {
@@ -161,23 +196,43 @@ model AiActionLog {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   prompt    String   @db.Text
-  tools     Json     // tool calls proposed
-  applied   Boolean
+  toolCalls Json     
+  applied   Boolean  @default(false)
   result    Json?
-  tokensIn  Int
-  tokensOut Int
+  tokensIn  Int      @default(0)
+  tokensOut Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([shopId, createdAt])
 }
 
 model UsageCounter {
-  id      String @id @default(cuid())
   shopId  String
-  shop    Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  metric  String // AI_ACTIONS, GENERATIONS, CAMPAIGNS_LIVE
-  period  String // YYYY-MM
+  metric  String 
+  period  String 
   count   Int    @default(0)
+  shop    Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
-  @@unique([shopId, metric, period])
+  @@id([shopId, metric, period])
+}
+
+model Integration {
+  id      String  @id @default(cuid())
+  shopId  String
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  kind    String  
+  config  Json    
+  status  String  
+  pixelId String? 
+
+  @@unique([shopId, kind])
+}
+
+model WebhookEvent {
+  id        String   @id        
+  topic     String
+  shop      String
+  createdAt DateTime @default(now())
 }
 
 enum Plan { 
@@ -211,4 +266,46 @@ enum Feature {
   WHATSAPP 
   BUNDLES 
   TRUST_BADGES 
+}
+enum Category { 
+  HERO 
+  PRODUCT 
+  TRUST 
+  CONTENT 
+  CONVERSION 
+  UTILITY 
+  INDIA 
+}
+enum AddedVia { 
+  GALLERY 
+  AI 
+  GENERATOR 
+}
+enum CampaignStatus { 
+  DRAFT 
+  PUBLISHED 
+  ARCHIVED 
+}
+enum ScanTrigger { 
+  CRON 
+  MANUAL 
+  POST_FIX 
+}
+enum SnapKind { 
+  SETTINGS 
+  TEMPLATE 
+  ASSET 
+}
+enum SnapReason { 
+  DESIGN_STUDIO 
+  AI 
+  HEALTH_FIX 
+  CAMPAIGN 
+  GENERATOR 
+  MANUAL 
+}
+enum Actor { 
+  MERCHANT 
+  AI 
+  SYSTEM 
 }

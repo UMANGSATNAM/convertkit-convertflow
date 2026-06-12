@@ -49,6 +49,36 @@ const shopify = shopifyApp({
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
     : {}),
+  webhooks: {
+    APP_UNINSTALLED: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    SHOP_UPDATE: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    THEMES_PUBLISH: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    APP_SUBSCRIPTIONS_UPDATE: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    CUSTOMERS_DATA_REQUEST: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    CUSTOMERS_REDACT: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+    SHOP_REDACT: {
+      deliveryMethod: "http",
+      callbackUrl: "/webhooks",
+    },
+  },
 });
 
 export default shopify;
