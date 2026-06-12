@@ -7,7 +7,7 @@ import prisma from "./app/db.server.js";
 import { redis } from "./app/services/redis.server.js";
 
 // Import all workers so they start processing jobs
-// import "./app/services/generator/pipeline.server.js"; // Needs to be compiled or run with tsx
+import "./app/services/generator/pipeline.server.js"; // Needs to be compiled or run with tsx
 
 console.log("Worker process started...");
 

@@ -1,6 +1,6 @@
 import { Worker } from "bullmq";
 import { redis } from "../redis.server";
-import { prisma } from "../../db.server";
+import prisma from "../../db.server";
 import { installTheme, patchSettings, publishTheme } from "../theme-engine/index";
 import { importCatalog } from "./catalog.server";
 import { createNavigationAndPages } from "./navigation.server";

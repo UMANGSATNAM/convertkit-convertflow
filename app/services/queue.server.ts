@@ -20,3 +20,4 @@ export const webhookQueue = new Queue("webhooks", {
 
 // We will implement workers inside their respective domain folders,
 // e.g. services/generator/pipeline.server.ts will instantiate the generator worker.
+import "./generator/pipeline.server";
