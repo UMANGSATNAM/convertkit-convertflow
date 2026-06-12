@@ -5,6 +5,7 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
 import { writeTemplate } from "../services/theme-engine/index";
+import { campaignsQueue } from "../services/generator/campaign-worker.server";
 
 import { authenticate } from "../shopify.server";
 
@@ -31,34 +32,38 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const templateKey = formData.get("templateKey") as string;
   const title = formData.get("title") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
   const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-  // Generate Theme Template JSON
-  const templateJson = {
-    sections: {
-      hero: { type: "hero-festive", settings: { headline: title } },
-      products: { type: "featured-collection" }
-    },
-    order: ["hero", "products"]
-  };
+  const startDate = startDateStr ? new Date(startDateStr) : null;
+  const endDate = endDateStr ? new Date(endDateStr) : null;
 
-  const themeTemplatePath = `templates/page.campaign-${handle}.json`;
-  
-  // Write to theme via Theme Engine
-  // await writeTemplate(mockShop, "mock_theme_id", themeTemplatePath, templateJson, "CAMPAIGN");
-
-  await prisma.campaignPage.create({
+  const campaign = await prisma.campaignPage.create({
     data: {
       shopId: shop.id,
       templateKey,
       title,
       handle,
-      themeTemplate: themeTemplatePath,
       productIds: [],
       offer: { headline: title },
-      status: "PUBLISHED"
+      status: startDate ? "DRAFT" : "PUBLISHED",
+      startDate,
+      endDate
     }
   });
+
+  if (startDate) {
+    const delay = Math.max(0, startDate.getTime() - Date.now());
+    await campaignsQueue.add("apply-campaign", { type: "apply-campaign", campaignId: campaign.id }, { delay });
+  } else {
+    await campaignsQueue.add("apply-campaign", { type: "apply-campaign", campaignId: campaign.id });
+  }
+
+  if (endDate) {
+    const revertDelay = Math.max(0, endDate.getTime() - Date.now());
+    await campaignsQueue.add("revert-campaign", { type: "revert-campaign", campaignId: campaign.id }, { delay: revertDelay });
+  }
 
   return json({ success: true });
 };
@@ -69,6 +74,8 @@ export default function CampaignBuilder() {
 
   const [title, setTitle] = useState("");
   const [template, setTemplate] = useState("diwali");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const templates = [
     { label: "Diwali Mega Sale", value: "diwali" },
@@ -84,15 +91,20 @@ export default function CampaignBuilder() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("templateKey", template);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
     submit(formData, { method: "post" });
     setTitle("");
+    setStartDate("");
+    setEndDate("");
   };
 
   const rows = campaigns.map((c) => [
     c.title,
     c.templateKey,
-    <Badge tone={c.status === "PUBLISHED" ? "success" : "info"}>{c.status}</Badge>,
-    new Date(c.createdAt).toLocaleDateString()
+    <Badge tone={c.status === "PUBLISHED" ? "success" : c.status === "ARCHIVED" ? "critical" : "info"}>{c.status}</Badge>,
+    c.startDate ? new Date(c.startDate).toLocaleString() : "Immediate",
+    c.endDate ? new Date(c.endDate).toLocaleString() : "Never"
   ]);
 
   return (
@@ -104,7 +116,9 @@ export default function CampaignBuilder() {
               <Text as="h2" variant="headingMd">Create New Campaign</Text>
               <Select label="Template" options={templates} value={template} onChange={setTemplate} />
               <TextField label="Campaign Title" value={title} onChange={setTitle} autoComplete="off" />
-              <Button primary onClick={handleCreate}>Generate Page</Button>
+              <TextField label="Start Date/Time (Leave empty for immediate)" value={startDate} onChange={setStartDate} type="datetime-local" autoComplete="off" />
+              <TextField label="End Date/Time (Optional)" value={endDate} onChange={setEndDate} type="datetime-local" autoComplete="off" />
+              <Button primary onClick={handleCreate}>Schedule Campaign</Button>
             </BlockStack>
           </Card>
         </Layout.Section>
@@ -116,8 +130,8 @@ export default function CampaignBuilder() {
                 <Text as="p">No campaigns generated yet.</Text>
               ) : (
                 <DataTable
-                  columnContentTypes={["text", "text", "text", "text"]}
-                  headings={["Title", "Template", "Status", "Date Created"]}
+                  columnContentTypes={["text", "text", "text", "text", "text"]}
+                  headings={["Title", "Template", "Status", "Starts At", "Ends At"]}
                   rows={rows}
                 />
               )}

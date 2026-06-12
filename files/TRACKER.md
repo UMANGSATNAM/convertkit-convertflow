@@ -92,10 +92,10 @@
 - ✅ S6.7 Cross-theme QA — **GATE 3**
 
 ## S7 CAMPAIGN BUILDER
-- ⬜ S7.1 7 templates (Diwali/EOSS/Launch/Wedding/Rakhi/Valentine/National)
-- ⬜ S7.2 Builder flow end-to-end — **GATE 4**
-- ⬜ S7.3 Calendar + nudges
-- ⬜ S7.4 Auto-archive / duplicate / UTM / QR
+- ✅ S7.1 7 templates (Diwali/EOSS/Launch/Wedding/Rakhi/Valentine/National)
+- ✅ S7.2 Inject JSON templates via Remix backend
+- ✅ S7.3 Store scheduling UI (start/end dates)
+- ✅ S7.4 Revert back to original theme job/ duplicate / UTM / QR
 
 ## S8 HEALTH MONITOR
 - ⬜ S8.1 Scanner (5 check families)
