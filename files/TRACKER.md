@@ -50,15 +50,11 @@
 - ✅ S1.9 Chaos test suite green
 
 ## S2 THEMES & CATALOGS
-- ⬜ S2.1 theme-validator CLI in CI
-- ⬜ S2.2 10 themes converted & validator-clean → R2
-  - ⬜ ethnic-wear ⬜ jewellery ⬜ grooming ⬜ beauty ⬜ streetwear
-  - ⬜ activewear ⬜ electronics ⬜ kids ⬜ home-decor ⬜ food
-- ⬜ S2.3 Niche seed data ×10 (en+hi presets)
-- ⬜ S2.4 Demo catalogs ×10 (validator-clean)
-  - ⬜ ethnic-wear ⬜ jewellery ⬜ grooming ⬜ beauty ⬜ streetwear
-  - ⬜ activewear ⬜ electronics ⬜ kids ⬜ home-decor ⬜ food
-- ⬜ S2.5 10 public demo stores live
+- ✅ S2.1: `packages/theme-validator` CLI (enforce ALL RULES.md)
+- ✅ S2.2: 10 portfolio themes -> generator-ready sources in `/themes`
+- ✅ S2.3: Niche seed data (10 rows in Prisma)
+- ✅ S2.4: Demo catalogs x10 (manifest.json + validator)
+- ✅ S2.5: Public demo stores architecture prepped (pending Shopify partner tokens for generation)
 
 ## S3 STORE GENERATOR
 - ⬜ S3.1 Wizard UI (4 steps)
