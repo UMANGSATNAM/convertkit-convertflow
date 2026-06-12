@@ -63,7 +63,7 @@
 - ✅ S3.4 Navigation & Pages API (menus, policies)
 - ✅ S3.5 End-to-end BullMQ generation job+ retry-from-step
 - ✅ S3.5 Screenshot + success email + funnel events
-- ⬜ S3.6 Matrix 30/30 green (median <8 min) — **GATE 1**
+- ✅ S3.6 Matrix 30/30 green (median <8 min) — **GATE 1**
 
 ## S4 SECTION LIBRARY
 - ⬜ S4.1 sf-sections scaffold + budget CI
@@ -83,10 +83,10 @@
 - ✅ S5.5 Dashboard (Health score, Usage, AI usage)
 
 ## S6 CONVERSION TOOLKIT
-- ⬜ S6.1 sf-embeds + metafield pattern + budget CI
-- ⬜ S6.2 Sticky ATC / Countdown / Announcement / Trust badges
-- ⬜ S6.3 Size charts / WhatsApp suite
-- ⬜ S6.4 Pincode (simple + CSV + proxy endpoint)
+- ✅ S6.1 sf-embeds + metafield pattern + budget CI
+- ✅ S6.2 Sticky ATC / Countdown / Announcement / Trust badges
+- ✅ S6.3 Size charts / WhatsApp suite
+- ✅ S6.4 Pincode (simple + CSV + proxy endpoint)
 - ⬜ S6.5 Bundles (auto-discounts + blocks)
 - ⬜ S6.6 Metrics tiles
 - ⬜ S6.7 Cross-theme QA — **GATE 3**
