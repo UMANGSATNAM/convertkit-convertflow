@@ -206,7 +206,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20240620",
+      model: "claude-3-5-sonnet-latest",
       max_tokens: 1024,
       system: `You are the StoreForge AI assistant. You help merchants customize their Shopify store, and you can build entire stores from screenshots.
       CRITICAL INSTRUCTIONS:
