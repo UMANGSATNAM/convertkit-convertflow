@@ -202,8 +202,9 @@ export async function processUserMessage(request: Request, shopId: string, shopD
       
       Current state: ${hasPendingStore ? "A layout has been extracted from a screenshot and is pending generation. The user just needs to confirm." : "No pending store layouts. The user can upload a screenshot."}`;
 
-  if (gemini) {
-    const tools = [{
+  try {
+    if (gemini) {
+      const tools = [{
       functionDeclarations: [
         {
           name: "generate_store_from_context",
