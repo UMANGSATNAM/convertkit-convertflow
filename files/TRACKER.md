@@ -113,9 +113,9 @@
 - ✅ S9.6 Hinglish 50-prompt eval — **GATE 6**
 
 ## S10 TRACKING
-- ⬜ S10.1 Web Pixel + verifier
-- ⬜ S10.2 Merchant feed proxy + walkthrough
-- ⬜ S10.3 Status board
+- ✅ S10.1 Web Pixel + verifier
+- ✅ S10.2 Merchant feed proxy + walkthrough
+- ✅ S10.3 Status board
 
 ## S11 BILLING
 - ⬜ S11.1 Subscription flows + plans page
