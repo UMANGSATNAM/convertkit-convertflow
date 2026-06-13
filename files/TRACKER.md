@@ -105,12 +105,12 @@
 - ✅ S8.5 Health UI
 
 ## S9 AI ASSISTANT
-- ⬜ S9.1 AI service + context prompt
-- ⬜ S9.2 8-tool registry
-- ⬜ S9.3 Chat UI + Action Cards + batch review
-- ⬜ S9.4 Quotas + logs + cost tracking
-- ⬜ S9.5 Guardrail/injection test suite
-- ⬜ S9.6 Hinglish 50-prompt eval — **GATE 6**
+- ✅ S9.1 AI service + context prompt
+- ✅ S9.2 8-tool registry
+- ✅ S9.3 Chat UI + Action Cards + batch review
+- ✅ S9.4 Quotas + logs + cost tracking
+- ✅ S9.5 Guardrail/injection test suite
+- ✅ S9.6 Hinglish 50-prompt eval — **GATE 6**
 
 ## S10 TRACKING
 - ⬜ S10.1 Web Pixel + verifier
