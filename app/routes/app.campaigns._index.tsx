@@ -1,33 +1,50 @@
 import { useState } from "react";
-import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, Select, TextField, DataTable, Badge } from "@shopify/polaris";
-import { useSubmit, useLoaderData } from "@remix-run/react";
+import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, Select, TextField, DataTable, Badge, Banner } from "@shopify/polaris";
+import { useSubmit, useLoaderData, useActionData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
 import { writeTemplate } from "../services/theme-engine/index";
 import { campaignsQueue } from "../services/generator/campaign-worker.server";
 
-import { authenticate } from "../shopify.server";
+import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, billing } = await authenticate.admin(request);
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  if (!shop) return json({ campaigns: [] });
+  if (!shop) return json({ campaigns: [], hasActivePayment: false });
+
+  const planCheck = await billing.check({
+    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    isTest: true,
+  });
+  const hasActivePayment = planCheck.hasActivePayment;
 
   const campaigns = await prisma.campaignPage.findMany({
     where: { shopId: shop.id },
     orderBy: { createdAt: "desc" }
   });
-  return json({ campaigns });
+  return json({ campaigns, hasActivePayment });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, billing } = await authenticate.admin(request);
   const shop = await prisma.shop.upsert({
     where: { shopDomain: session.shop },
     update: {},
     create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
   });
+
+  const planCheck = await billing.check({
+    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    isTest: true,
+  });
+  const hasActivePayment = planCheck.hasActivePayment;
+  
+  const existingCount = await prisma.campaignPage.count({ where: { shopId: shop.id } });
+  if (!hasActivePayment && existingCount >= 1) {
+    return json({ error: "Free plan limit reached. Upgrade to PRO to create more campaigns." }, { status: 403 });
+  }
 
   const formData = await request.formData();
   const templateKey = formData.get("templateKey") as string;
@@ -65,12 +82,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await campaignsQueue.add("revert-campaign", { type: "revert-campaign", campaignId: campaign.id }, { delay: revertDelay });
   }
 
-  return json({ success: true });
+  return json({ success: true, error: null });
 };
 
 export default function CampaignBuilder() {
-  const { campaigns } = useLoaderData<typeof loader>();
+  const { campaigns, hasActivePayment } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const submit = useSubmit();
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [template, setTemplate] = useState("diwali");
@@ -86,6 +105,8 @@ export default function CampaignBuilder() {
     { label: "Valentine's Day", value: "valentines" },
     { label: "Republic/Independence Day", value: "national-sale" }
   ];
+
+  const limitReached = !hasActivePayment && campaigns.length >= 1;
 
   const handleCreate = () => {
     const formData = new FormData();
@@ -110,15 +131,31 @@ export default function CampaignBuilder() {
   return (
     <Page title="Campaign Page Builder">
       <Layout>
+        {actionData?.error && (
+          <Layout.Section>
+            <Banner tone="critical" title="Cannot Create Campaign">
+              {actionData.error}
+            </Banner>
+          </Layout.Section>
+        )}
+        
+        {limitReached && (
+          <Layout.Section>
+            <Banner tone="warning" title="Campaign Limit Reached" action={{content: "Upgrade to PRO", onAction: () => navigate("/app/upgrade")}}>
+              You have reached the 1 campaign limit on the Free plan. Upgrade to the PRO plan to create unlimited campaign pages.
+            </Banner>
+          </Layout.Section>
+        )}
+
         <Layout.Section variant="oneThird">
           <Card>
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">Create New Campaign</Text>
-              <Select label="Template" options={templates} value={template} onChange={setTemplate} />
-              <TextField label="Campaign Title" value={title} onChange={setTitle} autoComplete="off" />
-              <TextField label="Start Date/Time (Leave empty for immediate)" value={startDate} onChange={setStartDate} type="datetime-local" autoComplete="off" />
-              <TextField label="End Date/Time (Optional)" value={endDate} onChange={setEndDate} type="datetime-local" autoComplete="off" />
-              <Button primary onClick={handleCreate}>Schedule Campaign</Button>
+              <Select label="Template" options={templates} value={template} onChange={setTemplate} disabled={limitReached} />
+              <TextField label="Campaign Title" value={title} onChange={setTitle} autoComplete="off" disabled={limitReached} />
+              <TextField label="Start Date/Time (Leave empty for immediate)" value={startDate} onChange={setStartDate} type="datetime-local" autoComplete="off" disabled={limitReached} />
+              <TextField label="End Date/Time (Optional)" value={endDate} onChange={setEndDate} type="datetime-local" autoComplete="off" disabled={limitReached} />
+              <Button variant="primary" onClick={handleCreate} disabled={limitReached || !title.trim()}>Schedule Campaign</Button>
             </BlockStack>
           </Card>
         </Layout.Section>

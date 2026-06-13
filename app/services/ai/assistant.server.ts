@@ -4,6 +4,7 @@ import { applyHealthFix } from "../health/fixers.server";
 import { runHealthScan } from "../health/scanner.server";
 import { patchSettings, restoreSnapshot } from "../generator/theme-engine";
 import { campaignsQueue } from "../generator/campaign-worker.server";
+import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../shopify.server";
 
 const anthropic = new Anthropic({ 
   apiKey: process.env.ANTHROPIC_API_KEY || "dummy-key" // fallback if not set to avoid crash on boot
@@ -104,6 +105,13 @@ export async function processUserMessage(request: Request, shopId: string, shopD
   const shop = await prisma.shop.findUnique({ where: { id: shopId } });
   if (!shop) throw new Error("Shop not found");
 
+  const { billing } = await authenticate.admin(request);
+  const planCheck = await billing.check({
+    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    isTest: true,
+  });
+  const hasActivePayment = planCheck.hasActivePayment;
+
   // 1. Quotas & Guardrails
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -114,7 +122,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
   });
   
   const totalTokens = (recentLogs._sum.tokensIn || 0) + (recentLogs._sum.tokensOut || 0);
-  const tokenLimit = shop.plan === "PRO" ? 500000 : 10000;
+  const tokenLimit = hasActivePayment ? 500000 : 10000;
 
   if (totalTokens > tokenLimit) {
     return {

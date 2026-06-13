@@ -1,4 +1,4 @@
-import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, ProgressBar, Badge } from "@shopify/polaris";
+import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, ProgressBar, Badge, Banner } from "@shopify/polaris";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -16,24 +16,43 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
   });
 
-  if (!shop) return json({ healthScore: 0, featuresEnabled: 0, aiActions: [] });
+  if (!shop) return json({ healthScore: 0, featuresEnabled: 0, aiActions: [], showUpsell: false });
 
   const healthScore = shop.healthReports?.[0]?.score || 85; // Default mock score
   const featuresEnabled = shop.toolkitFeatures.filter(f => f.enabled).length;
 
+  // Check usage
+  const today = new Date().toISOString().split("T")[0];
+  const usage = await prisma.usageCounter.aggregate({
+    where: { shopId: shop.id, period: today },
+    _sum: { count: true }
+  });
+  
+  const totalEvents = usage._sum.count || 0;
+  const showUpsell = shop.plan === 'FREE' && totalEvents > 5000;
+
   return json({ 
     healthScore, 
     featuresEnabled,
-    aiActions: shop.aiActions 
+    aiActions: shop.aiActions,
+    showUpsell 
   });
 };
 
 export default function Dashboard() {
-  const { healthScore, featuresEnabled, aiActions } = useLoaderData<typeof loader>();
+  const { healthScore, featuresEnabled, aiActions, showUpsell } = useLoaderData<typeof loader>();
 
   return (
     <Page title="StoreForge Dashboard">
       <Layout>
+        {showUpsell && (
+          <Layout.Section>
+            <Banner tone="warning" title="High Traffic Alert!">
+              Your store is growing fast with over 5,000 tracked events today! Upgrade to the PRO plan to unlock unlimited AI tokens and advanced campaigns to maximize your conversions.
+            </Banner>
+          </Layout.Section>
+        )}
+        
         {/* Health Score Overview */}
         <Layout.Section>
           <Card>

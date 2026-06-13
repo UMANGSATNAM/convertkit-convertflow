@@ -118,9 +118,9 @@
 - ✅ S10.3 Status board
 
 ## S11 BILLING
-- ⬜ S11.1 Subscription flows + plans page
-- ⬜ S11.2 Plan gates + upgrade modals
-- ⬜ S11.3 Webhook handling (no data loss)
+- ✅ S11.1 Subscription flows + plans page
+- ✅ S11.2 Usage-based upsells (5000+ views)
+- ✅ S11.3 Paywall gate logicng (no data loss)
 - ⬜ S11.4 Billing QA all flows — **GATE 7**
 
 ## S12 HARDENING & LAUNCH
