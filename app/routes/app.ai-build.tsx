@@ -2,7 +2,7 @@ import { ActionFunctionArgs, json, unstable_parseMultipartFormData, unstable_cre
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Page, Layout, Card, BlockStack, Text, Button, InlineStack, Banner } from "@shopify/polaris";
 import { analyzeStoreScreenshot } from "../services/ai/vision.server";
-import prisma from "../../db.server";
+import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import { Queue } from "bullmq";
 import { redis } from "../services/redis.server";
