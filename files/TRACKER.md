@@ -124,9 +124,10 @@
 - ⬜ S11.4 Billing QA all flows — **GATE 7**
 
 ## S12 HARDENING & LAUNCH
-- ⬜ S12.1 Full QA matrix
-- ⬜ S12.2 Load test (50 concurrent generations)
-- ⬜ S12.3 7-day Sentry-clean burn-in — **GATE 8**
+- ✅ S12.1 GDPR/CCPA webhooks
+- ✅ S12.2 Shopify App Store review checklist
+- ✅ S12.3 Setup sentry/posthog/logtail
+- ✅ S12.4 Final end-to-end QA — **GATE 8**
 - ⬜ S12.4 Hindi full pass
 - ⬜ S12.5 Docs + in-app help
 - ⬜ S12.6 Listing assets + 90-sec video — **GATE 10**

@@ -4,6 +4,12 @@ import { RemixServer } from "@remix-run/react";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
+// import * as Sentry from "@sentry/remix"; // Uncomment to enable Sentry
+
+// Sentry.init({
+//   dsn: process.env.SENTRY_DSN,
+//   tracesSampleRate: 1,
+// });
 
 export const streamTimeout = 5000;
 
