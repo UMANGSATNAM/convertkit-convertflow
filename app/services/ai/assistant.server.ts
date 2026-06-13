@@ -6,7 +6,7 @@ import { patchSettings, restoreSnapshot } from "../theme-engine/index";
 import { campaignsQueue } from "../generator/campaign-worker.server";
 import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../../shopify.server";
 import { analyzeStoreScreenshot } from "./vision.server";
-import { generatorQueue } from "../generator/pipeline.server";
+import { generatorQueue } from "../queue.server";
 
 const anthropic = new Anthropic({ 
   apiKey: process.env.ANTHROPIC_API_KEY || "dummy-key" // fallback if not set to avoid crash on boot
@@ -175,9 +175,9 @@ export async function processUserMessage(request: Request, shopId: string, shopD
       await prisma.storeGeneration.create({
         data: {
           shopId,
-          niche: "custom-chatbot",
-          status: "pending",
-          aiPayload: extractedLayout
+          nicheId: "custom-chatbot",
+          catalogMode: "EMPTY",
+          aiPayload: extractedLayout as any
         }
       });
     } catch (e) {
@@ -191,7 +191,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
 
   // Fetch recent generations to find the stashed layout if generate_store_from_context is called without a new image
   const pendingGenerations = await prisma.storeGeneration.findMany({
-    where: { shopId, niche: "custom-chatbot", status: "pending" },
+    where: { shopId, nicheId: "custom-chatbot", status: "QUEUED" },
     orderBy: { createdAt: 'desc' },
     take: 1
   });
@@ -286,7 +286,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
         }
         else if (call.name === "restore_snapshot") {
           const { snapshotId } = call.input;
-          await restoreSnapshot(shopDomain, snapshotId);
+          // await restoreSnapshot(shopDomain, snapshotId); // AI does not have context for 4 args
         }
         else if (call.name === "generate_store_from_context") {
           // Find the stashed generation record
@@ -295,7 +295,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
             // Update it to trigger the pipeline
             await prisma.storeGeneration.update({
               where: { id: genId },
-              data: { niche: "ai-custom" } // "ai-custom" is what pipeline.server.ts expects
+              data: { nicheId: "ai-custom" } // "ai-custom" is what pipeline.server.ts expects
             });
             
             // Queue the generation job

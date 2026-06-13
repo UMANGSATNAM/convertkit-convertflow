@@ -75,8 +75,8 @@ export default function AIBuilderPage() {
                 <p>Your store generation is now queued and processing in the background.</p>
                 <p><strong>Extracted Colors:</strong></p>
                 <ul>
-                  <li>Primary: {actionData.data.colors.primary}</li>
-                  <li>Background: {actionData.data.colors.background}</li>
+                  <li>Primary: {(actionData as any).data.colors.primary}</li>
+                  <li>Background: {(actionData as any).data.colors.background}</li>
                 </ul>
               </Banner>
             )}

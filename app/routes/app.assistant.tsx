@@ -101,7 +101,7 @@ export default function Assistant() {
           { 
             role: "assistant", 
             content: actionData.response.text,
-            toolCalls: actionData.response.toolCalls
+            toolCalls: actionData.response.toolCalls as any
           }
         ];
       });
@@ -183,18 +183,19 @@ export default function Assistant() {
                       📎 Image
                     </Button>
                     <div style={{ flexGrow: 1 }}>
-                      <TextField
-                        labelHidden
-                        label="Message"
-                        value={input}
-                        onChange={setInput}
-                        autoComplete="off"
-                        placeholder="e.g. 'I want a store like this attached screenshot!'"
-                        disabled={isSubmitting}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter") handleSend();
-                        }}
-                      />
+                      <div onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSend();
+                      }}>
+                        <TextField
+                          labelHidden
+                          label="Message"
+                          value={input}
+                          onChange={setInput}
+                          autoComplete="off"
+                          placeholder="e.g. 'I want a store like this attached screenshot!'"
+                          disabled={isSubmitting}
+                        />
+                      </div>
                     </div>
                     <Button variant="primary" onClick={handleSend} loading={isSubmitting} disabled={(!input.trim() && !selectedImage)}>
                       Send
