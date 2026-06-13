@@ -164,14 +164,14 @@ export async function processUserMessage(request: Request, shopId: string, shopD
     });
     
     // TEMPORARY OPTIMIZATION: If they upload an image, extract layout immediately and stash it in context 
-    // so we don't have to resend the base64 string on the next turn.
+  const shopId = shop.id;
+
+  let textOutput = "";
+  let toolCallsOutput: any[] = [];
+
+  if (imageBase64 && imageType) {
     try {
-      const extractedLayout = await analyzeStoreScreenshot(base64Image, validMediaType);
-      contentBlocks.push({
-        type: "text",
-        text: `[SYSTEM CONTEXT: I have analyzed the uploaded image. Here is the JSON structure I extracted. Keep this in mind when I say 'okay' to generate the store: ${JSON.stringify(extractedLayout)}]`
-      });
-      // Stash this layout in the DB temporarily
+      const extractedLayout = await analyzeStoreScreenshot(imageBase64, imageType as any);
       await prisma.storeGeneration.create({
         data: {
           shopId,
@@ -181,46 +181,131 @@ export async function processUserMessage(request: Request, shopId: string, shopD
         }
       });
     } catch (e) {
-      console.error("Failed to pre-analyze image:", e);
+      console.error("Failed to analyze image with vision:", e);
     }
   }
-  
-  if (message.trim()) {
-    contentBlocks.push({ type: "text", text: message });
-  }
 
-  // Fetch recent generations to find the stashed layout if generate_store_from_context is called without a new image
   const pendingGenerations = await prisma.storeGeneration.findMany({
     where: { shopId, nicheId: "custom-chatbot", status: "QUEUED" },
     orderBy: { createdAt: 'desc' },
     take: 1
   });
+  
+  const hasPendingStore = pendingGenerations.length > 0;
+  const SYSTEM_PROMPT = `You are the StoreForge AI assistant. You help merchants customize their Shopify store, and you can build entire stores from screenshots.
+      CRITICAL INSTRUCTIONS:
+      - If the user provides a screenshot and asks to build a store, acknowledge the design and ask for any specific details (like their industry or target audience).
+      - If the user asks you to build the store and you already have enough information (or they just say "Okay" / "Go ahead"), YOU MUST CALL THE \`generate_store_from_context\` TOOL to start the generation.
+      - NEVER say "I will start building" without calling the tool.
+      - NEVER output raw Liquid code or CSS in your chat response.
+      - ALWAYS use the provided tools to make changes directly to the store.
+      
+      Current state: ${hasPendingStore ? "A layout has been extracted from a screenshot and is pending generation. The user just needs to confirm." : "No pending store layouts. The user can upload a screenshot."}`;
 
-  if (pendingGenerations.length > 0 && !base64Image) {
-    // inject a reminder of the stashed layout into the prompt so Claude knows it exists
-    contentBlocks.unshift({
-      type: "text",
-      text: `[SYSTEM CONTEXT: You have a pending store layout extracted from a previous image upload. If the user asks to generate the store, you can call generate_store_from_context.]`
+  if (gemini) {
+    const tools = [{
+      functionDeclarations: [
+        {
+          name: "generate_store_from_context",
+          description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+          parameters: {
+            type: "object",
+            properties: {
+              nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
+              instructions: { type: "string", description: "Any extra instructions" }
+            }
+          }
+        }
+      ]
+    }];
+
+    const contents: any[] = [{ role: "user", parts: [{ text: message }] }];
+    if (imageBase64 && imageType) {
+      contents[0].parts.push({
+        inlineData: {
+          data: imageBase64,
+          mimeType: imageType
+        }
+      });
+    }
+
+    const response = await gemini.models.generateContent({
+      model: "gemini-1.5-pro",
+      systemInstruction: SYSTEM_PROMPT,
+      tools: tools as any,
+      contents
     });
-  }
 
-  try {
+    textOutput = response.text || "";
+    if (response.functionCalls && response.functionCalls.length > 0) {
+      for (const call of response.functionCalls) {
+        toolCallsOutput.push({ name: call.name, input: call.args });
+      }
+    }
+  } else if (openai) {
+    const tools = [{
+      type: "function",
+      function: {
+        name: "generate_store_from_context",
+        description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+        parameters: { type: "object", properties: { nicheId: { type: "string" }, instructions: { type: "string" } } }
+      }
+    }];
+
+    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    if (imageBase64 && imageType) {
+      messages.push({
+        role: "user",
+        content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: `data:${imageType};base64,${imageBase64}` } }]
+      });
+    } else {
+      messages.push({ role: "user", content: message });
+    }
+
+    const response = await openai.chat.completions.create({ model: "gpt-4o", messages, tools: tools as any });
+    const choice = response.choices[0];
+    textOutput = choice?.message?.content || "";
+    if (choice?.message?.tool_calls) {
+      for (const call of choice.message.tool_calls) {
+        toolCallsOutput.push({ name: call.function.name, input: JSON.parse(call.function.arguments) });
+      }
+    }
+  } else if (anthropic) {
+    const contentArr: any[] = [];
+    if (imageBase64 && imageType) {
+      contentArr.push({ type: "image", source: { type: "base64", media_type: imageType as any, data: imageBase64 } });
+    }
+    contentArr.push({ type: "text", text: message });
+
     const response = await anthropic.messages.create({
       model: "claude-3-haiku-20240307",
       max_tokens: 1024,
-      system: `You are the StoreForge AI assistant. You help merchants customize their Shopify store, and you can build entire stores from screenshots.
-      CRITICAL INSTRUCTIONS:
-      1. If the user uploads an image and asks to build a store, acknowledge the design, summarize what you see, and ask for their final confirmation ("Okay") to proceed.
-      2. If they give confirmation, call the 'generate_store_from_context' tool.
-      3. NEVER output raw Liquid code or CSS in your chat response.
-      4. ALWAYS use the provided tools to make changes directly to the store.
-      5. Be concise and professional.`,
-      messages: [{ role: "user", content: contentBlocks }],
-      tools: tools as any
+      system: SYSTEM_PROMPT,
+      tools: [
+        {
+          name: "generate_store_from_context",
+          description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+          input_schema: {
+            type: "object",
+            properties: {
+              nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
+              instructions: { type: "string", description: "Any extra instructions" }
+            }
+          }
+        }
+      ],
+      messages: [{ role: "user", content: contentArr }]
     });
 
     const textContent = response.content.find((c: any) => c.type === "text") as any;
+    if (textContent) {
+      textOutput = textContent.text;
+    }
+    
     const toolCalls = response.content.filter((c: any) => c.type === "tool_use") as any[];
+    for (const call of toolCalls) {
+      toolCallsOutput.push({ name: call.name, input: call.input });
+    }
 
     // Log the request
     await prisma.aiActionLog.create({
