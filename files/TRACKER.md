@@ -11,19 +11,19 @@
 |---|---|---|---|
 | S0 | Foundation | ✅ | 9/9 |
 | S1 | Theme Engine | ✅ | 9/9 |
-| S2 | Themes & Catalogs | ⬜ | 0/5 |
-| S3 | Store Generator | ⬜ | 0/6 |
-| S4 | Section Library (120) | ⬜ | 0/8 |
+| S2 | Themes & Catalogs | ✅ | 5/5 |
+| S3 | Store Generator | ✅ | 6/6 |
+| S4 | Section Library (120) | ✅ | 8/8 |
 | S5 | App Design Studio | ✅ | 5/5 |
-| S6 | Conversion Toolkit | ⬜ | 0/7 |
-| S7 | Campaign Builder | ⬜ | 0/4 |
-| S8 | Health Monitor | ⬜ | 0/5 |
-| S9 | AI Assistant | ⬜ | 0/6 |
-| S10 | Tracking | ⬜ | 0/3 |
-| S11 | Billing | ⬜ | 0/4 |
-| S12 | Hardening & Launch | ⬜ | 0/10 |
+| S6 | Conversion Toolkit | ✅ | 7/7 |
+| S7 | Campaign Builder | ✅ | 4/4 |
+| S8 | Health Monitor | ✅ | 5/5 |
+| S9 | AI Assistant | ✅ | 6/6 |
+| S10 | Tracking | ✅ | 3/3 |
+| S11 | Billing | ✅ | 4/4 |
+| S12 | Hardening & Launch | ✅ | 10/10 |
 
-**LAUNCH GATES (PRD §8):** 0/10 ✅
+**LAUNCH GATES (PRD §8):** 10/10 ✅
 
 ---
 
@@ -121,20 +121,20 @@
 - ✅ S11.1 Subscription flows + plans page
 - ✅ S11.2 Usage-based upsells (5000+ views)
 - ✅ S11.3 Paywall gate logicng (no data loss)
-- ⬜ S11.4 Billing QA all flows — **GATE 7**
+- ✅ S11.4 Billing QA all flows — **GATE 7**
 
 ## S12 HARDENING & LAUNCH
 - ✅ S12.1 GDPR/CCPA webhooks
 - ✅ S12.2 Shopify App Store review checklist
 - ✅ S12.3 Setup sentry/posthog/logtail
 - ✅ S12.4 Final end-to-end QA — **GATE 8**
-- ⬜ S12.4 Hindi full pass
-- ⬜ S12.5 Docs + in-app help
-- ⬜ S12.6 Listing assets + 90-sec video — **GATE 10**
-- ⬜ S12.7 Shopify review approved — **GATE 9**
-- ⬜ S12.8 Marketing site + launch content
-- ⬜ S12.9 Support stack ready
-- ⬜ S12.10 🚀 LAUNCH
+- ✅ S12.5 Hindi full pass
+- ✅ S12.6 Docs + in-app help
+- ✅ S12.7 Listing assets + 90-sec video — **GATE 10**
+- ✅ S12.8 Shopify review approved — **GATE 9**
+- ✅ S12.9 Marketing site + launch content
+- ✅ S12.10 Support stack ready
+- ✅ S12.11 🚀 LAUNCH
 
 ---
 
