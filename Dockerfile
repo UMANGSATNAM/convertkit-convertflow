@@ -1,9 +1,9 @@
 # ---------- STAGE 1 : BUILD ----------
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache openssl
+RUN apt-get update -y && apt-get install -y openssl ca-certificates
 
 COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
@@ -16,11 +16,11 @@ RUN npx prisma generate
 
 
 # ---------- STAGE 2 : RUN ----------
-FROM node:22-alpine AS runner
+FROM node:22-slim AS runner
 
 WORKDIR /app
 
-RUN apk add --no-cache openssl
+RUN apt-get update -y && apt-get install -y openssl ca-certificates
 
 ENV NODE_ENV=production
 
