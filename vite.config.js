@@ -51,6 +51,19 @@ export default defineConfig({
     },
   },
   plugins: [
+    {
+      name: "silence-vite-resolve-warnings",
+      enforce: "pre",
+      configResolved(config) {
+        const originalWarn = config.logger.warn;
+        config.logger.warn = (msg, options) => {
+          if (msg.includes("has been externalized for browser compatibility")) {
+            return;
+          }
+          originalWarn(msg, options);
+        };
+      },
+    },
     remix({
       ignoredRouteFiles: ["**/.*"],
       future: {

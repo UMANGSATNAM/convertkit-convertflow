@@ -69,7 +69,7 @@ export default function Integrations() {
                 <TextField label="Meta Pixel ID" value={metaPixel} onChange={setMetaPixel} autoComplete="off" placeholder="e.g. 1234567890" />
                 <TextField label="GA4 Measurement ID" value={ga4} onChange={setGa4} autoComplete="off" placeholder="e.g. G-XXXXXXX" />
                 
-                <Button primary onClick={handleSavePixels}>Save Configuration</Button>
+                <Button variant="primary" onClick={handleSavePixels}>Save Configuration</Button>
               </BlockStack>
             </Card>
           </Layout.Section>
@@ -97,7 +97,7 @@ export default function Integrations() {
                       <Text as="p">$12.99/month</Text>
                       <Text as="p">- 120 Sections</Text>
                       <Text as="p">- Basic Toolkit</Text>
-                      <Button primary={plan !== "GROWTH"} disabled={plan === "GROWTH"} onClick={() => handleUpgrade("GROWTH")}>Upgrade</Button>
+                      <Button variant={plan !== "GROWTH" ? "primary" : undefined} disabled={plan === "GROWTH"} onClick={() => handleUpgrade("GROWTH")}>Upgrade</Button>
                     </BlockStack>
                   </Card>
 
@@ -107,7 +107,7 @@ export default function Integrations() {
                       <Text as="p">$24.99/month</Text>
                       <Text as="p">- Everything + AI Assistant</Text>
                       <Text as="p">- Full Conversion Toolkit</Text>
-                      <Button primary={plan !== "PRO"} disabled={plan === "PRO"} onClick={() => handleUpgrade("PRO")}>Upgrade</Button>
+                      <Button variant={plan !== "PRO" ? "primary" : undefined} disabled={plan === "PRO"} onClick={() => handleUpgrade("PRO")}>Upgrade</Button>
                     </BlockStack>
                   </Card>
                 </InlineStack>

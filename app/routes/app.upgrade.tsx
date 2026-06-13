@@ -8,7 +8,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   
   // Check active plan
   const planCheck = await billing.check({
-    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE] as string[],
     isTest: true,
   });
 
@@ -25,9 +25,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (plan === PLAN_PRO) {
     await billing.require({
-      plans: [PLAN_PRO],
+      plans: [PLAN_PRO] as string[],
       isTest: true,
-      onFailure: async () => billing.request({ plan: PLAN_PRO, isTest: true, returnUrl: "/app/upgrade" }),
+      onFailure: async () => billing.request({ plan: PLAN_PRO as string, isTest: true, returnUrl: "/app/upgrade" }),
     });
   }
 

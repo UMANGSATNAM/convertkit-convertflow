@@ -128,7 +128,7 @@ export default function Generator() {
 
           {activeGen?.status === "FAILED" && (
             <Banner tone="critical" title="Generation Failed">
-              <p>An error occurred while generating the store. Please try again. ({activeGen.error?.message || "Unknown error"})</p>
+              <p>An error occurred while generating the store. Please try again. ({typeof activeGen.error === "object" && activeGen.error !== null ? (activeGen.error as any).message || "Unknown error" : "Unknown error"})</p>
             </Banner>
           )}
 

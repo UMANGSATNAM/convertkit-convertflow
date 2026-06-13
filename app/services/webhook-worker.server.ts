@@ -4,7 +4,7 @@ import prisma from "../db.server";
 
 let webhookWorker: Worker;
 
-if (process.env.NODE_ENV === "production" || !global.__webhookWorker) {
+if (process.env.NODE_ENV === "production" || !(global as any).__webhookWorker) {
   webhookWorker = new Worker(
     "webhooks",
     async (job) => {
@@ -52,10 +52,10 @@ if (process.env.NODE_ENV === "production" || !global.__webhookWorker) {
   });
 
   if (process.env.NODE_ENV !== "production") {
-    global.__webhookWorker = webhookWorker;
+    (global as any).__webhookWorker = webhookWorker;
   }
 } else {
-  webhookWorker = global.__webhookWorker;
+  webhookWorker = (global as any).__webhookWorker;
 }
 
 export { webhookWorker };

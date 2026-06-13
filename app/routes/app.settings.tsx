@@ -95,7 +95,7 @@ export default function PincodeSettings() {
                 <Button onClick={() => setCodEnabled(!codEnabled)}>
                   Cash on Delivery: {codEnabled ? "Enabled" : "Disabled"}
                 </Button>
-                <Button primary onClick={handleAdd}>Add Pincode</Button>
+                <Button variant="primary" onClick={handleAdd}>Add Pincode</Button>
               </FormLayout>
             </BlockStack>
           </Card>

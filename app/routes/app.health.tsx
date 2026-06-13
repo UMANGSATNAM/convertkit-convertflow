@@ -58,9 +58,9 @@ export default function HealthMonitor() {
   };
 
   const score = report ? report.score : 0;
-  let tone: "success" | "warning" | "critical" = "success";
+  let tone: "success" | "attention" | "critical" = "success";
   if (score < 50) tone = "critical";
-  else if (score < 80) tone = "warning";
+  else if (score < 80) tone = "attention";
 
   const issues = report ? JSON.parse(report.issues as string) : [];
 

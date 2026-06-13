@@ -1,13 +1,15 @@
 import prisma from "../../db.server";
 import { uploadToR2, getPresignedDownloadUrl, PRIVATE_BUCKET } from "../r2.server";
 
+import { SnapReason } from "@prisma/client";
+
 export async function createSnapshot(
   shopId: string, 
   themeId: string, 
   kind: "SETTINGS" | "TEMPLATE" | "ASSET", 
   path: string, 
   content: string, 
-  reason: string
+  reason: SnapReason
 ) {
   const r2Key = `snapshots/${shopId}/${themeId}/${Date.now()}_${path.replace(/\//g, '_')}`;
   

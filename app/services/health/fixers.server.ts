@@ -1,5 +1,5 @@
 import prisma from "../../db.server";
-import { restoreSnapshot, writeTemplate } from "../generator/theme-engine";
+import { restoreSnapshot, writeTemplate } from "../theme-engine/index";
 import { SnapReason, SnapKind, Actor } from "@prisma/client";
 
 export async function applyHealthFix(shopId: string, shopDomain: string, themeId: string, issueId: string) {

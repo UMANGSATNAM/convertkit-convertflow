@@ -16,7 +16,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     where: { shopId: shop.id }
   });
   
-  const map = configs.reduce((acc, curr) => ({ ...acc, [curr.feature]: curr.enabled }), {});
+  const map = configs.reduce((acc, curr) => ({ ...acc, [curr.feature]: curr.enabled }), {} as Record<string, boolean>);
   return json({ configs: map });
 };
 
@@ -63,7 +63,7 @@ export default function ConversionToolkit() {
     { id: "TRUST_BADGES", name: "Trust & Payment Badges", desc: "Display secure checkout indicators." }
   ];
 
-  const activeCount = features.filter(f => configs[f.id]).length;
+  const activeCount = features.filter(f => (configs as Record<string, boolean>)[f.id]).length;
 
   return (
     <Page title="Conversion Toolkit">
@@ -101,7 +101,7 @@ export default function ConversionToolkit() {
         <Layout.Section>
           <BlockStack gap="400">
             {features.map(f => {
-              const isEnabled = configs[f.id] || false;
+              const isEnabled = (configs as Record<string, boolean>)[f.id] || false;
               return (
                 <SettingToggle
                   key={f.id}

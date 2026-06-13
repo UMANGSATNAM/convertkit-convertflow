@@ -2,9 +2,9 @@ import { Anthropic } from "@anthropic-ai/sdk";
 import prisma from "../../db.server";
 import { applyHealthFix } from "../health/fixers.server";
 import { runHealthScan } from "../health/scanner.server";
-import { patchSettings, restoreSnapshot } from "../generator/theme-engine";
+import { patchSettings, restoreSnapshot } from "../theme-engine/index";
 import { campaignsQueue } from "../generator/campaign-worker.server";
-import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../shopify.server";
+import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../../shopify.server";
 
 const anthropic = new Anthropic({ 
   apiKey: process.env.ANTHROPIC_API_KEY || "dummy-key" // fallback if not set to avoid crash on boot
