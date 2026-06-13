@@ -1,4 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import prisma from "../../db.server";
 import { applyHealthFix } from "../health/fixers.server";
 import { runHealthScan } from "../health/scanner.server";
@@ -8,9 +10,9 @@ import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../../shop
 import { analyzeStoreScreenshot } from "./vision.server";
 import { generatorQueue } from "../queue.server";
 
-const anthropic = new Anthropic({ 
-  apiKey: process.env.ANTHROPIC_API_KEY || "dummy-key" // fallback if not set to avoid crash on boot
-});
+const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
+const gemini = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
 export const tools = [
   {
@@ -145,33 +147,20 @@ export async function processUserMessage(request: Request, shopId: string, shopD
     };
   }
 
-  // Construct the message array. If we have an image, we pass it as a multimodal block.
-  let contentBlocks: any[] = [];
-  if (base64Image && mediaType) {
-    // We need to validate mediaType is image/jpeg, image/png, image/gif, or image/webp
-    let validMediaType = mediaType;
-    if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(mediaType)) {
-      validMediaType = "image/jpeg"; // fallback
-    }
-    
-    contentBlocks.push({
-      type: "image",
-      source: {
-        type: "base64",
-        media_type: validMediaType,
-        data: base64Image
-      }
-    });
-    
-    // TEMPORARY OPTIMIZATION: If they upload an image, extract layout immediately and stash it in context 
-  const shopId = shop.id;
-
   let textOutput = "";
   let toolCallsOutput: any[] = [];
 
-  if (imageBase64 && imageType) {
+  let validMediaType = mediaType;
+  if (base64Image && mediaType) {
+    if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(mediaType)) {
+      validMediaType = "image/jpeg"; // fallback
+    }
+  }
+
+  // TEMPORARY OPTIMIZATION: If they upload an image, extract layout immediately and stash it in context 
+  if (base64Image && validMediaType) {
     try {
-      const extractedLayout = await analyzeStoreScreenshot(imageBase64, imageType as any);
+      const extractedLayout = await analyzeStoreScreenshot(base64Image, validMediaType as any);
       await prisma.storeGeneration.create({
         data: {
           shopId,
@@ -205,107 +194,112 @@ export async function processUserMessage(request: Request, shopId: string, shopD
   try {
     if (gemini) {
       const tools = [{
-      functionDeclarations: [
-        {
-          name: "generate_store_from_context",
-          description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
-          parameters: {
-            type: "object",
-            properties: {
-              nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
-              instructions: { type: "string", description: "Any extra instructions" }
+        functionDeclarations: [
+          {
+            name: "generate_store_from_context",
+            description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+            parameters: {
+              type: "object",
+              properties: {
+                nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
+                instructions: { type: "string", description: "Any extra instructions" }
+              }
             }
           }
-        }
-      ]
-    }];
+        ]
+      }];
 
-    const contents: any[] = [{ role: "user", parts: [{ text: message }] }];
-    if (imageBase64 && imageType) {
-      contents[0].parts.push({
-        inlineData: {
-          data: imageBase64,
-          mimeType: imageType
-        }
-      });
-    }
-
-    const response = await gemini.models.generateContent({
-      model: "gemini-1.5-pro",
-      systemInstruction: SYSTEM_PROMPT,
-      tools: tools as any,
-      contents
-    });
-
-    textOutput = response.text || "";
-    if (response.functionCalls && response.functionCalls.length > 0) {
-      for (const call of response.functionCalls) {
-        toolCallsOutput.push({ name: call.name, input: call.args });
+      const contents: any[] = [{ role: "user", parts: [{ text: message }] }];
+      if (base64Image && validMediaType) {
+        contents[0].parts.push({
+          inlineData: {
+            data: base64Image,
+            mimeType: validMediaType
+          }
+        });
       }
-    }
-  } else if (openai) {
-    const tools = [{
-      type: "function",
-      function: {
-        name: "generate_store_from_context",
-        description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
-        parameters: { type: "object", properties: { nicheId: { type: "string" }, instructions: { type: "string" } } }
-      }
-    }];
 
-    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
-    if (imageBase64 && imageType) {
-      messages.push({
-        role: "user",
-        content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: `data:${imageType};base64,${imageBase64}` } }]
+      const response = await gemini.models.generateContent({
+        model: "gemini-1.5-pro",
+        systemInstruction: SYSTEM_PROMPT as any,
+        tools: tools as any,
+        contents
       });
+
+      textOutput = response.text || "";
+      if (response.functionCalls && response.functionCalls.length > 0) {
+        for (const call of response.functionCalls) {
+          toolCallsOutput.push({ name: call.name, input: call.args });
+        }
+      }
+    } else if (openai) {
+      const tools = [{
+        type: "function",
+        function: {
+          name: "generate_store_from_context",
+          description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+          parameters: { type: "object", properties: { nicheId: { type: "string" }, instructions: { type: "string" } } }
+        }
+      }];
+
+      const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+      if (base64Image && validMediaType) {
+        messages.push({
+          role: "user",
+          content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: `data:${validMediaType};base64,${base64Image}` } }]
+        });
+      } else {
+        messages.push({ role: "user", content: message });
+      }
+
+      const response = await openai.chat.completions.create({ model: "gpt-4o", messages, tools: tools as any });
+      const choice = response.choices[0];
+      textOutput = choice?.message?.content || "";
+      if (choice?.message?.tool_calls) {
+        for (const call of choice.message.tool_calls) {
+          if (call.type === "function") {
+            toolCallsOutput.push({ name: call.function.name, input: JSON.parse(call.function.arguments) });
+          }
+        }
+      }
+    } else if (anthropic) {
+      const contentArr: any[] = [];
+      if (base64Image && validMediaType) {
+        contentArr.push({ type: "image", source: { type: "base64", media_type: validMediaType as any, data: base64Image } });
+      }
+      contentArr.push({ type: "text", text: message });
+
+      const response = await anthropic.messages.create({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        tools: [
+          {
+            name: "generate_store_from_context",
+            description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
+            input_schema: {
+              type: "object",
+              properties: {
+                nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
+                instructions: { type: "string", description: "Any extra instructions" }
+              }
+            }
+          }
+        ],
+        messages: [{ role: "user", content: contentArr }]
+      });
+
+      const textContent = response.content.find((c: any) => c.type === "text") as any;
+      if (textContent) {
+        textOutput = textContent.text;
+      }
+      
+      const toolCalls = response.content.filter((c: any) => c.type === "tool_use") as any[];
+      for (const call of toolCalls) {
+        toolCallsOutput.push({ name: call.name, input: call.input });
+      }
     } else {
-      messages.push({ role: "user", content: message });
-    }
-
-    const response = await openai.chat.completions.create({ model: "gpt-4o", messages, tools: tools as any });
-    const choice = response.choices[0];
-    textOutput = choice?.message?.content || "";
-    if (choice?.message?.tool_calls) {
-      for (const call of choice.message.tool_calls) {
-        toolCallsOutput.push({ name: call.function.name, input: JSON.parse(call.function.arguments) });
-      }
-    }
-  } else if (anthropic) {
-    const contentArr: any[] = [];
-    if (imageBase64 && imageType) {
-      contentArr.push({ type: "image", source: { type: "base64", media_type: imageType as any, data: imageBase64 } });
-    }
-    contentArr.push({ type: "text", text: message });
-
-    const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      tools: [
-        {
-          name: "generate_store_from_context",
-          description: "Trigger the AI store generation pipeline using the previously uploaded screenshot and context.",
-          input_schema: {
-            type: "object",
-            properties: {
-              nicheId: { type: "string", description: "The industry/niche of the store (e.g. fashion, electronics)" },
-              instructions: { type: "string", description: "Any extra instructions" }
-            }
-          }
-        }
-      ],
-      messages: [{ role: "user", content: contentArr }]
-    });
-
-    const textContent = response.content.find((c: any) => c.type === "text") as any;
-    if (textContent) {
-      textOutput = textContent.text;
-    }
-    
-    const toolCalls = response.content.filter((c: any) => c.type === "tool_use") as any[];
-    for (const call of toolCalls) {
-      toolCallsOutput.push({ name: call.name, input: call.input });
+      throw new Error("No AI Provider Configured!");
     }
 
     // Log the request
@@ -313,10 +307,10 @@ export async function processUserMessage(request: Request, shopId: string, shopD
       data: {
         shopId,
         prompt: message || "Uploaded Image",
-        toolCalls: JSON.stringify(toolCalls.map(tc => ({ name: tc.name, input: tc.input }))),
-        applied: toolCalls.length > 0,
-        tokensIn: response.usage.input_tokens,
-        tokensOut: response.usage.output_tokens
+        toolCalls: JSON.stringify(toolCallsOutput),
+        applied: toolCallsOutput.length > 0,
+        tokensIn: 0,
+        tokensOut: 0
       }
     });
 
@@ -325,8 +319,8 @@ export async function processUserMessage(request: Request, shopId: string, shopD
     const executedTools = [];
 
     // Execute tool calls if any
-    if (toolCalls.length > 0) {
-      for (const call of toolCalls) {
+    if (toolCallsOutput.length > 0) {
+      for (const call of toolCallsOutput) {
         executedTools.push({ name: call.name, input: call.input });
         
         if (call.name === "change_theme_colors") {
@@ -371,8 +365,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
           await applyHealthFix(shopId, shopDomain, mockThemeId, issueId);
         }
         else if (call.name === "restore_snapshot") {
-          const { snapshotId } = call.input;
-          // await restoreSnapshot(shopDomain, snapshotId); // AI does not have context for 4 args
+          // not supported
         }
         else if (call.name === "generate_store_from_context") {
           // Find the stashed generation record
@@ -399,7 +392,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
     }
 
     return {
-      text: textContent?.text || "I have executed those actions for you.",
+      text: textOutput || "I have executed those actions for you.",
       toolCalls: executedTools
     };
 
