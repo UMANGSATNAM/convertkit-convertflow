@@ -27,12 +27,12 @@ export async function uploadAsset(shop: any, themeId: string, key: string, value
   }, true); // serialize mutations
 }
 
-export async function installTheme(shop: any, nicheId: string, sourceUrl: string): Promise<{ themeId: string }> {
-  console.log(`Installing theme for niche: ${nicheId} from ${sourceUrl}`);
+export async function installTheme(shop: any, themeName: string, sourceUrl: string): Promise<{ themeId: string }> {
+  console.log(`Installing theme ${themeName} from ${sourceUrl}`);
   
   const query = `
-    mutation themeCreate($source: URL!) {
-      themeCreate(source: $source) {
+    mutation themeCreate($source: URL!, $name: String!) {
+      themeCreate(source: $source, name: $name) {
         theme {
           id
         }
@@ -44,7 +44,7 @@ export async function installTheme(shop: any, nicheId: string, sourceUrl: string
     }
   `;
 
-  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { source: sourceUrl }, true);
+  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { source: sourceUrl, name: themeName }, true);
   if (data.themeCreate?.userErrors?.length > 0) {
     throw new Error(`Failed to create theme: ${data.themeCreate.userErrors[0].message}`);
   }

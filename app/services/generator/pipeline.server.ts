@@ -43,7 +43,7 @@ export function initGeneratorWorker() {
         // 1. INSTALLING_THEME
         trackEvent(shop.shopDomain, "Store Generation Started", { nicheId: gen.nicheId });
         await updateStatus("INSTALLING_THEME", "Downloading and installing base theme...");
-        const installRes: any = await installTheme(shop, niche.themeZipUrl, `StoreForge ${niche.name}`);
+        const installRes: any = await installTheme(shop, `StoreForge ${niche.name}`, niche.themeZipUrl);
         const themeId: string = typeof installRes === "string" ? installRes : installRes?.themeId;
         
         await prisma.storeGeneration.update({
