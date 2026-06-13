@@ -1,19 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Page, Layout, Card, Text, BlockStack, InlineStack, TextField, Button, Badge, Banner } from "@shopify/polaris";
 import { useSubmit, useActionData, useNavigation } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, unstable_parseMultipartFormData, unstable_createMemoryUploadHandler } from "@remix-run/node";
 import { processUserMessage } from "../services/ai/assistant.server";
 import { authenticate } from "../shopify.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const formData = await request.formData();
-  const message = formData.get("message") as string;
   
-  // We expect processUserMessage to handle finding the shop via session.shop
-  // We'll pass request so we can mock/extract admin if needed
-  // But processUserMessage is taking shopId. We need to query shopId first.
+  const uploadHandler = unstable_createMemoryUploadHandler({
+    maxPartSize: 10_000_000,
+  });
+  const formData = await unstable_parseMultipartFormData(request, uploadHandler);
+  
+  const message = formData.get("message") as string;
+  const image = formData.get("image") as File | null;
+
+  let base64Image = null;
+  let mediaType = null;
+  
+  if (image && typeof image !== "string" && image.size > 0) {
+    const arrayBuffer = await image.arrayBuffer();
+    base64Image = Buffer.from(arrayBuffer).toString("base64");
+    mediaType = image.type;
+  }
+  
   const prisma = (await import("../db.server")).default;
   const shop = await prisma.shop.upsert({
     where: { shopDomain: session.shop },
@@ -21,44 +33,66 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     create: { shopDomain: session.shop, accessToken: session.accessToken || "" }
   });
 
-  const response = await processUserMessage(request, shop.id, session.shop, message);
+  const response = await processUserMessage(request, shop.id, session.shop, message, base64Image, mediaType);
   return json({ response });
 };
 
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
   toolCalls?: Array<{ name: string; input: any }>;
 };
 
 export default function Assistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([{ 
     role: "assistant", 
-    content: "Hi! I am the StoreForge AI. You can ask me to change your theme color, enable sticky cart, run a health scan, or inject a campaign!" 
+    content: "Hi! I am the StoreForge AI. You can ask me to change your theme color, enable features, or upload a screenshot and say 'I want a store like this'!" 
   }]);
   const [input, setInput] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const submit = useSubmit();
   const actionData = useActionData<typeof action>();
   const nav = useNavigation();
   const isSubmitting = nav.state === "submitting";
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSend = () => {
-    if (!input.trim() || isSubmitting) return;
-    setMessages(prev => [...prev, { role: "user", content: input }]);
+    if ((!input.trim() && !selectedImage) || isSubmitting) return;
+    
+    setMessages(prev => [
+      ...prev, 
+      { role: "user", content: input, imageUrl: imagePreview || undefined }
+    ]);
     
     const formData = new FormData();
     formData.append("message", input);
-    submit(formData, { method: "post" });
+    if (selectedImage) {
+      formData.append("image", selectedImage);
+    }
+    
+    submit(formData, { method: "post", encType: "multipart/form-data" });
     
     setInput("");
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   useEffect(() => {
     if (actionData?.response && !isSubmitting) {
-      // Avoid duplicating the response if it's already the last message
       setMessages(prev => {
         const lastMsg = prev[prev.length - 1];
-        // simple check to prevent duplicate appends on re-renders
         if (lastMsg.role === "assistant" && lastMsg.content === actionData.response.text) {
           return prev;
         }
@@ -86,11 +120,17 @@ export default function Assistant() {
                     <InlineStack key={i} align={msg.role === "user" ? "end" : "start"}>
                       <div style={{ maxWidth: "80%" }}>
                         <Card background={msg.role === "user" ? "bg-surface-brand" : "bg-surface"}>
-                          <Text as="p" tone={msg.role === "user" ? "text-inverse" : "base"}>
-                            {msg.content}
-                          </Text>
+                          <BlockStack gap="200">
+                            {msg.imageUrl && (
+                              <img src={msg.imageUrl} alt="Upload" style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: "8px" }} />
+                            )}
+                            {msg.content && (
+                              <Text as="p" tone={msg.role === "user" ? "text-inverse" : "base"}>
+                                {msg.content}
+                              </Text>
+                            )}
+                          </BlockStack>
                           
-                          {/* Render Action Cards for tool calls */}
                           {msg.toolCalls && msg.toolCalls.length > 0 && (
                             <div style={{ marginTop: "12px" }}>
                               <BlockStack gap="200">
@@ -117,25 +157,50 @@ export default function Assistant() {
               </div>
 
               <div style={{ padding: "16px", borderTop: "1px solid #e1e3e5" }}>
-                <InlineStack gap="300" align="space-between" blockAlign="center">
-                  <div style={{ flexGrow: 1 }}>
-                    <TextField
-                      labelHidden
-                      label="Message"
-                      value={input}
-                      onChange={setInput}
-                      autoComplete="off"
-                      placeholder="e.g. 'Enable Trust Badges and change my primary color to #FF0000'"
-                      disabled={isSubmitting}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") handleSend();
-                      }}
+                <BlockStack gap="300">
+                  {imagePreview && (
+                    <InlineStack align="start">
+                      <div style={{ position: "relative" }}>
+                        <img src={imagePreview} alt="Preview" style={{ height: "60px", borderRadius: "4px", border: "1px solid #ccc" }} />
+                        <button 
+                          onClick={() => { setSelectedImage(null); setImagePreview(null); }}
+                          style={{ position: "absolute", top: "-5px", right: "-5px", background: "red", color: "white", borderRadius: "50%", width: "20px", height: "20px", border: "none", cursor: "pointer" }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </InlineStack>
+                  )}
+                  <InlineStack gap="300" align="space-between" blockAlign="center">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      ref={fileInputRef} 
+                      style={{ display: "none" }} 
+                      onChange={handleImageChange}
                     />
-                  </div>
-                  <Button variant="primary" onClick={handleSend} loading={isSubmitting} disabled={!input.trim()}>
-                    Send
-                  </Button>
-                </InlineStack>
+                    <Button onClick={() => fileInputRef.current?.click()} disabled={isSubmitting}>
+                      📎 Image
+                    </Button>
+                    <div style={{ flexGrow: 1 }}>
+                      <TextField
+                        labelHidden
+                        label="Message"
+                        value={input}
+                        onChange={setInput}
+                        autoComplete="off"
+                        placeholder="e.g. 'I want a store like this attached screenshot!'"
+                        disabled={isSubmitting}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") handleSend();
+                        }}
+                      />
+                    </div>
+                    <Button variant="primary" onClick={handleSend} loading={isSubmitting} disabled={(!input.trim() && !selectedImage)}>
+                      Send
+                    </Button>
+                  </InlineStack>
+                </BlockStack>
               </div>
             </BlockStack>
           </Card>
