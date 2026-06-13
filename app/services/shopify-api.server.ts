@@ -108,6 +108,7 @@ export async function graphqlRequest(shopDomain: string, accessToken: string, qu
     headers: {
       "Content-Type": "application/json",
       "X-Shopify-Access-Token": accessToken,
+      "Connection": "close"
     },
     body: JSON.stringify({
       query,
@@ -135,6 +136,7 @@ export async function restRequest(shopDomain: string, accessToken: string, metho
     headers: {
       "Content-Type": "application/json",
       "X-Shopify-Access-Token": accessToken,
+      "Connection": "close"
     },
     ...(body ? { body: JSON.stringify(body) } : {})
   });
