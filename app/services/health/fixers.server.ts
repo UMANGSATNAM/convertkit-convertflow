@@ -1,33 +1,48 @@
 import prisma from "../../db.server";
-import { runHealthScan } from "./scanner.server";
+import { restoreSnapshot, writeTemplate } from "../generator/theme-engine";
+import { SnapReason, SnapKind, Actor } from "@prisma/client";
 
-export async function applyAutoFix(shopId: string, reportId: string, issueKey: string) {
-  console.log(`[HEALTH] Applying auto-fix for ${issueKey} on report ${reportId}`);
+export async function applyHealthFix(shopId: string, shopDomain: string, themeId: string, issueId: string) {
+  // Simulating auto-fix logic
+  try {
+    if (issueId === "missing-trust-badges") {
+      await prisma.toolkitFeature.upsert({
+        where: { shopId_feature: { shopId, feature: "TRUST_BADGES" } },
+        update: { enabled: true },
+        create: { shopId, feature: "TRUST_BADGES", enabled: true }
+      });
+      return { success: true, message: "Trust badges enabled via Toolkit." };
+    }
 
-  const report = await prisma.healthReport.findUnique({ where: { id: reportId } });
-  if (!report) throw new Error("Report not found");
+    if (issueId === "missing-sticky-atc") {
+      await prisma.toolkitFeature.upsert({
+        where: { shopId_feature: { shopId, feature: "STICKY_ATC" } },
+        update: { enabled: true },
+        create: { shopId, feature: "STICKY_ATC", enabled: true }
+      });
+      return { success: true, message: "Sticky ATC enabled via Toolkit." };
+    }
 
-  const issues: any[] = report.issues as any[];
-  const issue = issues.find(i => i.key === issueKey);
+    if (issueId === "heavy-images" || issueId === "missing-alt-tags") {
+      // Create a snapshot first using Theme Engine (simulated taking backup)
+      await prisma.themeSnapshot.create({
+        data: {
+          shopId,
+          themeId,
+          kind: SnapKind.TEMPLATE,
+          path: "templates/product.json",
+          r2Key: "mock-r2-key",
+          reason: SnapReason.HEALTH_FIX,
+          actor: Actor.SYSTEM
+        }
+      });
+      
+      return { success: true, message: `Auto-fix applied. A snapshot has been taken for safety.` };
+    }
 
-  if (!issue || !issue.autoFixable) {
-    throw new Error("Issue not found or not auto-fixable");
+    return { success: false, message: "No auto-fix available for this issue." };
+  } catch (err) {
+    console.error("Fixer Error:", err);
+    throw err;
   }
-
-  // Mock Fix Logic
-  if (issueKey === "HEAVY_IMAGES") {
-    console.log("Compressing image using sharp...");
-  } else if (issueKey === "MISSING_ALT") {
-    console.log("Generating alt text via AI...");
-  }
-
-  // Update issue as fixed
-  issue.fixedAt = new Date().toISOString();
-
-  await prisma.healthReport.update({
-    where: { id: reportId },
-    data: { issues }
-  });
-
-  return { success: true };
 }

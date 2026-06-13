@@ -21,6 +21,10 @@ export default function App() {
         <Link to="/app" rel="home">Dashboard</Link>
         <Link to="/app/generator">Generator</Link>
         <Link to="/app/design">Design Studio</Link>
+        <Link to="/app/library">Section Library</Link>
+        <Link to="/app/toolkit">Toolkit</Link>
+        <Link to="/app/campaigns">Campaigns</Link>
+        <Link to="/app/health">Health Monitor</Link>
         <Link to="/app/features">Features</Link>
         <Link to="/app/history">History</Link>
         <Link to="/app/settings">Pincode Settings</Link>

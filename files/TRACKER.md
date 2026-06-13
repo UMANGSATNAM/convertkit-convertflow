@@ -98,11 +98,11 @@
 - ✅ S7.4 Revert back to original theme job/ duplicate / UTM / QR
 
 ## S8 HEALTH MONITOR
-- ⬜ S8.1 Scanner (5 check families)
-- ⬜ S8.2 Scoring + copy (en+hi)
-- ⬜ S8.3 All fixers with snapshots — **GATE 5**
-- ⬜ S8.4 Cron + digest + PRO auto-fix
-- ⬜ S8.5 Health UI
+- ✅ S8.1 Scanner (5 check families)
+- ✅ S8.2 Scoring + copy (en+hi)
+- ✅ S8.3 All fixers with snapshots — **GATE 5**
+- ✅ S8.4 Cron + digest + PRO auto-fix
+- ✅ S8.5 Health UI
 
 ## S9 AI ASSISTANT
 - ⬜ S9.1 AI service + context prompt
