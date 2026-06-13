@@ -20,6 +20,7 @@ export default function App() {
       <NavMenu>
         <Link to="/app" rel="home">Dashboard</Link>
         <Link to="/app/generator">Generator</Link>
+        <Link to="/app/ai-build">AI Builder</Link>
         <Link to="/app/design">Design Studio</Link>
         <Link to="/app/library">Section Library</Link>
         <Link to="/app/toolkit">Toolkit</Link>

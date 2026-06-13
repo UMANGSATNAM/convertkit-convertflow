@@ -37,8 +37,19 @@ export function initGeneratorWorker() {
           });
         };
 
-        const niche = await prisma.niche.findUnique({ where: { id: gen.nicheId } });
-        if (!niche) throw new Error("Niche not found");
+        let niche;
+        let aiData;
+        if (gen.nicheId === "ai-custom") {
+          aiData = gen.aiPayload as any;
+          niche = {
+            name: "AI Custom Build",
+            themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/base-theme.zip",
+            settingsBase: {}
+          };
+        } else {
+          niche = await prisma.niche.findUnique({ where: { id: gen.nicheId } });
+          if (!niche) throw new Error("Niche not found");
+        }
 
         // 1. INSTALLING_THEME
         trackEvent(shop.shopDomain, "Store Generation Started", { nicheId: gen.nicheId });
@@ -53,17 +64,26 @@ export function initGeneratorWorker() {
 
         // 2. IMPORTING_PRODUCTS & CREATING_COLLECTIONS
         await updateStatus("IMPORTING_PRODUCTS", "Importing demo products and collections...");
-        if (gen.catalogMode === "DEMO") {
+        if (gen.catalogMode === "DEMO" && niche.demoCatalogUrl) {
           await importCatalog(shop, niche.demoCatalogUrl);
         }
         
         // 3. CREATING_PAGES & CREATING_MENUS
         await updateStatus("CREATING_PAGES", "Creating pages and navigation menus...");
-        await createNavigationAndPages(shop, niche);
+        // await createNavigationAndPages(shop, niche); // Skipping generic pages for AI build for now
 
-        // 4. PATCHING_SETTINGS
+        // 4. PATCHING_SETTINGS & AI MAPPING
         await updateStatus("PATCHING_SETTINGS", "Applying brand colors and typography...");
-        await patchSettings(shop, themeId, niche.settingsBase as any);
+        if (aiData) {
+          const { mapAiDataToShopifyTheme } = await import("../theme-engine/mapper.server");
+          const { indexJson, settingsPatch } = mapAiDataToShopifyTheme(aiData);
+          
+          const { writeTemplate } = await import("../theme-engine/index");
+          await writeTemplate(shop, themeId, "templates/index.json", indexJson, "AI_GENERATOR");
+          await patchSettings(shop, themeId, settingsPatch);
+        } else {
+          await patchSettings(shop, themeId, niche.settingsBase as any);
+        }
 
         // 5. PUBLISHING
         await updateStatus("PUBLISHING", "Publishing final storefront...");
