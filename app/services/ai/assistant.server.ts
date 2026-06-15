@@ -6,7 +6,7 @@ import { applyHealthFix } from "../health/fixers.server";
 import { runHealthScan } from "../health/scanner.server";
 import { patchSettings, restoreSnapshot } from "../theme-engine/index";
 import { campaignsQueue } from "../generator/campaign-worker.server";
-import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../../shopify.server";
+import { authenticate, PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE } from "../../shopify.server";
 import { analyzeStoreScreenshot } from "./vision.server";
 import { generatorQueue } from "../queue.server";
 
@@ -123,7 +123,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
 
   const { billing } = await authenticate.admin(request);
   const planCheck = await billing.check({
-    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    plans: [PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE] as any,
     isTest: true,
   });
   const hasActivePayment = planCheck.hasActivePayment;
@@ -221,9 +221,11 @@ export async function processUserMessage(request: Request, shopId: string, shopD
 
       const response = await gemini.models.generateContent({
         model: "gemini-1.5-pro",
-        systemInstruction: SYSTEM_PROMPT as any,
-        tools: tools as any,
-        contents
+        contents,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          tools: tools as any
+        }
       });
 
       textOutput = response.text || "";

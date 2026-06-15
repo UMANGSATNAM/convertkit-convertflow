@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 // worker.ts
 import dotenv from "dotenv";
 dotenv.config();

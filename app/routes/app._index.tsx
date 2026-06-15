@@ -59,7 +59,7 @@ export default function Dashboard() {
             <BlockStack gap="400">
               <InlineStack align="space-between" blockAlign="center">
                 <Text as="h2" variant="headingLg">Store Health Score</Text>
-                <Badge tone={healthScore > 80 ? "success" : "warning"}>{healthScore}/100</Badge>
+                <Badge tone={healthScore > 80 ? "success" : "warning"}>{`${healthScore}/100`}</Badge>
               </InlineStack>
               <ProgressBar progress={healthScore} tone={healthScore > 80 ? "success" : "highlight"} />
               <Text as="p" tone="subdued">Your store is highly optimized for conversion. Keep up the good work!</Text>

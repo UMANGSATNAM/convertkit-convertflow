@@ -61,6 +61,8 @@ export default function HealthMonitor() {
   let tone: "success" | "attention" | "critical" = "success";
   if (score < 50) tone = "critical";
   else if (score < 80) tone = "attention";
+  
+  const progressTone = score < 50 ? "critical" : score < 80 ? "highlight" : "success";
 
   const issues = report ? JSON.parse(report.issues as string) : [];
 
@@ -85,10 +87,10 @@ export default function HealthMonitor() {
               <Card>
                 <BlockStack gap="400" align="center">
                   <Text as="h2" variant="headingLg">Overall Health Score</Text>
-                  <div style={{ fontSize: "48px", fontWeight: "bold", color: tone === "critical" ? "red" : tone === "warning" ? "orange" : "green" }}>
+                  <div style={{ fontSize: "48px", fontWeight: "bold", color: tone === "critical" ? "red" : tone === "attention" ? "orange" : "green" }}>
                     {score}/100
                   </div>
-                  <ProgressBar progress={score} tone={tone} />
+                  <ProgressBar progress={score} tone={progressTone} />
                 </BlockStack>
               </Card>
 

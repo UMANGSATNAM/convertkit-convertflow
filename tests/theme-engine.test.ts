@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { acquireLock } from '../app/services/mutex.server';
 import { validateSettingsPatch, validateTemplateStructure } from '../app/services/theme-engine/validators.server';
 

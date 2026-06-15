@@ -55,7 +55,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function AIBuilderPage() {
-  const actionData = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>() as any;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 

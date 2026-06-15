@@ -72,7 +72,7 @@ export default function GenerateStore() {
             <Card>
               <BlockStack gap="400">
                 <Text as="h2" variant="headingLg">Generating Your Store...</Text>
-                <ProgressBar progress={30} color="primary" />
+                <ProgressBar progress={30} />
                 <Text as="p">Installing theme, importing products, and configuring settings. This will take a few minutes.</Text>
               </BlockStack>
             </Card>
@@ -90,7 +90,7 @@ export default function GenerateStore() {
                       <Button pressed={niche === "beauty"} onClick={() => setNiche("beauty")}>Beauty</Button>
                       {/* Add more niches up to 10 as per spec */}
                     </InlineStack>
-                    <Button primary onClick={() => setStep(2)}>Next</Button>
+                    <Button variant="primary" onClick={() => setStep(2)}>Next</Button>
                   </BlockStack>
                 )}
 
@@ -100,7 +100,7 @@ export default function GenerateStore() {
                     <FormLayout>
                       <TextField label="Store Name" autoComplete="off" />
                       <TextField label="Primary Color" autoComplete="off" value="#000000" />
-                      <Button primary onClick={() => setStep(3)}>Next</Button>
+                      <Button variant="primary" onClick={() => setStep(3)}>Next</Button>
                     </FormLayout>
                   </BlockStack>
                 )}
@@ -120,7 +120,7 @@ export default function GenerateStore() {
                         onChange={() => setCatalog("EMPTY")}
                       />
                     </BlockStack>
-                    <Button primary onClick={() => setStep(4)}>Next</Button>
+                    <Button variant="primary" onClick={() => setStep(4)}>Next</Button>
                   </BlockStack>
                 )}
 
@@ -129,7 +129,7 @@ export default function GenerateStore() {
                     <Text as="h2" variant="headingMd">4. Review & Generate</Text>
                     <Text as="p">Niche: {niche}</Text>
                     <Text as="p">Catalog: {catalog}</Text>
-                    <Button primary size="large" onClick={handleGenerate}>
+                    <Button variant="primary" size="large" onClick={handleGenerate}>
                       Generate Store
                     </Button>
                   </BlockStack>

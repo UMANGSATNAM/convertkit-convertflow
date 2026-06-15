@@ -2,6 +2,17 @@ import { createSnapshot, fetchSnapshotContent } from "./snapshot.server";
 import { graphqlRequest, restRequest } from "../shopify-api.server";
 import { validateSettingsPatch, validateTemplateStructure } from "./validators.server";
 import crypto from "crypto";
+import { SnapReason } from "@prisma/client";
+
+function normalizeSnapReason(reason: string): SnapReason {
+  const upper = reason.toUpperCase();
+  if (upper.includes("DESIGN")) return SnapReason.DESIGN_STUDIO;
+  if (upper.includes("GENERATOR")) return SnapReason.GENERATOR;
+  if (upper.includes("HEALTH")) return SnapReason.HEALTH_FIX;
+  if (upper.includes("CAMPAIGN")) return SnapReason.CAMPAIGN;
+  if (upper.includes("MANUAL")) return SnapReason.MANUAL;
+  return SnapReason.AI; // fallback
+}
 
 async function getActiveThemeId(shopDomain: string, accessToken: string) {
   const data = await restRequest(shopDomain, accessToken, "GET", "themes.json");
@@ -106,7 +117,7 @@ export async function patchSettings(shop: any, themeId: string, patch: any, reas
   const existingSettings = await readFile(shop, themeId, "config/settings_data.json");
   
   // 3. Snapshot
-  const snapshot = await createSnapshot(shop.id, themeId, "SETTINGS", "config/settings_data.json", existingSettings, reason);
+  const snapshot = await createSnapshot(shop.id, themeId, "SETTINGS", "config/settings_data.json", existingSettings, normalizeSnapReason(reason));
   
   // 4. Merge
   const parsedSettings = existingSettings ? JSON.parse(existingSettings) : { current: {} };
@@ -137,7 +148,7 @@ export async function writeTemplate(shop: any, themeId: string, path: string, js
   }
   
   // 2. Snapshot
-  const snapshot = await createSnapshot(shop.id, themeId, "TEMPLATE", path, existingContent, reason);
+  const snapshot = await createSnapshot(shop.id, themeId, "TEMPLATE", path, existingContent, normalizeSnapReason(reason));
   
   // 3. Write
   await uploadAsset(shop, themeId, path, JSON.stringify(jsonContent, null, 2));

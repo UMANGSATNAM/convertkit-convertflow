@@ -10,10 +10,9 @@ import prisma from "./db.server";
 
 import { restResources } from "@shopify/shopify-api/rest/admin/2025-10";
 
-export const PLAN_FREE = 'FREE';
-export const PLAN_GROWTH = 'GROWTH';
-export const PLAN_PRO = 'PRO';
-export const PLAN_ENTERPRISE = 'ENTERPRISE';
+export const PLAN_STARTER = 'STARTER';
+export const PLAN_PRO = 'Pro - $19/mo';
+export const PLAN_ENTERPRISE = 'Enterprise - $49/mo';
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -26,18 +25,18 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   billing: {
-    [PLAN_GROWTH]: {
-      amount: 12.99,
-      currencyCode: 'USD',
+    [PLAN_STARTER]: {
+      amount: 999,
+      currencyCode: 'INR',
       interval: BillingInterval.Every30Days,
     },
     [PLAN_PRO]: {
-      amount: 24.99,
+      amount: 19,
       currencyCode: 'USD',
       interval: BillingInterval.Every30Days,
     },
     [PLAN_ENTERPRISE]: {
-      amount: 49.00,
+      amount: 49,
       currencyCode: 'USD',
       interval: BillingInterval.Every30Days,
     },

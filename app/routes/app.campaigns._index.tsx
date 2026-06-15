@@ -7,7 +7,7 @@ import prisma from "../db.server";
 import { writeTemplate } from "../services/theme-engine/index";
 import { campaignsQueue } from "../services/generator/campaign-worker.server";
 
-import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../shopify.server";
+import { authenticate, PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session, billing } = await authenticate.admin(request);
@@ -15,7 +15,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!shop) return json({ campaigns: [], hasActivePayment: false });
 
   const planCheck = await billing.check({
-    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    plans: [PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE] as any,
     isTest: true,
   });
   const hasActivePayment = planCheck.hasActivePayment;
@@ -36,7 +36,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 
   const planCheck = await billing.check({
-    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE],
+    plans: [PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE] as any,
     isTest: true,
   });
   const hasActivePayment = planCheck.hasActivePayment;

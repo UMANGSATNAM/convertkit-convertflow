@@ -312,3 +312,104 @@ enum Actor {
   AI 
   SYSTEM 
 }
+
+model ComponentPerformance {
+  id              String   @id @default(cuid())
+  componentId     String   @unique
+  industry        String
+  storesUsed      Int      @default(0)
+  avgConversion   Float    @default(0.0)
+  avgTimeOnPage   Float    @default(0.0)
+  bounceRate      Float    @default(0.0)
+  updatedAt       DateTime @updatedAt
+}
+
+model IndustryPattern {
+  id                String   @id @default(cuid())
+  industry          String   @unique
+  bestHero          String
+  bestNavigation    String
+  bestTrustSection  String
+  bestFooter        String
+  confidence        Float    @default(100.0)
+}
+
+model BlueprintSnapshot {
+  id              String   @id @default(cuid())
+  storeId         String
+  businessJson    Json
+  brandJson       Json
+  croJson         Json
+  storeJson       Json
+  version         String
+  createdAt       DateTime @default(now())
+}
+
+model GenerationCost {
+  id                String   @id @default(cuid())
+  generationId      String
+  aiTokens          Int      @default(0)
+  aiCostUsd         Float    @default(0.0)
+  shopifyCalls      Int      @default(0)
+  componentUploads  Int      @default(0)
+  totalCostUsd      Float    @default(0.0)
+  createdAt         DateTime @default(now())
+}
+
+model MerchantFeedback {
+  id            String   @id @default(cuid())
+  generationId  String
+  rating        Int
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+}
+
+/// Internal validation research tool — Merchant Reality Test Protocol
+model ValidationInterview {
+  id              String   @id @default(cuid())
+  name            String   @default("")
+  segment         String   // fashion | beauty | d2c | freelancer | agency
+  screenshotStyle String   // luxury | minimal | modern | bold
+  perceivedStyle  String   @default("")
+  publishIntent   String   // yes | maybe | no
+  pricingIntent   String   // 999 | 2999 | 4999 | never
+  customFeel      String   // custom | maybe | template
+  weaknessArea    String   @default("none") // hero | grid | typography | trust | overall | none
+  dealBreaker     String   @default("no")   // yes | depends | no
+  // Agency-specific fields
+  agencyWouldSell String   @default("na")   // yes | maybe | no | na (na for non-agency)
+  agencyPricing   String   @default("")     // what agency would charge clients e.g. "15000"
+  notes           String?  @db.Text
+  score           Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+model ComponentRegistry {
+  id                String   @id @default(cuid())
+  componentId       String   @unique
+  category          String
+  industryTags      Json
+  styleTags         Json
+  searchKeywords    Json?
+  croScore          Float    @default(0.0)
+  mobileScore       Float    @default(0.0)
+  version           String   @default("1.0.0")
+  liquidPath        String
+  status            String   @default("ACTIVE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PromptVersion {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  version       String
+  promptText    String   @db.Text
+  promptType    String
+  temperature   Float?   @default(0.3)
+  modelName     String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+

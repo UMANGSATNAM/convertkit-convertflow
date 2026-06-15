@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import express from "express";
 import { createRequestHandler } from "@remix-run/express";

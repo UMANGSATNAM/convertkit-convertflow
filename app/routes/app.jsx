@@ -26,6 +26,7 @@ export default function App() {
         <Link to="/app/toolkit">Toolkit</Link>
         <Link to="/app/campaigns">Campaigns</Link>
         <Link to="/app/health">Health Monitor</Link>
+        <Link to="/app/validation">Validation Lab</Link>
         <Link to="/app/tracking">Tracking</Link>
         <Link to="/app/features">Features</Link>
         <Link to="/app/history">History</Link>

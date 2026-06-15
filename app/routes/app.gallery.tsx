@@ -57,12 +57,12 @@ export default function Gallery() {
         <Layout.Section>
           {fetcher.data?.success === true && (
             <Banner tone="success" title="Section Added">
-              <p>{fetcher.data.message}</p>
+              <p>{(fetcher.data as any).message}</p>
             </Banner>
           )}
           {fetcher.data?.success === false && (
             <Banner tone="critical" title="Error Adding Section">
-              <p>{fetcher.data.error}</p>
+              <p>{(fetcher.data as any).error}</p>
             </Banner>
           )}
           <div style={{ marginTop: '20px' }}>

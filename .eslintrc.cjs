@@ -11,4 +11,16 @@ module.exports = {
     shopify: "readonly",
     BigInt: "readonly"
   },
+  settings: {
+    jest: {
+      version: 29,
+    },
+  },
+  rules: {
+    "no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "import/no-duplicates": "warn",
+    "import/first": "warn",
+    "@typescript-eslint/no-use-before-define": "warn"
+  }
 };

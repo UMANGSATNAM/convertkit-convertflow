@@ -67,7 +67,7 @@ export default function DesignStudio() {
 
               <TextField label="Heading Font" value={font} onChange={setFont} autoComplete="off" />
               
-              <Button primary onClick={handleSave}>Save & Publish</Button>
+              <Button variant="primary" onClick={handleSave}>Save & Publish</Button>
             </BlockStack>
           </Card>
 

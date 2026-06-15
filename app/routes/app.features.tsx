@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
   
-  if (!shop) return json({ features: [] });
+  if (!shop) return json({ activeFeatures: [] });
 
   const activeFeatures = await prisma.toolkitFeature.findMany({
     where: { shopId: shop.id }
@@ -61,7 +61,7 @@ export default function FeatureLibrary() {
   };
 
   const getFeatureState = (key: string) => {
-    const feature = activeFeatures.find(f => f.key === key);
+    const feature = activeFeatures.find((f: any) => f.key === key);
     return feature?.enabled || false;
   };
 

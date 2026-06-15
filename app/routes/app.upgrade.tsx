@@ -1,14 +1,14 @@
 import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSubmit, useNavigation } from "@remix-run/react";
 import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, List, Badge, Divider, Banner } from "@shopify/polaris";
-import { authenticate, PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE } from "../shopify.server";
+import { authenticate, PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { billing } = await authenticate.admin(request);
   
   // Check active plan
   const planCheck = await billing.check({
-    plans: [PLAN_PRO, PLAN_GROWTH, PLAN_ENTERPRISE] as string[],
+    plans: [PLAN_STARTER, PLAN_PRO, PLAN_ENTERPRISE] as any,
     isTest: true,
   });
 
@@ -23,11 +23,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const plan = formData.get("plan") as string;
 
-  if (plan === PLAN_PRO) {
+  if (plan === PLAN_STARTER) {
     await billing.require({
-      plans: [PLAN_PRO] as string[],
+      plans: [PLAN_STARTER] as any,
       isTest: true,
-      onFailure: async () => billing.request({ plan: PLAN_PRO as string, isTest: true, returnUrl: "/app/upgrade" }),
+      onFailure: async () => billing.request({ plan: PLAN_STARTER, isTest: true, returnUrl: "/app/upgrade" } as any),
     });
   }
 
