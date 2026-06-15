@@ -33,7 +33,6 @@ export async function importCatalog(shop: any, catalogUrl: string) {
       {
         input: {
           title: product.title,
-          handle: product.handle,
           vendor: product.vendor,
           productType: product.product_type,
           tags: product.tags,
