@@ -1,4 +1,4 @@
-import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, ProgressBar, Badge, Banner } from "@shopify/polaris";
+import { Page, Layout, Card, Text, BlockStack, InlineStack, Button, ProgressBar, Badge, Banner, Box, List, Divider } from "@shopify/polaris";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -53,6 +53,54 @@ export default function Dashboard() {
           </Layout.Section>
         )}
         
+        {/* Massive Hero Block: StoreForge AI Agency OS */}
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="500">
+              <Text as="h1" variant="heading2xl">StoreForge AI Agency OS</Text>
+              <Text as="p" variant="bodyLg">
+                Turn your products into a premium Shopify store in minutes. StoreForge analyzes your products, detects your brand style, selects premium design components, and assembles a custom Shopify theme automatically.
+              </Text>
+
+              <Box padding="400" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="300">
+                  <List type="bullet">
+                    <List.Item>
+                      <Text as="span" fontWeight="bold">🔍 Analyze Products & Brand:</Text> We scan your catalog, pricing, collections, and brand signals.
+                    </List.Item>
+                    <List.Item>
+                      <Text as="span" fontWeight="bold">🎨 Select Premium Design System:</Text> Luxury, Minimal, Modern, or Bold — the best design style is chosen automatically.
+                    </List.Item>
+                    <List.Item>
+                      <Text as="span" fontWeight="bold">🏗️ Assemble Premium Store:</Text> Our engine combines premium components into a cohesive, agency-quality storefront.
+                    </List.Item>
+                    <List.Item>
+                      <Text as="span" fontWeight="bold">🚀 Preview & Publish:</Text> Review your generated store and publish it directly to Shopify.
+                    </List.Item>
+                  </List>
+                </BlockStack>
+              </Box>
+
+              <InlineStack gap="400" blockAlign="center" wrap>
+                <Text as="p" fontWeight="bold">Ready To Analyze Your Store</Text>
+                <Badge tone="info">Products Analyzed: 40</Badge>
+                <Badge tone="success">Industry Detected: Jewelry</Badge>
+                <Badge tone="magic">Style Selected: Luxury</Badge>
+                <Badge tone="attention">Components Available: 28</Badge>
+              </InlineStack>
+
+              <Divider />
+
+              <InlineStack gap="300">
+                <Link to="/app/generator">
+                  <Button size="large" variant="primary" tone="success">Generate Premium Store</Button>
+                </Link>
+                <Button size="large">See How It Works</Button>
+              </InlineStack>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+
         {/* Health Score Overview */}
         <Layout.Section>
           <Card>
@@ -87,15 +135,7 @@ export default function Dashboard() {
           </Card>
         </Layout.Section>
 
-        <Layout.Section variant="oneThird">
-          <Card>
-            <BlockStack gap="400">
-              <Text as="h3" variant="headingMd">Store Generator</Text>
-              <Text as="p">Seed your store with niches.</Text>
-              <Link to="/app/generator"><Button fullWidth>Open Generator</Button></Link>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
+
 
         <Layout.Section variant="oneThird">
           <Card>
