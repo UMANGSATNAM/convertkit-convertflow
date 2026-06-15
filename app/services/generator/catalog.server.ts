@@ -56,9 +56,8 @@ export async function importCatalog(shop: any, catalogUrl: string) {
       const variantsInput = product.variants.map((variant: any) => ({
         price: variant.price,
         compareAtPrice: variant.compare_at_price || null,
-        sku: variant.sku,
         optionValues: [{ optionName: "Size", name: variant.title || "Default Title" }],
-        inventoryItem: { tracked: false }
+        inventoryItem: { sku: variant.sku, tracked: false }
       }));
 
       const vResponse = await graphqlRequest(
