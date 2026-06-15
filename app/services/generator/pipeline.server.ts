@@ -100,7 +100,7 @@ export function initGeneratorWorker() {
 
         const storeBlueprintAi = {
           pages: {
-            "index": indexSections
+            "index": { sections: indexSections }
           }
         };
         console.log("Store Blueprint assembled:", storeBlueprintAi);
@@ -112,8 +112,8 @@ export function initGeneratorWorker() {
         
         const matchedComponentsList = [];
         // Flatten the sections out of the pages map from the Store Blueprint to retrieve each
-        for (const [pageHandle, pageSections] of Object.entries(storeBlueprintAi.pages)) {
-          for (const section of pageSections) {
+        for (const [pageHandle, pageData] of Object.entries(storeBlueprintAi.pages)) {
+          for (const section of pageData.sections) {
             const bestComponent = await retrieveBestComponent({
               sectionType: section.sectionType,
               industryTags: industriesList,
@@ -163,7 +163,7 @@ export function initGeneratorWorker() {
 
         // 14. HEALTH SCORING (Weighted Health score calculation)
         // Health = SEO * 0.20 + Accessibility * 0.20 + Mobile * 0.20 + CRO * 0.30 + Validation * 0.10
-        const indexTemplateJson = storeBlueprintAi.pages.index; // Approximate the index structure for scoring
+        const indexTemplateJson = storeBlueprintAi.pages.index.sections; // Approximate the index structure for scoring
         const healthScoreResult = calculateHealthScore({ sections: indexTemplateJson }, 0); // Assuming 0 validation errors at first
         console.log("Health scoring computed:", healthScoreResult);
 
