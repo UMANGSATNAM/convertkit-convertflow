@@ -37,7 +37,7 @@ export async function importCatalog(shop: any, catalogUrl: string) {
           vendor: product.vendor,
           productType: product.product_type,
           tags: product.tags,
-          bodyHtml: product.body_html,
+          descriptionHtml: product.body_html,
           seo: {
             title: product.seo_title,
             description: product.seo_description
