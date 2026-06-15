@@ -53,31 +53,36 @@ export async function importCatalog(shop: any, catalogUrl: string) {
     }
 
     // 2. Add Variants
-    for (const variant of product.variants) {
-      await graphqlRequest(
+    if (product.variants && product.variants.length > 0) {
+      const variantsInput = product.variants.map((variant: any) => ({
+        price: variant.price,
+        compareAtPrice: variant.compare_at_price || null,
+        sku: variant.sku,
+        optionValues: [{ optionName: "Size", name: variant.title || "Default Title" }],
+        inventoryItem: { tracked: false }
+      }));
+
+      const vResponse = await graphqlRequest(
         shop.shopDomain,
         shop.accessToken,
         `
-        mutation productVariantCreate($input: ProductVariantInput!) {
-          productVariantCreate(input: $input) {
-            productVariant { id }
+        mutation productVariantsBulkCreate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+          productVariantsBulkCreate(productId: $productId, variants: $variants) {
+            productVariants { id }
             userErrors { field message }
           }
         }
         `,
         {
-          input: {
-            productId,
-            title: variant.title,
-            price: variant.price,
-            compareAtPrice: variant.compare_at_price || null,
-            sku: variant.sku,
-            inventoryQuantities: [
-              { availableQuantity: variant.inventory_quantity || 10, locationId: "gid://shopify/Location/1" } // Note: hardcoding location 1 for mock purposes
-            ]
-          }
+          productId,
+          variants: variantsInput
         }
       );
+      
+      if (vResponse.productVariantsBulkCreate?.userErrors?.length > 0) {
+        console.error("Variant bulk create errors:", vResponse.productVariantsBulkCreate.userErrors);
+      }
+
       await sleep(250); // Rate limit backoff
     }
 
