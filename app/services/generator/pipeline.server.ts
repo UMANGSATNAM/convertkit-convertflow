@@ -260,12 +260,13 @@ export function initGeneratorWorker() {
         }
 
       } catch (error: any) {
+        const currentGen = await prisma.storeGeneration.findUnique({ where: { id: generationId }, select: { log: true } });
         await prisma.storeGeneration.update({
           where: { id: generationId },
           data: {
             status: "FAILED",
             error: { message: error.message, stack: error.stack },
-            log: [...(gen.log as any[]), { time: new Date().toISOString(), msg: `FAILED: ${error.message}` }]
+            log: [...((currentGen?.log as any[]) || []), { time: new Date().toISOString(), msg: `FAILED: ${error.message}` }]
           }
         });
 

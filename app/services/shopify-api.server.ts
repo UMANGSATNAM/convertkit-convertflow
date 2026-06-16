@@ -49,7 +49,7 @@ function recordCircuitSuccess(shopDomain: string) {
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Response>): Promise<any> {
-  const MAX_RETRIES = 5;
+  const MAX_RETRIES = 10;
   let attempt = 0;
 
   while (attempt < MAX_RETRIES) {
@@ -101,7 +101,7 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
 }
 
 export async function graphqlRequest(shopDomain: string, accessToken: string, query: string, variables: any = {}, serialize: boolean = false) {
-  const url = `https://${shopDomain}/admin/api/2024-04/graphql.json`;
+  const url = `https://${shopDomain}/admin/api/2024-10/graphql.json`;
   
   const requestFn = () => fetch(url, {
     method: "POST",
@@ -129,7 +129,7 @@ export async function graphqlRequest(shopDomain: string, accessToken: string, qu
 }
 
 export async function restRequest(shopDomain: string, accessToken: string, method: string, path: string, body?: any, serialize: boolean = false) {
-  const url = `https://${shopDomain}/admin/api/2024-04/${path}`;
+  const url = `https://${shopDomain}/admin/api/2024-10/${path}`;
   
   const requestFn = () => fetch(url, {
     method,
