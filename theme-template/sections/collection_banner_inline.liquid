@@ -1,0 +1,62 @@
+<div class="sf-inline-banner sf-ib-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ib-wrapper">
+    <div class="sf-ib-content">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+      {% if section.settings.btn_link != blank %}
+        <a href="{{ section.settings.btn_link }}" class="sf-ib-btn" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">{{ section.settings.btn_label }}</a>
+      {% endif %}
+    </div>
+    <div class="sf-ib-products">
+      {% for product in collections[section.settings.collection].products limit: 2 %}
+        <a href="{{ product.url }}" class="sf-ib-product">
+          {% if product.featured_image %}
+            <img src="{{ product.featured_image | img_url: '300x' }}" alt="{{ product.title }}">
+          {% else %}
+            {{ 'product-1' | placeholder_svg_tag: 'sf-placeholder' }}
+          {% endif %}
+          <div class="sf-ib-info">
+            <h3 style="color: {{ section.settings.text_color }};">{{ product.title }}</h3>
+            <span style="color: {{ section.settings.text_color }};">{{ product.price | money }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ib-{{ section.id }} { padding: 3rem 1rem; margin: 2rem auto; max-width: 1200px; border-radius: 12px; }
+  .sf-ib-wrapper { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
+  @media (min-width: 768px) { .sf-ib-wrapper { grid-template-columns: 1fr 1fr; } }
+  .sf-ib-content { padding: 2rem; text-align: center; }
+  @media (min-width: 768px) { .sf-ib-content { text-align: left; } }
+  .sf-ib-content h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  .sf-ib-content p { font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; }
+  .sf-ib-btn { display: inline-block; padding: 12px 28px; font-weight: bold; text-decoration: none; border-radius: 50px; text-transform: uppercase; }
+  .sf-ib-products { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0 1rem; }
+  .sf-ib-product { background: rgba(255,255,255,0.5); border-radius: 8px; overflow: hidden; text-decoration: none; text-align: center; transition: 0.3s; }
+  .sf-ib-product:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+  .sf-ib-product img, .sf-placeholder { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .sf-ib-info { padding: 1rem; }
+  .sf-ib-info h3 { font-size: 0.9rem; margin: 0 0 0.5rem; }
+  .sf-ib-info span { font-weight: bold; }
+</style>
+
+{% schema %}
+{
+  "name": "Inline Collection Banner",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f0f4f8" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Curated For You" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Handpicked favorites just arrived." },
+    { "type": "text", "id": "btn_label", "label": "Button", "default": "Shop Collection" },
+    { "type": "url", "id": "btn_link", "label": "Link" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#111111" },
+    { "type": "color", "id": "btn_text", "label": "Button Text", "default": "#ffffff" },
+    { "type": "collection", "id": "collection", "label": "Products to Feature" }
+  ],
+  "presets": [ { "name": "Inline Collection Banner", "category": "Collection" } ]
+}
+{% endschema %}

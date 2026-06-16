@@ -1,0 +1,92 @@
+<div class="sf-tabs sf-tb-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-tb-container">
+    <div class="sf-tb-text">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    <div class="sf-tb-wrapper">
+      <div class="sf-tb-nav">
+        {% for block in section.blocks %}
+          <button class="sf-tb-btn {% if forloop.first %}active{% endif %}" data-target="sf-tab-{{ block.id }}" style="color: {{ section.settings.text_color }};">
+            {{ block.settings.title }}
+          </button>
+        {% endfor %}
+      </div>
+      <div class="sf-tb-content-area">
+        {% for block in section.blocks %}
+          <div class="sf-tb-pane {% if forloop.first %}active{% endif %}" id="sf-tab-{{ block.id }}" style="color: {{ section.settings.text_color }};">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | img_url: '600x' }}" alt="{{ block.settings.title }}">
+            {% endif %}
+            <div class="sf-tb-desc">{{ block.settings.text }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-tb-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-tb-container { max-width: 1000px; margin: 0 auto; }
+  .sf-tb-text { text-align: center; margin-bottom: 3rem; }
+  .sf-tb-text h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  .sf-tb-nav { display: flex; border-bottom: 2px solid rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; scrollbar-width: none; }
+  .sf-tb-nav::-webkit-scrollbar { display: none; }
+  .sf-tb-btn { flex: 1; padding: 1rem; background: none; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; white-space: nowrap; position: relative; opacity: 0.6; transition: 0.3s; }
+  .sf-tb-btn.active { opacity: 1; }
+  .sf-tb-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: currentColor; }
+  .sf-tb-pane { display: none; animation: sf-fade 0.5s; }
+  .sf-tb-pane.active { display: block; }
+  .sf-tb-pane img { width: 100%; max-width: 600px; border-radius: 8px; margin-bottom: 1.5rem; display: block; }
+  .sf-tb-desc { font-size: 1.1rem; line-height: 1.8; opacity: 0.9; }
+  @keyframes sf-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  @media (min-width: 768px) {
+    .sf-tb-wrapper { display: flex; gap: 4rem; }
+    .sf-tb-nav { flex-direction: column; border-bottom: none; border-right: 2px solid rgba(0,0,0,0.1); flex: 0 0 250px; }
+    .sf-tb-btn { text-align: left; padding: 1.5rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .sf-tb-btn.active::after { bottom: 0; left: auto; right: -2px; width: 2px; height: 100%; }
+    .sf-tb-content-area { flex: 1; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const btns = document.querySelectorAll('.sf-tb-{{ section.id }} .sf-tb-btn');
+    const panes = document.querySelectorAll('.sf-tb-{{ section.id }} .sf-tb-pane');
+    
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => b.classList.remove('active'));
+        panes.forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Information Tabs",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Discover Our Features" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Everything you need to know." }
+  ],
+  "blocks": [
+    {
+      "type": "tab", "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab Title", "default": "Feature 1" },
+        { "type": "richtext", "id": "text", "label": "Content", "default": "<p>Content for feature 1.</p>" },
+        { "type": "image_picker", "id": "image", "label": "Image (Optional)" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Information Tabs", "category": "Information" } ]
+}
+{% endschema %}

@@ -1,0 +1,65 @@
+<div class="sf-marquee sf-ma-{{ section.id }}" style="background-color: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }}; padding: {{ section.settings.padding }}px 0;">
+  <div class="sf-ma-container">
+    <div class="sf-ma-track" style="animation-duration: {{ section.settings.speed }}s; animation-direction: {{ section.settings.direction }};">
+      {% for i in (1..10) %}
+        <div class="sf-ma-content">
+          {% for block in section.blocks %}
+            <span class="sf-ma-item">
+              {% if block.settings.icon != 'none' %}
+                <span class="sf-ma-icon">
+                  {% if block.settings.icon == 'star' %}★{% elsif block.settings.icon == 'circle' %}●{% elsif block.settings.icon == 'lightning' %}⚡{% endif %}
+                </span>
+              {% endif %}
+              {% if block.settings.link != blank %}
+                <a href="{{ block.settings.link }}" style="color: {{ section.settings.text_color }};">{{ block.settings.text }}</a>
+              {% else %}
+                {{ block.settings.text }}
+              {% endif %}
+            </span>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ma-{{ section.id }} { overflow: hidden; white-space: nowrap; width: 100%; position: relative; z-index: 10; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .sf-ma-container { display: flex; }
+  .sf-ma-track { display: flex; animation: sf-marquee-scroll linear infinite; }
+  .sf-ma-content { display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; min-width: 100%; }
+  .sf-ma-item { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0 2rem; font-size: {{ section.settings.font_size }}px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+  .sf-ma-item a { text-decoration: none; }
+  .sf-ma-item a:hover { text-decoration: underline; }
+  .sf-ma-icon { font-size: 0.8em; }
+  
+  @keyframes sf-marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Scrolling Announcement",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#111111" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "range", "id": "padding", "label": "Vertical Padding", "min": 5, "max": 30, "step": 1, "default": 12 },
+    { "type": "range", "id": "font_size", "label": "Font Size", "min": 12, "max": 36, "step": 1, "default": 14 },
+    { "type": "range", "id": "speed", "label": "Scroll Speed", "min": 10, "max": 60, "step": 1, "default": 30 },
+    { "type": "select", "id": "direction", "label": "Direction", "options": [ { "value": "normal", "label": "Right to Left" }, { "value": "reverse", "label": "Left to Right" } ], "default": "normal" }
+  ],
+  "blocks": [
+    {
+      "type": "text", "name": "Announcement Text",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "FREE SHIPPING ON ORDERS OVER $50" },
+        { "type": "url", "id": "link", "label": "Link (Optional)" },
+        { "type": "select", "id": "icon", "label": "Separator Icon", "options": [ { "value": "none", "label": "None" }, { "value": "star", "label": "Star" }, { "value": "circle", "label": "Circle" }, { "value": "lightning", "label": "Lightning" } ], "default": "star" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Scrolling Announcement", "category": "Utilities", "blocks": [{"type":"text"},{"type":"text"},{"type":"text"}] } ]
+}
+{% endschema %}

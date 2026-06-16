@@ -1,0 +1,60 @@
+<div class="sf-process sf-ps-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ps-container">
+    <div class="sf-ps-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-ps-steps">
+      {% for block in section.blocks %}
+        <div class="sf-ps-step">
+          <div class="sf-ps-number" style="color: {{ section.settings.text_color }}; border-color: {{ section.settings.text_color }};">{{ forloop.index }}</div>
+          <h3 style="color: {{ section.settings.text_color }};">{{ block.settings.title }}</h3>
+          <p style="color: {{ section.settings.text_color }};">{{ block.settings.text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ps-{{ section.id }} { padding: 6rem 1rem; }
+  .sf-ps-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+  .sf-ps-header { margin-bottom: 4rem; }
+  .sf-ps-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  .sf-ps-header p { font-size: 1.1rem; opacity: 0.8; max-width: 600px; margin: 0 auto; }
+  
+  .sf-ps-steps { display: grid; grid-template-columns: 1fr; gap: 3rem; position: relative; }
+  @media (min-width: 768px) {
+    .sf-ps-steps { grid-template-columns: repeat({{ section.blocks.size | at_most: 4 }}, 1fr); }
+    .sf-ps-steps::before { content: ''; position: absolute; top: 35px; left: 10%; right: 10%; height: 2px; background: rgba(0,0,0,0.1); z-index: 1; }
+  }
+  
+  .sf-ps-step { position: relative; z-index: 2; }
+  .sf-ps-number { width: 70px; height: 70px; margin: 0 auto 1.5rem; border-radius: 50%; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; background: {{ section.settings.bg_color }}; }
+  .sf-ps-step h3 { font-size: 1.25rem; margin-bottom: 1rem; }
+  .sf-ps-step p { opacity: 0.8; line-height: 1.6; }
+</style>
+
+{% schema %}
+{
+  "name": "Process Steps",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "How It Works" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "A simple process to get you started." }
+  ],
+  "blocks": [
+    {
+      "type": "step", "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Step Title" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Describe this step in the process." }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Process Steps", "category": "Information", "blocks": [{"type":"step"}, {"type":"step"}, {"type":"step"}] } ]
+}
+{% endschema %}

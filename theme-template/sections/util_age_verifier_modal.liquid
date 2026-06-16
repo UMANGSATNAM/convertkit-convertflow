@@ -1,0 +1,85 @@
+<div class="sf-age sf-age-{{ section.id }}" id="sf-age-modal-{{ section.id }}">
+  <div class="sf-age-overlay"></div>
+  <div class="sf-age-content" style="background-color: {{ section.settings.bg_color }};">
+    
+    {% if section.settings.logo != blank %}
+      <div class="sf-age-logo">
+        <img src="{{ section.settings.logo | img_url: '300x' }}" alt="Logo">
+      </div>
+    {% endif %}
+
+    <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+    <p style="color: {{ section.settings.text_color }};">{{ section.settings.text }}</p>
+    
+    <div class="sf-age-actions">
+      <button class="sf-age-btn sf-age-yes" onclick="verifyAge()" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">{{ section.settings.btn_yes }}</button>
+      <a href="{{ section.settings.fail_url }}" class="sf-age-btn sf-age-no" style="background: transparent; border: 1px solid {{ section.settings.text_color }}; color: {{ section.settings.text_color }};">{{ section.settings.btn_no }}</a>
+    </div>
+
+    {% if section.settings.disclaimer != blank %}
+      <p class="sf-age-disclaimer" style="color: {{ section.settings.text_color }};">{{ section.settings.disclaimer }}</p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .sf-age-{{ section.id }} { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; display: none; align-items: center; justify-content: center; }
+  .sf-age-{{ section.id }}.active { display: flex; }
+  .sf-age-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
+  
+  .sf-age-content { position: relative; z-index: 10; width: 90%; max-width: 500px; padding: 4rem 3rem; border-radius: 12px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  
+  .sf-age-logo { margin-bottom: 2rem; }
+  .sf-age-logo img { max-height: 80px; width: auto; margin: 0 auto; }
+  
+  .sf-age-content h2 { font-size: 2rem; margin-bottom: 1rem; font-weight: bold; }
+  .sf-age-content p { opacity: 0.8; margin-bottom: 2.5rem; line-height: 1.5; font-size: 1.1rem; }
+  
+  .sf-age-actions { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+  @media (min-width: 400px) { .sf-age-actions { flex-direction: row; } }
+  
+  .sf-age-btn { flex: 1; padding: 15px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; transition: opacity 0.3s; }
+  .sf-age-btn:hover { opacity: 0.8; }
+  
+  .sf-age-disclaimer { font-size: 0.85rem !important; opacity: 0.5 !important; margin-bottom: 0 !important; }
+</style>
+
+<script>
+  function verifyAge() {
+    localStorage.setItem('sf_age_verified', 'true');
+    document.getElementById('sf-age-modal-{{ section.id }}').classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.Shopify && window.Shopify.designMode) {
+      document.getElementById('sf-age-modal-{{ section.id }}').classList.add('active');
+      return;
+    }
+    
+    if (!localStorage.getItem('sf_age_verified')) {
+      document.getElementById('sf-age-modal-{{ section.id }}').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Age Verifier Modal",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#111111" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Are you 21 or older?" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "You must be of legal drinking age to enter this site." },
+    { "type": "text", "id": "btn_yes", "label": "Yes Button", "default": "Yes, I am 21+" },
+    { "type": "color", "id": "btn_bg", "label": "Yes Button BG", "default": "#ffffff" },
+    { "type": "color", "id": "btn_text", "label": "Yes Button Text", "default": "#111111" },
+    { "type": "text", "id": "btn_no", "label": "No Button", "default": "No, I am under 21" },
+    { "type": "url", "id": "fail_url", "label": "Redirect if No", "default": "https://google.com" },
+    { "type": "textarea", "id": "disclaimer", "label": "Disclaimer", "default": "By entering this site you agree to our Terms & Conditions and Privacy Policy." }
+  ],
+  "presets": [ { "name": "Age Verifier Modal", "category": "Utilities" } ]
+}
+{% endschema %}

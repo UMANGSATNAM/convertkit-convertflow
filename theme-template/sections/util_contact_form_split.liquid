@@ -1,0 +1,106 @@
+<div class="sf-contact sf-cf-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-cf-container">
+    <div class="sf-cf-info">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <div class="sf-cf-desc" style="color: {{ section.settings.text_color }};">
+        {{ section.settings.text }}
+      </div>
+      
+      <div class="sf-cf-details">
+        {% if section.settings.email != blank %}
+          <div class="sf-cf-detail">
+            <span class="sf-cf-icon">✉</span>
+            <div style="color: {{ section.settings.text_color }};">
+              <strong>Email Us</strong>
+              <p><a href="mailto:{{ section.settings.email }}" style="color: inherit;">{{ section.settings.email }}</a></p>
+            </div>
+          </div>
+        {% endif %}
+        {% if section.settings.phone != blank %}
+          <div class="sf-cf-detail">
+            <span class="sf-cf-icon">☏</span>
+            <div style="color: {{ section.settings.text_color }};">
+              <strong>Call Us</strong>
+              <p><a href="tel:{{ section.settings.phone }}" style="color: inherit;">{{ section.settings.phone }}</a></p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="sf-cf-form-wrap" style="background: {{ section.settings.form_bg }};">
+      {% form 'contact' %}
+        {% if form.posted_successfully? %}
+          <p class="sf-cf-success" style="color: green; background: #e8f5e9; padding: 15px; border-radius: 4px;">Thanks for contacting us! We'll get back to you as soon as possible.</p>
+        {% endif %}
+        {{ form.errors | default_errors }}
+        
+        <div class="sf-cf-row">
+          <div class="sf-cf-group">
+            <label for="ContactFormName" style="color: {{ section.settings.text_color }};">Name</label>
+            <input type="text" id="ContactFormName" name="contact[name]" placeholder="Jane Doe" required>
+          </div>
+          <div class="sf-cf-group">
+            <label for="ContactFormEmail" style="color: {{ section.settings.text_color }};">Email</label>
+            <input type="email" id="ContactFormEmail" name="contact[email]" placeholder="jane@example.com" required>
+          </div>
+        </div>
+        
+        <div class="sf-cf-group">
+          <label for="ContactFormSubject" style="color: {{ section.settings.text_color }};">Subject</label>
+          <input type="text" id="ContactFormSubject" name="contact[subject]" placeholder="How can we help?">
+        </div>
+        
+        <div class="sf-cf-group">
+          <label for="ContactFormMessage" style="color: {{ section.settings.text_color }};">Message</label>
+          <textarea rows="6" id="ContactFormMessage" name="contact[body]" placeholder="Your message here..." required></textarea>
+        </div>
+        
+        <button type="submit" class="sf-cf-btn" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">Send Message</button>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-cf-{{ section.id }} { padding: 6rem 1rem; }
+  .sf-cf-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 4rem; }
+  @media (min-width: 992px) { .sf-cf-container { grid-template-columns: 4fr 6fr; } }
+  
+  .sf-cf-info h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+  .sf-cf-desc { font-size: 1.1rem; line-height: 1.6; opacity: 0.8; margin-bottom: 3rem; }
+  .sf-cf-details { display: flex; flex-direction: column; gap: 2rem; }
+  .sf-cf-detail { display: flex; align-items: flex-start; gap: 1rem; }
+  .sf-cf-icon { font-size: 2rem; line-height: 1; }
+  .sf-cf-detail strong { display: block; margin-bottom: 0.25rem; font-size: 1.1rem; }
+  .sf-cf-detail p { opacity: 0.8; margin: 0; }
+  
+  .sf-cf-form-wrap { padding: 3rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+  .sf-cf-row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+  @media (min-width: 600px) { .sf-cf-row { grid-template-columns: 1fr 1fr; } }
+  .sf-cf-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .sf-cf-group label { font-weight: bold; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+  .sf-cf-group input, .sf-cf-group textarea { padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; font-size: 1rem; width: 100%; background: transparent; }
+  .sf-cf-group input:focus, .sf-cf-group textarea:focus { outline: none; border-color: #000; }
+  
+  .sf-cf-btn { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 4px; cursor: pointer; transition: opacity 0.3s; }
+  .sf-cf-btn:hover { opacity: 0.9; }
+</style>
+
+{% schema %}
+{
+  "name": "Contact Form Split",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#fafafa" },
+    { "type": "color", "id": "form_bg", "label": "Form Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Get in Touch" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>We'd love to hear from you. Fill out the form and our team will get back to you within 24 hours.</p>" },
+    { "type": "text", "id": "email", "label": "Contact Email", "default": "hello@example.com" },
+    { "type": "text", "id": "phone", "label": "Contact Phone", "default": "+1 (800) 123-4567" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#111111" },
+    { "type": "color", "id": "btn_text", "label": "Button Text", "default": "#ffffff" }
+  ],
+  "presets": [ { "name": "Contact Form Split", "category": "Utilities" } ]
+}
+{% endschema %}

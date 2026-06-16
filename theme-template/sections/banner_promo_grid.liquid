@@ -1,0 +1,55 @@
+<div class="sf-promo-grid sf-promo-{{ section.id }}">
+  {% for block in section.blocks %}
+    <a href="{{ block.settings.link }}" class="sf-promo-item" style="background-color: {{ block.settings.bg_color }};">
+      <div class="sf-promo-content">
+        <h3 style="color: {{ block.settings.text_color }};">{{ block.settings.title }}</h3>
+        <p style="color: {{ block.settings.text_color }};">{{ block.settings.subtitle }}</p>
+      </div>
+      {% if block.settings.image != blank %}
+        <img src="{{ block.settings.image | img_url: '400x' }}" class="sf-promo-img" alt="{{ block.settings.title }}">
+      {% endif %}
+    </a>
+  {% endfor %}
+</div>
+
+<style>
+  .sf-promo-grid {
+    display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1rem; max-width: 1200px; margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .sf-promo-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .sf-promo-item {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 2rem; border-radius: 8px; text-decoration: none; overflow: hidden; min-height: 250px;
+    transition: transform 0.3s ease;
+  }
+  .sf-promo-item:hover { transform: translateY(-5px); }
+  .sf-promo-content { position: relative; z-index: 2; }
+  .sf-promo-content h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .sf-promo-img {
+    position: absolute; bottom: -10%; right: -10%; width: 60%; object-fit: contain; z-index: 1; transition: transform 0.3s;
+  }
+  .sf-promo-item:hover .sf-promo-img { transform: scale(1.1); }
+</style>
+
+{% schema %}
+{
+  "name": "Promo Grid",
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "promo", "name": "Promo Card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Save 20%" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "On selected items" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "color", "id": "bg_color", "label": "BG", "default": "#f4f4f4" },
+        { "type": "color", "id": "text_color", "label": "Text", "default": "#000" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Promo Grid", "category": "Banner" } ]
+}
+{% endschema %}

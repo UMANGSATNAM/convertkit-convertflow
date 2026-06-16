@@ -1,0 +1,58 @@
+<div class="sf-cl-slider sf-cls-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-cls-header">
+    <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+  </div>
+  <div class="sf-cls-track">
+    {% for block in section.blocks %}
+      {% assign coll = collections[block.settings.collection] %}
+      <a href="{{ coll.url | default: block.settings.link }}" class="sf-cls-item">
+        <div class="sf-cls-img">
+          {% if block.settings.image != blank %}
+            <img src="{{ block.settings.image | img_url: '400x400', crop: 'center' }}" alt="{{ block.settings.title }}">
+          {% elsif coll.image %}
+            <img src="{{ coll.image | img_url: '400x400', crop: 'center' }}" alt="{{ coll.title }}">
+          {% else %}
+            {{ 'collection-1' | placeholder_svg_tag: 'sf-placeholder' }}
+          {% endif %}
+        </div>
+        <h3 style="color: {{ section.settings.text_color }};">{{ block.settings.title | default: coll.title | default: 'Collection' }}</h3>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .sf-cls-{{ section.id }} { padding: 4rem 1rem; text-align: center; overflow: hidden; }
+  .sf-cls-header h2 { font-size: 2.5rem; margin-bottom: 2rem; }
+  .sf-cls-track { display: flex; gap: 1.5rem; overflow-x: auto; padding: 1rem 0; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .sf-cls-track::-webkit-scrollbar { display: none; }
+  .sf-cls-item { flex: 0 0 80%; max-width: 300px; text-decoration: none; scroll-snap-align: start; }
+  @media (min-width: 768px) { .sf-cls-item { flex: 0 0 calc(25% - 1.5rem); } }
+  .sf-cls-img { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 3/4; margin-bottom: 1rem; }
+  .sf-cls-img img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+  .sf-cls-item:hover .sf-cls-img img { transform: scale(1.05); }
+  .sf-cls-item h3 { font-size: 1.2rem; margin: 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+
+{% schema %}
+{
+  "name": "Collection List Slider",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Shop Collections" }
+  ],
+  "blocks": [
+    {
+      "type": "collection", "name": "Collection",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Override Image" },
+        { "type": "text", "id": "title", "label": "Override Title" },
+        { "type": "url", "id": "link", "label": "Override Link" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Collection List Slider", "category": "Collection" } ]
+}
+{% endschema %}

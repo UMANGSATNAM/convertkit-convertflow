@@ -1,0 +1,194 @@
+<div class="sf-product-info sf-product-info-{{ section.id }}">
+  <h1 class="sf-product-title">{{ product.title }}</h1>
+  
+  <div class="sf-product-reviews">
+    <span class="sf-stars">★★★★★</span>
+    <span class="sf-review-count">4.8 (124 Reviews)</span>
+  </div>
+
+  <div class="sf-product-price">
+    <span class="sf-price">{{ product.price | money }}</span>
+    {% if product.compare_at_price > product.price %}
+      <span class="sf-compare-price">{{ product.compare_at_price | money }}</span>
+      <span class="sf-save-badge">Save {{ product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round }}%</span>
+    {% endif %}
+  </div>
+
+  {% if section.settings.show_scarcity %}
+    <div class="sf-scarcity">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Only a few units left in stock!
+    </div>
+  {% endif %}
+
+  {% form 'product', product, class: 'sf-product-form' %}
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    
+    <div class="sf-quantity-wrapper">
+      <label for="Quantity">Quantity</label>
+      <input type="number" id="Quantity" name="quantity" value="1" min="1" class="sf-quantity-input">
+    </div>
+
+    <button type="submit" class="sf-add-to-cart" style="background-color: {{ section.settings.btn_color }};">
+      {{ section.settings.btn_text | default: 'Add to Cart' }}
+    </button>
+  {% endform %}
+
+  <div class="sf-product-description">
+    {{ product.description }}
+  </div>
+
+  {% if section.settings.show_shipping %}
+    <div class="sf-shipping-info">
+      <p>🚚 <strong>Free Shipping</strong> across India</p>
+      <p>⚡ Dispatch within 24 hours</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .sf-product-info-{{ section.id }} {
+    padding: 2rem 0;
+    color: {{ section.settings.text_color }};
+  }
+  .sf-product-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .sf-product-reviews {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .sf-stars {
+    color: #f5c518;
+    letter-spacing: 2px;
+  }
+  .sf-review-count {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+  .sf-product-price {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .sf-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .sf-compare-price {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  .sf-save-badge {
+    background: #e6f4ea;
+    color: #137333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .sf-scarcity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d93025;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    background: #fce8e6;
+    padding: 8px 12px;
+    border-radius: 4px;
+  }
+  .sf-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .sf-quantity-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sf-quantity-input {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  .sf-add-to-cart {
+    padding: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: opacity 0.3s;
+  }
+  .sf-add-to-cart:hover {
+    opacity: 0.9;
+  }
+  .sf-shipping-info {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    background: #fafafa;
+  }
+  .sf-shipping-info p {
+    margin: 0.5rem 0;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "D2C Product Info",
+  "settings": [
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Button Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scarcity",
+      "label": "Show Scarcity Badge",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping",
+      "label": "Show Shipping Info",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "D2C Product Info",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

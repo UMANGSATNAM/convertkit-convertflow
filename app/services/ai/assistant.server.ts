@@ -272,7 +272,7 @@ export async function processUserMessage(request: Request, shopId: string, shopD
       contentArr.push({ type: "text", text: message });
 
       const response = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307",
+        model: "claude-3-5-sonnet-20241022",
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
         tools: [
