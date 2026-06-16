@@ -78,56 +78,74 @@ export function initGeneratorWorker() {
 
         // 4. STORE BLUEPRINT (Deterministic Assembly)
         await updateStatus("INSTALLING_THEME", "4. Store Blueprint: Assembling skeleton layout...");
+
+        // Map logical section types to actual DB category names
+        const SECTION_TO_CATEGORY: Record<string, string> = {
+          "hero": "hero",
+          "product_grid": "product_grid",
+          "testimonials": "testimonials",
+          "trust": "social_proof",
+          "faq": "information",
+          "footer": "layout",
+          "banner": "banner",
+          "brand_story": "brand_story",
+        };
         
-        const indexSections = [
-          { sectionType: "hero" },
-          { sectionType: "product_grid" }
-        ];
+        const indexSectionTypes = ["hero", "product_grid"];
 
         if (croContext.socialProofNeeded) {
-          indexSections.push({ sectionType: "testimonials" });
+          indexSectionTypes.push("testimonials");
         }
         
         if (croContext.trustLevel === "high") {
-          indexSections.push({ sectionType: "trust" });
+          indexSectionTypes.push("trust");
         }
 
         if (croContext.faqNeeded) {
-          indexSections.push({ sectionType: "faq" });
+          indexSectionTypes.push("faq");
         }
         
-        indexSections.push({ sectionType: "footer" });
+        indexSectionTypes.push("footer");
+
+        // 5. COMPONENT RETRIEVAL ENGINE
+        const industriesList = [catalogContext.industry, catalogContext.subcategory, "generic"];
+        const stylesList = [brandContext.style, "minimal", "modern"];
+
+        // Build blueprint sections with resolved componentIds
+        const resolvedSections: Array<{ sectionType: string; componentId: string; settings?: any }> = [];
+        
+        for (const sectionType of indexSectionTypes) {
+          const dbCategory = SECTION_TO_CATEGORY[sectionType] || sectionType;
+          const bestComponent = await retrieveBestComponent({
+            sectionType: dbCategory,
+            industryTags: industriesList,
+            styleTags: stylesList
+          });
+          if (bestComponent) {
+            resolvedSections.push({
+              sectionType,
+              componentId: bestComponent.componentId,
+              settings: {}
+            });
+            console.log(`[Blueprint] Resolved ${sectionType} → ${bestComponent.componentId}`);
+          } else {
+            console.warn(`[Blueprint] No component found for sectionType=${sectionType} (category=${dbCategory})`);
+          }
+        }
 
         const storeBlueprintAi = {
           pages: {
-            "index": { sections: indexSections }
+            "index": { sections: resolvedSections }
+          },
+          settings: {
+            colors_accent_1: brandContext.primaryColor || "#1A1A1A",
+            colors_accent_2: brandContext.secondaryColor || "#C9A84C",
+            colors_background_1: brandContext.accentColor || "#FFFFFF",
           }
         };
-        console.log("Store Blueprint assembled:", storeBlueprintAi);
+        console.log("Store Blueprint assembled with sections:", resolvedSections.length);
 
-        // 5. COMPONENT RETRIEVAL ENGINE
-        // Query ComponentRegistry using tags via our new Retrieval Engine
-        const industriesList = [catalogContext.industry, catalogContext.subcategory, "generic"];
-        const stylesList = [brandContext.style, "minimal", "modern"];
-        
-        const matchedComponentsList = [];
-        // Flatten the sections out of the pages map from the Store Blueprint to retrieve each
-        for (const [pageHandle, pageData] of Object.entries(storeBlueprintAi.pages)) {
-          for (const section of pageData.sections) {
-            const bestComponent = await retrieveBestComponent({
-              sectionType: section.sectionType,
-              industryTags: industriesList,
-              styleTags: stylesList
-            });
-            if (bestComponent) {
-              matchedComponentsList.push(bestComponent);
-              // Store the resolved componentId back into the blueprint for the composer
-              (section as any).componentId = bestComponent.componentId;
-            } else {
-              console.warn(`No component found for ${section.sectionType}`);
-            }
-          }
-        }
+        const matchedComponentsList = resolvedSections;
         console.log("Matched components retrieved count:", matchedComponentsList.length);
 
         // 10. THEME COMPOSER & ASSET CACHE
