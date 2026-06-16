@@ -18,6 +18,25 @@ export async function importCatalog(shop: any, catalogUrl: string) {
   }
 
   for (const product of products) {
+    // 0. Check if product already exists (idempotency for retries)
+    const searchResponse = await graphqlRequest(
+      shop.shopDomain,
+      shop.accessToken,
+      `
+      query findProduct($query: String!) {
+        products(first: 1, query: $query) {
+          edges { node { id title } }
+        }
+      }
+      `,
+      { query: `title:'${product.title.replace(/'/g, "\\'")}'` }
+    );
+    const existingProduct = searchResponse.products?.edges?.[0]?.node;
+    if (existingProduct) {
+      console.log(`[Catalog] Skipping duplicate product: "${product.title}"`);
+      continue;
+    }
+
     // 1. Create the Product
     const pResponse = await graphqlRequest(
       shop.shopDomain,

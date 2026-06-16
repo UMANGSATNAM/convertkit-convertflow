@@ -62,9 +62,9 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
         recordCircuitFailure(shopDomain);
         if (attempt === MAX_RETRIES - 1) throw new Error(`Shopify 5xx Error: ${response.status} ${response.statusText}`);
       } else if (response.status === 429) {
-        // Throttled (REST)
-        // Backoff with jitter
-        const delay = Math.pow(2, attempt) * 500 + Math.random() * 500;
+        // Throttled — exponential backoff with jitter
+        const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+        console.warn(`[Shopify] 429 Rate Limited. Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1})`);
         await sleep(delay);
         attempt++;
         continue;
@@ -75,7 +75,8 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
         
         // Handle GraphQL specific rate limiting
         if (data.errors && Array.isArray(data.errors) && data.errors.some((e: any) => e.extensions?.code === 'THROTTLED')) {
-          const delay = Math.pow(2, attempt) * 500 + Math.random() * 500;
+          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+          console.warn(`[Shopify] GraphQL THROTTLED. Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1})`);
           await sleep(delay);
           attempt++;
           continue;
@@ -90,10 +91,27 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
       }
     } catch (error: any) {
       if (error instanceof CircuitBreakerOpenError) throw error;
+      
+      // Retry SSL/network-level transient errors (EPROTO, ECONNRESET, ETIMEDOUT)
+      const isNetworkError = error.code === 'EPROTO' || 
+                             error.code === 'ECONNRESET' || 
+                             error.code === 'ETIMEDOUT' ||
+                             error.code === 'ECONNREFUSED' ||
+                             (error.message && error.message.includes('SSL'));
+      
+      if (isNetworkError && attempt < MAX_RETRIES - 1) {
+        // Longer delay for SSL/network errors to let Cloudflare reset
+        const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
+        console.warn(`[Shopify] Network/SSL error (${error.code || 'SSL'}). Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await sleep(delay);
+        attempt++;
+        continue;
+      }
+      
       if (attempt === MAX_RETRIES - 1) throw error;
     }
     
-    // Default backoff for network errors
+    // Default backoff for other errors
     const delay = Math.pow(2, attempt) * 500 + Math.random() * 500;
     await sleep(delay);
     attempt++;
