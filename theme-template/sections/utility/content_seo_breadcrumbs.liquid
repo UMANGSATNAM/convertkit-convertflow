@@ -1,0 +1,71 @@
+{%- if section.settings.enable_breadcrumbs -%}
+  <nav class="breadcrumbs py-4 px-6 text-xs text-[var(--color-text-muted, #555)] uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="breadcrumbs">
+    <ol class="flex items-center space-x-2">
+      <li>
+        <a href="/" class="hover:text-[var(--color-text, #111)] transition-colors" title="Home">Home</a>
+      </li>
+      
+      {%- if template contains 'page' -%}
+        <li><span class="mx-2">/</span></li>
+        <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ page.title }}</li>
+        
+      {%- elsif template contains 'product' -%}
+        {%- if collection.url -%}
+          <li><span class="mx-2">/</span></li>
+          <li><a href="{{ collection.url }}" class="hover:text-[var(--color-text, #111)] transition-colors">{{ collection.title }}</a></li>
+        {%- endif -%}
+        <li><span class="mx-2">/</span></li>
+        <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ product.title }}</li>
+        
+      {%- elsif template contains 'collection' and collection.handle -%}
+        <li><span class="mx-2">/</span></li>
+        {%- if current_tags -%}
+          <li><a href="{{ collection.url }}" class="hover:text-[var(--color-text, #111)] transition-colors">{{ collection.title }}</a></li>
+          <li><span class="mx-2">/</span></li>
+          <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ current_tags | join: " + " }}</li>
+        {%- else -%}
+          <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ collection.title }}</li>
+        {%- endif -%}
+        
+      {%- elsif template == 'blog' -%}
+        <li><span class="mx-2">/</span></li>
+        {%- if current_tags -%}
+          <li><a href="{{ blog.url }}" class="hover:text-[var(--color-text, #111)] transition-colors">{{ blog.title }}</a></li>
+          <li><span class="mx-2">/</span></li>
+          <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ current_tags | join: " + " }}</li>
+        {%- else -%}
+          <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ blog.title }}</li>
+        {%- endif -%}
+        
+      {%- elsif template == 'article' -%}
+        <li><span class="mx-2">/</span></li>
+        <li><a href="{{ blog.url }}" class="hover:text-[var(--color-text, #111)] transition-colors">{{ blog.title }}</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ article.title }}</li>
+        
+      {%- else -%}
+        <li><span class="mx-2">/</span></li>
+        <li aria-current="page" class="font-bold text-[var(--color-text, #111)]">{{ page_title }}</li>
+      {%- endif -%}
+    </ol>
+  </nav>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Breadcrumbs"
+    }
+  ]
+}
+{% endschema %}

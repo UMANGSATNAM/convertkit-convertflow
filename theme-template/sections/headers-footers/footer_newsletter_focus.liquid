@@ -1,0 +1,75 @@
+<footer class="footer-newsletter bg-[var(--color-bg, #f8f8f8)] text-[var(--color-text, #111)]">
+  
+  <!-- Newsletter Focus Area -->
+  <div class="border-b border-gray-200">
+    <div class="max-w-4xl mx-auto py-24 px-6 text-center">
+      <h2 class="text-4xl md:text-6xl font-black uppercase tracking-wider mb-6">{{ section.settings.title }}</h2>
+      <p class="text-lg text-gray-600 mb-10">{{ section.settings.subtitle }}</p>
+      
+      {% form 'customer', class: 'relative max-w-xl mx-auto' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="flex border-b-2 border-black focus-within:border-[var(--color-accent, #ff0000)] transition-colors">
+          <input 
+            type="email" 
+            name="contact[email]" 
+            class="w-full py-4 bg-transparent outline-none text-xl placeholder-gray-400" 
+            placeholder="Enter your email address"
+            required
+          >
+          <button type="submit" class="font-bold uppercase tracking-widest text-sm hover:text-[var(--color-accent, #ff0000)] transition-colors px-4">
+            Subscribe
+          </button>
+        </div>
+        {%- if form.posted_successfully? -%}
+          <p class="mt-4 text-green-600 font-medium">Thanks for subscribing!</p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <p class="mt-4 text-red-600 font-medium">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+      {% endform %}
+    </div>
+  </div>
+
+  <!-- Minimal Bottom Links -->
+  <div class="max-w-[1440px] mx-auto py-8 px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-sm">
+    <div class="flex gap-6 font-bold uppercase tracking-widest text-xs">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="hover:text-[var(--color-accent, #ff0000)] transition-colors">{{ link.title }}</a>
+      {%- endfor -%}
+    </div>
+    <div class="text-gray-500">
+      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}.
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer - Newsletter Focus",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join The Club"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Sign up for early access to drops, exclusive offers, and community events."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Bottom Menu",
+      "default": "footer"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer - Newsletter Focus"
+    }
+  ]
+}
+{% endschema %}

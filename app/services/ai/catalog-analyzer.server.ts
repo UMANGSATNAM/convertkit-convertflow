@@ -1,4 +1,5 @@
 import { graphqlRequest } from "../shopify-api.server";
+import { generateStructuredJson } from "./claude.server";
 
 export interface CatalogContext {
   industry: string;
@@ -16,8 +17,7 @@ export interface CatalogContext {
 
 /**
  * Analyzes the Shopify catalog to extract a compressed context for the AI engines.
- * This prevents blowing up LLM token limits by summarizing the catalog instead of
- * passing raw product JSONs.
+ * It uses Anthropic Claude to determine the true industry, subcategory, price tier, and a qualitative catalog score.
  */
 export async function analyzeCatalog(
   shopDomain: string,
@@ -27,6 +27,7 @@ export async function analyzeCatalog(
     query getCatalogData {
       products(first: 100) {
         nodes {
+          title
           vendor
           productType
           tags
@@ -52,12 +53,14 @@ export async function analyzeCatalog(
   const vendors = new Set<string>();
   const productTypes = new Set<string>();
   const tags = new Set<string>();
+  const titles: string[] = [];
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
   let totalImages = 0;
 
   for (const product of products) {
+    if (product.title) titles.push(product.title);
     if (product.vendor) vendors.add(product.vendor);
     if (product.productType) productTypes.add(product.productType);
     
@@ -79,11 +82,9 @@ export async function analyzeCatalog(
     }
   }
 
-  // Handle edge cases where no valid prices exist
   if (minPrice === Infinity) minPrice = 0;
   if (maxPrice === -Infinity) maxPrice = 0;
 
-  // Calculate Average Price deterministically
   let totalPrice = 0;
   let priceCount = 0;
   for (const product of products) {
@@ -97,55 +98,62 @@ export async function analyzeCatalog(
     }
   }
   const avgPrice = priceCount > 0 ? totalPrice / priceCount : 0;
+  const productCount = products.length;
+  const imagesPerProduct = productCount > 0 ? totalImages / productCount : 0;
 
-  // --- DETERMINISTIC RULES ENGINE ---
+  // --- AI ENGINE (CLAUDE) ---
   
-  // 1. Price Tier
-  let priceTier = "Standard";
-  if (avgPrice > 1500) priceTier = "Premium";
-  if (avgPrice < 500) priceTier = "Value";
+  const systemInstruction = `
+    You are a Senior E-commerce Data Analyst.
+    Your job is to analyze the compressed catalog data of a Shopify store and categorize it.
+    
+    You must output ONLY valid JSON matching this schema:
+    {
+      "industry": "string (e.g., fashion, beauty, jewelry, home, electronics, generic)",
+      "subcategory": "string (e.g., streetwear, skincare, luxury, general)",
+      "priceTier": "string (e.g., Premium, Standard, Value)",
+      "catalogScore": "number (0-100 indicating quality/richness of the catalog data)"
+    }
 
-  // 2. Industry & Subcategory
-  let industry = "generic";
-  let subcategory = "general";
-  const allText = [...Array.from(productTypes), ...Array.from(tags), ...Array.from(vendors)].join(" ").toLowerCase();
+    Guidelines:
+    - Determine 'industry' and 'subcategory' from the product titles, tags, vendors, and types.
+    - 'priceTier': 'Premium' if avg price is very high relative to the niche, 'Standard' for average, 'Value' if very cheap.
+    - 'catalogScore': Score higher if there are many products, multiple images, and robust tagging/typing.
+  `;
 
-  if (allText.includes("shirt") || allText.includes("fashion") || allText.includes("apparel") || allText.includes("clothing")) {
-    industry = "fashion";
-    if (allText.includes("streetwear") || allText.includes("oversize")) subcategory = "streetwear";
-    else if (allText.includes("luxury")) subcategory = "luxury";
-  } else if (allText.includes("jewelry") || allText.includes("ring") || allText.includes("necklace")) {
-    industry = "jewelry";
-  } else if (allText.includes("beauty") || allText.includes("cosmetics") || allText.includes("skincare")) {
-    industry = "beauty";
-  } else if (allText.includes("furniture") || allText.includes("home") || allText.includes("decor")) {
-    industry = "home";
-  } else if (allText.includes("electronics") || allText.includes("gadget") || allText.includes("tech")) {
-    industry = "electronics";
+  // Compress the data to send to the LLM (to save tokens)
+  const userPrompt = JSON.stringify({
+    shopDomain,
+    productCount,
+    avgPrice,
+    imagesPerProduct,
+    vendors: Array.from(vendors).slice(0, 10),
+    productTypes: Array.from(productTypes).slice(0, 10),
+    tags: Array.from(tags).slice(0, 20),
+    sampleTitles: titles.slice(0, 5) // Just a few titles to give context
+  });
+
+  let aiResult = {
+    industry: "generic",
+    subcategory: "general",
+    priceTier: "Standard",
+    catalogScore: 50
+  };
+
+  try {
+    aiResult = await generateStructuredJson<typeof aiResult>(systemInstruction, userPrompt);
+  } catch (err) {
+    console.error("Claude failed in catalog analyzer, falling back to defaults.", err);
   }
 
-  // 3. Catalog Score (Mock calculation based on product count and variants)
-  // E.g., if they have products and prices, they get a decent score.
-  let catalogScore = 50;
-  if (products.length > 10) catalogScore += 20;
-  if (priceCount > products.length) catalogScore += 20; // Multiple variants
-  if (vendors.size > 1) catalogScore += 10;
-  
-  // Cap at 100
-  catalogScore = Math.min(catalogScore, 100);
-
-  // If deterministic classification fails (industry is still 'generic'), 
-  // we would normally trigger an LLM fallback here passing the compressed data.
-  // For the MVP, we assume the deterministic rules catch the primary targets.
-
   return {
-    industry,
-    subcategory,
-    priceTier,
-    catalogScore,
+    industry: aiResult.industry,
+    subcategory: aiResult.subcategory,
+    priceTier: aiResult.priceTier,
+    catalogScore: aiResult.catalogScore,
     avgPrice,
-    productCount: products.length,
-    imagesPerProduct: products.length > 0 ? totalImages / products.length : 0,
+    productCount,
+    imagesPerProduct,
     tags: Array.from(tags),
     vendors: Array.from(vendors),
     productTypes: Array.from(productTypes),

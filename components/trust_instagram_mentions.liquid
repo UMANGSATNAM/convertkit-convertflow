@@ -1,0 +1,72 @@
+<div class="sf-ig sf-igm-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-igm-container">
+    <div class="sf-igm-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <a href="{{ section.settings.link }}" class="sf-igm-handle" style="color: {{ section.settings.text_color }};">{{ section.settings.handle }}</a>
+    </div>
+    
+    <div class="sf-igm-grid">
+      {% for block in section.blocks %}
+        <a href="{{ block.settings.post_link | default: '#' }}" class="sf-igm-item">
+          <div class="sf-igm-img">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | img_url: '600x600', crop: 'center' }}" alt="Instagram post">
+            {% else %}
+              {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'sf-placeholder' }}
+            {% endif %}
+            <div class="sf-igm-overlay">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sf-igm-icon"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-igm-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-igm-container { max-width: 1400px; margin: 0 auto; }
+  .sf-igm-header { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 3rem; text-align: center; }
+  @media (min-width: 768px) { .sf-igm-header { flex-direction: row; justify-content: space-between; } }
+  .sf-igm-header h2 { font-size: 2rem; margin: 0; }
+  .sf-igm-handle { font-size: 1.1rem; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+  .sf-igm-handle::before { content: '@'; }
+  
+  .sf-igm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  @media (min-width: 768px) { .sf-igm-grid { grid-template-columns: repeat({{ section.blocks.size | at_most: 5 }}, 1fr); gap: 1.5rem; } }
+  
+  .sf-igm-item { display: block; position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; }
+  .sf-igm-img { width: 100%; height: 100%; position: relative; }
+  .sf-igm-img img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .sf-igm-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+  .sf-igm-icon { color: white; transform: scale(0.8); transition: transform 0.3s ease; }
+  
+  .sf-igm-item:hover .sf-igm-img img, .sf-igm-item:hover .sf-placeholder { transform: scale(1.05); }
+  .sf-igm-item:hover .sf-igm-overlay { opacity: 1; }
+  .sf-igm-item:hover .sf-igm-icon { transform: scale(1); }
+</style>
+
+{% schema %}
+{
+  "name": "Instagram Mentions",
+  "max_blocks": 5,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Join the Community" },
+    { "type": "text", "id": "handle", "label": "Instagram Handle", "default": "yourbrand" },
+    { "type": "url", "id": "link", "label": "Profile Link" }
+  ],
+  "blocks": [
+    {
+      "type": "post", "name": "Post",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "post_link", "label": "Post Link" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Instagram Mentions", "category": "Trust", "blocks": [{"type":"post"},{"type":"post"},{"type":"post"},{"type":"post"}] } ]
+}
+{% endschema %}

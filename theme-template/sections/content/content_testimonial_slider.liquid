@@ -1,0 +1,189 @@
+<div class="content-testimonials py-24 px-6 bg-[var(--color-bg, #f4f4f4)] overflow-hidden">
+  <div class="max-w-5xl mx-auto text-center relative">
+    
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-5xl font-bold text-[var(--color-text, #111)]">{{ section.settings.title }}</h2>
+    </div>
+
+    <!-- Testimonial Slider Container -->
+    <div class="testimonial-slider-wrapper relative overflow-hidden">
+      <div class="testimonial-track flex transition-transform duration-500 ease-in-out">
+        
+        {%- for block in section.blocks -%}
+          <div class="testimonial-slide w-full flex-shrink-0 px-4" {{ block.shopify_attributes }}>
+            <div class="flex flex-col items-center">
+              <!-- Star Rating -->
+              <div class="flex gap-1 text-[#FFD700] mb-6">
+                {%- for i in (1..block.settings.stars) -%}
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                {%- endfor -%}
+              </div>
+              
+              <!-- Quote -->
+              <p class="text-2xl md:text-4xl font-light text-[var(--color-text, #111)] leading-relaxed mb-8 italic max-w-3xl">
+                "{{ block.settings.quote }}"
+              </p>
+              
+              <!-- Author Info -->
+              <div class="flex items-center gap-4">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | img_url: '100x100', crop: 'center' }}" alt="{{ block.settings.author }}" class="w-14 h-14 rounded-full object-cover shadow-md">
+                {%- else -%}
+                  <div class="w-14 h-14 rounded-full bg-[var(--color-primary, #000)] text-white flex items-center justify-center font-bold text-xl">
+                    {{ block.settings.author | slice: 0 }}
+                  </div>
+                {%- endif -%}
+                <div class="text-left">
+                  <p class="font-bold text-[var(--color-text, #111)]">{{ block.settings.author }}</p>
+                  <p class="text-sm text-gray-500 flex items-center gap-1">
+                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    Verified Buyer
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+
+        {%- if section.blocks.size == 0 -%}
+           <div class="testimonial-slide w-full flex-shrink-0 px-4">
+            <div class="flex flex-col items-center">
+              <div class="flex gap-1 text-[#FFD700] mb-6">★★★★★</div>
+              <p class="text-2xl md:text-4xl font-light mb-8 italic">"Absolutely phenomenal quality. It changed the way I look at online shopping."</p>
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center font-bold text-xl">J</div>
+                <div class="text-left">
+                  <p class="font-bold">John Doe</p>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endendif -%}
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    {%- if section.blocks.size > 1 -%}
+      <div class="flex items-center justify-center gap-4 mt-12">
+        <button class="testi-prev w-10 h-10 rounded-full border border-[var(--color-primary, #000)] text-[var(--color-primary, #000)] hover:bg-[var(--color-primary, #000)] hover:text-white flex items-center justify-center transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div class="testi-dots flex gap-2">
+          {%- for block in section.blocks -%}
+            <button class="w-2 h-2 rounded-full bg-gray-300 transition-all {% if forloop.first %}bg-black w-6{% endif %}" data-index="{{ forloop.index0 }}"></button>
+          {%- endfor -%}
+        </div>
+        <button class="testi-next w-10 h-10 rounded-full border border-[var(--color-primary, #000)] text-[var(--color-primary, #000)] hover:bg-[var(--color-primary, #000)] hover:text-white flex items-center justify-center transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('#shopify-section-{{ section.id }}');
+  if (!container) return;
+
+  const track = container.querySelector('.testimonial-track');
+  const slides = container.querySelectorAll('.testimonial-slide');
+  const prev = container.querySelector('.testi-prev');
+  const next = container.querySelector('.testi-next');
+  const dots = container.querySelectorAll('.testi-dots button');
+  
+  if (!track || slides.length <= 1) return;
+
+  let currentIndex = 0;
+
+  const updateSlider = () => {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, idx) => {
+      if (idx === currentIndex) {
+        dot.classList.add('bg-[var(--color-primary, #000)]', 'w-6');
+        dot.classList.remove('bg-gray-300', 'w-2');
+      } else {
+        dot.classList.remove('bg-[var(--color-primary, #000)]', 'w-6');
+        dot.classList.add('bg-gray-300', 'w-2');
+      }
+    });
+  };
+
+  prev?.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    updateSlider();
+  });
+
+  next?.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    updateSlider();
+  });
+
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', () => {
+      currentIndex = idx;
+      updateSlider();
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Testimonial Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Don't just take our word for it."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "stars",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5,
+          "label": "Star Rating"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "This product exceeded all my expectations. The quality is unmatched."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name",
+          "default": "Sarah M."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Author Image (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonial Slider",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}

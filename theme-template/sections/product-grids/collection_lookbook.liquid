@@ -1,0 +1,161 @@
+<div class="collection-lookbook py-20 bg-[var(--color-bg, #ffffff)] relative">
+  <div class="max-w-7xl mx-auto px-4 md:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-5xl font-bold text-[var(--color-text, #111)]">{{ section.settings.title }}</h2>
+      {%- if section.settings.subtitle != blank -%}
+        <p class="mt-4 text-lg text-[var(--color-text-muted, #555)]">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+      
+      <!-- Lookbook Image with Hotspots -->
+      <div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-neutral-100 group">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | img_url: 'master' }}" alt="{{ section.settings.title }}" class="w-full h-full object-cover">
+        {%- else -%}
+          {{ 'collection-2' | placeholder_svg_tag: 'w-full h-full object-cover opacity-60 mix-blend-multiply' }}
+        {%- endif -%}
+
+        <!-- Hotspots -->
+        {%- for block in section.blocks -%}
+          {%- assign product = all_products[block.settings.product] -%}
+          <div class="absolute group/hotspot cursor-pointer" 
+               style="top: {{ block.settings.top_position }}%; left: {{ block.settings.left_position }}%; transform: translate(-50%, -50%);"
+               {{ block.shopify_attributes }}>
+            
+            <!-- Pulse ring -->
+            <div class="absolute inset-0 bg-white rounded-full animate-ping opacity-75 w-8 h-8 -ml-1 -mt-1"></div>
+            <!-- Core Dot -->
+            <div class="relative w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-200 z-10 transition-transform group-hover/hotspot:scale-125">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+            </div>
+            
+            <!-- Tooltip -->
+            <div class="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-white p-3 rounded shadow-2xl min-w-[200px] opacity-0 invisible group-hover/hotspot:opacity-100 group-hover/hotspot:visible transition-all duration-300 z-20 pointer-events-none group-hover/hotspot:pointer-events-auto transform translate-y-2 group-hover/hotspot:translate-y-0">
+              <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-white"></div>
+              {%- if product != blank -%}
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-neutral-100 rounded flex-shrink-0">
+                    <img src="{{ product.featured_image | img_url: '100x' }}" class="w-full h-full object-cover rounded">
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold text-black leading-tight mb-1">{{ product.title }}</h4>
+                    <p class="text-xs text-gray-500">{{ product.price | money }}</p>
+                  </div>
+                </div>
+                <a href="{{ product.url }}" class="block w-full mt-3 py-2 bg-black text-white text-xs font-bold uppercase text-center rounded">View</a>
+              {%- else -%}
+                <h4 class="text-xs font-bold text-black mb-1">Example Item</h4>
+                <p class="text-xs text-gray-500">$45.00</p>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <!-- Shop the Look Items (Text side) -->
+      <div class="flex flex-col gap-8">
+        <div>
+          <h3 class="text-2xl font-bold mb-6 border-b pb-4">Shop The Look</h3>
+          <div class="space-y-6">
+            {%- for block in section.blocks -%}
+              {%- assign product = all_products[block.settings.product] -%}
+              {%- if product != blank -%}
+                <a href="{{ product.url }}" class="flex items-center gap-6 group hover:bg-neutral-50 p-2 -mx-2 rounded transition-colors">
+                  <div class="w-20 h-24 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
+                    <img src="{{ product.featured_image | img_url: '300x' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-bold text-black group-hover:underline underline-offset-4 decoration-2">{{ product.title }}</h4>
+                    <p class="text-gray-600 mt-1">{{ product.price | money }}</p>
+                  </div>
+                </a>
+              {%- else -%}
+                <div class="flex items-center gap-6 group">
+                  <div class="w-20 h-24 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
+                    {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'w-full h-full object-cover mix-blend-multiply opacity-50' }}
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-bold text-black">Look Item {{ forloop.index }}</h4>
+                    <p class="text-gray-600 mt-1">$45.00</p>
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if section.blocks.size == 0 -%}
+              <p class="text-gray-500 italic">Add products as blocks to populate this lookbook.</p>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Lookbook",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Street Style Vol. 1"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Get the complete fit from our latest campaign."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Lookbook Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "look_item",
+      "name": "Look Item",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "top_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "label": "Top Position %"
+        },
+        {
+          "type": "range",
+          "id": "left_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "label": "Left Position %"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lookbook",
+      "blocks": [
+        { "type": "look_item", "settings": {"top_position": 30, "left_position": 40} },
+        { "type": "look_item", "settings": {"top_position": 60, "left_position": 60} }
+      ]
+    }
+  ]
+}
+{% endschema %}

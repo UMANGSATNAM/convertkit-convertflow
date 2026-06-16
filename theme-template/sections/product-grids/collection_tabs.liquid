@@ -1,0 +1,168 @@
+<div class="collection-tabs py-16 px-6 bg-[var(--color-bg, #ffffff)]">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-5xl font-bold text-[var(--color-text, #111)] mb-4">{{ section.settings.title }}</h2>
+      {%- if section.settings.subtitle != blank -%}
+        <p class="text-lg text-[var(--color-text-muted, #555)] max-w-2xl mx-auto">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="flex flex-wrap justify-center gap-4 mb-10 border-b border-gray-200 pb-4">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.collection != blank -%}
+          <button 
+            class="tab-btn px-6 py-2 text-lg font-medium text-[var(--color-text-muted, #555)] hover:text-[var(--color-primary, #000)] relative transition-colors
+            {% if forloop.first %}active text-[var(--color-primary, #000)]{% endif %}"
+            data-target="tab-content-{{ section.id }}-{{ forloop.index }}"
+            {{ block.shopify_attributes }}>
+            {{ collections[block.settings.collection].title | default: block.settings.title }}
+            <span class="absolute bottom-[-17px] left-0 w-full h-[2px] bg-[var(--color-primary, #000)] transform scale-x-0 transition-transform duration-300 {% if forloop.first %}scale-x-100{% endif %}"></span>
+          </button>
+        {%- else -%}
+          <button 
+            class="tab-btn px-6 py-2 text-lg font-medium text-[var(--color-text-muted, #555)] hover:text-[var(--color-primary, #000)] relative transition-colors
+            {% if forloop.first %}active text-[var(--color-primary, #000)]{% endif %}"
+            data-target="tab-content-{{ section.id }}-{{ forloop.index }}"
+            {{ block.shopify_attributes }}>
+            {{ block.settings.title | default: 'Collection' }}
+            <span class="absolute bottom-[-17px] left-0 w-full h-[2px] bg-[var(--color-primary, #000)] transform scale-x-0 transition-transform duration-300 {% if forloop.first %}scale-x-100{% endif %}"></span>
+          </button>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <!-- Tabs Content -->
+    <div class="tabs-container relative min-h-[400px]">
+      {%- for block in section.blocks -%}
+        {%- assign collection = collections[block.settings.collection] -%}
+        <div id="tab-content-{{ section.id }}-{{ forloop.index }}" class="tab-content w-full transition-opacity duration-500 {% if forloop.first %}opacity-100 relative z-10 block{% else %}opacity-0 absolute top-0 left-0 -z-10 hidden{% endif %}">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {%- if collection != blank and collection.products_count > 0 -%}
+              {%- for product in collection.products limit: section.settings.products_to_show -%}
+                {% render 'product-card', product: product %}
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..section.settings.products_to_show) -%}
+                <div class="product-card group">
+                  <div class="relative aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden rounded">
+                    {{ 'product-' | append: i | placeholder_svg_tag: 'w-full h-full object-cover opacity-50 mix-blend-multiply transition-transform duration-700 group-hover:scale-110' }}
+                  </div>
+                  <h3 class="text-sm font-bold mb-1">Example Product {{ i }}</h3>
+                  <p class="text-sm text-gray-500">$19.99</p>
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+          
+          {%- if collection != blank -%}
+            <div class="mt-12 text-center">
+              <a href="{{ collection.url }}" class="inline-block px-8 py-3 bg-transparent border border-[var(--color-primary, #000)] text-[var(--color-primary, #000)] font-medium uppercase hover:bg-[var(--color-primary, #000)] hover:text-white transition-colors duration-300">
+                View All {{ collection.title }}
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('#shopify-section-{{ section.id }}');
+  if (!container) return;
+
+  const btns = container.querySelectorAll('.tab-btn');
+  const contents = container.querySelectorAll('.tab-content');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Reset all buttons
+      btns.forEach(b => {
+        b.classList.remove('active', 'text-[var(--color-primary, #000)]');
+        b.querySelector('span').classList.remove('scale-x-100');
+      });
+      // Activate clicked button
+      btn.classList.add('active', 'text-[var(--color-primary, #000)]');
+      btn.querySelector('span').classList.add('scale-x-100');
+
+      // Hide all contents
+      contents.forEach(content => {
+        content.classList.remove('opacity-100', 'relative', 'z-10', 'block');
+        content.classList.add('opacity-0', 'absolute', 'top-0', 'left-0', '-z-10', 'hidden');
+      });
+
+      // Show target content
+      const targetId = btn.getAttribute('data-target');
+      const targetContent = document.getElementById(targetId);
+      if (targetContent) {
+        targetContent.classList.remove('opacity-0', 'absolute', '-z-10', 'hidden');
+        targetContent.classList.add('block');
+        // Small delay for animation
+        setTimeout(() => {
+          targetContent.classList.add('opacity-100', 'relative', 'z-10');
+        }, 10);
+      }
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Collection Tabs",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop Our Collections"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Discover the latest drops tailored for your lifestyle."
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "default": 8,
+      "label": "Products per tab"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection Tab",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab Title Override (Optional)"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Tabs",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

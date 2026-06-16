@@ -1,4 +1,5 @@
 import { CatalogContext } from "./catalog-analyzer.server";
+import { generateStructuredJson } from "./claude.server";
 
 export interface CROContext {
   trustLevel: "low" | "medium" | "high";
@@ -7,40 +8,54 @@ export interface CROContext {
 }
 
 /**
- * Analyzes the required CRO elements purely deterministically 
+ * Analyzes the required CRO elements using Anthropic Claude
  * based on the Catalog Analysis.
  */
 export async function analyzeCRO(catalogData: CatalogContext): Promise<CROContext> {
-  let trustLevel: "low" | "medium" | "high" = "medium";
-  let socialProofNeeded = false;
-  let faqNeeded = false;
+  const systemInstruction = `
+    You are a Senior Conversion Rate Optimization (CRO) Expert for E-commerce.
+    Your job is to determine the optimal trust signals needed for a store based on its catalog context.
+    
+    You must output ONLY valid JSON matching this schema:
+    {
+      "trustLevel": "string (MUST BE 'low', 'medium', or 'high')",
+      "socialProofNeeded": boolean,
+      "faqNeeded": boolean
+    }
 
-  // Premium items require high trust and FAQs
-  if (catalogData.priceTier === "Premium") {
-    trustLevel = "high";
-    faqNeeded = true;
-    socialProofNeeded = true;
-  }
+    Guidelines:
+    - High trustLevel & faqNeeded = true: For Premium/high-priced goods (Luxury, Electronics), or if catalog score is low (needs compensation).
+    - socialProofNeeded = true: Almost always true for Beauty, Fashion, Health, or if it's a value/trend product (TikTok style).
+    - Low trustLevel: Only if it's a very cheap, high-impulse buy item where heavy trust badges might look spammy.
+  `;
 
-  // Certain industries always need social proof
-  if (catalogData.industry === "beauty" || catalogData.industry === "health" || catalogData.industry === "fashion") {
-    socialProofNeeded = true;
-  }
+  const userPrompt = JSON.stringify({
+    industry: catalogData.industry,
+    subcategory: catalogData.subcategory,
+    priceTier: catalogData.priceTier,
+    avgPrice: catalogData.avgPrice,
+    catalogScore: catalogData.catalogScore
+  });
 
-  // If the catalog score is low (lack of data/images), we must compensate with heavy social proof
-  if (catalogData.catalogScore < 70) {
-    trustLevel = "high";
-    socialProofNeeded = true;
-  }
+  let aiResult = {
+    trustLevel: "medium" as "low" | "medium" | "high",
+    socialProofNeeded: false,
+    faqNeeded: false
+  };
 
-  // Value tier might not need as much trust overhead to convert
-  if (catalogData.priceTier === "Value" && catalogData.catalogScore > 80) {
-    trustLevel = "low";
+  try {
+    aiResult = await generateStructuredJson<typeof aiResult>(systemInstruction, userPrompt);
+    
+    if (!["low", "medium", "high"].includes(aiResult.trustLevel)) {
+      aiResult.trustLevel = "medium";
+    }
+  } catch (err) {
+    console.error("Claude failed in CRO analyzer, falling back to defaults.", err);
   }
 
   return {
-    trustLevel,
-    socialProofNeeded,
-    faqNeeded
+    trustLevel: aiResult.trustLevel,
+    socialProofNeeded: aiResult.socialProofNeeded,
+    faqNeeded: aiResult.faqNeeded
   };
 }

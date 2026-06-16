@@ -1,0 +1,62 @@
+<div class="sf-icons sf-ic-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ic-container">
+    {% if section.settings.title != blank %}
+      <div class="sf-ic-header">
+        <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      </div>
+    {% endif %}
+    
+    <div class="sf-ic-grid">
+      {% for block in section.blocks %}
+        <div class="sf-ic-item">
+          <div class="sf-ic-icon" style="color: {{ section.settings.icon_color }};">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | img_url: '100x100' }}" alt="Icon">
+            {% else %}
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            {% endif %}
+          </div>
+          <h3 style="color: {{ section.settings.text_color }};">{{ block.settings.title }}</h3>
+          <p style="color: {{ section.settings.text_color }};">{{ block.settings.text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ic-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-ic-container { max-width: 1200px; margin: 0 auto; text-align: center; }
+  .sf-ic-header h2 { font-size: 2.5rem; margin-bottom: 3rem; }
+  .sf-ic-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
+  @media (min-width: 768px) { .sf-ic-grid { grid-template-columns: repeat({{ section.blocks.size | at_most: 4 }}, 1fr); } }
+  .sf-ic-item { padding: 1rem; }
+  .sf-ic-icon { margin-bottom: 1.5rem; display: flex; justify-content: center; }
+  .sf-ic-icon img { max-width: 60px; height: auto; }
+  .sf-ic-item h3 { font-size: 1.25rem; margin-bottom: 1rem; font-weight: 600; }
+  .sf-ic-item p { font-size: 1rem; opacity: 0.8; line-height: 1.6; }
+</style>
+
+{% schema %}
+{
+  "name": "Icon Columns",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "color", "id": "icon_color", "label": "Icon Color", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Why Choose Us" }
+  ],
+  "blocks": [
+    {
+      "type": "column", "name": "Column",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Custom Icon (Image)" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Free Shipping" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "On all orders over $50." }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Icon Columns", "category": "Information", "blocks": [{"type": "column"}, {"type": "column"}, {"type": "column"}] } ]
+}
+{% endschema %}
