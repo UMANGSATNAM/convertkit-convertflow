@@ -53,10 +53,32 @@ export async function importCatalog(shop: any, catalogUrl: string) {
 
     // 2. Add Variants
     if (product.variants && product.variants.length > 0) {
+      const uniqueVariantTitles = Array.from(new Set(product.variants.map((v: any) => v.title || "Default Title")));
+      
+      // 2a. Create the Option (Size) so variants can use it
+      await graphqlRequest(
+        shop.shopDomain,
+        shop.accessToken,
+        `
+        mutation productOptionsCreate($productId: ID!, $options: [OptionCreateInput!]!) {
+          productOptionsCreate(productId: $productId, options: $options) {
+            userErrors { field message }
+          }
+        }
+        `,
+        {
+          productId,
+          options: [{
+            name: "Size",
+            values: uniqueVariantTitles.map(name => ({ name: String(name) }))
+          }]
+        }
+      );
+
       const variantsInput = product.variants.map((variant: any) => ({
         price: variant.price,
         compareAtPrice: variant.compare_at_price || null,
-        optionValues: [{ optionName: "Size", name: variant.title || "Default Title" }],
+        optionValues: [{ optionName: "Size", name: String(variant.title || "Default Title") }],
         inventoryItem: { sku: variant.sku, tracked: false }
       }));
 
