@@ -12,7 +12,7 @@ const anthropic = new Anthropic({
 
 /**
  * Helper to call Claude and ensure the output is structured JSON.
- * Uses claude-3-5-sonnet-20240620 as the fast default model.
+ * Uses claude-sonnet-4-6 as the fast default model.
  * 
  * @param systemInstruction The system prompt instructing the model on its persona and JSON schema.
  * @param userPrompt The actual data/prompt to process.
@@ -24,7 +24,7 @@ export async function generateStructuredJson<T>(
 ): Promise<T> {
   try {
     const msg = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-20240620",
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
       max_tokens: 1024,
       temperature: 0.1, // Low temperature for deterministic output
       system: `${systemInstruction}\n\nCRITICAL: You MUST output ONLY valid JSON. Do not wrap it in markdown block quotes (e.g. \`\`\`json). Just the raw JSON.`,

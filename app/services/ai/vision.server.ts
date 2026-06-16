@@ -95,7 +95,7 @@ export async function analyzeStoreScreenshot(base64Image: string, mediaType: "im
     textOutput = response.choices[0]?.message?.content || "{}";
   } else if (anthropic) {
     const response = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-20240620",
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
       max_tokens: 4000,
       system: SYSTEM_PROMPT,
       messages: [
