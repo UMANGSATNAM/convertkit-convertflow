@@ -51,7 +51,7 @@ export function initGeneratorWorker() {
           aiData = gen.aiPayload as any;
           niche = {
             name: "AI Custom Build",
-            themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/base-theme.zip",
+            themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/skeleton-theme.zip",
             settingsBase: {}
           };
         } else {
