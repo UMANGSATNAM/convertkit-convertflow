@@ -81,6 +81,9 @@ export async function composeThemeFromBlueprint(
         if (uploaded) {
           console.log(`Uploaded component asset: ${shopifyAssetKey}`);
         }
+        
+        // Small delay to prevent Shopify/Cloudflare SSL exhaustion or rate limits
+        await new Promise(r => setTimeout(r, 200));
       } catch (err: any) {
         console.error(`Failed to read/upload component ${component.componentId} from ${component.liquidPath}:`, err.message);
       }
