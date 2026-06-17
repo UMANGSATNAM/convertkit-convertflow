@@ -1,0 +1,165 @@
+{% comment %} Testimonials Luxury Marquee — Infinite auto-scroll, gold stars, dark editorial {% endcomment %}
+
+<section class="sf-lux sf-testimonials-marquee sf-tm-{{ section.id }}">
+  <div class="sf-tm-header sf-reveal">
+    <span class="sf-section-label">{{ section.settings.label | default: 'Client Stories' }}</span>
+    <h2 class="sf-tm-title">{{ section.settings.title | default: 'What They Say' }}</h2>
+    {% if section.settings.subtitle != blank %}
+      <p class="sf-tm-subtitle">{{ section.settings.subtitle }}</p>
+    {% endif %}
+  </div>
+
+  {%- comment -%} Rating bar {%- endcomment -%}
+  <div class="sf-tm-rating-bar sf-reveal sf-reveal-delay-2">
+    <div class="sf-tm-stars">
+      {% for i in (1..5) %}<svg width="18" height="18" viewBox="0 0 18 18" fill="var(--lux-gold)"><path d="M9 1L11.09 6.26L17 6.27L12.45 9.97L14.18 15.23L9 12L3.82 15.23L5.55 9.97L1 6.27L6.91 6.26L9 1Z"/></svg>{% endfor %}
+    </div>
+    <span class="sf-tm-rating-text">{{ section.settings.rating_text | default: '4.9 / 5 from 2,400+ reviews' }}</span>
+  </div>
+
+  {%- comment -%} Marquee Row 1 — Left {%- endcomment -%}
+  <div class="sf-tm-marquee-wrapper">
+    <div class="sf-tm-marquee sf-tm-marquee-left">
+      {% assign cards = '' %}
+      {% for block in section.blocks %}
+        {% assign cards = cards | append: '|' | append: block.settings.name | append: '~' | append: block.settings.text | append: '~' | append: block.settings.location | append: '~' | append: block.settings.rating %}
+      {% endfor %}
+
+      {%- comment -%} Two copies for seamless loop {%- endcomment -%}
+      {% for pass in (1..2) %}
+        {% for block in section.blocks %}
+          <div class="sf-tm-card">
+            <div class="sf-tm-card-stars">
+              {% assign stars = block.settings.rating | default: 5 %}
+              {% for i in (1..stars) %}<svg width="12" height="12" viewBox="0 0 18 18" fill="var(--lux-gold)"><path d="M9 1L11.09 6.26L17 6.27L12.45 9.97L14.18 15.23L9 12L3.82 15.23L5.55 9.97L1 6.27L6.91 6.26L9 1Z"/></svg>{% endfor %}
+            </div>
+            <blockquote class="sf-tm-quote">&ldquo;{{ block.settings.text }}&rdquo;</blockquote>
+            <div class="sf-tm-author">
+              {% if block.settings.avatar != blank %}
+                <img class="sf-tm-avatar" src="{{ block.settings.avatar | img_url: '80x80', crop: 'center' }}" alt="{{ block.settings.name }}" loading="lazy">
+              {% else %}
+                <div class="sf-tm-avatar sf-tm-avatar-initials">{{ block.settings.name | slice: 0 }}</div>
+              {% endif %}
+              <div>
+                <strong class="sf-tm-name">{{ block.settings.name }}</strong>
+                {% if block.settings.location != blank %}
+                  <span class="sf-tm-location">{{ block.settings.location }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {%- comment -%} Default placeholder cards {%- endcomment -%}
+          {% for i in (1..4) %}
+            <div class="sf-tm-card">
+              <div class="sf-tm-card-stars">{% for j in (1..5) %}<svg width="12" height="12" viewBox="0 0 18 18" fill="var(--lux-gold)"><path d="M9 1L11.09 6.26L17 6.27L12.45 9.97L14.18 15.23L9 12L3.82 15.23L5.55 9.97L1 6.27L6.91 6.26L9 1Z"/></svg>{% endfor %}</div>
+              <blockquote class="sf-tm-quote">&ldquo;The craftsmanship is extraordinary. Each piece feels like it was made just for you. I wore it to my wedding and received countless compliments.&rdquo;</blockquote>
+              <div class="sf-tm-author">
+                <div class="sf-tm-avatar sf-tm-avatar-initials">P</div>
+                <div><strong class="sf-tm-name">Priya Sharma</strong><span class="sf-tm-location">Mumbai, India</span></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {%- comment -%} Fade edges {%- endcomment -%}
+  <div class="sf-tm-fade-left"></div>
+  <div class="sf-tm-fade-right"></div>
+</section>
+
+<style>
+  .sf-tm-{{ section.id }} {
+    padding: 6rem 0; background: var(--lux-bg-mid); position: relative; overflow: hidden;
+  }
+
+  /* Header */
+  .sf-tm-header { text-align: center; margin-bottom: 2.5rem; padding: 0 20px; }
+  .sf-tm-title {
+    font-family: var(--font-serif); font-weight: 400; font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: var(--lux-cream); letter-spacing: -0.01em; margin-bottom: 0.75rem;
+  }
+  .sf-tm-subtitle { color: var(--lux-grey); font-size: 0.9rem; max-width: 400px; margin: 0 auto; }
+
+  /* Rating bar */
+  .sf-tm-rating-bar {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 3rem;
+  }
+  .sf-tm-stars { display: flex; gap: 3px; }
+  .sf-tm-rating-text { font-size: 0.75rem; color: var(--lux-grey); letter-spacing: 0.05em; }
+
+  /* Marquee */
+  .sf-tm-marquee-wrapper { overflow: hidden; }
+  .sf-tm-marquee {
+    display: flex; gap: 1.5rem; width: max-content;
+    animation: sfMarqueeLeft 40s linear infinite;
+  }
+  .sf-tm-marquee:hover { animation-play-state: paused; }
+  @keyframes sfMarqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* Card */
+  .sf-tm-card {
+    flex-shrink: 0; width: 340px;
+    padding: 2rem; background: var(--lux-bg-card);
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 2px;
+    transition: border-color 0.4s;
+  }
+  .sf-tm-card:hover { border-color: rgba(201,168,76,0.2); }
+
+  .sf-tm-card-stars { display: flex; gap: 3px; margin-bottom: 1rem; }
+
+  .sf-tm-quote {
+    font-family: var(--font-serif); font-style: italic; font-size: 0.95rem;
+    line-height: 1.7; color: rgba(245,237,216,0.75);
+    margin-bottom: 1.5rem; border: none; padding: 0;
+  }
+
+  .sf-tm-author { display: flex; align-items: center; gap: 12px; }
+  .sf-tm-avatar {
+    width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+    border: 1px solid rgba(201,168,76,0.3); flex-shrink: 0;
+  }
+  .sf-tm-avatar-initials {
+    background: var(--lux-bg-mid); display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-serif); font-size: 1.1rem; color: var(--lux-gold);
+  }
+  .sf-tm-name { display: block; font-size: 0.85rem; font-weight: 500; color: var(--lux-cream); margin-bottom: 2px; }
+  .sf-tm-location { display: block; font-size: 0.7rem; color: var(--lux-grey); letter-spacing: 0.05em; }
+
+  /* Fade edges */
+  .sf-tm-fade-left, .sf-tm-fade-right {
+    position: absolute; top: 0; bottom: 0; width: 160px; z-index: 2; pointer-events: none;
+  }
+  .sf-tm-fade-left { left: 0; background: linear-gradient(90deg, var(--lux-bg-mid), transparent); }
+  .sf-tm-fade-right { right: 0; background: linear-gradient(-90deg, var(--lux-bg-mid), transparent); }
+</style>
+
+{% schema %}
+{
+  "name": "Testimonials — Luxury Marquee",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Eyebrow Label", "default": "Client Stories" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Worn By The Discerning" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle" },
+    { "type": "text", "id": "rating_text", "label": "Rating Summary", "default": "4.9 / 5 · Rated by 2,400+ customers" }
+  ],
+  "blocks": [
+    {
+      "name": "Review",
+      "type": "review",
+      "settings": [
+        { "type": "textarea", "id": "text", "label": "Review Text", "default": "The most exquisite piece I have ever owned. The hallmarking gives me full confidence in the quality." },
+        { "type": "text", "id": "name", "label": "Customer Name", "default": "Ananya Patel" },
+        { "type": "text", "id": "location", "label": "Location", "default": "Delhi, India" },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "Stars", "default": 5 },
+        { "type": "image_picker", "id": "avatar", "label": "Customer Photo (optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [{ "name": "Testimonials — Luxury Marquee", "category": "Testimonials" }]
+}
+{% endschema %}

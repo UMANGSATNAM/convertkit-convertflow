@@ -1,0 +1,267 @@
+{% comment %} Jewellery Showcase Grid — Dark cards, gold hover, stagger animation, quick-add {% endcomment %}
+
+<section class="sf-lux sf-jewel-grid sf-jg-{{ section.id }}">
+  <div class="sf-jg-inner">
+
+    {%- comment -%} Header {%- endcomment -%}
+    <div class="sf-jg-header">
+      <p class="sf-section-label sf-reveal">
+        <span class="sf-hle-eyebrow-line"></span>
+        {{ section.settings.label | default: 'The Collection' }}
+        <span class="sf-hle-eyebrow-line"></span>
+      </p>
+      <h2 class="sf-jg-title sf-reveal sf-reveal-delay-1">{{ section.settings.title | default: 'Crafted With Precision' }}</h2>
+      {% if section.settings.subtitle != blank %}
+        <p class="sf-jg-subtitle sf-reveal sf-reveal-delay-2">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Product Grid {%- endcomment -%}
+    <div class="sf-jg-grid" id="sf-jg-grid-{{ section.id }}">
+      {% assign collection = collections[section.settings.collection] %}
+      {% if collection != blank and collection.products.size > 0 %}
+        {% for product in collection.products limit: section.settings.product_count %}
+          <div class="sf-jg-card sf-reveal sf-reveal-delay-{{ forloop.index }}" data-index="{{ forloop.index }}">
+            <div class="sf-jg-card-img-wrap">
+              <a href="{{ product.url }}" class="sf-jg-img-link">
+                {% if product.images.size > 1 %}
+                  <img class="sf-jg-img-primary" src="{{ product.images[0] | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
+                  <img class="sf-jg-img-hover" src="{{ product.images[1] | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
+                {% elsif product.featured_image %}
+                  <img class="sf-jg-img-primary" src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
+                {% else %}
+                  <div class="sf-jg-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+                {% endif %}
+              </a>
+
+              {%- comment -%} Badges {%- endcomment -%}
+              <div class="sf-jg-badges">
+                {% if product.available == false %}
+                  <span class="sf-jg-badge sf-jg-badge-sold">Sold Out</span>
+                {% elsif product.compare_at_price > product.price %}
+                  <span class="sf-jg-badge sf-jg-badge-sale">Sale</span>
+                {% endif %}
+                {% for tag in product.tags limit: 1 %}
+                  {% if tag == 'new' or tag == 'New' or tag == 'peril-new' %}
+                    <span class="sf-jg-badge sf-jg-badge-new">New</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              {%- comment -%} Quick action overlay {%- endcomment -%}
+              <div class="sf-jg-actions">
+                {% if product.available %}
+                  <form action="/cart/add" method="post" class="sf-jg-atc-form">
+                    {% if product.variants.size == 1 %}
+                      <input type="hidden" name="id" value="{{ product.variants[0].id }}">
+                      <button type="submit" class="sf-jg-quick-add">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2H3.5L5 9H11L12 5H4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5.5" cy="11.5" r="0.8" fill="currentColor"/><circle cx="10.5" cy="11.5" r="0.8" fill="currentColor"/></svg>
+                        <span>Quick Add</span>
+                      </button>
+                    {% else %}
+                      <a href="{{ product.url }}" class="sf-jg-quick-add">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M7 1L13 7L7 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                        <span>View Options</span>
+                      </a>
+                    {% endif %}
+                  </form>
+                {% else %}
+                  <a href="{{ product.url }}" class="sf-jg-quick-add sf-jg-quick-add--sold">Notify Me</a>
+                {% endif %}
+
+                <button class="sf-jg-wishlist" aria-label="Add to wishlist" title="Save">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 13.5S1.5 9.5 1.5 5.5C1.5 3.567 3.067 2 5 2C6.19 2 7.25 2.63 8 3.5C8.75 2.63 9.81 2 11 2C12.933 2 14.5 3.567 14.5 5.5C14.5 9.5 8 13.5 8 13.5Z" stroke="currentColor" stroke-width="1.2"/></svg>
+                </button>
+              </div>
+            </div>
+
+            {%- comment -%} Card Info {%- endcomment -%}
+            <div class="sf-jg-card-info">
+              {% if product.vendor != blank %}
+                <span class="sf-jg-vendor">{{ product.vendor }}</span>
+              {% endif %}
+              <h3 class="sf-jg-name">
+                <a href="{{ product.url }}">{{ product.title }}</a>
+              </h3>
+              <div class="sf-jg-price-row">
+                {% if product.compare_at_price > product.price %}
+                  <span class="sf-price-compare">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="sf-price-gold">{{ product.price | money }}</span>
+                {% if product.compare_at_price > product.price %}
+                  {% assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+                  <span class="sf-jg-savings">-{{ savings }}%</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+      {% else %}
+        {%- comment -%} Placeholder products {%- endcomment -%}
+        {% for i in (1..8) %}
+          <div class="sf-jg-card sf-reveal sf-reveal-delay-{{ i }}">
+            <div class="sf-jg-card-img-wrap">
+              <div class="sf-jg-placeholder">{{ 'product-' | append: i | placeholder_svg_tag }}</div>
+            </div>
+            <div class="sf-jg-card-info">
+              <h3 class="sf-jg-name"><a href="#">Luxury Piece</a></h3>
+              <div class="sf-jg-price-row">
+                <span class="sf-price-gold">₹12,500</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {%- comment -%} View All CTA {%- endcomment -%}
+    {% if section.settings.view_all_link != blank %}
+      <div class="sf-jg-footer sf-reveal">
+        <a href="{{ section.settings.view_all_link }}" class="sf-btn-gold">
+          <span>View Entire Collection</span>
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" style="position:relative;z-index:1"><path d="M0 4H14M14 4L10 1M14 4L10 7" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+  .sf-jg-{{ section.id }} {
+    padding: 6rem 0;
+    background: {{ section.settings.bg_dark | default: 'true' | yoink: 'true' }};
+    {% if section.settings.bg_dark %}
+      background: #0f0d0a;
+    {% else %}
+      background: var(--lux-bg);
+    {% endif %}
+  }
+
+  .sf-jg-inner { max-width: 1400px; margin: 0 auto; padding: 0 60px; }
+  @media (max-width: 768px) { .sf-jg-inner { padding: 0 20px; } }
+
+  /* Header */
+  .sf-jg-header { text-align: center; margin-bottom: 4rem; }
+  .sf-jg-title {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3rem); color: var(--lux-cream);
+    letter-spacing: -0.01em; margin-bottom: 1rem;
+  }
+  .sf-jg-subtitle {
+    font-size: 0.95rem; color: var(--lux-grey); max-width: 480px; margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Grid */
+  .sf-jg-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+    gap: 1.5rem;
+  }
+  @media (max-width: 1024px) { .sf-jg-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .sf-jg-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+  @media (max-width: 480px) { .sf-jg-grid { grid-template-columns: 1fr; } }
+
+  /* Card */
+  .sf-jg-card { cursor: pointer; }
+  .sf-jg-card-img-wrap {
+    position: relative; aspect-ratio: 3/4;
+    background: var(--lux-bg-card); overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 2px;
+    transition: border-color 0.5s var(--ease-lux);
+  }
+  .sf-jg-card:hover .sf-jg-card-img-wrap { border-color: rgba(201,168,76,0.25); }
+
+  .sf-jg-img-link { display: block; width: 100%; height: 100%; }
+  .sf-jg-img-primary, .sf-jg-img-hover {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    transition: opacity 0.6s var(--ease-lux), transform 0.6s var(--ease-lux);
+  }
+  .sf-jg-img-hover { opacity: 0; }
+  .sf-jg-card:hover .sf-jg-img-primary { opacity: 0; transform: scale(1.04); }
+  .sf-jg-card:hover .sf-jg-img-hover { opacity: 1; transform: scale(1.04); }
+  .sf-jg-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .sf-jg-placeholder svg { width: 50%; height: 50%; opacity: 0.2; }
+
+  /* Badges */
+  .sf-jg-badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+  .sf-jg-badge {
+    display: inline-block; padding: 3px 10px;
+    font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    border-radius: 1px;
+  }
+  .sf-jg-badge-new { background: var(--lux-gold); color: var(--lux-bg); }
+  .sf-jg-badge-sale { background: transparent; border: 1px solid var(--lux-gold); color: var(--lux-gold); }
+  .sf-jg-badge-sold { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+
+  /* Actions overlay */
+  .sf-jg-actions {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+    display: flex; align-items: center; gap: 8px; padding: 12px;
+    transform: translateY(100%);
+    transition: transform 0.45s var(--ease-lux);
+    background: linear-gradient(0deg, rgba(10,9,8,0.9) 0%, transparent 100%);
+    padding-top: 32px;
+  }
+  .sf-jg-card:hover .sf-jg-actions { transform: translateY(0); }
+
+  .sf-jg-quick-add {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; border: 1px solid var(--lux-gold); background: var(--lux-gold);
+    font-family: var(--font-sans); font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--lux-bg);
+    cursor: pointer; transition: background 0.3s;
+  }
+  .sf-jg-quick-add:hover { background: var(--lux-gold-lt); }
+  .sf-jg-quick-add--sold { background: transparent; color: var(--lux-grey); border-color: var(--lux-grey); }
+
+  .sf-jg-wishlist {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(10,9,8,0.6);
+    color: var(--lux-white); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: border-color 0.3s, color 0.3s;
+  }
+  .sf-jg-wishlist:hover { border-color: var(--lux-gold); color: var(--lux-gold); }
+
+  /* Card info */
+  .sf-jg-card-info { padding: 1rem 0.25rem 0; }
+  .sf-jg-vendor {
+    font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--lux-grey); display: block; margin-bottom: 0.3rem;
+  }
+  .sf-jg-name {
+    font-family: var(--font-serif); font-size: 1rem; font-weight: 400;
+    margin-bottom: 0.5rem; line-height: 1.3;
+  }
+  .sf-jg-name a { color: var(--lux-cream); transition: color 0.3s; }
+  .sf-jg-name a:hover { color: var(--lux-gold); }
+  .sf-jg-price-row { display: flex; align-items: center; gap: 8px; }
+  .sf-jg-savings {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em;
+    color: var(--lux-bg); background: var(--lux-gold);
+    padding: 2px 6px; border-radius: 1px;
+  }
+
+  /* Footer */
+  .sf-jg-footer { margin-top: 3.5rem; text-align: center; }
+</style>
+
+{% schema %}
+{
+  "name": "Grid — Jewellery Showcase",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Eyebrow Label", "default": "The Collection" },
+    { "type": "text", "id": "title", "label": "Section Title", "default": "Crafted With Precision" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "product_count", "min": 4, "max": 12, "step": 2, "label": "Products to Show", "default": 8 },
+    { "type": "select", "id": "columns", "label": "Columns (desktop)", "options": [{"value":"3","label":"3 Columns"},{"value":"4","label":"4 Columns"}], "default": "4" },
+    { "type": "checkbox", "id": "bg_dark", "label": "Dark Background", "default": true },
+    { "type": "url", "id": "view_all_link", "label": "View All Link" }
+  ],
+  "presets": [{ "name": "Grid — Jewellery Showcase", "category": "Collection" }]
+}
+{% endschema %}
