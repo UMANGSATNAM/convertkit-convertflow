@@ -92,17 +92,22 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
     } catch (error: any) {
       if (error instanceof CircuitBreakerOpenError) throw error;
       
-      // Retry SSL/network-level transient errors (EPROTO, ECONNRESET, ETIMEDOUT)
-      const isNetworkError = error.code === 'EPROTO' || 
-                             error.code === 'ECONNRESET' || 
-                             error.code === 'ETIMEDOUT' ||
-                             error.code === 'ECONNREFUSED' ||
-                             (error.message && error.message.includes('SSL'));
+      // Retry SSL/network-level transient errors
+      // NOTE: Node.js 18+ native fetch (undici) wraps low-level errors in error.cause
+      const rootError = error.cause || error;
+      const isNetworkError = 
+        rootError.code === 'EPROTO' || 
+        rootError.code === 'ECONNRESET' || 
+        rootError.code === 'ETIMEDOUT' ||
+        rootError.code === 'ECONNREFUSED' ||
+        rootError.code === 'ERR_SOCKET_CONNECTION_TIMEOUT' ||
+        (rootError.message && rootError.message.includes('SSL')) ||
+        (error.message && error.message.includes('EPROTO')) ||
+        (error.message && error.message.includes('SSL'));
       
       if (isNetworkError && attempt < MAX_RETRIES - 1) {
-        // Longer delay for SSL/network errors to let Cloudflare reset
         const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
-        console.warn(`[Shopify] Network/SSL error (${error.code || 'SSL'}). Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        console.warn(`[Shopify] Network/SSL error (${rootError.code || error.code || 'SSL'}). Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
         await sleep(delay);
         attempt++;
         continue;

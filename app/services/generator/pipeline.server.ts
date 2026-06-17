@@ -207,7 +207,31 @@ export function initGeneratorWorker() {
           
           const { writeTemplate } = await import("../theme-engine/index");
           for (const [templatePath, templateJson] of Object.entries(templates)) {
-             await writeTemplate(shop, themeId, templatePath, templateJson, "AI_GENERATOR");
+            // Retry template writes on SSL/network errors — this is the CRITICAL step
+            let templateWritten = false;
+            for (let attempt = 0; attempt < 5; attempt++) {
+              try {
+                await writeTemplate(shop, themeId, templatePath, templateJson, "AI_GENERATOR");
+                console.log(`[Pipeline] Template written: ${templatePath}`);
+                templateWritten = true;
+                break;
+              } catch (err: any) {
+                const rootErr = err.cause || err;
+                const isSSL = rootErr.code === "EPROTO" || rootErr.code === "ECONNRESET" ||
+                              (err.message && (err.message.includes("EPROTO") || err.message.includes("SSL")));
+                if (isSSL && attempt < 4) {
+                  const delay = Math.pow(2, attempt) * 3000;
+                  console.warn(`[Pipeline] SSL error writing ${templatePath}, retry in ${delay}ms (attempt ${attempt + 1}/5)`);
+                  await new Promise(r => setTimeout(r, delay));
+                } else {
+                  console.error(`[Pipeline] Failed to write template ${templatePath}: ${err.message}`);
+                  break;
+                }
+              }
+            }
+            if (!templateWritten) {
+              console.error(`[Pipeline] CRITICAL: Could not write ${templatePath} after retries.`);
+            }
           }
 
           // Apply Design Tokens
