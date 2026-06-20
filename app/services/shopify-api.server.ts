@@ -48,6 +48,13 @@ function recordCircuitSuccess(shopDomain: string) {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+export class NonRetryableShopifyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NonRetryableShopifyError";
+  }
+}
+
 async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Response>): Promise<any> {
   const MAX_RETRIES = 10;
   let attempt = 0;
@@ -71,7 +78,13 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
       } else {
         recordCircuitSuccess(shopDomain);
         
-        const data = await response.json();
+        let data: any;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+           data = await response.json();
+        } else {
+           data = await response.text();
+        }
         
         // Handle GraphQL specific rate limiting
         if (data.errors && Array.isArray(data.errors) && data.errors.some((e: any) => e.extensions?.code === 'THROTTLED')) {
@@ -82,15 +95,20 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
           continue;
         }
 
+        // Do not retry 400-level client errors!
+        if (!response.ok && response.status >= 400 && response.status < 500) {
+           throw new NonRetryableShopifyError(`Shopify API Error ${response.status}: ${typeof data === 'object' ? JSON.stringify(data.errors || data) : data}`);
+        }
+
         if (data.errors) {
           const errMsg = Array.isArray(data.errors) ? data.errors[0]?.message : (typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors));
-          throw new Error(`Shopify API Error: ${errMsg}`);
+          throw new NonRetryableShopifyError(`Shopify API Error: ${errMsg}`);
         }
 
         return data;
       }
     } catch (error: any) {
-      if (error instanceof CircuitBreakerOpenError) throw error;
+      if (error instanceof CircuitBreakerOpenError || error instanceof NonRetryableShopifyError) throw error;
       
       // Retry SSL/network-level transient errors
       // NOTE: Node.js 18+ native fetch (undici) wraps low-level errors in error.cause
