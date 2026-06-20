@@ -31,6 +31,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const activeGen = shop ? await prisma.storeGeneration.findFirst({
     where: { shopId: shop.id },
     orderBy: { createdAt: "desc" },
+    include: { shop: true }
   }) : null;
 
   return json({ niches, activeGen });
