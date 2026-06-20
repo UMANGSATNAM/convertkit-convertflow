@@ -36,7 +36,16 @@ export function initGeneratorWorker() {
 
       try {
         const updateStatus = async (status: any, logMsg: string) => {
-          const currentLog = gen.log as any[];
+          const currentGen = await prisma.storeGeneration.findUnique({
+            where: { id: generationId },
+            select: { status: true, log: true }
+          });
+          if (currentGen?.status === "CANCELLED") {
+            console.log(`[Pipeline] Generation ${generationId} was cancelled by user.`);
+            throw new Error("Generation Cancelled");
+          }
+
+          const currentLog = (currentGen?.log || []) as any[];
           await prisma.storeGeneration.update({
             where: { id: generationId },
             data: {

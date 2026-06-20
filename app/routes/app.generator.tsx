@@ -135,6 +135,14 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     }
   }
+  if (actionType === "CANCEL_GENERATION") {
+    const generationId = formData.get("generationId") as string;
+    await prisma.storeGeneration.update({
+      where: { id: generationId },
+      data: { status: "CANCELLED" }
+    });
+    return json({ success: true, cancelled: true });
+  }
 
   return json({ error: "Invalid action" }, { status: 400 });
 }
@@ -420,8 +428,18 @@ function LoadingState({ activeGen, isSubmitting, submit }: { activeGen: any, isS
                    }} />
                 </div>
 
-                <div className="status-badge">
-                  STATUS: {activeGen.status}
+                <div style={{ display: "flex", justifyContent: "center", gap: "12px", alignItems: "center" }}>
+                  <div className="status-badge">
+                    STATUS: {activeGen.status}
+                  </div>
+                  {activeGen.status !== "DONE" && activeGen.status !== "FAILED" && activeGen.status !== "CANCELLED" && (
+                    <Button 
+                      tone="critical" 
+                      onClick={() => submit({ actionType: "CANCEL_GENERATION", generationId: activeGen.id }, { method: "POST" })}
+                    >
+                      Cancel Generation
+                    </Button>
+                  )}
                 </div>
               </div>
               

@@ -41,7 +41,9 @@ export async function validateSettingsPatch(shop: any, themeId: string, patch: R
   for (const [key, value] of Object.entries(patch)) {
     const settingDef = settingsMap.get(key);
     if (!settingDef) {
-      throw new ValidationError(`Setting '${key}' does not exist in theme schema`);
+      console.warn(`[Validator] Setting '${key}' does not exist in theme schema. Skipping.`);
+      delete patch[key];
+      continue;
     }
 
     // Basic type validation
