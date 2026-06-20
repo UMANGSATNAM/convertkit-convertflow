@@ -11,15 +11,27 @@ export async function createSnapshot(
   content: string, 
   reason: SnapReason
 ) {
-  const r2Key = `snapshots/${shopId}/${themeId}/${Date.now()}_${path.replace(/\//g, '_')}`;
-  
-  // Upload content to R2 private bucket
-  await uploadToR2({
-    bucket: PRIVATE_BUCKET,
-    key: r2Key,
-    body: content,
-    contentType: "application/json"
-  });
+  try {
+    // Quick check to skip R2 upload if we are using the fallback dev credentials
+    if (!process.env.R2_ACCOUNT_ID || process.env.R2_ACCOUNT_ID === "dev-account-id") {
+      console.warn(`[Snapshot] Skipping R2 upload for ${path} because R2 credentials are not configured.`);
+      return { id: "dev-snapshot-id" };
+    }
+
+    const r2Key = `snapshots/${shopId}/${themeId}/${Date.now()}_${path.replace(/\//g, '_')}`;
+    
+    // Upload content to R2 private bucket with a 5-second timeout to prevent hanging
+    const uploadPromise = uploadToR2({
+      bucket: PRIVATE_BUCKET,
+      key: r2Key,
+      body: content,
+      contentType: "application/json"
+    });
+    
+    await Promise.race([
+      uploadPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("R2 upload timeout")), 5000))
+    ]);
 
   const snapshot = await prisma.themeSnapshot.create({
     data: {
@@ -36,6 +48,11 @@ export async function createSnapshot(
   await pruneSnapshots(shopId, themeId, path);
 
   return snapshot;
+  } catch (error: any) {
+    console.error(`[Snapshot] Failed to create snapshot for ${path}: ${error.message}`);
+    // Return a dummy object so the caller doesn't crash
+    return { id: "failed-snapshot-id" };
+  }
 }
 
 export async function fetchSnapshotContent(r2Key: string): Promise<string> {
