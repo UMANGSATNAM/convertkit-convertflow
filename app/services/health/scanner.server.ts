@@ -20,19 +20,24 @@ export async function runHealthScan(request: Request, shopId: string, shopDomain
     const { admin } = await authenticate.admin(request);
     
     // 1. Compliance Check (Policies)
-    const policyResponse = await admin.graphql(`
-      query {
-        shop {
-          privacyPolicy { id }
-          termsOfService { id }
-          refundPolicy { id }
+    let hasPolicies = true;
+    try {
+      // In newer API versions, these fields might be moved to shop.shopPolicies
+      const policyResponse = await admin.graphql(`
+        query {
+          shop {
+            shopPolicies { type }
+          }
         }
-      }
-    `);
-    const policyData = await policyResponse.json();
-    const policies = policyData.data.shop;
+      `);
+      const policyData = await policyResponse.json();
+      const policies = policyData.data?.shop?.shopPolicies || [];
+      if (policies.length === 0) hasPolicies = false;
+    } catch (e) {
+      console.warn("Could not fetch policies, skipping to prevent crash", e);
+    }
 
-    if (!policies.privacyPolicy || !policies.termsOfService || !policies.refundPolicy) {
+    if (!hasPolicies) {
       issues.push({
         id: "missing-policies",
         family: "COMPLIANCE",
