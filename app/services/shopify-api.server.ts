@@ -106,14 +106,22 @@ async function executeWithRetry(shopDomain: string, requestFn: () => Promise<Res
         (error.message && error.message.includes('SSL'));
       
       if (isNetworkError && attempt < MAX_RETRIES - 1) {
-        const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
+        // Cap the delay at 5000ms to avoid 30+ minute hangs on Railway network hiccups
+        const maxDelay = 5000;
+        const delay = Math.min(Math.pow(2, attempt) * 1000 + Math.random() * 1000, maxDelay);
         console.warn(`[Shopify] Network/SSL error (${rootError.code || error.code || 'SSL'}). Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        
+        // If we hit too many network errors quickly, just bail after 4 attempts to prevent forever loops
+        if (attempt >= 4) {
+          throw new Error(`[Shopify] Network/SSL error persistent after 4 attempts: ${error.message}`);
+        }
+        
         await sleep(delay);
         attempt++;
         continue;
       }
       
-      if (attempt === MAX_RETRIES - 1) throw error;
+      if (attempt >= MAX_RETRIES - 1) throw error;
     }
     
     // Default backoff for other errors

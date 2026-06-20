@@ -8,10 +8,13 @@ async function runE2E() {
   console.log("Starting End-to-End Test for StoreForge Generator...");
 
   // 1. Find or create a shop
-  let shop = await prisma.shop.findFirst();
-  if (!shop) {
-    console.error("No shop found in DB. Please ensure the app is installed on a dev store.");
-    process.exit(1);
+  // 1. Find the real shop
+  const shop = await prisma.shop.findFirst({
+    where: { shopDomain: "uwyhex-nb.myshopify.com" }
+  });
+
+  if (!shop || !shop.accessToken) {
+    throw new Error("Could not find the real shop uwyhex-nb.myshopify.com with a valid access token in the DB");
   }
   
   // 2. Find or create a niche
