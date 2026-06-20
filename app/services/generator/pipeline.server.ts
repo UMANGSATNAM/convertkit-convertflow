@@ -258,7 +258,12 @@ export function initGeneratorWorker() {
           }
 
           const finalSettingsPatch = { ...settingsPatch, ...designTokens };
-          await patchSettings(shop, themeId, finalSettingsPatch);
+          
+          try {
+            await patchSettings(shop, themeId, finalSettingsPatch);
+          } catch (patchErr: any) {
+            console.warn(`[Pipeline] Failed to apply design tokens to settings_data.json: ${patchErr.message}. Continuing anyway.`);
+          }
         } else {
           await patchSettings(shop, themeId, niche.settingsBase as any);
         }
