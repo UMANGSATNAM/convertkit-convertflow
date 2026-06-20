@@ -66,6 +66,22 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ success: true, generationId: gen.id });
   }
 
+  if (actionType === "CANCEL_GENERATION") {
+    const generationId = formData.get("generationId") as string;
+    
+    await prisma.storeGeneration.update({
+      where: { id: generationId },
+      data: {
+        status: "FAILED",
+        error: { message: "Cancelled by user." },
+      }
+    });
+
+    console.error(`[Generator] User manually cancelled generation: ${generationId}`);
+
+    return json({ success: true, cancelled: true });
+  }
+
   if (actionType === "TRACK_PREVIEW") {
     const generationId = formData.get("generationId") as string;
     const { trackEvent } = await import("../services/posthog.server");
@@ -178,6 +194,20 @@ export default function Generator() {
                 <ProgressBar progress={50} tone="primary" />
                 <Text as="p">Current Status: {activeGen.status}</Text>
                 <Text as="p" tone="subdued">This process usually takes 30-60 seconds.</Text>
+                <div style={{ marginTop: "1rem" }}>
+                  <Button 
+                    tone="critical" 
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      submit(
+                        { actionType: "CANCEL_GENERATION", generationId: activeGen.id },
+                        { method: "POST" }
+                      );
+                    }}
+                  >
+                    Cancel Generation
+                  </Button>
+                </div>
               </BlockStack>
             </Card>
           </Layout.Section>
