@@ -194,6 +194,29 @@ export default function Generator() {
                 <ProgressBar progress={50} tone="primary" />
                 <Text as="p">Current Status: {activeGen.status}</Text>
                 <Text as="p" tone="subdued">This process usually takes 30-60 seconds.</Text>
+                
+                {activeGen.log && Array.isArray(activeGen.log) && activeGen.log.length > 0 && (
+                  <div style={{ 
+                    maxHeight: "250px", 
+                    overflowY: "auto", 
+                    backgroundColor: "#f4f6f8", 
+                    padding: "12px", 
+                    borderRadius: "8px",
+                    border: "1px solid #dfe3e8",
+                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px"
+                  }}>
+                    {activeGen.log.map((log: any, idx: number) => (
+                      <div key={idx} style={{ color: log.msg?.toLowerCase().includes("error") || log.msg?.toLowerCase().includes("failed") ? "#d82c0d" : "#202223" }}>
+                        <span style={{ color: "#8c9196" }}>[{new Date(log.time).toLocaleTimeString()}]</span> {log.msg}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div style={{ marginTop: "1rem" }}>
                   <Button 
                     tone="critical" 
@@ -286,7 +309,31 @@ export default function Generator() {
 
           {activeGen?.status === "FAILED" && (
             <Banner tone="critical" title="Generation Failed">
-              <p>An error occurred while generating the store. Please try again. ({typeof activeGen.error === "object" && activeGen.error !== null ? (activeGen.error as any).message || "Unknown error" : "Unknown error"})</p>
+              <BlockStack gap="400">
+                <Text as="p">An error occurred while generating the store. Please try again. {activeGen.error ? `(${activeGen.error.message || JSON.stringify(activeGen.error)})` : ""}</Text>
+                
+                {activeGen.log && Array.isArray(activeGen.log) && activeGen.log.length > 0 && (
+                  <div style={{ 
+                    maxHeight: "250px", 
+                    overflowY: "auto", 
+                    backgroundColor: "#f4f6f8", 
+                    padding: "12px", 
+                    borderRadius: "8px",
+                    border: "1px solid #dfe3e8",
+                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px"
+                  }}>
+                    {activeGen.log.map((log: any, idx: number) => (
+                      <div key={idx} style={{ color: log.msg?.toLowerCase().includes("error") || log.msg?.toLowerCase().includes("failed") ? "#d82c0d" : "#202223" }}>
+                        <span style={{ color: "#8c9196" }}>[{new Date(log.time).toLocaleTimeString()}]</span> {log.msg}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </BlockStack>
             </Banner>
           )}
 
