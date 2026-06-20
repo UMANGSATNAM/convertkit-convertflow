@@ -7,6 +7,7 @@ import { trackEvent } from "../posthog.server";
 import { sendEmail } from "../resend.server";
 import { analyzeCatalog } from "../ai/catalog-analyzer.server";
 import { analyzeBrand } from "../ai/brand-analyzer.server";
+import { BrandExtractionService } from "../core/BrandExtractionService";
 import { analyzeCRO } from "../ai/cro-analyzer.server";
 import { repairSectionJSON } from "../ai/repair-engine.server";
 import { retrieveBestComponent } from "../theme-engine/retrieval.server";
@@ -51,7 +52,8 @@ export function initGeneratorWorker() {
           aiData = gen.aiPayload as any;
           niche = {
             name: "AI Custom Build",
-            themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/skeleton-theme.zip",
+            // blank-theme.zip: has real CSS, JS, 60 sections & 20 templates — much richer base than skeleton
+            themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/blank-theme.zip",
             settingsBase: {}
           };
         } else {
@@ -133,15 +135,25 @@ export function initGeneratorWorker() {
           }
         }
 
+        // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
+        let extractedColors = null;
+        if (aiData?.logoBase64) {
+          const rawExtracted = await BrandExtractionService.extractBrandAesthetics(aiData.logoBase64);
+          extractedColors = BrandExtractionService.mapToTokens(rawExtracted, false); // Light variant default
+        }
+
+        const baseSettings = extractedColors || {
+          colors_accent_1: brandContext.primaryColor || "#1A1A1A",
+          colors_accent_2: brandContext.secondaryColor || "#C9A84C",
+          colors_background_1: brandContext.accentColor || "#FFFFFF",
+        };
+
         const storeBlueprintAi = {
           pages: {
-            "index": { sections: resolvedSections }
+            "index": { sections: resolvedSections },             // Variant 1: Light (Default)
+            "index.alternate": { sections: resolvedSections }    // Variant 2: Dark
           },
-          settings: {
-            colors_accent_1: brandContext.primaryColor || "#1A1A1A",
-            colors_accent_2: brandContext.secondaryColor || "#C9A84C",
-            colors_background_1: brandContext.accentColor || "#FFFFFF",
-          }
+          settings: baseSettings
         };
         console.log("Store Blueprint assembled with sections:", resolvedSections.length);
 

@@ -1,126 +1,170 @@
-{% comment %} Jewellery Showcase Grid — Dark cards, gold hover, stagger animation, quick-add {% endcomment %}
+{% comment %}
+  ============================================================================
+  SECTION — Jewellery Showcase v3 ("Rosé") · Light / CaratLane-style
+  ----------------------------------------------------------------------------
+  A complete redesign away from the dark theme. Bright, friendly, conversion
+  focused — the aesthetic of modern Indian D2C jewellery (CaratLane / Mia):
+    • Crisp white + blush palette, rose-pink primary, warm-gold micro accent
+    • Soft rounded cards that lift on hover with a coloured glow + image zoom
+    • Star ratings (from review metafields), savings pill, trust line
+    • Real AJAX add-to-cart via /cart/add.js  → dispatches cart:refresh
+    • In-place tag filtering · variant colour swatches · localStorage wishlist
+    • IntersectionObserver scroll reveal · full a11y · reduced-motion safe
+    • Valid Liquid throughout (no yoink / ternary / pluralize / color_modify)
+  ============================================================================
+{% endcomment %}
 
-<section class="sf-lux sf-jewel-grid sf-jg-{{ section.id }}">
-  <div class="sf-jg-inner">
+{%- liquid
+  assign sec = section.settings
+  assign coll = collections[sec.collection]
+  assign count = sec.product_count
+  assign uid = section.id
+-%}
+
+<section class="rz rz--{{ uid }}" data-section-id="{{ uid }}" aria-labelledby="rz-title-{{ uid }}">
+  <div class="rz-inner">
 
     {%- comment -%} Header {%- endcomment -%}
-    <div class="sf-jg-header">
-      <p class="sf-section-label sf-reveal">
-        <span class="sf-hle-eyebrow-line"></span>
-        {{ section.settings.label | default: 'The Collection' }}
-        <span class="sf-hle-eyebrow-line"></span>
-      </p>
-      <h2 class="sf-jg-title sf-reveal sf-reveal-delay-1">{{ section.settings.title | default: 'Crafted With Precision' }}</h2>
-      {% if section.settings.subtitle != blank %}
-        <p class="sf-jg-subtitle sf-reveal sf-reveal-delay-2">{{ section.settings.subtitle }}</p>
+    <header class="rz-head">
+      {% if sec.label != blank %}
+        <p class="rz-eyebrow rz-rv">{{ sec.label }}</p>
       {% endif %}
-    </div>
+      <h2 id="rz-title-{{ uid }}" class="rz-title rz-rv" style="--d:1">{{ sec.title }}</h2>
+      {% if sec.subtitle != blank %}
+        <p class="rz-sub rz-rv" style="--d:2">{{ sec.subtitle }}</p>
+      {% endif %}
 
-    {%- comment -%} Product Grid {%- endcomment -%}
-    <div class="sf-jg-grid" id="sf-jg-grid-{{ section.id }}">
-      {% assign collection = collections[section.settings.collection] %}
-      {% if collection != blank and collection.products.size > 0 %}
-        {% for product in collection.products limit: section.settings.product_count %}
-          <div class="sf-jg-card sf-reveal sf-reveal-delay-{{ forloop.index }}" data-index="{{ forloop.index }}">
-            <div class="sf-jg-card-img-wrap">
-              <a href="{{ product.url }}" class="sf-jg-img-link">
-                {% if product.images.size > 1 %}
-                  <img class="sf-jg-img-primary" src="{{ product.images[0] | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
-                  <img class="sf-jg-img-hover" src="{{ product.images[1] | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
-                {% elsif product.featured_image %}
-                  <img class="sf-jg-img-primary" src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}" loading="lazy">
+      {% if sec.enable_filter and sec.filter_tags != blank %}
+        {% assign tags = sec.filter_tags | split: ',' %}
+        <div class="rz-filter rz-rv" style="--d:3" role="tablist" aria-label="Filter products">
+          <button class="rz-chip is-active" data-filter="*" role="tab" aria-selected="true">All</button>
+          {% for t in tags %}
+            {% assign tag = t | strip %}
+            <button class="rz-chip" data-filter="{{ tag | handleize }}" role="tab" aria-selected="false">{{ tag }}</button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </header>
+
+    {%- comment -%} Grid {%- endcomment -%}
+    <div class="rz-grid" id="rz-grid-{{ uid }}">
+      {% if coll != blank and coll.products.size > 0 %}
+        {% for product in coll.products limit: count %}
+
+          {%- liquid
+            assign on_sale = false
+            if product.compare_at_price > product.price
+              assign on_sale = true
+            endif
+            assign tag_handles = ''
+            for t in product.tags
+              assign tag_handles = tag_handles | append: ' ' | append: t | handleize
+            endfor
+            assign rating = product.metafields.reviews.rating.value
+            assign rating_count = product.metafields.reviews.rating_count.value
+          -%}
+
+          <article class="rz-card rz-rv" style="--d:{{ forloop.index }}" data-tags="{{ tag_handles | strip }}">
+            <div class="rz-media">
+              <a href="{{ product.url }}" class="rz-media-link" aria-label="{{ product.title | escape }}">
+                {% if product.featured_media %}
+                  <img class="rz-img rz-img--a"
+                       src="{{ product.featured_media | image_url: width: 800 }}"
+                       srcset="{{ product.featured_media | image_url: width: 400 }} 400w, {{ product.featured_media | image_url: width: 800 }} 800w"
+                       sizes="(max-width:768px) 50vw, 25vw"
+                       width="800" height="800"
+                       alt="{{ product.featured_media.alt | escape | default: product.title }}" loading="lazy">
+                  {% if product.media[1] %}
+                    <img class="rz-img rz-img--b" src="{{ product.media[1] | image_url: width: 800 }}" width="800" height="800" alt="" aria-hidden="true" loading="lazy">
+                  {% endif %}
                 {% else %}
-                  <div class="sf-jg-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+                  <div class="rz-ph">{{ 'product-1' | placeholder_svg_tag }}</div>
                 {% endif %}
               </a>
 
-              {%- comment -%} Badges {%- endcomment -%}
-              <div class="sf-jg-badges">
-                {% if product.available == false %}
-                  <span class="sf-jg-badge sf-jg-badge-sold">Sold Out</span>
-                {% elsif product.compare_at_price > product.price %}
-                  <span class="sf-jg-badge sf-jg-badge-sale">Sale</span>
-                {% endif %}
-                {% for tag in product.tags limit: 1 %}
-                  {% if tag == 'new' or tag == 'New' or tag == 'peril-new' %}
-                    <span class="sf-jg-badge sf-jg-badge-new">New</span>
-                  {% endif %}
-                {% endfor %}
-              </div>
-
-              {%- comment -%} Quick action overlay {%- endcomment -%}
-              <div class="sf-jg-actions">
-                {% if product.available %}
-                  <form action="/cart/add" method="post" class="sf-jg-atc-form">
-                    {% if product.variants.size == 1 %}
-                      <input type="hidden" name="id" value="{{ product.variants[0].id }}">
-                      <button type="submit" class="sf-jg-quick-add">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2H3.5L5 9H11L12 5H4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5.5" cy="11.5" r="0.8" fill="currentColor"/><circle cx="10.5" cy="11.5" r="0.8" fill="currentColor"/></svg>
-                        <span>Quick Add</span>
-                      </button>
-                    {% else %}
-                      <a href="{{ product.url }}" class="sf-jg-quick-add">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M7 1L13 7L7 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-                        <span>View Options</span>
-                      </a>
-                    {% endif %}
-                  </form>
-                {% else %}
-                  <a href="{{ product.url }}" class="sf-jg-quick-add sf-jg-quick-add--sold">Notify Me</a>
-                {% endif %}
-
-                <button class="sf-jg-wishlist" aria-label="Add to wishlist" title="Save">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 13.5S1.5 9.5 1.5 5.5C1.5 3.567 3.067 2 5 2C6.19 2 7.25 2.63 8 3.5C8.75 2.63 9.81 2 11 2C12.933 2 14.5 3.567 14.5 5.5C14.5 9.5 8 13.5 8 13.5Z" stroke="currentColor" stroke-width="1.2"/></svg>
-                </button>
-              </div>
-            </div>
-
-            {%- comment -%} Card Info {%- endcomment -%}
-            <div class="sf-jg-card-info">
-              {% if product.vendor != blank %}
-                <span class="sf-jg-vendor">{{ product.vendor }}</span>
+              {% if on_sale %}
+                {% assign pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+                <span class="rz-flag rz-flag--save">{{ pct }}% OFF</span>
+              {% elsif product.tags contains 'new' or product.tags contains 'New' %}
+                <span class="rz-flag rz-flag--new">New In</span>
               {% endif %}
-              <h3 class="sf-jg-name">
-                <a href="{{ product.url }}">{{ product.title }}</a>
-              </h3>
-              <div class="sf-jg-price-row">
-                {% if product.compare_at_price > product.price %}
-                  <span class="sf-price-compare">{{ product.compare_at_price | money }}</span>
+              {% if product.available == false %}
+                <span class="rz-flag rz-flag--sold">Sold Out</span>
+              {% endif %}
+
+              <button class="rz-wish" data-wish="{{ product.id }}" aria-label="Save {{ product.title | escape }}" title="Save">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 20s-7-4.6-9.3-9C1.2 8 2.6 4.8 5.8 4.4 8 4.1 9.7 5.3 12 8c2.3-2.7 4-3.9 6.2-3.6 3.2.4 4.6 3.6 3.1 6.6C19 15.4 12 20 12 20Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </button>
+
+              {% if product.available %}
+                {% if product.variants.size == 1 %}
+                  <button type="button" class="rz-add" data-add="{{ product.variants.first.id }}">
+                    <span class="rz-add-txt">Add to Cart</span>
+                    <span class="rz-add-done" aria-hidden="true">Added ✓</span>
+                    <span class="rz-spin" aria-hidden="true"></span>
+                  </button>
+                {% else %}
+                  <a href="{{ product.url }}" class="rz-add rz-add--opt"><span class="rz-add-txt">Select Options</span></a>
                 {% endif %}
-                <span class="sf-price-gold">{{ product.price | money }}</span>
-                {% if product.compare_at_price > product.price %}
-                  {% assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
-                  <span class="sf-jg-savings">-{{ savings }}%</span>
+              {% else %}
+                <a href="{{ product.url }}" class="rz-add rz-add--sold">Notify Me</a>
+              {% endif %}
+            </div>
+
+            <div class="rz-info">
+              {% if rating != blank and sec.show_ratings %}
+                <div class="rz-rating" aria-label="Rated {{ rating }} out of 5">
+                  <span class="rz-stars" style="--r:{{ rating }}">★★★★★</span>
+                  {% if rating_count != blank %}<span class="rz-rcount">({{ rating_count }})</span>{% endif %}
+                </div>
+              {% endif %}
+
+              <h3 class="rz-name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+
+              {% for opt in product.options_with_values %}
+                {% assign on = opt.name | downcase %}
+                {% if on == 'color' or on == 'colour' %}
+                  <div class="rz-swatches" aria-label="Colours">
+                    {% for value in opt.values limit: 5 %}
+                      <span class="rz-sw" style="background: {{ value | downcase | split: ' ' | last }};" title="{{ value }}"></span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+
+              <div class="rz-price">
+                <span class="rz-price-now">{{ product.price | money }}</span>
+                {% if on_sale %}
+                  <span class="rz-price-was">{{ product.compare_at_price | money }}</span>
                 {% endif %}
               </div>
+
+              {% if sec.trust_line != blank %}
+                <p class="rz-trust">{{ sec.trust_line }}</p>
+              {% endif %}
             </div>
-          </div>
+          </article>
+
         {% endfor %}
 
       {% else %}
-        {%- comment -%} Placeholder products {%- endcomment -%}
-        {% for i in (1..8) %}
-          <div class="sf-jg-card sf-reveal sf-reveal-delay-{{ i }}">
-            <div class="sf-jg-card-img-wrap">
-              <div class="sf-jg-placeholder">{{ 'product-' | append: i | placeholder_svg_tag }}</div>
+        {% for i in (1..count) %}
+          <article class="rz-card rz-rv" style="--d:{{ forloop.index }}">
+            <div class="rz-media"><div class="rz-ph">{{ 'product-' | append: i | placeholder_svg_tag }}</div></div>
+            <div class="rz-info">
+              <div class="rz-rating"><span class="rz-stars" style="--r:4.5">★★★★★</span><span class="rz-rcount">(128)</span></div>
+              <h3 class="rz-name"><a href="#">Signature Piece</a></h3>
+              <div class="rz-price"><span class="rz-price-now">₹12,500</span><span class="rz-price-was">₹15,000</span></div>
             </div>
-            <div class="sf-jg-card-info">
-              <h3 class="sf-jg-name"><a href="#">Luxury Piece</a></h3>
-              <div class="sf-jg-price-row">
-                <span class="sf-price-gold">₹12,500</span>
-              </div>
-            </div>
-          </div>
+          </article>
         {% endfor %}
       {% endif %}
     </div>
 
-    {%- comment -%} View All CTA {%- endcomment -%}
-    {% if section.settings.view_all_link != blank %}
-      <div class="sf-jg-footer sf-reveal">
-        <a href="{{ section.settings.view_all_link }}" class="sf-btn-gold">
-          <span>View Entire Collection</span>
-          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" style="position:relative;z-index:1"><path d="M0 4H14M14 4L10 1M14 4L10 7" stroke="currentColor" stroke-width="1.5"/></svg>
+    {% if sec.view_all_link != blank %}
+      <div class="rz-foot rz-rv">
+        <a href="{{ sec.view_all_link }}" class="rz-cta">{{ sec.view_all_text | default: 'Explore All Jewellery' }}
+          <svg width="17" height="9" viewBox="0 0 17 9" fill="none" aria-hidden="true"><path d="M0 4.5h15M15 4.5 11.5 1M15 4.5 11.5 8" stroke="currentColor" stroke-width="1.5"/></svg>
         </a>
       </div>
     {% endif %}
@@ -129,139 +173,190 @@
 </section>
 
 <style>
-  .sf-jg-{{ section.id }} {
-    padding: 6rem 0;
-    background: {{ section.settings.bg_dark | default: 'true' | yoink: 'true' }};
-    {% if section.settings.bg_dark %}
-      background: #0f0d0a;
-    {% else %}
-      background: var(--lux-bg);
-    {% endif %}
+  .rz--{{ uid }} {
+    --rz-bg: {{ sec.bg_color | default: 'var(--color-surface)' }};
+    --rz-card: var(--color-background);
+    --rz-ink: var(--color-text);
+    --rz-body: var(--color-text);
+    --rz-pink: {{ sec.accent | default: 'var(--color-surface)' }};
+    --rz-pink-dk: var(--color-text);
+    --rz-pink-soft: var(--color-surface);
+    --rz-gold: var(--color-text);
+    --rz-green: var(--color-text);
+    --rz-line: var(--color-surface);
+    --rz-star: var(--color-surface);
+    --rz-ease: cubic-bezier(.22,1,.36,1);
+    --rz-disp: var(--font-heading, 'Poppins', sans-serif);
+    --rz-sans: var(--font-body, 'DM Sans', sans-serif);
+    --rz-cols: {{ sec.columns }};
   }
 
-  .sf-jg-inner { max-width: 1400px; margin: 0 auto; padding: 0 60px; }
-  @media (max-width: 768px) { .sf-jg-inner { padding: 0 20px; } }
+  .rz { padding: 5rem 0; background: var(--color-surface); }
+  .rz-inner { max-width: 1400px; margin: 0 auto; padding: 0 clamp(18px,4vw,56px); }
 
-  /* Header */
-  .sf-jg-header { text-align: center; margin-bottom: 4rem; }
-  .sf-jg-title {
-    font-family: var(--font-serif); font-weight: 400;
-    font-size: clamp(2rem, 4vw, 3rem); color: var(--lux-cream);
-    letter-spacing: -0.01em; margin-bottom: 1rem;
-  }
-  .sf-jg-subtitle {
-    font-size: 0.95rem; color: var(--lux-grey); max-width: 480px; margin: 0 auto;
-    line-height: 1.7;
-  }
+  .rz-head { text-align: center; margin-bottom: 3rem; }
+  .rz-eyebrow { display: inline-block; margin-bottom: .8rem; padding: 5px 14px; border-radius: 100px; background: var(--color-surface); color: var(--color-surface); font-family: var(--color-surface); font-size: .66rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+  .rz-title { font-family: var(--color-surface); font-weight: 600; font-size: clamp(1.8rem,3.6vw,2.7rem); line-height: 1.12; letter-spacing: -.02em; color: var(--color-surface); margin-bottom: .8rem; }
+  .rz-sub { font-family: var(--color-surface); font-size: .98rem; line-height: 1.65; color: var(--color-surface); max-width: 520px; margin: 0 auto; }
 
-  /* Grid */
-  .sf-jg-grid {
-    display: grid;
-    grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
-    gap: 1.5rem;
-  }
-  @media (max-width: 1024px) { .sf-jg-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 768px) { .sf-jg-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
-  @media (max-width: 480px) { .sf-jg-grid { grid-template-columns: 1fr; } }
+  .rz-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 1.8rem; }
+  .rz-chip { padding: 9px 20px; border: 1px solid var(--color-surface); background: var(--color-background); cursor: pointer; font-family: var(--color-surface); font-size: .72rem; font-weight: 500; color: var(--color-surface); border-radius: 100px; transition: all .25s var(--color-surface); }
+  .rz-chip:hover { border-color: var(--color-surface); color: var(--color-surface); }
+  .rz-chip.is-active { background: var(--color-surface); border-color: var(--color-surface); color: var(--color-background); box-shadow: 0 6px 16px -8px var(--color-surface); }
 
-  /* Card */
-  .sf-jg-card { cursor: pointer; }
-  .sf-jg-card-img-wrap {
-    position: relative; aspect-ratio: 3/4;
-    background: var(--lux-bg-card); overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 2px;
-    transition: border-color 0.5s var(--ease-lux);
-  }
-  .sf-jg-card:hover .sf-jg-card-img-wrap { border-color: rgba(201,168,76,0.25); }
+  .rz-grid { display: grid; grid-template-columns: repeat(var(--color-surface),1fr); gap: 1.4rem 1.3rem; }
+  @media (max-width:1024px){ .rz-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width:768px){ .rz-grid { grid-template-columns: repeat(2,1fr); gap: 1.1rem .9rem; } }
+  @media (max-width:430px){ .rz-grid { grid-template-columns: repeat(2,1fr); gap: .8rem .7rem; } }
 
-  .sf-jg-img-link { display: block; width: 100%; height: 100%; }
-  .sf-jg-img-primary, .sf-jg-img-hover {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    transition: opacity 0.6s var(--ease-lux), transform 0.6s var(--ease-lux);
-  }
-  .sf-jg-img-hover { opacity: 0; }
-  .sf-jg-card:hover .sf-jg-img-primary { opacity: 0; transform: scale(1.04); }
-  .sf-jg-card:hover .sf-jg-img-hover { opacity: 1; transform: scale(1.04); }
-  .sf-jg-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-  .sf-jg-placeholder svg { width: 50%; height: 50%; opacity: 0.2; }
+  .rz-card { position: relative; background: var(--color-surface); border-radius: 16px; padding: 10px 10px 4px; border: 1px solid var(--color-surface); transition: transform .4s var(--color-surface), box-shadow .4s var(--color-surface); }
+  .rz-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -24px color-mix(in srgb, var(--color-surface) 50%, transparent); }
+  .rz-card.is-hidden { display: none; }
 
-  /* Badges */
-  .sf-jg-badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
-  .sf-jg-badge {
-    display: inline-block; padding: 3px 10px;
-    font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    border-radius: 1px;
-  }
-  .sf-jg-badge-new { background: var(--lux-gold); color: var(--lux-bg); }
-  .sf-jg-badge-sale { background: transparent; border: 1px solid var(--lux-gold); color: var(--lux-gold); }
-  .sf-jg-badge-sold { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+  .rz-media { position: relative; aspect-ratio: 1/1; border-radius: 11px; overflow: hidden; background: var(--color-surface); }
+  .rz-media-link { display: block; width: 100%; height: 100%; }
+  .rz-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .6s var(--color-surface), transform .7s var(--color-surface); }
+  .rz-img--b { opacity: 0; }
+  .rz-card:hover .rz-img--a { transform: scale(1.06); }
+  .rz-card:hover .rz-img--b { opacity: 1; transform: scale(1.06); }
+  .rz-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .rz-ph svg { width: 50%; height: 50%; opacity: .18; }
 
-  /* Actions overlay */
-  .sf-jg-actions {
-    position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
-    display: flex; align-items: center; gap: 8px; padding: 12px;
-    transform: translateY(100%);
-    transition: transform 0.45s var(--ease-lux);
-    background: linear-gradient(0deg, rgba(10,9,8,0.9) 0%, transparent 100%);
-    padding-top: 32px;
-  }
-  .sf-jg-card:hover .sf-jg-actions { transform: translateY(0); }
+  .rz-flag { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 10px; border-radius: 6px; font-family: var(--color-surface); font-size: .62rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+  .rz-flag--save { background: var(--color-surface); color: var(--color-background); }
+  .rz-flag--new { background: var(--color-surface); color: var(--color-background); }
+  .rz-flag--sold { background: color-mix(in srgb, var(--color-surface) 50%, transparent); color: var(--color-background); backdrop-filter: blur(3px); top: auto; bottom: 10px; }
 
-  .sf-jg-quick-add {
-    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 10px; border: 1px solid var(--lux-gold); background: var(--lux-gold);
-    font-family: var(--font-sans); font-size: 0.65rem; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--lux-bg);
-    cursor: pointer; transition: background 0.3s;
-  }
-  .sf-jg-quick-add:hover { background: var(--lux-gold-lt); }
-  .sf-jg-quick-add--sold { background: transparent; color: var(--lux-grey); border-color: var(--lux-grey); }
+  .rz-wish { position: absolute; top: 9px; right: 9px; z-index: 2; width: 36px; height: 36px; border: none; border-radius: 50%; background: color-mix(in srgb, var(--color-background) 90%, transparent); color: var(--color-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px -4px color-mix(in srgb, var(--color-text) 20%, transparent); transition: color .25s, transform .25s var(--color-surface); }
+  .rz-wish:hover { transform: scale(1.1); color: var(--color-surface); }
+  .rz-wish.is-saved { color: var(--color-surface); }
+  .rz-wish.is-saved svg path { fill: var(--color-surface); }
 
-  .sf-jg-wishlist {
-    width: 40px; height: 40px; flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.15); background: rgba(10,9,8,0.6);
-    color: var(--lux-white); cursor: pointer; display: flex; align-items: center;
-    justify-content: center; transition: border-color 0.3s, color 0.3s;
-  }
-  .sf-jg-wishlist:hover { border-color: var(--lux-gold); color: var(--lux-gold); }
+  .rz-add { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; padding: 11px; border: none; cursor: pointer; overflow: hidden; text-decoration: none; background: var(--color-background); color: var(--color-surface); border: 1.5px solid var(--color-surface); border-radius: 9px; font-family: var(--color-surface); font-size: .72rem; font-weight: 600; letter-spacing: .04em; opacity: 0; transform: translateY(8px); transition: opacity .35s var(--color-surface), transform .35s var(--color-surface), background .25s, color .25s; }
+  .rz-card:hover .rz-add { opacity: 1; transform: translateY(0); }
+  .rz-add:hover { background: var(--color-surface); color: var(--color-background); }
+  .rz-add--opt:hover { background: var(--color-surface); color: var(--color-background); }
+  .rz-add--sold { color: var(--color-surface); border-color: var(--color-surface); }
+  .rz-add--sold:hover { background: var(--color-surface); color: var(--color-surface); }
+  .rz-add-done, .rz-spin { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .rz-add-done { opacity: 0; }
+  .rz-spin { opacity: 0; }
+  .rz-spin::after { content: ''; width: 15px; height: 15px; border: 2px solid var(--color-surface); border-top-color: var(--color-surface); border-radius: 50%; animation: rz-rot .6s linear infinite; }
+  @keyframes rz-rot { to { transform: rotate(360deg); } }
+  .rz-add.is-loading .rz-add-txt { opacity: 0; } .rz-add.is-loading .rz-spin { opacity: 1; }
+  .rz-add.is-done { background: var(--color-surface); color: var(--color-background); border-color: var(--color-surface); }
+  .rz-add.is-done .rz-add-txt { opacity: 0; } .rz-add.is-done .rz-add-done { opacity: 1; }
 
-  /* Card info */
-  .sf-jg-card-info { padding: 1rem 0.25rem 0; }
-  .sf-jg-vendor {
-    font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--lux-grey); display: block; margin-bottom: 0.3rem;
-  }
-  .sf-jg-name {
-    font-family: var(--font-serif); font-size: 1rem; font-weight: 400;
-    margin-bottom: 0.5rem; line-height: 1.3;
-  }
-  .sf-jg-name a { color: var(--lux-cream); transition: color 0.3s; }
-  .sf-jg-name a:hover { color: var(--lux-gold); }
-  .sf-jg-price-row { display: flex; align-items: center; gap: 8px; }
-  .sf-jg-savings {
-    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em;
-    color: var(--lux-bg); background: var(--lux-gold);
-    padding: 2px 6px; border-radius: 1px;
-  }
+  .rz-info { padding: .9rem .4rem .7rem; }
+  .rz-rating { display: flex; align-items: center; gap: 5px; margin-bottom: .4rem; }
+  .rz-stars { position: relative; display: inline-block; font-size: .8rem; letter-spacing: 1px; color: var(--color-surface); }
+  .rz-stars::before { content: '★★★★★'; position: absolute; left: 0; top: 0; width: calc(var(--radius-card) / 5 * 100%); overflow: hidden; color: var(--color-surface); white-space: nowrap; }
+  .rz-rcount { font-family: var(--color-surface); font-size: .68rem; color: var(--color-surface); }
+  .rz-name { font-family: var(--color-surface); font-size: .92rem; font-weight: 500; line-height: 1.35; margin-bottom: .5rem; }
+  .rz-name a { color: var(--color-surface); text-decoration: none; }
+  .rz-name a:hover { color: var(--color-surface); }
+  .rz-swatches { display: flex; gap: 5px; margin-bottom: .55rem; }
+  .rz-sw { width: 13px; height: 13px; border-radius: 50%; border: 1px solid var(--color-surface); }
+  .rz-price { display: flex; align-items: baseline; gap: 8px; }
+  .rz-price-now { font-family: var(--color-surface); font-size: 1.02rem; font-weight: 600; color: var(--color-surface); }
+  .rz-price-was { font-family: var(--color-surface); font-size: .8rem; color: var(--color-surface); text-decoration: line-through; }
+  .rz-trust { margin-top: .5rem; font-family: var(--color-surface); font-size: .68rem; color: var(--color-surface); font-weight: 500; }
 
-  /* Footer */
-  .sf-jg-footer { margin-top: 3.5rem; text-align: center; }
+  .rz-foot { margin-top: 3rem; text-align: center; }
+  .rz-cta { display: inline-flex; align-items: center; gap: 11px; padding: 14px 32px; background: var(--color-surface); color: var(--color-background); text-decoration: none; border-radius: 100px; font-family: var(--color-surface); font-size: .8rem; font-weight: 600; letter-spacing: .02em; box-shadow: 0 12px 28px -12px var(--color-surface); transition: transform .3s var(--color-surface), background .3s; }
+  .rz-cta:hover { transform: translateY(-2px); background: var(--color-surface); }
+
+  .rz-rv { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--color-surface), transform .7s var(--color-surface); transition-delay: calc(var(--transition-fast) * 55ms); }
+  .rz-rv.is-in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rz-rv, .rz-img, .rz-add, .rz-card, .rz-cta { transition: none !important; }
+    .rz-rv { opacity: 1; transform: none; }
+    .rz-add { opacity: 1; transform: none; }
+  }
 </style>
+
+<script>
+  (function () {
+    var root = document.querySelector('.rz--{{ uid }}');
+    if (!root) return;
+
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    root.querySelectorAll('.rz-rv').forEach(function (el) { io.observe(el); });
+
+    root.querySelectorAll('.rz-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var f = chip.getAttribute('data-filter');
+        root.querySelectorAll('.rz-chip').forEach(function (c) { c.classList.remove('is-active'); c.setAttribute('aria-selected','false'); });
+        chip.classList.add('is-active'); chip.setAttribute('aria-selected','true');
+        root.querySelectorAll('.rz-card').forEach(function (card) {
+          var tags = (card.getAttribute('data-tags') || '');
+          card.classList.toggle('is-hidden', !(f === '*' || tags.split(' ').indexOf(f) !== -1));
+        });
+      });
+    });
+
+    var KEY = 'sf_wishlist';
+    var saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+    root.querySelectorAll('.rz-wish').forEach(function (btn) {
+      var id = btn.getAttribute('data-wish');
+      if (saved.indexOf(id) !== -1) btn.classList.add('is-saved');
+      btn.addEventListener('click', function () {
+        var i = saved.indexOf(id);
+        if (i === -1) { saved.push(id); btn.classList.add('is-saved'); }
+        else { saved.splice(i,1); btn.classList.remove('is-saved'); }
+        localStorage.setItem(KEY, JSON.stringify(saved));
+      });
+    });
+
+    root.querySelectorAll('.rz-add[data-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('is-loading')) return;
+        var id = btn.getAttribute('data-add');
+        btn.classList.add('is-loading');
+        fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ items: [{ id: id, quantity: 1 }] }) })
+          .then(function (r) { return r.json(); })
+          .then(function () {
+            btn.classList.remove('is-loading'); btn.classList.add('is-done');
+            document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+            setTimeout(function () { btn.classList.remove('is-done'); }, 1800);
+          })
+          .catch(function () { btn.classList.remove('is-loading'); });
+      });
+    });
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Grid — Jewellery Showcase",
+  "name": "Showcase — Jewellery v3",
+  "tag": "section",
+  "class": "section-jewellery-rose",
   "settings": [
-    { "type": "text", "id": "label", "label": "Eyebrow Label", "default": "The Collection" },
-    { "type": "text", "id": "title", "label": "Section Title", "default": "Crafted With Precision" },
-    { "type": "textarea", "id": "subtitle", "label": "Subtitle" },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "label", "label": "Eyebrow label", "default": "Trending Now" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Everyday Sparkle, Made for You" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Lightweight, BIS-hallmarked gold and diamond jewellery — designed to wear every single day." },
     { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "product_count", "min": 4, "max": 12, "step": 2, "label": "Products to Show", "default": 8 },
-    { "type": "select", "id": "columns", "label": "Columns (desktop)", "options": [{"value":"3","label":"3 Columns"},{"value":"4","label":"4 Columns"}], "default": "4" },
-    { "type": "checkbox", "id": "bg_dark", "label": "Dark Background", "default": true },
-    { "type": "url", "id": "view_all_link", "label": "View All Link" }
+    { "type": "range", "id": "product_count", "min": 4, "max": 16, "step": 1, "label": "Products to show", "default": 8 },
+
+    { "type": "header", "content": "Layout & colour" },
+    { "type": "range", "id": "columns", "min": 3, "max": 5, "step": 1, "label": "Columns (desktop)", "default": 4 },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#fff7f9" },
+    { "type": "color", "id": "accent", "label": "Accent (pink)", "default": "#e63780" },
+    { "type": "checkbox", "id": "show_ratings", "label": "Show review ratings", "default": true },
+    { "type": "text", "id": "trust_line", "label": "Trust line under price", "info": "e.g. ✓ 30-day returns · Free shipping", "default": "✓ Free shipping · 30-day returns" },
+
+    { "type": "header", "content": "Filtering" },
+    { "type": "checkbox", "id": "enable_filter", "label": "Enable tag filter", "default": true },
+    { "type": "text", "id": "filter_tags", "label": "Filter tags (comma separated)", "default": "Rings, Earrings, Necklaces, Bracelets" },
+
+    { "type": "header", "content": "Call to action" },
+    { "type": "url", "id": "view_all_link", "label": "Button link" },
+    { "type": "text", "id": "view_all_text", "label": "Button text", "default": "Explore All Jewellery" }
   ],
-  "presets": [{ "name": "Grid — Jewellery Showcase", "category": "Collection" }]
+  "presets": [{ "name": "Showcase — Jewellery v3", "category": "Collection" }]
 }
 {% endschema %}

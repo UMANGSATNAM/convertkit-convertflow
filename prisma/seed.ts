@@ -18,7 +18,8 @@ async function main() {
       id: "ethnic-wear",
       name: "Ethnic Wear",
       nameHi: "एथनिक वियर",
-      themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/base-theme.zip",
+      // blank-theme.zip: 85kb with real CSS, JS, 60 sections — faster & cleaner than Dawn (1.97MB)
+      themeZipUrl: "https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/blank-theme.zip",
       themeVersion: "1.0.0",
       previewImages: ["https://placehold.co/600x800?text=Ethnic+Wear+1"],
       demoStoreUrl: "https://ethnic-demo.storeforge.app",
@@ -60,7 +61,7 @@ async function main() {
       id,
       name: id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
       nameHi: id, // Stub
-      themeZipUrl: `https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/base-theme.zip`,
+      themeZipUrl: `https://raw.githubusercontent.com/UMANGSATNAM/convertkit-convertflow/main/public/blank-theme.zip`,
       themeVersion: "1.0.0",
       previewImages: [`https://placehold.co/600x800?text=${id}`],
       demoStoreUrl: `https://${id}-demo.storeforge.app`,
