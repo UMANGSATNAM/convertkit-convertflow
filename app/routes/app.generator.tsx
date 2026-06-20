@@ -185,59 +185,7 @@ export default function Generator() {
   }, [isGenerating, revalidator]);
 
   if (isGenerating) {
-    return (
-      <Page title="Store Generation in Progress">
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="400">
-                <Text as="h2" variant="headingMd">Building your store...</Text>
-                <ProgressBar progress={50} tone="primary" />
-                <Text as="p">Current Status: {activeGen.status}</Text>
-                <Text as="p" tone="subdued">This process usually takes 30-60 seconds.</Text>
-                
-                {activeGen.log && Array.isArray(activeGen.log) && activeGen.log.length > 0 && (
-                  <div style={{ 
-                    maxHeight: "250px", 
-                    overflowY: "auto", 
-                    backgroundColor: "#f4f6f8", 
-                    padding: "12px", 
-                    borderRadius: "8px",
-                    border: "1px solid #dfe3e8",
-                    fontFamily: "monospace",
-                    fontSize: "12px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "4px"
-                  }}>
-                    {activeGen.log.map((log: any, idx: number) => (
-                      <div key={idx} style={{ color: log.msg?.toLowerCase().includes("error") || log.msg?.toLowerCase().includes("failed") ? "#d82c0d" : "#202223" }}>
-                        <span style={{ color: "#8c9196" }}>[{new Date(log.time).toLocaleTimeString()}]</span> {log.msg}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ marginTop: "1rem" }}>
-                  <Button 
-                    tone="critical" 
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      submit(
-                        { actionType: "CANCEL_GENERATION", generationId: activeGen.id },
-                        { method: "POST" }
-                      );
-                    }}
-                  >
-                    Cancel Generation
-                  </Button>
-                </div>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </Page>
-    );
+    return <LoadingState activeGen={activeGen} isSubmitting={isSubmitting} submit={submit} />;
   }
 
   return (
@@ -394,6 +342,132 @@ export default function Generator() {
                   </InlineStack>
                 </BlockStack>
               )}
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
+  );
+}
+
+function LoadingState({ activeGen, isSubmitting, submit }: { activeGen: any, isSubmitting: boolean, submit: any }) {
+  const [msgIndex, setMsgIndex] = useState(0);
+  const messages = [
+    "Teaching the AI about fashion...",
+    "Polishing the diamonds...",
+    "Sprinkling conversion rate magic...",
+    "Refactoring the storefront...",
+    "Cooking up high-converting layouts...",
+    "Analyzing catalog trends...",
+    "Applying premium brand colors...",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex((prev) => (prev + 1) % messages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
+  return (
+    <Page title="Store Generator">
+      <Layout>
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="500">
+              <div style={{ textAlign: "center", padding: "20px 0" }}>
+                <style>{`
+                  @keyframes pulseMagic {
+                    0% { opacity: 0.6; transform: scale(0.98); }
+                    50% { opacity: 1; transform: scale(1.02); }
+                    100% { opacity: 0.6; transform: scale(0.98); }
+                  }
+                  @keyframes glowText {
+                    0% { text-shadow: 0 0 5px rgba(0,200,100,0.2); }
+                    50% { text-shadow: 0 0 15px rgba(0,200,100,0.6); }
+                    100% { text-shadow: 0 0 5px rgba(0,200,100,0.2); }
+                  }
+                  .status-badge {
+                    display: inline-block;
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    background: #E8F5E9;
+                    color: #1B5E20;
+                    font-weight: bold;
+                    font-size: 12px;
+                    letter-spacing: 0.5px;
+                    animation: pulseMagic 2s infinite ease-in-out;
+                    border: 1px solid #C8E6C9;
+                  }
+                `}</style>
+                <Text as="h2" variant="headingLg">Building your store...</Text>
+                
+                <div style={{ margin: "20px 0" }}>
+                  <Text as="p" tone="subdued" variant="bodyLg">
+                    <span style={{ fontStyle: "italic", animation: "pulseMagic 3s infinite" }}>
+                      ✨ {messages[msgIndex]} ✨
+                    </span>
+                  </Text>
+                </div>
+
+                <div style={{ margin: "24px 0", padding: "0 40px" }}>
+                   <div style={{ 
+                      height: "8px", 
+                      background: "linear-gradient(90deg, #f4f6f8 0%, #008060 50%, #f4f6f8 100%)",
+                      backgroundSize: "200% 100%",
+                      borderRadius: "4px",
+                      animation: "pulseMagic 1.5s infinite"
+                   }} />
+                </div>
+
+                <div className="status-badge">
+                  STATUS: {activeGen.status}
+                </div>
+              </div>
+              
+              {activeGen.log && Array.isArray(activeGen.log) && activeGen.log.length > 0 && (
+                <div style={{ 
+                  maxHeight: "300px", 
+                  overflowY: "auto", 
+                  backgroundColor: "#0d0d0d", 
+                  padding: "16px", 
+                  borderRadius: "12px",
+                  border: "1px solid #333",
+                  fontFamily: "'Courier New', Courier, monospace",
+                  fontSize: "13px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)"
+                }}>
+                  <div style={{ color: "#4af626", marginBottom: "8px", borderBottom: "1px solid #333", paddingBottom: "8px" }}>
+                    &gt; STORE_FORGE_TERMINAL v1.0
+                    <br/>
+                    &gt; Executing pipeline...
+                  </div>
+                  {activeGen.log.map((log: any, idx: number) => (
+                    <div key={idx} style={{ color: log.msg?.toLowerCase().includes("error") || log.msg?.toLowerCase().includes("failed") ? "#ff4d4f" : "#a6adc8" }}>
+                      <span style={{ color: "#6272a4" }}>[{new Date(log.time).toLocaleTimeString()}]</span> <span style={{ color: log.msg?.toLowerCase().includes("error") ? "#ff4d4f" : "#f8f8f2" }}>{log.msg}</span>
+                    </div>
+                  ))}
+                  <div style={{ color: "#4af626", animation: "pulseMagic 1s infinite" }}>_</div>
+                </div>
+              )}
+
+              <div style={{ marginTop: "1rem", textAlign: "center" }}>
+                <Button 
+                  tone="critical" 
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    submit(
+                      { actionType: "CANCEL_GENERATION", generationId: activeGen.id },
+                      { method: "POST" }
+                    );
+                  }}
+                >
+                  Cancel Generation
+                </Button>
+              </div>
             </BlockStack>
           </Card>
         </Layout.Section>
