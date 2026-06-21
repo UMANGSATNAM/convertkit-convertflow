@@ -150,7 +150,7 @@ export async function readFile(shop: any, themeId: string, path: string): Promis
   const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
   
   try {
-    const data = await restRequest(shop.shopDomain, shop.accessToken, "GET", `themes/${actualThemeId}/assets.json?asset[key]=${path}`);
+    const data = await restRequest(shop.shopDomain, shop.accessToken, "GET", `themes/${actualThemeId}/assets.json?asset[key]=${encodeURIComponent(path)}`);
     return data.asset?.value || "{}";
   } catch (e: any) {
     if (e.message.includes("404")) return "{}";
