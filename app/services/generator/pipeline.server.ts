@@ -266,7 +266,17 @@ export function initGeneratorWorker() {
             console.warn(`Could not load design tokens for style ${brandContext.style}`);
           }
 
-          const finalSettingsPatch = { ...settingsPatch, ...designTokens };
+          const rawPatch = { ...settingsPatch, ...designTokens };
+          const finalSettingsPatch: Record<string, any> = {};
+          
+          // Map Dawn/StoreForge tokens to blank-theme schema keys
+          for (const [k, v] of Object.entries(rawPatch)) {
+            if (k === "colors_accent_1") finalSettingsPatch["color_accent"] = v;
+            else if (k === "colors_background_1") finalSettingsPatch["color_bg"] = v;
+            else if (k === "fontHeading") finalSettingsPatch["font_heading"] = v;
+            else if (k === "fontBody") finalSettingsPatch["font_body"] = v;
+            else finalSettingsPatch[k] = v;
+          }
           
           try {
             await patchSettings(shop, themeId, finalSettingsPatch);
