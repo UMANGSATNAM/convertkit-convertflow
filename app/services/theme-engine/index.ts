@@ -88,23 +88,13 @@ export async function installTheme(shop: any, themeName: string, sourceUrl: stri
 
 export async function publishTheme(shop: any, themeId: string) {
   console.log(`Publishing theme: ${themeId}`);
-  const query = `
-    mutation themePublish($id: ID!) {
-      themePublish(id: $id) {
-        theme {
-          id
-        }
-        userErrors {
-          field
-          message
-        }
-      }
+  const data = await restRequest(shop.shopDomain, shop.accessToken, "PUT", `themes/${themeId}.json`, {
+    theme: {
+      id: themeId,
+      role: "main"
     }
-  `;
-  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { id: `gid://shopify/Theme/${themeId}` }, true);
-  if (data.themePublish?.userErrors?.length > 0) {
-    throw new Error(`Failed to publish theme: ${data.themePublish.userErrors[0].message}`);
-  }
+  });
+  return data;
 }
 
 export async function patchSettings(shop: any, themeId: string, patch: any, reason: string = "API"): Promise<{ snapshotId: string }> {
