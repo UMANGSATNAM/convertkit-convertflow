@@ -143,7 +143,62 @@ async function main() {
     { componentId: "util_mobile_bottom_nav", category: "utilities", industryTags: ["generic", "ecommerce"], styleTags: ["app-like", "functional"], searchKeywords: ["mobile", "nav", "bottom", "bar"], croScore: 98.0, mobileScore: 99.0, version: "1.0.0", liquidPath: "theme-template/sections/util_mobile_bottom_nav.liquid", status: "PUBLISHED" }
   ];
 
-  const components = [...legacyComponents, ...publishedComponents, ...d2cComponents, ...batch1Components, ...batch2Components, ...batch3Components, ...batch4Components, ...batch5Components];
+  const nicheComponents: any[] = [];
+  const nichesList = ["jewellery", "streetwear", "beauty", "electronics", "home-decor"];
+  const sectionsList = [
+    "announcement-bar",
+    "header",
+    "hero-banner",
+    "featured-collection",
+    "image-with-text",
+    "testimonials",
+    "newsletter",
+    "main-product",
+    "main-collection",
+    "footer",
+    "spin-wheel-popup",
+    "bundle-builder"
+  ];
+
+  const nicheStyleTags: Record<string, string[]> = {
+    "jewellery": ["luxury", "dark-mode", "refined"],
+    "streetwear": ["bold", "high-contrast", "street", "modern"],
+    "beauty": ["soft", "pastel", "clean", "minimal"],
+    "electronics": ["modern", "technical", "dark-blue", "grid"],
+    "home-decor": ["warm", "editorial", "terracotta", "editorial-spacing"]
+  };
+
+  const nicheIndustryTags: Record<string, string[]> = {
+    "jewellery": ["jewelry", "luxury"],
+    "streetwear": ["apparel", "fashion", "streetwear"],
+    "beauty": ["beauty", "skincare"],
+    "electronics": ["electronics", "gadgets"],
+    "home-decor": ["home", "decor"]
+  };
+
+  for (const niche of nichesList) {
+    for (const section of sectionsList) {
+      nicheComponents.push({
+        componentId: `${niche}-${section}`,
+        category: section,
+        niche: niche,
+        sectionType: section,
+        filePath: `app/data/templates/theme-engine/niches/${niche}/sections/${section}.liquid`,
+        liquidPath: `app/data/templates/theme-engine/niches/${niche}/sections/${section}.liquid`,
+        industryTags: nicheIndustryTags[niche],
+        styleTags: nicheStyleTags[niche],
+        searchKeywords: [niche, section, "niche-matched"],
+        croScore: 95.0,
+        mobileScore: 95.0,
+        version: "1.0.0",
+        status: "PUBLISHED",
+        isUniversal: false,
+        performanceScore: null
+      });
+    }
+  }
+
+  const components = [...legacyComponents, ...publishedComponents, ...d2cComponents, ...batch1Components, ...batch2Components, ...batch3Components, ...batch4Components, ...batch5Components, ...nicheComponents];
 
   for (const comp of components) {
     await prisma.componentRegistry.upsert({

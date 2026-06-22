@@ -2,6 +2,7 @@ import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
 import * as fs from "fs/promises";
 import * as path from "path";
+import { ValidationError } from "./validators.server";
 
 export interface BlueprintSection {
   componentId: string;
@@ -75,16 +76,75 @@ async function uploadLiquidWithRetry(
  * 1. Generates the `index.json` (and other templates) — this ALWAYS runs.
  * 2. Uploads the necessary `.liquid` files to the Shopify theme — failures here are non-fatal.
  */
+/**
+ * Helper to recursively read all files in a directory and return a map of relative Shopify asset paths to their string contents.
+ */
+async function readDirRecursive(dirPath: string, baseDir: string): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  try {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        const subResult = await readDirRecursive(fullPath, baseDir);
+        Object.assign(result, subResult);
+      } else {
+        const relPath = path.relative(baseDir, fullPath).replace(/\\/g, "/");
+        const content = await fs.readFile(fullPath, "utf-8");
+        result[relPath] = content;
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[readDirRecursive] Error reading directory ${dirPath}: ${err.message}`);
+  }
+  return result;
+}
+
+/**
+ * The Theme Composer takes the Store Blueprint and the matched components from the registry.
+ * It compiles the core files, niche files, and database sections into a single merged in-memory theme map.
+ * Then it runs 3 safety validation checks before performing a single-batch upload to Shopify.
+ */
 export async function composeThemeFromBlueprint(
   shop: any,
   themeId: string,
   blueprint: StoreBlueprint,
-  components: ComponentRegistry[]
+  components: ComponentRegistry[],
+  nicheId: string
 ) {
-  const templates: Record<string, any> = {};
+  const filesToUpload: Record<string, string> = {};
 
-  // Track which liquid files we need to upload
-  const componentsToUpload = new Set<string>();
+  // Step 1: Read Core
+  const coreDir = path.resolve(process.cwd(), "app/data/templates/theme-engine/core");
+  const coreFiles = await readDirRecursive(coreDir, coreDir);
+  Object.assign(filesToUpload, coreFiles);
+
+  // Step 2: Overwrite with Niche
+  if (nicheId && nicheId !== "ai-custom") {
+    const nicheDir = path.resolve(process.cwd(), `app/data/templates/theme-engine/niches/${nicheId}`);
+    const exists = await fs.stat(nicheDir).then(s => s.isDirectory()).catch(() => false);
+    if (exists) {
+      const nicheFiles = await readDirRecursive(nicheDir, nicheDir);
+      Object.assign(filesToUpload, nicheFiles);
+    } else {
+      console.warn(`[Composer] Niche directory not found: ${nicheDir}`);
+    }
+  }
+
+  // Step 3: Resolve Niche Tokens CSS
+  if (!filesToUpload["assets/niche-tokens.css"]) {
+    try {
+      const fallbackPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/core/assets/niche-tokens.css");
+      filesToUpload["assets/niche-tokens.css"] = await fs.readFile(fallbackPath, "utf-8");
+    } catch (e) {
+      // Inline absolute fallback
+      filesToUpload["assets/niche-tokens.css"] = `/* Fallback */\n:root {\n  --color-background: #ffffff;\n  --color-text: #1a1a1a;\n  --color-accent: #008060;\n  --color-border: #e2e8f0;\n  --font-heading-family: sans-serif;\n  --font-body-family: sans-serif;\n  --card-radius: 0px;\n  --button-radius: 0px;\n}`;
+    }
+  }
+
+  // Step 4: Inject Registry Sections & JSON Templates
+  const resolvedComponents: ComponentRegistry[] = [];
+  const templates: Record<string, any> = {};
 
   for (const [pageHandle, pageData] of Object.entries(blueprint.pages)) {
     const templateJson: any = {
@@ -100,44 +160,101 @@ export async function composeThemeFromBlueprint(
         return;
       }
 
-      const sectionKey = `${component.componentId}_${index}`;
-      
+      const sectionType = component.sectionType || component.componentId;
+      const sectionKey = `${sectionType}_${index}`;
+
       templateJson.sections[sectionKey] = {
-        type: component.componentId, // Maps to sections/{componentId}.liquid
+        type: sectionType, // Maps to sections/{sectionType}.liquid
         settings: section.settings || {},
         blocks: section.blocks || {}
       };
-      
+
       templateJson.order.push(sectionKey);
-      componentsToUpload.add(component.componentId);
+      
+      if (!resolvedComponents.some(c => c.componentId === component.componentId)) {
+        resolvedComponents.push(component);
+      }
     });
 
     const templatePath = `templates/${pageHandle}.json`;
     templates[templatePath] = templateJson;
-    console.log(`[Composer] Built template ${templatePath} with ${templateJson.order.length} sections: ${templateJson.order.join(", ")}`);
+    filesToUpload[templatePath] = JSON.stringify(templateJson, null, 2);
+    console.log(`[Composer] Built template ${templatePath} with ${templateJson.order.length} sections`);
   }
 
-  // Upload the required liquid files — failures are NON-FATAL (template JSON is what matters)
-  let uploadedCount = 0;
-  for (const componentId of componentsToUpload) {
-    const component = components.find(c => c.componentId === componentId);
-    if (component && component.liquidPath) {
+  // Read and inject liquid files for all resolved components
+  for (const component of resolvedComponents) {
+    if (component.liquidPath || component.filePath) {
       try {
-        const fullPath = path.resolve(process.cwd(), component.liquidPath);
+        const fullPath = path.resolve(process.cwd(), component.liquidPath || component.filePath);
         const liquidContent = await fs.readFile(fullPath, "utf-8");
-        const shopifyAssetKey = `sections/${component.componentId}.liquid`;
-
-        const success = await uploadLiquidWithRetry(shop, themeId, shopifyAssetKey, liquidContent);
-        if (success) uploadedCount++;
-
-        // Spacing between uploads to avoid Cloudflare rate limits
-        await sleep(500);
+        const sectionType = component.sectionType || component.componentId;
+        const targetKey = `sections/${sectionType}.liquid`;
+        filesToUpload[targetKey] = liquidContent;
       } catch (err: any) {
-        console.error(`[Composer] Could not read liquid file for ${componentId}: ${err.message}`);
+        console.error(`[Composer] Could not read liquid file for ${component.componentId}: ${err.message}`);
       }
     }
   }
 
-  console.log(`[Composer] Liquid uploads complete: ${uploadedCount}/${componentsToUpload.size}`);
+  // --- SAFETY VALIDATION CHECKS ---
+
+  // Check 1: Required Files Verification
+  const requiredKeys = [
+    "layout/theme.liquid",
+    "layout/password.liquid",
+    "config/settings_schema.json",
+    "config/settings_data.json",
+    "locales/en.default.json",
+    "assets/cart.js",
+    "assets/variant-swap.js",
+    "assets/theme.js"
+  ];
+  if (nicheId !== "ai-custom") {
+    requiredKeys.push("assets/niche-tokens.css");
+  }
+  for (const key of requiredKeys) {
+    if (!filesToUpload[key]) {
+      throw new ValidationError(`Required theme file missing: ${key}`);
+    }
+  }
+
+  // Check 2: Missing Section Verification
+  for (const [pageHandle, pageData] of Object.entries(blueprint.pages)) {
+    for (const section of pageData.sections) {
+      const component = components.find(c => c.componentId === section.componentId);
+      if (component) {
+        const sectionType = component.sectionType || component.componentId;
+        const targetKey = `sections/${sectionType}.liquid`;
+        if (!filesToUpload[targetKey]) {
+          throw new ValidationError(`Section file missing in merged theme: ${targetKey}`);
+        }
+      }
+    }
+  }
+
+  // Check 3: Empty Tokens Verification
+  if (nicheId !== "ai-custom") {
+    const tokensContent = filesToUpload["assets/niche-tokens.css"];
+    if (!tokensContent || !tokensContent.trim()) {
+      throw new ValidationError("Niche tokens stylesheet is empty or invalid");
+    }
+  }
+
+  // --- SINGLE-BATCH UPLOAD ---
+  let uploadedCount = 0;
+  const keysToUpload = Object.keys(filesToUpload);
+  for (const assetKey of keysToUpload) {
+    const content = filesToUpload[assetKey];
+    const success = await uploadLiquidWithRetry(shop, themeId, assetKey, content);
+    if (success) {
+      uploadedCount++;
+    }
+    // Respect spacing delay of 500ms between calls to prevent rate limits
+    await sleep(500);
+  }
+
+  console.log(`[Composer] Batch upload complete: ${uploadedCount}/${keysToUpload.length} files uploaded.`);
+
   return { templates, settingsPatch: blueprint.settings };
 }

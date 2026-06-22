@@ -1,0 +1,184 @@
+<section class="bundle-builder bundle-builder--home-decor" style="padding: var(--space-80) 0; background-color: var(--color-surface); border-bottom: 1px solid var(--color-border);">
+  <div class="container" style="max-width: 900px;">
+    
+    <header class="section-header text-center" style="margin-bottom: var(--space-48);">
+      <h2 class="section-title" style="font-family: var(--font-heading-family); font-size: 2.4rem; font-weight: 500; margin-bottom: var(--space-12); color: var(--color-text);">
+        {{ section.settings.title | escape }}
+      </h2>
+      <p style="font-family: var(--font-body-family); font-size: 0.95rem; color: var(--color-text); opacity: 0.8;">Assemble these curated design objects together and enjoy a {{ section.settings.discount_percentage }}% bundle discount.</p>
+    </header>
+
+    <div class="bundle-builder-inner" style="display: flex; flex-direction: column; gap: var(--space-40); align-items: center;" class="md-flex-row">
+      
+      <!-- Products Grid -->
+      <div class="bundle-products-grid" style="display: flex; flex-wrap: wrap; gap: var(--space-24); justify-content: center; flex: 2; width: 100%;">
+        {%- assign total_regular_price = 0 -%}
+        {%- assign select_count = 0 -%}
+
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign prod = all_products[block.settings.product]
+            if prod == blank
+              continue
+            endif
+            assign select_count = select_count | plus: 1
+            assign variant = prod.selected_or_first_available_variant
+            assign total_regular_price = total_regular_price | plus: variant.price
+          -%}
+          
+          <div class="bundle-product-card" data-variant-id="{{ variant.id }}" data-price="{{ variant.price }}" 
+               style="width: 190px; text-align: center; border: 1px solid var(--color-border); padding: var(--space-16); background-color: var(--color-background); position: relative; border-radius: var(--card-radius); box-shadow: var(--card-shadow);">
+            <label style="position: absolute; left: 12px; top: 12px; z-index: 5; cursor: pointer;">
+              <input type="checkbox" class="bundle-checkbox js-bundle-item-toggle" checked style="width: 18px; height: 18px; accent-color: var(--color-accent);">
+            </label>
+            <img src="{{ prod.featured_image | image_url: width: 300 }}" alt="{{ prod.title | escape }}" style="width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: var(--space-12); border-radius: 4px; border: 1px solid var(--color-border);">
+            <h4 style="font-family: var(--font-heading-family); font-size: 0.95rem; margin: 0 0 var(--space-8) 0; height: 38px; overflow: hidden; font-weight: 600; line-height: 1.3; color: var(--color-text);">{{ prod.title }}</h4>
+            <span style="font-weight: 700; color: var(--color-accent); font-family: var(--font-body-family);">{{ variant.price | money }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <!-- Action Card Column -->
+      {%- if select_count > 0 -%}
+        <div class="bundle-action-card" style="flex: 1; min-width: 290px; width: 100%; border: 1px solid var(--color-border); padding: var(--space-32); background-color: var(--color-background); text-align: center; display: flex; flex-direction: column; justify-content: center; border-radius: var(--card-radius); box-shadow: var(--card-shadow);">
+          <div style="font-family: var(--font-heading-family); font-size: 1.3rem; font-weight: 600; margin-bottom: var(--space-20); color: var(--color-text); letter-spacing: 0.05em; text-transform: uppercase;">SET SUMMARY</div>
+          
+          <div class="bundle-pricing-rows" style="display: flex; flex-direction: column; gap: var(--space-12); margin-bottom: var(--space-24); font-family: var(--font-body-family);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--color-text); opacity: 0.85;">
+              <span>Regular Price:</span>
+              <span class="js-bundle-reg-total" style="text-decoration: line-through;">{{ total_regular_price | money }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; color: var(--color-sale-accent); font-size: 1.05rem;">
+              <span>Bundle Deal:</span>
+              {%- liquid
+                assign multiplier = 100 | minus: section.settings.discount_percentage
+                assign discount_price = total_regular_price | times: multiplier | divided_by: 100
+              -%}
+              <span class="js-bundle-deal-total">{{ discount_price | money }}</span>
+            </div>
+          </div>
+
+          <button type="button" class="button button--primary js-bundle-submit width-100" style="border-radius: var(--button-radius); padding: 14px 0;">
+            Add Curation to Cart
+          </button>
+        </div>
+      {%- endif -%}
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+  window.domReady(() => {
+    const section = document.querySelector(".bundle-builder--home-decor");
+    if (!section) return;
+
+    const discountPercent = parseInt("{{ section.settings.discount_percentage }}", 10) || 0;
+    const checkboxes = section.querySelectorAll(".js-bundle-item-toggle");
+    const regTotalEl = section.querySelector(".js-bundle-reg-total");
+    const dealTotalEl = section.querySelector(".js-bundle-deal-total");
+    const submitBtn = section.querySelector(".js-bundle-submit");
+
+    function updateBundleTotals() {
+      let regTotal = 0;
+      const selectedVariantIds = [];
+
+      section.querySelectorAll(".bundle-product-card").forEach(card => {
+        const checkbox = card.querySelector(".js-bundle-item-toggle");
+        if (checkbox && checkbox.checked) {
+          const price = parseInt(card.getAttribute("data-price"), 10) || 0;
+          const varId = card.getAttribute("data-variant-id");
+          regTotal += price;
+          selectedVariantIds.push(varId);
+        }
+      });
+
+      const dealTotal = Math.round(regTotal * (1 - (discountPercent / 100)));
+
+      if (regTotalEl) regTotalEl.textContent = window.formatMoney(regTotal);
+      if (dealTotalEl) dealTotalEl.textContent = window.formatMoney(dealTotal);
+
+      if (selectedVariantIds.length === 0) {
+        submitBtn?.setAttribute("disabled", "disabled");
+      } else {
+        submitBtn?.removeAttribute("disabled");
+      }
+
+      return selectedVariantIds;
+    }
+
+    checkboxes.forEach(box => {
+      box.addEventListener("change", updateBundleTotals);
+    });
+
+    submitBtn?.addEventListener("click", async () => {
+      const ids = updateBundleTotals();
+      if (ids.length === 0) return;
+
+      submitBtn.setAttribute("disabled", "disabled");
+      submitBtn.textContent = "Adding curation...";
+
+      try {
+        const items = ids.map(id => ({ id: parseInt(id, 10), quantity: 1 }));
+        
+        await fetch("/cart/add.js", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ items })
+        });
+
+        const cart = await window.Cart.fetchCart();
+        window.PubSub.publish("cart:updated", cart);
+        window.Cart.open();
+
+        submitBtn.textContent = "Curations Added!";
+        setTimeout(() => {
+          submitBtn.removeAttribute("disabled");
+          submitBtn.textContent = "Add Curation to Cart";
+        }, 2000);
+      } catch (err) {
+        alert("Failed to add bundle: " + err.message);
+        submitBtn.removeAttribute("disabled");
+        submitBtn.textContent = "Add Curation to Cart";
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Bundle Builder",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Harmonious Sets"
+    },
+    {
+      "type": "number",
+      "id": "discount_percentage",
+      "label": "Bundle Discount Percentage",
+      "default": 15
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product Slot",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product Option"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

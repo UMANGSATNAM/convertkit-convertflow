@@ -1,0 +1,114 @@
+<header class="header header--beauty" style="background-color: var(--color-background); border-bottom: 1px solid var(--color-border); padding: var(--space-16) 0;">
+  <div class="container" style="display: flex; align-items: center; justify-content: space-between; position: relative;">
+    
+    <!-- Mobile Menu Trigger -->
+    <button type="button" class="header-mobile-trigger hide-desktop" data-disclosure-btn aria-expanded="false" aria-controls="mobile-menu-beauty" style="background: none; border: none; cursor: pointer; padding: var(--space-8);">
+      <svg class="icon icon-menu" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="24" height="24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    <!-- Logo (Left) -->
+    <div class="header-logo-container">
+      <a href="/" class="header-logo-link" style="display: block;">
+        {%- if section.settings.logo != blank -%}
+          <img src="{{ section.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}" style="max-height: 38px; width: auto;" loading="eager">
+        {%- else -%}
+          <span style="font-family: var(--font-heading-family); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em;">
+            {{ shop.name }}
+          </span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <!-- Navigation (Center) -->
+    <nav class="header-nav hide-mobile" role="navigation" style="position: absolute; left: 50%; transform: translateX(-50%);">
+      <ul style="display: flex; list-style: none; gap: var(--space-32); margin: 0; padding: 0;">
+        {%- for link in linklists[section.settings.menu].links -%}
+          <li>
+            <a href="{{ link.url }}" class="header-nav-link" style="font-family: var(--font-body-family); font-size: 0.9rem; font-weight: 500; transition: color var(--transition-fast);">
+              {{ link.title }}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <!-- Actions (Right) -->
+    <div class="header-actions" style="display: flex; align-items: center; gap: var(--space-8);">
+      {%- if section.settings.show_search -%}
+        <button type="button" class="js-search-trigger header-action-btn" aria-label="Search" style="background: none; border: none; cursor: pointer; padding: var(--space-8); display: flex; align-items: center; justify-content: center;">
+          {% render 'icon-search' %}
+        </button>
+      {%- endif -%}
+
+      {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+        <a href="{% if customer %}/account{% else %}/account/login{% endif %}" class="header-action-btn" aria-label="Account" style="display: flex; align-items: center; justify-content: center; padding: var(--space-8);">
+          {% render 'icon-account' %}
+        </a>
+      {%- endif -%}
+
+      <button type="button" class="header-action-btn" aria-label="Cart" onclick="window.Cart.open()" 
+              style="background: none; border: none; cursor: pointer; padding: var(--space-8); display: flex; align-items: center; justify-content: center; position: relative; color: var(--color-text);">
+        {% render 'icon-cart' %}
+        <span class="cart-count-bubble {% if cart.item_count == 0 %}visually-hidden{% endif %}" 
+              style="position: absolute; top: 0; right: 0; background-color: var(--color-accent); color: #fff; font-size: 0.65rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          {{ cart.item_count }}
+        </span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div id="mobile-menu-beauty" class="mobile-navigation-drawer hide-desktop" style="position: fixed; top: 72px; left: 0; width: 100%; height: calc(100vh - 72px); background-color: var(--color-background); z-index: var(--z-drawer); transform: translateX(-100%); transition: transform var(--transition-normal); border-top: 1px solid var(--color-border);">
+  <nav style="padding: var(--space-24);">
+    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-16);">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <li>
+          <a href="{{ link.url }}" style="font-family: var(--font-heading-family); font-size: 1.25rem; font-weight: 500; display: block; padding: var(--space-4) 0;">
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+</div>
+
+<style>
+  #mobile-menu-beauty.drawer-open {
+    transform: translateX(0) !important;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search trigger",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show customer account trigger",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

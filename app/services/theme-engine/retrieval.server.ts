@@ -6,14 +6,32 @@ export interface RetrievalParams {
   sectionType: string;
   industryTags: string[];
   styleTags: string[];
+  nicheId?: string;
 }
 
 export async function retrieveBestComponent(
   params: RetrievalParams
 ): Promise<ComponentRegistry | null> {
+  // 1. If nicheId is valid (niche-based generation mode), perform exact match query
+  if (params.nicheId && params.nicheId !== "ai-custom") {
+    const matchedComponent = await prisma.componentRegistry.findFirst({
+      where: {
+        niche: params.nicheId,
+        sectionType: params.sectionType,
+        status: "PUBLISHED"
+      }
+    });
+    if (matchedComponent) {
+      console.log(`[Composer] Niche-matched resolved: ${params.nicheId}/${params.sectionType} -> ${matchedComponent.componentId}`);
+      return matchedComponent;
+    }
+    // Safety Alert warning as requested to catch seeding gaps immediately
+    console.error(`[Composer] Safety Alert: Missing niche-section combo: ${params.nicheId}/${params.sectionType}`);
+  }
+
   const industry = params.industryTags[0] || "generic";
   
-  // 1. Ask Recommendation Engine first
+  // 2. Ask Recommendation Engine first
   const recommendedId = await getRecommendedComponent(params.sectionType, industry);
   if (recommendedId) {
     const recommended = await prisma.componentRegistry.findUnique({

@@ -1,0 +1,91 @@
+<section class="featured-collection featured-collection--beauty" style="padding: var(--space-64) 0; background-color: var(--color-background);">
+  <div class="container">
+    
+    <header class="section-header text-center" style="margin-bottom: var(--space-48);">
+      <h2 class="section-title" style="font-family: var(--font-heading-family); font-size: 2.2rem; font-weight: 600; margin-bottom: var(--space-8);">
+        {{ section.settings.title | escape }}
+      </h2>
+      <p style="font-family: var(--font-body-family); font-size: 0.95rem; color: #888;">Nurturing botanical essentials for healthy skin</p>
+    </header>
+
+    {%- liquid
+      assign collection_obj = collections[section.settings.collection]
+      assign limit = section.settings.products_to_show
+      assign cols = section.settings.columns_desktop
+    -%}
+
+    <div class="grid grid-cols-1 grid-cols-md-2 grid-cols-lg-{{ cols }}" style="--grid-spacing: var(--space-24);">
+      {%- if collection_obj != blank and collection_obj.products_count > 0 -%}
+        {%- for product in collection_obj.products limit: limit -%}
+          {%- render 'product-card', product: product -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..limit) -%}
+          <div class="product-card product-card--beauty product-card--placeholder" style="border: 1px solid var(--color-border); border-radius: var(--card-radius); box-shadow: var(--card-shadow); background-color: #fff; overflow: hidden; display: flex; flex-direction: column; text-align: center;">
+            <div style="aspect-ratio: 1; background-color: var(--color-surface); display: flex; align-items: center; justify-content: center;">
+              {{ 'product-3' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+            <div style="padding: var(--space-16); flex-grow: 1;">
+              <h3 class="product-card-title" style="font-family: var(--font-heading-family); font-size: 1.05rem; margin: 0 0 var(--space-8) 0; font-weight: 600;">
+                BOTANICAL SERUM {{ i }}
+              </h3>
+              <div class="price-container">
+                <span class="price-item price-item--regular">$48.00</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Botanical Favourites"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to Show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns Desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor name",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

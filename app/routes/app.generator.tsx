@@ -267,7 +267,7 @@ export default function Generator() {
           {activeGen?.status === "FAILED" && (
             <Banner tone="critical" title="Generation Failed">
               <BlockStack gap="400">
-                <Text as="p">An error occurred while generating the store. Please try again. {activeGen.error ? `(${activeGen.error.message || JSON.stringify(activeGen.error)})` : ""}</Text>
+                <Text as="p">An error occurred while generating the store. Please try again. {activeGen.error ? `(${(activeGen.error as any).message || JSON.stringify(activeGen.error)})` : ""}</Text>
                 
                 {activeGen.log && Array.isArray(activeGen.log) && activeGen.log.length > 0 && (
                   <div style={{ 
@@ -430,7 +430,22 @@ function LoadingState({ activeGen, isSubmitting, submit }: { activeGen: any, isS
 
                 <div style={{ display: "flex", justifyContent: "center", gap: "12px", alignItems: "center" }}>
                   <div className="status-badge">
-                    STATUS: {activeGen.status}
+                    STATUS: {(() => {
+                      switch (activeGen.status) {
+                        case "QUEUED": return "Queued in build pipeline";
+                        case "INSTALLING_THEME": return "Analyzing aesthetics & templates";
+                        case "IMPORTING_PRODUCTS":
+                        case "CREATING_COLLECTIONS": return "Importing products & collections";
+                        case "CREATING_PAGES":
+                        case "CREATING_MENUS": return "Composing sections & templates";
+                        case "PATCHING_SETTINGS": return "Applying design tokens & settings";
+                        case "PUBLISHING": return "Uploading theme assets to Shopify";
+                        case "DONE": return "Generation Complete!";
+                        case "FAILED": return "Generation Failed";
+                        case "CANCELLED": return "Cancelled";
+                        default: return activeGen.status;
+                      }
+                    })()}
                   </div>
                   {activeGen.status !== "DONE" && activeGen.status !== "FAILED" && activeGen.status !== "CANCELLED" && (
                     <Button 

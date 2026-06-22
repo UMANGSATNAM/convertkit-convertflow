@@ -1,0 +1,210 @@
+<div id="SpinWheelPopup" class="spin-wheel-popup-wrapper visually-hidden" aria-hidden="true" role="dialog" 
+     data-exit-intent="{{ section.settings.exit_intent_only }}" 
+     data-delay="{{ section.settings.delay_seconds }}"
+     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(9, 13, 22, 0.85); z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-normal); padding: var(--space-16); backdrop-filter: blur(5px);">
+  
+  <div class="spin-wheel-container" style="background-color: var(--color-background); border: 1px solid var(--color-accent); max-width: 680px; width: 100%; display: grid; grid-template-columns: 1fr; position: relative; overflow: hidden; padding: var(--space-32); gap: var(--space-24); border-radius: var(--card-radius); box-shadow: var(--card-shadow);" class="grid-cols-md-2">
+    
+    <button type="button" class="spin-wheel-close-btn" aria-label="Close promotion" 
+            onclick="document.getElementById('SpinWheelPopup').classList.add('visually-hidden'); document.getElementById('SpinWheelPopup').style.opacity = '0';"
+            style="position: absolute; right: 15px; top: 15px; background: none; border: none; cursor: pointer; color: #fff; z-index: 10;">
+      {% render 'icon-close' %}
+    </button>
+
+    <!-- Canvas Wheel -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; min-height: 260px;">
+      <div class="spin-wheel-outer-ring" style="width: 250px; height: 250px; border-radius: 50%; border: 4px solid var(--color-accent); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #0b111e; box-shadow: var(--card-shadow);">
+        <div class="wheel-canvas-mock" style="width: 100%; height: 100%; position: absolute; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); transform: rotate(0deg); display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: rotate(-22.5deg);">
+            {%- for block in section.blocks -%}
+              {%- assign rotation = forloop.index0 | times: 45 -%}
+              <path d="M 50,50 L 50,0 A 50,50 0 0,1 85.35,14.64 Z" 
+                    fill="{% cycle '#111827', '#1f2937', '#090d16', '#1e293b' %}" 
+                    transform="rotate({{ rotation }} 50 50)" />
+              <text x="50" y="15" fill="var(--color-accent)" font-size="3.5" font-family="var(--font-heading-family)" font-weight="bold" text-anchor="middle" transform="rotate({{ rotation | plus: 22.5 }} 50 50)">
+                {{ block.settings.label | escape }}
+              </text>
+            {%- endfor -%}
+          </svg>
+        </div>
+        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--color-text); border: 2px solid var(--color-accent); position: relative; z-index: 5; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid var(--color-accent); position: absolute; top: -14px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: left;">
+      <h3 style="font-family: var(--font-heading-family); font-size: 2.2rem; font-weight: 700; text-transform: uppercase; margin-bottom: var(--space-8); color: #fff; line-height: 1.1;">
+        {{ section.settings.title | escape }}
+      </h3>
+      <p style="font-family: var(--font-body-family); font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin-bottom: var(--space-20);">
+        {{ section.settings.subheading | escape }}
+      </p>
+
+      <div class="spin-wheel-form-container">
+        <input type="email" id="SpinWheelEmail" placeholder="your.email@example.com" required 
+               style="width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-size: 0.95rem; border-radius: var(--button-radius); margin-bottom: var(--space-12); outline: none; color: #fff;">
+        
+        <button type="button" class="button button--primary width-100" id="SpinWheelTrigger">
+          {{ 'sections.spin_wheel.spin' | t }}
+        </button>
+      </div>
+
+      <div class="spin-wheel-results-container visually-hidden" style="margin-top: var(--space-16); padding: var(--space-16); background-color: var(--color-surface); border: 1px solid var(--color-accent); border-radius: var(--card-radius); text-align: center; box-shadow: var(--card-shadow);">
+        <p style="font-family: var(--font-heading-family); font-size: 1.25rem; margin-bottom: var(--space-8); color: #fff; font-weight: bold;" class="spin-wheel-win-msg"></p>
+        <div style="display: flex; gap: var(--space-8); align-items: center; justify-content: center;">
+          <input type="text" class="spin-wheel-discount-code" readonly style="padding: 8px 12px; border: 1px dashed var(--color-accent); background-color: var(--color-background); color: var(--color-accent); font-weight: bold; font-family: var(--font-body-family); text-align: center; font-size: 0.95rem;" value="">
+          <button type="button" class="button button--secondary button--small spin-wheel-copy-btn">Copy</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  window.domReady(() => {
+    const popup = document.getElementById("SpinWheelPopup");
+    if (!popup) return;
+
+    const exitIntent = popup.getAttribute("data-exit-intent") === "true";
+    const delay = parseInt(popup.getAttribute("data-delay"), 10) * 1000;
+    const isShownKey = "spin_wheel_popup_shown_electronics";
+
+    function showPopup() {
+      if (localStorage.getItem(isShownKey)) return;
+      popup.classList.remove("visually-hidden");
+      setTimeout(() => {
+        popup.style.opacity = "1";
+      }, 50);
+      localStorage.setItem(isShownKey, "true");
+    }
+
+    if (exitIntent) {
+      document.addEventListener("mouseleave", (e) => {
+        if (e.clientY < 20) showPopup();
+      });
+    } else {
+      setTimeout(showPopup, delay);
+    }
+
+    const spinBtn = document.getElementById("SpinWheelTrigger");
+    const emailInput = document.getElementById("SpinWheelEmail");
+    const wheel = popup.querySelector(".wheel-canvas-mock");
+    const formContainer = popup.querySelector(".spin-wheel-form-container");
+    const resultBox = popup.querySelector(".spin-wheel-results-container");
+
+    spinBtn?.addEventListener("click", () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes("@")) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
+      const winningIndex = Math.floor(Math.random() * 8);
+      const degree = 3600 + (winningIndex * 45);
+
+      spinBtn.setAttribute("disabled", "disabled");
+      emailInput.setAttribute("disabled", "disabled");
+
+      if (wheel) {
+        wheel.style.transform = `rotate(${degree}deg)`;
+      }
+
+      setTimeout(() => {
+        const segments = [
+          {%- for block in section.blocks -%}
+            { label: "{{ block.settings.label }}", code: "{{ block.settings.discount_code }}" }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ];
+
+        const prize = segments[winningIndex] || { label: "No Luck Today", code: "" };
+
+        formContainer.classList.add("visually-hidden");
+        resultBox.classList.remove("visually-hidden");
+
+        const winMsg = resultBox.querySelector(".spin-wheel-win-msg");
+        const codeInput = resultBox.querySelector(".spin-wheel-discount-code");
+        const copyBtn = resultBox.querySelector(".spin-wheel-copy-btn");
+
+        if (prize.code) {
+          winMsg.textContent = `SYSTEM ACCESS KEY: ${prize.label}`;
+          codeInput.value = prize.code;
+        } else {
+          winMsg.textContent = "Better luck next time! Thank you for playing.";
+          resultBox.querySelector("div").classList.add("visually-hidden");
+        }
+
+        copyBtn?.addEventListener("click", () => {
+          navigator.clipboard.writeText(prize.code);
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => copyBtn.textContent = "Copy", 2000);
+        });
+
+      }, 4000);
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Spin Wheel Promo",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Popup Heading",
+      "default": "DECRYPTION MATRIX"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Initiate email bypass logic to spin the matrix for hardware discount keys."
+    },
+    {
+      "type": "checkbox",
+      "id": "exit_intent_only",
+      "label": "Exit intent trigger only",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "delay_seconds",
+      "label": "Delay trigger (Seconds)",
+      "min": 2,
+      "max": 30,
+      "step": 1,
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "segment",
+      "name": "Wheel Segment",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Segment Label",
+          "default": "10% OFF"
+        },
+        {
+          "type": "text",
+          "id": "discount_code",
+          "label": "Discount Code",
+          "default": "TECH10"
+        },
+        {
+          "type": "number",
+          "id": "win_chance",
+          "label": "Winning Weight",
+          "default": 1
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

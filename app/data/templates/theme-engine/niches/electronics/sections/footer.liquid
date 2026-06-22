@@ -1,0 +1,142 @@
+<footer class="footer footer--electronics" style="background-color: #06090e; color: #94a3b8; padding: var(--space-64) 0; border-top: 1px solid var(--color-border); font-size: 0.85rem; font-family: var(--font-body-family);">
+  <div class="container grid grid-cols-1 grid-cols-md-2 grid-cols-lg-4" style="--grid-spacing: var(--space-48); margin-bottom: var(--space-48);">
+    
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'link_list' -%}
+          <div class="footer-widget footer-widget--menu" {{ block.shopify_attributes }}>
+            <h4 class="footer-widget-title" style="font-family: var(--font-heading-family); font-size: 1.25rem; font-weight: 700; text-transform: uppercase; color: #fff; margin-bottom: var(--space-20); letter-spacing: 0.05em;">
+              // {{ block.settings.heading | escape }} //
+            </h4>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-12);">
+              {%- for link in linklists[block.settings.menu].links -%}
+                <li>
+                  <a href="{{ link.url }}" class="footer-menu-link" style="transition: color var(--transition-fast); color: #94a3b8;">
+                    {{ link.title }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+
+        {%- when 'text' -%}
+          <div class="footer-widget footer-widget--text" {{ block.shopify_attributes }}>
+            <h4 class="footer-widget-title" style="font-family: var(--font-heading-family); font-size: 1.25rem; font-weight: 700; text-transform: uppercase; color: #fff; margin-bottom: var(--space-20); letter-spacing: 0.05em;">
+              // {{ block.settings.heading | escape }} //
+            </h4>
+            <div style="line-height: 1.7; color: #94a3b8;">
+              {{ block.settings.subtext }}
+            </div>
+          </div>
+
+        {%- when 'newsletter' -%}
+          <div class="footer-widget footer-widget--newsletter" {{ block.shopify_attributes }}>
+            <h4 class="footer-widget-title" style="font-family: var(--font-heading-family); font-size: 1.25rem; font-weight: 700; text-transform: uppercase; color: #fff; margin-bottom: var(--space-20); letter-spacing: 0.05em;">
+              // {{ block.settings.heading | escape }} //
+            </h4>
+            <div style="margin-bottom: var(--space-16); color: #94a3b8;">
+              <p>Sign up for firmware updates and logs.</p>
+            </div>
+            
+            {%- form 'customer', class: 'footer-newsletter-form' -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <div style="display: flex; border-bottom: 1px solid var(--color-border); padding-bottom: 4px;">
+                <input type="email" name="contact[email]" placeholder="email@example.com" required 
+                       style="background: none; border: none; color: #fff; font-family: var(--font-body-family); font-size: 0.85rem; padding: var(--space-8) 0; flex-grow: 1; outline: none; width: 100%;">
+                <button type="submit" aria-label="Subscribe" style="background: none; border: none; color: var(--color-accent); cursor: pointer; padding: 0 var(--space-8);">
+                  {% render 'icon-chevron' %}
+                </button>
+              </div>
+            {%- endform -%}
+          </div>
+
+      {%- endcase -%}
+    {%- endfor -%}
+
+  </div>
+
+  <div class="container footer-bottom" style="border-top: 1px solid var(--color-border); padding-top: var(--space-32); display: flex; flex-direction: column; gap: var(--space-20); align-items: center;" class="md-flex-row">
+    
+    <div style="display: flex; flex-direction: column; gap: var(--space-16); align-items: center;" class="md-flex-row">
+      {% render 'social-icons' %}
+      <div style="color: #94a3b8; font-size: 0.8rem;">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. Cyber Tech Systems.
+      </div>
+    </div>
+
+    {%- if section.settings.show_payment_methods -%}
+      <div class="footer-payments" style="display: flex; gap: var(--space-8); flex-wrap: wrap;">
+        {%- for type in shop.enabled_payment_types -%}
+          <span style="width: 36px; height: 24px; display: inline-block; background-color: #111827; padding: 1px; border-radius: 4px; border: 1px solid var(--color-border);">
+            {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+          </span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_payment_methods",
+      "label": "Show payment methods",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Link List Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Column Heading",
+          "default": "Tech Links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Navigation Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Column Heading",
+          "default": "Specs Philosophy"
+        },
+        {
+          "type": "richtext",
+          "id": "subtext",
+          "label": "Column Text",
+          "default": "<p>Designing computational peripherals geared for raw speed, ergonomic validation, and persistent lifetime use.</p>"
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter Subscribe Column",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Column Heading",
+          "default": "Hardware Feed"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

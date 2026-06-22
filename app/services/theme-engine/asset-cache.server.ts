@@ -31,7 +31,11 @@ export async function uploadAssetWithCache(
   }
 
   // Upload to Shopify
-  await uploadAsset(shop, themeId, assetKey, content);
+  if (process.env.MOCK_SHOPIFY === "true") {
+    console.log(`[Mock Upload Cache] Skip upload to Shopify for: ${assetKey}`);
+  } else {
+    await uploadAsset(shop, themeId, assetKey, content);
+  }
   
   // Update cache
   localAssetCache.set(cacheKey, checksum);

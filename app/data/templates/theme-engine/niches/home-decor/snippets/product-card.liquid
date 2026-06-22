@@ -1,0 +1,71 @@
+{%- liquid
+  assign ratio = 1
+  assign featured_image = product.featured_image
+  assign second_image = product.images[1]
+-%}
+
+<div class="product-card product-card--home-decor" style="border: 1px solid var(--color-border); border-radius: var(--card-radius); box-shadow: var(--card-shadow); background-color: #fff; overflow: hidden; display: flex; flex-direction: column; text-align: left; transition: transform var(--transition-normal);">
+  
+  <div class="product-card-media-wrapper" style="position: relative; overflow: hidden; aspect-ratio: {{ ratio }}; background-color: var(--color-surface);">
+    
+    <!-- Wishlist -->
+    <button type="button" class="js-wishlist-toggle wishlist-toggle-btn" data-product-handle="{{ product.handle }}" aria-label="Add to wishlist" 
+            style="position: absolute; right: 10px; top: 10px; z-index: 10; background-color: #fff; border: 1px solid var(--color-border); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-accent);">
+      {% render 'icon-heart', filled: false %}
+    </button>
+
+    <a href="{{ product.url }}" class="product-card-image-link" style="display: block; width: 100%; height: 100%;">
+      <img src="{{ featured_image | image_url: width: 480 }}" 
+           alt="{{ featured_image.alt | escape }}" 
+           class="product-card-image main-image" 
+           loading="lazy" 
+           style="width: 100%; height: 100%; object-fit: cover;">
+      
+      {%- if second_image != blank and settings.product_card_swap_image_on_hover -%}
+        <img src="{{ second_image | image_url: width: 480 }}" 
+             alt="{{ second_image.alt | escape }}" 
+             class="product-card-image hover-image" 
+             loading="lazy" 
+             style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity var(--transition-normal);">
+      {%- endif -%}
+    </a>
+  </div>
+
+  <div class="product-card-info" style="padding: var(--space-16); flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      {%- if settings.product_card_show_vendor -%}
+        <div class="product-card-vendor" style="font-size: 0.75rem; letter-spacing: 0.05em; color: var(--color-accent); text-transform: uppercase; margin-bottom: var(--space-4); font-weight: bold;">
+          {{ product.vendor }}
+        </div>
+      {%- endif -%}
+      
+      <h3 class="product-card-title" style="font-size: 1.1rem; font-family: var(--font-heading-family); margin: 0 0 var(--space-8) 0; font-weight: 500; line-height: 1.3;">
+        <a href="{{ product.url }}">{{ product.title }}</a>
+      </h3>
+    </div>
+
+    <div>
+      {% render 'price', product: product, use_variant: false %}
+
+      <div class="product-card-rating" style="margin-top: var(--space-8); display: flex; gap: 2px; color: var(--color-accent);">
+        {%- render 'icon-star', filled: true -%}
+        {%- render 'icon-star', filled: true -%}
+        {%- render 'icon-star', filled: true -%}
+        {%- render 'icon-star', filled: true -%}
+        {%- render 'icon-star', filled: false -%}
+      </div>
+
+      <div class="product-card-actions" style="margin-top: var(--space-12);">
+        <button type="button" class="button button--secondary button--small width-100 product-card-quick-add" style="padding: 10px 0; font-size: 0.8rem;" onclick="window.PubSub.publish('cart:add', { id: {{ product.selected_or_first_available_variant.id }} })">
+          View Detail
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-card--home-decor:hover {
+    transform: translateY(-4px);
+  }
+</style>
