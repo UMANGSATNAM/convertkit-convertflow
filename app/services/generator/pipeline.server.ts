@@ -119,6 +119,19 @@ export function initGeneratorWorker() {
         indexSectionTypes.push("footer");
 
         // 5. COMPONENT RETRIEVAL ENGINE (Niche-matched selection)
+        let archetypeProfile: any = null;
+        let profileFamily = "Generic";
+        try {
+          const profilePath = path.resolve(process.cwd(), `app/data/templates/theme-engine/niche-profiles/${gen.nicheId}.json`);
+          const profileContent = await fs.readFile(profilePath, "utf-8");
+          const profile = JSON.parse(profileContent);
+          archetypeProfile = profile.archetypes[0]; // Take first archetype for MVP
+          profileFamily = profile.families?.[0] || "Generic";
+          console.log(`[Pipeline] Loaded niche profile for ${gen.nicheId}, archetype: ${archetypeProfile.id}`);
+        } catch (err) {
+          console.log(`[Pipeline] No niche profile found for ${gen.nicheId}, falling back to V1 dynamic retrieval.`);
+        }
+
         const industriesList = [catalogContext.industry, catalogContext.subcategory, "generic"];
         const stylesList = [brandContext.style, "minimal", "modern"];
 
@@ -127,22 +140,48 @@ export function initGeneratorWorker() {
         
         for (const sectionType of indexSectionTypes) {
           const dbCategory = SECTION_TO_CATEGORY[sectionType] || sectionType;
-          const matchedComponent = await retrieveBestComponent({
-            sectionType: dbCategory,
-            industryTags: industriesList,
-            styleTags: stylesList,
-            nicheId: gen.nicheId
-          });
-          if (matchedComponent) {
+          let matchedComponentId: string | null = null;
+          
+          if (archetypeProfile) {
+            let poolKey = sectionType;
+            if (sectionType === "product_grid") poolKey = "product-grid";
+            if (sectionType === "brand_story") poolKey = "brand-story";
+            
+            if (archetypeProfile.componentPools[poolKey]) {
+               matchedComponentId = archetypeProfile.componentPools[poolKey][0];
+            }
+          }
+
+          if (!matchedComponentId) {
+            const matchedComponent = await retrieveBestComponent({
+              sectionType: dbCategory,
+              industryTags: industriesList,
+              styleTags: stylesList,
+              nicheId: gen.nicheId
+            });
+            matchedComponentId = matchedComponent ? matchedComponent.componentId : null;
+          }
+
+          if (matchedComponentId) {
             resolvedSections.push({
               sectionType,
-              componentId: matchedComponent.componentId,
+              componentId: matchedComponentId,
               settings: {}
             });
-            console.log(`[Blueprint] Resolved ${sectionType} (niche-matched) → ${matchedComponent.componentId}`);
+            console.log(`[Blueprint] Resolved ${sectionType} (niche-matched) → ${matchedComponentId}`);
           } else {
             console.warn(`[Blueprint] No component found for sectionType=${sectionType} (category=${dbCategory})`);
           }
+        }
+
+        const globalComponents: string[] = [];
+        if (archetypeProfile) {
+           const globals = ["header", "footer", "bundle-builder", "popup"];
+           globals.forEach(g => {
+             if (archetypeProfile.componentPools[g]) {
+               globalComponents.push(archetypeProfile.componentPools[g][0]);
+             }
+           });
         }
 
         // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
@@ -163,7 +202,9 @@ export function initGeneratorWorker() {
             "index": { sections: resolvedSections },             // Variant 1: Light (Default)
             "index.alternate": { sections: resolvedSections }    // Variant 2: Dark
           },
-          settings: baseSettings
+          settings: baseSettings,
+          tokensFile: archetypeProfile ? archetypeProfile.tokensFile : undefined,
+          globalComponents
         };
         console.log("Store Blueprint assembled with sections:", resolvedSections.length);
 
@@ -180,6 +221,31 @@ export function initGeneratorWorker() {
           where: { id: generationId },
           data: { themeId }
         });
+
+        // 10b. SAVE STORE BLUEPRINT TO DB
+        if (archetypeProfile) {
+          const componentsObj: any = {};
+          resolvedSections.forEach(s => componentsObj[s.sectionType] = s.componentId);
+          globalComponents.forEach(g => {
+            const prefix = g.split("-")[0];
+            componentsObj[prefix] = g;
+          });
+
+          const blueprintDb = await prisma.storeBlueprint.create({
+            data: {
+              shopId: shop.id,
+              generationId: gen.id,
+              niche: gen.nicheId,
+              family: profileFamily,
+              archetype: archetypeProfile.id,
+              tokensFile: archetypeProfile.tokensFile,
+              components: componentsObj,
+              pdpFeatures: archetypeProfile.pdpFeatures || {},
+              status: "preview"
+            }
+          });
+          console.log(`[Pipeline] Saved StoreBlueprint to DB: ${blueprintDb.id}`);
+        }
 
         // 11. IMPORTING_PRODUCTS & CREATING_COLLECTIONS
         await updateStatus("IMPORTING_PRODUCTS", "Importing demo products and collections...");

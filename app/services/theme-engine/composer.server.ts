@@ -16,6 +16,8 @@ export interface StoreBlueprint {
       sections: BlueprintSection[];
     }
   };
+  globalComponents?: string[];
+  tokensFile?: string;
   settings: Record<string, any>;
 }
 
@@ -132,6 +134,17 @@ export async function composeThemeFromBlueprint(
   }
 
   // Step 3: Resolve Niche Tokens CSS
+  if (blueprint.tokensFile) {
+    try {
+      const tokensPath = path.resolve(process.cwd(), "app/data/templates/theme-engine", blueprint.tokensFile);
+      filesToUpload["assets/niche-tokens.css"] = await fs.readFile(tokensPath, "utf-8");
+      console.log(`[Composer] Loaded tokens from profile: ${blueprint.tokensFile}`);
+    } catch (e: any) {
+      console.warn(`[Composer] Failed to load tokensFile ${blueprint.tokensFile}: ${e.message}`);
+    }
+  }
+
+  // Fallback if not loaded
   if (!filesToUpload["assets/niche-tokens.css"]) {
     try {
       const fallbackPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/core/assets/niche-tokens.css");
@@ -145,6 +158,15 @@ export async function composeThemeFromBlueprint(
   // Step 4: Inject Registry Sections & JSON Templates
   const resolvedComponents: ComponentRegistry[] = [];
   const templates: Record<string, any> = {};
+
+  if (blueprint.globalComponents) {
+    blueprint.globalComponents.forEach(componentId => {
+      const component = components.find(c => c.componentId === componentId);
+      if (component && !resolvedComponents.some(c => c.componentId === component.componentId)) {
+        resolvedComponents.push(component);
+      }
+    });
+  }
 
   for (const [pageHandle, pageData] of Object.entries(blueprint.pages)) {
     const templateJson: any = {
