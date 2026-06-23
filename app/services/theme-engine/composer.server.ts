@@ -243,7 +243,29 @@ export async function composeThemeFromBlueprint(
 
   // --- SINGLE-BATCH UPLOAD ---
   let uploadedCount = 0;
-  const keysToUpload = Object.keys(filesToUpload);
+  const keysToUpload = Object.keys(filesToUpload).sort((a, b) => {
+    const getPriority = (key: string): number => {
+      if (
+        key.startsWith("layout/") ||
+        key.startsWith("assets/") ||
+        key.startsWith("snippets/") ||
+        key.startsWith("locales/")
+      ) {
+        return 1;
+      }
+      if (key.startsWith("sections/")) {
+        return 2;
+      }
+      if (key.startsWith("templates/")) {
+        return 3;
+      }
+      if (key.startsWith("config/")) {
+        return 4;
+      }
+      return 5;
+    };
+    return getPriority(a) - getPriority(b);
+  });
   for (const assetKey of keysToUpload) {
     const content = filesToUpload[assetKey];
     const success = await uploadLiquidWithRetry(shop, themeId, assetKey, content);

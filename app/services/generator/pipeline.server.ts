@@ -92,12 +92,12 @@ export function initGeneratorWorker() {
 
         // Map logical section types to actual DB category names
         const SECTION_TO_CATEGORY: Record<string, string> = {
-          "hero": "hero",
-          "product_grid": "product_grid",
+          "hero": "hero-banner",
+          "product_grid": "featured-collection",
           "testimonials": "testimonials",
           "trust": "social_proof",
           "faq": "information",
-          "footer": "layout",
+          "footer": "footer",
           "banner": "banner",
           "brand_story": "brand_story",
         };
