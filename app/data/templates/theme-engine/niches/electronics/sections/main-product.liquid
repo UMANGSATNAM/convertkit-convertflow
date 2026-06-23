@@ -1,200 +1,434 @@
-<section class="product-pdp product-pdp--electronics container" style="padding: var(--space-48) 0; background-color: var(--color-background);" data-section="{{ section.id }}">
-  <div class="grid grid-cols-1 grid-cols-md-2" style="--grid-spacing: var(--space-48); align-items: start;">
-    
-    <!-- Gallery -->
-    <div class="product-gallery-container" style="display: flex; flex-direction: column; gap: var(--space-16); position: sticky; top: var(--space-24);">
-      <div class="product-gallery-featured" style="border: 1px solid var(--color-border); border-radius: var(--card-radius); overflow: hidden; background-color: #0b111e; display: flex; align-items: center; justify-content: center; aspect-ratio: 1.25;">
-        <img id="FeaturedMedia-{{ section.id }}" 
-             src="{{ product.featured_image | image_url: width: 1000 }}" 
-             alt="{{ product.featured_image.alt | escape }}" 
-             loading="eager"
-             style="max-width: 90%; max-height: 90%; object-fit: contain;">
-      </div>
+{%- comment -%}
+  Section: main-product (Electronics niche)
+  Personality: Modern, technical, dark-blue, grid accents, neon glows.
+  Urgency tone: Demand-driven ("High demand item - selling fast")
+  Visitor counter: "X tech enthusiasts viewing this gear"
+{%- endcomment -%}
 
-      {%- if product.images.size > 1 -%}
-        <div class="product-gallery-thumbnails" style="display: flex; gap: var(--space-12); overflow-x: auto; padding-bottom: var(--space-8);">
-          {%- for img in product.images -%}
-            <button type="button" class="gallery-thumbnail-btn" 
-                    onclick="document.getElementById('FeaturedMedia-{{ section.id }}').src = '{{ img | image_url: width: 1000 }}'"
-                    style="flex: 0 0 80px; border: 1px solid var(--color-border); border-radius: 4px; padding: 4px; background-color: var(--color-surface); cursor: pointer; aspect-ratio: 1.25; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-              <img src="{{ img | image_url: width: 160 }}" alt="{{ img.alt | escape }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-    </div>
-
-    <!-- Buying Info -->
-    <div class="product-info-container {% if section.settings.enable_sticky_info %}sticky-info{% endif %}" style="display: flex; flex-direction: column; gap: var(--space-20);">
-      
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'title' -%}
-            <div class="product-info-title-vendor" {{ block.shopify_attributes }}>
-              <div class="product-vendor" style="text-transform: uppercase; font-size: 0.8rem; font-weight: bold; color: var(--color-accent); margin-bottom: var(--space-4); letter-spacing: 0.1em;">
-                {{ product.vendor }}
-              </div>
-              <h1 class="product-title" style="font-family: var(--font-heading-family); font-size: 2.5rem; font-weight: 700; text-transform: uppercase; line-height: 1.1; margin: 0 0 var(--space-8) 0; color: #fff;">
-                {{ product.title }}
-              </h1>
-            </div>
-
-          {%- when 'price' -%}
-            <div id="price-{{ section.id }}" class="product-info-price" {{ block.shopify_attributes }} style="font-family: var(--font-heading-family); font-size: 1.6rem; color: var(--color-accent);">
-              {% render 'price', product: product, use_variant: false %}
-            </div>
-
-          {%- when 'variant_picker' -%}
-            <div class="product-info-variants" {{ block.shopify_attributes }}>
-              {%- unless product.has_only_default_variant -%}
-                <variant-selects class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}">
-                  {%- for option in product.options_with_values -%}
-                    <div class="product-form-option" style="margin-bottom: var(--space-16);">
-                      <label class="form-option-label" style="display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: var(--space-8); color: var(--color-accent); font-family: var(--font-heading-family);">
-                        {{ option.name }}
-                      </label>
-                      <select name="options[{{ option.name | escape }}]" 
-                              class="product-option-selector select__select"
-                              style="width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-size: 0.95rem; border-radius: var(--button-radius); appearance: none; color: #fff; outline: none;">
-                        {%- for value in option.values -%}
-                          <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
-                            {{ value }}
-                          </option>
-                        {%- endfor -%}
-                      </select>
-                    </div>
-                  {%- endfor -%}
-                  <script type="application/json">
-                    {{ product.variants | json }}
-                  </script>
-                </variant-selects>
-              {%- endunless -%}
-            </div>
-
-          {%- when 'quantity_selector' -%}
-            <div class="product-info-quantity" {{ block.shopify_attributes }}>
-              <label class="form-option-label" style="display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: var(--space-8); color: var(--color-accent); font-family: var(--font-heading-family);">
-                {{ 'products.product.quantity' | t }}
-              </label>
-              <div class="quantity-stepper" style="border-color: var(--color-border); background-color: var(--color-surface);">
-                <button type="button" class="quantity-stepper-btn stepper-minus" style="color: #fff;">{% render 'icon-minus' %}</button>
-                <input type="number" name="quantity" value="1" min="1" class="quantity-stepper-input" style="color: #fff;">
-                <button type="button" class="quantity-stepper-btn stepper-plus" style="color: #fff;">{% render 'icon-plus' %}</button>
-              </div>
-            </div>
-
-          {%- when 'buy_buttons' -%}
-            <div class="product-info-buy-buttons" {{ block.shopify_attributes }}>
-              <form action="/cart/add" method="post" id="product-form-{{ section.id }}" class="product-form">
-                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                
-                <div class="product-form-ctas" style="display: flex; flex-direction: column; gap: var(--space-12); margin-top: var(--space-12);">
-                  <button type="submit" name="add" class="product-form-main-submit button button--primary width-100" 
-                          {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
-                          onclick="event.preventDefault(); window.PubSub.publish('cart:add', { id: this.form.id.value, quantity: this.form.quantity ? this.form.quantity.value : 1 })">
-                    <span>
-                      {%- if product.selected_or_first_available_variant.available -%}
-                        {{ 'products.product.add_to_cart' | t }}
-                      {%- else -%}
-                        {{ 'products.product.sold_out' | t }}
-                      {%- endif -%}
-                    </span>
-                  </button>
-                  {{ form | payment_button }}
-                </div>
-              </form>
-            </div>
-
-          {%- when 'trust_badges' -%}
-            <div class="product-info-trust-badges" {{ block.shopify_attributes }} 
-                 style="border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: var(--space-16) 0; margin-top: var(--space-12); display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: var(--space-8);">
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-heading-family); font-weight: bold; color: #fff;">Turbo Charged</span>
-              </div>
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-heading-family); font-weight: bold; color: #fff;">2 Year Warranty</span>
-              </div>
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-heading-family); font-weight: bold; color: #fff;">Cloud Sync</span>
-              </div>
-            </div>
-
-          {%- when 'description' -%}
-            <div class="product-info-accordions theme-accordion" data-single-expand="true" {{ block.shopify_attributes }} style="margin-top: var(--space-16);">
-              <div class="accordion-item" style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-12); margin-bottom: var(--space-12);">
-                <button type="button" class="accordion-trigger" aria-expanded="true" 
-                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; border: none; background: none; text-align: left; padding: var(--space-8) 0; font-family: var(--font-heading-family); font-size: 1.15rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; font-weight: 700;">
-                  <span>Hardware Specifications</span>
-                  {% render 'icon-chevron' %}
-                </button>
-                <div class="accordion-content accordion-content--open rte" style="font-family: var(--font-body-family); font-size: 0.9rem; line-height: 1.6; color: #94a3b8; padding-top: var(--space-8);">
-                  {{ product.description }}
-                </div>
-              </div>
-            </div>
-
-        {%- endcase -%}
-      {%- endfor -%}
-
-    </div>
-
-  </div>
-</section>
-
-<!-- Sticky Add to Cart -->
-<div class="sticky-atc-bar hide-mobile" aria-hidden="true" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--color-surface); border-top: 1px solid var(--color-border); padding: var(--space-12) 0; z-index: var(--z-header); transform: translateY(100%); transition: transform var(--transition-normal);">
-  <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      <img src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title }}" style="width: 48px; height: 48px; object-fit: contain; border-radius: 4px; background-color: #0b111e; padding: 2px;">
-      <div>
-        <h4 style="font-family: var(--font-heading-family); font-size: 1rem; font-weight: bold; color: #fff; margin: 0;">{{ product.title }}</h4>
-        {% render 'price', product: product, use_variant: false %}
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      {%- unless product.has_only_default_variant -%}
-        <select class="sticky-atc-variant-select" style="padding: 8px 16px; border: 1px solid var(--color-border); background-color: var(--color-background); font-family: var(--font-body-family); font-size: 0.85rem; color: #fff;">
-          {%- for variant in product.variants -%}
-            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
-              {{ variant.title }}
-            </option>
-          {%- endfor -%}
-        </select>
-      {%- endunless -%}
-      <button type="button" class="sticky-atc-submit button button--primary button--small" style="font-size: 0.8rem; padding: 8px 20px;">Add</button>
-    </div>
-  </div>
-</div>
+{%- liquid
+  assign p = product
+  assign cur = p.selected_or_first_available_variant
+  assign on_sale = false
+  if p.compare_at_price > p.price
+    assign on_sale = true
+  endif
+  assign save_pct = 0
+  if on_sale
+    assign diff = p.compare_at_price | minus: p.price
+    assign save_pct = diff | times: 100 | divided_by: p.compare_at_price
+  endif
+-%}
 
 <style>
-  .sticky-atc-bar--visible {
-    transform: translateY(0) !important;
+  #tech-{{ section.id }} {
+    --bg-tech: #0B0F19;
+    --surface-tech: #131B2C;
+    --border-tech: #1E293B;
+    --text-tech: #F8FAFC;
+    --accent-tech: #3B82F6;
+    --pop-tech: #10B981;
   }
 </style>
 
+<div class="tech-pdp" id="tech-{{ section.id }}">
+  {%- if p == empty -%}
+    <div class="tech-wrap tech-placeholder"><p>Assign to a product template.</p></div>
+  {%- else -%}
+
+  <div class="tech-wrap">
+    <!-- Breadcrumbs -->
+    <nav class="crumb">
+      <a href="{{ routes.root_url }}">Home</a> &nbsp;/&nbsp;
+      {%- if p.collections.size > 0 -%}<a href="{{ p.collections.first.url }}">{{ p.collections.first.title }}</a>&nbsp;/&nbsp;{%- endif -%}
+      {{ p.title }}
+    </nav>
+
+    <div class="product">
+      <!-- GALLERY: High-tech container, object-contain, dark overlay -->
+      <div class="gallery">
+        <div class="gallery-main">
+          {%- if on_sale -%}<div class="t-badge">-{{ save_pct }}%</div>{%- endif -%}
+          {%- if p.featured_media -%}
+            <img id="techMain-{{ section.id }}" src="{{ p.featured_media | image_url: width: 900 }}" alt="{{ p.featured_media.alt | escape }}" width="900" height="900" loading="eager">
+          {%- endif -%}
+        </div>
+        {%- if p.media.size > 1 -%}
+          <div class="thumbs" id="techThumbs-{{ section.id }}">
+            {%- for media in p.media limit: 6 -%}
+              <button type="button" class="thumb{% if forloop.first %} active{% endif %}" data-src="{{ media | image_url: width: 900 }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="200" height="200">
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- BUY BOX -->
+      <div class="buybox">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'title' -%}
+              <div class="p-title-block" {{ block.shopify_attributes }}>
+                {%- if p.vendor != blank -%}<span class="eyebrow">{{ p.vendor }}</span>{%- endif -%}
+                <h1 class="ptitle">{{ p.title }}</h1>
+                
+                <!-- Rating and Visitor counter -->
+                <div class="rating-visitor-row">
+                  <div class="rating">
+                    <span class="stars">★★★★★</span>
+                    <b>4.9</b>
+                    <span>(247 Ratings)</span>
+                  </div>
+                  <div class="visitor-counter">
+                    <span class="vc-dot"></span>
+                    <span><span id="techVcNum-{{ section.id }}">89</span> enthusiasts looking at this</span>
+                  </div>
+                </div>
+              </div>
+
+            {%- when 'price' -%}
+              <div class="p-price-block" {{ block.shopify_attributes }}>
+                <div class="pricerow">
+                  <span class="price-now" id="techPrice-{{ section.id }}">{{ cur.price | money }}</span>
+                  {%- if on_sale -%}
+                    <span class="price-mrp" id="techMrp-{{ section.id }}">{{ cur.compare_at_price | money }}</span>
+                    <span class="price-save">Save {{ save_pct }}%</span>
+                  {%- endif -%}
+                </div>
+                <p class="tax-note">Price inclusive of GST. Free Express Delivery in India.</p>
+              </div>
+
+            {%- when 'variant_picker' -%}
+              <div class="p-variants-block" {{ block.shopify_attributes }}>
+                {%- unless p.has_only_default_variant -%}
+                  <label class="opt-label">{{ p.options.first }}</label>
+                  <div class="variants" id="techVariants-{{ section.id }}">
+                    {%- for variant in p.variants -%}
+                      <input class="v-radio" type="radio" name="tech-v-{{ section.id }}" id="tv-{{ section.id }}-{{ variant.id }}" value="{{ variant.id }}"
+                        data-price="{{ variant.price | money }}"
+                        {% if variant.compare_at_price > variant.price %}data-mrp="{{ variant.compare_at_price | money }}"{% endif %}
+                        {% unless variant.available %}disabled{% endunless %}
+                        {% if variant.id == cur.id %}checked{% endif %} hidden>
+                      <label class="variant" for="tv-{{ section.id }}-{{ variant.id }}">
+                        {{ variant.title }}
+                        {%- unless variant.available -%}<small>Sold out</small>{%- endunless -%}
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                {%- endunless -%}
+              </div>
+
+            {%- when 'quantity_selector' -%}
+              <div class="p-qty-block" {{ block.shopify_attributes }}>
+                <label class="opt-label">Quantity</label>
+                <div class="qty-stepper">
+                  <button type="button" class="qminus" aria-label="−">−</button>
+                  <input class="qinput" type="number" name="quantity" value="1" min="1" max="5">
+                  <button type="button" class="qplus" aria-label="+">+</button>
+                </div>
+              </div>
+
+            {%- when 'buy_buttons' -%}
+              <div class="p-buy-block" {{ block.shopify_attributes }}>
+                {%- form 'product', p, id: 'techForm-' | append: section.id, class: 'tech-form' -%}
+                  <input type="hidden" name="id" id="techVarId-{{ section.id }}" value="{{ cur.id }}">
+                  <div class="buy-actions">
+                    <button type="submit" name="add" class="btn btn-add"{% unless cur.available %} disabled{% endunless %}>
+                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      <span>{% if cur.available %}Add to Cart{% else %}Sold Out{% endif %}</span>
+                    </button>
+                  </div>
+                  {%- if section.settings.enable_dynamic_checkout -%}
+                    <div class="tech-dcb">{{ form | payment_button }}</div>
+                  {%- endif -%}
+                {%- endform -%}
+
+                <!-- URGENCY: Live Inventory Stock Progress Bar -->
+                <div class="stock-progress-container">
+                  <div class="stock-header">
+                    <span>🔥 High demand: Only <b id="techStockNum-{{ section.id }}">6</b> pieces left in slot</span>
+                    <span class="stock-alert-pulse"></span>
+                  </div>
+                  <div class="stock-bar-outer">
+                    <div class="stock-bar-inner" style="width: 40%;"></div>
+                  </div>
+                </div>
+
+                <!-- DELIVERY TIMER PROMISE -->
+                <div class="delivery-promise">
+                  ⚡ Shipped within <b>24 hours</b>. Order in next <span class="tech-cd"><b>02h 45m 12s</b></span>
+                </div>
+              </div>
+
+            {%- when 'trust_badges' -%}
+              <div class="p-trust-block" {{ block.shopify_attributes }}>
+                <div class="trust-strip">
+                  <div class="trust-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>2 Year Global Warranty</span>
+                  </div>
+                  <div class="trust-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <span>100% Secure Transaction</span>
+                  </div>
+                  <div class="trust-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3M3 12a48.654 48.654 0 01.138-3.662 4.006 4.006 0 013.7-3.7 48.656 48.656 0 017.324 0 4.006 4.006 0 013.7 3.7c.017.22.032.441.046.662M3 12l-3-3m3 3l3-3" /></svg>
+                    <span>Hassle-Free Returns</span>
+                  </div>
+                </div>
+              </div>
+
+            {%- when 'description' -%}
+              <div class="p-desc-block" {{ block.shopify_attributes }}>
+                <div class="acc">
+                  <div class="acc-item open">
+                    <button type="button" class="acc-q">Hardware Specifications <span class="ico">+</span></button>
+                    <div class="acc-a"><div class="acc-rt">{{ product.description }}</div></div>
+                  </div>
+                </div>
+              </div>
+
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY MOBILE BAR -->
+  <div class="sticky-bar" id="techSticky-{{ section.id }}">
+    <div class="sb-info">
+      <div class="nm">{{ p.title | truncate: 22 }}</div>
+      <div class="pr"><b id="techSbPrice-{{ section.id }}">{{ cur.price | money }}</b></div>
+    </div>
+    <button type="button" class="btn btn-add tech-sticky-add">Add to Cart</button>
+  </div>
+
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+.tech-pdp {
+  background: var(--bg-tech);
+  color: var(--text-tech);
+  font-family: 'Space Grotesk', var(--font-body-family), sans-serif;
+  line-height: 1.5;
+}
+.tech-pdp img { max-width: 100%; display: block; }
+.tech-pdp a { color: inherit; text-decoration: none; }
+.tech-pdp button { font-family: inherit; cursor: pointer; }
+.tech-wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+.tech-placeholder { padding: 60px 20px; text-align: center; color: #888; }
+
+.tech-pdp .crumb { font-size: 11px; color: #888; padding: 20px 0; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .product { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 50px; padding-bottom: 60px; align-items: start; }
+@media(max-width: 900px) { .tech-pdp .product { grid-template-columns: 1fr; gap: 30px; } }
+
+.tech-pdp .gallery { position: sticky; top: 90px; }
+@media(max-width: 900px) { .tech-pdp .gallery { position: static; } }
+.tech-pdp .gallery-main { position: relative; aspect-ratio: 1.25; overflow: hidden; border: 1px solid var(--border-tech); border-radius: var(--card-radius); background: var(--surface-tech); display: flex; align-items: center; justify-content: center; }
+.tech-pdp .gallery-main img { max-width: 90%; max-height: 90%; object-fit: contain; }
+.tech-pdp .t-badge { position: absolute; top: 16px; left: 16px; background: var(--accent-tech); color: #fff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 2; }
+.tech-pdp .thumbs { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; }
+.tech-pdp .thumb { flex: 0 0 80px; aspect-ratio: 1.25; overflow: hidden; border: 1px solid var(--border-tech); border-radius: 4px; background: var(--surface-tech); opacity: 0.6; padding: 0; display: flex; align-items: center; justify-content: center; }
+.tech-pdp .thumb.active { border-color: var(--accent-tech); opacity: 1; }
+.tech-pdp .thumb img { max-height: 90%; max-width: 90%; object-fit: contain; }
+
+.tech-pdp .eyebrow { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-tech); display: block; margin-bottom: 8px; }
+.tech-pdp .ptitle { font-size: 36px; line-height: 1.2; font-weight: 700; margin: 0 0 12px 0; color: #fff; }
+@media(max-width: 520px) { .tech-pdp .ptitle { font-size: 26px; } }
+
+.tech-pdp .rating-visitor-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-tech); padding-bottom: 16px; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .rating { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #94A3B8; }
+.tech-pdp .stars { color: var(--accent-tech); letter-spacing: 1px; }
+.tech-pdp .visitor-counter { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94A3B8; }
+.tech-pdp .vc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pop-tech); animation: techPulse 1.5s infinite; }
+@keyframes techPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+.tech-pdp .pricerow { display: flex; align-items: center; gap: 14px; }
+.tech-pdp .price-now { font-size: 28px; font-weight: 700; color: #fff; }
+.tech-pdp .price-mrp { font-size: 18px; color: #94A3B8; text-decoration: line-through; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .price-save { font-size: 11px; background: rgba(59, 130, 246, 0.1); color: var(--accent-tech); font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--accent-tech); font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .tax-note { font-size: 12px; color: #94A3B8; margin: 4px 0 20px 0; font-family: var(--font-body-family), sans-serif; }
+
+.tech-pdp .opt-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; color: var(--accent-tech); }
+.tech-pdp .variants { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.tech-pdp .variant { border: 1px solid var(--border-tech); background: var(--surface-tech); padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; transition: 0.15s; display: inline-block; cursor: pointer; border-radius: var(--button-radius); font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .v-radio:checked + .variant { border-color: var(--accent-tech); background: var(--accent-tech); }
+.tech-pdp .v-radio:disabled + .variant { opacity: 0.3; text-decoration: line-through; }
+
+.tech-pdp .qty-stepper { display: flex; align-items: center; border: 1px solid var(--border-tech); border-radius: var(--button-radius); width: fit-content; overflow: hidden; margin-bottom: 24px; height: 38px; background: var(--surface-tech); }
+.tech-pdp .qty-stepper button { width: 34px; height: 100%; border: none; background: transparent; font-size: 16px; color: #fff; transition: background 0.2s; }
+.tech-pdp .qty-stepper button:hover { background: var(--border-tech); }
+.tech-pdp .qty-stepper input { width: 34px; text-align: center; border: none; font-size: 14px; font-weight: bold; background: transparent; color: #fff; pointer-events: none; }
+
+.tech-pdp .buy-actions { margin-top: 10px; }
+.tech-pdp .btn { font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; height: 50px; border-radius: var(--button-radius); display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; border: none; width: 100%; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .btn-add { background: var(--accent-tech); color: #fff; }
+.tech-pdp .btn-add:hover { opacity: 0.9; }
+.tech-pdp .btn-add[disabled] { opacity: 0.4; cursor: not-allowed; }
+.tech-pdp .tech-dcb { margin-top: 8px; }
+
+.tech-pdp .stock-progress-container { margin-top: 20px; background: var(--surface-tech); padding: 12px; border-radius: 6px; border: 1px solid var(--border-tech); }
+.tech-pdp .stock-header { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; font-weight: bold; color: var(--accent-tech); margin-bottom: 6px; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .stock-alert-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-tech); animation: alertPulse 1.2s infinite; }
+@keyframes alertPulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(0.9); opacity: 1; } }
+.tech-pdp .stock-bar-outer { height: 6px; background: var(--border-tech); border-radius: 3px; overflow: hidden; }
+.tech-pdp .stock-bar-inner { height: 100%; background: var(--accent-tech); border-radius: 3px; }
+
+.tech-pdp .delivery-promise { font-size: 12px; color: #94A3B8; margin-top: 12px; border-top: 1px dashed var(--border-tech); padding-top: 12px; font-family: var(--font-body-family), sans-serif; }
+
+.tech-pdp .trust-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 24px; padding: 16px 0; border-top: 1px solid var(--border-tech); border-bottom: 1px solid var(--border-tech); }
+.tech-pdp .trust-item { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; font-size: 11px; color: #94A3B8; font-weight: 600; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .trust-item svg { width: 22px; height: 22px; color: var(--accent-tech); }
+
+.tech-pdp .acc { margin-top: 20px; border-top: 1px solid var(--border-tech); }
+.tech-pdp .acc-item { border-bottom: 1px solid var(--border-tech); }
+.tech-pdp .acc-q { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; color: #fff; background: none; border: none; text-align: left; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .acc-q .ico { font-size: 16px; color: #888; transition: transform 0.2s; }
+.tech-pdp .acc-item.open .ico { transform: rotate(45deg); }
+.tech-pdp .acc-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.tech-pdp .acc-item.open .acc-a { max-height: 500px; }
+.tech-pdp .acc-rt { font-size: 13.5px; color: #94A3B8; padding-bottom: 14px; line-height: 1.6; font-family: var(--font-body-family), sans-serif; }
+
+.tech-pdp .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; background: var(--surface-tech); border-top: 1px solid var(--border-tech); padding: 12px 20px; display: flex; align-items: center; gap: 14px; transform: translateY(120%); transition: transform 0.3s ease; }
+.tech-pdp .sticky-bar.show { transform: translateY(0); }
+.tech-pdp .sb-info .nm { font-size: 13px; color: #fff; font-weight: bold; line-height: 1.2; font-family: var(--font-body-family), sans-serif; }
+.tech-pdp .sb-info .pr b { font-size: 15px; color: var(--accent-tech); }
+.tech-pdp .sticky-bar .btn { flex: 1; height: 40px; background: var(--accent-tech); color: #fff; width: auto; font-size: 12px; }
+@media(min-width: 921px) { .tech-pdp .sticky-bar { display: none; } }
+@media(prefers-reduced-motion:reduce) { .tech-pdp *, .tech-pdp *::before, .tech-pdp *::after { animation: none!important; transition: none!important; } }
+{% endstylesheet %}
+
+<script>
+(function(){
+  var root = document.getElementById('tech-{{ section.id }}'); if(!root) return;
+  var mainImg = document.getElementById('techMain-{{ section.id }}');
+  var thumbs = document.getElementById('techThumbs-{{ section.id }}');
+  if(thumbs && mainImg){
+    thumbs.addEventListener('click', function(e){
+      var t = e.target.closest('.thumb'); if(!t) return;
+      thumbs.querySelectorAll('.thumb').forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active'); mainImg.src = t.dataset.src;
+    });
+  }
+
+  var varId = document.getElementById('techVarId-{{ section.id }}');
+  var priceNow = document.getElementById('techPrice-{{ section.id }}');
+  var priceMrp = document.getElementById('techMrp-{{ section.id }}');
+  var sbPrice = document.getElementById('techSbPrice-{{ section.id }}');
+  root.querySelectorAll('.v-radio').forEach(function(r){
+    r.addEventListener('change', function(){
+      if(varId) varId.value = r.value;
+      if(priceNow && r.dataset.price) priceNow.textContent = r.dataset.price;
+      if(sbPrice && r.dataset.price) sbPrice.textContent = r.dataset.price;
+      if(priceMrp){
+        if(r.dataset.mrp){
+          priceMrp.textContent = r.dataset.mrp;
+          priceMrp.style.display = '';
+        } else {
+          priceMrp.style.display = 'none';
+        }
+      }
+    });
+  });
+
+  var qtyInput = root.querySelector('.qinput');
+  var qMinus = root.querySelector('.qminus');
+  var qPlus = root.querySelector('.qplus');
+  if(qtyInput && qMinus && qPlus){
+    qMinus.addEventListener('click', function(){
+      var val = parseInt(qtyInput.value, 10) || 1;
+      if(val > 1) qtyInput.value = val - 1;
+    });
+    qPlus.addEventListener('click', function(){
+      var val = parseInt(qtyInput.value, 10) || 1;
+      if(val < 5) qtyInput.value = val + 1;
+    });
+  }
+
+  var acc = root.querySelector('.acc');
+  if(acc){
+    acc.addEventListener('click', function(e){
+      var q = e.target.closest('.acc-q'); if(!q) return;
+      var item = q.parentElement; var a = item.querySelector('.acc-a'); var open = item.classList.contains('open');
+      acc.querySelectorAll('.acc-item').forEach(function(i){
+        i.classList.remove('open');
+        i.querySelector('.acc-a').style.maxHeight = null;
+      });
+      if(!open){
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+    var fo = acc.querySelector('.acc-item.open .acc-a'); if(fo) fo.style.maxHeight = fo.scrollHeight + 'px';
+  }
+
+  var cds = root.querySelectorAll('.tech-cd');
+  if(cds.length){
+    function tick(){
+      var now = new Date(), end = new Date(); end.setHours(23, 59, 59, 999);
+      var diff = Math.max(0, end - now);
+      var h = String(Math.floor(diff / 3.6e6)).padStart(2, '0');
+      var m = String(Math.floor(diff % 3.6e6 / 6e4)).padStart(2, '0');
+      var s = String(Math.floor(diff % 6e4 / 1e3)).padStart(2, '0');
+      cds.forEach(function(el){ el.innerHTML = '<b>' + h + 'h ' + m + 'm ' + s + 's</b>'; });
+    } tick(); setInterval(tick, 1000);
+  }
+
+  /* Visitor counter */
+  var vcNum = document.getElementById('techVcNum-{{ section.id }}');
+  if(vcNum){
+    var base = Math.floor(Math.random() * (120 - 45 + 1)) + 45;
+    vcNum.textContent = base;
+    setInterval(function(){
+      var delta = (Math.random() < .5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
+      base = Math.max(25, Math.min(195, base + delta));
+      vcNum.textContent = base;
+    }, 4500);
+  }
+
+  /* Stock counter */
+  var stockNum = document.getElementById('techStockNum-{{ section.id }}');
+  var stockBar = root.querySelector('.stock-bar-inner');
+  if(stockNum && stockBar){
+    var baseStock = Math.floor(Math.random() * (7 - 3 + 1)) + 3;
+    stockNum.textContent = baseStock;
+    stockBar.style.width = (baseStock * 14) + '%';
+    setInterval(function(){
+      if(baseStock > 1 && Math.random() < 0.12) {
+        baseStock--;
+        stockNum.textContent = baseStock;
+        stockBar.style.width = (baseStock * 14) + '%';
+      }
+    }, 11000);
+  }
+
+  var sticky = document.getElementById('techSticky-{{ section.id }}');
+  var trigger = root.querySelector('.buy-actions');
+  if(sticky && trigger && 'IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      var e = entries[0];
+      if(e.isIntersecting) sticky.classList.remove('show');
+      else if(e.boundingClientRect.top<0) sticky.classList.add('show');
+    }, {threshold: 0}).observe(trigger);
+  }
+
+  var sAdd = root.querySelector('.tech-sticky-add');
+  var addBtn = root.querySelector('.btn-add');
+  if(sAdd && addBtn) sAdd.onclick = function(){ addBtn.click(); };
+})();
+</script>
+
 {% schema %}
 {
-  "name": "Product Details",
+  "name": "Product — Electronics",
+  "tag": "section",
+  "class": "tech-section",
   "settings": [
     {
       "type": "checkbox",
-      "id": "enable_sticky_info",
-      "label": "Enable sticky info column",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_image_zoom",
-      "label": "Enable image zoom modal",
+      "id": "enable_dynamic_checkout",
+      "label": "Enable Dynamic Checkout",
       "default": true
     }
   ],
@@ -203,9 +437,14 @@
     { "type": "price", "name": "Product Price", "limit": 1 },
     { "type": "variant_picker", "name": "Variant Selector", "limit": 1 },
     { "type": "quantity_selector", "name": "Quantity Selector", "limit": 1 },
-    { "type": "buy_buttons", "name": "Buy Button triggers", "limit": 1 },
-    { "type": "description", "name": "Description Accordion", "limit": 1 },
-    { "type": "trust_badges", "name": "Trust Badges Matrix", "limit": 1 }
+    { "type": "buy_buttons", "name": "Buy Buttons", "limit": 1 },
+    { "type": "trust_badges", "name": "Trust Badges", "limit": 1 },
+    { "type": "description", "name": "Description Tab", "limit": 1 }
+  ],
+  "presets": [
+    {
+      "name": "Product — Electronics"
+    }
   ]
 }
 {% endschema %}

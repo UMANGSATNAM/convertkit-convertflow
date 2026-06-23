@@ -1,153 +1,636 @@
-<div class="sf-product-info sf-product-info-{{ section.id }}">
-  <h1 class="sf-product-title">{{ product.title }}</h1>
-  
-  <div class="sf-product-reviews">
-    <span class="sf-stars">★★★★★</span>
-    <span class="sf-review-count">4.8 (124 Reviews)</span>
-  </div>
+{%- comment -%}
+  Section: product_info_premium
+  Personality: Premium Core D2C product info with high-conversion urgency elements.
+{%- endcomment -%}
 
-  <div class="sf-product-price">
-    <span class="sf-price">{{ product.price | money }}</span>
-    {% if product.compare_at_price > product.price %}
-      <span class="sf-compare-price">{{ product.compare_at_price | money }}</span>
-      <span class="sf-save-badge">Save {{ product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round }}%</span>
-    {% endif %}
-  </div>
+{%- liquid
+  assign p = product
+  assign cur = p.selected_or_first_available_variant
+  assign on_sale = false
+  if p.compare_at_price > p.price
+    assign on_sale = true
+  endif
+  assign save_pct = 0
+  if on_sale
+    assign diff = p.compare_at_price | minus: p.price
+    assign save_pct = diff | times: 100 | divided_by: p.compare_at_price
+  endif
+-%}
 
-  {% if section.settings.show_scarcity %}
-    <div class="sf-scarcity">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-      Only a few units left in stock!
-    </div>
-  {% endif %}
-
-  {% form 'product', product, class: 'sf-product-form' %}
-    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+<div class="sf-product-premium sf-product-premium-{{ section.id }}" data-section="{{ section.id }}">
+  <div class="sf-product-grid">
     
-    <div class="sf-quantity-wrapper">
-      <label for="Quantity">Quantity</label>
-      <input type="number" id="Quantity" name="quantity" value="1" min="1" class="sf-quantity-input">
+    <!-- Gallery Layout (Left) -->
+    <div class="sf-gallery-col">
+      <div class="sf-gallery-featured">
+        {%- if on_sale -%}
+          <div class="sf-sale-badge">Save {{ save_pct }}%</div>
+        {%- endif -%}
+        {%- if p.featured_media -%}
+          <img id="sfMainImage-{{ section.id }}" src="{{ p.featured_media | image_url: width: 900 }}" alt="{{ p.featured_media.alt | escape }}" width="900" height="900" loading="eager">
+        {%- endif -%}
+      </div>
+      {%- if p.images.size > 1 -%}
+        <div class="sf-gallery-thumbs" id="sfThumbs-{{ section.id }}">
+          {%- for img in p.images limit: 6 -%}
+            <button type="button" class="sf-thumb-btn{% if forloop.first %} active{% endif %}" data-src="{{ img | image_url: width: 900 }}">
+              <img src="{{ img | image_url: width: 160 }}" alt="{{ img.alt | escape }}" loading="lazy" width="160" height="160">
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
     </div>
 
-    <button type="submit" class="sf-add-to-cart" style="background-color: {{ section.settings.btn_color }};">
-      {{ section.settings.btn_text | default: 'Add to Cart' }}
-    </button>
-  {% endform %}
+    <!-- Buying Info (Right) -->
+    <div class="sf-info-col">
+      {%- if p.vendor != blank -%}
+        <span class="sf-vendor">{{ p.vendor }}</span>
+      {%- endif -%}
+      
+      <h1 class="sf-product-title">{{ p.title }}</h1>
+      
+      <div class="sf-reviews-visitor-row">
+        <div class="sf-product-reviews">
+          <span class="sf-stars">★★★★★</span>
+          <span class="sf-review-count">4.8 (124 Reviews)</span>
+        </div>
+        
+        {%- if section.settings.show_visitor_counter -%}
+          <div class="sf-visitor-counter">
+            <span class="sf-pulse-dot"></span>
+            <span><span id="sfVcNum-{{ section.id }}">42</span> people are looking at this</span>
+          </div>
+        {%- endif -%}
+      </div>
 
-  <div class="sf-product-description">
-    {{ product.description }}
+      <div class="sf-product-price">
+        <span class="sf-price" id="sfPrice-{{ section.id }}">{{ cur.price | money }}</span>
+        {%- if on_sale -%}
+          <span class="sf-compare-price" id="sfMrp-{{ section.id }}">{{ cur.compare_at_price | money }}</span>
+          <span class="sf-save-badge">Save {{ save_pct }}%</span>
+        {%- endif -%}
+      </div>
+      <p class="sf-tax-note">Inclusive of all taxes & Free Express Shipping</p>
+
+      {%- form 'product', p, id: 'sfProductForm-' | append: section.id, class: 'sf-product-form' -%}
+        <input type="hidden" name="id" id="sfVarId-{{ section.id }}" value="{{ cur.id }}">
+        
+        {%- if p.variants.size > 1 -%}
+          <div class="sf-variants-picker">
+            <label class="sf-option-label">{{ p.options.first }}</label>
+            <div class="sf-variants" id="sfVariants-{{ section.id }}">
+              {%- for variant in p.variants -%}
+                <input class="sf-v-radio" type="radio" name="sf-v-{{ section.id }}" id="sfv-{{ section.id }}-{{ variant.id }}" value="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  {% if variant.compare_at_price > variant.price %}data-mrp="{{ variant.compare_at_price | money }}"{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                  {% if variant.id == cur.id %}checked{% endif %} hidden>
+                <label class="sf-variant-label" for="sfv-{{ section.id }}-{{ variant.id }}">
+                  {{ variant.title }}
+                  {%- unless variant.available -%}<small>Sold out</small>{%- endunless -%}
+                </label>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="sf-buy-wrapper">
+          <div class="sf-qty-selector">
+            <label class="sf-option-label">Qty</label>
+            <div class="sf-qty-stepper">
+              <button type="button" class="qminus" aria-label="−">−</button>
+              <input class="qinput" type="number" name="quantity" value="1" min="1" max="10">
+              <button type="button" class="qplus" aria-label="+">+</button>
+            </div>
+          </div>
+
+          <button type="submit" name="add" class="sf-add-to-cart" style="background-color: {{ section.settings.btn_color }}; color: #fff;">
+            {{ section.settings.btn_text | default: 'Add to Bag' }}
+          </button>
+        </div>
+
+        {%- if section.settings.show_dynamic_checkout -%}
+          <div class="sf-dcb">{{ form | payment_button }}</div>
+        {%- endif -%}
+      {%- endform -%}
+
+      {%- if section.settings.show_scarcity -%}
+        <div class="sf-scarcity-progress-bar">
+          <div class="sf-scarcity-header">
+            <span>🔥 Only <b id="sfStockNum-{{ section.id }}">5</b> items left in stock</span>
+            <span class="sf-scarcity-pulse"></span>
+          </div>
+          <div class="sf-bar-outer">
+            <div class="sf-bar-inner" style="width: 30%;"></div>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_shipping -%}
+        <div class="sf-delivery-timeline">
+          🚚 Dispatch within 24 hours. Order within next <span class="sf-cd-timer"><b>02h 45m 12s</b></span>
+        </div>
+      {%- endif -%}
+
+      <div class="sf-product-description rte">
+        {{ p.description }}
+      </div>
+    </div>
+
   </div>
+</div>
 
-  {% if section.settings.show_shipping %}
-    <div class="sf-shipping-info">
-      <p>🚚 <strong>Free Shipping</strong> across India</p>
-      <p>⚡ Dispatch within 24 hours</p>
+<!-- Sticky ATC for Desktop/Mobile scroll -->
+<div class="sf-sticky-bar" id="sfSticky-{{ section.id }}">
+  <div class="sf-sb-wrap">
+    <div class="sf-sb-info">
+      <div class="sf-sb-title">{{ p.title | truncate: 25 }}</div>
+      <div class="sf-sb-price"><b id="sfStickyPrice-{{ section.id }}">{{ cur.price | money }}</b></div>
     </div>
-  {% endif %}
+    <button type="button" class="sf-sticky-add-btn" style="background-color: {{ section.settings.btn_color }};">Add to Bag</button>
+  </div>
 </div>
 
 <style>
-  .sf-product-info-{{ section.id }} {
-    padding: 2rem 0;
-    color: {{ section.settings.text_color }};
+  .sf-product-premium-{{ section.id }} {
+    padding: 3rem 0;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-body-family), sans-serif;
+  }
+  .sf-product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .sf-product-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+  .sf-gallery-col {
+    position: sticky;
+    top: 90px;
+  }
+  @media (max-width: 900px) {
+    .sf-gallery-col {
+      position: static;
+    }
+  }
+  .sf-gallery-featured {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    background: var(--color-surface);
+  }
+  .sf-gallery-featured img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sf-sale-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--color-accent);
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: var(--button-radius);
+    z-index: 2;
+  }
+  .sf-gallery-thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    overflow-x: auto;
+  }
+  .sf-thumb-btn {
+    flex: 0 0 75px;
+    aspect-ratio: 1;
+    border: 1px solid var(--color-border);
+    border-radius: var(--button-radius);
+    background: white;
+    opacity: 0.6;
+    padding: 0;
+    cursor: pointer;
+  }
+  .sf-thumb-btn.active {
+    border-color: var(--color-accent);
+    opacity: 1;
+  }
+  .sf-thumb-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .sf-vendor {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 6px;
   }
   .sf-product-title {
-    font-size: 2rem;
+    font-size: 32px;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin: 0 0 10px 0;
+    line-height: 1.25;
+    font-family: var(--font-heading-family);
+  }
+  
+  .sf-reviews-visitor-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
   }
   .sf-product-reviews {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: 6px;
   }
   .sf-stars {
-    color: var(--color-accent);
-    letter-spacing: 2px;
+    color: #F59E0B;
+    letter-spacing: 1px;
+    font-size: 14px;
   }
   .sf-review-count {
-    font-size: 0.9rem;
-    opacity: 0.7;
+    font-size: 13px;
+    color: #666;
   }
+  
+  .sf-visitor-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #666;
+  }
+  .sf-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10B981;
+    animation: sfPulse 1.8s infinite;
+  }
+  @keyframes sfPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
   .sf-product-price {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 12px;
+    margin-bottom: 4px;
   }
   .sf-price {
-    font-size: 1.5rem;
+    font-size: 26px;
     font-weight: 700;
   }
   .sf-compare-price {
+    font-size: 18px;
     text-decoration: line-through;
-    opacity: 0.6;
+    color: #888;
   }
   .sf-save-badge {
-    background: var(--color-surface);
+    background: var(--soft-rose, #FFF5F5);
     color: var(--color-accent);
-    padding: 4px 8px;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px dashed var(--color-accent);
   }
-  .sf-scarcity {
+  .sf-tax-note {
+    font-size: 11px;
+    color: #777;
+    margin: 0 0 20px 0;
+  }
+
+  .sf-option-label {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .sf-variants {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .sf-variant-label {
+    border: 1px solid var(--color-border);
+    background: #fff;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+    transition: 0.15s;
+    display: inline-block;
+  }
+  .sf-v-radio:checked + .sf-variant-label {
+    border-color: var(--color-text);
+    background: var(--color-text);
+    color: #fff;
+  }
+  .sf-v-radio:disabled + .sf-variant-label {
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  .sf-buy-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+  }
+  .sf-qty-selector {
+    flex-shrink: 0;
+  }
+  .sf-qty-stepper {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--color-accent);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    background: var(--color-surface);
-    padding: 8px 12px;
-    border-radius: 4px;
-  }
-  .sf-product-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  .sf-quantity-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .sf-quantity-input {
-    width: 80px;
-    padding: 10px;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: var(--button-radius);
+    height: 48px;
+    background: #fff;
   }
-  .sf-add-to-cart {
-    padding: 16px;
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
+  .sf-qty-stepper button {
+    width: 32px;
+    height: 100%;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    background: transparent;
+    font-size: 16px;
+  }
+  .sf-qty-stepper button:hover {
+    background: var(--color-surface);
+  }
+  .sf-qty-stepper input {
+    width: 32px;
+    text-align: center;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .sf-add-to-cart {
+    flex: 1;
+    height: 48px;
+    font-weight: bold;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: opacity 0.3s;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+    transition: opacity 0.2s;
   }
   .sf-add-to-cart:hover {
     opacity: 0.9;
   }
-  .sf-shipping-info {
-    margin-top: 2rem;
-    padding: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background: var(--color-surface);
+  .sf-add-to-cart[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
-  .sf-shipping-info p {
-    margin: 0.5rem 0;
+  .sf-dcb {
+    margin-bottom: 20px;
+  }
+  
+  .sf-scarcity-progress-bar {
+    background: #FFF9F9;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #FFEBEB;
+    margin-bottom: 16px;
+  }
+  .sf-scarcity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--color-accent);
+    margin-bottom: 6px;
+  }
+  .sf-scarcity-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: alertPulse 1.2s infinite;
+  }
+  @keyframes alertPulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+    100% { transform: scale(0.9); opacity: 1; }
+  }
+  .sf-bar-outer {
+    height: 6px;
+    background: #E5E7EB;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sf-bar-inner {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 3px;
+  }
+
+  .sf-delivery-timeline {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 20px;
+    border-top: 1px dashed var(--color-border);
+    padding-top: 12px;
+  }
+  
+  .sf-product-description {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #444;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+
+  .sf-sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 80;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    padding: 12px 20px;
+    transform: translateY(120%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+  }
+  .sf-sticky-bar.show {
+    transform: translateY(0);
+  }
+  .sf-sb-wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .sf-sb-title {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+  .sf-sb-price b {
+    font-size: 14px;
+    color: var(--color-accent);
+  }
+  .sf-sticky-add-btn {
+    height: 40px;
+    padding: 0 24px;
+    background: var(--color-text);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  @media(min-width: 921px) {
+    .sf-sticky-bar {
+      display: none;
+    }
   }
 </style>
+
+<script>
+(function(){
+  var root = document.querySelector('.sf-product-premium-{{ section.id }}'); if(!root) return;
+  var mainImg = document.getElementById('sfMainImage-{{ section.id }}');
+  var thumbs = document.getElementById('sfThumbs-{{ section.id }}');
+  if(thumbs && mainImg){
+    thumbs.addEventListener('click', function(e){
+      var t = e.target.closest('.sf-thumb-btn'); if(!t) return;
+      thumbs.querySelectorAll('.sf-thumb-btn').forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active'); mainImg.src = t.dataset.src;
+    });
+  }
+
+  var varId = document.getElementById('sfVarId-{{ section.id }}');
+  var priceNow = document.getElementById('sfPrice-{{ section.id }}');
+  var priceMrp = document.getElementById('sfMrp-{{ section.id }}');
+  var stickyPrice = document.getElementById('sfStickyPrice-{{ section.id }}');
+  root.querySelectorAll('.sf-v-radio').forEach(function(r){
+    r.addEventListener('change', function(){
+      if(varId) varId.value = r.value;
+      if(priceNow && r.dataset.price) priceNow.textContent = r.dataset.price;
+      if(stickyPrice && r.dataset.price) stickyPrice.textContent = r.dataset.price;
+      if(priceMrp){
+        if(r.dataset.mrp){
+          priceMrp.textContent = r.dataset.mrp;
+          priceMrp.style.display = '';
+        } else {
+          priceMrp.style.display = 'none';
+        }
+      }
+    });
+  });
+
+  var qtyInput = root.querySelector('.qinput');
+  var qMinus = root.querySelector('.qminus');
+  var qPlus = root.querySelector('.qplus');
+  if(qtyInput && qMinus && qPlus){
+    qMinus.addEventListener('click', function(){
+      var val = parseInt(qtyInput.value, 10) || 1;
+      if(val > 1) qtyInput.value = val - 1;
+    });
+    qPlus.addEventListener('click', function(){
+      var val = parseInt(qtyInput.value, 10) || 1;
+      if(val < 10) qtyInput.value = val + 1;
+    });
+  }
+
+  var cds = root.querySelectorAll('.sf-cd-timer');
+  if(cds.length){
+    function tick(){
+      var now = new Date(), end = new Date(); end.setHours(23, 59, 59, 999);
+      var diff = Math.max(0, end - now);
+      var h = String(Math.floor(diff / 3.6e6)).padStart(2, '0');
+      var m = String(Math.floor(diff % 3.6e6 / 6e4)).padStart(2, '0');
+      var s = String(Math.floor(diff % 6e4 / 1e3)).padStart(2, '0');
+      cds.forEach(function(el){ el.innerHTML = '<b>' + h + 'h ' + m + 'm ' + s + 's</b>'; });
+    } tick(); setInterval(tick, 1000);
+  }
+
+  /* Visitor Counter */
+  var vcNum = document.getElementById('sfVcNum-{{ section.id }}');
+  if(vcNum){
+    var base = Math.floor(Math.random() * (50 - 20 + 1)) + 20;
+    vcNum.textContent = base;
+    setInterval(function(){
+      var delta = (Math.random() < .5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+      base = Math.max(10, Math.min(90, base + delta));
+      vcNum.textContent = base;
+    }, 5500);
+  }
+
+  /* Stock Counter */
+  var stockNum = document.getElementById('sfStockNum-{{ section.id }}');
+  var stockBar = root.querySelector('.sf-bar-inner');
+  if(stockNum && stockBar){
+    var baseStock = Math.floor(Math.random() * (8 - 3 + 1)) + 3;
+    stockNum.textContent = baseStock;
+    stockBar.style.width = (baseStock * 12.5) + '%';
+    setInterval(function(){
+      if(baseStock > 1 && Math.random() < 0.15) {
+        baseStock--;
+        stockNum.textContent = baseStock;
+        stockBar.style.width = (baseStock * 12.5) + '%';
+      }
+    }, 13000);
+  }
+
+  var sticky = document.getElementById('sfSticky-{{ section.id }}');
+  var trigger = root.querySelector('.sf-buy-wrapper');
+  if(sticky && trigger && 'IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      var e = entries[0];
+      if(e.isIntersecting) sticky.classList.remove('show');
+      else if(e.boundingClientRect.top < 0) sticky.classList.add('show');
+    }, {threshold: 0}).observe(trigger);
+  }
+
+  var sAdd = document.querySelector('.sf-sticky-add-btn');
+  var addBtn = root.querySelector('.sf-add-to-cart');
+  if(sAdd && addBtn) sAdd.onclick = function(){ addBtn.click(); };
+})();
+</script>
 
 {% schema %}
 {
@@ -169,18 +652,30 @@
       "type": "text",
       "id": "btn_text",
       "label": "Button Text",
-      "default": "Add to Cart"
+      "default": "Add to Bag"
     },
     {
       "type": "checkbox",
       "id": "show_scarcity",
-      "label": "Show Scarcity Badge",
+      "label": "Show Scarcity Badge & Progress Bar",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_shipping",
-      "label": "Show Shipping Info",
+      "label": "Show Shipping Info & Countdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_visitor_counter",
+      "label": "Show Live Viewer Counter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show Express Checkout",
       "default": true
     }
   ],

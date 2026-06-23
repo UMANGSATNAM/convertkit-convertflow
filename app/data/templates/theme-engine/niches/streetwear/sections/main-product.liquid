@@ -1,202 +1,518 @@
-<section class="product-pdp product-pdp--streetwear container" style="padding: var(--space-48) 0; background-color: var(--color-background);" data-section="{{ section.id }}">
-  <div class="grid grid-cols-1 grid-cols-md-2" style="--grid-spacing: var(--space-48); align-items: start;">
-    
-    <!-- Gallery -->
-    <div class="product-gallery-container" style="display: flex; flex-direction: column; gap: var(--space-16); position: sticky; top: var(--space-24);">
-      <div class="product-gallery-featured" style="border: 2px solid var(--color-border); box-shadow: 4px 4px 0px #000; overflow: hidden; background-color: #fff;">
-        <img id="FeaturedMedia-{{ section.id }}" 
-             src="{{ product.featured_image | image_url: width: 1000 }}" 
-             alt="{{ product.featured_image.alt | escape }}" 
-             loading="eager"
-             style="width: 100%; aspect-ratio: 0.8; object-fit: cover;">
-      </div>
+{%- comment -%}
+  Section: main-product (Streetwear niche)
+  Personality: Bold, raw, high-contrast, drop culture.
+  Urgency tone: Hype/scarcity ("This drop is selling fast", "Almost gone")
+  Visitor counter: "X heads checking this drop"
+{%- endcomment -%}
 
-      {%- if product.images.size > 1 -%}
-        <div class="product-gallery-thumbnails" style="display: flex; gap: var(--space-12); overflow-x: auto; padding-bottom: var(--space-8);">
-          {%- for img in product.images -%}
-            <button type="button" class="gallery-thumbnail-btn" 
-                    onclick="document.getElementById('FeaturedMedia-{{ section.id }}').src = '{{ img | image_url: width: 1000 }}'"
-                    style="flex: 0 0 80px; border: 2px solid var(--color-border); padding: 4px; background-color: #fff; cursor: pointer; aspect-ratio: 0.8; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #000;">
-              <img src="{{ img | image_url: width: 160 }}" alt="{{ img.alt | escape }}" style="max-height: 100%; max-width: 100%; object-fit: cover;">
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-    </div>
-
-    <!-- Details -->
-    <div class="product-info-container {% if section.settings.enable_sticky_info %}sticky-info{% endif %}" style="display: flex; flex-direction: column; gap: var(--space-20);">
-      
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'title' -%}
-            <div class="product-info-title-vendor" {{ block.shopify_attributes }}>
-              <div class="product-vendor" style="text-transform: uppercase; font-size: 0.8rem; font-weight: 800; color: var(--color-accent); margin-bottom: var(--space-4);">
-                {{ product.vendor }}
-              </div>
-              <h1 class="product-title" style="font-family: var(--font-heading-family); font-size: 2.5rem; font-weight: 900; line-height: 1; margin: 0 0 var(--space-8) 0; letter-spacing: -0.01em;">
-                {{ product.title }}
-              </h1>
-            </div>
-
-          {%- when 'price' -%}
-            <div id="price-{{ section.id }}" class="product-info-price" {{ block.shopify_attributes }} style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-heading-family);">
-              {% render 'price', product: product, use_variant: false %}
-            </div>
-
-          {%- when 'variant_picker' -%}
-            <div class="product-info-variants" {{ block.shopify_attributes }}>
-              {%- unless product.has_only_default_variant -%}
-                <variant-selects class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}">
-                  {%- for option in product.options_with_values -%}
-                    <div class="product-form-option" style="margin-bottom: var(--space-16);">
-                      <label class="form-option-label" style="display: block; font-size: 0.85rem; font-weight: 900; margin-bottom: var(--space-8);">
-                        SELECT {{ option.name | uppercase }}
-                      </label>
-                      <select name="options[{{ option.name | escape }}]" 
-                              class="product-option-selector select__select"
-                              style="width: 100%; padding: 12px 16px; border: 2px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-weight: 700; font-size: 0.95rem; border-radius: var(--button-radius); appearance: none; outline: none;">
-                        {%- for value in option.values -%}
-                          <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
-                            {{ value }}
-                          </option>
-                        {%- endfor -%}
-                      </select>
-                    </div>
-                  {%- endfor -%}
-                  <script type="application/json">
-                    {{ product.variants | json }}
-                  </script>
-                </variant-selects>
-              {%- endunless -%}
-            </div>
-
-          {%- when 'quantity_selector' -%}
-            <div class="product-info-quantity" {{ block.shopify_attributes }}>
-              <label class="form-option-label" style="display: block; font-size: 0.85rem; font-weight: 900; margin-bottom: var(--space-8);">
-                QUANTITY
-              </label>
-              <div class="quantity-stepper" style="border: 2px solid var(--color-border);">
-                <button type="button" class="quantity-stepper-btn stepper-minus">{% render 'icon-minus' %}</button>
-                <input type="number" name="quantity" value="1" min="1" class="quantity-stepper-input" style="font-weight: bold;">
-                <button type="button" class="quantity-stepper-btn stepper-plus">{% render 'icon-plus' %}</button>
-              </div>
-            </div>
-
-          {%- when 'buy_buttons' -%}
-            <div class="product-info-buy-buttons" {{ block.shopify_attributes }}>
-              <form action="/cart/add" method="post" id="product-form-{{ section.id }}" class="product-form">
-                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                
-                <div class="product-form-ctas" style="display: flex; flex-direction: column; gap: var(--space-12); margin-top: var(--space-12);">
-                  <button type="submit" name="add" class="product-form-main-submit button button--primary width-100" 
-                          {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
-                          style="box-shadow: 4px 4px 0px var(--color-accent); border: 2px solid #000; padding: 16px 0; font-size: 1rem;"
-                          onclick="event.preventDefault(); window.PubSub.publish('cart:add', { id: this.form.id.value, quantity: this.form.quantity ? this.form.quantity.value : 1 })">
-                    <span>
-                      {%- if product.selected_or_first_available_variant.available -%}
-                        ADD TO CART
-                      {%- else -%}
-                        SOLD OUT
-                      {%- endif -%}
-                    </span>
-                  </button>
-                  {{ form | payment_button }}
-                </div>
-              </form>
-            </div>
-
-          {%- when 'trust_badges' -%}
-            <div class="product-info-trust-badges" {{ block.shopify_attributes }} 
-                 style="border: 2px solid var(--color-border); box-shadow: 4px 4px 0px var(--color-accent); border-radius: var(--card-radius); padding: var(--space-20); margin-top: var(--space-12); background-color: #fff;">
-              <div style="font-family: var(--font-heading-family); font-size: 1.1rem; font-weight: 900; margin-bottom: var(--space-12); border-bottom: 2px solid var(--color-border); padding-bottom: 4px;">
-                // SPECS & DETAILS //
-              </div>
-              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-8); font-family: var(--font-body-family); font-size: 0.85rem; font-weight: 700;">
-                <li>Heavyweight 320GSM Loopback Cotton</li>
-                <li>Preshrunk & Pigment Dyed for Vintage Wash</li>
-                <li>Made in Portugal</li>
-              </ul>
-            </div>
-
-          {%- when 'description' -%}
-            <div class="product-info-accordions theme-accordion" data-single-expand="true" {{ block.shopify_attributes }} style="margin-top: var(--space-16);">
-              <div class="accordion-item" style="border: 2px solid var(--color-border); margin-bottom: var(--space-12); background-color: #fff; border-radius: var(--card-radius); overflow: hidden; box-shadow: 2px 2px 0px #000;">
-                <button type="button" class="accordion-trigger" aria-expanded="true" 
-                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; border: none; border-bottom: 2px solid var(--color-border); background: none; text-align: left; padding: var(--space-16); font-family: var(--font-heading-family); font-size: 1.1rem; cursor: pointer; font-weight: 900;">
-                  <span>DETAILS</span>
-                  {% render 'icon-chevron' %}
-                </button>
-                <div class="accordion-content accordion-content--open rte" style="font-family: var(--font-body-family); font-size: 0.9rem; line-height: 1.6; padding: var(--space-16); color: #333;">
-                  {{ product.description }}
-                </div>
-              </div>
-            </div>
-
-        {%- endcase -%}
-      {%- endfor -%}
-
-    </div>
-
-  </div>
-</section>
-
-<!-- Sticky Add to Cart -->
-<div class="sticky-atc-bar hide-mobile" aria-hidden="true" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--color-background); border-top: 2px solid var(--color-border); padding: var(--space-12) 0; z-index: var(--z-header); transform: translateY(100%); transition: transform var(--transition-normal);">
-  <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      <img src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title }}" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--color-border);">
-      <div>
-        <h4 style="font-family: var(--font-heading-family); font-size: 1rem; font-weight: 900; margin: 0;">{{ product.title }}</h4>
-        {% render 'price', product: product, use_variant: false %}
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      {%- unless product.has_only_default_variant -%}
-        <select class="sticky-atc-variant-select" style="padding: 8px 16px; border: 2px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-weight: bold; font-size: 0.85rem;">
-          {%- for variant in product.variants -%}
-            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
-              {{ variant.title }}
-            </option>
-          {%- endfor -%}
-        </select>
-      {%- endunless -%}
-      <button type="button" class="sticky-atc-submit button button--primary button--small" style="box-shadow: 2px 2px 0px #000; font-size: 0.8rem; padding: 8px 16px;">ADD</button>
-    </div>
-  </div>
-</div>
+{%- liquid
+  assign p = product
+  assign cur = p.selected_or_first_available_variant
+  assign on_sale = false
+  if p.compare_at_price > p.price
+    assign on_sale = true
+  endif
+  assign save_pct = 0
+  if on_sale
+    assign diff = p.compare_at_price | minus: p.price
+    assign save_pct = diff | times: 100 | divided_by: p.compare_at_price
+  endif
+-%}
 
 <style>
-  .sticky-atc-bar--visible {
-    transform: translateY(0) !important;
+  #hype-{{ section.id }}{
+    --bg:{{ section.settings.c_bg }};
+    --primary:{{ section.settings.c_primary }};
+    --accent:{{ section.settings.c_accent }};
+    --pop:{{ section.settings.c_pop }};
+    --ink:#F0EDE8;
+    --muted:#8A8278;
+    --line:#2E2B27;
+    --white:#fff;
+    --radius:0px;
+    --radius-sm:0px;
   }
 </style>
 
+<div class="hype" id="hype-{{ section.id }}">
+  {%- if p == empty -%}
+    <div class="hype-wrap hype-placeholder"><p>Add this section to a product template.</p></div>
+  {%- else -%}
+
+  <div class="hype-wrap">
+    <nav class="crumb">
+      <a href="{{ routes.root_url }}">Home</a> / 
+      {%- if p.collections.size > 0 -%}<a href="{{ p.collections.first.url }}">{{ p.collections.first.title }}</a> / {%- endif -%}
+      {{ p.title }}
+    </nav>
+
+    <div class="product">
+      <!-- GALLERY: full bleed, bold badges -->
+      <div class="gallery">
+        <div class="gallery-main">
+          <div class="hbadges">
+            {%- if section.settings.badge_text != blank -%}<span class="hbadge hbadge-drop">{{ section.settings.badge_text }}</span>{%- endif -%}
+            {%- if on_sale -%}<span class="hbadge hbadge-off">{{ save_pct }}% OFF</span>{%- endif -%}
+          </div>
+          {%- if p.featured_media -%}
+            <img id="hypeMain-{{ section.id }}" src="{{ p.featured_media | image_url: width: 900 }}" alt="{{ p.featured_media.alt | escape }}" width="900" height="1125" loading="eager">
+          {%- endif -%}
+        </div>
+        {%- if p.media.size > 1 -%}
+          <div class="thumbs" id="hypeThumbs-{{ section.id }}">
+            {%- for media in p.media limit: 5 -%}
+              <button type="button" class="thumb{% if forloop.first %} active{% endif %}" data-src="{{ media | image_url: width: 900 }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="200" height="200">
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- BUY BOX: raw, oversized type, no decoration -->
+      <div class="buybox">
+        {%- if p.type != blank -%}<span class="eyebrow">{{ p.type }}</span>{%- endif -%}
+        <h1 class="ptitle">{{ p.title }}</h1>
+        {%- if section.settings.subtitle != blank -%}<p class="psub">{{ section.settings.subtitle }}</p>{%- endif -%}
+
+        {%- if section.settings.show_rating -%}
+          <div class="rating">
+            <span class="stars">★★★★★</span>
+            <b>{{ section.settings.rating_value }}</b>
+            <a href="#hype-reviews-{{ section.id }}">{{ section.settings.rating_count }} reviews</a>
+          </div>
+        {%- endif -%}
+
+        <!-- VISITOR COUNTER: streetwear — "heads checking this drop" -->
+        {%- if section.settings.show_visitor_counter -%}
+          <div class="visitor-counter">
+            <span class="vc-dot"></span>
+            <span id="hypeVcNum-{{ section.id }}">512</span> heads on this drop right now
+          </div>
+        {%- endif -%}
+
+        <div class="pricerow">
+          <span class="price-now" id="hypePrice-{{ section.id }}">{{ cur.price | money }}</span>
+          {%- if on_sale -%}
+            <span class="price-mrp" id="hypeMrp-{{ section.id }}">{{ cur.compare_at_price | money }}</span>
+            <span class="price-save">SAVE {{ save_pct }}%</span>
+          {%- endif -%}
+        </div>
+        <p class="tax-note">{{ section.settings.tax_note }}</p>
+
+        {%- if section.settings.offer_text != blank -%}
+          <div class="offer">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;color:var(--accent);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591L9.568 3.659A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+            <p>{{ section.settings.offer_text }}
+              {%- if section.settings.offer_code != blank -%}&nbsp;<code>{{ section.settings.offer_code }}</code>{%- endif -%}
+            </p>
+          </div>
+        {%- endif -%}
+
+        {%- form 'product', p, id: 'hypeForm-' | append: section.id, class: 'hype-form' -%}
+          <input type="hidden" name="id" id="hypeVarId-{{ section.id }}" value="{{ cur.id }}">
+
+          {%- if p.variants.size > 1 -%}
+            <div class="size-header">
+              <label class="opt-label">{{ p.options.first }}</label>
+              {%- if section.settings.size_guide_url != blank -%}
+                <a class="size-guide" href="{{ section.settings.size_guide_url }}">Size Guide →</a>
+              {%- endif -%}
+            </div>
+            <!-- fit chip -->
+            {%- if section.settings.fit_label != blank -%}
+              <div class="fit-chip">{{ section.settings.fit_label }}</div>
+            {%- endif -%}
+            <div class="variants" id="hypeVariants-{{ section.id }}">
+              {%- for variant in p.variants -%}
+                <input class="v-radio" type="radio" name="hype-v-{{ section.id }}" id="hv-{{ section.id }}-{{ variant.id }}" value="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  {% if variant.compare_at_price > variant.price %}data-mrp="{{ variant.compare_at_price | money }}"{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                  {% if variant.id == cur.id %}checked{% endif %} hidden>
+                <label class="variant" for="hv-{{ section.id }}-{{ variant.id }}">
+                  {{ variant.title }}
+                  {%- unless variant.available -%}<small>GONE</small>{%- endunless -%}
+                </label>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="buy-actions">
+            <div class="qty">
+              <button type="button" class="qminus" aria-label="−">−</button>
+              <input class="qinput" type="number" name="quantity" value="1" min="1" max="10">
+              <button type="button" class="qplus" aria-label="+">+</button>
+            </div>
+            <button type="submit" name="add" class="btn btn-add"{% unless cur.available %} disabled{% endunless %}>
+              {%- render 'icon-cart' -%}
+              <span>{% if cur.available %}ADD TO CART{% else %}SOLD OUT{% endif %}</span>
+            </button>
+          </div>
+          {%- if section.settings.show_dynamic_checkout -%}
+            <div class="hype-dcb">{{ form | payment_button }}</div>
+          {%- endif -%}
+        {%- endform -%}
+
+        <!-- URGENCY: hype/scarcity for streetwear drops -->
+        {%- if section.settings.urgency_enable -%}
+          {%- liquid
+            assign qty_left = cur.inventory_quantity
+            assign show_stock = false
+            if cur.inventory_management == 'shopify' and qty_left > 0 and qty_left <= section.settings.low_stock_threshold
+              assign show_stock = true
+            endif
+          -%}
+          {%- if show_stock -%}
+            <div class="urgency">
+              <span class="pulse"></span>
+              THIS DROP IS SELLING FAST — Only <b>{{ qty_left }} left</b>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.show_countdown -%}
+            <div class="urgency-cd">
+              <span class="pulse"></span>DROP ENDS IN <span class="hype-cd"></span>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+
+        <!-- TRUST CHIPS -->
+        <div class="chips">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'chip' -%}
+              <span class="chip" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <!-- ACCORDION -->
+        {%- assign detail_count = 0 -%}
+        {%- for block in section.blocks -%}{%- if block.type == 'detail' -%}{%- assign detail_count = detail_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+        {%- if detail_count > 0 -%}
+          <div class="acc">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'detail' -%}
+                <div class="acc-item{% if forloop.first %} open{% endif %}" {{ block.shopify_attributes }}>
+                  <button type="button" class="acc-q">{{ block.settings.title }} <span class="ico">+</span></button>
+                  <div class="acc-a"><div class="acc-rt">{{ block.settings.body }}</div></div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  {%- assign review_count = 0 -%}
+  {%- for block in section.blocks -%}{%- if block.type == 'review' -%}{%- assign review_count = review_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+  {%- if review_count > 0 -%}
+    <section class="band-reviews" id="hype-reviews-{{ section.id }}">
+      <div class="hype-wrap">
+        <div class="sec-head">
+          <span class="eyebrow">{{ section.settings.reviews_eyebrow }}</span>
+          <h2>{{ section.settings.reviews_title }}</h2>
+        </div>
+        <div class="rev-grid">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'review' -%}
+              {%- assign initial = block.settings.name | slice: 0 -%}
+              <div class="rev-card" {{ block.shopify_attributes }}>
+                <div class="stars">{%- assign r = block.settings.rating | plus: 0 -%}{%- for i in (1..5) -%}{% if i <= r %}★{% else %}☆{% endif %}{%- endfor -%}</div>
+                {%- if block.settings.title != blank -%}<div class="rtitle">{{ block.settings.title }}</div>{%- endif -%}
+                <p>{{ block.settings.body }}</p>
+                <div class="rev-meta"><div class="av">{{ initial }}</div><span>{{ block.settings.name }}</span></div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+
+  <!-- FINAL CTA -->
+  {%- if section.settings.show_final_cta -%}
+    <section class="band-final">
+      <div class="hype-wrap">
+        <span class="eyebrow">{{ section.settings.final_eyebrow }}</span>
+        <h2>{{ section.settings.final_title }}</h2>
+        <a href="#hype-{{ section.id }}" class="btn btn-add">{{ section.settings.final_button }}</a>
+      </div>
+    </section>
+  {%- endif -%}
+
+  <!-- STICKY MOBILE BAR -->
+  <div class="sticky-bar" id="hypeSticky-{{ section.id }}">
+    <div class="sb-info">
+      <div class="nm">{{ p.title | truncate: 20 }}</div>
+      <div class="pr"><b id="hypeSbPrice-{{ section.id }}">{{ cur.price | money }}</b></div>
+    </div>
+    <button type="button" class="btn btn-add hype-sticky-add">ADD TO CART</button>
+  </div>
+
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+.hype{
+  background:var(--bg);color:var(--ink);
+  font-family:'Space Grotesk','Inter',system-ui,sans-serif;
+  line-height:1.4
+}
+.hype img{max-width:100%;display:block}
+.hype a{color:inherit;text-decoration:none}
+.hype button{font-family:inherit;cursor:pointer}
+.hype-wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.hype-placeholder{padding:60px 20px;text-align:center;color:var(--muted)}
+
+.hype .crumb{font-size:11.5px;color:var(--muted);padding:16px 0 4px;letter-spacing:.06em;text-transform:uppercase}
+.hype .product{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;padding:8px 0 56px;align-items:start}
+@media(max-width:920px){.hype .product{grid-template-columns:1fr;gap:28px}}
+.hype .gallery{position:sticky;top:88px}
+@media(max-width:920px){.hype .gallery{position:static}}
+.hype .gallery-main{position:relative;aspect-ratio:3/4;overflow:hidden;background:color-mix(in srgb,var(--bg) 80%,#000)}
+.hype .gallery-main img{width:100%;height:100%;object-fit:cover}
+.hype .hbadges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.hype .hbadge{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;display:inline-block}
+.hype .hbadge-drop{background:var(--accent);color:#fff}
+.hype .hbadge-off{background:var(--pop);color:#000}
+.hype .thumbs{display:flex;gap:6px;margin-top:8px}
+.hype .thumb{flex:1;aspect-ratio:3/4;overflow:hidden;border:2px solid transparent;background:color-mix(in srgb,var(--bg) 70%,#000);opacity:.6;transition:.14s;padding:0}
+.hype .thumb.active{border-color:var(--accent);opacity:1}
+.hype .thumb img{width:100%;height:100%;object-fit:cover}
+
+.hype .eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.hype .ptitle{font-size:40px;line-height:1;font-weight:800;color:var(--ink);margin:8px 0 6px;text-transform:uppercase;letter-spacing:-.01em}
+@media(max-width:520px){.hype .ptitle{font-size:30px}}
+.hype .psub{font-size:14px;color:var(--muted);margin-bottom:14px}
+.hype .rating{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.hype .stars{color:var(--pop);font-size:14px;letter-spacing:1px}
+.hype .rating b,.hype .rating a{font-size:12.5px;color:var(--muted)}
+
+.hype .visitor-counter{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.hype .vc-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:hypepulse 1.4s infinite;flex-shrink:0}
+@keyframes hypepulse{0%,100%{opacity:1}50%{opacity:.2}}
+
+.hype .pricerow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hype .price-now{font-size:36px;font-weight:800;color:var(--ink)}
+.hype .price-mrp{font-size:16px;color:var(--muted);text-decoration:line-through}
+.hype .price-save{background:var(--pop);color:#000;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px}
+.hype .tax-note{font-size:11.5px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+
+.hype .offer{display:flex;align-items:center;gap:10px;margin:14px 0;padding:11px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--bg))}
+.hype .offer svg{width:18px;height:18px;color:var(--accent);flex-shrink:0}
+.hype .offer p{font-size:12.5px;color:var(--ink)}
+.hype .offer code{font-weight:800;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+
+.hype .size-header{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
+.hype .opt-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.hype .size-guide{font-size:12px;color:var(--accent);font-weight:600}
+.hype .fit-chip{display:inline-flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:#fff;padding:4px 10px;margin:8px 0 10px}
+.hype .variants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.hype .variant{border:2px solid var(--line);background:transparent;padding:12px 16px;font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;transition:.12s;display:inline-block;min-width:52px;text-align:center}
+.hype .variant small{display:block;font-size:10px;letter-spacing:.04em;margin-top:2px}
+.hype .v-radio:checked+.variant{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.hype .v-radio:disabled+.variant{opacity:.3;text-decoration:line-through}
+.hype .v-radio:focus-visible+.variant{outline:2px solid var(--accent);outline-offset:2px}
+
+.hype .buy-actions{display:flex;align-items:stretch;gap:8px;margin-top:20px;height:54px}
+.hype .qty{display:flex;align-items:center;border:2px solid var(--line);overflow:hidden;flex-shrink:0}
+.hype .qty button{width:38px;height:100%;font-size:18px;color:var(--ink);font-weight:800;transition:.12s;border:none;background:none}
+.hype .qty button:hover{background:var(--line)}
+.hype .qty input{width:32px;text-align:center;border:none;font-size:14px;font-weight:700;color:var(--ink);background:transparent;-moz-appearance:textfield}
+.hype .qty input::-webkit-outer-spin-button,.hype .qty input::-webkit-inner-spin-button{-webkit-appearance:none}
+.hype .btn{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:0 20px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s,transform .1s;white-space:nowrap;border:none}
+.hype .btn:active{transform:scale(.97)}
+.hype .btn svg{width:16px;height:16px}
+.hype .btn-add{flex:1;background:var(--accent);color:#fff}
+.hype .btn-add:hover{background:color-mix(in srgb,var(--accent) 85%,#000)}
+.hype .btn-add[disabled]{opacity:.4;cursor:not-allowed}
+.hype .hype-dcb{margin-top:8px}
+
+.hype .urgency{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--pop);margin-top:14px}
+.hype .urgency b{color:var(--pop)}
+.hype .urgency-cd{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.hype .urgency-cd .hype-cd b{color:var(--ink);font-variant-numeric:tabular-nums}
+.hype .pulse{width:6px;height:6px;border-radius:50%;background:var(--pop);flex-shrink:0;animation:hypepulse 1.4s infinite}
+
+.hype .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px}
+.hype .chip{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:6px 10px}
+
+.hype .acc{margin-top:22px;border-top:2px solid var(--line)}
+.hype .acc-item{border-bottom:1px solid var(--line)}
+.hype .acc-q{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);text-align:left;background:none;border:none}
+.hype .acc-q .ico{font-size:18px;font-weight:400;color:var(--accent);transition:.2s;line-height:1}
+.hype .acc-item.open .ico{transform:rotate(45deg)}
+.hype .acc-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.hype .acc-rt{font-size:13px;color:var(--muted);padding:0 0 14px;line-height:1.65;font-weight:400;text-transform:none;letter-spacing:0}
+
+.hype .band-reviews{padding:56px 0;background:color-mix(in srgb,var(--bg) 85%,#000)}
+.hype .sec-head{margin-bottom:36px}
+.hype .sec-head .eyebrow{display:block;margin-bottom:8px}
+.hype .sec-head h2{font-size:32px;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;color:var(--ink)}
+.hype .rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:640px){.hype .rev-grid{grid-template-columns:1fr}}
+.hype .rev-card{background:var(--line);padding:22px}
+.hype .rev-card .stars{color:var(--pop);font-size:13px;letter-spacing:1px;margin-bottom:8px}
+.hype .rev-card .rtitle{font-size:15px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px}
+.hype .rev-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.hype .rev-meta{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.hype .av{width:30px;height:30px;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px;text-transform:uppercase;flex-shrink:0}
+
+.hype .band-final{padding:60px 0;background:var(--accent);text-align:center}
+.hype .band-final .eyebrow{display:block;margin-bottom:8px;color:rgba(255,255,255,.6)}
+.hype .band-final h2{font-size:36px;font-weight:800;text-transform:uppercase;color:#fff;letter-spacing:-.01em;margin-bottom:24px}
+.hype .band-final .btn{background:#fff;color:var(--accent);display:inline-flex;width:auto;min-width:200px;margin:0 auto}
+
+.hype .sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:80;background:var(--bg);border-top:2px solid var(--accent);padding:10px 16px;display:flex;align-items:center;gap:12px;transform:translateY(120%);transition:transform .28s ease}
+.hype .sticky-bar.show{transform:translateY(0)}
+.hype .sb-info .nm{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);line-height:1.2}
+.hype .sb-info .pr b{font-size:15px;font-weight:800;color:var(--accent)}
+.hype .sticky-bar .btn{flex:1;height:44px}
+@media(min-width:921px){.hype .sticky-bar{display:none}}
+@media(prefers-reduced-motion:reduce){.hype *,.hype *::before,.hype *::after{animation:none!important;transition:none!important}}
+{% endstylesheet %}
+
+<script>
+(function(){
+  var root=document.getElementById('hype-{{ section.id }}'); if(!root) return;
+  var mainImg=document.getElementById('hypeMain-{{ section.id }}');
+  var thumbs=document.getElementById('hypeThumbs-{{ section.id }}');
+  if(thumbs&&mainImg){
+    thumbs.addEventListener('click',function(e){
+      var t=e.target.closest('.thumb'); if(!t) return;
+      thumbs.querySelectorAll('.thumb').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active'); mainImg.src=t.dataset.src;
+    });
+  }
+  var varId=document.getElementById('hypeVarId-{{ section.id }}');
+  var priceNow=document.getElementById('hypePrice-{{ section.id }}');
+  var priceMrp=document.getElementById('hypeMrp-{{ section.id }}');
+  var sbPrice=document.getElementById('hypeSbPrice-{{ section.id }}');
+  root.querySelectorAll('.v-radio').forEach(function(r){
+    r.addEventListener('change',function(){
+      if(varId) varId.value=r.value;
+      if(priceNow&&r.dataset.price) priceNow.textContent=r.dataset.price;
+      if(sbPrice&&r.dataset.price) sbPrice.textContent=r.dataset.price;
+      if(priceMrp){if(r.dataset.mrp){priceMrp.textContent=r.dataset.mrp;priceMrp.style.display='';}else{priceMrp.style.display='none';}}
+    });
+  });
+  var qtyInput=root.querySelector('.qinput');
+  var qMinus=root.querySelector('.qminus');
+  var qPlus=root.querySelector('.qplus');
+  if(qtyInput&&qMinus&&qPlus){
+    qMinus.addEventListener('click',function(){
+      var val=parseInt(qtyInput.value,10)||1;
+      if(val>1) qtyInput.value=val-1;
+    });
+    qPlus.addEventListener('click',function(){
+      var val=parseInt(qtyInput.value,10)||1;
+      if(val<10) qtyInput.value=val+1;
+    });
+  }
+  var acc=root.querySelector('.acc');
+  if(acc){
+    acc.addEventListener('click',function(e){
+      var q=e.target.closest('.acc-q'); if(!q) return;
+      var item=q.parentElement; var a=item.querySelector('.acc-a'); var open=item.classList.contains('open');
+      acc.querySelectorAll('.acc-item').forEach(function(i){i.classList.remove('open');i.querySelector('.acc-a').style.maxHeight=null;});
+      if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+    });
+    var fo=acc.querySelector('.acc-item.open .acc-a'); if(fo) fo.style.maxHeight=fo.scrollHeight+'px';
+  }
+  var cds=root.querySelectorAll('.hype-cd');
+  if(cds.length){
+    function tick(){
+      var now=new Date(),end=new Date(); end.setHours(23,59,59,999);
+      var diff=Math.max(0,end-now);
+      var h=String(Math.floor(diff/3.6e6)).padStart(2,'0');
+      var m=String(Math.floor(diff%3.6e6/6e4)).padStart(2,'0');
+      var s=String(Math.floor(diff%6e4/1e3)).padStart(2,'0');
+      cds.forEach(function(el){el.innerHTML='<b>'+h+':'+m+':'+s+'</b>';});
+    } tick(); setInterval(tick,1000);
+  }
+  /* visitor counter — streetwear: larger, hype numbers */
+  var vcNum=document.getElementById('hypeVcNum-{{ section.id }}');
+  if(vcNum){
+    var base=Math.floor(Math.random()*(650-220+1))+220;
+    vcNum.textContent=base;
+    setInterval(function(){
+      var delta=(Math.random()<.5?1:-1)*(Math.floor(Math.random()*15)+1);
+      base=Math.max(120,Math.min(980,base+delta));
+      vcNum.textContent=base;
+    },4000);
+  }
+  var sticky=document.getElementById('hypeSticky-{{ section.id }}');
+  var trigger=root.querySelector('.buy-actions');
+  if(sticky&&trigger&&'IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      var e=entries[0];
+      if(e.isIntersecting) sticky.classList.remove('show');
+      else if(e.boundingClientRect.top<0) sticky.classList.add('show');
+    },{threshold:0}).observe(trigger);
+  }
+  var sAdd=root.querySelector('.hype-sticky-add');
+  var addBtn=root.querySelector('.btn-add');
+  if(sAdd&&addBtn) sAdd.onclick=function(){addBtn.click();};
+})();
+</script>
+
 {% schema %}
 {
-  "name": "Product Details",
+  "name": "Product — Streetwear",
+  "tag": "section",
+  "class": "hype-section",
   "settings": [
-    {
-      "type": "checkbox",
-      "id": "enable_sticky_info",
-      "label": "Enable sticky info column",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_image_zoom",
-      "label": "Enable image zoom modal",
-      "default": true
-    }
+    {"type":"header","content":"Product info"},
+    {"type":"text","id":"subtitle","label":"Subtitle","default":"Heavyweight cotton drop"},
+    {"type":"text","id":"tax_note","label":"Tax note","default":"Tax included. Insured next-day shipping in India."},
+    {"type":"text","id":"badge_text","label":"Image badge","default":"New Drop"},
+    {"type":"checkbox","id":"show_dynamic_checkout","label":"Show Buy Now button","default":true},
+    {"type":"header","content":"Rating"},
+    {"type":"checkbox","id":"show_rating","label":"Show rating","default":true},
+    {"type":"text","id":"rating_value","label":"Rating value","default":"4.8"},
+    {"type":"text","id":"rating_count","label":"Review count","default":"129"},
+    {"type":"header","content":"Offer"},
+    {"type":"text","id":"offer_text","label":"Offer text","default":"Free shipping across India"},
+    {"type":"text","id":"offer_code","label":"Code (optional)","default":""},
+    {"type":"header","content":"Sizing and fit"},
+    {"type":"url","id":"size_guide_url","label":"Size guide URL"},
+    {"type":"text","id":"fit_label","label":"Fit label","default":"Oversized Boxy Fit"},
+    {"type":"header","content":"Urgency & Social Proof"},
+    {"type":"checkbox","id":"urgency_enable","label":"Enable scarcity urgency","default":true},
+    {"type":"range","id":"low_stock_threshold","label":"Low-stock threshold","min":1,"max":20,"step":1,"default":10},
+    {"type":"checkbox","id":"show_countdown","label":"Show offer countdown","default":true},
+    {"type":"checkbox","id":"show_visitor_counter","label":"Show viewer count","default":true},
+    {"type":"header","content":"Reviews"},
+    {"type":"text","id":"reviews_eyebrow","label":"Eyebrow","default":"Reviews"},
+    {"type":"text","id":"reviews_title","label":"Title","default":"Feedbacks from the street"},
+    {"type":"header","content":"Final CTA"},
+    {"type":"checkbox","id":"show_final_cta","label":"Show final CTA","default":true},
+    {"type":"text","id":"final_eyebrow","label":"Final eyebrow","default":"Don't sleep on this"},
+    {"type":"text","id":"final_title","label":"Title","default":"Secure your size now"},
+    {"type":"text","id":"final_button","label":"Button","default":"SHOP THE DROP"},
+    {"type":"header","content":"Colors"},
+    {"type":"color","id":"c_bg","label":"Background","default":"#161513"},
+    {"type":"color","id":"c_primary","label":"Primary","default":"#F0EDE8"},
+    {"type":"color","id":"c_accent","label":"Accent","default":"#FF3E3E"},
+    {"type":"color","id":"c_pop","label":"Pop color","default":"#FFE500"}
   ],
-  "blocks": [
-    { "type": "title", "name": "Product Title", "limit": 1 },
-    { "type": "price", "name": "Product Price", "limit": 1 },
-    { "type": "variant_picker", "name": "Variant Selector", "limit": 1 },
-    { "type": "quantity_selector", "name": "Quantity Selector", "limit": 1 },
-    { "type": "buy_buttons", "name": "Buy Button triggers", "limit": 1 },
-    { "type": "description", "name": "Description Accordion", "limit": 1 },
-    { "type": "trust_badges", "name": "Trust Badges Matrix", "limit": 1 }
-  ]
+  "blocks":[
+    {"type":"chip","name":"USP Badge","settings":[
+      {"type":"text","id":"text","label":"Text","default":"100% Cotton"}
+    ]},
+    {"type":"detail","name":"Accordion tab","settings":[
+      {"type":"text","id":"title","label":"Title","default":"Sizing & Details"},
+      {"type":"richtext","id":"body","label":"Body","default":"<p>Boxy fit. Drop shoulders. Standard unisex sizing.</p>"}
+    ]},
+    {"type":"review","name":"Review","settings":[
+      {"type":"text","id":"name","label":"Name","default":"Karan S."},
+      {"type":"range","id":"rating","label":"Stars","min":1,"max":5,"step":1,"default":5},
+      {"type":"text","id":"title","label":"Title","default":"Absolute fire"},
+      {"type":"textarea","id":"body","label":"Review","default":"Perfect boxy fit. Stitching is solid. Will cop the next drop too."}
+    ]}
+  ],
+  "presets":[{"name":"Product — Streetwear"}]
 }
 {% endschema %}

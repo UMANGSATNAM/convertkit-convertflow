@@ -1,213 +1,507 @@
-<section class="product-pdp product-pdp--jewellery container" style="padding: var(--space-48) 0; background-color: var(--color-background);" data-section="{{ section.id }}">
-  <div class="grid grid-cols-1 grid-cols-md-2" style="--grid-spacing: var(--space-48); align-items: start;">
-    
-    <!-- Product Media Gallery (Left) -->
-    <div class="product-gallery-container" style="display: flex; flex-direction: column; gap: var(--space-16); position: sticky; top: var(--space-24);">
-      <div class="product-gallery-featured" style="border: 1px solid var(--color-border); padding: var(--space-8); background-color: #fff; position: relative;">
-        <img id="FeaturedMedia-{{ section.id }}" 
-             src="{{ product.featured_image | image_url: width: 1000 }}" 
-             alt="{{ product.featured_image.alt | escape }}" 
-             loading="eager"
-             style="width: 100%; aspect-ratio: 1; object-fit: cover;">
-      </div>
+{%- comment -%}
+  Section: main-product (Jewellery niche)
+  Personality: Luxury, editorial, certificate-of-authenticity, serif-heavy.
+  Urgency tone: Exclusivity-driven ("Only a few pieces crafted", "Limited edition")
+  Visitor counter: "X people admiring this piece"
+{%- endcomment -%}
 
-      {%- if product.images.size > 1 -%}
-        <div class="product-gallery-thumbnails" style="display: flex; gap: var(--space-12); overflow-x: auto; padding-bottom: var(--space-8);">
-          {%- for img in product.images -%}
-            <button type="button" class="gallery-thumbnail-btn" 
-                    onclick="document.getElementById('FeaturedMedia-{{ section.id }}').src = '{{ img | image_url: width: 1000 }}'"
-                    style="flex: 0 0 80px; border: 1px solid var(--color-border); padding: var(--space-4); background-color: #fff; cursor: pointer; aspect-ratio: 1; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-              <img src="{{ img | image_url: width: 160 }}" alt="{{ img.alt | escape }}" style="max-height: 100%; max-width: 100%; object-fit: cover;">
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-    </div>
-
-    <!-- Product Buying Info (Right) -->
-    <div class="product-info-container {% if section.settings.enable_sticky_info %}sticky-info{% endif %}" style="display: flex; flex-direction: column; gap: var(--space-20);">
-      
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'title' -%}
-            <div class="product-info-title-vendor" {{ block.shopify_attributes }}>
-              <div class="product-vendor" style="text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em; color: var(--color-accent); margin-bottom: var(--space-4);">
-                {{ product.vendor }}
-              </div>
-              <h1 class="product-title" style="font-family: var(--font-heading-family); font-size: 2.4rem; font-weight: 300; margin-bottom: var(--space-8); text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2;">
-                {{ product.title }}
-              </h1>
-            </div>
-
-          {%- when 'price' -%}
-            <div id="price-{{ section.id }}" class="product-info-price" {{ block.shopify_attributes }}>
-              {% render 'price', product: product, use_variant: false %}
-            </div>
-
-          {%- when 'variant_picker' -%}
-            <div class="product-info-variants" {{ block.shopify_attributes }}>
-              {%- unless product.has_only_default_variant -%}
-                <variant-selects class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}">
-                  {%- for option in product.options_with_values -%}
-                    <div class="product-form-option" style="margin-bottom: var(--space-16);">
-                      <label class="form-option-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-8); font-weight: 500;">
-                        {{ option.name }}
-                      </label>
-                      <div class="select" style="position: relative;">
-                        <select name="options[{{ option.name | escape }}]" 
-                                class="product-option-selector select__select"
-                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-size: 0.95rem; border-radius: var(--button-radius); appearance: none;">
-                          {%- for value in option.values -%}
-                            <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
-                              {{ value }}
-                            </option>
-                          {%- endfor -%}
-                        </select>
-                      </div>
-                    </div>
-                  {%- endfor -%}
-                  <script type="application/json">
-                    {{ product.variants | json }}
-                  </script>
-                </variant-selects>
-              {%- endunless -%}
-            </div>
-
-          {%- when 'quantity_selector' -%}
-            <div class="product-info-quantity" {{ block.shopify_attributes }}>
-              <label class="form-option-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-8); font-weight: 500;">
-                {{ 'products.product.quantity' | t }}
-              </label>
-              <div class="quantity-stepper">
-                <button type="button" class="quantity-stepper-btn stepper-minus">{% render 'icon-minus' %}</button>
-                <input type="number" name="quantity" value="1" min="1" class="quantity-stepper-input">
-                <button type="button" class="quantity-stepper-btn stepper-plus">{% render 'icon-plus' %}</button>
-              </div>
-            </div>
-
-          {%- when 'buy_buttons' -%}
-            <div class="product-info-buy-buttons" {{ block.shopify_attributes }}>
-              <form action="/cart/add" method="post" id="product-form-{{ section.id }}" class="product-form">
-                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                
-                <div class="product-form-ctas" style="display: flex; flex-direction: column; gap: var(--space-12); margin-top: var(--space-12);">
-                  <button type="submit" name="add" class="product-form-main-submit button button--primary width-100" 
-                          {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
-                          onclick="event.preventDefault(); window.PubSub.publish('cart:add', { id: this.form.id.value, quantity: this.form.quantity ? this.form.quantity.value : 1 })">
-                    <span>
-                      {%- if product.selected_or_first_available_variant.available -%}
-                        {{ 'products.product.add_to_cart' | t }}
-                      {%- else -%}
-                        {{ 'products.product.sold_out' | t }}
-                      {%- endif -%}
-                    </span>
-                  </button>
-                  {{ form | payment_button }}
-                </div>
-              </form>
-            </div>
-
-          {%- when 'trust_badges' -%}
-            <div class="product-info-trust-badges" {{ block.shopify_attributes }} 
-                 style="border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: var(--space-16) 0; margin-top: var(--space-12); display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: var(--space-8);">
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-body-family); font-weight: 500;">Certified Gold</span>
-              </div>
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-body-family); font-weight: 500;">Secure Delivery</span>
-              </div>
-              <div class="trust-badge-item">
-                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color: var(--color-accent); margin: 0 auto var(--space-4) auto; display: block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span style="font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-body-family); font-weight: 500;">Lifetime Warranty</span>
-              </div>
-            </div>
-
-          {%- when 'description' -%}
-            <div class="product-info-accordions theme-accordion" data-single-expand="true" {{ block.shopify_attributes }} style="margin-top: var(--space-16);">
-              <div class="accordion-item" style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-12); margin-bottom: var(--space-12);">
-                <button type="button" class="accordion-trigger" aria-expanded="true" 
-                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; border: none; background: none; text-align: left; padding: var(--space-8) 0; font-family: var(--font-heading-family); font-size: 1.15rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em;">
-                  <span>Description</span>
-                  {% render 'icon-chevron' %}
-                </button>
-                <div class="accordion-content accordion-content--open rte" style="font-family: var(--font-body-family); font-size: 0.9rem; line-height: 1.6; color: #4a4944; padding-top: var(--space-8);">
-                  {{ product.description }}
-                </div>
-              </div>
-            </div>
-
-        {%- endcase -%}
-      {%- endfor -%}
-
-    </div>
-
-  </div>
-</section>
-
-<!-- Sticky Add to Cart (Observed via sticky-atc.js) -->
-<div class="sticky-atc-bar hide-mobile" aria-hidden="true" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--color-background); border-top: 1px solid var(--color-border); padding: var(--space-12) 0; z-index: var(--z-header); transform: translateY(100%); transition: transform var(--transition-normal);">
-  <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      <img src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title }}" style="width: 48px; height: 48px; object-fit: cover;">
-      <div>
-        <h4 style="font-family: var(--font-heading-family); font-size: 1.1rem; margin: 0;">{{ product.title }}</h4>
-        {% render 'price', product: product, use_variant: false %}
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: var(--space-16);">
-      {%- unless product.has_only_default_variant -%}
-        <select class="sticky-atc-variant-select" style="padding: 8px 16px; border: 1px solid var(--color-border); background-color: var(--color-surface); font-family: var(--font-body-family); font-size: 0.9rem;">
-          {%- for variant in product.variants -%}
-            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
-              {{ variant.title }}
-            </option>
-          {%- endfor -%}
-        </select>
-      {%- endunless -%}
-      <button type="button" class="sticky-atc-submit button button--primary button--small">Add</button>
-    </div>
-  </div>
-</div>
+{%- liquid
+  assign p = product
+  assign cur = p.selected_or_first_available_variant
+  assign on_sale = false
+  if p.compare_at_price > p.price
+    assign on_sale = true
+  endif
+  assign save_pct = 0
+  if on_sale
+    assign diff = p.compare_at_price | minus: p.price
+    assign save_pct = diff | times: 100 | divided_by: p.compare_at_price
+  endif
+-%}
 
 <style>
-  .sticky-atc-bar--visible {
-    transform: translateY(0) !important;
+  #luxe-{{ section.id }}{
+    --bg:{{ section.settings.c_bg }};
+    --primary:{{ section.settings.c_primary }};
+    --gold:{{ section.settings.c_gold }};
+    --accent:{{ section.settings.c_accent }};
+    --ink:#1A1408;
+    --muted:#8C7E6A;
+    --line:#E8DDD0;
+    --white:#fff;
+    --radius:4px;
+    --radius-sm:3px;
+    --shadow:0 2px 6px rgba(26,20,8,.06),0 12px 32px rgba(26,20,8,.08);
   }
 </style>
 
+<div class="luxe" id="luxe-{{ section.id }}">
+  {%- if p == empty -%}
+    <div class="luxe-wrap luxe-placeholder"><p>Assign to a product template.</p></div>
+  {%- else -%}
+
+  <div class="luxe-wrap">
+    <nav class="crumb">
+      <a href="{{ routes.root_url }}">Home</a> &nbsp;/&nbsp;
+      {%- if p.collections.size > 0 -%}<a href="{{ p.collections.first.url }}">{{ p.collections.first.title }}</a>&nbsp;/&nbsp;{%- endif -%}
+      {{ p.title }}
+    </nav>
+
+    <div class="product">
+      <!-- GALLERY: square, minimal border, zoom-ready -->
+      <div class="gallery">
+        <div class="gallery-main">
+          {%- if on_sale -%}<div class="lbadge">{{ save_pct }}% OFF</div>{%- endif -%}
+          {%- if section.settings.badge_text != blank -%}<div class="lbadge lbadge-top">{{ section.settings.badge_text }}</div>{%- endif -%}
+          {%- if p.featured_media -%}
+            <img id="luxeMain-{{ section.id }}" src="{{ p.featured_media | image_url: width: 900 }}" alt="{{ p.featured_media.alt | escape }}" width="900" height="900" loading="eager">
+          {%- endif -%}
+        </div>
+        {%- if p.media.size > 1 -%}
+          <div class="thumbs" id="luxeThumbs-{{ section.id }}">
+            {%- for media in p.media limit: 6 -%}
+              <button type="button" class="thumb{% if forloop.first %} active{% endif %}" data-src="{{ media | image_url: width: 900 }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="200" height="200">
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- BUY BOX: serif-heavy, luxury spacing -->
+      <div class="buybox">
+        {%- if p.type != blank -%}<span class="eyebrow">{{ p.type }}</span>{%- endif -%}
+        <h1 class="ptitle">{{ p.title }}</h1>
+        {%- if section.settings.subtitle != blank -%}<p class="psub">{{ section.settings.subtitle }}</p>{%- endif -%}
+
+        {%- if section.settings.show_rating -%}
+          <div class="rating">
+            <span class="stars">★★★★★</span>
+            <b>{{ section.settings.rating_value }}</b>
+            <a href="#luxe-reviews-{{ section.id }}">{{ section.settings.rating_count }} reviews</a>
+          </div>
+        {%- endif -%}
+
+        <!-- VISITOR COUNTER: jewellery — exclusivity/admiration angle -->
+        {%- if section.settings.show_visitor_counter -%}
+          <div class="visitor-counter">
+            <span class="vc-dot"></span>
+            <span><span id="luxeVcNum-{{ section.id }}">38</span> people admiring this piece right now</span>
+          </div>
+        {%- endif -%}
+
+        <div class="gold-divider"></div>
+
+        <div class="pricerow">
+          <span class="price-now" id="luxePrice-{{ section.id }}">{{ cur.price | money }}</span>
+          {%- if on_sale -%}
+            <span class="price-mrp" id="luxeMrp-{{ section.id }}">{{ cur.compare_at_price | money }}</span>
+            <span class="price-save">{{ save_pct }}% OFF</span>
+          {%- endif -%}
+        </div>
+        <p class="tax-note">{{ section.settings.tax_note }}</p>
+
+        {%- form 'product', p, id: 'luxeForm-' | append: section.id, class: 'luxe-form' -%}
+          <input type="hidden" name="id" id="luxeVarId-{{ section.id }}" value="{{ cur.id }}">
+          {%- if p.variants.size > 1 -%}
+            <label class="opt-label">{{ p.options.first }}</label>
+            <div class="variants" id="luxeVariants-{{ section.id }}">
+              {%- for variant in p.variants -%}
+                <input class="v-radio" type="radio" name="luxe-v-{{ section.id }}" id="lv-{{ section.id }}-{{ variant.id }}" value="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  {% if variant.compare_at_price > variant.price %}data-mrp="{{ variant.compare_at_price | money }}"{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                  {% if variant.id == cur.id %}checked{% endif %} hidden>
+                <label class="variant" for="lv-{{ section.id }}-{{ variant.id }}">
+                  {{ variant.title }}
+                  {%- unless variant.available -%}<small>Unavailable</small>{%- endunless -%}
+                </label>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="buy-actions">
+            <button type="submit" name="add" class="btn btn-add"{% unless cur.available %} disabled{% endunless %}>
+              {%- render 'icon-cart' -%}
+              <span>{% if cur.available %}Add to Cart{% else %}Sold Out{% endif %}</span>
+            </button>
+          </div>
+          {%- if section.settings.show_dynamic_checkout -%}
+            <div class="luxe-dcb">{{ form | payment_button }}</div>
+          {%- endif -%}
+        {%- endform -%}
+
+        <!-- URGENCY: exclusivity tone for jewellery -->
+        {%- if section.settings.urgency_enable -%}
+          {%- liquid
+            assign qty_left = cur.inventory_quantity
+            assign show_stock = false
+            if cur.inventory_management == 'shopify' and qty_left > 0 and qty_left <= section.settings.low_stock_threshold
+              assign show_stock = true
+            endif
+          -%}
+          {%- if show_stock -%}
+            <div class="urgency">
+              <span class="pulse"></span>
+              Exclusive: Only <b>{{ qty_left }} piece{% if qty_left > 1 %}s{% endif %} remaining</b> in this collection
+            </div>
+          {%- elsif section.settings.show_countdown -%}
+            <div class="urgency">
+              <span class="pulse"></span>Limited offer ends in <span class="luxe-cd"></span>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+
+        <!-- CERTIFICATE / USP STRIP -->
+        <div class="cert-strip">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'usp' -%}
+              <div class="cert-item" {{ block.shopify_attributes }}>
+                {%- case block.settings.icon -%}
+                  {%- when 'shield' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.956 11.956 0 0112 2.714z" /></svg>
+                  {%- when 'check' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {%- when 'clock' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {%- when 'truck' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177V18.75m0-11.177L12 8.25m0 0h-1.5m1.5 0v3.75m-6-3.75h-.75m.75 0v3.5m0-3.5L9 8.25m0 0h.75m-.75 0V12" /></svg>
+                  {%- when 'heart' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                  {%- when 'spark' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.096-.813L9 9l.813 5.096L15 15l-5.187.904zM19.071 4.929l-.707 1.95-.707-1.95-1.95-.707 1.95-.707.707-1.95.707 1.95 1.95.707-1.95.707z" /></svg>
+                  {%- when 'leaf' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21V9.75M12 9.75a3 3 0 116 0c0 1.657-2.686 3-6 3zm0 0a3 3 0 10-6 0c0 1.657 2.686 3 6 3z" /></svg>
+                  {%- when 'tag' -%}
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;color:var(--gold);"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591L9.568 3.659A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+                {%- endcase -%}
+                <span>{{ block.settings.label }}</span>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <!-- OFFER -->
+        {%- if section.settings.offer_text != blank -%}
+          <div class="offer">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;color:var(--gold);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591L9.568 3.659A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+            <p>{{ section.settings.offer_text }}
+              {%- if section.settings.offer_code != blank -%}&nbsp;<code>{{ section.settings.offer_code }}</code>{%- endif -%}
+            </p>
+          </div>
+        {%- endif -%}
+
+        <!-- ACCORDION -->
+        {%- assign detail_count = 0 -%}
+        {%- for block in section.blocks -%}{%- if block.type == 'detail' -%}{%- assign detail_count = detail_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+        {%- if detail_count > 0 -%}
+          <div class="acc">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'detail' -%}
+                <div class="acc-item{% if forloop.first %} open{% endif %}" {{ block.shopify_attributes }}>
+                  <button type="button" class="acc-q">{{ block.settings.title }} <span class="ico">+</span></button>
+                  <div class="acc-a"><div class="acc-rt">{{ block.settings.body }}</div></div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  {%- assign review_count = 0 -%}
+  {%- for block in section.blocks -%}{%- if block.type == 'review' -%}{%- assign review_count = review_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+  {%- if review_count > 0 -%}
+    <section class="band-reviews" id="luxe-reviews-{{ section.id }}">
+      <div class="luxe-wrap">
+        <div class="sec-head">
+          <span class="eyebrow">{{ section.settings.reviews_eyebrow }}</span>
+          <h2>{{ section.settings.reviews_title }}</h2>
+        </div>
+        <div class="rev-grid">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'review' -%}
+              {%- assign initial = block.settings.name | slice: 0 -%}
+              <div class="rev-card" {{ block.shopify_attributes }}>
+                <div class="stars">{%- assign r = block.settings.rating | plus: 0 -%}{%- for i in (1..5) -%}{% if i <= r %}★{% else %}☆{% endif %}{%- endfor -%}</div>
+                {%- if block.settings.title != blank -%}<div class="rtitle">{{ block.settings.title }}</div>{%- endif -%}
+                <p>{{ block.settings.body }}</p>
+                <div class="rev-meta"><div class="av">{{ initial }}</div><span>{{ block.settings.name }}</span></div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+
+  <!-- FINAL CTA -->
+  {%- if section.settings.show_final_cta -%}
+    <section class="band-final">
+      <div class="luxe-wrap">
+        <h2>{{ section.settings.final_title }}</h2>
+        {%- if section.settings.final_text != blank -%}<p>{{ section.settings.final_text }}</p>{%- endif -%}
+        <a href="#luxe-{{ section.id }}" class="btn btn-add">{{ section.settings.final_button }}</a>
+      </div>
+    </section>
+  {%- endif -%}
+
+  <!-- STICKY MOBILE BAR -->
+  <div class="sticky-bar" id="luxeSticky-{{ section.id }}">
+    <div class="sb-info">
+      <div class="nm">{{ p.title | truncate: 22 }}</div>
+      <div class="pr"><b id="luxeSbPrice-{{ section.id }}">{{ cur.price | money }}</b></div>
+    </div>
+    <button type="button" class="btn btn-add luxe-sticky-add">Add to Cart</button>
+  </div>
+
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+.luxe{
+  --bg-2:color-mix(in srgb,var(--bg) 92%,var(--gold) 8%);
+  --gold-soft:color-mix(in srgb,var(--gold) 70%,#fff 30%);
+  --primary-soft:color-mix(in srgb,var(--primary) 75%,#fff 25%);
+  background:var(--bg);color:var(--ink);
+  font-family:'Cormorant Garamond','Garamond','Georgia',serif;
+  line-height:1.6
+}
+.luxe img{max-width:100%;display:block}
+.luxe a{color:inherit;text-decoration:none}
+.luxe button{font-family:inherit;cursor:pointer}
+.luxe-wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.luxe-placeholder{padding:60px 20px;text-align:center;color:var(--muted)}
+
+.luxe .crumb{font-size:12px;color:var(--muted);padding:18px 0 4px;letter-spacing:.04em;font-family:'Inter',sans-serif}
+.luxe .product{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding:12px 0 60px;align-items:start}
+@media(max-width:900px){.luxe .product{grid-template-columns:1fr;gap:32px}}
+.luxe .gallery{position:sticky;top:90px}
+@media(max-width:900px){.luxe .gallery{position:static}}
+.luxe .gallery-main{position:relative;aspect-ratio:1;overflow:hidden;background:var(--bg-2);border:1px solid var(--line)}
+.luxe .gallery-main img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.luxe .gallery-main:hover img{transform:scale(1.03)}
+.luxe .lbadge{position:absolute;top:16px;right:16px;background:var(--gold);color:var(--bg);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px}
+.luxe .lbadge-top{top:16px;right:auto;left:16px}
+.luxe .thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}
+.luxe .thumb{aspect-ratio:1;overflow:hidden;border:1px solid transparent;background:var(--bg-2);opacity:.6;transition:.18s;padding:0}
+.luxe .thumb.active{border-color:var(--gold);opacity:1}
+.luxe .thumb img{width:100%;height:100%;object-fit:cover}
+
+.luxe .eyebrow{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-family:'Inter',sans-serif}
+.luxe .ptitle{font-size:40px;line-height:1.06;font-weight:400;color:var(--primary);margin:10px 0 8px}
+@media(max-width:520px){.luxe .ptitle{font-size:30px}}
+.luxe .psub{font-size:15px;color:var(--muted);margin-bottom:14px;font-style:italic}
+.luxe .rating{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:'Inter',sans-serif}
+.luxe .stars{color:var(--gold);font-size:15px;letter-spacing:2px}
+.luxe .rating b,.luxe .rating a{font-size:12.5px;color:var(--muted)}
+.luxe .rating a{text-decoration:underline;text-underline-offset:2px}
+
+.luxe .visitor-counter{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:16px;font-family:'Inter',sans-serif;font-style:italic}
+.luxe .vc-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:goldpulse 2.5s infinite}
+@keyframes goldpulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.luxe .gold-divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:18px 0}
+
+.luxe .pricerow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.luxe .price-now{font-size:34px;font-weight:400;color:var(--primary)}
+.luxe .price-mrp{font-size:16px;color:var(--muted);text-decoration:line-through;font-family:'Inter',sans-serif}
+.luxe .price-save{font-family:'Inter',sans-serif;background:color-mix(in srgb,var(--gold) 15%,#fff);color:var(--gold);font-size:12px;font-weight:700;padding:3px 9px;border:1px solid var(--gold)}
+.luxe .tax-note{font-size:12px;color:var(--muted);margin-top:4px;font-family:'Inter',sans-serif}
+
+.luxe .opt-label{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);margin:22px 0 10px;display:block}
+.luxe .variants{display:flex;gap:8px;flex-wrap:wrap}
+.luxe .variant{border:1px solid var(--line);background:var(--white);padding:10px 18px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--primary);transition:.15s;display:inline-block}
+.luxe .variant small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.luxe .v-radio:checked+.variant{border-color:var(--gold);background:var(--gold);color:var(--bg)}
+.luxe .v-radio:disabled+.variant{opacity:.35;text-decoration:line-through}
+.luxe .v-radio:focus-visible+.variant{outline:1px solid var(--gold);outline-offset:2px}
+
+.luxe .buy-actions{margin-top:24px}
+.luxe .btn{font-family:'Inter',sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:16px 28px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,color .15s;width:100%;border:none}
+.luxe .btn svg{width:15px;height:15px}
+.luxe .btn-add{background:var(--primary);color:var(--white)}
+.luxe .btn-add:hover{background:var(--primary-soft)}
+.luxe .btn-add[disabled]{opacity:.45;cursor:not-allowed}
+.luxe .luxe-dcb{margin-top:10px}
+.luxe .luxe-dcb .shopify-payment-button__button{border-radius:0}
+
+.luxe .urgency{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:12.5px;color:var(--muted);margin-top:16px;font-style:italic}
+.luxe .urgency b{color:var(--primary);font-style:normal}
+.luxe .urgency .pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:goldpulse 2.5s infinite}
+.luxe .luxe-cd b{color:var(--primary);font-variant-numeric:tabular-nums}
+
+.luxe .cert-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px;padding:18px;border:1px solid var(--line);background:var(--bg-2)}
+.luxe .cert-item{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-family:'Inter',sans-serif;font-size:11.5px;color:var(--muted)}
+.luxe .cert-item svg{width:22px;height:22px;color:var(--gold)}
+
+.luxe .offer{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;border:1px solid var(--gold);background:color-mix(in srgb,var(--gold) 6%,#fff);font-family:'Inter',sans-serif;font-size:13px}
+.luxe .offer svg{width:18px;height:18px;color:var(--gold);flex-shrink:0}
+.luxe .offer p{font-size:13px}
+.luxe .offer code{font-weight:700;color:var(--gold);letter-spacing:.04em}
+
+.luxe .acc{margin-top:24px;border-top:1px solid var(--line)}
+.luxe .acc-item{border-bottom:1px solid var(--line)}
+.luxe .acc-q{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 0;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--primary);text-align:left;background:none;border:none}
+.luxe .acc-q .ico{font-size:18px;font-weight:300;color:var(--gold);transition:.2s;line-height:1;font-family:serif}
+.luxe .acc-item.open .ico{transform:rotate(45deg)}
+.luxe .acc-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.luxe .acc-rt{font-family:'Inter',sans-serif;font-size:13.5px;color:var(--muted);padding:0 0 16px;line-height:1.7}
+
+.luxe .band-reviews{padding:64px 0;background:var(--bg-2)}
+.luxe .sec-head{text-align:center;margin:0 auto 40px;max-width:560px}
+.luxe .sec-head .eyebrow{display:block;margin-bottom:10px}
+.luxe .sec-head h2{font-size:34px;font-weight:400;color:var(--primary)}
+.luxe .rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media(max-width:640px){.luxe .rev-grid{grid-template-columns:1fr}}
+.luxe .rev-card{background:var(--white);border:1px solid var(--line);padding:26px}
+.luxe .rev-card .stars{color:var(--gold);font-size:14px;letter-spacing:2px;margin-bottom:10px}
+.luxe .rev-card .rtitle{font-size:16px;font-weight:600;color:var(--primary);margin-bottom:6px;font-family:'Cormorant Garamond',serif}
+.luxe .rev-card p{font-family:'Inter',sans-serif;font-size:13.5px;color:var(--muted);line-height:1.65}
+.luxe .rev-meta{display:flex;align-items:center;gap:10px;margin-top:16px;font-family:'Inter',sans-serif;font-size:12.5px;color:var(--muted)}
+.luxe .av{width:34px;height:34px;border-radius:50%;background:var(--primary);color:var(--white);font-weight:700;display:grid;place-items:center;font-size:13px;text-transform:uppercase;flex-shrink:0}
+
+.luxe .band-final{padding:72px 0;background:var(--primary);text-align:center;color:var(--white)}
+.luxe .band-final h2{font-size:38px;font-weight:400;margin-bottom:12px}
+.luxe .band-final p{font-family:'Inter',sans-serif;font-size:15px;color:rgba(255,255,255,.7);margin-bottom:28px;max-width:440px;margin-inline:auto}
+.luxe .band-final .btn{background:var(--gold);color:var(--bg);width:auto;min-width:220px;display:inline-flex;margin:0 auto}
+.luxe .band-final .btn:hover{background:var(--gold-soft)}
+
+.luxe .sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:80;background:var(--bg);border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:14px;transform:translateY(120%);transition:transform .3s ease}
+.luxe .sticky-bar.show{transform:translateY(0)}
+.luxe .sb-info .nm{font-size:13px;color:var(--primary);line-height:1.2}
+.luxe .sb-info .pr b{font-size:15px;color:var(--gold);font-family:'Cormorant Garamond',serif}
+.luxe .sticky-bar .btn{flex:1;height:44px;background:var(--primary);color:var(--white);width:auto}
+@media(min-width:921px){.luxe .sticky-bar{display:none}}
+@media(prefers-reduced-motion:reduce){.luxe *,.luxe *::before,.luxe *::after{animation:none!important;transition:none!important}}
+{% endstylesheet %}
+
+<script>
+(function(){
+  var root=document.getElementById('luxe-{{ section.id }}'); if(!root) return;
+  var mainImg=document.getElementById('luxeMain-{{ section.id }}');
+  var thumbs=document.getElementById('luxeThumbs-{{ section.id }}');
+  if(thumbs&&mainImg){
+    thumbs.addEventListener('click',function(e){
+      var t=e.target.closest('.thumb'); if(!t) return;
+      thumbs.querySelectorAll('.thumb').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active'); mainImg.src=t.dataset.src;
+    });
+  }
+  var varId=document.getElementById('luxeVarId-{{ section.id }}');
+  var priceNow=document.getElementById('luxePrice-{{ section.id }}');
+  var priceMrp=document.getElementById('luxeMrp-{{ section.id }}');
+  var sbPrice=document.getElementById('luxeSbPrice-{{ section.id }}');
+  root.querySelectorAll('.v-radio').forEach(function(r){
+    r.addEventListener('change',function(){
+      if(varId) varId.value=r.value;
+      if(priceNow&&r.dataset.price) priceNow.textContent=r.dataset.price;
+      if(sbPrice&&r.dataset.price) sbPrice.textContent=r.dataset.price;
+      if(priceMrp){if(r.dataset.mrp){priceMrp.textContent=r.dataset.mrp;priceMrp.style.display='';}else{priceMrp.style.display='none';}}
+    });
+  });
+  var acc=root.querySelector('.acc');
+  if(acc){
+    acc.addEventListener('click',function(e){
+      var q=e.target.closest('.acc-q'); if(!q) return;
+      var item=q.parentElement; var a=item.querySelector('.acc-a'); var open=item.classList.contains('open');
+      acc.querySelectorAll('.acc-item').forEach(function(i){i.classList.remove('open');i.querySelector('.acc-a').style.maxHeight=null;});
+      if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+    });
+    var fo=acc.querySelector('.acc-item.open .acc-a'); if(fo) fo.style.maxHeight=fo.scrollHeight+'px';
+  }
+  var cds=root.querySelectorAll('.luxe-cd');
+  if(cds.length){
+    function tick(){
+      var now=new Date(),end=new Date(); end.setHours(23,59,59,999);
+      var diff=Math.max(0,end-now);
+      var h=String(Math.floor(diff/3.6e6)).padStart(2,'0');
+      var m=String(Math.floor(diff%3.6e6/6e4)).padStart(2,'0');
+      var s=String(Math.floor(diff%6e4/1e3)).padStart(2,'0');
+      cds.forEach(function(el){el.innerHTML='<b>'+h+':'+m+':'+s+'</b>';});
+    } tick(); setInterval(tick,1000);
+  }
+  /* visitor counter — jewellery: small, exclusive numbers */
+  var vcNum=document.getElementById('luxeVcNum-{{ section.id }}');
+  if(vcNum){
+    var base=Math.floor(Math.random()*(65-22+1))+22;
+    vcNum.textContent=base;
+    setInterval(function(){
+      var delta=(Math.random()<.5?1:-1)*(Math.floor(Math.random()*2)+1);
+      base=Math.max(8,Math.min(90,base+delta));
+      vcNum.textContent=base;
+    },6000);
+  }
+  var sticky=document.getElementById('luxeSticky-{{ section.id }}');
+  var trigger=root.querySelector('.buy-actions');
+  if(sticky&&trigger&&'IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      var e=entries[0];
+      if(e.isIntersecting) sticky.classList.remove('show');
+      else if(e.boundingClientRect.top<0) sticky.classList.add('show');
+    },{threshold:0}).observe(trigger);
+  }
+  var sAdd=root.querySelector('.luxe-sticky-add');
+  var addBtn=root.querySelector('.btn-add');
+  if(sAdd&&addBtn) sAdd.onclick=function(){addBtn.click();};
+})();
+</script>
+
 {% schema %}
 {
-  "name": "Product Details",
+  "name": "Product — Jewellery",
+  "tag": "section",
+  "class": "luxe-section",
   "settings": [
-    {
-      "type": "checkbox",
-      "id": "enable_sticky_info",
-      "label": "Enable sticky info column",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_image_zoom",
-      "label": "Enable image zoom modal",
-      "default": true
-    }
+    {"type":"header","content":"Product info"},
+    {"type":"text","id":"subtitle","label":"Subtitle","default":"Handcrafted with ethically sourced materials"},
+    {"type":"text","id":"tax_note","label":"Tax note","default":"Inclusive of all taxes. Free insured shipping."},
+    {"type":"text","id":"badge_text","label":"Image badge","default":"Limited Edition"},
+    {"type":"checkbox","id":"show_dynamic_checkout","label":"Show Buy Now button","default":true},
+    {"type":"header","content":"Rating"},
+    {"type":"checkbox","id":"show_rating","label":"Show rating","default":true},
+    {"type":"text","id":"rating_value","label":"Rating value","default":"4.9"},
+    {"type":"text","id":"rating_count","label":"Review count","default":"847"},
+    {"type":"header","content":"Offer"},
+    {"type":"text","id":"offer_text","label":"Offer text","default":"Complimentary gift wrapping on all orders"},
+    {"type":"text","id":"offer_code","label":"Code (optional)","default":""},
+    {"type":"header","content":"Urgency & Social Proof"},
+    {"type":"checkbox","id":"urgency_enable","label":"Enable exclusivity urgency","default":true},
+    {"type":"range","id":"low_stock_threshold","label":"Low-stock threshold","min":1,"max":20,"step":1,"default":5},
+    {"type":"checkbox","id":"show_countdown","label":"Show offer countdown","default":true},
+    {"type":"checkbox","id":"show_visitor_counter","label":"Show viewer count","default":true},
+    {"type":"header","content":"Reviews"},
+    {"type":"text","id":"reviews_eyebrow","label":"Eyebrow","default":"Our customers"},
+    {"type":"text","id":"reviews_title","label":"Title","default":"Worn with love"},
+    {"type":"header","content":"Final CTA"},
+    {"type":"checkbox","id":"show_final_cta","label":"Show final CTA","default":true},
+    {"type":"text","id":"final_title","label":"Title","default":"Crafted for someone special"},
+    {"type":"text","id":"final_text","label":"Text","default":"Every piece arrives in a signature gift box. Free shipping on all orders."},
+    {"type":"text","id":"final_button","label":"Button","default":"Shop the Collection"},
+    {"type":"header","content":"Colors"},
+    {"type":"color","id":"c_bg","label":"Background","default":"#FAF7F2"},
+    {"type":"color","id":"c_primary","label":"Primary (dark)","default":"#1A1408"},
+    {"type":"color","id":"c_gold","label":"Gold","default":"#C9A84C"},
+    {"type":"color","id":"c_accent","label":"Accent","default":"#8B6E3A"}
   ],
-  "blocks": [
-    { "type": "title", "name": "Product Title", "limit": 1 },
-    { "type": "price", "name": "Product Price", "limit": 1 },
-    { "type": "variant_picker", "name": "Variant Selector", "limit": 1 },
-    { "type": "quantity_selector", "name": "Quantity Selector", "limit": 1 },
-    { "type": "buy_buttons", "name": "Buy Button triggers", "limit": 1 },
-    { "type": "description", "name": "Description Accordion", "limit": 1 },
-    { "type": "trust_badges", "name": "Trust Badges Matrix", "limit": 1 }
-  ]
+  "blocks":[
+    {"type":"usp","name":"Certificate / USP","settings":[
+      {"type":"select","id":"icon","label":"Icon","default":"shield","options":[{"value":"shield","label":"Shield"},{"value":"check","label":"Check"},{"value":"clock","label":"Clock"},{"value":"truck","label":"Truck"},{"value":"heart","label":"Heart"},{"value":"spark","label":"Certified"},{"value":"leaf","label":"Sustainable"},{"value":"tag","label":"Tag"}]},
+      {"type":"text","id":"label","label":"Label","default":"Hallmark Certified"}
+    ]},
+    {"type":"detail","name":"Accordion tab","settings":[
+      {"type":"text","id":"title","label":"Title","default":"Materials & Craftsmanship"},
+      {"type":"richtext","id":"body","label":"Body","default":"<p>925 Sterling Silver with 18K gold vermeil finish.</p>"}
+    ]},
+    {"type":"review","name":"Review","settings":[
+      {"type":"text","id":"name","label":"Name","default":"Meera R."},
+      {"type":"range","id":"rating","label":"Stars","min":1,"max":5,"step":1,"default":5},
+      {"type":"text","id":"title","label":"Title","default":"Absolutely breathtaking"},
+      {"type":"textarea","id":"body","label":"Review","default":"Wore it to my engagement and received so many compliments."}
+    ]}
+  ],
+  "presets":[{"name":"Product — Jewellery"}]
 }
 {% endschema %}
