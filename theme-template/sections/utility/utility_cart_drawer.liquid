@@ -1,155 +1,572 @@
-<div id="cart-drawer" class="fixed inset-0 z-[100] invisible">
-  <!-- Overlay -->
-  <div class="cart-overlay absolute inset-0 bg-[var(--color-text)]/50 opacity-0 transition-opacity duration-300"></div>
+{%- comment -%}
+  Section: utility_cart_drawer
+  Kinetic Adaptive Cart Drawer — niche-aware via theme CSS tokens.
+  Consumes: --color-background --color-text --color-accent
+            --font-heading-family --button-radius --card-radius
+  Modes: real Shopify (/cart.js, /cart/add.js, /cart/change.js) OR simulated preview.
+  Rules: no ternary/pluralize/color_modify filters; static CSS in {% stylesheet %};
+         token injection only in inline <style>.
+{%- endcomment -%}
 
-  <!-- Drawer -->
-  <div class="cart-content absolute top-0 right-0 w-full max-w-md h-full bg-[var(--color-background)] shadow-2xl transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.3,1)] flex flex-col">
-    
-    <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
-      <h2 class="text-2xl font-black uppercase tracking-widest text-[var(--color-text)]">Your Cart <span class="text-sm text-[var(--color-text-secondary)] font-medium ml-2" id="cart-drawer-count">({{ cart.item_count }})</span></h2>
-      <button class="cart-close p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors rounded-full hover:bg-[var(--color-surface)]">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+<style>
+  #cf-cart-{{ section.id }}{
+    --cf-accent: var(--color-accent, #111111);
+    --cf-bg: var(--color-background, #ffffff);
+    --cf-text: var(--color-text, #15110b);
+    --cf-heading: var(--font-heading-family, 'Inter', system-ui, sans-serif);
+    --cf-btn-radius: var(--button-radius, 0px);
+    --cf-card-radius: var(--card-radius, 10px);
+    --cf-muted: color-mix(in srgb, var(--cf-text) 52%, transparent);
+    --cf-line: color-mix(in srgb, var(--cf-text) 13%, transparent);
+    --cf-soft: color-mix(in srgb, var(--cf-bg) 94%, var(--cf-text) 6%);
+    --cf-accent-soft: color-mix(in srgb, var(--cf-accent) 12%, var(--cf-bg));
+    --cf-success: #1f9d55;
+    --cf-panel-w: 420px;
+  }
+  {%- if section.settings.accent_override != blank -%}
+    #cf-cart-{{ section.id }}{--cf-accent:{{ section.settings.accent_override }};}
+  {%- endif -%}
+</style>
+
+<script type="application/json" id="cfConfig-{{ section.id }}">
+{
+  "enableTimer": {% if section.settings.enable_timer %}true{% else %}false{% endif %},
+  "timerMin": {{ section.settings.timer_minutes | default: 10 }},
+  "enableUpsell": {% if section.settings.enable_upsell %}true{% else %}false{% endif %},
+  "freeShip": {{ section.settings.free_shipping_threshold | default: 0 | times: 100 }},
+  "txt": {
+    "title": {{ section.settings.drawer_title | default: 'Your Cart' | json }},
+    "empty": {{ section.settings.empty_text | default: 'Your cart is empty.' | json }},
+    "checkout": {{ section.settings.checkout_text | default: 'Checkout' | json }},
+    "continue": {{ section.settings.continue_text | default: 'Continue shopping' | json }},
+    "upsell": {{ section.settings.upsell_title | default: 'Frequently bought together' | json }},
+    "freeUnlocked": {{ section.settings.free_ship_unlocked | default: '🎉 You unlocked FREE shipping!' | json }}
+  },
+  "tiers": [
+    {%- assign cf_first = true -%}
+    {%- for b in section.blocks -%}
+      {%- if b.type == 'goal_tier' -%}
+        {%- unless cf_first %},{% endunless -%}
+        {"amount": {{ b.settings.amount | times: 100 }}, "label": {{ b.settings.label | json }}, "icon": {{ b.settings.icon | json }}}
+        {%- assign cf_first = false -%}
+      {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+
+<script type="application/json" id="cfUpsell-{{ section.id }}">
+[
+  {%- if section.settings.upsell_collection != blank -%}
+    {%- assign cf_u_first = true -%}
+    {%- for product in section.settings.upsell_collection.products limit: 8 -%}
+      {%- assign uv = product.selected_or_first_available_variant -%}
+      {%- unless cf_u_first %},{% endunless -%}
+      {
+        "id": {{ uv.id }},
+        "title": {{ product.title | json }},
+        "price": {{ uv.price }},
+        "compare": {{ uv.compare_at_price | default: 0 }},
+        "image": {{ product.featured_image | image_url: width: 200 | json }},
+        "url": {{ product.url | json }},
+        "available": {% if uv.available %}true{% else %}false{% endif %}
+      }
+      {%- assign cf_u_first = false -%}
+    {%- endfor -%}
+  {%- endif -%}
+]
+</script>
+
+<div class="cf-cart" id="cf-cart-{{ section.id }}" data-cf-cart aria-hidden="true">
+  <div class="cf-overlay" data-cf-close></div>
+  <aside class="cf-panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
+
+    <header class="cf-head">
+      <span class="cf-title">{{ section.settings.drawer_title | default: 'Your Cart' }}<span class="cf-count" data-cf-count>0</span></span>
+      <button class="cf-x" type="button" data-cf-close aria-label="Close cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-    </div>
+    </header>
 
-    <!-- Free Shipping Progress -->
-    {%- if section.settings.free_shipping_threshold != blank -%}
-      <div class="p-4 bg-neutral-50 border-b border-[var(--color-border)] text-sm text-center font-bold">
-        <!-- JS will calculate this dynamically in real implementation -->
-        <p>You are <span class="text-[var(--color-accent, #ff0000)]">$25.00</span> away from Free Shipping!</p>
-        <div class="w-full h-2 bg-[var(--color-border)] rounded-full mt-2 overflow-hidden">
-          <div class="h-full bg-[var(--color-text)] transition-all duration-500" style="width: 75%;"></div>
+    {%- if section.settings.enable_timer -%}
+      <div class="cf-timer" data-cf-timer hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        <span>We're holding your items for <b data-cf-timer-val>--:--</b></span>
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="cf-goal" data-cf-goal>
+        <p class="cf-goal-msg" data-cf-goal-msg></p>
+        <div class="cf-goal-track">
+          <div class="cf-goal-fill" data-cf-goal-fill></div>
+          <div class="cf-goal-nodes" data-cf-goal-nodes></div>
         </div>
       </div>
     {%- endif -%}
 
-    <!-- Cart Items (Scrollable) -->
-    <div class="flex-grow overflow-y-auto p-6 flex flex-col gap-6" id="cart-drawer-items">
-      {%- if cart.item_count > 0 -%}
-        {%- for item in cart.items -%}
-          <div class="flex gap-4">
-            <div class="w-20 h-24 flex-shrink-0 bg-neutral-100 rounded overflow-hidden">
-              <img src="{{ item.image | img_url: '200x' }}" alt="{{ item.title }}" class="w-full h-full object-cover" loading="lazy">
-            </div>
-            <div class="flex flex-col flex-grow">
-              <div class="flex justify-between items-start">
-                <a href="{{ item.url }}" class="font-bold text-sm hover:underline">{{ item.product.title }}</a>
-                <button class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-              </div>
-              <p class="text-xs text-[var(--color-text-secondary)] mb-2">{{ item.variant.title }}</p>
-              
-              <div class="flex items-center justify-between mt-auto">
-                <!-- Quantity Selector -->
-                <div class="flex items-center border border-[var(--color-border)] rounded">
-                  <button class="px-2 py-1 hover:bg-[var(--color-surface)]">-</button>
-                  <input type="number" value="{{ item.quantity }}" class="w-8 text-center text-sm focus:outline-none" readonly>
-                  <button class="px-2 py-1 hover:bg-[var(--color-surface)]">+</button>
-                </div>
-                <span class="font-bold">{{ item.final_line_price | money }}</span>
-              </div>
-            </div>
-          </div>
-        {%- endfor -%}
-      {%- else -%}
-        <div class="flex flex-col items-center justify-center h-full text-center text-[var(--color-text-secondary)]">
-          <svg class="w-16 h-16 mb-4 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-          <p class="text-lg font-medium">Your cart is empty.</p>
-          <button class="cart-close mt-6 underline font-bold uppercase tracking-widest text-[var(--color-text)]">Continue Shopping</button>
+    <div class="cf-body" data-cf-body>
+      <div class="cf-items" data-cf-items></div>
+
+      <div class="cf-empty" data-cf-empty hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p>{{ section.settings.empty_text | default: 'Your cart is empty.' }}</p>
+        <button type="button" class="cf-empty-cta" data-cf-close>{{ section.settings.continue_text | default: 'Continue shopping' }}</button>
+      </div>
+
+      {%- if section.settings.enable_upsell -%}
+        <div class="cf-upsell" data-cf-upsell hidden>
+          <h3 class="cf-upsell-h">{{ section.settings.upsell_title | default: 'Frequently bought together' }}</h3>
+          <div class="cf-upsell-track" data-cf-upsell-track></div>
         </div>
       {%- endif -%}
     </div>
 
-    <!-- Footer / Checkout -->
-    {%- if cart.item_count > 0 -%}
-      <div class="p-6 border-t border-[var(--color-border)] bg-neutral-50 flex flex-col gap-4">
-        
-        {%- if section.settings.show_order_note -%}
-          <div>
-            <button class="text-sm font-bold underline mb-2" onclick="document.getElementById('cart-note').classList.toggle('hidden')">Add Order Note</button>
-            <textarea id="cart-note" name="note" class="hidden w-full p-2 border border-[var(--color-border)] rounded text-sm focus:outline-none focus:border-black" rows="2" placeholder="Special instructions..."></textarea>
-          </div>
-        {%- endif -%}
-
-        <div class="flex items-center justify-between font-black text-xl">
-          <span>Subtotal</span>
-          <span>{{ cart.total_price | money }}</span>
-        </div>
-        <p class="text-xs text-[var(--color-text-secondary)] text-center">Taxes and shipping calculated at checkout.</p>
-        
-        <form action="/cart" method="post" id="cart-drawer-form">
-          <button type="submit" name="checkout" class="w-full py-4 bg-[var(--color-text)] text-[var(--color-background)] font-bold uppercase tracking-widest rounded hover:bg-neutral-800 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-            Checkout &rarr;
-          </button>
-        </form>
+    <footer class="cf-foot" data-cf-foot hidden>
+      <div class="cf-subtotal">
+        <span>Subtotal</span>
+        <b data-cf-subtotal>₹0</b>
       </div>
-    {%- endif -%}
+      <p class="cf-tax">{{ section.settings.tax_note | default: 'Inclusive of all taxes · Shipping calculated at checkout' }}</p>
+      <a href="/checkout" class="cf-checkout" data-cf-checkout>
+        <span>{{ section.settings.checkout_text | default: 'Checkout' }}</span>
+        <b data-cf-checkout-total></b>
+      </a>
+      <button type="button" class="cf-continue" data-cf-close>{{ section.settings.continue_text | default: 'Continue shopping' }}</button>
 
-  </div>
+      {%- assign trust_count = 0 -%}
+      {%- for b in section.blocks -%}{%- if b.type == 'trust_badge' -%}{%- assign trust_count = trust_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+      {%- if trust_count > 0 -%}
+        <div class="cf-trust">
+          {%- for b in section.blocks -%}
+            {%- if b.type == 'trust_badge' -%}
+              <span class="cf-trust-item" {{ b.shopify_attributes }}>
+                {%- case b.settings.icon -%}
+                  {%- when 'upi' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M7 9l3 6 4-10 3 8"/></svg>
+                  {%- when 'cod' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>
+                  {%- when 'card' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                  {%- when 'secure' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                  {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1" y="5" width="14" height="11"/><path d="M15 8h4l3 3v5h-7V8z"/><circle cx="5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                  {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 6L9 17l-5-5"/></svg>
+                {%- endcase -%}
+                {%- if b.settings.label != blank -%}<em>{{ b.settings.label }}</em>{%- endif -%}
+              </span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </footer>
+
+  </aside>
 </div>
 
+{% stylesheet %}
+.cf-cart{position:fixed;inset:0;z-index:9999;visibility:hidden;pointer-events:none;font-family:'Inter',system-ui,sans-serif;color:var(--cf-text)}
+.cf-cart[aria-hidden="false"]{visibility:visible;pointer-events:auto}
+.cf-cart *{box-sizing:border-box}
+.cf-overlay{position:absolute;inset:0;background:rgba(10,8,4,.42);opacity:0;transition:opacity .35s ease;backdrop-filter:blur(2px)}
+.cf-cart[aria-hidden="false"] .cf-overlay{opacity:1}
+.cf-panel{position:absolute;top:0;right:0;height:100%;width:min(var(--cf-panel-w),100%);background:var(--cf-bg);display:flex;flex-direction:column;transform:translateX(105%);transition:transform .5s cubic-bezier(.22,1,.36,1);box-shadow:-12px 0 40px rgba(10,8,4,.18)}
+.cf-cart[aria-hidden="false"] .cf-panel{transform:translateX(0)}
+
+.cf-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--cf-line);flex-shrink:0}
+.cf-title{font-family:var(--cf-heading);font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.cf-count{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;background:var(--cf-accent);color:#fff;min-width:20px;height:20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.cf-x{width:34px;height:34px;border:none;background:var(--cf-soft);border-radius:var(--cf-btn-radius);display:grid;place-items:center;cursor:pointer;color:var(--cf-text);transition:.18s}
+.cf-x:hover{background:var(--cf-accent);color:#fff;transform:rotate(90deg)}
+.cf-x svg{width:16px;height:16px}
+
+.cf-timer{display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--cf-accent-soft);font-size:12.5px;color:var(--cf-text);flex-shrink:0}
+.cf-timer svg{width:16px;height:16px;color:var(--cf-accent);flex-shrink:0}
+.cf-timer b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--cf-accent)}
+
+.cf-goal{padding:14px 20px 4px;flex-shrink:0}
+.cf-goal-msg{font-size:12.5px;font-weight:600;margin:0 0 9px;line-height:1.35}
+.cf-goal-msg b{color:var(--cf-accent)}
+.cf-goal-msg.is-done{color:var(--cf-success)}
+.cf-goal-track{position:relative;height:7px;background:var(--cf-soft);border-radius:999px;overflow:visible}
+.cf-goal-fill{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--cf-accent) 70%,#fff),var(--cf-accent));border-radius:999px;transition:width .6s cubic-bezier(.22,1,.36,1)}
+.cf-goal-nodes{position:absolute;inset:0}
+.cf-goal-node{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:var(--cf-bg);border:2px solid var(--cf-line);display:grid;place-items:center;transition:.3s}
+.cf-goal-node svg{width:9px;height:9px;color:var(--cf-muted)}
+.cf-goal-node.is-hit{border-color:var(--cf-accent);background:var(--cf-accent)}
+.cf-goal-node.is-hit svg{color:#fff}
+
+.cf-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 20px 20px}
+.cf-items{display:flex;flex-direction:column;gap:10px;padding-top:8px}
+
+.cf-item{display:flex;gap:12px;padding:12px;background:var(--cf-soft);border-radius:var(--cf-card-radius);opacity:0;transform:translateY(10px);animation:cfIn .45s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes cfIn{to{opacity:1;transform:none}}
+.cf-item.is-removing{opacity:0;transform:translateX(40px);transition:.3s ease}
+.cf-item-img{flex-shrink:0;width:68px;height:68px;border-radius:calc(var(--cf-card-radius) - 4px);overflow:hidden;background:var(--cf-bg)}
+.cf-item-img img{width:100%;height:100%;object-fit:cover;display:block}
+.cf-item-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.cf-item-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.cf-item-title{font-size:13.5px;font-weight:600;line-height:1.3}
+.cf-item-variant{font-size:11.5px;color:var(--cf-muted);margin-top:1px}
+.cf-item-rm{flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--cf-muted);padding:2px;transition:.15s}
+.cf-item-rm:hover{color:#d23}
+.cf-item-rm svg{width:15px;height:15px}
+.cf-item-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
+.cf-qty{display:flex;align-items:center;border:1px solid var(--cf-line);border-radius:var(--cf-btn-radius);overflow:hidden}
+.cf-qty button{width:28px;height:28px;border:none;background:none;cursor:pointer;font-size:15px;color:var(--cf-text);font-weight:700;line-height:1}
+.cf-qty button:hover{background:var(--cf-accent);color:#fff}
+.cf-qty span{min-width:26px;text-align:center;font-size:13px;font-weight:600}
+.cf-item-price{text-align:right;line-height:1.25}
+.cf-item-price b{font-size:14px;font-weight:700}
+.cf-item-price s{display:block;font-size:11px;color:var(--cf-muted)}
+.cf-save{display:inline-block;font-size:10px;font-weight:700;color:var(--cf-success);background:color-mix(in srgb,var(--cf-success) 14%,transparent);padding:1px 6px;border-radius:4px;margin-top:2px}
+
+.cf-empty{text-align:center;padding:56px 20px;color:var(--cf-muted)}
+.cf-empty svg{width:40px;height:40px;margin:0 auto 14px;color:var(--cf-line)}
+.cf-empty p{font-size:14px;margin:0 0 18px}
+.cf-empty-cta{border:1px solid var(--cf-text);background:none;color:var(--cf-text);font-weight:600;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;padding:11px 22px;border-radius:var(--cf-btn-radius);cursor:pointer}
+
+.cf-upsell{margin-top:22px;border-top:1px dashed var(--cf-line);padding-top:16px}
+.cf-upsell-h{font-family:var(--cf-heading);font-size:13px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:.05em}
+.cf-upsell-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.cf-upsell-track::-webkit-scrollbar{height:4px}
+.cf-upsell-track::-webkit-scrollbar-thumb{background:var(--cf-line);border-radius:99px}
+.cf-up-card{flex:0 0 130px;scroll-snap-align:start;background:var(--cf-soft);border-radius:var(--cf-card-radius);padding:8px;display:flex;flex-direction:column}
+.cf-up-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:calc(var(--cf-card-radius) - 4px);background:var(--cf-bg)}
+.cf-up-title{font-size:11.5px;font-weight:600;line-height:1.3;margin:7px 0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cf-up-price{font-size:12px;font-weight:700;margin-bottom:7px}
+.cf-up-price s{font-weight:400;color:var(--cf-muted);font-size:10.5px;margin-left:4px}
+.cf-up-add{margin-top:auto;border:1px solid var(--cf-accent);background:none;color:var(--cf-accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:7px;border-radius:var(--cf-btn-radius);cursor:pointer;transition:.15s}
+.cf-up-add:hover{background:var(--cf-accent);color:#fff}
+.cf-up-add.is-added{background:var(--cf-success);border-color:var(--cf-success);color:#fff}
+
+.cf-foot{border-top:1px solid var(--cf-line);padding:16px 20px;flex-shrink:0;background:var(--cf-bg)}
+.cf-subtotal{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:600}
+.cf-subtotal b{font-family:var(--cf-heading);font-size:20px;font-weight:700}
+.cf-tax{font-size:11px;color:var(--cf-muted);margin:3px 0 12px}
+.cf-checkout{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--cf-accent);color:#fff;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.03em;padding:15px;border-radius:var(--cf-btn-radius);transition:.18s;text-transform:uppercase}
+.cf-checkout:hover{background:color-mix(in srgb,var(--cf-accent) 85%,#000);transform:translateY(-1px)}
+.cf-checkout b{font-weight:700}
+.cf-continue{width:100%;border:none;background:none;color:var(--cf-muted);font-size:12.5px;padding:11px 0 4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.cf-trust{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:10px;padding-top:12px;border-top:1px solid var(--cf-line)}
+.cf-trust-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:var(--cf-muted);text-transform:uppercase;letter-spacing:.04em}
+.cf-trust-item svg{width:20px;height:20px;color:var(--cf-text)}
+
+@media(max-width:480px){.cf-cart{--cf-panel-w:100%}.cf-panel{box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.cf-panel,.cf-overlay,.cf-goal-fill,.cf-item{transition:none!important;animation:none!important}}
+{% endstylesheet %}
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const drawer = document.getElementById('cart-drawer');
-  if(!drawer) return;
-  
-  const overlay = drawer.querySelector('.cart-overlay');
-  const content = drawer.querySelector('.cart-content');
-  const closeBtns = drawer.querySelectorAll('.cart-close');
-  
-  window.openCartDrawer = () => {
-    drawer.classList.remove('invisible');
-    setTimeout(() => {
-      overlay.classList.add('opacity-100');
-      content.classList.remove('translate-x-full');
-      content.classList.add('translate-x-0');
-    }, 10);
+(function(){
+  var root = document.getElementById('cf-cart-{{ section.id }}');
+  if(!root || root.dataset.cfBound) return;
+  root.dataset.cfBound = '1';
+
+  var cfg = {};
+  var upsellSeed = [];
+  try{ cfg = JSON.parse(document.getElementById('cfConfig-{{ section.id }}').textContent); }catch(e){ cfg = {txt:{}}; }
+  try{ upsellSeed = JSON.parse(document.getElementById('cfUpsell-{{ section.id }}').textContent); }catch(e){ upsellSeed = []; }
+
+  var $ = function(s){ return root.querySelector(s); };
+  var els = {
+    items: $('[data-cf-items]'), empty: $('[data-cf-empty]'), foot: $('[data-cf-foot]'),
+    count: $('[data-cf-count]'), sub: $('[data-cf-subtotal]'), coTotal: $('[data-cf-checkout-total]'),
+    goal: $('[data-cf-goal]'), goalMsg: $('[data-cf-goal-msg]'), goalFill: $('[data-cf-goal-fill]'), goalNodes: $('[data-cf-goal-nodes]'),
+    timer: $('[data-cf-timer]'), timerVal: $('[data-cf-timer-val]'),
+    upsell: $('[data-cf-upsell]'), upsellTrack: $('[data-cf-upsell-track]')
   };
 
-  const closeDrawer = () => {
-    overlay.classList.remove('opacity-100');
-    content.classList.remove('translate-x-0');
-    content.classList.add('translate-x-full');
-    setTimeout(() => {
-      drawer.classList.add('invisible');
-    }, 500);
-  };
+  /* ---------- money (INR app-preview default) ---------- */
+  function money(paise){
+    var n = paise/100;
+    var dec = (n % 1 !== 0) ? 2 : 0;
+    return '₹' + n.toLocaleString('en-IN', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+  }
 
-  closeBtns.forEach(btn => btn.addEventListener('click', closeDrawer));
-  overlay.addEventListener('click', closeDrawer);
+  /* ---------- cart engine: real Shopify OR simulated ---------- */
+  var SIM = false;
+  var simCart = { items:[], total_price:0, item_count:0 };
 
-  // Bind to any standard cart links/buttons
-  document.querySelectorAll('a[href="/cart"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.openCartDrawer();
+  function seedSim(){
+    simCart = {
+      item_count: 2,
+      total_price: 219800,
+      items: [
+        { key:'sim-1', id:9001, title:'Signature Piece', variant_title:'Default', quantity:1,
+          final_line_price:129900, original_line_price:159900, image:'https://placehold.co/200x200/efe7da/8B6E3A?text=01' },
+        { key:'sim-2', id:9002, title:'Everyday Essential', variant_title:'Medium', quantity:1,
+          final_line_price:89900, original_line_price:89900, image:'https://placehold.co/200x200/e7e7e7/333?text=02' }
+      ]
+    };
+  }
+
+  function normalize(c){
+    return {
+      item_count: c.item_count || 0,
+      total_price: c.total_price || 0,
+      items: (c.items||[]).map(function(it,i){
+        return {
+          key: it.key || ('k'+i), line: i+1, id: it.id || it.variant_id, title: it.product_title || it.title,
+          variant_title: (it.variant_title && it.variant_title !== 'Default Title') ? it.variant_title : '',
+          quantity: it.quantity,
+          final_line_price: (it.final_line_price != null) ? it.final_line_price : (it.line_price || it.price*it.quantity),
+          original_line_price: (it.original_line_price != null) ? it.original_line_price : (it.line_price || it.price*it.quantity),
+          image: it.image ? (it.image.indexOf('//')===0 ? it.image : it.image) : 'https://placehold.co/200x200/eee/999?text=%20'
+        };
+      })
+    };
+  }
+
+  function getCart(){
+    if(SIM) return Promise.resolve(normalize(simCart));
+    return fetch('/cart.js',{headers:{'Accept':'application/json'}})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(c){ return normalize(c); })
+      .catch(function(){ SIM = true; seedSim(); return normalize(simCart); });
+  }
+
+  function addItem(id, qty){
+    qty = qty || 1;
+    if(SIM){
+      var found = simCart.items.filter(function(x){return x.id===id;})[0];
+      if(found){ found.quantity += qty; found.final_line_price = (found.final_line_price/(found.quantity-qty))*found.quantity; }
+      else{
+        var seed = upsellSeed.filter(function(u){return u.id===id;})[0] || {title:'New item', price:49900, image:'https://placehold.co/200x200/eee/999?text=%2B'};
+        simCart.items.push({ key:'sim-'+id, id:id, title:seed.title, variant_title:'', quantity:qty,
+          final_line_price:(seed.price||49900)*qty, original_line_price:((seed.compare||seed.price)||49900)*qty, image:seed.image });
+      }
+      recompute(); return Promise.resolve();
+    }
+    return fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id:id,quantity:qty})})
+      .then(function(r){ if(!r.ok) throw 0; });
+  }
+
+  function changeLine(line, qty){
+    if(SIM){
+      var it = simCart.items[line-1];
+      if(it){
+        if(qty<=0){ simCart.items.splice(line-1,1); }
+        else { var unit = it.final_line_price/it.quantity; it.quantity = qty; it.final_line_price = unit*qty;
+               var ounit = it.original_line_price/(it.quantity); it.original_line_price = ounit*qty; }
+      }
+      recompute(); return Promise.resolve();
+    }
+    return fetch('/cart/change.js',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({line:line,quantity:qty})})
+      .then(function(r){ if(!r.ok) throw 0; });
+  }
+
+  function recompute(){
+    simCart.total_price = simCart.items.reduce(function(s,x){return s + x.final_line_price;},0);
+    simCart.item_count = simCart.items.reduce(function(s,x){return s + x.quantity;},0);
+  }
+
+  /* ---------- render ---------- */
+  function render(c){
+    els.count.textContent = c.item_count;
+    var hasItems = c.items.length > 0;
+    els.empty.hidden = hasItems;
+    els.foot.hidden = !hasItems;
+    if(els.upsell) els.upsell.hidden = !hasItems;
+    if(els.goal) els.goal.style.display = hasItems ? '' : 'none';
+    if(els.timer && cfg.enableTimer) els.timer.hidden = !hasItems;
+
+    els.items.innerHTML = '';
+    c.items.forEach(function(it){
+      var save = it.original_line_price - it.final_line_price;
+      var div = document.createElement('div');
+      div.className = 'cf-item'; div.dataset.line = it.line;
+      div.innerHTML =
+        '<div class="cf-item-img"><img src="'+it.image+'" alt="" loading="lazy"></div>'+
+        '<div class="cf-item-main">'+
+          '<div class="cf-item-top">'+
+            '<div><div class="cf-item-title">'+it.title+'</div>'+(it.variant_title?'<div class="cf-item-variant">'+it.variant_title+'</div>':'')+'</div>'+
+            '<button type="button" class="cf-item-rm" data-cf-remove aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'+
+          '</div>'+
+          '<div class="cf-item-bottom">'+
+            '<div class="cf-qty"><button type="button" data-cf-dec aria-label="Decrease">−</button><span>'+it.quantity+'</span><button type="button" data-cf-inc aria-label="Increase">+</button></div>'+
+            '<div class="cf-item-price"><b>'+money(it.final_line_price)+'</b>'+(save>0?'<s>'+money(it.original_line_price)+'</s><span class="cf-save">Save '+money(save)+'</span>':'')+'</div>'+
+          '</div>'+
+        '</div>';
+      els.items.appendChild(div);
     });
+
+    els.sub.textContent = money(c.total_price);
+    if(els.coTotal) els.coTotal.textContent = money(c.total_price);
+    renderGoal(c.total_price);
+    if(els.upsell && !els.upsell.dataset.done) renderUpsell();
+    handleTimer(hasItems);
+  }
+
+  /* ---------- goal-gradient bar ---------- */
+  function renderGoal(total){
+    if(!els.goal) return;
+    var tiers = (cfg.tiers||[]).slice().sort(function(a,b){return a.amount-b.amount;});
+    if(!tiers.length){ els.goal.style.display='none'; return; }
+    var max = tiers[tiers.length-1].amount;
+    var pct = Math.min(100, (total/max)*100);
+    els.goalFill.style.width = pct + '%';
+
+    els.goalNodes.innerHTML = '';
+    var nextTier = null;
+    tiers.forEach(function(t){
+      var hit = total >= t.amount;
+      if(!hit && !nextTier) nextTier = t;
+      var node = document.createElement('div');
+      node.className = 'cf-goal-node' + (hit?' is-hit':'');
+      node.style.left = ((t.amount/max)*100) + '%';
+      node.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      els.goalNodes.appendChild(node);
+    });
+
+    if(nextTier){
+      var remain = nextTier.amount - total;
+      els.goalMsg.classList.remove('is-done');
+      els.goalMsg.innerHTML = 'Add <b>'+money(remain)+'</b> more to unlock '+ (nextTier.label || 'a reward') + '!';
+    } else {
+      els.goalMsg.classList.add('is-done');
+      els.goalMsg.textContent = (cfg.txt && cfg.txt.freeUnlocked) || 'All rewards unlocked!';
+    }
+  }
+
+  /* ---------- upsell carousel ---------- */
+  function renderUpsell(){
+    if(!els.upsellTrack) return;
+    var data = upsellSeed && upsellSeed.length ? upsellSeed : [
+      {id:7001,title:'Travel Mini',price:29900,compare:39900,image:'https://placehold.co/200x200/f0e9dc/8B6E3A?text=A',available:true},
+      {id:7002,title:'Refill Pack',price:49900,compare:0,image:'https://placehold.co/200x200/e9efe9/2a7?text=B',available:true},
+      {id:7003,title:'Gift Add-on',price:19900,compare:24900,image:'https://placehold.co/200x200/efe9f0/85a?text=C',available:true}
+    ];
+    els.upsellTrack.innerHTML = '';
+    data.forEach(function(p){
+      var card = document.createElement('div');
+      card.className = 'cf-up-card';
+      var priceHtml = money(p.price) + (p.compare && p.compare>p.price ? '<s>'+money(p.compare)+'</s>' : '');
+      card.innerHTML =
+        '<img src="'+p.image+'" alt="" loading="lazy">'+
+        '<div class="cf-up-title">'+p.title+'</div>'+
+        '<div class="cf-up-price">'+priceHtml+'</div>'+
+        '<button type="button" class="cf-up-add" data-id="'+p.id+'">+ Add</button>';
+      els.upsellTrack.appendChild(card);
+    });
+    els.upsell.dataset.done = '1';
+    els.upsellTrack.querySelectorAll('.cf-up-add').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = parseInt(btn.dataset.id,10);
+        btn.textContent = '✓ Added'; btn.classList.add('is-added');
+        addItem(id,1).then(refresh).then(function(){
+          setTimeout(function(){ btn.textContent='+ Add'; btn.classList.remove('is-added'); }, 1200);
+        });
+      });
+    });
+  }
+
+  /* ---------- reservation timer ---------- */
+  var timerInt = null;
+  function handleTimer(hasItems){
+    if(!cfg.enableTimer || !els.timer) return;
+    if(!hasItems){ if(timerInt) clearInterval(timerInt); return; }
+    var KEY='cf_cart_timer_end';
+    var end = parseInt(sessionStorage.getItem(KEY),10);
+    if(!end || isNaN(end) || end < Date.now()){
+      end = Date.now() + (cfg.timerMin||10)*60*1000;
+      sessionStorage.setItem(KEY, end);
+    }
+    if(timerInt) clearInterval(timerInt);
+    function tick(){
+      var diff = Math.max(0, end - Date.now());
+      var m = Math.floor(diff/60000), s = Math.floor((diff%60000)/1000);
+      els.timerVal.textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+      if(diff<=0){ clearInterval(timerInt); els.timer.querySelector('span').innerHTML = 'Your held items are still in the cart — checkout now!'; }
+    }
+    tick(); timerInt = setInterval(tick, 1000);
+  }
+
+  /* ---------- open / close ---------- */
+  function open(){ getCart().then(render); root.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; }
+  function close(){ root.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; }
+  function refresh(){ return getCart().then(render); }
+
+  /* ---------- events ---------- */
+  root.addEventListener('click', function(e){
+    if(e.target.closest('[data-cf-close]')){ close(); return; }
+    var itemEl = e.target.closest('.cf-item');
+    if(itemEl){
+      var line = parseInt(itemEl.dataset.line,10);
+      var qSpan = itemEl.querySelector('.cf-qty span');
+      var q = parseInt(qSpan.textContent,10);
+      if(e.target.closest('[data-cf-inc]')){ changeLine(line, q+1).then(refresh); }
+      else if(e.target.closest('[data-cf-dec]')){ changeLine(line, q-1).then(refresh); }
+      else if(e.target.closest('[data-cf-remove]')){ itemEl.classList.add('is-removing'); setTimeout(function(){ changeLine(line,0).then(refresh); },280); }
+    }
   });
-});
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && root.getAttribute('aria-hidden')==='false') close(); });
+
+  /* open triggers across the theme */
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-cart-toggle], a[href="/cart"], a[href$="/cart"], .cf-cart-open, #cart-icon, [data-cf-open]');
+    if(t){ e.preventDefault(); open(); }
+  });
+  document.addEventListener('cf:cart:open', open);
+
+  /* intercept product add-to-cart forms → AJAX + open drawer */
+  document.addEventListener('submit', function(e){
+    var form = e.target.closest('form[action$="/cart/add"], form[action*="/cart/add"]');
+    if(!form) return;
+    if(SIM){ return; }
+    e.preventDefault();
+    var fd = new FormData(form);
+    fetch('/cart/add.js',{method:'POST',headers:{'Accept':'application/json'},body:fd})
+      .then(function(r){ if(!r.ok) throw 0; })
+      .then(function(){ open(); })
+      .catch(function(){ SIM=true; open(); });
+  });
+
+  /* expose API */
+  window.CFCart = window.CFCart || {};
+  window.CFCart.open = open; window.CFCart.close = close; window.CFCart.refresh = refresh;
+})();
 </script>
 
 {% schema %}
 {
   "name": "Cart Drawer",
+  "tag": "section",
+  "class": "cf-cart-drawer-section",
   "settings": [
-    {
-      "type": "checkbox",
-      "id": "show_order_note",
-      "label": "Enable Order Note",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "free_shipping_threshold",
-      "label": "Free Shipping Threshold (in cents)",
-      "default": "10000",
-      "info": "Leave blank to disable."
-    }
+    {"type":"header","content":"General"},
+    {"type":"text","id":"drawer_title","label":"Drawer title","default":"Your Cart"},
+    {"type":"text","id":"checkout_text","label":"Checkout button","default":"Checkout"},
+    {"type":"text","id":"continue_text","label":"Continue shopping","default":"Continue shopping"},
+    {"type":"text","id":"empty_text","label":"Empty cart text","default":"Your cart is empty."},
+    {"type":"text","id":"tax_note","label":"Tax / shipping note","default":"Inclusive of all taxes · Shipping calculated at checkout"},
+    {"type":"header","content":"Reservation timer"},
+    {"type":"checkbox","id":"enable_timer","label":"Enable reservation countdown","default":true},
+    {"type":"range","id":"timer_minutes","label":"Hold time (minutes)","min":3,"max":30,"step":1,"default":10},
+    {"type":"header","content":"Free shipping / gift goal","info":"Add Goal tier blocks below (lowest to highest)."},
+    {"type":"text","id":"free_ship_unlocked","label":"All-unlocked message","default":"🎉 All rewards unlocked!"},
+    {"type":"header","content":"Upsell carousel"},
+    {"type":"checkbox","id":"enable_upsell","label":"Enable upsell carousel","default":true},
+    {"type":"text","id":"upsell_title","label":"Upsell heading","default":"Frequently bought together"},
+    {"type":"collection","id":"upsell_collection","label":"Upsell collection"},
+    {"type":"header","content":"Style override (optional)"},
+    {"type":"color","id":"accent_override","label":"Accent override","info":"Leave blank to inherit the active niche token --color-accent."}
   ],
-  "presets": [
-    {
-      "name": "Cart Drawer"
-    }
-  ]
+  "blocks":[
+    {"type":"goal_tier","name":"Goal tier","settings":[
+      {"type":"range","id":"amount","label":"Cart total to unlock (₹)","min":0,"max":10000,"step":50,"default":999},
+      {"type":"text","id":"label","label":"Reward label","default":"FREE Shipping"},
+      {"type":"select","id":"icon","label":"Icon","default":"truck","options":[
+        {"value":"truck","label":"Shipping"},{"value":"gift","label":"Gift"},{"value":"star","label":"Reward"}]}
+    ]},
+    {"type":"trust_badge","name":"Trust / payment badge","settings":[
+      {"type":"select","id":"icon","label":"Icon","default":"upi","options":[
+        {"value":"upi","label":"UPI"},{"value":"cod","label":"COD"},{"value":"card","label":"Cards"},{"value":"secure","label":"Secure"},{"value":"truck","label":"Shipping"}]},
+      {"type":"text","id":"label","label":"Label","default":"UPI"}
+    ]}
+  ],
+  "presets":[{"name":"Cart Drawer","blocks":[
+    {"type":"goal_tier","settings":{"amount":999,"label":"FREE Shipping","icon":"truck"}},
+    {"type":"goal_tier","settings":{"amount":1999,"label":"a FREE Gift","icon":"gift"}},
+    {"type":"trust_badge","settings":{"icon":"upi","label":"UPI"}},
+    {"type":"trust_badge","settings":{"icon":"cod","label":"COD"}},
+    {"type":"trust_badge","settings":{"icon":"card","label":"Cards"}},
+    {"type":"trust_badge","settings":{"icon":"secure","label":"Secure"}}
+  ]}]
 }
 {% endschema %}

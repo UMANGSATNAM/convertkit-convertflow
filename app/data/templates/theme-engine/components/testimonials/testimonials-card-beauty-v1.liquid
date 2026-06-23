@@ -1,0 +1,85 @@
+{%- comment -%}
+  Component: testimonials-card-beauty-v1
+  Family: Beauty | Style: soft
+  Archetypes: organic, premium, cozy, minimal
+  v2.0 — StoreForge Component Library
+{%- endcomment -%}
+<section class="testimonials testimonials--beauty" style="padding: var(--space-64) 0; background-color: var(--color-surface); border-bottom: 1px solid var(--color-border); text-align: center;">
+  <div class="container" style="max-width: 800px;">
+    
+    <h2 class="section-title" style="font-family: var(--font-heading-family); font-size: 2.2rem; font-weight: 600; margin-bottom: var(--space-40);">
+      {{ section.settings.title | escape }}
+    </h2>
+
+    <div class="testimonials-slider" style="display: flex; flex-direction: column; gap: var(--space-24);">
+      {%- for block in section.blocks -%}
+        <div class="testimonial-block" {{ block.shopify_attributes }} 
+             style="border: 1px solid var(--color-border); border-radius: var(--card-radius); box-shadow: var(--card-shadow); background-color: #fff; padding: var(--space-32); text-align: center;">
+          
+          <div class="testimonial-rating" style="display: flex; justify-content: center; gap: 4px; margin-bottom: var(--space-16); color: var(--color-accent);">
+            {%- assign rating = block.settings.rating -%}
+            {%- for i in (1..5) -%}
+              {%- if i <= rating -%}
+                {%- render 'icon-star', filled: true -%}
+              {%- else -%}
+                {%- render 'icon-star', filled: false -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          
+          <blockquote class="testimonial-quote" style="font-family: var(--font-heading-family); font-size: 1.25rem; font-style: italic; line-height: 1.6; color: var(--color-text); margin: 0 0 var(--space-16) 0; font-weight: 300;">
+            {{ block.settings.quote }}
+          </blockquote>
+          
+          <cite class="testimonial-author" style="font-family: var(--font-body-family); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text);">
+            &mdash; {{ block.settings.author | escape }}
+          </cite>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Loved by skin"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name",
+          "default": "EMILY R."
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Quote Content",
+          "default": "<p>\"My sensitive skin has never looked better. The botanical oil absorbs instantly and leaves a gorgeous dewy glow without any redness!\"</p>"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

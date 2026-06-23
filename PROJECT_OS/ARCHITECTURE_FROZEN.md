@@ -1,109 +1,373 @@
-# Architecture Frozen
+# StoreForge v2.0 — Architecture Freeze
+# STATUS: FROZEN — DO NOT MODIFY WITHOUT CEO APPROVAL
+# Frozen: 2026-06-24
 
-**Date**: 2026-06-14
-**Status**: APPROVED & LOCKED
+---
 
-The architecture of the AI Agency Operating System is officially frozen. This document establishes the immutable laws for further development.
+## Mission
 
-## 1. Priority Matrix
+StoreForge is an AI-powered Shopify Agency Operating System.
 
-All future decisions must adhere to this hierarchy:
-1. **Reliability** (Zero errors, state consistency, checkpoint recovery)
-2. **Conversion** (CRO-focused layouts, psychological triggers, performance data)
-3. **Cost** (Optimized AI tokens, fewer API calls, selective regeneration)
-4. **Features** (New bells and whistles come last)
+The goal is NOT to generate Shopify themes.
+The goal is to generate agency-quality Shopify stores that feel custom-built by an experienced Shopify agency.
 
-## 2. Core Constraints
+Flow:
+1. Analyze the business
+2. Analyze the catalog
+3. Analyze the brand
+4. Select compatible components
+5. Assemble a complete Shopify store
+6. Publish a preview-ready theme
 
-### The Schema Constraint
-The database schema (`schema.prisma`) is finalized. 
-- No more core entities will be added.
-- We have fully accommodated: `ComponentRegistry`, `BlueprintSnapshot`, `ThemeSnapshot`, `GenerationCost`, `MerchantFeedback`, and `PromptVersion`.
+Target output quality:
+- Professional
+- Conversion-focused
+- Mobile-first
+- SEO-ready
+- Fast
+- Brand-consistent
+- Agency-quality
 
-### The Component Constraint
-- Components (`ComponentRegistry`) must not be directly fetched from the filesystem unless caching misses or local dev overrides.
-- Tags are JSON arrays (`industryTags`, `styleTags`, `searchKeywords`). Single string categories are banned.
+---
 
-### The Cost Constraint
-- `GenerationCost` must be recorded for every generation attempt.
-- Over-uploading components is strictly prohibited. The system must verify if an asset exists before uploading to Shopify.
+## Core Principle (NEVER VIOLATE)
 
-### The Learning Constraint
-- `MerchantFeedback` and store analytics must feed back into the AI Prompt or Component selection mechanisms.
-- All prompts are version-controlled via `PromptVersion`.
+Store generation MUST NEVER rely on runtime Liquid generation.
 
-## 3. Freeze Exception Protocol
+AI generates strategy. AI does NOT generate production theme code during merchant generation.
 
-You may ONLY break this freeze if a proposed change mathematically proves:
-1. It reduces generation cost by >15% without impacting quality.
-2. It improves component conversion rates based on a 100-store sample size.
-3. It fixes a critical Shopify API deprecation.
+AI responsibilities:
+- Analyze
+- Detect
+- Classify
+- Select
+- Assemble
 
-Any other reason is instantly rejected.
+The moat is:
+- Component Library
+- Design System
+- Compatibility Engine
+- Brand Intelligence
+- Theme Composer
 
-## 4. Engineering Rules
+---
 
-### Deterministic First
-AI may recommend.
-AI may rank.
-AI may generate blueprints.
+## Architecture Layers
 
-AI must NOT directly:
-- Modify Shopify themes
-- Write production templates
-- Publish themes
-- Skip validators
+### Layer 1 — Universal Commerce Engine (FROZEN)
 
-All production changes must pass through deterministic engines.
+Location: core/
 
-### Recovery First
-Every checkpoint must be resumable.
-No stage may require restarting the entire generation process.
-All stages must be idempotent.
-Running the same stage twice must produce the same result.
+Includes:
+- Cart
+- Search
+- Variants
+- Product Logic
+- Inventory
+- Customer Accounts
+- Currency
+- Checkout Integration
+- SEO
+- Structured Data
+- Analytics
+- Responsive Framework
 
-### Validation First
-No theme may enter Preview state unless:
-- JSON validation passes
-- Asset validation passes
-- Component validation passes
-- Health scoring completes
+Files:
+core/
+├── layout/theme.liquid
+├── assets/ (cart.js, variant-swap.js, sticky-atc.js, search.js, animations.css, utils.js)
+├── sections/main-product.liquid  ← UNIVERSAL PDP
+├── sections/main-cart.liquid
+└── templates/ (index.json, product.json, collection.json, etc.)
 
-Validation failures trigger Repair Engine before regeneration.
+Rule: One version only. NEVER duplicated. NEVER niche-specific.
 
-### Cost Visibility
-Every AI call must have:
-- Prompt version
-- Model used
-- Token usage
-- Cost
-stored in GenerationCost.
+---
 
-Untracked AI usage is prohibited.
+### Layer 2 — Design Token System
 
-## 5. Definition of Success
+Location: niche-tokens/
 
-A generation is successful only if:
+Controls:
+- Colors (primary, secondary, background, text, accent)
+- Typography (heading family, body family, size scale)
+- Radius (card, button, badge)
+- Shadows
+- Spacing
+- Buttons
+- Cards
+- Animation Intensity
 
-1. Catalog analysis completes.
-2. Blueprints are generated.
-3. Components are selected.
-4. Theme composes successfully.
-5. Validation passes.
-6. Preview URL is generated.
-7. Theme Health Score >= 85.
+One .css file per archetype. Only token values change. Structure stays universal.
 
-Anything below this threshold is considered a failed generation.
+---
 
-## 6. Prohibited Patterns
+### Layer 3 — Reusable Component Library
 
-The following are permanently prohibited:
+Location: components/
 
-- Direct AI-generated Liquid themes
-- Direct AI-generated Shopify JSON templates
-- Auto-publishing without merchant approval
-- Full-store regeneration for minor edits
-- Filesystem-only component retrieval
-- Non-versioned prompts
-- Untracked AI costs
-- Bypassing validators
+Built by STYLE. NOT by niche.
+
+Folders:
+- components/hero/
+- components/header/
+- components/footer/
+- components/trust/
+- components/faq/
+- components/testimonials/
+- components/newsletter/
+- components/brand-story/
+- components/collections/
+- components/product-grid/
+- components/pdp-extensions/
+
+Naming: hero-editorial-luxury, hero-bold-streetwear, hero-tech-spec
+
+Every component has metadata (family, archetypes, style tags, mobile score).
+Components are REUSED across multiple niches.
+
+Component Pool Rule:
+Every slot MUST have minimum 3-5 variants.
+- hero-luxury-v1, hero-luxury-v2, hero-luxury-v3...
+This ensures no two stores look identical.
+
+---
+
+### Layer 3.5 — Component Factory (INTERNAL ONLY)
+
+Used for growing the library. NEVER used during merchant generation.
+
+Workflow:
+Request → Antigravity generates Liquid + CSS + Schema → Validation → Human Approval → Component Registry → Library
+
+The factory can generate:
+- Headers
+- Heroes
+- PDP Extensions
+- Trust Sections
+- Testimonials
+- FAQs
+- Footers
+- Landing Page Sections
+- Conversion Components
+
+Store generation uses APPROVED components only.
+
+---
+
+### Layer 4 — Design Families
+
+Prevent component chaos.
+
+Families:
+- Luxury      → Jewellery, Watches, Luxury Products
+- Lifestyle   → Fashion, Footwear, Accessories
+- Beauty      → Beauty, Cosmetics, Skincare
+- Home        → Home Decor, Furniture, Handmade, Gifts
+- Tech        → Electronics, Gadgets, Gaming
+- Health      → Supplements, Wellness, Organic
+- Travel      → Travel, Luggage
+- Industrial  → B2B, Industrial
+
+Each family has a compatible component pool. Cross-family components are forbidden by the compatibility engine.
+
+---
+
+### Layer 5 — Archetype System
+
+Prevent identical stores. Same niche → different visual result.
+
+Example:
+Beauty → Luxury Beauty
+Beauty → Organic Beauty
+Beauty → Clinical Beauty
+Beauty → Gen-Z Beauty
+Beauty → Premium Beauty
+
+Same niche. Different archetype. Different store. Different token set.
+
+---
+
+### Layer 6 — Niche Profiles
+
+Location: niche-profiles/
+
+Each profile contains:
+- Family
+- Available Archetypes
+- Compatible Component IDs per slot
+- PDP Feature Flags
+- Token File path
+
+Example: beauty.json
+{
+  "niche": "beauty",
+  "family": "Beauty",
+  "archetypes": ["luxury", "organic", "clinical", "gen-z", "premium"],
+  "tokensDir": "niche-tokens/beauty/",
+  "pdpFeatures": {
+    "beforeAfter": true,
+    "skinQuiz": true,
+    "ingredients": true,
+    "certificate": false,
+    "specTable": false
+  },
+  "sections": {
+    "header": ["header-luxury-v1", "header-minimal-v1"],
+    "hero": ["hero-editorial-luxury-v1", "hero-storytelling-organic-v1"],
+    "product_grid": ["grid-minimal-v1", "grid-luxury-v1"],
+    "trust": ["trust-minimal-v1", "trust-luxury-v1"],
+    "testimonials": ["testimonials-minimal-v1"],
+    "faq": ["faq-accordion-v1"],
+    "footer": ["footer-minimal-v1", "footer-luxury-v1"]
+  }
+}
+
+---
+
+## Universal PDP Architecture (FROZEN)
+
+One PDP Core. NEVER build separate PDPs per niche.
+
+Core (always rendered):
+- Gallery
+- Buy Box (Variants, Quantity, ATC, Sticky ATC)
+- Reviews
+- Trust
+- FAQ
+- Upsells / Cross-Sells
+- Delivery Checker
+
+PDP Extensions (conditional by niche profile):
+
+Luxury:
+- Authenticity Certificate
+- Craftsmanship Story
+- Materials Showcase
+
+Beauty:
+- Ingredients List
+- Skin Quiz
+- Before/After Slider
+
+Tech:
+- Spec Table
+- Compatibility Checker
+- Performance Benchmarks
+
+Health:
+- Certifications
+- Benefits Grid
+
+Home:
+- Materials Detail
+- Room Showcase
+
+---
+
+## Compatibility Engine
+
+Every component includes metadata:
+
+{
+  "componentId": "hero-luxury-v1",
+  "type": "hero",
+  "family": ["Luxury", "Lifestyle"],
+  "archetypes": ["luxury", "premium"],
+  "styleTags": ["editorial", "serif", "high-contrast"],
+  "mobileScore": 92,
+  "conversionScore": 88,
+  "status": "PUBLISHED"
+}
+
+Composer only selects compatible components. No cross-family combinations. No broken design language.
+
+---
+
+## Store Generation Flow (FROZEN)
+
+Merchant
+↓
+Catalog Analyzer
+↓
+Brand Analyzer
+↓
+Family Selection
+↓
+Archetype Selection
+↓
+Component Selection (from compatible pool)
+↓
+Token Application (archetype token file)
+↓
+Compatibility Validation
+↓
+Theme Composer (assemble)
+↓
+Preview URL
+↓
+Publish
+
+---
+
+## What Is FROZEN (Never Changes)
+
+- Cart Logic
+- Variant Logic
+- Search Logic
+- Checkout
+- Product Templates
+- Collection Templates
+- Currency Logic
+- SEO Framework
+- Analytics
+
+---
+
+## What Is DYNAMIC (Changes Per Store)
+
+- Header
+- Hero
+- Product Grid
+- Trust Sections
+- Testimonials
+- FAQ
+- Footer
+- Design Tokens (per archetype)
+- PDP Extensions (per family/archetype)
+- Brand Story Sections
+
+---
+
+## Long-Term Component Target
+
+Year 1: 200 Components
+Year 2: 500 Components
+Year 3: 1000+ Components
+
+The larger the library, the more unique and agency-quality every store.
+
+---
+
+## Final Principle
+
+Antigravity AI
+↓
+Creates Components (via Component Factory)
+↓
+Validation Layer
+↓
+Component Registry
+↓
+Approved Component Library
+↓
+StoreForge Engine
+↓
+Selects Components
+↓
+Builds Store
+
+StoreForge NEVER generates random production code for merchants.
+StoreForge ASSEMBLES approved agency-quality components into unique stores.
+
+Result: Thousands of unique Shopify stores from one scalable architecture without creating maintenance debt.

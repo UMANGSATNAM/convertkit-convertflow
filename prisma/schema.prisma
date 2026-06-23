@@ -56,6 +56,7 @@ model Shop {
   aiActions         AiActionLog[]
   usage             UsageCounter[]
   integrations      Integration[]
+  storeBlueprints   StoreBlueprint[]
 }
 
 model StoreGeneration {
@@ -387,23 +388,57 @@ model ValidationInterview {
 
 model ComponentRegistry {
   id                String   @id @default(cuid())
-  componentId       String   @unique
-  category          String
+  componentId       String   @unique   // e.g. "hero-editorial-beauty-v1"
+  category          String             // slot type: hero, header, footer, etc.
   niche             String   @default("core")
   sectionType       String   @default("")
   filePath          String   @default("")
-  liquidPath        String   @default("")
+  liquidPath        String   @default("")    // path in components/ dir
+  metaPath          String   @default("")    // path to .meta.json sidecar
+  // v2.0 classification fields
+  family            String   @default("")    // "Beauty", "Luxury", "Tech", "Home", etc.
+  archetypes        Json     @default("[]") // ["organic","premium"]
+  visualStyle       String   @default("")   // "editorial","luxury","bold","tech","natural"
+  compatibleSlots   Json     @default("[]") // ["header-minimal-beauty-v1"]
   industryTags      Json
   styleTags         Json
   searchKeywords    Json?
   croScore          Float    @default(0.0)
   mobileScore       Float    @default(0.0)
-  version           String   @default("1.0.0")
-  status            String   @default("ACTIVE")
+  version           String   @default("1")     // "1", "2" etc — String for backward compat
+  status            String   @default("ACTIVE")  // "ACTIVE" | "APPROVED" | "DEPRECATED"
   isUniversal       Boolean  @default(false)
   performanceScore  Float?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// v2.0: Store Blueprint Snapshot — mandatory before every compose run
+model StoreBlueprint {
+  id          String   @id @default(cuid())
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  generationId String? // link to StoreGeneration if applicable
+
+  // Classification
+  niche       String   // "beauty", "jewellery", "streetwear" etc.
+  family      String   // "Beauty", "Luxury", "Lifestyle", "Tech", "Home"
+  archetype   String   // "organic", "luxury", "bold", "tech", "minimal"
+
+  // Assembly
+  tokensFile  String   // "niche-tokens/beauty/organic.css"
+  components  Json     // { "header": "header-minimal-beauty-v1", "hero": "hero-editorial-beauty-v1", ... }
+  pdpFeatures Json     // { "beforeAfter": true, "skinQuiz": false, ... }
+
+  // State
+  status      String   @default("preview")  // "preview" | "published" | "archived"
+  healthScore Float?
+  themeId     String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([shopId, createdAt])
 }
 
 model PromptVersion {
