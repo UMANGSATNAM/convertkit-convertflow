@@ -1,204 +1,45 @@
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding ComponentRegistry for Design Systems...");
+  console.log("Seeding ComponentRegistry for Design Systems V2...");
 
-  const legacyComponents = [
-    { componentId: "header_fashion_1", category: "header", industryTags: ["fashion", "apparel", "beauty"], styleTags: ["minimal", "clean"], searchKeywords: ["navigation", "logo center", "transparent header"], croScore: 88.0, mobileScore: 98.0, version: "1.0.0", liquidPath: "theme-template/sections/header_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "grid_fashion_1", category: "product_grid", industryTags: ["fashion", "apparel"], styleTags: ["modern", "editorial"], searchKeywords: ["collection", "3 column", "hover effect", "products"], croScore: 94.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "trust_fashion_1", category: "trust", industryTags: ["fashion", "beauty", "home"], styleTags: ["clean", "conversion"], searchKeywords: ["badges", "shipping", "returns", "secure"], croScore: 96.5, mobileScore: 99.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "footer_fashion_1", category: "footer", industryTags: ["fashion", "apparel"], styleTags: ["minimal", "informative"], searchKeywords: ["newsletter", "links", "social media"], croScore: 85.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/footer_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "testimonials_fashion_1", category: "testimonials", industryTags: ["fashion"], styleTags: ["modern", "editorial"], searchKeywords: ["reviews", "social proof"], croScore: 95, mobileScore: 96, version: "1.0.0", liquidPath: "theme-template/sections/testimonials_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "testimonials_beauty_1", category: "testimonials", industryTags: ["beauty"], styleTags: ["soft"], searchKeywords: ["glow", "customer reviews"], croScore: 96, mobileScore: 97, version: "1.0.0", liquidPath: "theme-template/sections/testimonials_beauty_1.liquid", status: "LEGACY" },
-    { componentId: "testimonials_tech_1", category: "testimonials", industryTags: ["electronics"], styleTags: ["modern"], searchKeywords: ["ratings", "tech reviews"], croScore: 94, mobileScore: 95, version: "1.0.0", liquidPath: "theme-template/sections/testimonials_tech_1.liquid", status: "LEGACY" },
-    { componentId: "testimonials_generic_1", category: "testimonials", industryTags: ["generic"], styleTags: ["clean"], searchKeywords: ["reviews", "stars"], croScore: 90, mobileScore: 92, version: "1.0.0", liquidPath: "theme-template/sections/testimonials_generic_1.liquid", status: "LEGACY" },
-    { componentId: "trust_beauty_1", category: "trust", industryTags: ["beauty"], styleTags: ["soft"], searchKeywords: ["cruelty-free", "organic"], croScore: 98, mobileScore: 98, version: "1.0.0", liquidPath: "theme-template/sections/trust_beauty_1.liquid", status: "LEGACY" },
-    { componentId: "trust_tech_1", category: "trust", industryTags: ["electronics"], styleTags: ["modern"], searchKeywords: ["warranty", "secure"], croScore: 97, mobileScore: 97, version: "1.0.0", liquidPath: "theme-template/sections/trust_tech_1.liquid", status: "LEGACY" },
-    { componentId: "trust_generic_1", category: "trust", industryTags: ["generic"], styleTags: ["clean"], searchKeywords: ["shipping", "returns"], croScore: 95, mobileScore: 95, version: "1.0.0", liquidPath: "theme-template/sections/trust_generic_1.liquid", status: "LEGACY" },
-    { componentId: "faq_fashion_1", category: "faq", industryTags: ["fashion"], styleTags: ["minimal"], searchKeywords: ["sizing", "shipping"], croScore: 91, mobileScore: 94, version: "1.0.0", liquidPath: "theme-template/sections/faq_fashion_1.liquid", status: "LEGACY" },
-    { componentId: "faq_tech_1", category: "faq", industryTags: ["electronics"], styleTags: ["modern"], searchKeywords: ["specs", "warranty faq"], croScore: 92, mobileScore: 95, version: "1.0.0", liquidPath: "theme-template/sections/faq_tech_1.liquid", status: "LEGACY" },
-    { componentId: "faq_generic_1", category: "faq", industryTags: ["generic"], styleTags: ["clean"], searchKeywords: ["questions", "help"], croScore: 89, mobileScore: 92, version: "1.0.0", liquidPath: "theme-template/sections/faq_generic_1.liquid", status: "LEGACY" },
-    { componentId: "grid_beauty_1", category: "product_grid", industryTags: ["beauty"], styleTags: ["soft"], searchKeywords: ["skincare lineup"], croScore: 93, mobileScore: 94, version: "1.0.0", liquidPath: "theme-template/sections/grid_beauty_1.liquid", status: "LEGACY" },
-    { componentId: "grid_tech_1", category: "product_grid", industryTags: ["electronics"], styleTags: ["modern", "dark"], searchKeywords: ["gadgets", "devices"], croScore: 92, mobileScore: 93, version: "1.0.0", liquidPath: "theme-template/sections/grid_tech_1.liquid", status: "LEGACY" },
-    { componentId: "grid_home_1", category: "product_grid", industryTags: ["home"], styleTags: ["organic"], searchKeywords: ["furniture grid"], croScore: 90, mobileScore: 91, version: "1.0.0", liquidPath: "theme-template/sections/grid_home_1.liquid", status: "LEGACY" },
-    { componentId: "grid_jewelry_1", category: "product_grid", industryTags: ["jewelry"], styleTags: ["elegant"], searchKeywords: ["rings", "necklaces"], croScore: 95, mobileScore: 96, version: "1.0.0", liquidPath: "theme-template/sections/grid_jewelry_1.liquid", status: "LEGACY" },
-    { componentId: "grid_generic_1", category: "product_grid", industryTags: ["generic"], styleTags: ["clean"], searchKeywords: ["products", "catalog"], croScore: 88, mobileScore: 90, version: "1.0.0", liquidPath: "theme-template/sections/grid_generic_1.liquid", status: "LEGACY" }
-  ];
+  // Load the new registry.json
+  const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'component-registry', 'registry.json');
+  const registryRaw = fs.readFileSync(registryPath, 'utf8');
+  
+  // Parse ignoring comments using Function (since JSON.parse fails on // comments)
+  const registry = new Function('return ' + registryRaw)();
+  
+  const components = registry.components.map((comp: any) => ({
+    componentId: comp.componentId,
+    category: comp.type, // Map 'type' to 'category'
+    niche: comp.family ? comp.family.toLowerCase() : "core",
+    sectionType: comp.type,
+    filePath: comp.liquidPath,
+    liquidPath: comp.liquidPath,
+    metaPath: comp.metaPath,
+    family: comp.family || "",
+    archetypes: comp.archetypes || [],
+    visualStyle: comp.visualStyle || "",
+    compatibleSlots: comp.compatibleSlots || [],
+    industryTags: comp.family ? [comp.family.toLowerCase()] : ["generic"],
+    styleTags: comp.visualStyle ? [comp.visualStyle] : [],
+    searchKeywords: [comp.type, comp.visualStyle, comp.family].filter(Boolean),
+    croScore: 95.0,
+    mobileScore: 95.0,
+    version: String(comp.version || "1"),
+    status: comp.status === "approved" ? "PUBLISHED" : "DRAFT",
+    isUniversal: !!comp.isUniversal,
+    performanceScore: 95.0
+  }));
 
-  const publishedComponents = [
-    // LUXURY
-    { componentId: "hero_luxury_1", category: "hero", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["full-bleed", "premium"], croScore: 92.5, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/heroes/hero_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "header_luxury_1", category: "header", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["navigation", "premium"], croScore: 90.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/headers/header_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "grid_luxury_1", category: "product_grid", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["curated", "premium"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/product-grids/grid_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "trust_luxury_1", category: "trust", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["craftsmanship", "concierge"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/trust/trust_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "testimonials_luxury_1", category: "testimonials", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["reviews", "premium"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/testimonials/testimonials_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "faq_luxury_1", category: "faq", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["client services", "help"], croScore: 91.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/faq/faq_luxury_1.liquid", status: "PUBLISHED" },
-    { componentId: "footer_luxury_1", category: "footer", industryTags: ["generic"], styleTags: ["luxury"], searchKeywords: ["links", "premium"], croScore: 89.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/footers/footer_luxury_1.liquid", status: "PUBLISHED" },
-
-    // MINIMAL
-    { componentId: "hero_minimal_1", category: "hero", industryTags: ["generic"], styleTags: ["minimal", "clean"], searchKeywords: ["whitespace", "simple", "clean"], croScore: 94.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/heroes/hero_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "header_minimal_1", category: "header", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["simple", "clean"], croScore: 92.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/headers/header_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "grid_minimal_1", category: "product_grid", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["clean", "grid"], croScore: 93.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/product-grids/grid_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "trust_minimal_1", category: "trust", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["materials", "carbon neutral"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/trust/trust_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "brand_story_minimal_1", category: "brand_story", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["story", "philosophy"], croScore: 90.0, mobileScore: 91.0, version: "1.0.0", liquidPath: "theme-template/sections/brand-story/brand_story_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "faq_minimal_1", category: "faq", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["questions", "clean"], croScore: 91.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/faq/faq_minimal_1.liquid", status: "PUBLISHED" },
-    { componentId: "footer_minimal_1", category: "footer", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["links", "simple"], croScore: 89.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/footers/footer_minimal_1.liquid", status: "PUBLISHED" },
-
-    // MODERN
-    { componentId: "hero_modern_1", category: "hero", industryTags: ["generic"], styleTags: ["modern", "tech"], searchKeywords: ["sleek", "blue", "apple"], croScore: 91.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/heroes/hero_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "header_modern_1", category: "header", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["dark", "glass"], croScore: 90.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/headers/header_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "grid_modern_1", category: "product_grid", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["tech", "dark"], croScore: 92.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/product-grids/grid_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "trust_modern_1", category: "trust", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["warranty", "support"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/trust/trust_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "testimonials_modern_1", category: "testimonials", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["reviews", "tech"], croScore: 91.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/testimonials/testimonials_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "feature_comparison_modern_1", category: "feature_comparison", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["compare", "specs"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/feature-comparison/feature_comparison_modern_1.liquid", status: "PUBLISHED" },
-    { componentId: "footer_modern_1", category: "footer", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["dark", "links"], croScore: 89.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/footers/footer_modern_1.liquid", status: "PUBLISHED" },
-
-    // BOLD
-    { componentId: "hero_bold_1", category: "hero", industryTags: ["generic"], styleTags: ["bold", "streetwear"], searchKeywords: ["high contrast", "black", "red"], croScore: 95.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/heroes/hero_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "header_bold_1", category: "header", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["marquee", "street"], croScore: 93.0, mobileScore: 91.0, version: "1.0.0", liquidPath: "theme-template/sections/headers/header_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "grid_bold_1", category: "product_grid", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["drops", "hype"], croScore: 96.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/product-grids/grid_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "social_hype_bold_1", category: "social_hype", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["marquee", "hype"], croScore: 95.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/social-hype/social_hype_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "testimonials_bold_1", category: "testimonials", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["hypebeast", "street"], croScore: 92.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/testimonials/testimonials_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "faq_bold_1", category: "faq", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["wtf", "drops"], croScore: 90.0, mobileScore: 89.0, version: "1.0.0", liquidPath: "theme-template/sections/faq/faq_bold_1.liquid", status: "PUBLISHED" },
-    { componentId: "footer_bold_1", category: "footer", industryTags: ["generic"], styleTags: ["bold"], searchKeywords: ["links", "street"], croScore: 88.0, mobileScore: 88.0, version: "1.0.0", liquidPath: "theme-template/sections/footers/footer_bold_1.liquid", status: "PUBLISHED" }
-  ];
-
-  const d2cComponents = [
-    { componentId: "hero_d2c_split", category: "hero", industryTags: ["generic", "d2c"], styleTags: ["modern", "clean"], searchKeywords: ["split", "d2c", "hero"], croScore: 95.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_d2c_split.liquid", status: "PUBLISHED" },
-    { componentId: "hero_luxury_overlay", category: "hero", industryTags: ["jewelry", "fashion"], styleTags: ["luxury"], searchKeywords: ["overlay", "luxury", "hero"], croScore: 92.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_luxury_overlay.liquid", status: "PUBLISHED" },
-    { componentId: "features_trust_badges", category: "trust", industryTags: ["generic", "d2c"], styleTags: ["minimal", "conversion"], searchKeywords: ["trust", "badges", "shipping", "features"], croScore: 98.0, mobileScore: 99.0, version: "1.0.0", liquidPath: "theme-template/sections/features_trust_badges.liquid", status: "PUBLISHED" },
-    { componentId: "social_proof_press", category: "social_proof", industryTags: ["generic", "d2c"], styleTags: ["modern"], searchKeywords: ["press", "logos", "featured in", "marquee"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/social_proof_press.liquid", status: "PUBLISHED" },
-    { componentId: "product_info_premium", category: "product_info", industryTags: ["generic", "d2c"], styleTags: ["modern", "conversion"], searchKeywords: ["product page", "scarcity", "add to cart"], croScore: 97.0, mobileScore: 98.0, version: "1.0.0", liquidPath: "theme-template/sections/product_info_premium.liquid", status: "PUBLISHED" },
-    { componentId: "product_gallery_carousel", category: "product_gallery", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["carousel", "gallery", "thumbnails"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/product_gallery_carousel.liquid", status: "PUBLISHED" },
-    { componentId: "testimonials_slider", category: "testimonials", industryTags: ["generic", "d2c"], styleTags: ["modern", "clean"], searchKeywords: ["reviews", "slider", "testimonials"], croScore: 96.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/testimonials_slider.liquid", status: "PUBLISHED" },
-    { componentId: "rich_text_story", category: "brand_story", industryTags: ["generic", "d2c"], styleTags: ["minimal", "clean"], searchKeywords: ["story", "about us", "rich text"], croScore: 90.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/rich_text_story.liquid", status: "PUBLISHED" },
-    { componentId: "collection_grid_modern", category: "product_grid", industryTags: ["generic", "d2c"], styleTags: ["modern", "clean"], searchKeywords: ["collection", "grid", "products"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/collection_grid_modern.liquid", status: "PUBLISHED" },
-    { componentId: "announcement_bar", category: "header", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["announcement", "banner", "top bar"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/announcement_bar.liquid", status: "PUBLISHED" }
-  ];
-
-  const batch1Components = [
-    { componentId: "hero_video_background", category: "hero", industryTags: ["generic"], styleTags: ["bold", "modern"], searchKeywords: ["video", "hero", "background"], croScore: 96.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_video_background.liquid", status: "PUBLISHED" },
-    { componentId: "hero_slider_fullwidth", category: "hero", industryTags: ["generic"], styleTags: ["modern", "clean"], searchKeywords: ["slider", "fullwidth", "carousel"], croScore: 94.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_slider_fullwidth.liquid", status: "PUBLISHED" },
-    { componentId: "hero_minimal_center", category: "hero", industryTags: ["generic"], styleTags: ["minimal", "clean"], searchKeywords: ["minimal", "center", "hero"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_minimal_center.liquid", status: "PUBLISHED" },
-    { componentId: "hero_split_asymmetric", category: "hero", industryTags: ["generic"], styleTags: ["modern", "editorial"], searchKeywords: ["split", "asymmetric", "hero"], croScore: 93.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_split_asymmetric.liquid", status: "PUBLISHED" },
-    { componentId: "banner_countdown", category: "banner", industryTags: ["generic"], styleTags: ["bold", "conversion"], searchKeywords: ["countdown", "banner", "sale", "timer"], croScore: 99.0, mobileScore: 98.0, version: "1.0.0", liquidPath: "theme-template/sections/banner_countdown.liquid", status: "PUBLISHED" },
-    { componentId: "banner_promo_grid", category: "banner", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["promo", "grid", "banner"], croScore: 94.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/banner_promo_grid.liquid", status: "PUBLISHED" },
-    { componentId: "hero_product_showcase", category: "hero", industryTags: ["generic", "electronics"], styleTags: ["modern", "premium"], searchKeywords: ["product", "showcase", "hero", "device"], croScore: 97.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_product_showcase.liquid", status: "PUBLISHED" },
-    { componentId: "hero_parallax", category: "hero", industryTags: ["generic"], styleTags: ["modern", "immersive"], searchKeywords: ["parallax", "hero", "image"], croScore: 93.0, mobileScore: 91.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_parallax.liquid", status: "PUBLISHED" },
-    { componentId: "banner_newsletter_signup", category: "banner", industryTags: ["generic"], styleTags: ["minimal"], searchKeywords: ["newsletter", "signup", "banner", "email"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/banner_newsletter_signup.liquid", status: "PUBLISHED" },
-    { componentId: "hero_collection_mosaic", category: "hero", industryTags: ["generic", "fashion"], styleTags: ["modern", "editorial"], searchKeywords: ["collection", "mosaic", "grid", "images"], croScore: 94.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/hero_collection_mosaic.liquid", status: "PUBLISHED" }
-  ];
-
-  const batch2Components = [
-    { componentId: "grid_masonry_gallery", category: "product_grid", industryTags: ["generic", "fashion", "art"], styleTags: ["creative", "modern"], searchKeywords: ["masonry", "gallery", "grid", "images"], croScore: 92.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_masonry_gallery.liquid", status: "PUBLISHED" },
-    { componentId: "grid_bestsellers_carousel", category: "product_grid", industryTags: ["generic"], styleTags: ["modern", "conversion"], searchKeywords: ["bestsellers", "carousel", "slider", "top products"], croScore: 97.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_bestsellers_carousel.liquid", status: "PUBLISHED" },
-    { componentId: "grid_category_circles", category: "product_grid", industryTags: ["generic", "d2c"], styleTags: ["minimal", "clean"], searchKeywords: ["category", "circles", "navigation", "collections"], croScore: 96.0, mobileScore: 98.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_category_circles.liquid", status: "PUBLISHED" },
-    { componentId: "grid_product_tabs", category: "product_grid", industryTags: ["generic", "electronics", "beauty"], styleTags: ["modern", "organized"], searchKeywords: ["tabs", "categories", "filter", "grid"], croScore: 95.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_product_tabs.liquid", status: "PUBLISHED" },
-    { componentId: "grid_instagram_shop", category: "product_grid", industryTags: ["fashion", "beauty", "d2c"], styleTags: ["social", "modern"], searchKeywords: ["instagram", "social", "shop the look", "ugc"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_instagram_shop.liquid", status: "PUBLISHED" },
-    { componentId: "grid_featured_lookbook", category: "product_grid", industryTags: ["fashion", "apparel"], styleTags: ["editorial", "luxury"], searchKeywords: ["lookbook", "hotspots", "shoppable", "image"], croScore: 96.0, mobileScore: 91.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_featured_lookbook.liquid", status: "PUBLISHED" },
-    { componentId: "collection_list_slider", category: "product_grid", industryTags: ["generic"], styleTags: ["modern"], searchKeywords: ["collections", "slider", "horizontal"], croScore: 93.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/collection_list_slider.liquid", status: "PUBLISHED" },
-    { componentId: "grid_flash_sale", category: "product_grid", industryTags: ["generic", "d2c"], styleTags: ["bold", "conversion"], searchKeywords: ["flash sale", "timer", "countdown", "urgent"], croScore: 98.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_flash_sale.liquid", status: "PUBLISHED" },
-    { componentId: "grid_minimal_hover", category: "product_grid", industryTags: ["generic", "fashion"], styleTags: ["minimal", "clean"], searchKeywords: ["hover", "image swap", "quick add"], croScore: 95.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/grid_minimal_hover.liquid", status: "PUBLISHED" },
-    { componentId: "collection_banner_inline", category: "product_grid", industryTags: ["generic"], styleTags: ["modern", "clean"], searchKeywords: ["inline", "banner", "featured products"], croScore: 92.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/collection_banner_inline.liquid", status: "PUBLISHED" }
-  ];
-
-  const batch3Components = [
-    { componentId: "story_timeline_vertical", category: "brand_story", industryTags: ["generic"], styleTags: ["clean", "informative"], searchKeywords: ["timeline", "history", "vertical", "story"], croScore: 92.0, mobileScore: 90.0, version: "1.0.0", liquidPath: "theme-template/sections/story_timeline_vertical.liquid", status: "PUBLISHED" },
-    { componentId: "story_image_text_overlap", category: "brand_story", industryTags: ["generic", "luxury"], styleTags: ["editorial", "modern"], searchKeywords: ["image", "text", "overlap", "story"], croScore: 94.0, mobileScore: 91.0, version: "1.0.0", liquidPath: "theme-template/sections/story_image_text_overlap.liquid", status: "PUBLISHED" },
-    { componentId: "info_icon_columns", category: "information", industryTags: ["generic", "d2c"], styleTags: ["minimal", "clean"], searchKeywords: ["icons", "columns", "features", "benefits"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/info_icon_columns.liquid", status: "PUBLISHED" },
-    { componentId: "info_accordion_tabs", category: "information", industryTags: ["generic", "tech"], styleTags: ["modern", "organized"], searchKeywords: ["accordion", "tabs", "features", "details"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/info_accordion_tabs.liquid", status: "PUBLISHED" },
-    { componentId: "story_founder_message", category: "brand_story", industryTags: ["generic", "d2c"], styleTags: ["personal", "clean"], searchKeywords: ["founder", "message", "quote", "story"], croScore: 96.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/story_founder_message.liquid", status: "PUBLISHED" },
-    { componentId: "info_process_steps", category: "information", industryTags: ["generic", "service"], styleTags: ["clean", "informative"], searchKeywords: ["process", "steps", "how it works", "guide"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/info_process_steps.liquid", status: "PUBLISHED" },
-    { componentId: "story_video_with_text", category: "brand_story", industryTags: ["generic"], styleTags: ["immersive", "modern"], searchKeywords: ["video", "text", "story", "watch"], croScore: 95.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/story_video_with_text.liquid", status: "PUBLISHED" },
-    { componentId: "info_stats_counter", category: "information", industryTags: ["generic", "b2b"], styleTags: ["bold", "modern"], searchKeywords: ["stats", "counter", "numbers", "data"], croScore: 91.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/info_stats_counter.liquid", status: "PUBLISHED" },
-    { componentId: "info_comparison_table", category: "information", industryTags: ["generic", "tech", "d2c"], styleTags: ["clear", "conversion"], searchKeywords: ["comparison", "table", "features", "vs"], croScore: 98.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/info_comparison_table.liquid", status: "PUBLISHED" },
-    { componentId: "story_materials_showcase", category: "brand_story", industryTags: ["fashion", "home", "sustainability"], styleTags: ["organic", "clean"], searchKeywords: ["materials", "quality", "sustainability", "showcase"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/story_materials_showcase.liquid", status: "PUBLISHED" }
-  ];
-
-  const batch4Components = [
-    { componentId: "trust_press_logos_grid", category: "social_proof", industryTags: ["generic", "d2c"], styleTags: ["minimal", "clean"], searchKeywords: ["press", "logos", "as seen in", "media"], croScore: 96.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_press_logos_grid.liquid", status: "PUBLISHED" },
-    { componentId: "trust_customer_reviews_masonry", category: "social_proof", industryTags: ["generic"], styleTags: ["modern", "organized"], searchKeywords: ["reviews", "masonry", "testimonials", "stars"], croScore: 97.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_customer_reviews_masonry.liquid", status: "PUBLISHED" },
-    { componentId: "trust_video_testimonials", category: "social_proof", industryTags: ["generic", "beauty"], styleTags: ["immersive", "conversion"], searchKeywords: ["video", "testimonials", "reviews", "ugc"], croScore: 98.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_video_testimonials.liquid", status: "PUBLISHED" },
-    { componentId: "trust_before_after_slider", category: "social_proof", industryTags: ["beauty", "health"], styleTags: ["interactive", "clean"], searchKeywords: ["before after", "slider", "results", "comparison"], croScore: 99.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_before_after_slider.liquid", status: "PUBLISHED" },
-    { componentId: "trust_instagram_mentions", category: "social_proof", industryTags: ["fashion", "d2c"], styleTags: ["social", "modern"], searchKeywords: ["instagram", "mentions", "ugc", "community"], croScore: 94.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_instagram_mentions.liquid", status: "PUBLISHED" },
-    { componentId: "trust_guarantees_banner", category: "social_proof", industryTags: ["generic", "ecommerce"], styleTags: ["clear", "minimal"], searchKeywords: ["guarantees", "shipping", "returns", "secure"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_guarantees_banner.liquid", status: "PUBLISHED" },
-    { componentId: "trust_featured_review_hero", category: "social_proof", industryTags: ["generic", "d2c"], styleTags: ["editorial", "bold"], searchKeywords: ["featured review", "hero", "quote", "testimonial"], croScore: 96.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_featured_review_hero.liquid", status: "PUBLISHED" },
-    { componentId: "trust_expert_endorsement", category: "social_proof", industryTags: ["health", "tech", "beauty"], styleTags: ["professional", "clean"], searchKeywords: ["expert", "endorsement", "doctor", "professional"], croScore: 97.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_expert_endorsement.liquid", status: "PUBLISHED" },
-    { componentId: "trust_certifications_list", category: "social_proof", industryTags: ["food", "beauty", "sustainability"], styleTags: ["clean", "minimal"], searchKeywords: ["certifications", "badges", "vegan", "organic"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_certifications_list.liquid", status: "PUBLISHED" },
-    { componentId: "trust_ugc_tiktok_feed", category: "social_proof", industryTags: ["fashion", "beauty", "d2c"], styleTags: ["trending", "modern"], searchKeywords: ["tiktok", "reels", "ugc", "video feed"], croScore: 98.0, mobileScore: 97.0, version: "1.0.0", liquidPath: "theme-template/sections/trust_ugc_tiktok_feed.liquid", status: "PUBLISHED" }
-  ];
-
-  const batch5Components = [
-    { componentId: "util_scrolling_announcement", category: "utilities", industryTags: ["generic", "d2c"], styleTags: ["dynamic", "bold"], searchKeywords: ["marquee", "scrolling", "announcement", "bar"], croScore: 95.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/util_scrolling_announcement.liquid", status: "PUBLISHED" },
-    { componentId: "util_shoppable_video_modal", category: "utilities", industryTags: ["fashion", "beauty", "d2c"], styleTags: ["interactive", "modern"], searchKeywords: ["video", "shoppable", "modal", "popup"], croScore: 98.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/util_shoppable_video_modal.liquid", status: "PUBLISHED" },
-    { componentId: "util_store_locator_map", category: "utilities", industryTags: ["generic", "retail"], styleTags: ["functional", "clean"], searchKeywords: ["store", "locator", "map", "locations"], croScore: 92.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/util_store_locator_map.liquid", status: "PUBLISHED" },
-    { componentId: "util_contact_form_split", category: "utilities", industryTags: ["generic", "service"], styleTags: ["clean", "professional"], searchKeywords: ["contact", "form", "split", "support"], croScore: 94.0, mobileScore: 96.0, version: "1.0.0", liquidPath: "theme-template/sections/util_contact_form_split.liquid", status: "PUBLISHED" },
-    { componentId: "util_newsletter_popup", category: "utilities", industryTags: ["generic", "ecommerce"], styleTags: ["conversion", "modern"], searchKeywords: ["newsletter", "popup", "modal", "subscribe"], croScore: 97.0, mobileScore: 93.0, version: "1.0.0", liquidPath: "theme-template/sections/util_newsletter_popup.liquid", status: "PUBLISHED" },
-    { componentId: "util_age_verifier_modal", category: "utilities", industryTags: ["alcohol", "vape"], styleTags: ["functional", "bold"], searchKeywords: ["age", "verifier", "modal", "gate"], croScore: 99.0, mobileScore: 98.0, version: "1.0.0", liquidPath: "theme-template/sections/util_age_verifier_modal.liquid", status: "PUBLISHED" },
-    { componentId: "util_size_guide_table", category: "utilities", industryTags: ["fashion"], styleTags: ["informative", "clean"], searchKeywords: ["size", "guide", "table", "chart"], croScore: 96.0, mobileScore: 95.0, version: "1.0.0", liquidPath: "theme-template/sections/util_size_guide_table.liquid", status: "PUBLISHED" },
-    { componentId: "layout_footer_mega", category: "layout", industryTags: ["generic", "ecommerce"], styleTags: ["organized", "comprehensive"], searchKeywords: ["footer", "mega", "links", "bottom"], croScore: 93.0, mobileScore: 94.0, version: "1.0.0", liquidPath: "theme-template/sections/layout_footer_mega.liquid", status: "PUBLISHED" },
-    { componentId: "layout_header_transparent", category: "layout", industryTags: ["generic", "luxury"], styleTags: ["minimal", "elegant"], searchKeywords: ["header", "transparent", "navigation", "top"], croScore: 95.0, mobileScore: 92.0, version: "1.0.0", liquidPath: "theme-template/sections/layout_header_transparent.liquid", status: "PUBLISHED" },
-    { componentId: "util_mobile_bottom_nav", category: "utilities", industryTags: ["generic", "ecommerce"], styleTags: ["app-like", "functional"], searchKeywords: ["mobile", "nav", "bottom", "bar"], croScore: 98.0, mobileScore: 99.0, version: "1.0.0", liquidPath: "theme-template/sections/util_mobile_bottom_nav.liquid", status: "PUBLISHED" }
-  ];
-
-  const nicheComponents: any[] = [];
-  const nichesList = ["jewellery", "streetwear", "beauty", "electronics", "home-decor"];
-  const sectionsList = [
-    "announcement-bar",
-    "header",
-    "hero-banner",
-    "featured-collection",
-    "image-with-text",
-    "testimonials",
-    "newsletter",
-    "main-product",
-    "main-collection",
-    "footer",
-    "spin-wheel-popup",
-    "bundle-builder"
-  ];
-
-  const nicheStyleTags: Record<string, string[]> = {
-    "jewellery": ["luxury", "dark-mode", "refined"],
-    "streetwear": ["bold", "high-contrast", "street", "modern"],
-    "beauty": ["soft", "pastel", "clean", "minimal"],
-    "electronics": ["modern", "technical", "dark-blue", "grid"],
-    "home-decor": ["warm", "editorial", "terracotta", "editorial-spacing"]
-  };
-
-  const nicheIndustryTags: Record<string, string[]> = {
-    "jewellery": ["jewelry", "luxury"],
-    "streetwear": ["apparel", "fashion", "streetwear"],
-    "beauty": ["beauty", "skincare"],
-    "electronics": ["electronics", "gadgets"],
-    "home-decor": ["home", "decor"]
-  };
-
-  for (const niche of nichesList) {
-    for (const section of sectionsList) {
-      nicheComponents.push({
-        componentId: `${niche}-${section}`,
-        category: section,
-        niche: niche,
-        sectionType: section,
-        filePath: `app/data/templates/theme-engine/niches/${niche}/sections/${section}.liquid`,
-        liquidPath: `app/data/templates/theme-engine/niches/${niche}/sections/${section}.liquid`,
-        industryTags: nicheIndustryTags[niche],
-        styleTags: nicheStyleTags[niche],
-        searchKeywords: [niche, section, "niche-matched"],
-        croScore: 95.0,
-        mobileScore: 95.0,
-        version: "1.0.0",
-        status: "PUBLISHED",
-        isUniversal: false,
-        performanceScore: null
-      });
-    }
-  }
-
-  const components = [...legacyComponents, ...publishedComponents, ...d2cComponents, ...batch1Components, ...batch2Components, ...batch3Components, ...batch4Components, ...batch5Components, ...nicheComponents];
+  // Clean the current table
+  await prisma.componentRegistry.deleteMany({});
+  console.log("Cleared old ComponentRegistry.");
 
   for (const comp of components) {
     await prisma.componentRegistry.upsert({
@@ -209,7 +50,7 @@ async function main() {
     console.log(`Seeded component: ${comp.componentId}`);
   }
 
-  console.log("ComponentRegistry seeding complete.");
+  console.log("ComponentRegistry V2 seeding complete.");
 }
 
 main()
