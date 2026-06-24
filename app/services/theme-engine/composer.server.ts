@@ -121,17 +121,7 @@ export async function composeThemeFromBlueprint(
   const coreFiles = await readDirRecursive(coreDir, coreDir);
   Object.assign(filesToUpload, coreFiles);
 
-  // Step 2: Overwrite with Niche
-  if (nicheId && nicheId !== "ai-custom") {
-    const nicheDir = path.resolve(process.cwd(), `app/data/templates/theme-engine/niches/${nicheId}`);
-    const exists = await fs.stat(nicheDir).then(s => s.isDirectory()).catch(() => false);
-    if (exists) {
-      const nicheFiles = await readDirRecursive(nicheDir, nicheDir);
-      Object.assign(filesToUpload, nicheFiles);
-    } else {
-      console.warn(`[Composer] Niche directory not found: ${nicheDir}`);
-    }
-  }
+  // Step 2: Overwrite with Niche (REMOVED in V2 architecture since niches folder is deleted)
 
   // Step 3: Resolve Niche Tokens CSS
   if (blueprint.tokensFile) {
@@ -208,7 +198,14 @@ export async function composeThemeFromBlueprint(
   for (const component of resolvedComponents) {
     if (component.liquidPath || component.filePath) {
       try {
-        const fullPath = path.resolve(process.cwd(), component.liquidPath || component.filePath);
+        const engineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
+        // Check if liquidPath is already absolute or relative to root
+        let fullPath = "";
+        if (component.liquidPath.startsWith("app/")) {
+          fullPath = path.resolve(process.cwd(), component.liquidPath);
+        } else {
+          fullPath = path.resolve(engineDir, component.liquidPath || component.filePath);
+        }
         const liquidContent = await fs.readFile(fullPath, "utf-8");
         const sectionType = component.sectionType || component.componentId;
         const targetKey = `sections/${sectionType}.liquid`;
