@@ -19,7 +19,9 @@ export async function injectProductsIntoBlueprint(
         nodes {
           handle
           title
-          productsCount
+          productsCount {
+            count
+          }
         }
       }
     }
@@ -34,7 +36,7 @@ export async function injectProductsIntoBlueprint(
   }
 
   // Find collections that have products
-  const validCollections = collections.filter(c => c.productsCount > 0);
+  const validCollections = collections.filter(c => c.productsCount?.count > 0);
   const primaryCollection = validCollections[0]?.handle || "frontpage";
   const secondaryCollection = validCollections.length > 1 ? validCollections[1].handle : primaryCollection;
 

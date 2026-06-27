@@ -24,9 +24,9 @@ export function calculateHealthScore(
 
     // CRO Boosts
     if (types.some(t => t.includes("hero"))) cro += 15;
-    if (types.some(t => t.includes("trust"))) cro += 15;
-    if (types.some(t => t.includes("reviews"))) cro += 10;
-    if (types.some(t => t.includes("faq"))) cro += 10;
+    if (types.some(t => t.includes("trust") || t.includes("logo"))) cro += 15;
+    if (types.some(t => t.includes("reviews") || t.includes("testimonial"))) cro += 10;
+    if (types.some(t => t.includes("faq") || t.includes("accordion"))) cro += 10;
 
     // SEO Boosts
     if (types.some(t => t.includes("seo") || t.includes("content"))) seo += 20;
