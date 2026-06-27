@@ -2,9 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { analyzeCatalog } from "../app/services/ai/catalog-analyzer.server";
 import { analyzeBrand } from "../app/services/ai/brand-analyzer.server";
 import { analyzeCRO } from "../app/services/ai/cro-analyzer.server";
+import { analyzeVisualAssets } from "../app/services/ai/visual-analyzer.server";
 import { retrieveBestComponent } from "../app/services/theme-engine/retrieval.server";
-import { composeThemeFromBlueprint } from "../app/services/theme-engine/composer.server";
-import { calculateHealthScore } from "../app/services/theme-engine/health.server";
+import { generateStoreBlueprint } from "../app/services/theme-engine/blueprint.server";
 
 const prisma = new PrismaClient();
 
@@ -28,43 +28,34 @@ async function runValidation() {
     console.log("Running Catalog Analyzer...");
     const catalogContext = await analyzeCatalog(shop.shop, shop.accessToken);
     
+    console.log("Running Visual Analyzer...");
+    const visualContext = await analyzeVisualAssets(shop.shop, catalogContext.sampleImageUrls);
+
     // 4 & 5. Run Brand & CRO Analyzer
     console.log("Running Brand & CRO Analyzers...");
     const [brandContext, croContext] = await Promise.all([
-      analyzeBrand(catalogContext, shop.shop),
+      analyzeBrand(catalogContext, visualContext, shop.shop),
       analyzeCRO(catalogContext)
     ]);
 
     // 6. Generate Store Blueprint
     console.log("Generating Store Blueprint...");
-    const indexSections = [
-      { sectionType: "hero" },
-      { sectionType: "product_grid" }
-    ];
-    if (croContext.socialProofNeeded) indexSections.push({ sectionType: "testimonials" });
-    if (croContext.trustLevel === "high") indexSections.push({ sectionType: "trust" });
-    if (croContext.faqNeeded) indexSections.push({ sectionType: "faq" });
-    indexSections.push({ sectionType: "footer" });
-
-    const storeBlueprintAi = {
-      pages: { index: indexSections }
-    };
+    const storeBlueprintAi = generateStoreBlueprint(catalogContext, brandContext);
 
     // 7. Component Selection
     console.log("Running Component Selection...");
-    const industriesList = [catalogContext.industry, catalogContext.subcategory, "generic"];
-    const stylesList = [brandContext.style, "minimal", "modern"];
     const matchedComponentsList = [];
     
-    for (const section of storeBlueprintAi.pages.index) {
+    for (const sectionType of storeBlueprintAi.pages.index) {
       const bestComponent = await retrieveBestComponent({
-        sectionType: section.sectionType,
-        industryTags: industriesList,
-        styleTags: stylesList
+        sectionType: sectionType,
+        brandArchetype: brandContext.brand_archetype,
+        catalogIndustry: catalogContext.industry,
+        catalogStyle: catalogContext.style,
+        catalogVisualComplexity: catalogContext.visual_complexity
       });
       if (bestComponent) {
         matchedComponentsList.push(bestComponent);
-        (section as any).componentId = bestComponent.componentId;
       }
     }
 
@@ -76,12 +67,12 @@ async function runValidation() {
     console.log("\n=================================");
     console.log("REQUIRED REPORT:");
     console.log("=================================");
-    console.log(`Product Count: ${catalogContext.productCount}`); 
+    console.log(`Product Count: ${catalogContext.product_count}`); 
     console.log(`Images Per Product: ${catalogContext.imagesPerProduct.toFixed(2)}`);
-    console.log(`Winning Style Preset: ${brandContext.style}`);
+    console.log(`Winning Style Preset: ${brandContext.visual_direction}`);
     console.log(`Industry: ${catalogContext.industry}`);
-    console.log(`Price Tier: ${catalogContext.priceTier}`);
-    console.log(`Catalog Score: ${catalogContext.catalogScore}`);
+    console.log(`Price Tier: ${catalogContext.price_band}`);
+    console.log(`Catalog Score: ${catalogContext.catalog_strength}`);
     console.log(`Components Selected: ${matchedComponentsList.length}`);
     console.log(`Theme Health Score: ${healthScore}`);
     console.log(`Generation Time: ${timeTakenStr}`);

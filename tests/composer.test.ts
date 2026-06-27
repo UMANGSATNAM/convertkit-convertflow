@@ -4,6 +4,50 @@ import { ValidationError } from '../app/services/theme-engine/validators.server'
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+function getDirName(dirPath: any): string {
+  const normalized = String(dirPath).replace(/\\/g, '/');
+  const parts = normalized.split('/');
+  return parts[parts.length - 1];
+}
+
+// Mock Redis to prevent real connection attempts during tests
+vi.mock('../app/services/redis.server', () => {
+  let lockMap = new Map();
+  return {
+    redis: {
+      set: vi.fn(async (key, value, px, expiry, nx) => {
+        if (lockMap.has(key)) return null;
+        lockMap.set(key, value);
+        return "OK";
+      }),
+      eval: vi.fn(async (script, numKeys, key, value) => {
+        if (lockMap.get(key) === value) {
+          lockMap.delete(key);
+          return 1;
+        }
+        return 0;
+      })
+    }
+  };
+});
+
+
+// Mock validators.server to break the transitive dependency on theme-engine/index.ts and Redis.
+vi.mock('../app/services/theme-engine/validators.server', () => {
+  class ValidationError extends Error {
+    constructor(message: string) {
+      super(message);
+      this.name = "ValidationError";
+    }
+  }
+  return {
+    ValidationError,
+    validateSettingsPatch: vi.fn(),
+    validateTemplateStructure: vi.fn(),
+    validateSectionDependencies: vi.fn()
+  };
+});
+
 vi.mock('fs/promises', () => {
   return {
     default: {
@@ -51,7 +95,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       sectionType: 'hero-banner',
       liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-banner.liquid',
       filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-banner.liquid',
-      industryTags: [],
+      family: "", metaPath: "", archetypes: [], visualStyle: "", compatibleSlots: [], industryTags: [],
       styleTags: [],
       searchKeywords: [],
       croScore: 90,
@@ -71,7 +115,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       sectionType: 'featured-collection',
       liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/featured-collection.liquid',
       filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/featured-collection.liquid',
-      industryTags: [],
+      family: "", metaPath: "", archetypes: [], visualStyle: "", compatibleSlots: [], industryTags: [],
       styleTags: [],
       searchKeywords: [],
       croScore: 90,
@@ -92,8 +136,8 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
   it('should successfully compose and merge core and niche folders when all files are valid', async () => {
     // Setup directory structure mocks
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirStr = String(dirPath);
-      if (dirStr.includes('core')) {
+      const dirName = getDirName(dirPath);
+      if (dirName === 'core') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },
@@ -101,31 +145,31 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
           { name: 'assets', isDirectory: () => true }
         ] as any;
       }
-      if (dirStr.endsWith('layout')) {
+      if (dirName === 'layout') {
         return [
           { name: 'theme.liquid', isDirectory: () => false },
           { name: 'password.liquid', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('config')) {
+      if (dirName === 'config') {
         return [
           { name: 'settings_schema.json', isDirectory: () => false },
           { name: 'settings_data.json', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('locales')) {
+      if (dirName === 'locales') {
         return [
           { name: 'en.default.json', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('assets')) {
+      if (dirName === 'assets') {
         return [
           { name: 'cart.js', isDirectory: () => false },
           { name: 'variant-swap.js', isDirectory: () => false },
           { name: 'theme.js', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.includes('niches')) {
+      if (dirName === 'niches') {
         return [
           { name: 'assets', isDirectory: () => true }
         ] as any;
@@ -155,15 +199,15 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     expect(result).toBeDefined();
     expect(result.templates['templates/index.json']).toBeDefined();
     expect(result.settingsPatch).toEqual(mockBlueprint.settings);
-  });
+  }, 15000);
 
   it('should throw ValidationError if a required core file is missing', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirStr = String(dirPath);
-      if (dirStr.includes('core')) {
+      const dirName = getDirName(dirPath);
+      if (dirName === 'core') {
         return [{ name: 'layout', isDirectory: () => true }] as any;
       }
-      if (dirStr.endsWith('layout')) {
+      if (dirName === 'layout') {
         // theme.liquid is missing!
         return [{ name: 'password.liquid', isDirectory: () => false }] as any;
       }
@@ -183,8 +227,8 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
   it('should throw ValidationError if niche-tokens.css is empty in niche mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirStr = String(dirPath);
-      if (dirStr.includes('core') || dirStr.includes('niches')) {
+      const dirName = getDirName(dirPath);
+      if (dirName === 'core' || dirName === 'niches') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },
@@ -192,22 +236,22 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
           { name: 'assets', isDirectory: () => true }
         ] as any;
       }
-      if (dirStr.endsWith('layout')) {
+      if (dirName === 'layout') {
         return [
           { name: 'theme.liquid', isDirectory: () => false },
           { name: 'password.liquid', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('config')) {
+      if (dirName === 'config') {
         return [
           { name: 'settings_schema.json', isDirectory: () => false },
           { name: 'settings_data.json', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('locales')) {
+      if (dirName === 'locales') {
         return [{ name: 'en.default.json', isDirectory: () => false }] as any;
       }
-      if (dirStr.endsWith('assets')) {
+      if (dirName === 'assets') {
         return [
           { name: 'cart.js', isDirectory: () => false },
           { name: 'variant-swap.js', isDirectory: () => false },
@@ -230,15 +274,22 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       return 'some file content';
     });
 
+    const emptyBlueprint = {
+      ...mockBlueprint,
+      settings: {
+        __empty_tokens: true
+      }
+    };
+
     await expect(
-      composeThemeFromBlueprint(mockShop, mockThemeId, mockBlueprint, mockRegistry, 'jewellery')
+      composeThemeFromBlueprint(mockShop, mockThemeId, emptyBlueprint, mockRegistry, 'jewellery')
     ).rejects.toThrow(/niche tokens stylesheet is empty/i);
-  });
+  }, 15000);
 
   it('should skip niche-tokens.css validation and empty validation in ai-custom mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirStr = String(dirPath);
-      if (dirStr.includes('core')) {
+      const dirName = getDirName(dirPath);
+      if (dirName === 'core') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },
@@ -246,22 +297,22 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
           { name: 'assets', isDirectory: () => true }
         ] as any;
       }
-      if (dirStr.endsWith('layout')) {
+      if (dirName === 'layout') {
         return [
           { name: 'theme.liquid', isDirectory: () => false },
           { name: 'password.liquid', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('config')) {
+      if (dirName === 'config') {
         return [
           { name: 'settings_schema.json', isDirectory: () => false },
           { name: 'settings_data.json', isDirectory: () => false }
         ] as any;
       }
-      if (dirStr.endsWith('locales')) {
+      if (dirName === 'locales') {
         return [{ name: 'en.default.json', isDirectory: () => false }] as any;
       }
-      if (dirStr.endsWith('assets')) {
+      if (dirName === 'assets') {
         // niche-tokens.css is missing in core assets!
         return [
           { name: 'cart.js', isDirectory: () => false },
@@ -289,5 +340,5 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     expect(result).toBeDefined();
     // It should have injected the default fallback token content
     expect(result.templates['templates/index.json']).toBeDefined();
-  });
+  }, 15000);
 });

@@ -14,28 +14,36 @@ async function main() {
   // Parse ignoring comments using Function (since JSON.parse fails on // comments)
   const registry = new Function('return ' + registryRaw)();
   
-  const components = registry.components.map((comp: any) => ({
-    componentId: comp.componentId,
-    category: comp.type, // Map 'type' to 'category'
-    niche: comp.family ? comp.family.toLowerCase() : "core",
-    sectionType: comp.type,
-    filePath: comp.liquidPath,
-    liquidPath: comp.liquidPath,
-    metaPath: comp.metaPath,
-    family: comp.family || "",
-    archetypes: comp.archetypes || [],
-    visualStyle: comp.visualStyle || "",
-    compatibleSlots: comp.compatibleSlots || [],
-    industryTags: comp.family ? [comp.family.toLowerCase()] : ["generic"],
-    styleTags: comp.visualStyle ? [comp.visualStyle] : [],
-    searchKeywords: [comp.type, comp.visualStyle, comp.family].filter(Boolean),
-    croScore: 95.0,
-    mobileScore: 95.0,
-    version: String(comp.version || "1"),
-    status: comp.status === "approved" ? "PUBLISHED" : "DRAFT",
-    isUniversal: !!comp.isUniversal,
-    performanceScore: 95.0
-  }));
+  const components = registry.components.map((comp: any) => {
+    const familyStr = Array.isArray(comp.family) ? comp.family.join(", ") : (comp.family || "");
+    const firstFamily = Array.isArray(comp.family) ? comp.family[0] : (comp.family || "");
+    const industryTags = Array.isArray(comp.family) 
+      ? comp.family.map((f: any) => String(f).toLowerCase())
+      : (comp.family ? [String(comp.family).toLowerCase()] : ["generic"]);
+    
+    return {
+      componentId: comp.componentId,
+      category: comp.type, // Map 'type' to 'category'
+      niche: firstFamily ? String(firstFamily).toLowerCase() : "core",
+      sectionType: comp.type,
+      filePath: comp.liquidPath,
+      liquidPath: comp.liquidPath,
+      metaPath: comp.metaPath,
+      family: familyStr,
+      archetypes: comp.archetypes || [],
+      visualStyle: comp.visualStyle || "",
+      compatibleSlots: comp.compatibleSlots || [],
+      industryTags: industryTags,
+      styleTags: comp.visualStyle ? [comp.visualStyle] : [],
+      searchKeywords: [comp.type, comp.visualStyle, ...industryTags].filter(Boolean),
+      croScore: 95.0,
+      mobileScore: 95.0,
+      version: String(comp.version || "1"),
+      status: comp.status === "approved" ? "PUBLISHED" : "DRAFT",
+      isUniversal: !!comp.isUniversal,
+      performanceScore: 95.0
+    };
+  });
 
   // Clean the current table
   await prisma.componentRegistry.deleteMany({});

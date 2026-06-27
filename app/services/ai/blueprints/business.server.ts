@@ -24,7 +24,7 @@ export async function generateBusinessBlueprint(
     
     Context:
     Niche: ${nicheInput}
-    Product Count: ${catalogContext.productCount}
+    Product Count: ${catalogContext.product_count}
     Vendors: ${catalogContext.vendors.join(", ")}
     Product Types: ${catalogContext.productTypes.join(", ")}
     Price Range: $${catalogContext.priceRange.min} - $${catalogContext.priceRange.max}

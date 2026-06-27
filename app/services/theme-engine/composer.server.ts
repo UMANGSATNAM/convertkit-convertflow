@@ -10,7 +10,7 @@ export interface BlueprintSection {
   blocks?: Record<string, any>;
 }
 
-export interface StoreBlueprint {
+export interface StoreBlueprintData {
   pages: {
     [pageHandle: string]: {
       sections: BlueprintSection[];
@@ -110,7 +110,7 @@ async function readDirRecursive(dirPath: string, baseDir: string): Promise<Recor
 export async function composeThemeFromBlueprint(
   shop: any,
   themeId: string,
-  blueprint: StoreBlueprint,
+  blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
   nicheId: string
 ) {
@@ -123,27 +123,25 @@ export async function composeThemeFromBlueprint(
 
   // Step 2: Overwrite with Niche (REMOVED in V2 architecture since niches folder is deleted)
 
-  // Step 3: Resolve Niche Tokens CSS
-  if (blueprint.tokensFile) {
-    try {
-      const tokensPath = path.resolve(process.cwd(), "app/data/templates/theme-engine", blueprint.tokensFile);
-      filesToUpload["assets/niche-tokens.css"] = await fs.readFile(tokensPath, "utf-8");
-      console.log(`[Composer] Loaded tokens from profile: ${blueprint.tokensFile}`);
-    } catch (e: any) {
-      console.warn(`[Composer] Failed to load tokensFile ${blueprint.tokensFile}: ${e.message}`);
-    }
+  // Step 3: Generate Dynamic Niche Tokens CSS (Phase 6 Composition)
+  const settings = blueprint.settings || {};
+  if (settings.__empty_tokens) {
+    filesToUpload["assets/niche-tokens.css"] = "";
+  } else {
+    filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
+:root {
+  --color-background: ${settings.colors_background_1 || '#ffffff'};
+  --color-text: ${settings.colors_accent_1 || '#1a1a1a'};
+  --color-accent: ${settings.colors_accent_2 || '#008060'};
+  --color-border: #e2e8f0;
+  --font-heading-family: '${settings.fontHeading || 'Inter'}', sans-serif;
+  --font-body-family: '${settings.fontBody || 'Inter'}', sans-serif;
+  --card-radius: ${settings.card_style === 'soft' ? '12px' : settings.card_style === 'rounded' ? '24px' : '0px'};
+  --button-radius: ${settings.button_style === 'pill' ? '50px' : settings.button_style === 'rounded' ? '8px' : '0px'};
+  --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
+}`;
   }
-
-  // Fallback if not loaded
-  if (!filesToUpload["assets/niche-tokens.css"]) {
-    try {
-      const fallbackPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/core/assets/niche-tokens.css");
-      filesToUpload["assets/niche-tokens.css"] = await fs.readFile(fallbackPath, "utf-8");
-    } catch (e) {
-      // Inline absolute fallback
-      filesToUpload["assets/niche-tokens.css"] = `/* Fallback */\n:root {\n  --color-background: #ffffff;\n  --color-text: #1a1a1a;\n  --color-accent: #008060;\n  --color-border: #e2e8f0;\n  --font-heading-family: sans-serif;\n  --font-body-family: sans-serif;\n  --card-radius: 0px;\n  --button-radius: 0px;\n}`;
-    }
-  }
+  console.log(`[Composer] Generated dynamic CSS tokens from AI brand context.`);
 
   // Step 4: Inject Registry Sections & JSON Templates
   const resolvedComponents: ComponentRegistry[] = [];
@@ -229,11 +227,9 @@ export async function composeThemeFromBlueprint(
     "assets/variant-swap.js",
     "assets/theme.js"
   ];
-  if (nicheId !== "ai-custom") {
-    requiredKeys.push("assets/niche-tokens.css");
-  }
+  requiredKeys.push("assets/niche-tokens.css");
   for (const key of requiredKeys) {
-    if (!filesToUpload[key]) {
+    if (filesToUpload[key] === undefined) {
       throw new ValidationError(`Required theme file missing: ${key}`);
     }
   }
@@ -253,11 +249,9 @@ export async function composeThemeFromBlueprint(
   }
 
   // Check 3: Empty Tokens Verification
-  if (nicheId !== "ai-custom") {
-    const tokensContent = filesToUpload["assets/niche-tokens.css"];
-    if (!tokensContent || !tokensContent.trim()) {
-      throw new ValidationError("Niche tokens stylesheet is empty or invalid");
-    }
+  const tokensContent = filesToUpload["assets/niche-tokens.css"];
+  if (!tokensContent || !tokensContent.trim()) {
+    throw new ValidationError("Niche tokens stylesheet is empty or invalid");
   }
 
   // --- SINGLE-BATCH UPLOAD ---

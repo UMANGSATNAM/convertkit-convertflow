@@ -3,16 +3,23 @@ import { generateStructuredJson } from "./claude.server";
 
 export interface CatalogContext {
   industry: string;
-  subcategory: string;
-  priceTier: string;
-  catalogScore: number;
+  positioning: string;
+  style: string;
+  price_band: string;
+  catalog_strength: number;
+  product_count: number;
+  collection_count: number;
+  dominant_categories: string[];
+  catalog_depth: string;
+  visual_complexity: string;
+  hero_product_type: string;
   avgPrice: number;
-  productCount: number;
   imagesPerProduct: number;
   tags: string[];
   vendors: string[];
   productTypes: string[];
   priceRange: { min: number, max: number };
+  sampleImageUrls: string[];
 }
 
 /**
@@ -31,9 +38,12 @@ export async function analyzeCatalog(
           vendor
           productType
           tags
-          images(first: 5) {
+          images(first: 20) {
             nodes {
-              id
+              url
+              altText
+              width
+              height
             }
           }
           variants(first: 10) {
@@ -43,17 +53,25 @@ export async function analyzeCatalog(
           }
         }
       }
+      collections(first: 50) {
+        nodes {
+          title
+        }
+      }
     }
   `;
 
   const response = await graphqlRequest(shopDomain, accessToken, query);
 
   const products = response.products?.nodes || [];
+  const collections = response.collections?.nodes || [];
+  const collectionCount = collections.length;
   
   const vendors = new Set<string>();
   const productTypes = new Set<string>();
   const tags = new Set<string>();
   const titles: string[] = [];
+  const sampleImageUrls: string[] = [];
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
@@ -70,6 +88,12 @@ export async function analyzeCatalog(
 
     if (product.images?.nodes) {
       totalImages += product.images.nodes.length;
+      product.images.nodes.forEach((img: any) => {
+        // Collect real CDN URLs for the visual analyzer — skip blank/missing
+        if (img.url && sampleImageUrls.length < 20) {
+          sampleImageUrls.push(img.url);
+        }
+      });
     }
 
     const variants = product.variants?.nodes || [];
@@ -104,40 +128,55 @@ export async function analyzeCatalog(
   // --- AI ENGINE (CLAUDE) ---
   
   const systemInstruction = `
-    You are a Senior E-commerce Data Analyst.
-    Your job is to analyze the compressed catalog data of a Shopify store and categorize it.
+    You are a Senior E-commerce Data Analyst for a premium AI agency.
+    Your job is to analyze the compressed catalog data of a Shopify store and strictly categorize it for down-stream theme generation.
     
-    You must output ONLY valid JSON matching this schema:
+    You must output ONLY valid JSON matching this exact schema:
     {
-      "industry": "string (e.g., fashion, beauty, jewelry, home, electronics, generic)",
-      "subcategory": "string (e.g., streetwear, skincare, luxury, general)",
-      "priceTier": "string (e.g., Premium, Standard, Value)",
-      "catalogScore": "number (0-100 indicating quality/richness of the catalog data)"
+      "industry": "string (e.g., fashion, beauty, home, electronics, jewelry, generic)",
+      "positioning": "string (e.g., premium, luxury, budget, mid_market)",
+      "style": "string (e.g., minimal, bold, trendy, heritage)",
+      "price_band": "string (e.g., high, mid_high, mid, low)",
+      "catalog_strength": "number (0-100 indicating quality/richness of data)",
+      "product_count": "number",
+      "collection_count": "number",
+      "dominant_categories": ["string", "string"],
+      "catalog_depth": "string (e.g., high, medium, low)",
+      "visual_complexity": "string (e.g., high, medium, low)",
+      "hero_product_type": "string (e.g., oversized_tshirts, gold_necklaces)"
     }
 
     Guidelines:
-    - Determine 'industry' and 'subcategory' from the product titles, tags, vendors, and types.
-    - 'priceTier': 'Premium' if avg price is very high relative to the niche, 'Standard' for average, 'Value' if very cheap.
-    - 'catalogScore': Score higher if there are many products, multiple images, and robust tagging/typing.
+    - 'catalog_strength': Score higher if there are many products, multiple images, and robust tags.
+    - 'visual_complexity': Guess based on tags and product types (e.g. multi-variant fashion vs single digital product).
+    - 'hero_product_type': What is the most prominent product type they sell?
   `;
 
-  // Compress the data to send to the LLM (to save tokens)
+  // Compress the data to send to the LLM
   const userPrompt = JSON.stringify({
     shopDomain,
     productCount,
+    collectionCount,
     avgPrice,
     imagesPerProduct,
     vendors: Array.from(vendors).slice(0, 10),
     productTypes: Array.from(productTypes).slice(0, 10),
     tags: Array.from(tags).slice(0, 20),
-    sampleTitles: titles.slice(0, 5) // Just a few titles to give context
+    sampleTitles: titles.slice(0, 10)
   });
 
   let aiResult = {
     industry: "generic",
-    subcategory: "general",
-    priceTier: "Standard",
-    catalogScore: 50
+    positioning: "mid_market",
+    style: "minimal",
+    price_band: "mid",
+    catalog_strength: 50,
+    product_count: productCount,
+    collection_count: collectionCount,
+    dominant_categories: ["general"],
+    catalog_depth: "medium",
+    visual_complexity: "medium",
+    hero_product_type: "general_goods"
   };
 
   try {
@@ -148,15 +187,22 @@ export async function analyzeCatalog(
 
   return {
     industry: aiResult.industry,
-    subcategory: aiResult.subcategory,
-    priceTier: aiResult.priceTier,
-    catalogScore: aiResult.catalogScore,
+    positioning: aiResult.positioning,
+    style: aiResult.style,
+    price_band: aiResult.price_band,
+    catalog_strength: aiResult.catalog_strength,
+    product_count: aiResult.product_count,
+    collection_count: aiResult.collection_count,
+    dominant_categories: aiResult.dominant_categories,
+    catalog_depth: aiResult.catalog_depth,
+    visual_complexity: aiResult.visual_complexity,
+    hero_product_type: aiResult.hero_product_type,
     avgPrice,
-    productCount,
     imagesPerProduct,
     tags: Array.from(tags),
     vendors: Array.from(vendors),
     productTypes: Array.from(productTypes),
-    priceRange: { min: minPrice, max: maxPrice }
+    priceRange: { min: minPrice, max: maxPrice },
+    sampleImageUrls
   };
 }

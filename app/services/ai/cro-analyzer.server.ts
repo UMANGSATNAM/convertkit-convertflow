@@ -31,10 +31,10 @@ export async function analyzeCRO(catalogData: CatalogContext): Promise<CROContex
 
   const userPrompt = JSON.stringify({
     industry: catalogData.industry,
-    subcategory: catalogData.subcategory,
-    priceTier: catalogData.priceTier,
+    dominant_categories: catalogData.dominant_categories,
+    price_band: catalogData.price_band,
     avgPrice: catalogData.avgPrice,
-    catalogScore: catalogData.catalogScore
+    catalog_strength: catalogData.catalog_strength
   });
 
   let aiResult = {
