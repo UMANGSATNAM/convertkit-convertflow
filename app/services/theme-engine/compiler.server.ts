@@ -301,16 +301,12 @@ async function resolveComponentLiquidContent(component: any): Promise<string | n
   if (component.liquidPath) {
     addCandidate(component.liquidPath);
     addCandidate(path.join("app/data/templates/theme-engine", component.liquidPath));
-    addCandidate(path.join("app/services/theme-engine", component.liquidPath));
-    addCandidate(path.join("app/services/theme-engine/components", path.basename(component.liquidPath)));
     addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.liquidPath)));
   }
 
   if (component.filePath) {
     addCandidate(component.filePath);
     addCandidate(path.join("app/data/templates/theme-engine", component.filePath));
-    addCandidate(path.join("app/services/theme-engine", component.filePath));
-    addCandidate(path.join("app/services/theme-engine/components", path.basename(component.filePath)));
     addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.filePath)));
   }
 
@@ -331,7 +327,6 @@ async function resolveComponentLiquidContent(component: any): Promise<string | n
     ];
 
     const dirs = [
-      "app/services/theme-engine/components",
       "app/data/templates/theme-engine/components"
     ];
 
@@ -385,8 +380,7 @@ export async function composeThemeFromBlueprint(
 
   // Step 1: Read Read-Only Base Theme Files
   const baseThemePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/base-theme");
-  const fallbackCorePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/core");
-  const coreDir = (await fs.stat(baseThemePath).catch(() => null)) ? baseThemePath : fallbackCorePath;
+  const coreDir = baseThemePath;
   const coreFiles = await readDirRecursive(coreDir, coreDir);
   for (const [relPath, content] of Object.entries(coreFiles)) {
     addShopifyFile(filesToUpload, relPath, content);
