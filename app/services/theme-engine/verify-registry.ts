@@ -14,13 +14,14 @@ interface Registry {
   components: ComponentEntry[];
 }
 
-export function verifyRegistry(baseDir: string = process.cwd()): { success: boolean; errors: string[]; stats: { totalComponents: number; totalLiquidFiles: number } } {
+export function verifyRegistry(baseDir: string = process.cwd()): { success: boolean; errors: string[]; stats: { totalComponents: number; totalLiquidFiles: number; totalChassisFiles: number } } {
   const errors: string[] = [];
   const themeEngineDir = path.join(baseDir, 'app/data/templates/theme-engine');
   const registryPath = path.join(themeEngineDir, 'registry.json');
+  const chassisManifestPath = path.join(themeEngineDir, 'base-theme/chassis-manifest.json');
 
   if (!fs.existsSync(registryPath)) {
-    return { success: false, errors: [`Registry file not found at ${registryPath}`], stats: { totalComponents: 0, totalLiquidFiles: 0 } };
+    return { success: false, errors: [`Registry file not found at ${registryPath}`], stats: { totalComponents: 0, totalLiquidFiles: 0, totalChassisFiles: 0 } };
   }
 
   let registry: Registry;
@@ -28,10 +29,26 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     const content = fs.readFileSync(registryPath, 'utf-8');
     registry = JSON.parse(content);
   } catch (e: any) {
-    return { success: false, errors: [`Failed to parse registry.json: ${e.message}`], stats: { totalComponents: 0, totalLiquidFiles: 0 } };
+    return { success: false, errors: [`Failed to parse registry.json: ${e.message}`], stats: { totalComponents: 0, totalLiquidFiles: 0, totalChassisFiles: 0 } };
   }
 
-  const registeredPaths = new Set<string>();
+  let chassisFilesCount = 0;
+  const allowedPaths = new Set<string>();
+
+  if (!fs.existsSync(chassisManifestPath)) {
+    errors.push(`Chassis manifest file not found at ${chassisManifestPath}`);
+  } else {
+    try {
+      const chassisManifest = JSON.parse(fs.readFileSync(chassisManifestPath, 'utf-8'));
+      const list = chassisManifest.files || [];
+      chassisFilesCount = list.length;
+      for (const f of list) {
+        allowedPaths.add(f.replace(/\\/g, '/'));
+      }
+    } catch (e: any) {
+      errors.push(`Failed to parse chassis-manifest.json: ${e.message}`);
+    }
+  }
 
   // 1. Assert every registry path exists on disk
   for (const comp of registry.components) {
@@ -42,7 +59,7 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     }
 
     const normLiquid = relLiquid.replace(/\\/g, '/');
-    registeredPaths.add(normLiquid);
+    allowedPaths.add(normLiquid);
 
     const fullLiquid = path.join(themeEngineDir, normLiquid);
     if (!fs.existsSync(fullLiquid)) {
@@ -58,35 +75,16 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     }
   }
 
-  // 2. Assert every .liquid file in components/ is referenced by exactly one registry entry
-  const componentsDir = path.join(themeEngineDir, 'components');
+  // 2. Assert EVERY .liquid file under theme-engine is referenced by exactly one registry entry or chassis manifest
   let totalLiquidFiles = 0;
-  if (fs.existsSync(componentsDir)) {
-    const diskFiles = globSync('**/*.liquid', { cwd: componentsDir }).map(f => `components/${f.replace(/\\/g, '/')}`);
+  if (fs.existsSync(themeEngineDir)) {
+    const diskFiles = globSync('**/*.liquid', { cwd: themeEngineDir }).map(f => f.replace(/\\/g, '/'));
     totalLiquidFiles = diskFiles.length;
 
     for (const diskFile of diskFiles) {
-      if (!registeredPaths.has(diskFile)) {
-        errors.push(`Unreferenced liquid file on disk: ${diskFile}`);
+      if (!allowedPaths.has(diskFile)) {
+        errors.push(`Unreferenced orphan liquid file on disk: ${diskFile}`);
       }
-    }
-  }
-
-  // Optional: check chassis-manifest.json if exists
-  const chassisManifestPath = path.join(themeEngineDir, 'base-theme/chassis-manifest.json');
-  if (fs.existsSync(chassisManifestPath)) {
-    try {
-      const chassisManifest = JSON.parse(fs.readFileSync(chassisManifestPath, 'utf-8'));
-      const allowedPaths = new Set<string>((chassisManifest.files || []).map((f: string) => f.replace(/\\/g, '/')));
-      const baseThemeDir = path.join(themeEngineDir, 'base-theme');
-      const chassisFiles = globSync('**/*.liquid', { cwd: baseThemeDir }).map(f => f.replace(/\\/g, '/'));
-      for (const cf of chassisFiles) {
-        if (!allowedPaths.has(cf)) {
-          errors.push(`Unmanifested chassis file in base-theme: ${cf}`);
-        }
-      }
-    } catch (e: any) {
-      errors.push(`Failed to process chassis-manifest.json: ${e.message}`);
     }
   }
 
@@ -95,7 +93,8 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     errors,
     stats: {
       totalComponents: registry.components.length,
-      totalLiquidFiles
+      totalLiquidFiles,
+      totalChassisFiles: chassisFilesCount
     }
   };
 }
@@ -104,15 +103,16 @@ import { fileURLToPath } from 'url';
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 if (isMain) {
-  console.log('[VerifyRegistry] Starting registry verification...');
+  console.log('[VerifyRegistry] Starting registry and chassis manifest verification...');
   const result = verifyRegistry();
   if (!result.success) {
     console.error('[VerifyRegistry] FAILED with errors:');
     result.errors.forEach(e => console.error(`  - ${e}`));
     process.exit(1);
   } else {
-    console.log(`[VerifyRegistry] SUCCESS! Verified ${result.stats.totalComponents} components and ${result.stats.totalLiquidFiles} liquid files.`);
+    console.log(`[VerifyRegistry] SUCCESS! Verified ${result.stats.totalComponents} registry components, ${result.stats.totalChassisFiles} chassis manifest files, and 100% of ${result.stats.totalLiquidFiles} total disk liquid files.`);
     process.exit(0);
   }
 }
+
 
