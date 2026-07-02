@@ -254,6 +254,111 @@ export async function compileTheme(
   };
 }
 
+function addShopifyFile(files: Record<string, string>, relPath: string, content: string) {
+  const topLevelFolders = ["snippets/", "sections/", "assets/", "layout/", "locales/", "config/", "templates/"];
+  for (const prefix of topLevelFolders) {
+    if (relPath.startsWith(prefix)) {
+      const subPath = relPath.substring(prefix.length);
+      const cleanName = path.basename(subPath);
+      files[`${prefix}${cleanName}`] = content;
+      return;
+    }
+  }
+  files[relPath] = content;
+}
+
+function compType(id: string): string {
+  if (id.startsWith("header")) return "header";
+  if (id.startsWith("footer")) return "footer";
+  if (id.startsWith("hero")) return "hero";
+  if (id.startsWith("trust")) return "trust";
+  if (id.startsWith("grid") || id.includes("product-grid")) return "product-grid";
+  if (id.startsWith("collection")) return "collections";
+  if (id.startsWith("brand-story") || id.startsWith("rich-text") || id.startsWith("content")) return "brand-story";
+  if (id.startsWith("newsletter")) return "newsletter";
+  if (id.startsWith("testimonials")) return "testimonials";
+  if (id.startsWith("faq")) return "faq";
+  return "custom";
+}
+
+async function resolveComponentLiquidContent(component: any): Promise<string | null> {
+  const candidates: string[] = [];
+  const cwd = process.cwd();
+
+  const addCandidate = (p?: string | null) => {
+    if (!p) return;
+    const clean = p.replace(/^(\/?app\/)+/, "app/").replace(/^\/+/, "");
+    const full1 = path.resolve(cwd, clean);
+    const full2 = path.resolve(cwd, p);
+    if (!candidates.includes(full1)) candidates.push(full1);
+    if (!candidates.includes(full2)) candidates.push(full2);
+    if (clean.startsWith("app/")) {
+      const full3 = path.resolve(cwd, clean.slice(4));
+      if (!candidates.includes(full3)) candidates.push(full3);
+    }
+  };
+
+  if (component.liquidPath) {
+    addCandidate(component.liquidPath);
+    addCandidate(path.join("app/data/templates/theme-engine", component.liquidPath));
+    addCandidate(path.join("app/services/theme-engine", component.liquidPath));
+    addCandidate(path.join("app/services/theme-engine/components", path.basename(component.liquidPath)));
+    addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.liquidPath)));
+  }
+
+  if (component.filePath) {
+    addCandidate(component.filePath);
+    addCandidate(path.join("app/data/templates/theme-engine", component.filePath));
+    addCandidate(path.join("app/services/theme-engine", component.filePath));
+    addCandidate(path.join("app/services/theme-engine/components", path.basename(component.filePath)));
+    addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.filePath)));
+  }
+
+  const id = component.componentId || component.sectionType;
+  if (id) {
+    const idUnderscore = id.replace(/-/g, "_");
+    const idHyphen = id.replace(/_/g, "-");
+    const idNoV = idUnderscore.replace(/_v(\d+)$/, "_$1");
+    const idNoVHyphen = idHyphen.replace(/-v(\d+)$/, "-$1");
+    const idV = idUnderscore.replace(/_(\d+)$/, "_v$1");
+    const idVHyphen = idHyphen.replace(/-(\d+)$/, "-v$1");
+
+    const variations = new Set([id, idUnderscore, idHyphen, idNoV, idNoVHyphen, idV, idVHyphen]);
+    const categories = [
+      "announcement", "brand-story", "bundle-builder", "collections", "faq",
+      "footer", "header", "hero", "newsletter", "popup", "product-grid",
+      "testimonials", "trust", "custom", component.sectionType || compType(id)
+    ];
+
+    const dirs = [
+      "app/services/theme-engine/components",
+      "app/data/templates/theme-engine/components"
+    ];
+
+    for (const dir of dirs) {
+      for (const varName of variations) {
+        addCandidate(path.join(dir, `${varName}.liquid`));
+      }
+      for (const cat of categories) {
+        if (!cat) continue;
+        for (const varName of variations) {
+          addCandidate(path.join(dir, cat, `${varName}.liquid`));
+        }
+      }
+    }
+  }
+
+  for (const candidatePath of candidates) {
+    try {
+      const content = await fs.readFile(candidatePath, "utf-8");
+      return content;
+    } catch (e) {
+      // try next candidate
+    }
+  }
+  return null;
+}
+
 /**
  * The Theme Composer takes the Store Blueprint and the matched components from the registry.
  * It compiles the core files, niche files, and database sections into a single merged theme map.
@@ -278,16 +383,21 @@ export async function composeThemeFromBlueprint(
     console.warn(`[Composer] Compiler stage generated warning: ${compilerErr.message}. Continuing with live upload.`);
   }
 
-  // Step 1: Read Core Theme Files
-  const coreDir = path.resolve(process.cwd(), "app/data/templates/theme-engine/core");
+  // Step 1: Read Read-Only Base Theme Files
+  const baseThemePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/base-theme");
+  const fallbackCorePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/core");
+  const coreDir = (await fs.stat(baseThemePath).catch(() => null)) ? baseThemePath : fallbackCorePath;
   const coreFiles = await readDirRecursive(coreDir, coreDir);
-  Object.assign(filesToUpload, coreFiles);
+  for (const [relPath, content] of Object.entries(coreFiles)) {
+    addShopifyFile(filesToUpload, relPath, content);
+  }
 
-  // Step 2: Read Snippets from Components Directory
-  const snippetsDir = path.resolve(process.cwd(), "app/services/theme-engine/components/theme-template/snippets");
-  const snippetFiles = await readDirRecursive(snippetsDir, snippetsDir);
+  // Step 2: Ensure all core snippets are included flat (no subfolder 422 errors)
+  const snippetsDir = path.join(coreDir, "snippets");
+  const snippetFiles = await readDirRecursive(snippetsDir, snippetsDir).catch(() => ({}));
   for (const [relPath, content] of Object.entries(snippetFiles)) {
-    filesToUpload[`snippets/${relPath}`] = content;
+    const flatName = path.basename(relPath);
+    addShopifyFile(filesToUpload, `snippets/${flatName}`, content);
   }
 
   // Step 3: Generate Dynamic Niche Tokens CSS
@@ -354,7 +464,8 @@ export async function composeThemeFromBlueprint(
 
     try {
       validateTemplateStructure(templateJson);
-      validateSectionDependencies(templateJson);
+      const availableSnippets = new Set(Object.keys(filesToUpload).filter(f => f.startsWith("snippets/")).map(f => path.basename(f, ".liquid")));
+      validateSectionDependencies(templateJson, availableSnippets);
     } catch (valErr: any) {
       console.warn(`[Composer] Template structural validation note for ${pageHandle}: ${valErr.message}`);
     }
@@ -367,35 +478,12 @@ export async function composeThemeFromBlueprint(
 
   // Step 5: Read and inject Liquid files for all resolved components
   for (const component of resolvedComponents) {
-    if (component.liquidPath || component.filePath) {
-      try {
-        const engineDir = path.resolve(process.cwd(), "app/services/theme-engine");
-        let fullPath = "";
-        if ((component.liquidPath || "").startsWith("app/")) {
-          fullPath = path.resolve(process.cwd(), component.liquidPath!);
-        } else if (component.liquidPath) {
-          fullPath = path.resolve(process.cwd(), "app/services/theme-engine", component.liquidPath);
-        } else if (component.filePath) {
-          fullPath = path.resolve(process.cwd(), "app/services/theme-engine", component.filePath);
-        } else {
-          fullPath = path.resolve(process.cwd(), "app/services/theme-engine/components", `${component.componentId}.liquid`);
-        }
-
-        const liquidContent = await fs.readFile(fullPath, "utf-8");
-        const sectionType = component.sectionType || component.componentId;
-        const targetKey = `sections/${sectionType}.liquid`;
-        filesToUpload[targetKey] = liquidContent;
-      } catch (err: any) {
-        console.warn(`[Composer] Could not read liquid file for ${component.componentId}: ${err.message}. Checking alternative paths.`);
-        try {
-          const altPath = path.resolve(process.cwd(), "app/services/theme-engine/components", `${component.componentId}.liquid`);
-          const altContent = await fs.readFile(altPath, "utf-8");
-          const sectionType = component.sectionType || component.componentId;
-          filesToUpload[`sections/${sectionType}.liquid`] = altContent;
-        } catch (altErr: any) {
-          console.error(`[Composer] Failed to resolve liquid component ${component.componentId} from all paths.`);
-        }
-      }
+    const liquidContent = await resolveComponentLiquidContent(component);
+    const sectionType = component.sectionType || component.componentId;
+    if (liquidContent) {
+      filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
+    } else {
+      console.error(`[Composer] Failed to resolve liquid component ${component.componentId} (${sectionType}) from all candidate paths.`);
     }
   }
 

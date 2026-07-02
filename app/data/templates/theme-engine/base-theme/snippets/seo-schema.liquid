@@ -1,0 +1,39 @@
+{%- comment -%}
+  Automated JSON-LD Schema Generator
+{%- endcomment -%}
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "{{ shop.name }}",
+  "url": "{{ shop.url }}"
+}
+</script>
+
+{% if template.name == 'product' %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.title | escape }}",
+  "image": [
+    "https:{{ product.featured_image | img_url: '1000x' }}"
+  ],
+  "description": "{{ product.description | strip_html | escape }}",
+  "sku": "{{ product.selected_or_first_available_variant.sku }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ product.vendor | escape }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ shop.url }}{{ product.url }}",
+    "priceCurrency": "{{ cart.currency.iso_code }}",
+    "price": "{{ product.selected_or_first_available_variant.price | divided_by: 100.00 }}",
+    "itemCondition": "http://schema.org/NewCondition",
+    "availability": "{% if product.available %}http://schema.org/InStock{% else %}http://schema.org/OutOfStock{% endif %}"
+  }
+}
+</script>
+{% endif %}
