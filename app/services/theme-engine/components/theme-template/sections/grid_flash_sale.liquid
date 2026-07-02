@@ -1,0 +1,104 @@
+<div class="sf-flash-grid sf-fg-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-fg-header">
+    <div class="sf-fg-title-wrap">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <div class="sf-fg-timer" data-date="{{ section.settings.end_date }}">
+        <span class="hours">00</span>:<span class="minutes">00</span>:<span class="seconds">00</span>
+      </div>
+    </div>
+    {% if section.settings.view_all_link != blank %}
+      <a href="{{ section.settings.view_all_link }}" class="sf-fg-view-all" style="color: {{ section.settings.text_color }};">Shop All</a>
+    {% endif %}
+  </div>
+  
+  <div class="sf-fg-grid">
+    {% for product in collections[section.settings.collection].products limit: section.settings.product_limit %}
+      <div class="sf-fg-item">
+        <a href="{{ product.url }}" class="sf-fg-img-link">
+          {% if product.featured_image %}
+            <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}" loading="lazy">
+          {% else %}
+            {{ 'product-1' | placeholder_svg_tag: 'sf-placeholder' }}
+          {% endif %}
+          <div class="sf-fg-discount">
+            {% if product.compare_at_price > product.price %}
+              Save {{ product.compare_at_price | minus: product.price | money_without_trailing_zeros }}
+            {% else %}
+              Sale
+            {% endif %}
+          </div>
+        </a>
+        <div class="sf-fg-info">
+          <h3><a href="{{ product.url }}" style="color: {{ section.settings.text_color }};">{{ product.title }}</a></h3>
+          <div class="sf-fg-prices">
+            <span class="sf-fg-price" style="color: {{ section.settings.text_color }};">{{ product.price | money }}</span>
+            {% if product.compare_at_price > product.price %}
+              <s class="sf-fg-compare">{{ product.compare_at_price | money }}</s>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .sf-fg-{{ section.id }} { padding: 4rem 1rem; max-width: 1400px; margin: 0 auto; }
+  .sf-fg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid {{ section.settings.text_color }}; padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+  .sf-fg-title-wrap { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .sf-fg-header h2 { font-size: 2rem; margin: 0; text-transform: uppercase; font-weight: 900; }
+  .sf-fg-timer { display: flex; gap: 5px; background: red; color: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-variant-numeric: tabular-nums; font-size: 1.2rem; }
+  .sf-fg-view-all { font-weight: bold; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid; }
+  .sf-fg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  @media (min-width: 768px) { .sf-fg-grid { grid-template-columns: repeat(4, 1fr); gap: 2rem; } }
+  .sf-fg-item { text-align: left; }
+  .sf-fg-img-link { display: block; position: relative; aspect-ratio: 1; background: var(--color-surface); margin-bottom: 1rem; overflow: hidden; border-radius: 4px; }
+  .sf-fg-img-link img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+  .sf-fg-item:hover .sf-fg-img-link img { transform: scale(1.05); }
+  .sf-fg-discount { position: absolute; bottom: 10px; left: 10px; background: red; color: white; padding: 4px 10px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; border-radius: 2px; }
+  .sf-fg-info h3 { font-size: 1rem; margin: 0 0 0.5rem; text-transform: uppercase; }
+  .sf-fg-info h3 a { text-decoration: none; }
+  .sf-fg-prices { display: flex; gap: 0.5rem; align-items: center; }
+  .sf-fg-price { font-weight: bold; font-size: 1.1rem; }
+  .sf-fg-compare { color: var(--color-text-secondary); font-size: 0.9rem; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const timerEls = document.querySelectorAll('.sf-fg-{{ section.id }} .sf-fg-timer');
+    timerEls.forEach(timerEl => {
+      const endDateStr = timerEl.getAttribute('data-date');
+      if(!endDateStr) return;
+      const countDownDate = new Date(endDateStr).getTime();
+      
+      setInterval(function() {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+        if (distance < 0) return;
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) + Math.floor(distance / (1000 * 60 * 60 * 24)) * 24;
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        timerEl.querySelector('.hours').innerText = hours < 10 ? '0'+hours : hours;
+        timerEl.querySelector('.minutes').innerText = minutes < 10 ? '0'+minutes : minutes;
+        timerEl.querySelector('.seconds').innerText = seconds < 10 ? '0'+seconds : seconds;
+      }, 1000);
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Flash Sale Grid",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Flash Sale" },
+    { "type": "text", "id": "end_date", "label": "End Date", "info": "Format: Dec 31, 2026 23:59:59" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "product_limit", "min": 2, "max": 12, "step": 2, "label": "Product Limit", "default": 4 },
+    { "type": "url", "id": "view_all_link", "label": "View All Link" }
+  ],
+  "presets": [ { "name": "Flash Sale Grid", "category": "Collection" } ]
+}
+{% endschema %}

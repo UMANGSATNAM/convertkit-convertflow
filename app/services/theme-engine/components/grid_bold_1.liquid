@@ -1,0 +1,288 @@
+{%- comment -%}
+  grid_bold_1.liquid — Bold Streetwear & Drop Culture Grid
+  
+  DESIGN PHILOSOPHY:
+  Loud, graphic, high-contrast streetwear aesthetic. Features heavy solid
+  borders, bracketed numbering/badges, block-letter headlines, and hover
+  color inversions or accent shifts. Designed for hype drops and apparel.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --bdg-bg: var(--color-background, #0a0a0a);
+    --bdg-text: var(--color-text, #ffffff);
+    --bdg-muted: color-mix(in srgb, var(--bdg-text) 50%, transparent);
+    --bdg-border: color-mix(in srgb, var(--bdg-text) 20%, transparent);
+    --bdg-accent: var(--color-accent, #ff3c00);
+    --bdg-font: var(--font-body, 'Roboto Mono', monospace);
+    --bdg-font-head: var(--font-heading, 'Anton', sans-serif);
+  }
+
+  .bdg-section {
+    background: var(--bdg-bg);
+    padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+    border-top: 4px solid var(--bdg-accent);
+  }
+
+  .bdg-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .bdg-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid var(--bdg-text);
+  }
+  .bdg-title {
+    font-family: var(--bdg-font-head);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--bdg-text);
+    line-height: 0.95;
+    margin: 0;
+  }
+  .bdg-title span {
+    color: var(--bdg-accent);
+  }
+  .bdg-cta {
+    font-family: var(--bdg-font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--bdg-bg);
+    background: var(--bdg-accent);
+    padding: 0.8rem 1.75rem;
+    text-decoration: none;
+    border: 2px solid var(--bdg-accent);
+    transition: background 0.15s, color 0.15s;
+  }
+  .bdg-cta:hover {
+    background: transparent;
+    color: var(--bdg-accent);
+  }
+
+  .bdg-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 640px) {
+    .bdg-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .bdg-grid[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+    .bdg-grid[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .bdg-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--bdg-text);
+    border: 2px solid var(--bdg-border);
+    background: color-mix(in srgb, var(--bdg-text) 3%, transparent);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .bdg-card:hover {
+    border-color: var(--bdg-accent);
+    transform: translateY(-4px);
+  }
+
+  .bdg-media {
+    aspect-ratio: var(--aspect, 1/1);
+    background: color-mix(in srgb, var(--bdg-text) 6%, transparent);
+    overflow: hidden;
+    position: relative;
+    border-bottom: 2px solid var(--bdg-border);
+  }
+  .bdg-card:hover .bdg-media {
+    border-bottom-color: var(--bdg-accent);
+  }
+  .bdg-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .bdg-card:hover .bdg-media img {
+    transform: scale(1.06);
+  }
+
+  .bdg-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--bdg-accent);
+    color: var(--bdg-bg);
+    font-family: var(--bdg-font);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    z-index: 2;
+  }
+
+  .bdg-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+  .bdg-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--bdg-font);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--bdg-muted);
+  }
+  .bdg-card-title {
+    font-family: var(--bdg-font-head);
+    font-size: 1.5rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.1;
+  }
+  .bdg-card-price {
+    font-family: var(--bdg-font);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bdg-accent);
+    margin-top: auto;
+    padding-top: 0.75rem;
+  }
+</style>
+
+<section class="bdg-section" aria-label="Drop Grid">
+  <div class="bdg-inner">
+    {%- if section.settings.title_before != blank or section.settings.title_accent != blank -%}
+      <div class="bdg-header">
+        <h2 class="bdg-title">
+          {{ section.settings.title_before | default: 'Latest' }}
+          <span>{{ section.settings.title_accent | default: 'Drops' }}</span>
+        </h2>
+        {%- if section.settings.cta_text != blank -%}
+          <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="bdg-cta">{{ section.settings.cta_text }} →</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="bdg-grid" data-cols="{{ section.settings.columns | default: '3' }}" style="--aspect: {{ section.settings.aspect_ratio | default: '1/1' }};">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.url | default: '#' }}" class="bdg-card" {{ block.shopify_attributes }}>
+          <div class="bdg-media">
+            {%- if block.settings.badge != blank -%}
+              <span class="bdg-badge">{{ block.settings.badge }}</span>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--bdg-muted); font-size: 0.8rem;">
+                {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            {%- endif -%}
+          </div>
+          <div class="bdg-content">
+            <div class="bdg-meta-top">
+              <span>[{{ forloop.index | prepend: '0' | slice: -2, 2 }}]</span>
+              <span>{{ block.settings.subtitle | default: 'LIMITED STOCK' }}</span>
+            </div>
+            <h3 class="bdg-card-title">{{ block.settings.title | default: 'Oversized Heavy Tee' }}</h3>
+            {%- if block.settings.price != blank -%}
+              <div class="bdg-card-price">{{ block.settings.price }}</div>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bold Streetwear Grid",
+  "tag": "section",
+  "class": "section-grid-bold",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title_before",
+      "label": "Heading (Before Accent)",
+      "default": "Latest"
+    },
+    {
+      "type": "text",
+      "id": "title_accent",
+      "label": "Heading (Accent Word)",
+      "default": "Drops"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "Shop All Drops"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Link"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "options": [
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "4/5", "label": "Portrait (4:5)" },
+        { "value": "16/9", "label": "Landscape (16:9)" }
+      ],
+      "default": "1/1"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Grid Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "SOLD OUT SOON" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "HEAVYWEIGHT 280GSM" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Acid Wash Graphic Hoodie" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$110" },
+        { "type": "url", "id": "url", "label": "URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Streetwear Grid",
+      "blocks": [
+        { "type": "item", "settings": { "badge": "NEW DROP", "subtitle": "HEAVYWEIGHT 280GSM", "title": "Acid Wash Graphic Hoodie", "price": "$110" } },
+        { "type": "item", "settings": { "badge": "FAST SELLING", "subtitle": "FRENCH TERRY", "title": "Distressed Cargo Sweatpants", "price": "$95" } },
+        { "type": "item", "settings": { "badge": "RESTOCK", "subtitle": "100% COTTON", "title": "Boxy Fit Vintage Tee", "price": "$55" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

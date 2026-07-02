@@ -1,0 +1,589 @@
+{%- comment -%}
+  content_logo_cloud.liquid — Ultra-Comprehensive Partner & Press Recognition Showcase
+  
+  DESIGN PHILOSOPHY:
+  An architectural trust and brand endorsement feature engineered for maximum credibility.
+  Supports dual display modes: an infinite smooth CSS marquee ticker or an interactive
+  glassmorphic grid. Features interactive logo cards with verified quote popups and an
+  accessible case study inspection modal dialog. Engineered for 60fps performance.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --clc-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --clc-card-bg: {{ section.settings.card_bg_color | default: '#1e293b' }};
+    --clc-text: {{ section.settings.text_color | default: '#f8fafc' }};
+    --clc-muted: color-mix(in srgb, var(--clc-text) 65%, transparent);
+    --clc-border: color-mix(in srgb, var(--clc-text) 14%, transparent);
+    --clc-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --clc-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --clc-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --clc-padding-top: clamp(3.5rem, 7vw, 6rem);
+    --clc-padding-bottom: clamp(3.5rem, 7vw, 6rem);
+    --clc-speed: {{ section.settings.marquee_speed | default: 30 }}s;
+  }
+
+  .clc-section {
+    background-color: var(--clc-bg);
+    color: var(--clc-text);
+    font-family: var(--clc-font-body);
+    padding: var(--clc-padding-top) clamp(1.25rem, 4vw, 4rem) var(--clc-padding-bottom);
+    border-top: 1px solid var(--clc-border);
+    border-bottom: 1px solid var(--clc-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .clc-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Section Header */
+  .clc-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto clamp(2rem, 4.5vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .clc-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--clc-accent);
+    background: color-mix(in srgb, var(--clc-accent) 12%, transparent);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    border: 1px solid color-mix(in srgb, var(--clc-accent) 30%, transparent);
+  }
+  .clc-title {
+    font-family: var(--clc-font-head);
+    font-size: clamp(1.85rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--clc-text);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .clc-desc {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--clc-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Marquee Display Mode */
+  .clc-marquee-wrap {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 1rem 0;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  .clc-marquee-track {
+    display: flex;
+    width: max-content;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    animation: clcMarquee var(--clc-speed) linear infinite;
+  }
+  .clc-marquee-wrap:hover .clc-marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes clcMarquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* Grid Display Mode */
+  .clc-grid-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+  @media (min-width: 640px) {
+    .clc-grid-wrap {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .clc-grid-wrap {
+      grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    }
+  }
+
+  /* Logo Card Item */
+  .clc-card {
+    background: var(--clc-card-bg);
+    border: 1px solid var(--clc-border);
+    border-radius: 20px;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: 260px;
+  }
+  .clc-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--clc-accent);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+    background: color-mix(in srgb, var(--clc-card-bg) 85%, var(--clc-accent));
+  }
+  .clc-logo-box {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: {% if section.settings.grayscale_logos %}grayscale(100%) opacity(70%){% else %}none{% endif %};
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+  .clc-card:hover .clc-logo-box {
+    filter: grayscale(0%) opacity(100%);
+    transform: scale(1.08);
+  }
+  .clc-logo-box img {
+    max-height: 100%;
+    max-width: 160px;
+    object-fit: contain;
+  }
+  .clc-logo-fallback {
+    font-family: var(--clc-font-head);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--clc-text);
+  }
+
+  .clc-card-quote {
+    font-size: 0.85rem;
+    color: var(--clc-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .clc-card-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--clc-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* Case Study Inspection Modal */
+  .clc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .clc-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .clc-modal {
+    background: var(--clc-card-bg);
+    color: var(--clc-text);
+    border: 1px solid var(--clc-border);
+    border-radius: 28px;
+    max-width: 620px;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    position: relative;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .clc-modal-overlay[data-open="true"] .clc-modal {
+    transform: scale(1);
+  }
+  .clc-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: color-mix(in srgb, var(--clc-text) 10%, transparent);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--clc-text);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .clc-modal-close:hover {
+    background: color-mix(in srgb, var(--clc-text) 20%, transparent);
+  }
+  .clc-modal-logo {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .clc-modal-logo img {
+    max-height: 100%;
+    max-width: 200px;
+    object-fit: contain;
+  }
+  .clc-modal-quote {
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--clc-text);
+    margin: 0;
+  }
+  .clc-modal-author {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--clc-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .clc-modal-cta {
+    background: var(--clc-accent);
+    color: #000000;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.95rem 2.25rem;
+    border-radius: 100px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .clc-modal-cta:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+  }
+</style>
+
+<section class="clc-section" id="clc-section-{{ section.id }}" aria-labelledby="clc-title-{{ section.id }}">
+  <div class="clc-container">
+    
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="clc-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="clc-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="clc-title-{{ section.id }}" class="clc-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="clc-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Display Mode Switcher (Marquee vs Grid) -->
+    {%- if section.settings.display_mode == 'marquee' -%}
+      <div class="clc-marquee-wrap">
+        <div class="clc-marquee-track" id="clc-track-{{ section.id }}">
+          {%- for i in (1..2) -%}
+            {%- for block in section.blocks -%}
+              <div 
+                class="clc-card" 
+                data-name="{{ block.settings.title | escape }}"
+                data-quote="{{ block.settings.quote | escape }}"
+                data-author="{{ block.settings.author | default: 'Editor-in-Chief' | escape }}"
+                data-link="{{ block.settings.link | default: '/pages/press' }}"
+                data-img="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 400 }}{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                <div class="clc-logo-box">
+                  {%- if block.settings.image != blank -%}
+                    {{ block.settings.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.title }}
+                  {%- else -%}
+                    <span class="clc-logo-fallback">{{ block.settings.title }}</span>
+                  {%- endif -%}
+                </div>
+                {%- if block.settings.quote != blank -%}
+                  <p class="clc-card-quote">"{{ block.settings.quote }}"</p>
+                {%- endif -%}
+                <span class="clc-card-badge">✦ Verified Feature</span>
+              </div>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="clc-grid-wrap" id="clc-grid-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          <div 
+            class="clc-card" 
+            data-name="{{ block.settings.title | escape }}"
+            data-quote="{{ block.settings.quote | escape }}"
+            data-author="{{ block.settings.author | default: 'Editor-in-Chief' | escape }}"
+            data-link="{{ block.settings.link | default: '/pages/press' }}"
+            data-img="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 400 }}{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="clc-logo-box">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.title }}
+              {%- else -%}
+                <span class="clc-logo-fallback">{{ block.settings.title }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.quote != blank -%}
+              <p class="clc-card-quote">"{{ block.settings.quote }}"</p>
+            {%- endif -%}
+            <span class="clc-card-badge">✦ Read Press Review →</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- Press Review Modal -->
+  <div class="clc-modal-overlay" id="clc-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="clc-modal">
+      <button type="button" class="clc-modal-close" id="clc-modal-close-{{ section.id }}" aria-label="Close press review modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="clc-modal-logo" id="clc-modal-logo">
+        <span class="clc-logo-fallback" id="clc-modal-name" style="font-size:1.8rem;">Press Brand</span>
+      </div>
+
+      <p class="clc-modal-quote" id="clc-modal-quote">"Unquestionably the finest architectural engineering we have encountered in the luxury hardware space."</p>
+      <span class="clc-modal-author" id="clc-modal-author">✦ WIRED MAGAZINE | REVIEW EDITION</span>
+
+      <a href="/pages/press" class="clc-modal-cta" id="clc-modal-cta">Read Full Press Feature →</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('clc-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Modal Dialog Controller
+    var modalOverlay = document.getElementById('clc-modal-' + sid);
+    var modalClose = document.getElementById('clc-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var logoWrap = document.getElementById('clc-modal-logo');
+      var nameEl = document.getElementById('clc-modal-name');
+      var quoteEl = document.getElementById('clc-modal-quote');
+      var authorEl = document.getElementById('clc-modal-author');
+      var ctaEl = document.getElementById('clc-modal-cta');
+
+      var cards = sectionEl.querySelectorAll('.clc-card');
+      cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          var name = card.getAttribute('data-name') || 'Press Recognition';
+          var quote = card.getAttribute('data-quote') || 'Verified Press Review Feature.';
+          var author = card.getAttribute('data-author') || 'Editorial Review';
+          var link = card.getAttribute('data-link') || '/pages/press';
+          var imgSrc = card.getAttribute('data-img');
+
+          if (quoteEl) quoteEl.innerText = '"' + quote + '"';
+          if (authorEl) authorEl.innerText = '✦ ' + author;
+          if (ctaEl) ctaEl.href = link;
+
+          if (logoWrap) {
+            if (imgSrc && imgSrc !== 'null' && imgSrc !== '') {
+              logoWrap.innerHTML = '<img src="' + imgSrc + '" alt="' + name + '">';
+            } else {
+              logoWrap.innerHTML = '<span class="clc-logo-fallback" style="font-size:1.8rem;">' + name + '</span>';
+            }
+          }
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Partner Recognition Cloud",
+  "tag": "section",
+  "class": "section-content-logo-cloud",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#1e293b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "display_mode",
+      "label": "Showcase Display Mode",
+      "options": [
+        { "value": "marquee", "label": "Infinite Smooth Marquee Ticker" },
+        { "value": "grid", "label": "Interactive Cards Grid" }
+      ],
+      "default": "marquee"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "label": "Marquee Animation Speed (Seconds)",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Grid Columns (if Grid selected)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale_logos",
+      "label": "Grayscale Logos (Colorize on Hover)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Global Recognition"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured & Endorsed By"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Our architectural engineering and uncompromising design standards have been recognized by the world's leading technology and lifestyle publications."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "partner",
+      "name": "Partner / Press Review",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Brand Logo Image (PNG/SVG)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Brand Name (Fallback)",
+          "default": "WIRED MAGAZINE"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Editorial Quote / Excerpt",
+          "default": "Unquestionably the finest architectural hardware we have reviewed this decade."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Reviewer / Issue Info",
+          "default": "Hardware Review Annual 2026"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Case Study / Press URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Partner Recognition Cloud",
+      "blocks": [
+        { "type": "partner", "settings": { "title": "WIRED", "quote": "A masterclass in modern Swiss engineering and industrial design.", "author": "Gear Review 2026" } },
+        { "type": "partner", "settings": { "title": "WALLPAPER*", "quote": "Redefining the aesthetic boundaries of premium workstation hardware.", "author": "Design Awards Winner" } },
+        { "type": "partner", "settings": { "title": "GQ MAGAZINE", "quote": "The ultimate status symbol for high-performance home executives.", "author": "Best Tech of the Year" } },
+        { "type": "partner", "settings": { "title": "FAST COMPANY", "quote": "Innovation by Design honoree for sustainable aerospace materials.", "author": "Innovation Awards 2026" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

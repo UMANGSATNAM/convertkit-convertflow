@@ -1,4 +1,4 @@
-import { composeThemeFromBlueprint } from './app/services/theme-engine/composer.server.js';
+import { composeThemeFromBlueprint } from './app/services/theme-engine/compiler.server.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

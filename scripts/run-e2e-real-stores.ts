@@ -17,7 +17,7 @@ import { analyzeCRO } from "../app/services/ai/cro-analyzer.server";
 import { retrieveBestComponent } from "../app/services/theme-engine/retrieval.server";
 import { generateStoreBlueprint } from "../app/services/theme-engine/blueprint.server";
 import { calculateHealthScore } from "../app/services/theme-engine/health.server";
-import { composeThemeFromBlueprint } from "../app/services/theme-engine/composer.server";
+import { composeThemeFromBlueprint } from "../app/services/theme-engine/compiler.server";
 import { installTheme, patchSettings } from "../app/services/theme-engine/index";
 import * as fs from "fs/promises";
 import * as path from "path";
@@ -187,6 +187,48 @@ const MOCK_CATALOGS: Record<string, any[]> = {
         nodes: [{ url: "https://cdn.shopify.com/s/files/1/0000/0000/products/mic1.jpg" }]
       },
       variants: { nodes: [{ price: "5499.00" }] }
+    }
+  ],
+  supplements: [
+    {
+      title: "CleanWhey 100% Grass-Fed Protein Isolate",
+      vendor: "BioOptimal",
+      productType: "Protein Powder",
+      tags: ["supplements", "protein", "whey", "fitness", "grassfed", "recovery"],
+      images: {
+        nodes: [{ url: "https://cdn.shopify.com/s/files/1/0000/0000/products/protein1.jpg" }]
+      },
+      variants: { nodes: [{ price: "3499.00" }] }
+    },
+    {
+      title: "DeepSleep Ashwagandha & Magnesium Complex",
+      vendor: "VitalityLab",
+      productType: "Sleep Support",
+      tags: ["supplements", "sleep", "magnesium", "ashwagandha", "recovery", "nootropic"],
+      images: {
+        nodes: [{ url: "https://cdn.shopify.com/s/files/1/0000/0000/products/sleep1.jpg" }]
+      },
+      variants: { nodes: [{ price: "1499.00" }] }
+    },
+    {
+      title: "MegaFlora 50-Billion CFU Daily Probiotic",
+      vendor: "BioOptimal",
+      productType: "Probiotics",
+      tags: ["supplements", "guthealth", "probiotic", "digestion", "daily"],
+      images: {
+        nodes: [{ url: "https://cdn.shopify.com/s/files/1/0000/0000/products/probiotic1.jpg" }]
+      },
+      variants: { nodes: [{ price: "1899.00" }] }
+    },
+    {
+      title: "CellularBoost NAD+ CoEnzyme Precursor",
+      vendor: "VitalityLab",
+      productType: "Longevity",
+      tags: ["supplements", "nad", "longevity", "antiaging", "cellular", "energy"],
+      images: {
+        nodes: [{ url: "https://cdn.shopify.com/s/files/1/0000/0000/products/nad1.jpg" }]
+      },
+      variants: { nodes: [{ price: "4499.00" }] }
     }
   ]
 };
@@ -367,6 +409,17 @@ async function runE2EPipeline(
           visual_complexity: "high",
           hero_product_type: "gold_necklaces"
         };
+      } else if (nicheId === "supplements") {
+        catalogContext = {
+          ...catalogContext,
+          industry: "health",
+          style: "clinical",
+          positioning: "premium",
+          price_band: "mid_high",
+          catalog_strength: 90,
+          visual_complexity: "low",
+          hero_product_type: "protein_powder"
+        };
       }
     }
     phaseTimings.catalog = Date.now() - startCatalog;
@@ -385,6 +438,8 @@ async function runE2EPipeline(
         visualContext = { image_style: "product_only", brightness: "neutral", background_type: "white", visual_quality: "high", people_present: false, image_quality_score: 90 };
       } else if (nicheId === "jewellery") {
         visualContext = { image_style: "editorial", brightness: "high_contrast", background_type: "studio", visual_quality: "high", people_present: false, image_quality_score: 95 };
+      } else if (nicheId === "supplements") {
+        visualContext = { image_style: "product_only", brightness: "light", background_type: "clean_white", visual_quality: "high", people_present: false, image_quality_score: 90 };
       }
     }
     phaseTimings.visual = Date.now() - startVisual;
@@ -445,6 +500,17 @@ async function runE2EPipeline(
           theme_tokens: { button_style: "sharp", card_style: "minimal", section_density: "airy", image_ratio: "square", animation_level: "medium" }
         };
         croContext = { trustLevel: "high", socialProofNeeded: true, faqNeeded: true };
+      } else if (nicheId === "supplements") {
+        brandContext = {
+          brand_archetype: "clinical_trust",
+          tone: "scientific",
+          visual_direction: "clean",
+          trust_level: "maximum",
+          colors: { primary: "#1B365D", secondary: "#F4F8FA", accent: "#00A86B" },
+          typography: { heading: "Inter", body: "Roboto" },
+          theme_tokens: { button_style: "pill", card_style: "bordered", section_density: "standard", image_ratio: "square", animation_level: "low" }
+        };
+        croContext = { trustLevel: "maximum", socialProofNeeded: true, faqNeeded: true };
       }
     }
     phaseTimings.brand = Date.now() - startBrand;
@@ -757,6 +823,12 @@ async function runAllE2ETests() {
     results["Electronics Mock Niche"] = electronicsRes;
     if (electronicsRes.status === "FAILED") overallFailed = true;
 
+    // 3b. Run Mock Supplements
+    console.log("Starting Run 3b: Supplements Mock Niche");
+    const supplementsRes = await runE2EPipeline("supplements", true);
+    results["Supplements Mock Niche"] = supplementsRes;
+    if (supplementsRes.status === "FAILED") overallFailed = true;
+
     // 4. Run Layout Diversity Test
     console.log("Starting Layout Diversity Test");
     const diversityRes = await runLayoutDiversityTest();
@@ -781,6 +853,8 @@ async function runAllE2ETests() {
     for (const [runName, res] of Object.entries(results)) {
       if (runName === "Layout Diversity Test") {
         console.log(`• ${runName.padEnd(35)}: ${res.status === "PASSED" ? "✅ PASSED" : "❌ FAILED"} (${res.uniqueCount || 0}/5 unique compositions)`);
+      } else if (res.status === "SKIPPED") {
+        console.log(`• ${runName.padEnd(35)}: ⏸️ SKIPPED (${res.note || "N/A"})`);
       } else {
         console.log(`• ${runName.padEnd(35)}: ${res.status === "PASSED" ? "✅ PASSED" : "❌ FAILED"} (Score: ${res.validationScore || 0}, Preview: ${res.previewUrl || "N/A"})`);
       }

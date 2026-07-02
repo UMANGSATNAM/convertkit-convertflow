@@ -1,0 +1,244 @@
+{%- comment -%}
+  testimonials_modern_1.liquid — Modern / Tech Testimonials
+  
+  DESIGN PHILOSOPHY:
+  Clean card-based testimonials with subtle glassmorphism.
+  Company logos or avatar photos. Horizontal scroll on mobile.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mdtst-bg: var(--color-background, #0f0f0f);
+    --mdtst-text: var(--color-text, #e0e0e0);
+    --mdtst-muted: color-mix(in srgb, var(--mdtst-text) 40%, transparent);
+    --mdtst-accent: var(--color-accent, #6366f1);
+    --mdtst-border: color-mix(in srgb, var(--mdtst-text) 8%, transparent);
+    --mdtst-card-bg: color-mix(in srgb, var(--mdtst-text) 4%, transparent);
+    --mdtst-font: var(--font-body, 'Inter', sans-serif);
+    --mdtst-font-heading: var(--font-heading, 'Space Grotesk', sans-serif);
+    --mdtst-radius: var(--radius-card, 12px);
+  }
+
+  .md-testimonials {
+    background: var(--mdtst-bg);
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .md-testimonials__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .md-testimonials__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .md-testimonials__eyebrow {
+    font-family: var(--mdtst-font);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--mdtst-accent);
+    margin-bottom: 0.75rem;
+  }
+  .md-testimonials__title {
+    font-family: var(--mdtst-font-heading);
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--mdtst-text);
+    margin: 0;
+  }
+
+  /* Grid → horizontal scroll on mobile */
+  .md-testimonials__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 767px) {
+    .md-testimonials__grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      gap: 1rem;
+      padding-bottom: 0.5rem;
+    }
+    .md-testimonials__grid::-webkit-scrollbar { display: none; }
+    .md-testimonials__card {
+      flex: 0 0 85%;
+      scroll-snap-align: start;
+    }
+  }
+  @media (min-width: 768px) {
+    .md-testimonials__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .md-testimonials__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .md-testimonials__card {
+    background: var(--mdtst-card-bg);
+    border: 1px solid var(--mdtst-border);
+    border-radius: var(--mdtst-radius);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .md-testimonials__card:hover {
+    border-color: var(--mdtst-accent);
+    transform: translateY(-4px);
+  }
+
+  .md-testimonials__stars {
+    color: var(--mdtst-accent);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .md-testimonials__quote {
+    font-family: var(--mdtst-font);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--mdtst-text);
+    flex: 1;
+  }
+
+  .md-testimonials__author-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--mdtst-border);
+  }
+  .md-testimonials__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mdtst-accent), color-mix(in srgb, var(--mdtst-accent) 50%, var(--mdtst-text)));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mdtst-font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .md-testimonials__author-name {
+    font-family: var(--mdtst-font);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--mdtst-text);
+  }
+  .md-testimonials__author-title {
+    font-family: var(--mdtst-font);
+    font-size: 0.68rem;
+    color: var(--mdtst-muted);
+  }
+</style>
+
+<section class="md-testimonials">
+  <div class="md-testimonials__inner">
+
+    <div class="md-testimonials__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="md-testimonials__eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      <h2 class="md-testimonials__title">{{ section.settings.title | default: 'What Our Customers Say' }}</h2>
+    </div>
+
+    <div class="md-testimonials__grid">
+      {%- for block in section.blocks -%}
+        <div class="md-testimonials__card" {{ block.shopify_attributes }}>
+          <div class="md-testimonials__stars" aria-label="{{ block.settings.rating }} stars">
+            {%- for i in (1..5) -%}
+              {%- if i <= block.settings.rating -%}★{%- else -%}☆{%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="md-testimonials__quote">"{{ block.settings.quote }}"</div>
+          <div class="md-testimonials__author-row">
+            <div class="md-testimonials__avatar">{{ block.settings.author | slice: 0 | upcase }}</div>
+            <div>
+              <div class="md-testimonials__author-name">{{ block.settings.author }}</div>
+              {%- if block.settings.title != blank -%}
+                <div class="md-testimonials__author-title">{{ block.settings.title }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Modern Testimonials",
+  "tag": "section",
+  "class": "section-testimonials-modern",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Customer Love"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "What Our Customers Say"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Review Text",
+          "default": "The product quality exceeded my expectations. Fast shipping, great packaging, and excellent customer support."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Name",
+          "default": "Sarah K."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title / Role",
+          "default": "Verified Customer"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Stars",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Testimonials",
+      "blocks": [
+        { "type": "testimonial", "settings": { "quote": "Incredible quality and lightning-fast delivery. This is the future of shopping.", "author": "Sarah K.", "title": "Verified Customer", "rating": 5 } },
+        { "type": "testimonial", "settings": { "quote": "The attention to detail is remarkable. Will definitely be ordering again.", "author": "Marcus T.", "title": "Repeat Buyer", "rating": 5 } },
+        { "type": "testimonial", "settings": { "quote": "Best customer experience I've had online. Period.", "author": "Priya M.", "title": "Verified Customer", "rating": 4 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

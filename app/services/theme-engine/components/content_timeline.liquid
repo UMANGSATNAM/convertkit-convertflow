@@ -1,0 +1,563 @@
+{%- comment -%}
+  content_timeline.liquid — Ultra-Comprehensive Innovation Chronicle & Roadmap Timeline
+  
+  DESIGN PHILOSOPHY:
+  An architectural historical timeline engineered to chart brand evolution and engineering
+  milestones. Features interactive era filtering tabs, animated milestone node connections,
+  rich typography hierarchy, and an accessible Archival Milestone Deep-Dive Modal Dialog
+  for inspecting historical engineering specifications and blueprints.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --ctl-bg: {{ section.settings.bg_color | default: '#ffffff' }};
+    --ctl-card-bg: {{ section.settings.card_bg_color | default: '#f8fafc' }};
+    --ctl-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --ctl-muted: color-mix(in srgb, var(--ctl-text) 60%, transparent);
+    --ctl-border: color-mix(in srgb, var(--ctl-text) 14%, transparent);
+    --ctl-accent: {{ section.settings.accent_color | default: '#0f172a' }};
+    --ctl-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --ctl-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --ctl-padding-top: clamp(4rem, 8vw, 7rem);
+    --ctl-padding-bottom: clamp(4rem, 8vw, 7rem);
+  }
+
+  .ctl-section {
+    background-color: var(--ctl-bg);
+    color: var(--ctl-text);
+    font-family: var(--ctl-font-body);
+    padding: var(--ctl-padding-top) clamp(1.25rem, 4vw, 4rem) var(--ctl-padding-bottom);
+    border-bottom: 1px solid var(--ctl-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ctl-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* Section Header */
+  .ctl-header {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.95rem;
+  }
+  .ctl-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ctl-accent);
+    background: color-mix(in srgb, var(--ctl-accent) 8%, transparent);
+    padding: 0.4rem 1.1rem;
+    border-radius: 100px;
+  }
+  .ctl-title {
+    font-family: var(--ctl-font-head);
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+  }
+  .ctl-desc {
+    font-size: clamp(0.98rem, 2vw, 1.18rem);
+    color: var(--ctl-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Era Filtering Tabs */
+  .ctl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.5rem;
+    background: var(--ctl-card-bg);
+    border: 1px solid var(--ctl-border);
+    border-radius: 100px;
+    max-width: fit-content;
+    margin: 0 auto;
+  }
+  .ctl-tab {
+    background: transparent;
+    border: none;
+    color: var(--ctl-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.6rem 1.35rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .ctl-tab[data-active="true"],
+  .ctl-tab:hover {
+    background: var(--ctl-text);
+    color: var(--ctl-bg);
+  }
+
+  /* Timeline Grid */
+  .ctl-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 4vw, 3rem);
+    position: relative;
+  }
+  .ctl-grid::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 2px;
+    background: var(--ctl-border);
+  }
+  @media (min-width: 768px) {
+    .ctl-grid::before {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Timeline Item Node Card */
+  .ctl-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    padding-left: 54px;
+    opacity: 1;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ctl-item[data-hidden="true"] {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  @media (min-width: 768px) {
+    .ctl-item {
+      width: 50%;
+      padding-left: 0;
+      padding-right: 3rem;
+      align-self: flex-start;
+      text-align: right;
+    }
+    .ctl-item:nth-child(even) {
+      align-self: flex-end;
+      padding-right: 0;
+      padding-left: 3rem;
+      text-align: left;
+    }
+  }
+
+  /* Central Timeline Node Circle */
+  .ctl-node {
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ctl-bg);
+    border: 4px solid var(--ctl-accent);
+    z-index: 5;
+    box-shadow: 0 0 0 6px var(--ctl-bg);
+  }
+  @media (min-width: 768px) {
+    .ctl-node {
+      left: auto;
+      right: -11px;
+    }
+    .ctl-item:nth-child(even) .ctl-node {
+      right: auto;
+      left: -11px;
+    }
+  }
+
+  /* Milestone Card Content Box */
+  .ctl-card {
+    background: var(--ctl-card-bg);
+    border: 1px solid var(--ctl-border);
+    border-radius: 28px;
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ctl-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--ctl-accent);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+  }
+  .ctl-year-badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ctl-accent);
+    background: color-mix(in srgb, var(--ctl-accent) 10%, transparent);
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    width: fit-content;
+  }
+  @media (min-width: 768px) {
+    .ctl-item:nth-child(odd) .ctl-year-badge {
+      align-self: flex-end;
+    }
+    .ctl-item:nth-child(even) .ctl-year-badge {
+      align-self: flex-start;
+    }
+  }
+  .ctl-card-title {
+    font-family: var(--ctl-font-head);
+    font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    margin: 0;
+  }
+  .ctl-card-desc {
+    font-size: 0.95rem;
+    color: var(--ctl-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .ctl-btn {
+    background: transparent;
+    border: 1px solid var(--ctl-border);
+    color: var(--ctl-text);
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 100px;
+    cursor: pointer;
+    width: fit-content;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+  .ctl-btn:hover {
+    background: var(--ctl-text);
+    color: var(--ctl-bg);
+  }
+  @media (min-width: 768px) {
+    .ctl-item:nth-child(odd) .ctl-btn {
+      align-self: flex-end;
+    }
+    .ctl-item:nth-child(even) .ctl-btn {
+      align-self: flex-start;
+    }
+  }
+
+  /* Archival Deep-Dive Modal Dialog */
+  .ctl-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .ctl-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .ctl-modal {
+    background: var(--ctl-card-bg);
+    color: var(--ctl-text);
+    border: 1px solid var(--ctl-border);
+    border-radius: 28px;
+    max-width: 580px;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    position: relative;
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ctl-modal-overlay[data-open="true"] .ctl-modal {
+    transform: scale(1);
+  }
+  .ctl-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: color-mix(in srgb, var(--ctl-text) 10%, transparent);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ctl-text);
+    cursor: pointer;
+  }
+</style>
+
+<section class="ctl-section" id="ctl-section-{{ section.id }}" aria-labelledby="ctl-title-{{ section.id }}">
+  <div class="ctl-container">
+    
+    <!-- Section Header -->
+    <div class="ctl-header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ctl-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="ctl-title-{{ section.id }}" class="ctl-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="ctl-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Era Filter Tabs -->
+    {%- if section.settings.show_filters -%}
+      <div class="ctl-filters" role="tablist">
+        <button type="button" class="ctl-tab" data-filter="all" data-active="true" role="tab" aria-selected="true">All Eras</button>
+        <button type="button" class="ctl-tab" data-filter="2024" role="tab" aria-selected="false">2024 Genesis</button>
+        <button type="button" class="ctl-tab" data-filter="2025" role="tab" aria-selected="false">2025 Evolution</button>
+        <button type="button" class="ctl-tab" data-filter="2026" role="tab" aria-selected="false">2026 Monolith</button>
+      </div>
+    {%- endif -%}
+
+    <!-- Timeline Grid -->
+    <div class="ctl-grid" id="ctl-grid-{{ section.id }}" role="list">
+      {%- for block in section.blocks -%}
+        <div class="ctl-item" data-year="{{ block.settings.year | default: '2026' }}" role="listitem" {{ block.shopify_attributes }}>
+          <div class="ctl-node"></div>
+          
+          <div class="ctl-card">
+            <span class="ctl-year-badge">{{ block.settings.year | default: '2026' }} Milestone</span>
+            <h3 class="ctl-card-title">{{ block.settings.title }}</h3>
+            <p class="ctl-card-desc">{{ block.settings.desc }}</p>
+
+            <button type="button" class="ctl-btn" data-year="{{ block.settings.year | default: '2026' }}" data-title="{{ block.settings.title }}" data-desc="{{ block.settings.desc }}" data-archival="{{ block.settings.archival_notes | default: 'Full technical archival blueprints and CNC schematic drawings are stored in our Zürich registry.' }}" aria-label="Inspect archival details for {{ block.settings.title }}">Inspect Archival Blueprint</button>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Archival Deep-Dive Modal -->
+  <div class="ctl-modal-overlay" id="ctl-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="ctl-modal">
+      <button type="button" class="ctl-modal-close" id="ctl-modal-close-{{ section.id }}" aria-label="Close archival modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span id="ctl-modal-year" style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--ctl-accent);background:color-mix(in srgb,var(--ctl-accent) 10%,transparent);padding:0.3rem 0.8rem;border-radius:100px;">2026 Milestone</span>
+        <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--ctl-muted);">Zürich Archival Registry #409</span>
+      </div>
+
+      <h3 id="ctl-modal-title" style="font-family:var(--ctl-font-head);font-size:1.85rem;margin:0;">Milestone Specification</h3>
+      <p id="ctl-modal-desc" style="font-size:1rem;line-height:1.65;color:var(--ctl-muted);margin:0;">Milestone overview will display here.</p>
+
+      <div style="padding:1.25rem;background:color-mix(in srgb,var(--ctl-text) 5%,transparent);border-radius:16px;border:1px dashed var(--ctl-border);">
+        <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ctl-text);display:block;margin-bottom:0.5rem;">Archival Engineering Notes:</span>
+        <p id="ctl-modal-archival" style="font-size:0.88rem;color:var(--ctl-muted);line-height:1.6;margin:0;">Archival engineering schematic details will display here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('ctl-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Era Filtering Controller
+    var tabs = sectionEl.querySelectorAll('.ctl-tab');
+    var items = sectionEl.querySelectorAll('.ctl-item');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var filter = tab.getAttribute('data-filter');
+
+        tabs.forEach(function(t) {
+          t.removeAttribute('data-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.setAttribute('data-active', 'true');
+        tab.setAttribute('aria-selected', 'true');
+
+        items.forEach(function(item) {
+          var yr = item.getAttribute('data-year');
+          if (filter === 'all' || yr === filter) {
+            item.removeAttribute('data-hidden');
+          } else {
+            item.setAttribute('data-hidden', 'true');
+          }
+        });
+      });
+    });
+
+    // 2. Archival Deep-Dive Modal Controller
+    var modalOverlay = document.getElementById('ctl-modal-' + sid);
+    var modalClose = document.getElementById('ctl-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var yrEl = document.getElementById('ctl-modal-year');
+      var titleEl = document.getElementById('ctl-modal-title');
+      var descEl = document.getElementById('ctl-modal-desc');
+      var archEl = document.getElementById('ctl-modal-archival');
+
+      var btns = sectionEl.querySelectorAll('.ctl-btn');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (yrEl) yrEl.innerText = (btn.getAttribute('data-year') || '2026') + ' Milestone';
+          if (titleEl) titleEl.innerText = btn.getAttribute('data-title') || 'Engineering Milestone';
+          if (descEl) descEl.innerText = btn.getAttribute('data-desc') || '';
+          if (archEl) archEl.innerText = btn.getAttribute('data-archival') || '';
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Innovation Timeline",
+  "tag": "section",
+  "class": "section-content-timeline",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Milestone Card Background",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Era Filter Tabs",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Chronicle of Innovation"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Architectural Evolution"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Chart our engineering journey from initial Swiss prototypes to global serialized workstation releases."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "milestone",
+      "name": "Milestone Event",
+      "settings": [
+        {
+          "type": "text",
+          "id": "year",
+          "label": "Milestone Year / Era",
+          "default": "2024"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Milestone Headline",
+          "default": "The Zürich Atelier Foundation"
+        },
+        {
+          "type": "textarea",
+          "id": "desc",
+          "label": "Milestone Description",
+          "default": "Established our first Swiss industrial design laboratory dedicated to high-precision acoustic hardware engineering."
+        },
+        {
+          "type": "textarea",
+          "id": "archival_notes",
+          "label": "Archival Technical Schematic Notes",
+          "default": "Initial acoustic tests recorded 42% less keystroke reverberation using our prototype custom silicone chamber mold."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Innovation Timeline",
+      "blocks": [
+        { "type": "milestone", "settings": { "year": "2024", "title": "The Zürich Atelier Foundation" } },
+        { "type": "milestone", "settings": { "year": "2025", "title": "Series 01 Unibody Patent" } },
+        { "type": "milestone", "settings": { "year": "2025", "title": "Acoustic Dampening Gasket" } },
+        { "type": "milestone", "settings": { "year": "2026", "title": "The Monolith Series 04 Global Drop" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,371 @@
+{%- comment -%}
+  header_modern_1.liquid — Modern / Tech Header
+  
+  DESIGN PHILOSOPHY:
+  Glassmorphism-inspired. Frosted background, gradient logo,
+  pill-shaped cart button. Clean geometric aesthetic.
+  
+  FEATURES:
+  • Frosted glass backdrop-filter effect
+  • Gradient text logo
+  • Pill-shaped cart button with count
+  • Mobile fullscreen overlay menu
+  • Scroll-aware transparency
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mdhdr-bg: var(--color-background, #0a0a0a);
+    --mdhdr-text: var(--color-text, #e8e8e8);
+    --mdhdr-muted: color-mix(in srgb, var(--mdhdr-text) 50%, transparent);
+    --mdhdr-border: color-mix(in srgb, var(--mdhdr-text) 8%, transparent);
+    --mdhdr-accent: var(--color-accent, #6366f1);
+    --mdhdr-height: 64px;
+    --mdhdr-font: var(--font-body, 'Inter', sans-serif);
+    --mdhdr-font-logo: var(--font-heading, 'Space Grotesk', sans-serif);
+    --mdhdr-radius: var(--radius-card, 8px);
+  }
+
+  .md-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--mdhdr-bg) 85%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--mdhdr-border);
+    transition: background 0.3s ease;
+  }
+  .md-header[data-scrolled="true"] {
+    background: color-mix(in srgb, var(--mdhdr-bg) 95%, transparent);
+  }
+
+  .md-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--mdhdr-height);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /* ── LEFT: NAV ─────────────────── */
+  .md-header__nav {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+  }
+  @media (min-width: 840px) {
+    .md-header__nav { display: flex; }
+  }
+  .md-header__nav-link {
+    font-family: var(--mdhdr-font);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--mdhdr-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .md-header__nav-link:hover,
+  .md-header__nav-link[aria-current="page"] {
+    color: var(--mdhdr-text);
+  }
+
+  /* ── CENTER: LOGO ──────────────── */
+  .md-header__logo {
+    font-family: var(--mdhdr-font-logo);
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: linear-gradient(135deg, var(--mdhdr-accent), color-mix(in srgb, var(--mdhdr-accent) 60%, var(--mdhdr-text)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .md-header__logo-img {
+    max-height: 36px;
+    width: auto;
+  }
+
+  /* ── RIGHT: ACTIONS ────────────── */
+  .md-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .md-header__action {
+    font-family: var(--mdhdr-font);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--mdhdr-muted);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+  }
+  .md-header__action:hover {
+    color: var(--mdhdr-text);
+  }
+
+  /* Cart pill */
+  .md-header__cart-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mdhdr-font);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--mdhdr-text);
+    text-decoration: none;
+    background: color-mix(in srgb, var(--mdhdr-text) 10%, transparent);
+    padding: 0.45rem 1rem;
+    border-radius: 100px;
+    transition: background 0.2s ease;
+  }
+  .md-header__cart-pill:hover {
+    background: color-mix(in srgb, var(--mdhdr-text) 15%, transparent);
+  }
+  .md-header__cart-count {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--mdhdr-accent);
+    color: #fff;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── MOBILE BURGER ─────────────── */
+  .md-header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    width: 22px;
+  }
+  .md-header__burger span {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: var(--mdhdr-text);
+    border-radius: 1px;
+  }
+  @media (min-width: 840px) {
+    .md-header__burger { display: none; }
+  }
+
+  /* ── FULLSCREEN MOBILE OVERLAY ── */
+  .md-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--mdhdr-bg);
+    z-index: 300;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .md-mobile-overlay[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .md-mobile-overlay__close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: none;
+    border: 1px solid var(--mdhdr-border);
+    color: var(--mdhdr-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+  .md-mobile-overlay__close:hover {
+    background: color-mix(in srgb, var(--mdhdr-text) 10%, transparent);
+  }
+
+  .md-mobile-overlay__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .md-mobile-overlay__nav-link {
+    font-family: var(--mdhdr-font-logo);
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    color: var(--mdhdr-text);
+    text-decoration: none;
+    display: block;
+    padding: 0.5rem 2rem;
+    transition: opacity 0.2s ease;
+  }
+  .md-mobile-overlay__nav-link:hover {
+    opacity: 0.6;
+  }
+
+  .md-mobile-overlay__footer {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    gap: 2rem;
+  }
+  .md-mobile-overlay__footer a {
+    font-family: var(--mdhdr-font);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--mdhdr-muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .md-header, .md-mobile-overlay { transition: none; }
+  }
+</style>
+
+{%- comment -%} ══ MOBILE FULLSCREEN OVERLAY ══ {%- endcomment -%}
+<div class="md-mobile-overlay" data-open="false" id="md-overlay-{{ section.id }}">
+  <button class="md-mobile-overlay__close"
+    onclick="document.getElementById('md-overlay-{{ section.id }}').dataset.open='false'"
+    aria-label="Close menu">✕</button>
+  <ul class="md-mobile-overlay__nav">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <li>
+        <a href="{{ link.url }}" class="md-mobile-overlay__nav-link">{{ link.title }}</a>
+      </li>
+    {%- endfor -%}
+  </ul>
+  <div class="md-mobile-overlay__footer">
+    <a href="{{ routes.search_url }}">Search</a>
+    <a href="{{ routes.account_url }}">Account</a>
+    <a href="{{ routes.cart_url }}">Cart ({{ cart.item_count }})</a>
+  </div>
+</div>
+
+{%- comment -%} ══ MAIN HEADER ══ {%- endcomment -%}
+<header class="md-header" data-scrolled="false" id="md-header-{{ section.id }}">
+  <div class="md-header__inner">
+
+    {%- comment -%} Mobile burger {%- endcomment -%}
+    <button class="md-header__burger" aria-label="Open menu"
+      onclick="document.getElementById('md-overlay-{{ section.id }}').dataset.open='true'">
+      <span></span>
+      <span></span>
+    </button>
+
+    {%- comment -%} Desktop nav {%- endcomment -%}
+    <ul class="md-header__nav" role="navigation" aria-label="Main navigation">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <li>
+          <a href="{{ link.url }}" class="md-header__nav-link"
+            {% if link.current %} aria-current="page"{% endif %}>
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- comment -%} Center logo {%- endcomment -%}
+    <a href="{{ routes.root_url }}" class="md-header__logo">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 260 | image_tag: class: 'md-header__logo-img', alt: shop.name }}
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Right actions {%- endcomment -%}
+    <div class="md-header__actions">
+      <a href="{{ routes.search_url }}" class="md-header__action" aria-label="Search">Search</a>
+      <a href="{{ routes.cart_url }}" class="md-header__cart-pill" aria-label="Cart">
+        Cart
+        {%- if cart.item_count > 0 -%}
+          <span class="md-header__cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  (function() {
+    var hdr = document.getElementById('md-header-{{ section.id }}');
+    if (!hdr) return;
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          hdr.dataset.scrolled = window.scrollY > 30 ? 'true' : 'false';
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Modern Header",
+  "tag": "section",
+  "class": "section-header-modern",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Recommended: transparent PNG or SVG, max 260px wide."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Sticky Header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_blur",
+      "label": "Frosted Glass Effect",
+      "default": true,
+      "info": "Uses backdrop-filter for a frosted glass look."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Header"
+    }
+  ]
+}
+{% endschema %}

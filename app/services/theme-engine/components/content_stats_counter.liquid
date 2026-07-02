@@ -1,0 +1,114 @@
+<div class="content-stats py-20 px-6 bg-[var(--color-text)] text-[var(--color-primary-text, #fff)]">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+      
+      {%- for block in section.blocks -%}
+        <div class="stat-item flex flex-col items-center" {{ block.shopify_attributes }}>
+          <div class="text-4xl md:text-6xl font-black mb-2 tabular-nums">
+            <span class="counter" data-target="{{ block.settings.number }}">0</span>{{ block.settings.suffix }}
+          </div>
+          <p class="text-sm md:text-base font-bold uppercase tracking-widest opacity-80">{{ block.settings.title }}</p>
+        </div>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        <div class="stat-item flex flex-col items-center">
+          <div class="text-4xl md:text-6xl font-black mb-2"><span class="counter" data-target="100">0</span>k+</div>
+          <p class="text-sm uppercase tracking-widest opacity-80">Happy Customers</p>
+        </div>
+        <div class="stat-item flex flex-col items-center">
+          <div class="text-4xl md:text-6xl font-black mb-2"><span class="counter" data-target="50">0</span>+</div>
+          <p class="text-sm uppercase tracking-widest opacity-80">Awards Won</p>
+        </div>
+        <div class="stat-item flex flex-col items-center">
+          <div class="text-4xl md:text-6xl font-black mb-2"><span class="counter" data-target="10">0</span></div>
+          <p class="text-sm uppercase tracking-widest opacity-80">Years Active</p>
+        </div>
+        <div class="stat-item flex flex-col items-center">
+          <div class="text-4xl md:text-6xl font-black mb-2"><span class="counter" data-target="5">0</span>★</div>
+          <p class="text-sm uppercase tracking-widest opacity-80">Average Rating</p>
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const counters = document.querySelectorAll('#shopify-section-{{ section.id }} .counter');
+  
+  const animateCounter = (el) => {
+    const target = +el.getAttribute('data-target');
+    const duration = 2000; // ms
+    const step = target / (duration / 16); // 60fps
+    
+    let current = 0;
+    
+    const update = () => {
+      current += step;
+      if (current < target) {
+        el.innerText = Math.ceil(current);
+        requestAnimationFrame(update);
+      } else {
+        el.innerText = target;
+      }
+    };
+    update();
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(counter => observer.observe(counter));
+});
+</script>
+
+{% schema %}
+{
+  "name": "Stats Counter",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "number",
+          "id": "number",
+          "label": "Number Target",
+          "default": 100
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Suffix (e.g. k+, %)",
+          "default": "%"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "Satisfaction"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stats Counter",
+      "blocks": [
+        { "type": "stat", "settings": {"number": 50, "suffix": "k+", "title": "Customers"} },
+        { "type": "stat", "settings": {"number": 99, "suffix": "%", "title": "Satisfaction"} }
+      ]
+    }
+  ]
+}
+{% endschema %}

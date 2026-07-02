@@ -1,0 +1,223 @@
+{%- comment -%}
+  story_image_text_overlap.liquid — Editorial Overlapping Story Section
+  
+  DESIGN PHILOSOPHY:
+  Magazine-inspired brand storytelling. The text card physically overlaps
+  the image on desktop for depth and visual intrigue, while stacking cleanly
+  on mobile. High contrast elevation shadow and refined typography.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --sio-bg: var(--color-surface, var(--color-background, #f8fafc));
+    --sio-card: #ffffff;
+    --sio-text: var(--color-text, #0f172a);
+    --sio-muted: color-mix(in srgb, var(--sio-text) 55%, transparent);
+    --sio-border: color-mix(in srgb, var(--sio-text) 10%, transparent);
+    --sio-accent: var(--color-accent, #2563eb);
+    --sio-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --sio-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .sio-section {
+    background: var(--sio-bg);
+    padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--sio-border);
+  }
+
+  .sio-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 992px) {
+    .sio-inner {
+      grid-template-columns: 7fr 5fr;
+      gap: 0;
+    }
+  }
+
+  .sio-media-wrap {
+    position: relative;
+    border-radius: var(--radius-card, 20px);
+    overflow: hidden;
+    aspect-ratio: var(--aspect, 16/10);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15);
+  }
+  .sio-media-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .sio-media-wrap:hover img {
+    transform: scale(1.05);
+  }
+
+  .sio-card {
+    background: var(--sio-card);
+    border: 1px solid var(--sio-border);
+    border-radius: var(--radius-card, 20px);
+    padding: clamp(2rem, 5vw, 3.5rem);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.18);
+    position: relative;
+    z-index: 2;
+    color: var(--sio-text);
+  }
+  @media (min-width: 992px) {
+    .sio-card {
+      margin-left: -18%;
+    }
+  }
+
+  .sio-eyebrow {
+    font-family: var(--sio-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--sio-accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .sio-title {
+    font-family: var(--sio-font-head);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 1.25rem 0;
+  }
+
+  .sio-text {
+    font-family: var(--sio-font);
+    font-size: 0.95rem;
+    color: var(--sio-muted);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .sio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--sio-font);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--sio-text);
+    padding: 0.85rem 1.8rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .sio-btn:hover {
+    background: var(--sio-accent);
+    transform: translateY(-2px);
+  }
+</style>
+
+<section class="sio-section" aria-labelledby="sio-title-{{ section.id }}">
+  <div class="sio-inner">
+    <div class="sio-media-wrap" style="--aspect: {{ section.settings.aspect_ratio | default: '16/10' }};">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1400 | image_tag: loading: 'lazy', alt: section.settings.title }}
+      {%- else -%}
+        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e2e8f0; color: #64748b;">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="sio-card" style="background: {{ section.settings.card_bg | default: '#ffffff' }};">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="sio-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="sio-title-{{ section.id }}" class="sio-title" style="color: {{ section.settings.text_color | default: '#0f172a' }};">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="sio-text" style="color: {{ section.settings.text_color | default: '#0f172a' }}; opacity: 0.85;">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_link | default: '/pages/about' }}" class="sio-btn">{{ section.settings.btn_label }} →</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image Text Overlap",
+  "tag": "section",
+  "class": "section-story-overlap",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Featured Image"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "16/10", "label": "Widescreen (16:10)" },
+        { "value": "4/3", "label": "Standard (4:3)" },
+        { "value": "1/1", "label": "Square (1:1)" }
+      ],
+      "default": "16/10"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Text Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Card Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Our Philosophy"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Crafted with Purpose"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Story Text",
+      "default": "<p>Discover the story behind our meticulous process and dedication to quality. Every piece is designed to stand the test of time, blending heritage artistry with modern innovation.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read Our Story"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Text Overlap"
+    }
+  ]
+}
+{% endschema %}

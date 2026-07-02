@@ -1,0 +1,264 @@
+{%- comment -%}
+  feature_comparison_modern_1.liquid — Us vs. Them Comparison Table
+  
+  DESIGN PHILOSOPHY:
+  High-impact SaaS & eCommerce comparison grid. Clearly highlights
+  the brand's superiority over competitors or generic alternatives
+  with checkmarks, badges, and highlighted columns.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --fcm-bg: var(--color-background, #0b0f19);
+    --fcm-card: color-mix(in srgb, var(--color-text, #fff) 4%, transparent);
+    --fcm-text: var(--color-text, #f8fafc);
+    --fcm-muted: color-mix(in srgb, var(--fcm-text) 50%, transparent);
+    --fcm-border: color-mix(in srgb, var(--fcm-text) 10%, transparent);
+    --fcm-accent: var(--color-accent, #6366f1);
+    --fcm-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --fcm-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .fcm-section {
+    background: var(--fcm-bg);
+    padding: clamp(3.5rem, 8vw, 6.5rem) clamp(1.25rem, 4vw, 3.5rem);
+    font-family: var(--fcm-font);
+  }
+
+  .fcm-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .fcm-header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+  }
+  .fcm-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--fcm-accent);
+    margin-bottom: 0.5rem;
+  }
+  .fcm-title {
+    font-family: var(--fcm-font-head);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--fcm-text);
+    margin: 0;
+  }
+
+  .fcm-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--fcm-border);
+    border-radius: var(--radius-card, 16px);
+    background: var(--fcm-card);
+  }
+
+  .fcm-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 580px;
+  }
+
+  .fcm-table th, .fcm-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--fcm-border);
+  }
+  .fcm-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .fcm-table th {
+    font-family: var(--fcm-font-head);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--fcm-text);
+    background: color-mix(in srgb, var(--fcm-text) 3%, transparent);
+  }
+
+  .fcm-col-us {
+    background: color-mix(in srgb, var(--fcm-accent) 12%, transparent);
+    color: var(--fcm-text);
+    font-weight: 600;
+    position: relative;
+    width: 28%;
+    text-align: center;
+  }
+  .fcm-table th.fcm-col-us {
+    background: var(--fcm-accent);
+    color: #fff;
+    font-size: 1.15rem;
+  }
+
+  .fcm-col-them {
+    color: var(--fcm-muted);
+    width: 28%;
+    text-align: center;
+  }
+
+  .fcm-feature-name {
+    font-weight: 500;
+    color: var(--fcm-text);
+  }
+
+  .fcm-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+  .fcm-icon-check {
+    background: color-mix(in srgb, #10b981 20%, transparent);
+    color: #10b981;
+  }
+  .fcm-icon-cross {
+    background: color-mix(in srgb, #ef4444 20%, transparent);
+    color: #ef4444;
+  }
+  .fcm-icon svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+    stroke: currentColor;
+    fill: none;
+  }
+</style>
+
+<section class="fcm-section" aria-labelledby="fcm-title-{{ section.id }}">
+  <div class="fcm-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="fcm-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="fcm-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="fcm-title-{{ section.id }}" class="fcm-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="fcm-table-wrap">
+      <table class="fcm-table">
+        <thead>
+          <tr>
+            <th style="width: 44%;">Feature / Capability</th>
+            <th class="fcm-col-us">{{ section.settings.brand_name | default: 'Our Brand' }}</th>
+            <th class="fcm-col-them">{{ section.settings.competitor_name | default: 'Others' }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for block in section.blocks -%}
+            <tr {{ block.shopify_attributes }}>
+              <td class="fcm-feature-name">{{ block.settings.title }}</td>
+              <td class="fcm-col-us">
+                {%- if block.settings.us_value == 'check' -%}
+                  <span class="fcm-icon fcm-icon-check" title="Yes">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                {%- elsif block.settings.us_value == 'cross' -%}
+                  <span class="fcm-icon fcm-icon-cross" title="No">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </span>
+                {%- else -%}
+                  {{ block.settings.us_value }}
+                {%- endif -%}
+              </td>
+              <td class="fcm-col-them">
+                {%- if block.settings.them_value == 'check' -%}
+                  <span class="fcm-icon fcm-icon-check" title="Yes">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                {%- elsif block.settings.them_value == 'cross' -%}
+                  <span class="fcm-icon fcm-icon-cross" title="No">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </span>
+                {%- else -%}
+                  {{ block.settings.them_value }}
+                {%- endif -%}
+              </td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Feature Comparison",
+  "tag": "section",
+  "class": "section-feature-comparison",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Why Choose Us"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "How We Stack Up"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Our Brand Column Header",
+      "default": "Our Brand"
+    },
+    {
+      "type": "text",
+      "id": "competitor_name",
+      "label": "Competitor Column Header",
+      "default": "Traditional Brands"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Comparison Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Name",
+          "default": "100% Organic & Sustainably Sourced"
+        },
+        {
+          "type": "text",
+          "id": "us_value",
+          "label": "Our Brand Value ('check', 'cross', or text)",
+          "default": "check"
+        },
+        {
+          "type": "text",
+          "id": "them_value",
+          "label": "Competitor Value ('check', 'cross', or text)",
+          "default": "cross"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Feature Comparison",
+      "blocks": [
+        { "type": "row", "settings": { "title": "100% Organic Ingredients", "us_value": "check", "them_value": "cross" } },
+        { "type": "row", "settings": { "title": "Free Express Shipping", "us_value": "check", "them_value": "Orders over $100" } },
+        { "type": "row", "settings": { "title": "30-Day Risk-Free Trial", "us_value": "check", "them_value": "cross" } },
+        { "type": "row", "settings": { "title": "24/7 Priority Customer Support", "us_value": "check", "them_value": "Email only" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,538 @@
+{%- comment -%}
+  info_comparison_table.liquid — Ultra-Comprehensive Specification Comparison Matrix
+  
+  DESIGN PHILOSOPHY:
+  An architectural comparison matrix engineered to clearly differentiate your premium
+  workstation tier against industry competitors. Features sticky header columns, interactive
+  spotlight column illumination, checkmark/cross visual indicators, and an accessible
+  Technical Definition Modal Dialog to explain complex acoustic and mechanical terminology.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --ict-bg: {{ section.settings.bg_color | default: '#f8fafc' }};
+    --ict-card-bg: {{ section.settings.card_bg_color | default: '#ffffff' }};
+    --ict-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --ict-muted: color-mix(in srgb, var(--ict-text) 60%, transparent);
+    --ict-border: color-mix(in srgb, var(--ict-text) 14%, transparent);
+    --ict-accent: {{ section.settings.accent_color | default: '#0f172a' }};
+    --ict-spotlight: {{ section.settings.spotlight_color | default: '#0f172a' }};
+    --ict-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --ict-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --ict-padding-top: clamp(4rem, 8vw, 7rem);
+    --ict-padding-bottom: clamp(4rem, 8vw, 7rem);
+  }
+
+  .ict-section {
+    background-color: var(--ict-bg);
+    color: var(--ict-text);
+    font-family: var(--ict-font-body);
+    padding: var(--ict-padding-top) clamp(1.25rem, 4vw, 4rem) var(--ict-padding-bottom);
+    border-top: 1px solid var(--ict-border);
+    border-bottom: 1px solid var(--ict-border);
+    position: relative;
+  }
+
+  .ict-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  /* Section Header */
+  .ict-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .ict-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ict-accent);
+    background: color-mix(in srgb, var(--ict-accent) 8%, transparent);
+    padding: 0.4rem 1.1rem;
+    border-radius: 100px;
+  }
+  .ict-title {
+    font-family: var(--ict-font-head);
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--ict-text);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .ict-desc {
+    font-size: clamp(0.98rem, 2vw, 1.18rem);
+    color: var(--ict-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Matrix Table Wrapper */
+  .ict-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 28px;
+    background: var(--ict-card-bg);
+    border: 1px solid var(--ict-border);
+    box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.05);
+    scrollbar-width: thin;
+  }
+
+  /* Comparison Matrix Table */
+  .ict-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+    text-align: left;
+  }
+  .ict-table th,
+  .ict-table td {
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid var(--ict-border);
+    font-size: 0.95rem;
+  }
+  .ict-table th {
+    font-family: var(--ict-font-head);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ict-text);
+    background: color-mix(in srgb, var(--ict-text) 3%, transparent);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .ict-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Column 1: Feature Labels */
+  .ict-feature-cell {
+    font-weight: 600;
+    color: var(--ict-text);
+    width: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .ict-tooltip-btn {
+    background: color-mix(in srgb, var(--ict-text) 8%, transparent);
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    color: var(--ict-text);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .ict-tooltip-btn:hover {
+    background: var(--ict-accent);
+    color: #ffffff;
+  }
+
+  /* Spotlight Product Column */
+  .ict-table th.spotlight,
+  .ict-table td.spotlight {
+    background: color-mix(in srgb, var(--ict-spotlight) 6%, transparent);
+    color: var(--ict-text);
+    font-weight: 700;
+    position: relative;
+  }
+  .ict-table th.spotlight {
+    background: var(--ict-spotlight);
+    color: #ffffff;
+    font-size: 1.2rem;
+  }
+  .ict-spotlight-badge {
+    position: absolute;
+    top: 0.4rem;
+    right: 1rem;
+    background: #e11d48;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+  }
+
+  /* Checkmark & Cross Icons */
+  .ict-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+  .ict-icon.check {
+    background: color-mix(in srgb, #10b981 15%, transparent);
+    color: #10b981;
+  }
+  .ict-icon.cross {
+    background: color-mix(in srgb, #ef4444 15%, transparent);
+    color: #ef4444;
+  }
+  .ict-icon svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  /* Section Category Rows */
+  .ict-category-row td {
+    background: color-mix(in srgb, var(--ict-text) 8%, transparent);
+    font-family: var(--ict-font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.8rem;
+    color: var(--ict-text);
+    padding: 0.85rem 1.5rem;
+  }
+
+  /* CTA Row */
+  .ict-cta-row td {
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  .ict-btn {
+    background: var(--ict-text);
+    color: var(--ict-bg);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 0.85rem 1.85rem;
+    border-radius: 100px;
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+  .ict-btn:hover {
+    background: var(--ict-accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+  .ict-btn.spotlight-btn {
+    background: var(--ict-spotlight);
+    color: #ffffff;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Technical Definition Modal Dialog */
+  .ict-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .ict-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .ict-modal {
+    background: var(--ict-card-bg);
+    color: var(--ict-text);
+    border: 1px solid var(--ict-border);
+    border-radius: 28px;
+    max-width: 540px;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3rem);
+    position: relative;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ict-modal-overlay[data-open="true"] .ict-modal {
+    transform: scale(1);
+  }
+  .ict-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: color-mix(in srgb, var(--ict-text) 10%, transparent);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ict-text);
+    cursor: pointer;
+  }
+</style>
+
+<section class="ict-section" id="ict-section-{{ section.id }}" aria-labelledby="ict-title-{{ section.id }}">
+  <div class="ict-container">
+    
+    <!-- Section Header -->
+    <div class="ict-header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ict-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="ict-title-{{ section.id }}" class="ict-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="ict-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Comparison Matrix Table -->
+    <div class="ict-table-wrap">
+      <table class="ict-table" id="ict-table-{{ section.id }}">
+        <thead>
+          <tr>
+            <th>Specification Metric</th>
+            <th class="spotlight">
+              <span class="ict-spotlight-badge">Atelier Standard</span>
+              <span>Obsidian Pro Atelier</span>
+            </th>
+            <th>Standard Mass-Market Tier</th>
+            <th>Competitor Flagship</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="ict-category-row">
+            <td colspan="4">Acoustic Architecture & Dampening</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell">
+              <span>Silicone Internal Dampening Chamber</span>
+              <button type="button" class="ict-tooltip-btn" data-term="Silicone Dampening Chamber" data-def="A custom-molded medical-grade silicone gasket layer sealed between the PCB and bottom chassis that absorbs high-frequency acoustic reverberation." aria-label="Define Silicone Dampening Chamber">?</button>
+            </td>
+            <td class="spotlight">
+              <span class="ict-icon check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+              <span style="margin-left:0.4rem;">Dual-Layer Bespoke</span>
+            </td>
+            <td><span class="ict-icon cross"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+            <td>Single Foam Sheet</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell">
+              <span>Acoustic Reverberation Frequency</span>
+              <button type="button" class="ict-tooltip-btn" data-term="Acoustic Reverberation" data-def="The measured decibel echo duration inside the chassis following high-speed mechanical keystroke actuation." aria-label="Define Acoustic Reverberation">?</button>
+            </td>
+            <td class="spotlight">&lt; 12ms Ultra-Dampened</td>
+            <td>&gt; 65ms Metallic Ping</td>
+            <td>45ms Standard Hollow</td>
+          </tr>
+
+          <tr class="ict-category-row">
+            <td colspan="4">Materials & CNC Precision</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell">
+              <span>Chassis Alloy Construction</span>
+              <button type="button" class="ict-tooltip-btn" data-term="Chassis Alloy Construction" data-def="The foundational metal blend milled via 5-axis CNC machines to form the unibody structural enclosure." aria-label="Define Chassis Alloy Construction">?</button>
+            </td>
+            <td class="spotlight">6063 Aerospace Titanium Alloy</td>
+            <td>ABS Injection Molded Plastic</td>
+            <td>Cast Aluminum Alloy</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell">
+              <span>Surface Chamfer Finishing</span>
+              <button type="button" class="ict-tooltip-btn" data-term="Surface Chamfer Finishing" data-def="Hand-polished 45-degree bevels along all external chassis edges that prevent palm abrasion during long editing sessions." aria-label="Define Surface Chamfer Finishing">?</button>
+            </td>
+            <td class="spotlight">
+              <span class="ict-icon check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+              <span style="margin-left:0.4rem;">Hand-Polished Satin</span>
+            </td>
+            <td><span class="ict-icon cross"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+            <td>Machine Bevel Only</td>
+          </tr>
+
+          <tr class="ict-category-row">
+            <td colspan="4">Warranty & Swiss Atelier Support</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell"><span>Complimentary Global Express Shipping</span></td>
+            <td class="spotlight"><span class="ict-icon check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span></td>
+            <td><span class="ict-icon cross"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></td>
+            <td>Paid Extra ($45+)</td>
+          </tr>
+          <tr>
+            <td class="ict-feature-cell"><span>Atelier Structural Warranty</span></td>
+            <td class="spotlight">Lifetime Swiss Registry</td>
+            <td>1 Year Limited</td>
+            <td>2 Years Standard</td>
+          </tr>
+
+          <!-- CTA Row -->
+          <tr class="ict-cta-row">
+            <td></td>
+            <td class="spotlight">
+              <a href="/products/sample" class="ict-btn spotlight-btn">Acquire Flagship Pro →</a>
+            </td>
+            <td><a href="/collections/all" class="ict-btn" style="background:#64748b;">View Basic Tier</a></td>
+            <td><a href="/collections/all" class="ict-btn" style="background:#64748b;">Compare Specs</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Technical Definition Modal -->
+  <div class="ict-modal-overlay" id="ict-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="ict-modal">
+      <button type="button" class="ict-modal-close" id="ict-modal-close-{{ section.id }}" aria-label="Close definition modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span style="width:12px;height:12px;border-radius:50%;background:var(--ict-accent);"></span>
+        <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--ict-muted);">Technical Architecture Glossary</span>
+      </div>
+
+      <h3 id="ict-modal-term" style="font-family:var(--ict-font-head);font-size:1.75rem;margin:0;">Terminology Definition</h3>
+      <p id="ict-modal-def" style="font-size:1rem;line-height:1.65;color:var(--ict-muted);margin:0;">Full technical definition will display here.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('ict-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Definition Tooltip Modal Controller
+    var modalOverlay = document.getElementById('ict-modal-' + sid);
+    var modalClose = document.getElementById('ict-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var termEl = document.getElementById('ict-modal-term');
+      var defEl = document.getElementById('ict-modal-def');
+
+      var btns = sectionEl.querySelectorAll('.ict-tooltip-btn');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (termEl) termEl.innerText = btn.getAttribute('data-term') || 'Specification Term';
+          if (defEl) defEl.innerText = btn.getAttribute('data-def') || '';
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Comparison Matrix Table",
+  "tag": "section",
+  "class": "section-info-comparison-table",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Table Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "spotlight_color",
+      "label": "Spotlight Product Highlight Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Technical Specification Comparison"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Why The Atelier Stand Alone"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Compare mechanical tolerances, acoustic dampening architecture, and raw material purity against standard mass-market mechanical keyboards."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison Matrix Table"
+    }
+  ]
+}
+{% endschema %}

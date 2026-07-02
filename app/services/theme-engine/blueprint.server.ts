@@ -20,8 +20,8 @@ export function generateStoreBlueprint(
   brandContext: BrandContext
 ): StoreBlueprint {
   
-  const indexSections: string[] = ["header"]; // Always start with header
-
+  const indexSections: string[] = []; // Headers and footers are OS 2.0 global section groups
+  
   // 1. Hero Section (Always needed, but which type?)
   // We just request a 'hero' and let the ranking engine find the best fit.
   indexSections.push("hero");
@@ -77,7 +77,6 @@ export function generateStoreBlueprint(
   }
   
   indexSections.push("newsletter");
-  indexSections.push("footer");
 
   return {
     pages: {

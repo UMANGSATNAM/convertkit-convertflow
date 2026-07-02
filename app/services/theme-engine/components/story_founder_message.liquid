@@ -1,0 +1,233 @@
+{%- comment -%}
+  story_founder_message.liquid — Founder's Letter & Message
+  
+  DESIGN PHILOSOPHY:
+  Personal, authentic brand storytelling. Editorial letter layout featuring
+  a founder photo portrait, personal note/quote, signature callout, and
+  clean typography to build deep customer trust and brand connection.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --sfm-bg: var(--color-surface, var(--color-background, #fdfbf7));
+    --sfm-text: var(--color-text, #18181b);
+    --sfm-muted: color-mix(in srgb, var(--sfm-text) 60%, transparent);
+    --sfm-border: color-mix(in srgb, var(--sfm-text) 12%, transparent);
+    --sfm-accent: var(--color-accent, #b89758);
+    --sfm-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --sfm-font-head: var(--font-heading, 'Playfair Display', Georgia, serif);
+  }
+
+  .sfm-section {
+    background: var(--sfm-bg);
+    padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--sfm-border);
+    border-bottom: 1px solid var(--sfm-border);
+  }
+
+  .sfm-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .sfm-inner {
+      grid-template-columns: 5fr 7fr;
+    }
+  }
+
+  .sfm-media {
+    position: relative;
+    border-radius: var(--radius-card, 16px);
+    overflow: hidden;
+    aspect-ratio: var(--aspect, 4/5);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+  }
+  .sfm-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .sfm-media:hover img {
+    transform: scale(1.04);
+  }
+
+  .sfm-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .sfm-eyebrow {
+    font-family: var(--sfm-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--sfm-accent);
+  }
+
+  .sfm-title {
+    font-family: var(--sfm-font-head);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 400;
+    color: var(--sfm-text);
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .sfm-body {
+    font-family: var(--sfm-font);
+    font-size: clamp(0.95rem, 2vw, 1.08rem);
+    color: var(--sfm-muted);
+    line-height: 1.8;
+    margin: 0;
+  }
+  .sfm-body p {
+    margin: 0 0 1rem 0;
+  }
+  .sfm-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .sfm-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--sfm-border);
+    width: 100%;
+  }
+
+  .sfm-name {
+    font-family: var(--sfm-font-head);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--sfm-text);
+  }
+
+  .sfm-role {
+    font-family: var(--sfm-font);
+    font-size: 0.82rem;
+    color: var(--sfm-muted);
+  }
+
+  .sfm-sig {
+    height: 48px;
+    margin-top: 0.5rem;
+  }
+  .sfm-sig img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+</style>
+
+<section class="sfm-section" aria-labelledby="sfm-title-{{ section.id }}">
+  <div class="sfm-inner">
+    <div class="sfm-media" style="--aspect: {{ section.settings.aspect_ratio | default: '4/5' }};">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1000 | image_tag: loading: 'lazy', alt: section.settings.name }}
+      {%- else -%}
+        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e2e8f0; color: #64748b;">
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="sfm-content">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="sfm-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="sfm-title-{{ section.id }}" class="sfm-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      
+      <div class="sfm-body">
+        {{ section.settings.message | default: '<p>When we started this journey, our mission was simple: create something uncompromisingly authentic that respects both tradition and tomorrow. Every detail you see is a testament to our passion and dedication.</p><p>Thank you for letting us be a part of your daily life.</p>' }}
+      </div>
+
+      <div class="sfm-footer">
+        <span class="sfm-name">{{ section.settings.name | default: 'Elena Rostova' }}</span>
+        <span class="sfm-role">{{ section.settings.role | default: 'Founder & Creative Director' }}</span>
+        {%- if section.settings.signature != blank -%}
+          <div class="sfm-sig">
+            {{ section.settings.signature | image_url: width: 300 | image_tag: loading: 'lazy', alt: 'Signature' }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Founder Message",
+  "tag": "section",
+  "class": "section-story-founder",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Founder Photo"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Photo Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "4/5", "label": "Portrait (4:5)" },
+        { "value": "3/4", "label": "Tall (3:4)" }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "A Note From The Founder"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Why We Do What We Do"
+    },
+    {
+      "type": "richtext",
+      "id": "message",
+      "label": "Message / Letter Content",
+      "default": "<p>When we started this journey, our mission was simple: create something uncompromisingly authentic that respects both tradition and tomorrow. Every detail you see is a testament to our passion and dedication.</p><p>Thank you for letting us be a part of your daily life.</p>"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Founder Name",
+      "default": "Elena Rostova"
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "Founder Title / Role",
+      "default": "Founder & Creative Director"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature",
+      "label": "Signature Image (Optional PNG)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Founder Message"
+    }
+  ]
+}
+{% endschema %}

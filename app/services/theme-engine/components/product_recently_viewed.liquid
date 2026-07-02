@@ -1,0 +1,129 @@
+<div class="recently-viewed-products py-12 px-4 border-t border-[var(--color-border)] bg-[var(--color-background)] hidden" id="recently-viewed-section-{{ section.id }}">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold text-[var(--color-text)]">{{ section.settings.title }}</h2>
+      <button id="clear-recently-viewed" class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] underline transition-colors">Clear History</button>
+    </div>
+
+    <!-- Container for dynamic injection -->
+    <div id="recently-viewed-grid-{{ section.id }}" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+      <!-- Products injected via JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Logic to handle Recently Viewed Products using LocalStorage
+document.addEventListener('DOMContentLoaded', () => {
+  const LOCAL_STORAGE_KEY = 'shopify_recently_viewed';
+  const limit = {{ section.settings.products_to_show | default: 5 }};
+  const sectionEl = document.getElementById('recently-viewed-section-{{ section.id }}');
+  const gridEl = document.getElementById('recently-viewed-grid-{{ section.id }}');
+  const clearBtn = document.getElementById('clear-recently-viewed');
+
+  // Helper: Get data from local storage
+  const getRecentlyViewed = () => {
+    try {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch(e) {
+      return [];
+    }
+  };
+
+  // Render products into the grid
+  const renderProducts = async (handles) => {
+    if (handles.length === 0) {
+      sectionEl.classList.add('hidden');
+      return;
+    }
+
+    gridEl.innerHTML = '';
+    sectionEl.classList.remove('hidden');
+
+    // Fetch product data via Shopify Ajax API
+    for (const handle of handles.slice(0, limit)) {
+      try {
+        const response = await fetch(`/products/${handle}.js`);
+        if (!response.ok) continue;
+        const product = await response.json();
+        
+        // Build basic card UI
+        const priceFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(product.price / 100);
+        
+        const cardHTML = `
+          <a href="${product.url}" class="block group">
+            <div class="relative aspect-square bg-neutral-100 rounded overflow-hidden mb-3">
+              <img src="${product.featured_image}" alt="${product.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            </div>
+            <h3 class="text-sm font-bold text-[var(--color-text)] truncate">${product.title}</h3>
+            <p class="text-sm text-[var(--color-text-secondary)]">${priceFormatted}</p>
+          </a>
+        `;
+        
+        gridEl.insertAdjacentHTML('beforeend', cardHTML);
+      } catch (e) {
+        console.error('Error fetching recently viewed product:', e);
+      }
+    }
+  };
+
+  // Initial Render
+  let viewedHandles = getRecentlyViewed();
+  
+  // If we are currently ON a product page, don't show the current product in the "recently viewed" list
+  // Note: For a real Shopify implementation, you'd check `window.location.pathname.includes('/products/')` 
+  // and filter out the current handle.
+  
+  if(viewedHandles.length > 0) {
+    renderProducts(viewedHandles);
+  }
+
+  // Handle Clear Button
+  clearBtn?.addEventListener('click', () => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    sectionEl.classList.add('hidden');
+    gridEl.innerHTML = '';
+  });
+});
+
+// To hook up the product page, you would add this to your main product.liquid / product.json template:
+/*
+<script>
+  const handle = "{{ product.handle }}";
+  let viewed = JSON.parse(localStorage.getItem('shopify_recently_viewed') || '[]');
+  viewed = viewed.filter(h => h !== handle); // Remove if exists
+  viewed.unshift(handle); // Add to beginning
+  viewed = viewed.slice(0, 10); // Keep last 10
+  localStorage.setItem('shopify_recently_viewed', JSON.stringify(viewed));
+</script>
+*/
+</script>
+
+{% schema %}
+{
+  "name": "Recently Viewed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Recently Viewed"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "label": "Products to show"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recently Viewed"
+    }
+  ]
+}
+{% endschema %}

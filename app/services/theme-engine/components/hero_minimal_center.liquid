@@ -1,0 +1,668 @@
+{%- comment -%}
+  hero_minimal_center.liquid — Ultra-Comprehensive Minimalist Centered Hero Showcase
+  
+  DESIGN PHILOSOPHY:
+  An ultra-refined, typography-led hero section engineered for luxury and minimalist brands.
+  Features floating ambient background glow shapes with mousemove parallax, animated
+  pill badges, proof metrics counters, video lookbook inspection modal dialog, and smooth
+  scroll indicators. Engineered for 60fps animations and flawless responsive scaling.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hmc-bg: {{ section.settings.bg_color | default: '#f8fafc' }};
+    --hmc-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --hmc-muted: color-mix(in srgb, var(--hmc-text) 65%, transparent);
+    --hmc-border: color-mix(in srgb, var(--hmc-text) 12%, transparent);
+    --hmc-accent: {{ section.settings.accent_color | default: '#0f172a' }};
+    --hmc-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --hmc-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --hmc-min-height: {{ section.settings.min_height_desktop | default: 85 }}vh;
+  }
+
+  .hmc-section {
+    background-color: var(--hmc-bg);
+    color: var(--hmc-text);
+    font-family: var(--hmc-font-body);
+    position: relative;
+    overflow: hidden;
+    min-height: var(--hmc-min-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(4rem, 10vw, 8rem) clamp(1.25rem, 4vw, 4rem);
+    border-bottom: 1px solid var(--hmc-border);
+  }
+
+  /* Ambient Parallax Glow Orbs */
+  .hmc-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hmc-orb-1 {
+    width: clamp(300px, 40vw, 600px);
+    height: clamp(300px, 40vw, 600px);
+    background: {{ section.settings.orb_color_1 | default: '#38bdf8' }};
+    top: -10%;
+    left: 10%;
+  }
+  .hmc-orb-2 {
+    width: clamp(250px, 35vw, 500px);
+    height: clamp(250px, 35vw, 500px);
+    background: {{ section.settings.orb_color_2 | default: '#818cf8' }};
+    bottom: -10%;
+    right: 15%;
+  }
+
+  /* Main Container */
+  .hmc-container {
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  /* Pill Badge */
+  .hmc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--hmc-text);
+    background: color-mix(in srgb, var(--hmc-text) 6%, transparent);
+    padding: 0.45rem 1.15rem;
+    border-radius: 100px;
+    border: 1px solid var(--hmc-border);
+    transition: all 0.3s ease;
+  }
+  .hmc-badge:hover {
+    background: color-mix(in srgb, var(--hmc-text) 10%, transparent);
+    transform: translateY(-2px);
+  }
+  .hmc-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: hmcPulse 2s infinite;
+  }
+  @keyframes hmcPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: 0.4; }
+  }
+
+  /* Typography */
+  .hmc-title {
+    font-family: var(--hmc-font-head);
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 700;
+    color: var(--hmc-text);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  .hmc-title-highlight {
+    background: linear-gradient(135deg, var(--hmc-text) 0%, color-mix(in srgb, var(--hmc-text) 40%, transparent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hmc-desc {
+    font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+    color: var(--hmc-muted);
+    line-height: 1.65;
+    max-width: 680px;
+    margin: 0;
+  }
+
+  /* CTA Button Group */
+  .hmc-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  .hmc-btn-primary {
+    background: var(--hmc-accent);
+    color: {{ section.settings.btn_text_color | default: '#ffffff' }};
+    font-family: var(--hmc-font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 1.15rem 2.75rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--hmc-accent) 50%, transparent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hmc-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px -8px color-mix(in srgb, var(--hmc-accent) 65%, transparent);
+    opacity: 0.94;
+  }
+  .hmc-btn-primary svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    transition: transform 0.2s ease;
+  }
+  .hmc-btn-primary:hover svg {
+    transform: translateX(4px);
+  }
+
+  .hmc-btn-secondary {
+    background: transparent;
+    color: var(--hmc-text);
+    font-family: var(--hmc-font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1.15rem 2.5rem;
+    border-radius: 100px;
+    border: 1px solid var(--hmc-border);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .hmc-btn-secondary:hover {
+    background: color-mix(in srgb, var(--hmc-text) 6%, transparent);
+    border-color: var(--hmc-text);
+  }
+  .hmc-btn-secondary svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  /* Trust Proof Bar */
+  .hmc-proof {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    margin-top: clamp(1rem, 3vw, 2.5rem);
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--hmc-border);
+    width: 100%;
+    max-width: 800px;
+  }
+  .hmc-proof-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+  }
+  .hmc-proof-num {
+    font-family: var(--hmc-font-head);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--hmc-text);
+    line-height: 1;
+  }
+  .hmc-proof-label {
+    font-size: 0.8rem;
+    color: var(--hmc-muted);
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  /* Scroll Indicator */
+  .hmc-scroll-down {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--hmc-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .hmc-scroll-down:hover {
+    color: var(--hmc-text);
+  }
+  .hmc-scroll-icon {
+    width: 20px;
+    height: 32px;
+    border: 2px solid var(--hmc-border);
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    padding-top: 6px;
+  }
+  .hmc-scroll-wheel {
+    width: 4px;
+    height: 6px;
+    background: var(--hmc-text);
+    border-radius: 2px;
+    animation: hmcScrollWheel 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  @keyframes hmcScrollWheel {
+    0% { transform: translateY(0); opacity: 1; }
+    80% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+
+  /* Lookbook Video Modal */
+  .hmc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .hmc-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .hmc-modal {
+    background: #000000;
+    border-radius: 20px;
+    max-width: 900px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hmc-modal-overlay[data-open="true"] .hmc-modal {
+    transform: scale(1);
+  }
+  .hmc-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease;
+  }
+  .hmc-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .hmc-modal iframe,
+  .hmc-modal video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+  }
+</style>
+
+<section class="hmc-section" id="hmc-section-{{ section.id }}" aria-label="Hero Section">
+  
+  <!-- Ambient Parallax Orbs -->
+  <div class="hmc-orb hmc-orb-1" id="hmc-orb1-{{ section.id }}"></div>
+  <div class="hmc-orb hmc-orb-2" id="hmc-orb2-{{ section.id }}"></div>
+
+  <div class="hmc-container">
+    
+    <!-- Pill Badge -->
+    {%- if section.settings.badge != blank -%}
+      <div class="hmc-badge">
+        <span class="hmc-badge-dot"></span>
+        <span>{{ section.settings.badge }}</span>
+      </div>
+    {%- endif -%}
+
+    <!-- Main Title -->
+    {%- if section.settings.title != blank -%}
+      <h1 class="hmc-title">
+        {{ section.settings.title | replace: '[', '<span class="hmc-title-highlight">' | replace: ']', '</span>' }}
+      </h1>
+    {%- endif -%}
+
+    <!-- Subtitle -->
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hmc-desc">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+
+    <!-- CTA Button Group -->
+    <div class="hmc-btn-group">
+      {%- if section.settings.btn_1_label != blank -%}
+        <a href="{{ section.settings.btn_1_link | default: '/collections/all' }}" class="hmc-btn-primary">
+          <span>{{ section.settings.btn_1_label }}</span>
+          <svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_video_btn -%}
+        <button type="button" class="hmc-btn-secondary" id="hmc-play-{{ section.id }}" aria-label="Watch Brand Film">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>{{ section.settings.btn_2_label | default: 'Watch Film' }}</span>
+        </button>
+      {%- elsif section.settings.btn_2_label != blank -%}
+        <a href="{{ section.settings.btn_2_link | default: '/pages/about' }}" class="hmc-btn-secondary">
+          <span>{{ section.settings.btn_2_label }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <!-- Trust Proof Bar -->
+    {%- if section.settings.show_proof_bar -%}
+      <div class="hmc-proof">
+        {%- for block in section.blocks -%}
+          <div class="hmc-proof-item" {{ block.shopify_attributes }}>
+            <span class="hmc-proof-num">{{ block.settings.number }}</span>
+            <span class="hmc-proof-label">{{ block.settings.label }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- Scroll Down Indicator -->
+  {%- if section.settings.show_scroll_indicator -%}
+    <a href="#hmc-next-{{ section.id }}" class="hmc-scroll-down" id="hmc-scroll-{{ section.id }}" aria-label="Scroll down to explore">
+      <span>Explore Collection</span>
+      <div class="hmc-scroll-icon">
+        <div class="hmc-scroll-wheel"></div>
+      </div>
+    </a>
+  {%- endif -%}
+
+  <!-- Video Lookbook Modal -->
+  <div class="hmc-modal-overlay" id="hmc-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Video Player Modal">
+    <div class="hmc-modal">
+      <button type="button" class="hmc-modal-close" id="hmc-close-{{ section.id }}" aria-label="Close video player">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      {%- if section.settings.video_url != blank -%}
+        <iframe id="hmc-iframe-{{ section.id }}" data-src="{{ section.settings.video_url }}" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>
+      {%- else -%}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-family:sans-serif;font-size:1.2rem;">Please insert a valid Embed Video URL in section settings.</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<!-- Anchor targeting for scroll indicator -->
+<div id="hmc-next-{{ section.id }}"></div>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('hmc-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Mousemove Parallax Controller for Ambient Orbs
+    var orb1 = document.getElementById('hmc-orb1-' + sid);
+    var orb2 = document.getElementById('hmc-orb2-' + sid);
+    if (orb1 && orb2 && window.matchMedia('(min-width: 1024px)').matches) {
+      window.addEventListener('mousemove', function(e) {
+        var x = (e.clientX / window.innerWidth) - 0.5;
+        var y = (e.clientY / window.innerHeight) - 0.5;
+        
+        requestAnimationFrame(function() {
+          orb1.style.transform = 'translate(' + (-x * 40) + 'px, ' + (-y * 40) + 'px)';
+          orb2.style.transform = 'translate(' + (x * 40) + 'px, ' + (y * 40) + 'px)';
+        });
+      });
+    }
+
+    // 2. Video Modal Dialog Controller
+    var modalOverlay = document.getElementById('hmc-modal-' + sid);
+    var playBtn = document.getElementById('hmc-play-' + sid);
+    var closeBtn = document.getElementById('hmc-close-' + sid);
+    var iframe = document.getElementById('hmc-iframe-' + sid);
+
+    if (modalOverlay && playBtn && closeBtn) {
+      playBtn.addEventListener('click', function() {
+        if (iframe && iframe.getAttribute('data-src')) {
+          var src = iframe.getAttribute('data-src');
+          if (src.indexOf('?') === -1) src += '?autoplay=1';
+          else src += '&autoplay=1';
+          iframe.src = src;
+        }
+        modalOverlay.setAttribute('data-open', 'true');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (iframe) iframe.src = '';
+      }
+
+      closeBtn.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+
+    // 3. Smooth Scroll Anchor
+    var scrollBtn = document.getElementById('hmc-scroll-' + sid);
+    if (scrollBtn) {
+      scrollBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.getElementById('hmc-next-' + sid);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Minimalist Centered Hero",
+  "tag": "section",
+  "class": "section-hero-minimal-center",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Primary Button Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Primary Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "min_height_desktop",
+      "label": "Desktop Minimum Height (vh)",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "default": 85
+    },
+    {
+      "type": "header",
+      "content": "Ambient Parallax Orbs"
+    },
+    {
+      "type": "color",
+      "id": "orb_color_1",
+      "label": "Top Left Orb Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "color",
+      "id": "orb_color_2",
+      "label": "Bottom Right Orb Color",
+      "default": "#818cf8"
+    },
+    {
+      "type": "header",
+      "content": "Hero Typography & Content"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Pill Badge Text",
+      "default": "New Collection Release"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading (Use [brackets] for gradient highlight)",
+      "default": "The Architecture of [Modern Luxury]"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Crafted with uncompromising precision and sustainably sourced materials. Experience our latest series designed to elevate everyday rituals into extraordinary moments."
+    },
+    {
+      "type": "header",
+      "content": "Action Buttons"
+    },
+    {
+      "type": "text",
+      "id": "btn_1_label",
+      "label": "Primary Button Label",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_1_link",
+      "label": "Primary Button URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_video_btn",
+      "label": "Show Video Lookbook Modal Button for Secondary CTA",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "btn_2_label",
+      "label": "Secondary Button Label",
+      "default": "Watch Brand Film"
+    },
+    {
+      "type": "url",
+      "id": "btn_2_link",
+      "label": "Secondary Button URL (If Video Modal Disabled)"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video Modal Embed URL (YouTube/Vimeo Embed)",
+      "default": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    },
+    {
+      "type": "header",
+      "content": "Trust Proof & Indicators"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_proof_bar",
+      "label": "Show Bottom Trust Proof Metrics Bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show Bottom Animated Scroll Indicator",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "proof",
+      "name": "Trust Proof Metric",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Metric Value",
+          "default": "50k+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Metric Description",
+          "default": "Happy Customers<br>Worldwide"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimalist Centered Hero",
+      "blocks": [
+        { "type": "proof", "settings": { "number": "50,000+", "label": "Verified 5-Star Reviews" } },
+        { "type": "proof", "settings": { "number": "100%", "label": "Sustainably Sourced" } },
+        { "type": "proof", "settings": { "number": "10-Year", "label": "Global Hardware Warranty" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

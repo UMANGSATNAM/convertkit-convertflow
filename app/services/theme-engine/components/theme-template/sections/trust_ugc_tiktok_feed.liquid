@@ -1,0 +1,90 @@
+<div class="sf-tiktok sf-ttf-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ttf-container">
+    <div class="sf-ttf-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-ttf-grid">
+      {% for block in section.blocks %}
+        <div class="sf-ttf-item">
+          <div class="sf-ttf-video-wrapper">
+            {% if block.settings.video_url != blank %}
+              <video src="{{ block.settings.video_url }}" poster="{{ block.settings.poster | img_url: '600x' }}" loop muted playsinline class="sf-ttf-video"></video>
+              <div class="sf-ttf-play-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </div>
+            {% else %}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'sf-placeholder' }}
+            {% endif %}
+            
+            <div class="sf-ttf-overlay">
+              <div class="sf-ttf-user">
+                <strong>{{ block.settings.handle }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ttf-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-ttf-container { max-width: 1400px; margin: 0 auto; text-align: center; }
+  .sf-ttf-header { margin-bottom: 3rem; }
+  .sf-ttf-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  
+  .sf-ttf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  @media (min-width: 768px) { .sf-ttf-grid { grid-template-columns: repeat({{ section.blocks.size | at_most: 4 }}, 1fr); gap: 2rem; } }
+  
+  .sf-ttf-item { cursor: pointer; }
+  .sf-ttf-video-wrapper { position: relative; width: 100%; aspect-ratio: 9/16; border-radius: 12px; overflow: hidden; background: var(--color-text); box-shadow: 0 10px 20px color-mix(in srgb, var(--color-text) 10%, transparent); }
+  .sf-ttf-video, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; display: block; }
+  
+  .sf-ttf-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: color-mix(in srgb, var(--color-text) 50%, transparent); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: opacity 0.3s; pointer-events: none; }
+  .sf-ttf-video-wrapper:hover .sf-ttf-play-btn { opacity: 0; }
+  
+  .sf-ttf-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 15px; background: linear-gradient(to top, color-mix(in srgb, var(--color-text) 80%, transparent), transparent); text-align: left; color: white; }
+  .sf-ttf-user strong { font-size: 1rem; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const videos = document.querySelectorAll('.sf-ttf-{{ section.id }} .sf-ttf-video');
+    videos.forEach(video => {
+      video.parentElement.addEventListener('mouseenter', () => video.play());
+      video.parentElement.addEventListener('mouseleave', () => video.pause());
+      
+      // For mobile tap to play
+      video.parentElement.addEventListener('click', () => {
+        if (video.paused) { video.play(); } else { video.pause(); }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "TikTok/Reels Feed",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#111111" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Trending Now" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "See what creators are saying." }
+  ],
+  "blocks": [
+    {
+      "type": "video", "name": "Video",
+      "settings": [
+        { "type": "url", "id": "video_url", "label": "Video MP4 URL", "info": "Upload an MP4 to Shopify Files and paste URL here." },
+        { "type": "image_picker", "id": "poster", "label": "Cover Image" },
+        { "type": "text", "id": "handle", "label": "Creator Handle", "default": "@creator" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "TikTok/Reels Feed", "category": "Trust", "blocks": [{"type":"video"},{"type":"video"},{"type":"video"},{"type":"video"}] } ]
+}
+{% endschema %}

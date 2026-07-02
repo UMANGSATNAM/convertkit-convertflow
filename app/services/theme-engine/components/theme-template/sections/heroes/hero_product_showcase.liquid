@@ -1,0 +1,164 @@
+<div class="hero-product-showcase relative min-h-[90vh] bg-[var(--color-background)] flex items-center overflow-hidden">
+  
+  <div class="max-w-7xl mx-auto w-full px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10">
+    
+    <!-- Text Content -->
+    <div class="text-center lg:text-left pt-20 lg:pt-0">
+      {%- if section.settings.badge != blank -%}
+        <div class="inline-flex items-center px-3 py-1 rounded-full bg-[var(--color-accent, #ff3366)]/10 text-[var(--color-accent, #ff3366)] text-sm font-bold tracking-widest uppercase mb-6 border border-[var(--color-accent, #ff3366)]/20">
+          <span class="w-2 h-2 rounded-full bg-[var(--color-accent, #ff3366)] mr-2 animate-pulse"></span>
+          {{ section.settings.badge }}
+        </div>
+      {%- endif -%}
+
+      <h1 class="text-5xl lg:text-7xl font-black text-[var(--color-text)] mb-6 leading-[1.1]">{{ section.settings.title }}</h1>
+      <p class="text-lg lg:text-xl text-[var(--color-text-muted, #555)] mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+        {{ section.settings.text }}
+      </p>
+
+      {%- if section.settings.product != blank -%}
+        {%- assign showcase_product = all_products[section.settings.product] -%}
+        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
+          <div class="text-3xl font-bold text-[var(--color-text)]">
+            {{ showcase_product.price | money }}
+          </div>
+          <form method="post" action="/cart/add" class="w-full sm:w-auto">
+            <input type="hidden" name="id" value="{{ showcase_product.variants.first.id }}" />
+            <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-[var(--color-text)] text-[var(--color-background)] font-bold uppercase tracking-wider rounded shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-transform">
+              {{ section.settings.button_label | default: "Add to Cart" }}
+            </button>
+          </form>
+        </div>
+      {%- else -%}
+        <a href="{{ section.settings.button_link }}" class="inline-block px-8 py-4 bg-[var(--color-text)] text-[var(--color-background)] font-bold uppercase tracking-wider rounded shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-transform">
+          {{ section.settings.button_label | default: "Shop Now" }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <!-- Product Image / 3D Model Spot -->
+    <div class="relative w-full aspect-square flex items-center justify-center group perspective-1000">
+      <div class="absolute inset-0 bg-gradient-to-tr from-[var(--color-text)]/5 to-transparent rounded-full filter blur-3xl transform scale-75 group-hover:scale-100 transition-transform duration-1000"></div>
+      
+      {%- if section.settings.product_image != blank -%}
+        <img src="{{ section.settings.product_image | img_url: 'master' }}" alt="{{ section.settings.title }}" class="relative z-10 w-full h-full object-contain max-w-[80%] drop-shadow-2xl transform group-hover:scale-105 group-hover:rotate-2 transition-all duration-700 ease-out" fetchpriority="high">
+      {%- else -%}
+        <div class="relative z-10 w-full h-full max-w-[80%] bg-[var(--color-background)] rounded-2xl shadow-2xl flex items-center justify-center">
+          {{ 'product-1' | placeholder_svg_tag: 'w-1/2 h-1/2 opacity-20' }}
+        </div>
+      {%- endif -%}
+
+      <!-- Floating Feature Cards (Optional) -->
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks limit:2 -%}
+          <div class="hidden md:flex absolute {% if forloop.first %}top-10 -right-10{% else %}bottom-10 -left-10{% endif %} bg-[var(--color-background)]/90 backdrop-blur p-4 rounded-xl shadow-lg border border-white/20 items-center gap-3 z-20 animate-float" style="animation-delay: {{ forloop.index }}s;" {{ block.shopify_attributes }}>
+            <div class="w-10 h-10 rounded-full bg-[var(--color-surface)] flex items-center justify-center text-xl">
+              {{ block.settings.icon | default: '✨' }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-[var(--color-text)]">{{ block.settings.title }}</p>
+              <p class="text-xs text-[var(--color-text-secondary)]">{{ block.settings.text }}</p>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.perspective-1000 {
+  perspective: 1000px;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Product Showcase Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "Bestseller"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Meet The Signature."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Engineered for perfection. Discover the product that redefined our standard."
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Featured Product",
+      "info": "Select a product to show its price and an Add to Cart button."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Fallback Button Label",
+      "default": "Discover More"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Fallback Button Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Large Product Image (Transparent PNG recommended)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Floating Feature Note",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Emoji Icon",
+          "default": "⚡"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Fast"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Subtext",
+          "default": "Ultra Responsive"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Showcase Hero",
+      "blocks": [
+        { "type": "feature" },
+        { "type": "feature" }
+      ]
+    }
+  ]
+}
+{% endschema %}

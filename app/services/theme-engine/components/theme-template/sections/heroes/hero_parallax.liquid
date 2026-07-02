@@ -1,0 +1,96 @@
+<div class="hero-parallax relative w-full h-screen min-h-[600px] overflow-hidden bg-[var(--color-text)] flex items-center justify-center">
+  <!-- Parallax Background -->
+  <div class="parallax-bg absolute inset-0 w-full h-[120%] -top-[10%] z-0" style="background-image: url('{{ section.settings.image | img_url: 'master' }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+    {%- if section.settings.image == blank -%}
+      <div class="w-full h-full bg-neutral-800 flex items-center justify-center">
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'w-full h-full opacity-30 object-cover' }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80 z-0"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 text-center px-6 max-w-5xl mx-auto transform translate-y-10 opacity-0 animate-slide-up">
+    {%- if section.settings.badge != blank -%}
+      <span class="inline-block py-2 px-6 border border-white/30 text-[var(--color-background)] text-xs uppercase tracking-[0.3em] backdrop-blur-sm mb-8">{{ section.settings.badge }}</span>
+    {%- endif -%}
+
+    <h1 class="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/50 mb-6 uppercase tracking-tighter">{{ section.settings.title }}</h1>
+    
+    {%- if section.settings.text != blank -%}
+      <p class="text-xl md:text-2xl text-[var(--color-background)]/90 font-light mb-12 max-w-2xl mx-auto">{{ section.settings.text }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.button_label != blank -%}
+      <a href="{{ section.settings.button_link }}" class="relative inline-flex items-center justify-center px-10 py-5 overflow-hidden font-bold text-[var(--color-text)] bg-[var(--color-background)] rounded-full group">
+        <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-[var(--color-text)] rounded-full group-hover:w-56 group-hover:h-56"></span>
+        <span class="relative group-hover:text-[var(--color-background)] transition-colors duration-300 uppercase tracking-widest">{{ section.settings.button_label }}</span>
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slideUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Optional JS fallback for mobile parallax if fixed bg fails */
+@media (max-width: 768px) {
+  .parallax-bg {
+    background-attachment: scroll !important;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Parallax Hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image (High Res)"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge Text",
+      "default": "FW/25 Collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "ELEVATE"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Step into the future of design."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Explore Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Parallax Hero"
+    }
+  ]
+}
+{% endschema %}

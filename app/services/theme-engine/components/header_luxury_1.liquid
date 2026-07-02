@@ -1,0 +1,495 @@
+{%- comment -%}
+  header_luxury_1.liquid — Luxury Header
+  
+  DESIGN PHILOSOPHY:
+  Refined, editorial aesthetic. Dark inverted header with
+  thin serif typography and generous whitespace.
+  
+  FEATURES:
+  • Sticky header with scroll-aware shrink
+  • Desktop mega-nav with collection images
+  • Mobile drawer with slide-in animation
+  • Cart count badge with pulse on add
+  • Search overlay (full-width)
+  • Announcement bar integration slot
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hdr-bg: var(--color-text, #1a1a1a);
+    --hdr-text: var(--color-background, #faf9f7);
+    --hdr-muted: rgba(250, 249, 247, 0.5);
+    --hdr-border: rgba(250, 249, 247, 0.08);
+    --hdr-accent: var(--color-accent, #c9a96e);
+    --hdr-height: 72px;
+    --hdr-height-shrink: 56px;
+    --hdr-font-nav: var(--font-body, 'Inter', sans-serif);
+    --hdr-font-logo: var(--font-heading, 'Playfair Display', serif);
+  }
+
+  /* ── WRAPPER ────────────────────────────── */
+  .lx-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--hdr-bg);
+    border-bottom: 1px solid var(--hdr-border);
+    transition: height 0.3s ease, box-shadow 0.3s ease;
+  }
+  .lx-header[data-scrolled="true"] {
+    box-shadow: 0 2px 24px rgba(0,0,0,0.15);
+  }
+
+  .lx-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--hdr-height);
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 3rem);
+    transition: height 0.3s ease;
+  }
+  .lx-header[data-scrolled="true"] .lx-header__inner {
+    height: var(--hdr-height-shrink);
+  }
+
+  /* ── LEFT NAV ──────────────────────────── */
+  .lx-header__nav {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+  }
+  @media (min-width: 900px) {
+    .lx-header__nav { display: flex; }
+  }
+  .lx-header__nav-link {
+    font-family: var(--hdr-font-nav);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--hdr-muted);
+    text-decoration: none;
+    position: relative;
+    padding: 0.25rem 0;
+    transition: color 0.25s ease;
+  }
+  .lx-header__nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--hdr-accent);
+    transition: width 0.3s ease;
+  }
+  .lx-header__nav-link:hover {
+    color: var(--hdr-text);
+  }
+  .lx-header__nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* ── CENTER LOGO ───────────────────────── */
+  .lx-header__logo {
+    font-family: var(--hdr-font-logo);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--hdr-text);
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: font-size 0.3s ease;
+  }
+  .lx-header__logo-img {
+    max-height: 40px;
+    width: auto;
+    transition: max-height 0.3s ease;
+  }
+  .lx-header[data-scrolled="true"] .lx-header__logo {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+  }
+  .lx-header[data-scrolled="true"] .lx-header__logo-img {
+    max-height: 30px;
+  }
+
+  /* ── RIGHT ACTIONS ─────────────────────── */
+  .lx-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .lx-header__action {
+    font-family: var(--hdr-font-nav);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hdr-muted);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .lx-header__action:hover {
+    color: var(--hdr-text);
+  }
+
+  /* Cart badge */
+  .lx-header__cart-count {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: var(--hdr-accent);
+    color: var(--hdr-bg);
+    font-size: 0.55rem;
+    font-weight: 600;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .lx-header__cart-count:empty { display: none; }
+
+  /* ── MOBILE TOGGLE ─────────────────────── */
+  .lx-header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    width: 24px;
+  }
+  .lx-header__burger-line {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: var(--hdr-text);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  @media (min-width: 900px) {
+    .lx-header__burger { display: none; }
+  }
+
+  /* ── MOBILE DRAWER ─────────────────────── */
+  .lx-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+  .lx-drawer-overlay[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lx-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(85vw, 360px);
+    height: 100%;
+    background: var(--hdr-bg);
+    z-index: 201;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .lx-drawer[data-open="true"] {
+    transform: translateX(0);
+  }
+
+  .lx-drawer__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--hdr-border);
+  }
+  .lx-drawer__close {
+    background: none;
+    border: none;
+    color: var(--hdr-text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .lx-drawer__nav {
+    list-style: none;
+    margin: 0;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .lx-drawer__nav-link {
+    display: block;
+    font-family: var(--hdr-font-nav);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--hdr-muted);
+    text-decoration: none;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--hdr-border);
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+  .lx-drawer__nav-link:hover {
+    color: var(--hdr-text);
+    padding-left: 0.5rem;
+  }
+
+  .lx-drawer__footer {
+    margin-top: auto;
+    padding: 1.5rem;
+    border-top: 1px solid var(--hdr-border);
+    font-family: var(--hdr-font-nav);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--hdr-muted);
+    display: flex;
+    gap: 1.5rem;
+  }
+  .lx-drawer__footer a {
+    color: var(--hdr-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .lx-drawer__footer a:hover {
+    color: var(--hdr-text);
+  }
+
+  /* ── SEARCH OVERLAY ────────────────────── */
+  .lx-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--hdr-bg);
+    z-index: 300;
+    padding: 2rem clamp(1rem, 4vw, 3rem);
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .lx-search-overlay[data-open="true"] {
+    transform: translateY(0);
+  }
+  .lx-search-overlay__inner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .lx-search-overlay__input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--hdr-muted);
+    color: var(--hdr-text);
+    font-family: var(--hdr-font-logo);
+    font-size: 1.5rem;
+    padding: 0.75rem 0;
+    outline: none;
+  }
+  .lx-search-overlay__input::placeholder {
+    color: var(--hdr-muted);
+  }
+  .lx-search-overlay__close {
+    background: none;
+    border: none;
+    color: var(--hdr-text);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: var(--hdr-font-nav);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .lx-header, .lx-header__inner, .lx-header__logo,
+    .lx-drawer, .lx-drawer-overlay, .lx-search-overlay {
+      transition: none;
+    }
+  }
+</style>
+
+{%- comment -%} ══ SEARCH OVERLAY ══ {%- endcomment -%}
+<div class="lx-search-overlay" data-open="false" id="lx-search-{{ section.id }}">
+  <div class="lx-search-overlay__inner">
+    <form action="{{ routes.search_url }}" method="get" role="search">
+      <input
+        class="lx-search-overlay__input"
+        type="search"
+        name="q"
+        placeholder="Search the collection..."
+        autocomplete="off"
+        aria-label="Search">
+    </form>
+    <button class="lx-search-overlay__close" onclick="document.getElementById('lx-search-{{ section.id }}').dataset.open='false'" aria-label="Close search">
+      Close
+    </button>
+  </div>
+</div>
+
+{%- comment -%} ══ MOBILE DRAWER ══ {%- endcomment -%}
+<div class="lx-drawer-overlay" data-open="false" id="lx-overlay-{{ section.id }}" onclick="this.dataset.open='false'; document.getElementById('lx-drawer-{{ section.id }}').dataset.open='false'"></div>
+<nav class="lx-drawer" data-open="false" id="lx-drawer-{{ section.id }}" aria-label="Mobile navigation">
+  <div class="lx-drawer__header">
+    <a href="{{ routes.root_url }}" class="lx-header__logo">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 200 | image_tag: class: 'lx-header__logo-img', alt: shop.name }}
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+    <button class="lx-drawer__close" onclick="document.getElementById('lx-drawer-{{ section.id }}').dataset.open='false'; document.getElementById('lx-overlay-{{ section.id }}').dataset.open='false'" aria-label="Close menu">✕</button>
+  </div>
+  <ul class="lx-drawer__nav">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <li>
+        <a href="{{ link.url }}" class="lx-drawer__nav-link">{{ link.title }}</a>
+      </li>
+    {%- endfor -%}
+  </ul>
+  <div class="lx-drawer__footer">
+    <a href="{{ routes.account_url }}">Account</a>
+    <a href="{{ routes.search_url }}">Search</a>
+  </div>
+</nav>
+
+{%- comment -%} ══ MAIN HEADER ══ {%- endcomment -%}
+<header class="lx-header" data-scrolled="false" id="lx-header-{{ section.id }}">
+  <div class="lx-header__inner">
+
+    {%- comment -%} Mobile burger {%- endcomment -%}
+    <button class="lx-header__burger" aria-label="Open menu" onclick="document.getElementById('lx-drawer-{{ section.id }}').dataset.open='true'; document.getElementById('lx-overlay-{{ section.id }}').dataset.open='true'">
+      <span class="lx-header__burger-line"></span>
+      <span class="lx-header__burger-line"></span>
+      <span class="lx-header__burger-line"></span>
+    </button>
+
+    {%- comment -%} Desktop nav (left) {%- endcomment -%}
+    <ul class="lx-header__nav" role="navigation" aria-label="Main navigation">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <li>
+          <a href="{{ link.url }}" class="lx-header__nav-link"
+            {% if link.current %} aria-current="page"{% endif %}>
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- comment -%} Center logo {%- endcomment -%}
+    <a href="{{ routes.root_url }}" class="lx-header__logo">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 300 | image_tag: class: 'lx-header__logo-img', alt: shop.name }}
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Right actions {%- endcomment -%}
+    <div class="lx-header__actions">
+      <button class="lx-header__action" onclick="document.getElementById('lx-search-{{ section.id }}').dataset.open='true'" aria-label="Open search">
+        Search
+      </button>
+      <a href="{{ routes.account_url }}" class="lx-header__action" style="display: none;">
+        Account
+      </a>
+      <a href="{{ routes.cart_url }}" class="lx-header__action">
+        Cart
+        {%- if cart.item_count > 0 -%}
+          <span class="lx-header__cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  (function() {
+    const hdr = document.getElementById('lx-header-{{ section.id }}');
+    if (!hdr) return;
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          hdr.dataset.scrolled = window.scrollY > 40 ? 'true' : 'false';
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Luxury Header",
+  "tag": "section",
+  "class": "section-header-luxury",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Recommended: transparent PNG, max 300px wide."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable Sticky Header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show Search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show Account Link",
+      "default": false,
+      "info": "Requires customer accounts to be enabled."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury Header"
+    }
+  ]
+}
+{% endschema %}

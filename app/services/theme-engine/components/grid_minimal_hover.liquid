@@ -1,0 +1,699 @@
+{%- comment -%}
+  grid_minimal_hover.liquid — Ultra-Comprehensive Minimalist Gallery & Lookbook Grid
+  
+  DESIGN PHILOSOPHY:
+  An architectural gallery showcase engineered for visual discovery and lookbook exploration.
+  Features interactive category tab filtering, smooth image zoom hover reveals, floating
+  glassmorphic details cards, and an accessible Quick View modal dialog to inspect high-res
+  media and specification checklists without leaving the page. Engineered for 60fps performance.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --gmh-bg: {{ section.settings.bg_color | default: '#f8fafc' }};
+    --gmh-card-bg: {{ section.settings.card_bg_color | default: '#ffffff' }};
+    --gmh-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --gmh-muted: color-mix(in srgb, var(--gmh-text) 60%, transparent);
+    --gmh-border: color-mix(in srgb, var(--gmh-text) 12%, transparent);
+    --gmh-accent: {{ section.settings.accent_color | default: '#0f172a' }};
+    --gmh-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --gmh-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --gmh-padding-top: clamp(3.5rem, 8vw, 6.5rem);
+    --gmh-padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+    --gmh-ratio: {{ section.settings.aspect_ratio | default: '4/5' }};
+  }
+
+  .gmh-section {
+    background-color: var(--gmh-bg);
+    color: var(--gmh-text);
+    font-family: var(--gmh-font-body);
+    padding: var(--gmh-padding-top) clamp(1.25rem, 4vw, 4rem) var(--gmh-padding-bottom);
+    border-top: 1px solid var(--gmh-border);
+    border-bottom: 1px solid var(--gmh-border);
+    position: relative;
+  }
+
+  .gmh-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Section Header */
+  .gmh-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .gmh-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gmh-accent);
+    background: color-mix(in srgb, var(--gmh-accent) 10%, transparent);
+    padding: 0.35rem 0.9rem;
+    border-radius: 100px;
+  }
+  .gmh-title {
+    font-family: var(--gmh-font-head);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 700;
+    color: var(--gmh-text);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .gmh-desc {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--gmh-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Category Filter Tabs */
+  .gmh-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .gmh-filter-btn {
+    background: color-mix(in srgb, var(--gmh-text) 5%, transparent);
+    color: var(--gmh-text);
+    border: 1px solid var(--gmh-border);
+    border-radius: 100px;
+    padding: 0.6rem 1.35rem;
+    font-family: var(--gmh-font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .gmh-filter-btn:hover {
+    background: color-mix(in srgb, var(--gmh-text) 10%, transparent);
+  }
+  .gmh-filter-btn.active {
+    background: var(--gmh-accent);
+    color: #ffffff;
+    border-color: var(--gmh-accent);
+    box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--gmh-accent) 35%, transparent);
+  }
+
+  /* Gallery Grid */
+  .gmh-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+  @media (min-width: 640px) {
+    .gmh-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .gmh-grid {
+      grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    }
+  }
+
+  /* Card Layout */
+  .gmh-card {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: var(--gmh-ratio);
+    background: var(--gmh-card-bg);
+    border: 1px solid var(--gmh-border);
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, opacity 0.3s ease;
+  }
+  .gmh-card[data-hidden="true"] {
+    display: none;
+  }
+  .gmh-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 45px -15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Image Media */
+  .gmh-media {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .gmh-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gmh-card:hover .gmh-media img {
+    transform: scale(1.08);
+  }
+  .gmh-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.85) 100%);
+    z-index: 2;
+    opacity: {{ section.settings.overlay_opacity | default: 80 }}%;
+    transition: opacity 0.3s ease;
+  }
+  .gmh-card:hover .gmh-overlay {
+    opacity: 95%;
+  }
+
+  /* Content Overlay */
+  .gmh-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: clamp(1.5rem, 3.5vw, 2.25rem);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transform: translateY(10px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gmh-card:hover .gmh-content {
+    transform: translateY(0);
+  }
+
+  .gmh-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #38bdf8;
+  }
+  .gmh-card-title {
+    font-family: var(--gmh-font-head);
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.25;
+  }
+  .gmh-card-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Quick View Trigger Pill */
+  .gmh-quick-btn {
+    margin-top: 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: fit-content;
+    transition: all 0.2s ease;
+  }
+  .gmh-card:hover .gmh-quick-btn {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+  }
+
+  /* Quick View Modal Dialog */
+  .gmh-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .gmh-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .gmh-modal {
+    background: var(--gmh-card-bg);
+    color: var(--gmh-text);
+    border-radius: 28px;
+    max-width: 860px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-columns: 1fr;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 768px) {
+    .gmh-modal {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+  .gmh-modal-overlay[data-open="true"] .gmh-modal {
+    transform: scale(1);
+  }
+  .gmh-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease;
+  }
+  .gmh-modal-close:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+  .gmh-modal-media {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    background: #0f172a;
+    position: relative;
+  }
+  .gmh-modal-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gmh-modal-info {
+    padding: clamp(2rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .gmh-modal-title {
+    font-family: var(--gmh-font-head);
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .gmh-modal-desc {
+    font-size: 0.95rem;
+    color: var(--gmh-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .gmh-modal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+  }
+  .gmh-modal-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gmh-text);
+  }
+  .gmh-modal-cta {
+    margin-top: auto;
+    background: var(--gmh-accent);
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    text-align: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .gmh-modal-cta:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+  }
+</style>
+
+<section class="gmh-section" id="gmh-section-{{ section.id }}" aria-labelledby="gmh-title-{{ section.id }}">
+  <div class="gmh-container">
+    
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="gmh-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="gmh-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="gmh-title-{{ section.id }}" class="gmh-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="gmh-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Category Filter Tabs -->
+    {%- if section.settings.show_tabs -%}
+      <div class="gmh-filter-bar" id="gmh-filters-{{ section.id }}" role="tablist">
+        <button type="button" class="gmh-filter-btn active" data-filter="all" role="tab" aria-selected="true">All Gallery</button>
+        <button type="button" class="gmh-filter-btn" data-filter="lookbook" role="tab" aria-selected="false">Lookbook Series</button>
+        <button type="button" class="gmh-filter-btn" data-filter="process" role="tab" aria-selected="false">Craftsmanship</button>
+        <button type="button" class="gmh-filter-btn" data-filter="excl" role="tab" aria-selected="false">Exclusive Editions</button>
+      </div>
+    {%- endif -%}
+
+    <!-- Gallery Grid -->
+    <div class="gmh-grid" id="gmh-grid-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div 
+          class="gmh-card" 
+          data-category="{{ block.settings.category | default: 'lookbook' }}"
+          data-title="{{ block.settings.title | escape }}"
+          data-tag="{{ block.settings.tag | escape }}"
+          data-desc="{{ block.settings.text | escape }}"
+          data-img="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 1000 }}{% endif %}"
+          data-link="{{ block.settings.link | default: '/collections/all' }}"
+          {{ block.shopify_attributes }}
+        >
+          <div class="gmh-media">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#334155,#0f172a,#1e293b);"></div>
+            {%- endif -%}
+          </div>
+          <div class="gmh-overlay"></div>
+
+          <div class="gmh-content">
+            {%- if block.settings.tag != blank -%}
+              <span class="gmh-tag">{{ block.settings.tag }}</span>
+            {%- endif -%}
+            <h3 class="gmh-card-title">{{ block.settings.title }}</h3>
+            <p class="gmh-card-desc">{{ block.settings.text }}</p>
+            
+            <div class="gmh-quick-btn">
+              <span>Inspect Lookbook</span>
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Quick View Modal -->
+  <div class="gmh-modal-overlay" id="gmh-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="gmh-modal">
+      <button type="button" class="gmh-modal-close" id="gmh-modal-close-{{ section.id }}" aria-label="Close modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="gmh-modal-media">
+        <img src="" id="gmh-modal-img" alt="Enlarged Preview" style="display:none;">
+      </div>
+
+      <div class="gmh-modal-info">
+        <span class="gmh-tag" id="gmh-modal-tag" style="color:var(--gmh-accent);">Lookbook Edition</span>
+        <h3 class="gmh-modal-title" id="gmh-modal-title-val">Gallery Item Title</h3>
+        <p class="gmh-modal-desc" id="gmh-modal-desc-val">Detailed exploration of our material choices and design philosophy.</p>
+
+        <ul class="gmh-modal-list">
+          <li><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#10b981;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>High-Definition Architectural Render</span></li>
+          <li><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#10b981;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Sustainably Sourced Raw Materials</span></li>
+          <li><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#10b981;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Available for Global Dispatch</span></li>
+        </ul>
+
+        <a href="/collections/all" class="gmh-modal-cta" id="gmh-modal-cta">Explore Collection Piece →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('gmh-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Tab Filtering Controller
+    var filterBar = document.getElementById('gmh-filters-' + sid);
+    var grid = document.getElementById('gmh-grid-' + sid);
+    if (filterBar && grid) {
+      var btns = filterBar.querySelectorAll('.gmh-filter-btn');
+      var cards = grid.querySelectorAll('.gmh-card');
+
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btns.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          var filter = btn.getAttribute('data-filter');
+          cards.forEach(function(card) {
+            var cat = card.getAttribute('data-category');
+            if (filter === 'all' || cat === filter) {
+              card.removeAttribute('data-hidden');
+            } else {
+              card.setAttribute('data-hidden', 'true');
+            }
+          });
+        });
+      });
+    }
+
+    // 2. Quick View Modal Controller
+    var modalOverlay = document.getElementById('gmh-modal-' + sid);
+    var modalClose = document.getElementById('gmh-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var titleEl = document.getElementById('gmh-modal-title-val');
+      var tagEl = document.getElementById('gmh-modal-tag');
+      var descEl = document.getElementById('gmh-modal-desc-val');
+      var imgEl = document.getElementById('gmh-modal-img');
+      var ctaEl = document.getElementById('gmh-modal-cta');
+
+      var cards = sectionEl.querySelectorAll('.gmh-card');
+      cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          if (titleEl) titleEl.innerText = card.getAttribute('data-title') || 'Gallery Item';
+          if (tagEl) tagEl.innerText = card.getAttribute('data-tag') || 'Lookbook';
+          if (descEl) descEl.innerText = card.getAttribute('data-desc') || '';
+          if (ctaEl) ctaEl.href = card.getAttribute('data-link') || '/collections/all';
+
+          var imgSrc = card.getAttribute('data-img');
+          if (imgEl) {
+            if (imgSrc && imgSrc !== 'null' && imgSrc !== '') {
+              imgEl.src = imgSrc;
+              imgEl.style.display = 'block';
+            } else {
+              imgEl.style.display = 'none';
+            }
+          }
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Minimalist Gallery Grid",
+  "tag": "section",
+  "class": "section-grid-minimal-hover",
+  "max_blocks": 9,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "header",
+      "content": "Grid Settings"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Card Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "4/5", "label": "Portrait (4:5)" },
+        { "value": "3/4", "label": "Tall Portrait (3:4)" },
+        { "value": "16/9", "label": "Landscape (16:9)" }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Hover Dark Gradient Opacity (%)",
+      "min": 40,
+      "max": 95,
+      "step": 5,
+      "default": 80
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tabs",
+      "label": "Show Category Filter Tabs",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Visual Discovery"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Curated Architectural Series"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Explore our interactive visual lookbooks highlighting our latest seasonal innovations and timeless heritage craftsmanship."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_item",
+      "name": "Gallery Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Gallery Image"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Filter Category",
+          "options": [
+            { "value": "lookbook", "label": "Lookbook Series" },
+            { "value": "process", "label": "Craftsmanship Process" },
+            { "value": "excl", "label": "Exclusive Editions" }
+          ],
+          "default": "lookbook"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Eyebrow Tag",
+          "default": "Series III"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Item Title",
+          "default": "The Monolith Silhouette"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Crafted from aerospace-grade aluminum with hand-polished bevels and sustainable matte finishes."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Destination URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimalist Gallery Grid",
+      "blocks": [
+        { "type": "gallery_item", "settings": { "category": "lookbook", "tag": "Lookbook 2026", "title": "The Obsidian Workstation", "text": "Engineered for uncompromising daily focus with modular ergonomics." } },
+        { "type": "gallery_item", "settings": { "category": "process", "tag": "Craftsmanship", "title": "Precision CNC Milling", "text": "Each component undergoes 14 hours of continuous computer-guided shaping." } },
+        { "type": "gallery_item", "settings": { "category": "excl", "tag": "Limited Edition", "title": "Titanium Heritage Piece", "text": "Individually serialized collector unit with bespoke leather travel case." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

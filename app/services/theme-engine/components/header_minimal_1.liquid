@@ -1,0 +1,356 @@
+{%- comment -%}
+  header_minimal_1.liquid — Minimal Header
+  
+  DESIGN PHILOSOPHY:
+  Maximum negative space. Whisper-thin type.
+  Content disappears to let the product speak.
+  
+  FEATURES:
+  • Ultra-clean single-line layout
+  • Hidden nav on mobile → bottom sheet drawer
+  • Transparent background option
+  • Scroll-aware: appears on scroll-up, hides on scroll-down
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mhdr-bg: var(--color-background, #fff);
+    --mhdr-text: var(--color-text, #333);
+    --mhdr-muted: color-mix(in srgb, var(--mhdr-text) 45%, transparent);
+    --mhdr-border: color-mix(in srgb, var(--mhdr-text) 6%, transparent);
+    --mhdr-height: 60px;
+    --mhdr-font: var(--font-body, 'Helvetica Neue', sans-serif);
+    --mhdr-font-logo: var(--font-heading, 'Helvetica Neue', sans-serif);
+  }
+
+  .mn-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--mhdr-bg);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .mn-header[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+  .mn-header[data-scrolled="true"] {
+    box-shadow: 0 1px 0 var(--mhdr-border);
+  }
+
+  .mn-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--mhdr-height);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /* ── LEFT: NAV ─────────────────── */
+  .mn-header__nav {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+  }
+  @media (min-width: 768px) {
+    .mn-header__nav { display: flex; }
+  }
+  .mn-header__nav-link {
+    font-family: var(--mhdr-font);
+    font-size: 0.8rem;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    color: var(--mhdr-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .mn-header__nav-link:hover,
+  .mn-header__nav-link[aria-current="page"] {
+    color: var(--mhdr-text);
+  }
+
+  /* ── CENTER: LOGO ──────────────── */
+  .mn-header__logo {
+    font-family: var(--mhdr-font-logo);
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--mhdr-text);
+    text-decoration: none;
+  }
+  .mn-header__logo-img {
+    max-height: 32px;
+    width: auto;
+  }
+
+  /* ── RIGHT: ACTIONS ────────────── */
+  .mn-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .mn-header__action {
+    font-family: var(--mhdr-font);
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--mhdr-muted);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+  }
+  .mn-header__action:hover {
+    color: var(--mhdr-text);
+  }
+
+  /* Cart dot indicator */
+  .mn-header__cart-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mhdr-text);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .mn-header__cart-dot:empty { display: none; }
+
+  /* ── MOBILE BURGER ─────────────── */
+  .mn-header__burger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0;
+    width: 20px;
+  }
+  .mn-header__burger span {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: var(--mhdr-text);
+  }
+  @media (min-width: 768px) {
+    .mn-header__burger { display: none; }
+  }
+
+  /* ── MOBILE BOTTOM SHEET ───────── */
+  .mn-sheet-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .mn-sheet-bg[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mn-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 80vh;
+    background: var(--mhdr-bg);
+    border-radius: 16px 16px 0 0;
+    z-index: 201;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+  .mn-sheet[data-open="true"] {
+    transform: translateY(0);
+  }
+
+  .mn-sheet__handle {
+    width: 36px;
+    height: 4px;
+    background: var(--mhdr-border);
+    border-radius: 2px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .mn-sheet__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .mn-sheet__nav-link {
+    display: block;
+    font-family: var(--mhdr-font);
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--mhdr-text);
+    text-decoration: none;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--mhdr-border);
+    transition: padding-left 0.2s ease;
+  }
+  .mn-sheet__nav-link:hover {
+    padding-left: 0.5rem;
+  }
+  .mn-sheet__nav li:last-child .mn-sheet__nav-link {
+    border-bottom: none;
+  }
+
+  .mn-sheet__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--mhdr-border);
+  }
+  .mn-sheet__actions a {
+    font-family: var(--mhdr-font);
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--mhdr-muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mn-header, .mn-sheet, .mn-sheet-bg {
+      transition: none;
+    }
+  }
+</style>
+
+{%- comment -%} ══ MOBILE BOTTOM SHEET ══ {%- endcomment -%}
+<div class="mn-sheet-bg" data-open="false" id="mn-sheetbg-{{ section.id }}"
+  onclick="this.dataset.open='false'; document.getElementById('mn-sheet-{{ section.id }}').dataset.open='false'"></div>
+<div class="mn-sheet" data-open="false" id="mn-sheet-{{ section.id }}">
+  <div class="mn-sheet__handle"></div>
+  <ul class="mn-sheet__nav">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <li>
+        <a href="{{ link.url }}" class="mn-sheet__nav-link">{{ link.title }}</a>
+      </li>
+    {%- endfor -%}
+  </ul>
+  <div class="mn-sheet__actions">
+    <a href="{{ routes.search_url }}">Search</a>
+    <a href="{{ routes.account_url }}">Account</a>
+  </div>
+</div>
+
+{%- comment -%} ══ MAIN HEADER ══ {%- endcomment -%}
+<header class="mn-header" data-scrolled="false" data-hidden="false" id="mn-header-{{ section.id }}">
+  <div class="mn-header__inner">
+
+    {%- comment -%} Mobile burger {%- endcomment -%}
+    <button class="mn-header__burger" aria-label="Open menu"
+      onclick="document.getElementById('mn-sheet-{{ section.id }}').dataset.open='true'; document.getElementById('mn-sheetbg-{{ section.id }}').dataset.open='true'">
+      <span></span>
+      <span></span>
+    </button>
+
+    {%- comment -%} Desktop nav {%- endcomment -%}
+    <ul class="mn-header__nav" role="navigation" aria-label="Main navigation">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <li>
+          <a href="{{ link.url }}" class="mn-header__nav-link"
+            {% if link.current %} aria-current="page"{% endif %}>
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- comment -%} Logo {%- endcomment -%}
+    <a href="{{ routes.root_url }}" class="mn-header__logo">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 200 | image_tag: class: 'mn-header__logo-img', alt: shop.name }}
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Actions {%- endcomment -%}
+    <div class="mn-header__actions">
+      <a href="{{ routes.search_url }}" class="mn-header__action" aria-label="Search">Search</a>
+      <a href="{{ routes.cart_url }}" class="mn-header__action" aria-label="Cart">
+        Cart
+        {%- if cart.item_count > 0 -%}
+          <span class="mn-header__cart-dot"></span>
+        {%- endif -%}
+      </a>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  (function() {
+    var hdr = document.getElementById('mn-header-{{ section.id }}');
+    if (!hdr) return;
+    var lastY = 0;
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          var y = window.scrollY;
+          hdr.dataset.scrolled = y > 20 ? 'true' : 'false';
+          hdr.dataset.hidden = (y > lastY && y > 200) ? 'true' : 'false';
+          lastY = y;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Minimal Header",
+  "tag": "section",
+  "class": "section-header-minimal",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Recommended: transparent PNG, max 200px wide."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable Sticky Header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_scroll_down",
+      "label": "Hide on Scroll Down",
+      "default": true,
+      "info": "Header slides away when scrolling down, reappears on scroll up."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal Header"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,165 @@
+{%- comment -%}
+  collection_active_filters.liquid — Active Filter Pills & Clear All
+  
+  DESIGN PHILOSOPHY:
+  Clean, horizontal pill bar displaying currently active collection filters.
+  Allows shoppers to quickly remove individual tags or reset all filters
+  at once. Supports Shopify's native collection.filters object with fallback.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --caf-bg: var(--color-background, #ffffff);
+    --caf-text: var(--color-text, #18181b);
+    --caf-muted: color-mix(in srgb, var(--caf-text) 50%, transparent);
+    --caf-border: color-mix(in srgb, var(--caf-text) 15%, transparent);
+    --caf-accent: var(--color-accent, #2563eb);
+    --caf-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+  }
+
+  .caf-wrap {
+    background: var(--caf-bg);
+    padding: 0.75rem clamp(1.25rem, 4vw, 3rem);
+    font-family: var(--caf-font);
+  }
+
+  .caf-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .caf-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--caf-muted);
+    margin-right: 0.25rem;
+  }
+
+  .caf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: color-mix(in srgb, var(--caf-text) 5%, transparent);
+    border: 1px solid var(--caf-border);
+    border-radius: 100px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--caf-text);
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .caf-pill:hover {
+    background: color-mix(in srgb, var(--caf-accent) 10%, transparent);
+    border-color: var(--caf-accent);
+    color: var(--caf-accent);
+  }
+
+  .caf-pill-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--caf-text) 15%, transparent);
+    color: var(--caf-text);
+    font-size: 0.7rem;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .caf-pill:hover .caf-pill-remove {
+    background: var(--caf-accent);
+    color: #ffffff;
+  }
+
+  .caf-clear-all {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--caf-accent);
+    text-decoration: underline;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .caf-clear-all:hover {
+    opacity: 0.8;
+  }
+</style>
+
+<div class="caf-wrap" aria-label="Active Filters">
+  <div class="caf-inner">
+    {%- assign active_count = 0 -%}
+    {%- if collection.filters != blank -%}
+      {%- for filter in collection.filters -%}
+        {%- if filter.active_values.size > 0 -%}
+          {%- assign active_count = active_count | plus: filter.active_values.size -%}
+          {%- if active_count == filter.active_values.size -%}
+            <span class="caf-label">{{ section.settings.label_text | default: 'Active Filters:' }}</span>
+          {%- endif -%}
+          {%- for value in filter.active_values -%}
+            <a href="{{ value.url_to_remove }}" class="caf-pill">
+              <span>{{ filter.label }}: <strong>{{ value.label }}</strong></span>
+              <span class="caf-pill-remove" aria-hidden="true">×</span>
+            </a>
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+            {%- assign active_count = active_count | plus: 1 -%}
+            {%- if active_count == 1 -%}
+              <span class="caf-label">{{ section.settings.label_text | default: 'Active Filters:' }}</span>
+            {%- endif -%}
+            <a href="{{ filter.url_to_remove }}" class="caf-pill">
+              <span>Price: <strong>{{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }}</strong></span>
+              <span class="caf-pill-remove" aria-hidden="true">×</span>
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if active_count > 0 -%}
+        <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="caf-clear-all">{{ section.settings.clear_text | default: 'Clear all' }}</a>
+      {%- endif -%}
+    {%- else -%}
+      {%- comment -%} Fallback mock pills for preview / editor {%- endcomment -%}
+      <span class="caf-label">{{ section.settings.label_text | default: 'Active Filters:' }}</span>
+      <a href="#" class="caf-pill"><span>Color: <strong>Black</strong></span><span class="caf-pill-remove">×</span></a>
+      <a href="#" class="caf-pill"><span>Size: <strong>Medium</strong></span><span class="caf-pill-remove">×</span></a>
+      <a href="#" class="caf-pill"><span>Availability: <strong>In Stock</strong></span><span class="caf-pill-remove">×</span></a>
+      <a href="#" class="caf-clear-all">{{ section.settings.clear_text | default: 'Clear all' }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Active Filter Pills",
+  "tag": "section",
+  "class": "section-collection-active-filters",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Prefix Label",
+      "default": "Active Filters:"
+    },
+    {
+      "type": "text",
+      "id": "clear_text",
+      "label": "Clear All Link Text",
+      "default": "Clear all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Active Filter Pills"
+    }
+  ]
+}
+{% endschema %}

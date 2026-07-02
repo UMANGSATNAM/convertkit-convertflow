@@ -1,0 +1,549 @@
+{%- comment -%}
+  product_gallery_carousel.liquid — Ultra-Comprehensive Product Gallery & Lightbox Carousel
+  
+  DESIGN PHILOSOPHY:
+  An architectural product imagery showcase engineered for tactile inspection and high conversion.
+  Features a synchronized main carousel viewer with interactive thumbnail navigation,
+  smooth slide transitions, touch swipe support simulation, and an accessible Fullscreen
+  Zoom Lightbox Modal Dialog with keyboard left/right arrow navigation.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --pgc-bg: {{ section.settings.bg_color | default: '#ffffff' }};
+    --pgc-card-bg: {{ section.settings.card_bg_color | default: '#f8fafc' }};
+    --pgc-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --pgc-muted: color-mix(in srgb, var(--pgc-text) 60%, transparent);
+    --pgc-border: color-mix(in srgb, var(--pgc-text) 12%, transparent);
+    --pgc-accent: {{ section.settings.accent_color | default: '#0f172a' }};
+    --pgc-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --pgc-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --pgc-padding-top: clamp(3.5rem, 8vw, 6.5rem);
+    --pgc-padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+  }
+
+  .pgc-section {
+    background-color: var(--pgc-bg);
+    color: var(--pgc-text);
+    font-family: var(--pgc-font-body);
+    padding: var(--pgc-padding-top) clamp(1.25rem, 4vw, 4rem) var(--pgc-padding-bottom);
+    border-bottom: 1px solid var(--pgc-border);
+    position: relative;
+  }
+
+  .pgc-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  /* Section Header */
+  .pgc-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .pgc-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--pgc-accent);
+    background: color-mix(in srgb, var(--pgc-accent) 8%, transparent);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+  }
+  .pgc-title {
+    font-family: var(--pgc-font-head);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+  }
+  .pgc-desc {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--pgc-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Gallery Main Layout */
+  .pgc-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Main Carousel Viewer Box */
+  .pgc-viewer {
+    background: var(--pgc-card-bg);
+    border: 1px solid var(--pgc-border);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 16 / 10;
+    box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pgc-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.98);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+  }
+  .pgc-slide[data-active="true"] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+    z-index: 5;
+  }
+  .pgc-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Slide Counter & Lightbox Button */
+  .pgc-badge-bar {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .pgc-counter {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.45rem 1rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .pgc-zoom-btn {
+    pointer-events: auto;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 100px;
+    padding: 0.5rem 1.15rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .pgc-zoom-btn:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+  .pgc-zoom-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+
+  /* Nav Arrows */
+  .pgc-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.85);
+    color: #0f172a;
+    border: 1px solid var(--pgc-border);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+  .pgc-arrow:hover {
+    background: var(--pgc-accent);
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+  }
+  .pgc-arrow.prev { left: 1.5rem; }
+  .pgc-arrow.next { right: 1.5rem; }
+  .pgc-arrow svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  /* Thumbnail Strip */
+  .pgc-thumbs {
+    display: flex;
+    gap: 0.85rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+  }
+  .pgc-thumb {
+    width: 110px;
+    height: 80px;
+    border-radius: 16px;
+    background: var(--pgc-card-bg);
+    border: 2px solid transparent;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+  }
+  .pgc-thumb:hover,
+  .pgc-thumb[data-active="true"] {
+    opacity: 1;
+    border-color: var(--pgc-accent);
+    transform: translateY(-2px);
+  }
+  .pgc-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Fullscreen Zoom Lightbox Modal */
+  .pgc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .pgc-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .pgc-modal {
+    max-width: 1200px;
+    max-height: 85vh;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .pgc-modal img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.8);
+  }
+  .pgc-modal-close {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 1010;
+    transition: background 0.2s ease;
+  }
+  .pgc-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+</style>
+
+<section class="pgc-section" id="pgc-section-{{ section.id }}" aria-labelledby="pgc-title-{{ section.id }}">
+  <div class="pgc-container">
+    
+    <!-- Section Header -->
+    <div class="pgc-header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="pgc-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="pgc-title-{{ section.id }}" class="pgc-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="pgc-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Gallery Carousel Layout -->
+    <div class="pgc-layout" id="pgc-layout-{{ section.id }}">
+      
+      <!-- Main Viewer Box -->
+      <div class="pgc-viewer">
+        <div class="pgc-badge-bar">
+          <span class="pgc-counter"><span id="pgc-curr-{{ section.id }}">1</span> / {{ section.blocks.size }}</span>
+          <button type="button" class="pgc-zoom-btn" id="pgc-zoom-btn-{{ section.id }}" aria-label="Open fullscreen zoom lightbox">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+            <span>Inspect Fullscreen</span>
+          </button>
+        </div>
+
+        {%- for block in section.blocks -%}
+          <div class="pgc-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}" {% if forloop.first %}data-active="true"{% endif %} data-src="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 1600 }}{% endif %}" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 1400 | image_tag: loading: 'eager', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:1.5rem;font-weight:700;">Atelier Gallery Slide {{ forloop.index }}</div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+
+        <!-- Navigation Arrows -->
+        <button type="button" class="pgc-arrow prev" id="pgc-prev-{{ section.id }}" aria-label="Previous image slide">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="pgc-arrow next" id="pgc-next-{{ section.id }}" aria-label="Next image slide">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <!-- Synchronized Thumbnail Bar -->
+      <div class="pgc-thumbs" role="tablist">
+        {%- for block in section.blocks -%}
+          <div class="pgc-thumb {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}" {% if forloop.first %}data-active="true"{% endif %} role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width:100%;height:100%;background:#333;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:0.75rem;">Thumb {{ forloop.index }}</div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Fullscreen Zoom Lightbox Modal -->
+  <div class="pgc-modal-overlay" id="pgc-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <button type="button" class="pgc-modal-close" id="pgc-modal-close-{{ section.id }}" aria-label="Close fullscreen lightbox">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="pgc-modal">
+      <img src="" id="pgc-modal-img" alt="Enlarged Gallery Slide">
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('pgc-section-' + sid);
+    if (!sectionEl) return;
+
+    var slides = sectionEl.querySelectorAll('.pgc-slide');
+    var thumbs = sectionEl.querySelectorAll('.pgc-thumb');
+    var prevBtn = document.getElementById('pgc-prev-' + sid);
+    var nextBtn = document.getElementById('pgc-next-' + sid);
+    var currEl = document.getElementById('pgc-curr-' + sid);
+    var total = slides.length;
+    var currentIdx = 0;
+
+    if (total === 0) return;
+
+    function goToSlide(idx) {
+      if (idx < 0) idx = total - 1;
+      if (idx >= total) idx = 0;
+      currentIdx = idx;
+
+      slides.forEach(function(s, i) {
+        if (i === idx) {
+          s.setAttribute('data-active', 'true');
+        } else {
+          s.removeAttribute('data-active');
+        }
+      });
+      thumbs.forEach(function(t, i) {
+        if (i === idx) {
+          t.setAttribute('data-active', 'true');
+          t.setAttribute('aria-selected', 'true');
+          t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          t.removeAttribute('data-active');
+          t.setAttribute('aria-selected', 'false');
+        }
+      });
+      if (currEl) currEl.innerText = idx + 1;
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function() { goToSlide(currentIdx - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function() { goToSlide(currentIdx + 1); });
+    thumbs.forEach(function(t, idx) {
+      t.addEventListener('click', function() { goToSlide(idx); });
+    });
+
+    // Lightbox Modal Controller
+    var modalOverlay = document.getElementById('pgc-modal-' + sid);
+    var modalClose = document.getElementById('pgc-modal-close-' + sid);
+    var zoomBtn = document.getElementById('pgc-zoom-btn-' + sid);
+    var modalImg = document.getElementById('pgc-modal-img');
+
+    if (modalOverlay && modalClose && zoomBtn && modalImg) {
+      zoomBtn.addEventListener('click', function() {
+        var activeSlide = slides[currentIdx];
+        var src = activeSlide ? activeSlide.getAttribute('data-src') : '';
+        if (src && src !== 'null' && src !== '') {
+          modalImg.src = src;
+        } else {
+          modalImg.src = '';
+        }
+        modalOverlay.setAttribute('data-open', 'true');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (modalOverlay.getAttribute('data-open') === 'true') {
+          if (e.key === 'Escape') closeModal();
+          if (e.key === 'ArrowLeft') goToSlide(currentIdx - 1);
+          if (e.key === 'ArrowRight') goToSlide(currentIdx + 1);
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product Gallery Carousel",
+  "tag": "section",
+  "class": "section-product-gallery-carousel",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Viewer Background",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Atelier Gallery Showcase"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Architectural Detail & Polish"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Explore high-resolution macro photography showcasing our precision milling, hand-finished satin chamfers, and bespoke acoustic dampening architecture."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Gallery Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "High-Resolution Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Slide Caption Title",
+          "default": "Chamfered Aluminum Bezel"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Gallery Carousel",
+      "blocks": [
+        { "type": "slide", "settings": { "title": "Chamfered Aluminum Bezel" } },
+        { "type": "slide", "settings": { "title": "Acoustic Silicon Dampener" } },
+        { "type": "slide", "settings": { "title": "Bespoke Horn Button Detail" } },
+        { "type": "slide", "settings": { "title": "Gold-Plated PCB Architecture" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

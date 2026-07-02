@@ -1,0 +1,90 @@
+<div class="sf-lookbook sf-lb-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-lb-container">
+    <div class="sf-lb-image">
+      {% if section.settings.image != blank %}
+        <img src="{{ section.settings.image | img_url: 'master' }}" alt="Lookbook Image" loading="lazy">
+      {% else %}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'sf-placeholder' }}
+      {% endif %}
+      
+      {% for block in section.blocks %}
+        <div class="sf-lb-hotspot" style="top: {{ block.settings.top }}%; left: {{ block.settings.left }}%;">
+          <span class="sf-lb-dot"></span>
+          <div class="sf-lb-tooltip">
+            {% if block.settings.product != blank %}
+              {% assign lb_prod = all_products[block.settings.product] %}
+              <a href="{{ lb_prod.url }}">
+                <img src="{{ lb_prod.featured_image | img_url: '100x100' }}" alt="{{ lb_prod.title }}" loading="lazy">
+                <div class="sf-lb-tt-info">
+                  <strong>{{ lb_prod.title }}</strong>
+                  <span>{{ lb_prod.price | money }}</span>
+                </div>
+              </a>
+            {% else %}
+              <div class="sf-lb-tt-info">
+                <strong>Example Product</strong>
+                <span>$50.00</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="sf-lb-text">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+      {% if section.settings.btn_link != blank %}
+        <a href="{{ section.settings.btn_link }}" class="sf-lb-btn" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">{{ section.settings.btn_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-lb-{{ section.id }} { padding: 4rem 1rem; max-width: 1400px; margin: 0 auto; }
+  .sf-lb-container { display: flex; flex-direction: column; gap: 2rem; align-items: center; }
+  @media (min-width: 768px) { .sf-lb-container { flex-direction: row; gap: 4rem; } .sf-lb-image { flex: 1; } .sf-lb-text { flex: 1; } }
+  .sf-lb-image { position: relative; width: 100%; max-width: 600px; border-radius: 8px; overflow: hidden; }
+  .sf-lb-image img, .sf-placeholder { width: 100%; height: auto; display: block; }
+  .sf-lb-hotspot { position: absolute; z-index: 2; transform: translate(-50%, -50%); }
+  .sf-lb-dot { display: block; width: 24px; height: 24px; background: white; border-radius: 50%; box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-background) 40%, transparent); cursor: pointer; position: relative; }
+  .sf-lb-dot::after { content: ''; position: absolute; inset: 6px; background: black; border-radius: 50%; }
+  .sf-lb-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(10px); background: white; padding: 10px; border-radius: 8px; box-shadow: 0 10px 30px color-mix(in srgb, var(--color-text) 10%, transparent); display: none; width: max-content; margin-bottom: 15px; opacity: 0; transition: 0.3s; pointer-events: none; }
+  .sf-lb-hotspot:hover .sf-lb-tooltip { display: block; opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .sf-lb-tooltip a { display: flex; align-items: center; gap: 10px; text-decoration: none; color: black; }
+  .sf-lb-tooltip img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+  .sf-lb-tt-info { display: flex; flex-direction: column; text-align: left; }
+  .sf-lb-tt-info strong { font-size: 0.9rem; }
+  .sf-lb-tt-info span { font-size: 0.8rem; color: var(--color-text-secondary); }
+  .sf-lb-text h2 { font-size: 3rem; margin-bottom: 1rem; }
+  .sf-lb-text p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.8; }
+  .sf-lb-btn { display: inline-block; padding: 15px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
+</style>
+
+{% schema %}
+{
+  "name": "Featured Lookbook",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Spring Collection '26" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Get inspired by our latest looks." },
+    { "type": "image_picker", "id": "image", "label": "Lookbook Image" },
+    { "type": "text", "id": "btn_label", "label": "Button", "default": "Shop All" },
+    { "type": "url", "id": "btn_link", "label": "Link" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#000000" },
+    { "type": "color", "id": "btn_text", "label": "Button Text", "default": "#ffffff" }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot", "name": "Hotspot",
+      "settings": [
+        { "type": "range", "id": "top", "min": 0, "max": 100, "step": 1, "label": "Position Top (%)", "default": 50 },
+        { "type": "range", "id": "left", "min": 0, "max": 100, "step": 1, "label": "Position Left (%)", "default": 50 },
+        { "type": "product", "id": "product", "label": "Product" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Featured Lookbook", "category": "Image" } ]
+}
+{% endschema %}

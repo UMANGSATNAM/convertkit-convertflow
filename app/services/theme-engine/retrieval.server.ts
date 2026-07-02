@@ -109,7 +109,7 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     const registryFamilies: string[] = (Array.isArray(comp.family) ? comp.family : [comp.family || ''])
       .map((f: string) => f.toLowerCase());
 
-    const industryKey = params.catalogIndustry.toLowerCase();
+    const industryKey = (params.catalogIndustry || '').toLowerCase();
     if (compatIndustries.includes(industryKey)) {
       compatScore += 25; // Exact match in compatibility matrix
     } else if (registryFamilies.some(f => f === industryKey || f === 'universal')) {
@@ -120,8 +120,8 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
 
     // visualStyle match to catalogStyle (15 pts)
     const visualStyle = (comp.visualStyle || '').toLowerCase();
-    const catalogStyle = params.catalogStyle.toLowerCase();
-    if (visualStyle === catalogStyle) {
+    const catalogStyle = (params.catalogStyle || '').toLowerCase();
+    if (visualStyle === catalogStyle && catalogStyle !== '') {
       compatScore += 15;
     } else if (visualStyle === 'minimal' && ['clean', 'simple', 'organic'].includes(catalogStyle)) {
       compatScore += 8; // Soft match
@@ -143,7 +143,8 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     const compatArchetypes: string[] = (compatData.archetypes || comp.archetypes || [])
       .map((a: string) => a.toLowerCase());
 
-    if (compatArchetypes.includes(params.brandArchetype.toLowerCase())) {
+    const targetArchetype = (params.brandArchetype || '').toLowerCase();
+    if (targetArchetype !== '' && compatArchetypes.includes(targetArchetype)) {
       archetypeScore = 20;
     } else if (compatArchetypes.includes('*')) {
       archetypeScore = 10; // Universal wildcard partial score

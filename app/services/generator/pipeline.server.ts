@@ -16,7 +16,7 @@ import { injectProductsIntoBlueprint } from "../theme-engine/injector.server";
 import { generateStoreBlueprint } from "../theme-engine/blueprint.server";
 import { calculateHealthScore } from "../theme-engine/health.server";
 import { validateSectionDependencies, validateTemplateStructure } from "../theme-engine/validators.server";
-import { composeThemeFromBlueprint } from "../theme-engine/composer.server";
+import { composeThemeFromBlueprint } from "../theme-engine/compiler.server";
 import { createGenerationProfile, logGenerationProfile, type ComponentSelection } from "./generation-profiler.server";
 import fs from "fs/promises";
 import path from "path";
@@ -132,16 +132,14 @@ export function initGeneratorWorker() {
         const croInjected: string[] = [];
 
         if (croContext.socialProofNeeded && !indexSectionTypes.includes('testimonials')) {
-          const footerIdx = indexSectionTypes.lastIndexOf('footer');
-          const insertAt = footerIdx > 0 ? footerIdx : indexSectionTypes.length - 1;
+          const insertAt = indexSectionTypes.length;
           indexSectionTypes.splice(insertAt, 0, 'testimonials');
           croInjected.push('testimonials');
           console.log("[CRO] Injected 'testimonials' — socialProofNeeded=true");
         }
 
         if (croContext.faqNeeded && !indexSectionTypes.includes('faq')) {
-          const footerIdx = indexSectionTypes.lastIndexOf('footer');
-          const insertAt = footerIdx > 0 ? footerIdx : indexSectionTypes.length - 1;
+          const insertAt = indexSectionTypes.length;
           indexSectionTypes.splice(insertAt, 0, 'faq');
           croInjected.push('faq');
           console.log("[CRO] Injected 'faq' — faqNeeded=true");
@@ -204,8 +202,22 @@ export function initGeneratorWorker() {
           })
         };
 
-        const globalComponents: string[] = []; // Not yet integrated with new engine, default empty
-
+        const globalComponents: string[] = [];
+        const globalSectionTypes = ["header", "footer"];
+        
+        for (const sectionType of globalSectionTypes) {
+          const matchedComponent = await retrieveBestComponent({
+            sectionType,
+            brandArchetype: brandContext.brand_archetype,
+            catalogIndustry: catalogContext.industry,
+            catalogStyle: catalogContext.style,
+            catalogVisualComplexity: catalogContext.visual_complexity
+          });
+          if (matchedComponent && matchedComponent.componentId) {
+             globalComponents.push(matchedComponent.componentId);
+             console.log(`[Phase 5] Resolved GLOBAL ${sectionType} -> ${matchedComponent.componentId}`);
+          }
+        }
         // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
         let extractedColors = null;
         if (aiData?.logoBase64) {
@@ -390,7 +402,7 @@ export function initGeneratorWorker() {
             }
           });
 
-          const { composeThemeFromBlueprint } = await import("../theme-engine/composer.server");
+          const { composeThemeFromBlueprint } = await import("../theme-engine/compiler.server");
           
           // Pass the entire published registry to composer so it can fetch the liquid files
           const componentsToUse = await prisma.componentRegistry.findMany({

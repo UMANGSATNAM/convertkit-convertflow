@@ -1,0 +1,512 @@
+{%- comment -%}
+  header_announcement_bar.liquid — Ultra-Comprehensive Global Announcement & Notification Bar
+  
+  DESIGN PHILOSOPHY:
+  An architectural notification bar engineered for global site promotions, limited drop alerts,
+  and Swiss atelier shipping notices. Features automatic interval message cycling, manual slide
+  controls, region status display, persistent LocalStorage dismissal, and an accessible
+  Announcement Details Lightbox Modal Dialog explaining warranty and express delivery terms.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hab-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --hab-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --hab-muted: color-mix(in srgb, var(--hab-text) 70%, transparent);
+    --hab-border: color-mix(in srgb, var(--hab-text) 15%, transparent);
+    --hab-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --hab-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+  }
+
+  .hab-section {
+    background-color: var(--hab-bg);
+    color: var(--hab-text);
+    font-family: var(--hab-font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--hab-border);
+    position: relative;
+    z-index: 50;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+    max-height: 80px;
+    overflow: hidden;
+  }
+  .hab-section[data-dismissed="true"] {
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    border: none;
+    pointer-events: none;
+  }
+
+  .hab-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.65rem clamp(1rem, 3vw, 2.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Left Region Status */
+  .hab-region {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--hab-muted);
+    font-size: 0.75rem;
+  }
+  @media (min-width: 1024px) {
+    .hab-region { display: flex; }
+  }
+  .hab-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+  }
+
+  /* Center Ticker Box */
+  .hab-ticker {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 24px;
+    overflow: hidden;
+  }
+  .hab-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    text-align: center;
+  }
+  .hab-slide[data-active="true"] {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .hab-badge {
+    background: color-mix(in srgb, var(--hab-accent) 20%, transparent);
+    color: var(--hab-accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 0.15rem 0.6rem;
+    border-radius: 100px;
+    border: 1px solid color-mix(in srgb, var(--hab-accent) 40%, transparent);
+  }
+  .hab-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .hab-link:hover {
+    color: var(--hab-accent);
+  }
+  .hab-modal-btn {
+    background: transparent;
+    border: none;
+    color: var(--hab-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 0.3rem;
+  }
+
+  /* Right Controls */
+  .hab-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hab-arrow {
+    background: transparent;
+    border: none;
+    color: var(--hab-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .hab-arrow:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--hab-text);
+  }
+  .hab-arrow svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+  .hab-dismiss {
+    background: transparent;
+    border: none;
+    color: var(--hab-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 0.25rem;
+  }
+  .hab-dismiss:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ef4444;
+  }
+
+  /* Announcement Details Lightbox Modal */
+  .hab-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .hab-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .hab-modal {
+    background: #1e293b;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+    max-width: 540px;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    position: relative;
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hab-modal-overlay[data-open="true"] .hab-modal {
+    transform: scale(1);
+  }
+  .hab-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+  }
+</style>
+
+<div class="hab-section" id="hab-section-{{ section.id }}" data-dismissed="false" role="region" aria-label="Global Announcement Bar">
+  <div class="hab-container">
+    
+    <!-- Left Region Notice -->
+    <div class="hab-region">
+      <span class="hab-dot"></span>
+      <span>{{ section.settings.region_text | default: 'Zürich Atelier Registry • Global Express Delivery Active' }}</span>
+    </div>
+
+    <!-- Center Cycling Ticker -->
+    <div class="hab-ticker" id="hab-ticker-{{ section.id }}" aria-live="polite">
+      {%- for block in section.blocks -%}
+        <div class="hab-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}" {% if forloop.first %}data-active="true"{% endif %} {{ block.shopify_attributes }}>
+          {%- if block.settings.badge != blank -%}
+            <span class="hab-badge">{{ block.settings.badge }}</span>
+          {%- endif -%}
+          
+          {%- if block.settings.url != blank -%}
+            <a href="{{ block.settings.url }}" class="hab-link">{{ block.settings.text }}</a>
+          {%- else -%}
+            <span>{{ block.settings.text }}</span>
+          {%- endif -%}
+
+          {%- if block.settings.show_modal_link -%}
+            <button type="button" class="hab-modal-btn" data-title="{{ block.settings.modal_title | default: 'Global Shipping Protocol' }}" data-desc="{{ block.settings.modal_desc | default: 'All Atelier workstations are shipped via complimentary DHL Express Air from our Zürich laboratory with pre-paid customs duties.' }}">Read Protocol</button>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <!-- Right Controls -->
+    <div class="hab-controls">
+      <button type="button" class="hab-arrow" id="hab-prev-{{ section.id }}" aria-label="Previous announcement">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button type="button" class="hab-arrow" id="hab-next-{{ section.id }}" aria-label="Next announcement">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+
+      {%- if section.settings.show_dismiss -%}
+        <button type="button" class="hab-dismiss" id="hab-dismiss-{{ section.id }}" aria-label="Dismiss announcement bar">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+<!-- Announcement Details Modal -->
+<div class="hab-modal-overlay" id="hab-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="hab-modal">
+    <button type="button" class="hab-modal-close" id="hab-modal-close-{{ section.id }}" aria-label="Close protocol modal">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <span style="width:10px;height:10px;border-radius:50%;background:var(--hab-accent);"></span>
+      <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.7);">Atelier Service Protocol</span>
+    </div>
+
+    <h3 id="hab-modal-title" style="font-family:var(--font-heading,sans-serif);font-size:1.85rem;margin:0;">Global Express Delivery</h3>
+    <p id="hab-modal-desc" style="font-size:0.98rem;line-height:1.65;color:rgba(255,255,255,0.8);margin:0;">All orders are dispatched within 24 hours from Zurich with comprehensive insurance coverage.</p>
+
+    <div style="padding:1.25rem;background:rgba(255,255,255,0.05);border-radius:16px;border:1px dashed rgba(255,255,255,0.2);">
+      <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ffffff;display:block;margin-bottom:0.5rem;">Swiss Lifetime Warranty Included:</span>
+      <p style="font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.6;margin:0;">Every workstation includes registration in the Swiss Atelier archive for lifetime structural support and replacement parts.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('hab-section-' + sid);
+    if (!sectionEl) return;
+
+    var storageKey = 'obsidian_announcement_dismissed_' + sid;
+    try {
+      if (localStorage.getItem(storageKey) === 'true') {
+        sectionEl.setAttribute('data-dismissed', 'true');
+        return;
+      }
+    } catch(e) {}
+
+    var slides = sectionEl.querySelectorAll('.hab-slide');
+    var prevBtn = document.getElementById('hab-prev-' + sid);
+    var nextBtn = document.getElementById('hab-next-' + sid);
+    var dismissBtn = document.getElementById('hab-dismiss-' + sid);
+    var total = slides.length;
+    var currentIdx = 0;
+    var timer = null;
+
+    if (total > 0) {
+      function showSlide(idx) {
+        if (idx < 0) idx = total - 1;
+        if (idx >= total) idx = 0;
+        currentIdx = idx;
+
+        slides.forEach(function(s, i) {
+          if (i === idx) s.setAttribute('data-active', 'true');
+          else s.removeAttribute('data-active');
+        });
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', function() {
+        showSlide(currentIdx - 1);
+        resetTimer();
+      });
+      if (nextBtn) nextBtn.addEventListener('click', function() {
+        showSlide(currentIdx + 1);
+        resetTimer();
+      });
+
+      function startTimer() {
+        if (total <= 1) return;
+        var interval = parseInt('{{ section.settings.cycle_speed | default: 5000 }}', 10) || 5000;
+        timer = setInterval(function() { showSlide(currentIdx + 1); }, interval);
+      }
+      function resetTimer() {
+        if (timer) clearInterval(timer);
+        startTimer();
+      }
+
+      startTimer();
+    }
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', function() {
+        try { localStorage.setItem(storageKey, 'true'); } catch(e) {}
+        sectionEl.setAttribute('data-dismissed', 'true');
+      });
+    }
+
+    // Modal Controller
+    var modalOverlay = document.getElementById('hab-modal-' + sid);
+    var modalClose = document.getElementById('hab-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var titleEl = document.getElementById('hab-modal-title');
+      var descEl = document.getElementById('hab-modal-desc');
+
+      var btns = sectionEl.querySelectorAll('.hab-modal-btn');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (titleEl) titleEl.innerText = btn.getAttribute('data-title') || 'Service Protocol';
+          if (descEl) descEl.innerText = btn.getAttribute('data-desc') || '';
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Global Announcement Bar",
+  "tag": "section",
+  "class": "section-header-announcement-bar",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Bar Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "header",
+      "content": "Controls & Cycling"
+    },
+    {
+      "type": "number",
+      "id": "cycle_speed",
+      "label": "Autoplay Cycle Interval (ms)",
+      "default": 5000
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dismiss",
+      "label": "Show Dismiss Close Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "region_text",
+      "label": "Left Region Status Text",
+      "default": "Zürich Atelier Registry • Global Express Delivery Active"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge Pill Text",
+          "default": "LIMITED DROP #04"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Announcement Text",
+          "default": "Complimentary DHL Express Air Shipping on All Serialized Workstations."
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Destination URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_modal_link",
+          "label": "Show Protocol Details Link",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "modal_title",
+          "label": "Modal Title",
+          "default": "Global Shipping Protocol"
+        },
+        {
+          "type": "textarea",
+          "id": "modal_desc",
+          "label": "Modal Description",
+          "default": "All Atelier workstations are shipped via complimentary DHL Express Air from our Zürich laboratory with pre-paid customs duties."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Global Announcement Bar",
+      "blocks": [
+        { "type": "announcement", "settings": { "badge": "LIMITED DROP #04", "text": "The Monolith Series 04 is now open for allocation." } },
+        { "type": "announcement", "settings": { "badge": "SWISS ATELIER", "text": "Complimentary DHL Express Air Shipping on all orders." } },
+        { "type": "announcement", "settings": { "badge": "LIFETIME REGISTRY", "text": "All chassis include lifetime structural Swiss warranty." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

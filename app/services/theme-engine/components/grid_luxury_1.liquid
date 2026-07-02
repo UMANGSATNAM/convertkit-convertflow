@@ -1,0 +1,252 @@
+{%- comment -%}
+  grid_luxury_1.liquid — Luxury Aristocratic Grid
+  
+  DESIGN PHILOSOPHY:
+  High-end gallery aesthetic. Serif typography, delicate border framing,
+  generous vertical spacing, and refined metadata presentation.
+  Ideal for haute couture, jewelry, or premium home goods.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --lxg-bg: var(--color-surface, var(--color-background, #faf9f7));
+    --lxg-text: var(--color-text, #181818);
+    --lxg-muted: color-mix(in srgb, var(--lxg-text) 50%, transparent);
+    --lxg-border: color-mix(in srgb, var(--lxg-text) 12%, transparent);
+    --lxg-accent: var(--color-accent, #b89758);
+    --lxg-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --lxg-font-serif: var(--font-heading, 'Playfair Display', Georgia, serif);
+  }
+
+  .lxg-section {
+    background: var(--lxg-bg);
+    padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 4rem);
+    border-top: 1px solid var(--lxg-border);
+  }
+
+  .lxg-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  .lxg-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto clamp(2.5rem, 5vw, 4.5rem);
+  }
+  .lxg-eyebrow {
+    font-family: var(--lxg-font);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--lxg-accent);
+    margin-bottom: 0.75rem;
+  }
+  .lxg-title {
+    font-family: var(--lxg-font-serif);
+    font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+    font-weight: 400;
+    color: var(--lxg-text);
+    margin: 0 0 1rem 0;
+    line-height: 1.25;
+  }
+  .lxg-desc {
+    font-family: var(--lxg-font);
+    font-size: 0.9rem;
+    color: var(--lxg-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .lxg-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+  @media (min-width: 640px) {
+    .lxg-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .lxg-grid[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+    .lxg-grid[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .lxg-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--lxg-text);
+  }
+
+  .lxg-media {
+    aspect-ratio: var(--aspect, 3/4);
+    background: color-mix(in srgb, var(--lxg-text) 4%, transparent);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--lxg-border);
+  }
+  .lxg-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lxg-card:hover .lxg-media img {
+    transform: scale(1.06);
+  }
+
+  .lxg-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--lxg-bg);
+    color: var(--lxg-text);
+    font-family: var(--lxg-font);
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--lxg-border);
+    z-index: 2;
+  }
+
+  .lxg-meta {
+    text-align: center;
+  }
+  .lxg-card-title {
+    font-family: var(--lxg-font-serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    margin: 0 0 0.4rem 0;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease;
+  }
+  .lxg-card:hover .lxg-card-title {
+    color: var(--lxg-accent);
+  }
+  .lxg-card-price {
+    font-family: var(--lxg-font);
+    font-size: 0.85rem;
+    color: var(--lxg-muted);
+    letter-spacing: 0.05em;
+  }
+</style>
+
+<section class="lxg-section" aria-labelledby="lxg-title-{{ section.id }}">
+  <div class="lxg-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="lxg-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="lxg-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="lxg-title-{{ section.id }}" class="lxg-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank -%}
+          <p class="lxg-desc">{{ section.settings.description }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="lxg-grid" data-cols="{{ section.settings.columns | default: '3' }}" style="--aspect: {{ section.settings.aspect_ratio | default: '3/4' }};">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.url | default: '#' }}" class="lxg-card" {{ block.shopify_attributes }}>
+          <div class="lxg-media">
+            {%- if block.settings.badge != blank -%}
+              <span class="lxg-badge">{{ block.settings.badge }}</span>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--lxg-muted); font-size: 0.8rem;">
+                {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            {%- endif -%}
+          </div>
+          <div class="lxg-meta">
+            <h3 class="lxg-card-title">{{ block.settings.title | default: 'Collection Title' }}</h3>
+            {%- if block.settings.price != blank -%}
+              <div class="lxg-card-price">{{ block.settings.price }}</div>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Luxury Grid",
+  "tag": "section",
+  "class": "section-grid-luxury",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "The Collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Iconic Masterpieces"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Explore our curated selection of timeless designs, crafted from the finest materials."
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "options": [
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Tall (4:5)" }
+      ],
+      "default": "3/4"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Grid Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "badge", "label": "Badge (Optional)", "default": "Limited Edition" },
+        { "type": "text", "id": "title", "label": "Title", "default": "L'Heure Romantique" },
+        { "type": "text", "id": "price", "label": "Price / Subtitle", "default": "$1,450" },
+        { "type": "url", "id": "url", "label": "URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury Grid",
+      "blocks": [
+        { "type": "card", "settings": { "badge": "Exclusive", "title": "The Gold Signet Ring", "price": "$1,200" } },
+        { "type": "card", "settings": { "badge": "New Season", "title": "Diamond Tennis Bracelet", "price": "$3,400" } },
+        { "type": "card", "settings": { "badge": "Iconic", "title": "Emerald Pendant Necklace", "price": "$2,100" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,216 @@
+import * as fs from "fs";
+import * as path from "path";
+import { ResolvedDependencies } from "./dependency-resolver";
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export type CSSLayerName =
+  | "base-tokens"
+  | "theme-dna"
+  | "component-tokens"
+  | "merchant-overrides";
+
+export interface CSSLayer {
+  name: CSSLayerName;
+  order: 1 | 2 | 3 | 4;
+  tokens: Record<string, string>; // CSS variable name → value
+  sourceFile: string;
+}
+
+export interface CSSTokenArtifact {
+  layers: CSSLayer[];
+  composed: Record<string, string>; // Final merged token map
+  cssOutput: string;                // Ready-to-write :root block
+  conflicts: CSSConflict[];         // Audit trail of overrides
+  stats: {
+    totalTokens: number;
+    overrides: number;
+    layerBreakdown: Record<CSSLayerName, number>;
+  };
+}
+
+export interface CSSConflict {
+  token: string;
+  original: { layer: CSSLayerName; value: string };
+  override: { layer: CSSLayerName; value: string };
+}
+
+export interface CSSResolverInput {
+  niche: string;                             // e.g. "jewellery"
+  componentTokens: Record<string, string>;   // Passed from Stage 4/5 Dependency Graph
+  merchantOverrides: Record<string, string>; // From blueprint.settings.brand
+  themeDir: string;                          // Root path for JSON config files
+}
+
+export type TokenFileFetcher = (layer: "base-tokens" | "theme-dna", input: CSSResolverInput) => Record<string, string>;
+
+// ─── Merchant Override Generator ─────────────────────────────────────────────
+
+function generateMerchantTokens(
+  overrides: Record<string, string>
+): Record<string, string> {
+  const MERCHANT_TOKEN_MAP: Record<string, string> = {
+    color_primary:    "--color-primary",
+    color_secondary:  "--color-secondary",
+    color_background: "--color-background",
+    color_text:       "--color-text",
+    color_accent:     "--color-accent",
+    font_heading:     "--font-heading",
+    font_body:        "--font-body",
+    border_radius:    "--radius-base",
+  };
+
+  const tokens: Record<string, string> = {};
+  for (const [settingKey, cssVar] of Object.entries(MERCHANT_TOKEN_MAP)) {
+    if (overrides[settingKey]) {
+      tokens[cssVar] = overrides[settingKey];
+    }
+  }
+  return tokens;
+}
+
+// ─── Main Resolver ────────────────────────────────────────────────────────────
+
+export class CSSTokenResolver {
+  constructor(private fetchTokenFile: TokenFileFetcher) {}
+  
+  resolve(input: CSSResolverInput): CSSTokenArtifact {
+    const conflicts: CSSConflict[] = [];
+    const composed: Record<string, string> = {};
+    const layers: CSSLayer[] = [];
+    const layerOrder: CSSLayerName[] = [
+      "base-tokens",
+      "theme-dna",
+      "component-tokens",
+      "merchant-overrides",
+    ];
+
+    for (let i = 0; i < layerOrder.length; i++) {
+      const layerName = layerOrder[i];
+      const order = (i + 1) as 1 | 2 | 3 | 4;
+
+      let tokens: Record<string, string> = {};
+      let sourceFile = "";
+
+      // Determine token source based on layer
+      if (layerName === "merchant-overrides") {
+        tokens = generateMerchantTokens(input.merchantOverrides || {});
+        sourceFile = "memory:blueprint.settings.brand";
+      } else if (layerName === "component-tokens") {
+        tokens = input.componentTokens || {};
+        sourceFile = "memory:dependency-graph";
+      } else {
+        tokens = this.fetchTokenFile(layerName, input);
+        sourceFile = layerName === "base-tokens" ? "tokens/base-tokens.json" : `tokens/dna/${input.niche}.json`;
+      }
+
+      // Merge and track conflicts
+      for (const [token, newValue] of Object.entries(tokens)) {
+        // Enforce strict prefix formatting to prevent malformed CSS later
+        if (!token.startsWith("--")) {
+           throw new Error(`[CSSTokenResolver] Invalid token format in ${layerName}: "${token}". Must start with "--".`);
+        }
+
+        if (composed[token] !== undefined && composed[token] !== newValue) {
+          const originalLayer = layers.find((l) => l.tokens[token] !== undefined);
+          conflicts.push({
+            token,
+            original: {
+              layer: originalLayer?.name ?? "base-tokens",
+              value: composed[token],
+            },
+            override: { layer: layerName, value: newValue },
+          });
+        }
+        composed[token] = newValue;
+      }
+
+      layers.push({ name: layerName, order, tokens, sourceFile });
+    }
+
+    // Run strict Linter before generating CSS
+    this.lintTokens(composed);
+
+    // Compose final :root CSS block (Deterministically sorted)
+    const cssLines = Object.entries(composed)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([token, value]) => `  ${token}: ${value};`);
+
+    const cssOutput = `:root {\n${cssLines.join("\n")}\n}`;
+
+    // Generate Stats
+    const layerBreakdown = {} as Record<CSSLayerName, number>;
+    for (const layer of layers) {
+      layerBreakdown[layer.name] = Object.keys(layer.tokens).length;
+    }
+
+    return {
+      layers,
+      composed,
+      cssOutput,
+      conflicts,
+      stats: {
+        totalTokens: Object.keys(composed).length,
+        overrides: conflicts.length,
+        layerBreakdown,
+      },
+    };
+  }
+
+  // ─── CSS Linter ─────────────────────────────────────────────────────────────
+  // Validates that no token references a missing variable (e.g., var(--missing-color))
+  
+  private lintTokens(composed: Record<string, string>) {
+    const allTokens = new Set(Object.keys(composed));
+    const varRegex = /var\((--[a-zA-Z0-9_-]+)\)/g;
+
+    for (const [token, value] of Object.entries(composed)) {
+      let match: RegExpExecArray | null;
+      while ((match = varRegex.exec(value)) !== null) {
+        const referencedVar = match[1];
+        if (!allTokens.has(referencedVar)) {
+          throw new Error(
+            `[CSSTokenResolver] Linter Fatal Error: Token "${token}" references an undefined variable "${referencedVar}".`
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Orchestrator integration function
+ */
+export async function resolveCSSTokens(
+  blueprint: any,
+  dependencies: ResolvedDependencies
+): Promise<CSSTokenArtifact> {
+  const fetcher: TokenFileFetcher = (layer, input) => {
+    let filePath = "";
+    if (layer === "base-tokens") {
+      filePath = path.join(input.themeDir, "tokens/base-tokens.json");
+    } else {
+      filePath = path.join(input.themeDir, `tokens/dna/${input.niche}.json`);
+    }
+    
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    }
+    return {};
+  };
+
+  // In reality, component tokens would be extracted from the dependency graph.
+  // We mock the extraction here for now.
+  const componentTokens: Record<string, string> = {};
+  
+  // Actually, we could extract them if the metadata exposed them, but
+  // for now we'll pass an empty object since it's just the pipeline stage.
+  
+  const resolver = new CSSTokenResolver(fetcher);
+  return resolver.resolve({
+    niche: blueprint.catalogProfile?.industry || 'default',
+    themeDir: process.cwd(), // Will be updated to actual theme directory
+    componentTokens,
+    merchantOverrides: blueprint.settings || {}
+  });
+}

@@ -1,0 +1,81 @@
+<div class="category-circles py-12 px-4 border-y border-[var(--color-border)] bg-[var(--color-background)] overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    {%- if section.settings.title != blank -%}
+      <h2 class="text-2xl font-bold text-center mb-8 text-[var(--color-text)]">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    <div class="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 gap-6 md:gap-8 justify-start md:justify-center">
+      {%- for block in section.blocks -%}
+        <div class="snap-center flex-shrink-0 flex flex-col items-center group cursor-pointer" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.link }}" class="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden mb-3 border-4 border-transparent group-hover:border-[var(--color-text)] transition-all duration-300 shadow-sm p-1">
+            <div class="w-full h-full rounded-full overflow-hidden relative bg-neutral-100">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | img_url: '300x' }}" alt="{{ block.settings.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+              {%- else -%}
+                {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'w-full h-full object-cover opacity-50 mix-blend-multiply' }}
+              {%- endif -%}
+            </div>
+          </a>
+          <span class="text-sm md:text-base font-medium text-center text-[var(--color-text-muted, #555)] group-hover:text-[var(--color-text)] transition-colors">{{ block.settings.title | default: "Category" }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<style>
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+{% schema %}
+{
+  "name": "Category Circles",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Category"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Circles",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

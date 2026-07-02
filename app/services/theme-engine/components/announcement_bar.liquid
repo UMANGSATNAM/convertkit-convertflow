@@ -1,0 +1,552 @@
+{%- comment -%}
+  announcement_bar.liquid — Ultra-Comprehensive Rotating Promotional Ticker Bar
+  
+  DESIGN PHILOSOPHY:
+  An ultra-premium, interactive top notification bar designed to maximize store announcements.
+  Features automated vertical message rotation with pause-on-hover, click-to-copy discount
+  coupon codes with instant toast feedback, live flash sale countdown timer, utility links,
+  and a persistent dismiss button saved to localStorage. Engineered for zero layout shift.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --ab-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --ab-text: {{ section.settings.text_color | default: '#f8fafc' }};
+    --ab-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --ab-border: color-mix(in srgb, var(--ab-text) 12%, transparent);
+    --ab-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --ab-height: {{ section.settings.bar_height | default: 44 }}px;
+  }
+
+  .ab-section {
+    background-color: var(--ab-bg);
+    color: var(--ab-text);
+    font-family: var(--ab-font);
+    border-bottom: 1px solid var(--ab-border);
+    position: relative;
+    z-index: 1000;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 100px;
+    overflow: hidden;
+  }
+  .ab-section[data-dismissed="true"] {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-bottom: none;
+  }
+
+  .ab-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    min-height: var(--ab-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Utility Left / Right Columns (Desktop Only) */
+  .ab-col {
+    display: none;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  @media (min-width: 1024px) {
+    .ab-col {
+      display: flex;
+      flex: 1;
+    }
+    .ab-col.right {
+      justify-content: flex-end;
+    }
+  }
+  .ab-link {
+    color: color-mix(in srgb, var(--ab-text) 80%, transparent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ab-link:hover {
+    color: var(--ab-accent);
+  }
+  .ab-link svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+
+  /* Rotating Ticker Center */
+  .ab-ticker-wrap {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: var(--ab-height);
+    overflow: hidden;
+  }
+  .ab-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-align: center;
+    font-size: clamp(0.78rem, 2vw, 0.88rem);
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .ab-slide[data-active="true"] {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .ab-slide[data-exit="true"] {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  /* Coupon Copy Pill */
+  .ab-coupon {
+    background: color-mix(in srgb, var(--ab-accent) 15%, transparent);
+    color: var(--ab-accent);
+    border: 1px dashed color-mix(in srgb, var(--ab-accent) 45%, transparent);
+    padding: 0.15rem 0.65rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ab-coupon:hover {
+    background: var(--ab-accent);
+    color: #000000;
+    border-style: solid;
+    transform: scale(1.05);
+  }
+  .ab-coupon svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  /* Countdown Pill */
+  .ab-timer-pill {
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 100px;
+    letter-spacing: 0.05em;
+    animation: abPulse 2s infinite;
+  }
+  @keyframes abPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
+  /* Ticker Controls & Dismiss */
+  .ab-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ab-btn {
+    background: transparent;
+    border: none;
+    color: color-mix(in srgb, var(--ab-text) 60%, transparent);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .ab-btn:hover {
+    background: color-mix(in srgb, var(--ab-text) 10%, transparent);
+    color: var(--ab-text);
+  }
+  .ab-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+  .ab-divider {
+    width: 1px;
+    height: 14px;
+    background: var(--ab-border);
+    margin: 0 0.25rem;
+  }
+
+  /* Toast Notification */
+  .ab-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ab-accent);
+    color: #000000;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+  .ab-toast[data-show="true"] {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+</style>
+
+<section class="ab-section" id="ab-section-{{ section.id }}" aria-label="Store Announcement Ticker">
+  <div class="ab-container">
+    
+    <!-- Left Utility Column -->
+    <div class="ab-col left">
+      {%- if section.settings.show_support_link -%}
+        <a href="/pages/contact" class="ab-link">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path></svg>
+          <span>24/7 Support Care</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.show_tracking_link -%}
+        <a href="/pages/track-order" class="ab-link">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Track Order</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <!-- Rotating Ticker Center -->
+    <div class="ab-ticker-wrap" id="ab-ticker-{{ section.id }}" data-speed="{{ section.settings.rotation_speed | default: 5 }}000">
+      {%- for block in section.blocks -%}
+        <div class="ab-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}" {% if forloop.first %}data-active="true"{% endif %} {{ block.shopify_attributes }}>
+          
+          {%- if block.settings.icon == 'fire' -%}
+            <span style="color:#ef4444;">🔥</span>
+          {%- elsif block.settings.icon == 'shipping' -%}
+            <span>📦</span>
+          {%- elsif block.settings.icon == 'sparkle' -%}
+            <span>✨</span>
+          {%- endif -%}
+
+          <span>{{ block.settings.text }}</span>
+
+          {%- if block.settings.coupon != blank -%}
+            <button type="button" class="ab-coupon" data-copy="{{ block.settings.coupon }}" aria-label="Copy promo code {{ block.settings.coupon }}">
+              <span>{{ block.settings.coupon }}</span>
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+            </button>
+          {%- endif -%}
+
+          {%- if block.settings.show_timer -%}
+            <span class="ab-timer-pill" id="ab-timer-{{ block.id }}">03:59:59</span>
+          {%- endif -%}
+
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <!-- Right Utility & Dismiss -->
+    <div class="ab-col right">
+      <div class="ab-controls">
+        {%- if section.blocks.size > 1 -%}
+          <button type="button" class="ab-btn" id="ab-prev-{{ section.id }}" aria-label="Previous announcement">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button type="button" class="ab-btn" id="ab-next-{{ section.id }}" aria-label="Next announcement">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          <div class="ab-divider"></div>
+        {%- endif -%}
+
+        {%- if section.settings.show_dismiss -%}
+          <button type="button" class="ab-btn" id="ab-close-{{ section.id }}" aria-label="Dismiss announcement bar">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        {%- endif -%}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="ab-toast" id="ab-toast-{{ section.id }}">
+    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="ab-toast-text">Promo code copied to clipboard!</span>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('ab-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Check LocalStorage Dismiss State
+    var dismissKey = 'converflow_announcement_dismissed';
+    try {
+      if (localStorage.getItem(dismissKey) === 'true') {
+        sectionEl.setAttribute('data-dismissed', 'true');
+        return;
+      }
+    } catch(e) {}
+
+    // 2. Ticker Rotation Controller
+    var tickerWrap = document.getElementById('ab-ticker-' + sid);
+    if (tickerWrap) {
+      var slides = tickerWrap.querySelectorAll('.ab-slide');
+      var total = slides.length;
+      var current = 0;
+      var speed = parseInt(tickerWrap.getAttribute('data-speed'), 10) || 5000;
+      var timer = null;
+
+      function goToSlide(nextIdx) {
+        if (total <= 1) return;
+        var prev = slides[current];
+        prev.removeAttribute('data-active');
+        prev.setAttribute('data-exit', 'true');
+
+        setTimeout(function() {
+          prev.removeAttribute('data-exit');
+        }, 400);
+
+        current = (nextIdx + total) % total;
+        slides[current].setAttribute('data-active', 'true');
+      }
+
+      function startTicker() {
+        if (total <= 1) return;
+        stopTicker();
+        timer = setInterval(function() {
+          goToSlide(current + 1);
+        }, speed);
+      }
+
+      function stopTicker() {
+        if (timer) clearInterval(timer);
+      }
+
+      startTicker();
+
+      tickerWrap.addEventListener('mouseenter', stopTicker);
+      tickerWrap.addEventListener('mouseleave', startTicker);
+
+      var prevBtn = document.getElementById('ab-prev-' + sid);
+      var nextBtn = document.getElementById('ab-next-' + sid);
+      if (prevBtn) prevBtn.addEventListener('click', function() { stopTicker(); goToSlide(current - 1); startTicker(); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { stopTicker(); goToSlide(current + 1); startTicker(); });
+    }
+
+    // 3. Click-to-Copy Coupon Code Controller
+    var toastEl = document.getElementById('ab-toast-' + sid);
+    var toastText = document.getElementById('ab-toast-text');
+    var couponBtns = sectionEl.querySelectorAll('.ab-coupon');
+    couponBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var code = btn.getAttribute('data-copy');
+        if (!code) return;
+        
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(code);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = code;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+
+        if (toastText) toastText.innerText = 'Coupon code "' + code + '" copied!';
+        if (toastEl) {
+          toastEl.setAttribute('data-show', 'true');
+          setTimeout(function() {
+            toastEl.removeAttribute('data-show');
+          }, 3000);
+        }
+      });
+    });
+
+    // 4. Dismiss Button Controller
+    var closeBtn = document.getElementById('ab-close-' + sid);
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        sectionEl.setAttribute('data-dismissed', 'true');
+        try {
+          localStorage.setItem(dismissKey, 'true');
+          // Auto reset after 24 hours
+          setTimeout(function() {
+            localStorage.removeItem(dismissKey);
+          }, 86400000);
+        } catch(e) {}
+      });
+    }
+
+    // 5. Live Countdown Timer Loop for slides
+    var timerPills = sectionEl.querySelectorAll('.ab-timer-pill');
+    if (timerPills.length > 0) {
+      var secLeft = 4 * 3600; // 4 hours default
+      setInterval(function() {
+        if (secLeft <= 0) secLeft = 4 * 3600;
+        var h = Math.floor(secLeft / 3600);
+        var m = Math.floor((secLeft % 3600) / 60);
+        var s = secLeft % 60;
+        var str = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        timerPills.forEach(function(p) { p.innerText = str; });
+        secLeft--;
+      }, 1000);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement Bar Ticker",
+  "tag": "section",
+  "class": "section-announcement-bar",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Bar Background Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / Coupon Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Bar Height (px)",
+      "min": 36,
+      "max": 60,
+      "step": 2,
+      "default": 44
+    },
+    {
+      "type": "header",
+      "content": "Ticker & Controls"
+    },
+    {
+      "type": "range",
+      "id": "rotation_speed",
+      "label": "Rotation Interval (Seconds)",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dismiss",
+      "label": "Show Dismiss / Close Button (Saved to localStorage)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_support_link",
+      "label": "Show 24/7 Support Link (Desktop)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tracking_link",
+      "label": "Show Order Tracking Link (Desktop)",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement Slide",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Prefix Icon",
+          "options": [
+            { "value": "none", "label": "No Icon" },
+            { "value": "fire", "label": "🔥 Fire / Hot Deal" },
+            { "value": "shipping", "label": "📦 Package / Shipping" },
+            { "value": "sparkle", "label": "✨ Sparkles / VIP" }
+          ],
+          "default": "fire"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Announcement Text",
+          "default": "Free Worldwide Express Shipping on Orders Over $100!"
+        },
+        {
+          "type": "text",
+          "id": "coupon",
+          "label": "Click-to-Copy Promo Code (Optional)",
+          "default": "VIPSAVE20"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_timer",
+          "label": "Show Live Countdown Timer Badge",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar Ticker",
+      "blocks": [
+        { "type": "announcement", "settings": { "icon": "fire", "text": "Flash Sale: Enjoy an Extra 20% Off Storewide with Code", "coupon": "FLASH20", "show_timer": true } },
+        { "type": "announcement", "settings": { "icon": "shipping", "text": "Free Priority CO2-Neutral Delivery on All Orders Over $75", "coupon": "", "show_timer": false } },
+        { "type": "announcement", "settings": { "icon": "sparkle", "text": "Join Our Exclusive VIP Rewards Club for Instant 15% Cash Back", "coupon": "VIPCLUB", "show_timer": false } }
+      ]
+    }
+  ]
+}
+{% endschema %}

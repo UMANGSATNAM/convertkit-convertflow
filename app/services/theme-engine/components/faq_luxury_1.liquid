@@ -1,0 +1,215 @@
+{%- comment -%}
+  faq_luxury_1.liquid — Luxury FAQ
+  
+  Refined accordion with serif heading, editorial spacing.
+  Elegant open/close animation with plus→minus icon.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --lxfq-bg: var(--color-surface, var(--color-background, #faf9f7));
+    --lxfq-text: var(--color-text, #1a1a1a);
+    --lxfq-muted: color-mix(in srgb, var(--lxfq-text) 45%, transparent);
+    --lxfq-border: color-mix(in srgb, var(--lxfq-text) 10%, transparent);
+    --lxfq-accent: var(--color-accent, #c9a96e);
+    --lxfq-font: var(--font-body, 'Inter', sans-serif);
+    --lxfq-font-heading: var(--font-heading, 'Playfair Display', serif);
+  }
+
+  .lx-faq {
+    background: var(--lxfq-bg);
+    padding: clamp(3.5rem, 9vw, 7rem) clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .lx-faq__inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .lx-faq__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .lx-faq__eyebrow {
+    font-family: var(--lxfq-font);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--lxfq-accent);
+    margin-bottom: 0.75rem;
+  }
+  .lx-faq__title {
+    font-family: var(--lxfq-font-heading);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 400;
+    color: var(--lxfq-text);
+    margin: 0;
+  }
+
+  .lx-faq__list {
+    border-top: 1px solid var(--lxfq-border);
+  }
+
+  .lx-faq__item {
+    border-bottom: 1px solid var(--lxfq-border);
+  }
+  .lx-faq__item summary {
+    font-family: var(--lxfq-font-heading);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--lxfq-text);
+    cursor: pointer;
+    padding: 1.5rem 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: color 0.2s ease;
+  }
+  .lx-faq__item summary::-webkit-details-marker { display: none; }
+  .lx-faq__item summary:hover {
+    color: var(--lxfq-accent);
+  }
+
+  .lx-faq__icon {
+    font-family: var(--lxfq-font);
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: var(--lxfq-muted);
+    flex-shrink: 0;
+    transition: transform 0.35s ease;
+  }
+  .lx-faq__item[open] .lx-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .lx-faq__answer {
+    font-family: var(--lxfq-font);
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--lxfq-muted);
+    padding: 0 2rem 1.5rem 0;
+  }
+
+  .lx-faq__cta {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--lxfq-border);
+  }
+  .lx-faq__cta-text {
+    font-family: var(--lxfq-font);
+    font-size: 0.8rem;
+    color: var(--lxfq-muted);
+    margin-bottom: 1rem;
+  }
+  .lx-faq__cta-btn {
+    display: inline-block;
+    font-family: var(--lxfq-font);
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--lxfq-text);
+    text-decoration: none;
+    border: 1px solid var(--lxfq-text);
+    padding: 0.8rem 2rem;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .lx-faq__cta-btn:hover {
+    background: var(--lxfq-text);
+    color: var(--lxfq-bg);
+  }
+</style>
+
+<section class="lx-faq">
+  <div class="lx-faq__inner">
+
+    <div class="lx-faq__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="lx-faq__eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      <h2 class="lx-faq__title">{{ section.settings.title | default: 'Questions & Answers' }}</h2>
+    </div>
+
+    <div class="lx-faq__list">
+      {%- for block in section.blocks -%}
+        <details class="lx-faq__item" {{ block.shopify_attributes }}>
+          <summary>
+            {{ block.settings.question }}
+            <span class="lx-faq__icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="lx-faq__answer">{{ block.settings.answer }}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_cta -%}
+      <div class="lx-faq__cta">
+        <p class="lx-faq__cta-text">{{ section.settings.cta_text | default: 'Need further assistance?' }}</p>
+        <a href="{{ section.settings.cta_url | default: '/pages/contact' }}" class="lx-faq__cta-btn">Contact Us</a>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Luxury FAQ",
+  "tag": "section",
+  "class": "section-faq-luxury",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Support"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Questions & Answers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show Contact CTA",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Need further assistance?"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "FAQ Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What materials do you use?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>We source only the finest materials, including Italian leather, Japanese denim, and ethically mined precious metals.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury FAQ",
+      "blocks": [
+        { "type": "question", "settings": { "question": "What materials do you use?", "answer": "<p>We source only the finest materials, including Italian leather, Japanese denim, and ethically mined precious metals.</p>" } },
+        { "type": "question", "settings": { "question": "What is your return policy?", "answer": "<p>We offer a 30-day complimentary return policy. Items must be in their original condition with all tags attached.</p>" } },
+        { "type": "question", "settings": { "question": "Do you offer gift wrapping?", "answer": "<p>Yes, all orders can be beautifully gift-wrapped in our signature packaging at no additional charge.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,147 @@
+<div class="hero-slider relative w-full h-[80vh] min-h-[600px] overflow-hidden group">
+  <!-- Slides Container -->
+  <div class="slides-wrapper flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.7,0,0.3,1)]">
+    {%- for block in section.blocks -%}
+      <div class="slide flex-shrink-0 w-full h-full relative" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | img_url: 'master' }}" alt="{{ block.settings.title }}" class="absolute inset-0 w-full h-full object-cover" fetchpriority="high">
+        {%- else -%}
+          <div class="absolute inset-0 w-full h-full bg-neutral-200">
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'w-full h-full object-cover opacity-50 mix-blend-multiply' }}
+          </div>
+        {%- endif -%}
+        
+        <div class="absolute inset-0 bg-[var(--color-text)]/30"></div>
+        
+        <div class="absolute inset-0 flex items-center justify-center text-center p-6">
+          <div class="max-w-3xl">
+            {%- if block.settings.subheading != blank -%}
+              <p class="text-[var(--color-background)]/80 uppercase tracking-widest text-sm font-semibold mb-4">{{ block.settings.subheading }}</p>
+            {%- endif -%}
+            
+            <h2 class="text-[var(--color-background)] text-5xl md:text-7xl font-bold mb-6">{{ block.settings.title }}</h2>
+            
+            {%- if block.settings.button_label != blank -%}
+              <a href="{{ block.settings.button_link }}" class="inline-block px-8 py-4 bg-[var(--color-background)] text-[var(--color-text)] font-bold uppercase tracking-wide hover:bg-[var(--color-text)] hover:text-[var(--color-background)] transition-all duration-300">
+                {{ block.settings.button_label }}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="slide flex-shrink-0 w-full h-full relative bg-neutral-900 flex items-center justify-center">
+        <h2 class="text-[var(--color-background)] text-4xl">Add slides in theme editor</h2>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <!-- Controls -->
+  {%- if section.blocks.size > 1 -%}
+    <button class="slider-prev absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[var(--color-background)]/10 hover:bg-[var(--color-background)] text-transparent hover:text-[var(--color-text)] rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 border border-white/20">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <button class="slider-next absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[var(--color-background)]/10 hover:bg-[var(--color-background)] text-transparent hover:text-[var(--color-text)] rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 border border-white/20">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+    
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+      {%- for block in section.blocks -%}
+        <button class="slider-dot w-12 h-1 bg-[var(--color-background)]/30 hover:bg-[var(--color-background)] transition-colors" data-index="{{ forloop.index0 }}"></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.querySelector('.slides-wrapper');
+  const slides = document.querySelectorAll('.slide');
+  const nextBtn = document.querySelector('.slider-next');
+  const prevBtn = document.querySelector('.slider-prev');
+  const dots = document.querySelectorAll('.slider-dot');
+  
+  if (!wrapper || slides.length <= 1) return;
+
+  let currentIdx = 0;
+  
+  const updateSlider = () => {
+    wrapper.style.transform = `translateX(-${currentIdx * 100}%)`;
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('bg-white', idx === currentIdx);
+      dot.classList.toggle('bg-white/30', idx !== currentIdx);
+    });
+  };
+
+  nextBtn?.addEventListener('click', () => {
+    currentIdx = (currentIdx + 1) % slides.length;
+    updateSlider();
+  });
+  
+  prevBtn?.addEventListener('click', () => {
+    currentIdx = (currentIdx - 1 + slides.length) % slides.length;
+    updateSlider();
+  });
+
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', () => {
+      currentIdx = idx;
+      updateSlider();
+    });
+  });
+
+  updateSlider();
+});
+</script>
+
+{% schema %}
+{
+  "name": "Fullwidth Slider",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "New Arrivals"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "SEASON 2024"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fullwidth Slider",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}

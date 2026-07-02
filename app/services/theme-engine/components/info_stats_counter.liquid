@@ -1,0 +1,578 @@
+{%- comment -%}
+  info_stats_counter.liquid — Ultra-Comprehensive Animated Statistical Counter & Audit Grid
+  
+  DESIGN PHILOSOPHY:
+  An architectural metrics display engineered to validate technical claims and precision manufacturing
+  tolerances. Features smooth requestAnimationFrame animated number incrementation triggered via
+  IntersectionObserver, hover glow card physics, and an accessible Statistical Audit Lightbox
+  Modal Dialog outlining test methodology and certification parameters.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --isc-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --isc-card-bg: {{ section.settings.card_bg_color | default: '#1e293b' }};
+    --isc-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --isc-muted: color-mix(in srgb, var(--isc-text) 65%, transparent);
+    --isc-border: color-mix(in srgb, var(--isc-text) 15%, transparent);
+    --isc-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --isc-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --isc-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --isc-padding-top: clamp(4rem, 8vw, 7rem);
+    --isc-padding-bottom: clamp(4rem, 8vw, 7rem);
+  }
+
+  .isc-section {
+    background-color: var(--isc-bg);
+    color: var(--isc-text);
+    font-family: var(--isc-font-body);
+    padding: var(--isc-padding-top) clamp(1.25rem, 4vw, 4rem) var(--isc-padding-bottom);
+    border-bottom: 1px solid var(--isc-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle Background Glow */
+  .isc-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--isc-accent) 12%, transparent) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .isc-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 5rem);
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Section Header */
+  .isc-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--isc-border);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .isc-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 680px;
+  }
+  .isc-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--isc-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .isc-eyebrow::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--isc-accent);
+  }
+  .isc-title {
+    font-family: var(--isc-font-head);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+  }
+  .isc-desc {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--isc-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .isc-audit-btn {
+    background: transparent;
+    color: var(--isc-text);
+    border: 1px solid var(--isc-border);
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.85rem 1.75rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .isc-audit-btn:hover {
+    background: var(--isc-text);
+    color: var(--isc-bg);
+    border-color: var(--isc-text);
+    transform: translateY(-2px);
+  }
+
+  /* Grid Layout */
+  .isc-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: clamp(1.25rem, 2vw, 2rem);
+  }
+  @media (min-width: 640px) {
+    .isc-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .isc-grid {
+      grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+    }
+  }
+
+  /* Stat Card */
+  .isc-card {
+    background: var(--isc-card-bg);
+    border: 1px solid var(--isc-border);
+    border-radius: 32px;
+    padding: clamp(2rem, 3.5vw, 2.75rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .isc-card:hover {
+    transform: translateY(-6px);
+    border-color: color-mix(in srgb, var(--isc-accent) 50%, transparent);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+  .isc-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .isc-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: color-mix(in srgb, var(--isc-accent) 15%, transparent);
+    color: var(--isc-accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    border: 1px solid color-mix(in srgb, var(--isc-accent) 30%, transparent);
+  }
+  .isc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--isc-text) 8%, transparent);
+    color: var(--isc-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .isc-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+
+  /* Animated Numbers */
+  .isc-number-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.2rem;
+    font-family: var(--isc-font-head);
+    font-size: clamp(2.5rem, 5vw, 3.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--isc-text);
+  }
+  .isc-prefix, .isc-suffix {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    color: var(--isc-accent);
+  }
+  .isc-label {
+    font-family: var(--isc-font-head);
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--isc-text);
+  }
+  .isc-subtext {
+    font-size: 0.9rem;
+    color: var(--isc-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Statistical Audit Lightbox Modal */
+  .isc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .isc-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .isc-modal {
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 36px;
+    max-width: 720px;
+    width: 100%;
+    padding: clamp(2.5rem, 5vw, 4rem);
+    position: relative;
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .isc-modal-overlay[data-open="true"] .isc-modal {
+    transform: scale(1);
+  }
+  .isc-modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+  }
+</style>
+
+<section class="isc-section" id="isc-section-{{ section.id }}" aria-labelledby="isc-title-{{ section.id }}">
+  <div class="isc-glow"></div>
+
+  <div class="isc-container">
+    
+    <!-- Section Header -->
+    <div class="isc-header">
+      <div class="isc-head-text">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="isc-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="isc-title-{{ section.id }}" class="isc-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="isc-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+
+      <button type="button" class="isc-audit-btn" id="isc-audit-btn-{{ section.id }}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <span>View Audit & Methodology</span>
+      </button>
+    </div>
+
+    <!-- Stat Grid -->
+    <div class="isc-grid" role="list">
+      {%- for block in section.blocks -%}
+        <div class="isc-card" role="listitem" {{ block.shopify_attributes }}>
+          
+          <div class="isc-top-row">
+            <span class="isc-pill">{{ block.settings.pill | default: 'SWISS AUDITED' }}</span>
+            <div class="isc-icon">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div>
+            <div class="isc-number-wrap">
+              {%- if block.settings.prefix != blank -%}<span class="isc-prefix">{{ block.settings.prefix }}</span>{%- endif -%}
+              <span class="isc-num" data-target="{{ block.settings.number | default: '99' }}">0</span>
+              {%- if block.settings.suffix != blank -%}<span class="isc-suffix">{{ block.settings.suffix }}</span>{%- endif -%}
+            </div>
+            
+            <h3 class="isc-label">{{ block.settings.label | default: 'CNC Tolerance Accuracy' }}</h3>
+            <p class="isc-subtext">{{ block.settings.desc | default: 'Milled from high-density aerospace grade aluminum with sub-0.01mm variance across all joints.' }}</p>
+          </div>
+
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Statistical Audit Modal -->
+  <div class="isc-modal-overlay" id="isc-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="isc-modal">
+      <button type="button" class="isc-modal-close" id="isc-modal-close-{{ section.id }}" aria-label="Close audit methodology modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span style="width:12px;height:12px;border-radius:50%;background:var(--isc-accent);"></span>
+        <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.6);">Technical Testing Registry</span>
+      </div>
+
+      <h3 style="font-family:var(--font-heading,sans-serif);font-size:2rem;margin:0;">Verification Methodology</h3>
+      <p style="font-size:1rem;line-height:1.65;color:rgba(255,255,255,0.8);margin:0;">All statistical metrics reported in our Atelier documentation are validated quarterly by third-party acoustic laboratory audits in Zürich, Switzerland.</p>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;border-top:1px solid rgba(255,255,255,0.15);padding-top:1.5rem;">
+        <div style="display:flex;gap:1rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--isc-accent);flex-shrink:0;">01</div>
+          <div>
+            <strong style="display:block;font-size:0.95rem;color:#ffffff;margin-bottom:0.2rem;">Laser Interferometry CNC Validation</strong>
+            <span style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.5;display:block;">Every unibody chassis undergoes automated 48-point optical scanning to ensure zero structural bowing or keycap misalignment.</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--isc-accent);flex-shrink:0;">02</div>
+          <div>
+            <strong style="display:block;font-size:0.95rem;color:#ffffff;margin-bottom:0.2rem;">Anechoic Chamber Acoustic Profiling</strong>
+            <span style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.5;display:block;">Sound signatures are recorded using Class-1 laboratory microphones to certify the elimination of internal case reverberation.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('isc-section-' + sid);
+    if (!sectionEl) return;
+
+    // IntersectionObserver Animated Number Counter
+    var nums = sectionEl.querySelectorAll('.isc-num');
+    var animated = false;
+
+    function animateNumbers() {
+      if (animated) return;
+      animated = true;
+
+      nums.forEach(function(el) {
+        var targetStr = el.getAttribute('data-target') || '0';
+        var isFloat = targetStr.indexOf('.') !== -1;
+        var target = parseFloat(targetStr) || 0;
+        var start = 0;
+        var duration = 2000;
+        var startTime = null;
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = Math.min((timestamp - startTime) / duration, 1);
+          var easeProgress = 1 - Math.pow(1 - progress, 3);
+          var val = start + (target - start) * easeProgress;
+
+          if (isFloat) {
+            el.innerText = val.toFixed(1);
+          } else {
+            el.innerText = Math.floor(val).toLocaleString();
+          }
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            el.innerText = isFloat ? target.toFixed(1) : target.toLocaleString();
+          }
+        }
+
+        window.requestAnimationFrame(step);
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            animateNumbers();
+            obs.disconnect();
+          }
+        });
+      }, { threshold: 0.2 });
+      obs.observe(sectionEl);
+    } else {
+      animateNumbers();
+    }
+
+    // Modal Controller
+    var modalOverlay = document.getElementById('isc-modal-' + sid);
+    var modalClose = document.getElementById('isc-modal-close-' + sid);
+    var auditBtn = document.getElementById('isc-audit-btn-' + sid);
+
+    if (modalOverlay && modalClose && auditBtn) {
+      auditBtn.addEventListener('click', function() {
+        modalOverlay.setAttribute('data-open', 'true');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Statistical Metrics Grid",
+  "tag": "section",
+  "class": "section-info-stats-counter",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#1e293b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Performance Validation"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Precision By The Numbers"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Our acoustic and structural engineering parameters are continually benchmarked against laboratory manufacturing tolerances."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistic Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "pill",
+          "label": "Badge Pill",
+          "default": "SWISS AUDITED"
+        },
+        {
+          "type": "text",
+          "id": "prefix",
+          "label": "Number Prefix (e.g. $, <, +)"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Target Number Value",
+          "default": "99.8"
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Number Suffix (e.g. %, k, ms)",
+          "default": "%"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Metric Label",
+          "default": "CNC Tolerance Accuracy"
+        },
+        {
+          "type": "textarea",
+          "id": "desc",
+          "label": "Description",
+          "default": "Milled from aerospace aluminum with sub-0.01mm variance across all seams."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Statistical Metrics Grid",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "99.8", "suffix": "%", "label": "CNC Tolerance Accuracy" } },
+        { "type": "stat", "settings": { "number": "14200", "suffix": "+", "label": "Deployed Workstations" } },
+        { "type": "stat", "settings": { "number": "0.2", "suffix": "ms", "label": "Acoustic Reverberation" } },
+        { "type": "stat", "settings": { "number": "100", "suffix": "%", "label": "Unibody Metal Chassis" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

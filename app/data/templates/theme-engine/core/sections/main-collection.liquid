@@ -1,15 +1,73 @@
 <div class="main-collection">
-  <h2>{{ collection.title }}</h2>
-  <p>Products: {{ collection.products_count }}</p>
-  <div class="product-grid">
-    {% for product in collection.products %}
-      <div class="product-item">
-        <a href="{{ product.url }}">{{ product.title }}</a>
-      </div>
-    {% endfor %}
+  <header class="collection-header">
+    <h1 class="collection-title">{{ collection.title }}</h1>
+    {% if collection.description != blank %}
+      <div class="collection-description">{{ collection.description }}</div>
+    {% endif %}
+  </header>
+
+  <div class="collection-toolbar">
+    <div class="collection-filters">
+      {% if section.settings.enable_filtering %}
+        <!-- Faceted filtering integration will go here -->
+        <span class="filter-label">Filter</span>
+      {% endif %}
+    </div>
+    <div class="collection-sorting">
+      {% if section.settings.enable_sorting %}
+        <label for="SortBy">Sort by</label>
+        <select id="SortBy" name="sort_by">
+          {% for option in collection.sort_options %}
+            <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected="selected"{% endif %}>
+              {{ option.name }}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
   </div>
+
+  {% paginate collection.products by section.settings.products_per_page %}
+    {% if collection.products.size == 0 %}
+      <div class="collection-empty">
+        <p>No products found in this collection.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn">Continue shopping</a>
+      </div>
+    {% else %}
+      <div class="collection-grid">
+        {% for product in collection.products %}
+          <div class="collection-grid-item">
+            {% render 'product-card', product: product %}
+          </div>
+        {% endfor %}
+      </div>
+      
+      {% if paginate.pages > 1 %}
+        <div class="collection-pagination">
+          {{ paginate | default_pagination }}
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endpaginate %}
 </div>
 
+<style>
+.main-collection { max-width: 1200px; margin: 0 auto; padding: 40px 20px; font-family: var(--font-body-family); }
+.collection-header { text-align: center; margin-bottom: 40px; }
+.collection-title { font-size: 36px; font-weight: 700; margin-bottom: 16px; font-family: var(--font-heading-family); color: var(--color-text); }
+.collection-description { font-size: 16px; color: #555; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+.collection-toolbar { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: 16px 0; margin-bottom: 30px; }
+.collection-sorting select { padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 14px; margin-left: 8px; background: #fff; cursor: pointer; }
+.collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 900px) { .collection-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px) { .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+.collection-empty { text-align: center; padding: 60px 0; }
+.collection-empty p { font-size: 18px; margin-bottom: 24px; color: #666; }
+.collection-empty .btn { display: inline-block; padding: 12px 24px; background: var(--color-text); color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; }
+.collection-pagination { text-align: center; margin-top: 40px; }
+.collection-pagination a, .collection-pagination span { display: inline-block; padding: 8px 16px; margin: 0 4px; border: 1px solid var(--color-border); border-radius: 4px; text-decoration: none; color: var(--color-text); }
+.collection-pagination .current { background: var(--color-text); color: #fff; border-color: var(--color-text); }
+</style>
 {% schema %}
 {
   "name": "Collection Page",

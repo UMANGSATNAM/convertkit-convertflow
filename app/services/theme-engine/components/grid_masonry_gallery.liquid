@@ -1,0 +1,724 @@
+{%- comment -%}
+  grid_masonry_gallery.liquid — Ultra-Comprehensive Dynamic Masonry & Lightbox Mosaic
+  
+  DESIGN PHILOSOPHY:
+  An architectural masonry gallery engineered for high-impact visual storytelling.
+  Features asymmetric grid spanning tiles (tall, wide, large), interactive category tab
+  filtering, floating glassmorphic captions, and an accessible Lightbox Modal Dialog with
+  full keyboard arrow navigation and high-res preview capabilities. Engineered for 60fps.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --gmg-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --gmg-card-bg: {{ section.settings.card_bg_color | default: '#1e293b' }};
+    --gmg-text: {{ section.settings.text_color | default: '#f8fafc' }};
+    --gmg-muted: color-mix(in srgb, var(--gmg-text) 65%, transparent);
+    --gmg-border: color-mix(in srgb, var(--gmg-text) 14%, transparent);
+    --gmg-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --gmg-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --gmg-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --gmg-padding-top: clamp(4rem, 8vw, 7rem);
+    --gmg-padding-bottom: clamp(4rem, 8vw, 7rem);
+    --gmg-gap: clamp(1rem, 2vw, 1.75rem);
+  }
+
+  .gmg-section {
+    background-color: var(--gmg-bg);
+    color: var(--gmg-text);
+    font-family: var(--gmg-font-body);
+    padding: var(--gmg-padding-top) clamp(1.25rem, 4vw, 4rem) var(--gmg-padding-bottom);
+    border-top: 1px solid var(--gmg-border);
+    border-bottom: 1px solid var(--gmg-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gmg-container {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* Section Header */
+  .gmg-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .gmg-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gmg-accent);
+    background: color-mix(in srgb, var(--gmg-accent) 12%, transparent);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    border: 1px solid color-mix(in srgb, var(--gmg-accent) 30%, transparent);
+  }
+  .gmg-title {
+    font-family: var(--gmg-font-head);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--gmg-text);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .gmg-desc {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--gmg-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Category Filter Tabs */
+  .gmg-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .gmg-filter-btn {
+    background: color-mix(in srgb, var(--gmg-text) 5%, transparent);
+    color: var(--gmg-text);
+    border: 1px solid var(--gmg-border);
+    border-radius: 100px;
+    padding: 0.65rem 1.4rem;
+    font-family: var(--gmg-font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .gmg-filter-btn:hover {
+    background: color-mix(in srgb, var(--gmg-text) 12%, transparent);
+    transform: translateY(-2px);
+  }
+  .gmg-filter-btn.active {
+    background: var(--gmg-accent);
+    color: #000000;
+    border-color: var(--gmg-accent);
+    box-shadow: 0 8px 20px -4px color-mix(in srgb, var(--gmg-accent) 50%, transparent);
+  }
+
+  /* Masonry Grid */
+  .gmg-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-flow: dense;
+    gap: var(--gmg-gap);
+  }
+  @media (min-width: 640px) {
+    .gmg-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .gmg-grid {
+      grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    }
+  }
+
+  /* Masonry Spanning Rules */
+  .gmg-card {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    background: var(--gmg-card-bg);
+    border: 1px solid var(--gmg-border);
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, opacity 0.3s ease;
+  }
+  .gmg-card[data-hidden="true"] {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .gmg-card[data-span="tall"] {
+      grid-row: span 2;
+      aspect-ratio: auto;
+    }
+    .gmg-card[data-span="wide"] {
+      grid-column: span 2;
+      aspect-ratio: 2 / 1;
+    }
+    .gmg-card[data-span="large"] {
+      grid-column: span 2;
+      grid-row: span 2;
+      aspect-ratio: 1 / 1;
+    }
+  }
+  .gmg-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Image Media */
+  .gmg-media {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .gmg-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gmg-card:hover .gmg-media img {
+    transform: scale(1.08);
+  }
+  .gmg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+    z-index: 2;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  .gmg-card:hover .gmg-overlay {
+    opacity: 0.95;
+  }
+
+  /* Content Overlay */
+  .gmg-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transform: translateY(12px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gmg-card:hover .gmg-content {
+    transform: translateY(0);
+  }
+  .gmg-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gmg-accent);
+  }
+  .gmg-card-title {
+    font-family: var(--gmg-font-head);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+  }
+  .gmg-card-sub {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Lightbox Icon Pill */
+  .gmg-zoom-pill {
+    margin-top: 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
+    padding: 0.5rem 1.15rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: fit-content;
+    transition: all 0.2s ease;
+  }
+  .gmg-card:hover .gmg-zoom-pill {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  /* Lightbox Gallery Modal Dialog */
+  .gmg-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vw, 3rem);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .gmg-lightbox-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .gmg-lightbox-container {
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    max-height: 85vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    background: #0f172a;
+    border: 1px solid var(--gmg-border);
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.8);
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 768px) {
+    .gmg-lightbox-container {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+  .gmg-lightbox-overlay[data-open="true"] .gmg-lightbox-container {
+    transform: scale(1);
+  }
+
+  .gmg-lightbox-media {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .gmg-lightbox-media img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .gmg-lightbox-info {
+    padding: clamp(2rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    color: #ffffff;
+    justify-content: center;
+  }
+  .gmg-lightbox-title {
+    font-family: var(--gmg-font-head);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .gmg-lightbox-desc {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Lightbox Navigation Utilities */
+  .gmg-lb-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease;
+  }
+  .gmg-lb-close:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .gmg-lb-nav {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+  }
+  .gmg-lb-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+  }
+  .gmg-lb-btn:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+</style>
+
+<section class="gmg-section" id="gmg-section-{{ section.id }}" aria-labelledby="gmg-title-{{ section.id }}">
+  <div class="gmg-container">
+    
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="gmg-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="gmg-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="gmg-title-{{ section.id }}" class="gmg-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="gmg-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Category Filter Tabs -->
+    {%- if section.settings.show_tabs -%}
+      <div class="gmg-filter-bar" id="gmg-filters-{{ section.id }}" role="tablist">
+        <button type="button" class="gmg-filter-btn active" data-filter="all" role="tab" aria-selected="true">All Mosaic</button>
+        <button type="button" class="gmg-filter-btn" data-filter="architecture" role="tab" aria-selected="false">Architecture</button>
+        <button type="button" class="gmg-filter-btn" data-filter="materials" role="tab" aria-selected="false">Materials</button>
+        <button type="button" class="gmg-filter-btn" data-filter="atelier" role="tab" aria-selected="false">Atelier Craft</button>
+      </div>
+    {%- endif -%}
+
+    <!-- Masonry Mosaic Grid -->
+    <div class="gmg-grid" id="gmg-grid-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div 
+          class="gmg-card" 
+          data-index="{{ forloop.index0 }}"
+          data-span="{{ block.settings.span | default: 'standard' }}"
+          data-category="{{ block.settings.category | default: 'architecture' }}"
+          data-title="{{ block.settings.title | escape }}"
+          data-tag="{{ block.settings.tag | escape }}"
+          data-desc="{{ block.settings.text | escape }}"
+          data-img="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 1400 }}{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          <div class="gmg-media">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 1000 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#1e293b,#0f172a,#0369a1);"></div>
+            {%- endif -%}
+          </div>
+          <div class="gmg-overlay"></div>
+
+          <div class="gmg-content">
+            {%- if block.settings.tag != blank -%}
+              <span class="gmg-tag">{{ block.settings.tag }}</span>
+            {%- endif -%}
+            <h3 class="gmg-card-title">{{ block.settings.title }}</h3>
+            <p class="gmg-card-sub">{{ block.settings.text }}</p>
+            
+            <div class="gmg-zoom-pill">
+              <span>Inspect High-Res</span>
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Lightbox Modal Dialog -->
+  <div class="gmg-lightbox-overlay" id="gmg-lightbox-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="gmg-lightbox-container">
+      <button type="button" class="gmg-lb-close" id="gmg-lb-close-{{ section.id }}" aria-label="Close lightbox">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="gmg-lightbox-media">
+        <img src="" id="gmg-lb-img" alt="Lightbox Zoom" style="display:none;">
+      </div>
+
+      <div class="gmg-lightbox-info">
+        <span class="gmg-tag" id="gmg-lb-tag">Mosaic Series</span>
+        <h3 class="gmg-lightbox-title" id="gmg-lb-title">Architectural Frame</h3>
+        <p class="gmg-lightbox-desc" id="gmg-lb-desc">Detailed exploration of our material choices and design philosophy.</p>
+
+        <div class="gmg-lb-nav">
+          <button type="button" class="gmg-lb-btn" id="gmg-lb-prev-{{ section.id }}" aria-label="Previous image">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Previous</span>
+          </button>
+          <button type="button" class="gmg-lb-btn" id="gmg-lb-next-{{ section.id }}" aria-label="Next image">
+            <span>Next</span>
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('gmg-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Tab Filter Controller
+    var filterBar = document.getElementById('gmg-filters-' + sid);
+    var grid = document.getElementById('gmg-grid-' + sid);
+    if (filterBar && grid) {
+      var btns = filterBar.querySelectorAll('.gmg-filter-btn');
+      var cards = grid.querySelectorAll('.gmg-card');
+
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btns.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          var filter = btn.getAttribute('data-filter');
+          cards.forEach(function(card) {
+            var cat = card.getAttribute('data-category');
+            if (filter === 'all' || cat === filter) {
+              card.removeAttribute('data-hidden');
+            } else {
+              card.setAttribute('data-hidden', 'true');
+            }
+          });
+        });
+      });
+    }
+
+    // 2. Lightbox Modal Controller with Prev/Next Navigation
+    var lbOverlay = document.getElementById('gmg-lightbox-' + sid);
+    var lbClose = document.getElementById('gmg-lb-close-' + sid);
+    var lbPrev = document.getElementById('gmg-lb-prev-' + sid);
+    var lbNext = document.getElementById('gmg-lb-next-' + sid);
+
+    if (lbOverlay && lbClose && grid) {
+      var titleEl = document.getElementById('gmg-lb-title');
+      var tagEl = document.getElementById('gmg-lb-tag');
+      var descEl = document.getElementById('gmg-lb-desc');
+      var imgEl = document.getElementById('gmg-lb-img');
+
+      var cards = Array.from(grid.querySelectorAll('.gmg-card'));
+      var currentIndex = 0;
+
+      function updateLightbox(idx) {
+        if (idx < 0) idx = cards.length - 1;
+        if (idx >= cards.length) idx = 0;
+        currentIndex = idx;
+        var card = cards[currentIndex];
+
+        if (titleEl) titleEl.innerText = card.getAttribute('data-title') || 'Mosaic Item';
+        if (tagEl) tagEl.innerText = card.getAttribute('data-tag') || 'Gallery';
+        if (descEl) descEl.innerText = card.getAttribute('data-desc') || '';
+
+        var imgSrc = card.getAttribute('data-img');
+        if (imgEl && imgSrc && imgSrc !== 'null' && imgSrc !== '') {
+          imgEl.src = imgSrc;
+          imgEl.style.display = 'block';
+        } else if (imgEl) {
+          imgEl.style.display = 'none';
+        }
+      }
+
+      cards.forEach(function(card, idx) {
+        card.addEventListener('click', function() {
+          updateLightbox(idx);
+          lbOverlay.setAttribute('data-open', 'true');
+          lbOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      if (lbPrev) lbPrev.addEventListener('click', function() { updateLightbox(currentIndex - 1); });
+      if (lbNext) lbNext.addEventListener('click', function() { updateLightbox(currentIndex + 1); });
+
+      function closeLightbox() {
+        lbOverlay.setAttribute('data-open', 'false');
+        lbOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      lbClose.addEventListener('click', closeLightbox);
+      lbOverlay.addEventListener('click', function(e) {
+        if (e.target === lbOverlay) closeLightbox();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (lbOverlay.getAttribute('data-open') === 'true') {
+          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'ArrowLeft') updateLightbox(currentIndex - 1);
+          if (e.key === 'ArrowRight') updateLightbox(currentIndex + 1);
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Masonry Gallery Mosaic",
+  "tag": "section",
+  "class": "section-grid-masonry",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#1e293b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tabs",
+      "label": "Show Category Filter Tabs",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Curated Mosaic"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Architectural Visual Series"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Explore our asymmetric visual gallery highlighting our latest engineering achievements, bespoke atelier materials, and iconic design silhouettes."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Mosaic Gallery Tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "High-Res Photography"
+        },
+        {
+          "type": "select",
+          "id": "span",
+          "label": "Tile Span Size (Desktop)",
+          "options": [
+            { "value": "standard", "label": "Standard Square (1x1)" },
+            { "value": "tall", "label": "Tall Vertical (1x2)" },
+            { "value": "wide", "label": "Wide Horizontal (2x1)" },
+            { "value": "large", "label": "Large Feature (2x2)" }
+          ],
+          "default": "standard"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Filter Category",
+          "options": [
+            { "value": "architecture", "label": "Architecture" },
+            { "value": "materials", "label": "Materials" },
+            { "value": "atelier", "label": "Atelier Craft" }
+          ],
+          "default": "architecture"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Eyebrow Tag",
+          "default": "Series IV"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tile Title",
+          "default": "The Monolith Silhouette"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Crafted from aerospace-grade aluminum with hand-polished bevels and sustainable matte finishes."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Masonry Gallery Mosaic",
+      "blocks": [
+        { "type": "tile", "settings": { "span": "large", "category": "architecture", "tag": "Hero Feature", "title": "The Swiss Engineering Atelier", "text": "Our flagship design laboratory located in Zürich." } },
+        { "type": "tile", "settings": { "span": "tall", "category": "materials", "tag": "Raw Material", "title": "Forged Carbon Fiber", "text": "Ultralight structural composite with unique marbled grain." } },
+        { "type": "tile", "settings": { "span": "standard", "category": "atelier", "tag": "Assembly", "title": "Precision Calibration", "text": "Every unit undergoes 14 hours of continuous inspection." } },
+        { "type": "tile", "settings": { "span": "wide", "category": "architecture", "tag": "Lookbook 2026", "title": "The Obsidian Workstation", "text": "Engineered for uncompromising daily focus with modular ergonomics." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

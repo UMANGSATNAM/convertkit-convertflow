@@ -1,0 +1,131 @@
+{%- comment -%}
+  trust_minimal_1.liquid — Minimalist Typography Trust Bar
+  
+  DESIGN PHILOSOPHY:
+  Ultra-clean, borderless or fine-line typography banner.
+  No heavy icons—just refined, authoritative text statements
+  separated by delicate bullet points or vertical dividers.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mtr-bg: var(--color-background, #fff);
+    --mtr-text: var(--color-text, #222);
+    --mtr-muted: color-mix(in srgb, var(--mtr-text) 50%, transparent);
+    --mtr-border: color-mix(in srgb, var(--mtr-text) 10%, transparent);
+    --mtr-font: var(--font-body, 'Helvetica Neue', -apple-system, sans-serif);
+  }
+
+  .mtr-trust {
+    background: var(--mtr-bg);
+    padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 2rem);
+    border-top: 1px solid var(--mtr-border);
+    border-bottom: 1px solid var(--mtr-border);
+  }
+
+  .mtr-trust__list {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    list-style: none;
+    padding: 0;
+  }
+
+  .mtr-trust__item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--mtr-font);
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mtr-text);
+  }
+
+  .mtr-trust__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--mtr-muted);
+    display: inline-block;
+  }
+  
+  .mtr-trust__item:first-child .mtr-trust__dot {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .mtr-trust__dot { display: none; }
+    .mtr-trust__item {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+      padding: 0.35rem 0;
+    }
+  }
+
+  .mtr-trust__sub {
+    font-weight: 300;
+    color: var(--mtr-muted);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+</style>
+
+<section class="mtr-trust" aria-label="Brand Commitments">
+  <ul class="mtr-trust__list">
+    {%- for block in section.blocks -%}
+      <li class="mtr-trust__item" {{ block.shopify_attributes }}>
+        <span class="mtr-trust__dot" aria-hidden="true"></span>
+        <span>{{ block.settings.statement }}</span>
+        {%- if block.settings.subtext != blank -%}
+          <span class="mtr-trust__sub">— {{ block.settings.subtext }}</span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "Minimal Trust Bar",
+  "tag": "section",
+  "class": "section-trust-minimal",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "claim",
+      "name": "Trust Statement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "statement",
+          "label": "Statement",
+          "default": "100% Organic Materials"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtext (Optional)",
+          "default": "Certified GOTS"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal Trust Bar",
+      "blocks": [
+        { "type": "claim", "settings": { "statement": "Complimentary Shipping", "subtext": "On orders over $100" } },
+        { "type": "claim", "settings": { "statement": "Consciously Crafted", "subtext": "Ethical production" } },
+        { "type": "claim", "settings": { "statement": "30-Day Returns", "subtext": "Hassle-free guarantee" } },
+        { "type": "claim", "settings": { "statement": "Carbon Neutral", "subtext": "100% offset" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

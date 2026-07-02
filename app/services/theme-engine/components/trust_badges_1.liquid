@@ -1,0 +1,180 @@
+{%- comment -%}
+  trust_badges_1.liquid — Universal Value Proposition Badges
+  
+  DESIGN PHILOSOPHY:
+  Clean, highly legible trust icon row. Instant reassurance for
+  shipping, returns, secure payment, and customer support.
+  Designed to sit below hero banners or above footer.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --trb-bg: var(--color-surface, var(--color-background, #fdfdfd));
+    --trb-text: var(--color-text, #1e1e1e);
+    --trb-muted: color-mix(in srgb, var(--trb-text) 55%, transparent);
+    --trb-border: color-mix(in srgb, var(--trb-text) 8%, transparent);
+    --trb-accent: var(--color-accent, #2563eb);
+    --trb-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+  }
+
+  .trb-badges {
+    background: var(--trb-bg);
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
+    border-top: 1px solid var(--trb-border);
+    border-bottom: 1px solid var(--trb-border);
+  }
+
+  .trb-badges__inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  @media (min-width: 768px) {
+    .trb-badges__inner {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .trb-badges__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    border-radius: var(--radius-card, 12px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
+  }
+  .trb-badges__item:hover {
+    transform: translateY(-4px);
+    background-color: color-mix(in srgb, var(--trb-text) 3%, transparent);
+  }
+
+  .trb-badges__icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--trb-accent) 10%, transparent);
+    color: var(--trb-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.35rem;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  .trb-badges__item:hover .trb-badges__icon-wrap {
+    transform: scale(1.08);
+    background: color-mix(in srgb, var(--trb-accent) 18%, transparent);
+  }
+
+  .trb-badges__icon-wrap svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.75;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .trb-badges__title {
+    font-family: var(--trb-font);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--trb-text);
+    margin: 0 0 0.35rem 0;
+    line-height: 1.3;
+  }
+
+  .trb-badges__desc {
+    font-family: var(--trb-font);
+    font-size: 0.8rem;
+    color: var(--trb-muted);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 240px;
+  }
+</style>
+
+<section class="trb-badges" aria-label="Why Shop With Us">
+  <div class="trb-badges__inner">
+    {%- for block in section.blocks -%}
+      <div class="trb-badges__item" {{ block.shopify_attributes }}>
+        <div class="trb-badges__icon-wrap" aria-hidden="true">
+          {%- case block.settings.icon -%}
+            {%- when 'shipping' -%}
+              <svg viewBox="0 0 24 24"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+            {%- when 'return' -%}
+              <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            {%- when 'secure' -%}
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            {%- when 'support' -%}
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            {%- when 'quality' -%}
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {%- else -%}
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          {%- endcase -%}
+        </div>
+        <h3 class="trb-badges__title">{{ block.settings.title }}</h3>
+        <p class="trb-badges__desc">{{ block.settings.description }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Trust Badges",
+  "tag": "section",
+  "class": "section-trust-badges",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Trust Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shipping", "label": "Free Shipping" },
+            { "value": "return", "label": "Easy Returns" },
+            { "value": "secure", "label": "Secure Checkout" },
+            { "value": "support", "label": "24/7 Support" },
+            { "value": "quality", "label": "Quality Guarantee" },
+            { "value": "check", "label": "Checkmark" }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Global Shipping"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "On all orders over $100 with tracked express delivery."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust Badges",
+      "blocks": [
+        { "type": "badge", "settings": { "icon": "shipping", "title": "Free Global Shipping", "description": "Complimentary tracked shipping on all orders over $100." } },
+        { "type": "badge", "settings": { "icon": "return", "title": "30-Day Easy Returns", "description": "Hassle-free return policy with pre-paid return shipping labels." } },
+        { "type": "badge", "settings": { "icon": "secure", "title": "100% Secure Checkout", "description": "Bank-level 256-bit SSL encryption to protect your data." } },
+        { "type": "badge", "settings": { "icon": "support", "title": "Dedicated Support", "description": "Our expert customer service team is available 7 days a week." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

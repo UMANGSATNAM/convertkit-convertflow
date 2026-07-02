@@ -1,0 +1,138 @@
+{%- comment -%}
+  urgency_cart_timer.liquid — Cart Reservation Countdown Timer
+  
+  DESIGN PHILOSOPHY:
+  Urgency driver for carts or checkout drawers. Assures user their
+  items are held temporarily, reducing cart abandonment.
+  Includes vanilla JS timer with sessionStorage persistence.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --uct-bg: var(--color-surface, #fffbeb);
+    --uct-text: var(--color-text, #92400e);
+    --uct-accent: var(--color-accent, #d97706);
+    --uct-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+  }
+
+  .uct-banner {
+    background: var(--uct-bg);
+    border: 1px solid color-mix(in srgb, var(--uct-accent) 30%, transparent);
+    border-radius: var(--radius-card, 8px);
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--uct-font);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--uct-text);
+    text-align: center;
+  }
+
+  .uct-icon {
+    display: flex;
+    align-items: center;
+    color: var(--uct-accent);
+  }
+  .uct-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .uct-timer-clock {
+    font-weight: 700;
+    color: var(--uct-accent);
+    font-variant-numeric: tabular-nums;
+    background: color-mix(in srgb, var(--uct-accent) 15%, transparent);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+  }
+</style>
+
+<div class="uct-banner" id="uct-banner-{{ section.id }}" role="timer" aria-live="off">
+  <span class="uct-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  </span>
+  <span>
+    {{ section.settings.message | default: 'An item in your cart is in high demand. Reserved for:' }}
+    <span class="uct-timer-clock" id="uct-clock-{{ section.id }}">10:00</span>
+  </span>
+</div>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var el = document.getElementById('uct-clock-' + sid);
+    if (!el) return;
+    
+    var duration = {{ section.settings.duration_minutes | default: 10 }} * 60;
+    var storageKey = 'uct_target_' + sid;
+    var target = sessionStorage.getItem(storageKey);
+    
+    if (!target || isNaN(target)) {
+      target = Date.now() + (duration * 1000);
+      sessionStorage.setItem(storageKey, target);
+    } else {
+      target = parseInt(target, 10);
+    }
+    
+    function updateClock() {
+      var now = Date.now();
+      var diff = Math.max(0, Math.round((target - now) / 1000));
+      
+      if (diff === 0) {
+        el.textContent = "00:00";
+        var banner = document.getElementById('uct-banner-' + sid);
+        if (banner) {
+          banner.style.opacity = '0.7';
+          banner.innerHTML = '<span>⏳ Reservation expired. Complete order now before stock runs out!</span>';
+        }
+        return;
+      }
+      
+      var m = Math.floor(diff / 60);
+      var s = diff % 60;
+      el.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+      requestAnimationFrame(function() {
+        setTimeout(updateClock, 1000);
+      });
+    }
+    
+    updateClock();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cart Reservation Timer",
+  "tag": "section",
+  "class": "section-urgency-cart-timer",
+  "settings": [
+    {
+      "type": "number",
+      "id": "duration_minutes",
+      "label": "Reservation Duration (Minutes)",
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Message Text",
+      "default": "An item in your cart is in high demand. Reserved for:"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart Reservation Timer"
+    }
+  ]
+}
+{% endschema %}

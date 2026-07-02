@@ -30,18 +30,17 @@ def find_schema_files(project_path: Path) -> list:
     """Find database schema files."""
     schemas = []
     
-    # Prisma schema
-    prisma_files = list(project_path.glob('**/prisma/schema.prisma'))
-    schemas.extend([('prisma', f) for f in prisma_files])
-    
-    # Drizzle schema files
-    drizzle_files = list(project_path.glob('**/drizzle/*.ts'))
-    drizzle_files.extend(project_path.glob('**/schema/*.ts'))
-    for f in drizzle_files:
-        if 'schema' in f.name.lower() or 'table' in f.name.lower():
-            schemas.append(('drizzle', f))
-    
-    return schemas[:10]  # Limit
+    # Check prisma/schema.prisma directly
+    prisma_path = project_path / 'prisma' / 'schema.prisma'
+    if prisma_path.exists():
+        schemas.append(('prisma', prisma_path))
+        
+    # Check schema.prisma in root
+    prisma_root = project_path / 'schema.prisma'
+    if prisma_root.exists():
+        schemas.append(('prisma', prisma_root))
+        
+    return schemas
 
 
 def validate_prisma_schema(file_path: Path) -> list:

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { composeThemeFromBlueprint } from '../app/services/theme-engine/composer.server';
+import { composeThemeFromBlueprint } from '../app/services/theme-engine/compiler.server';
 import { ValidationError } from '../app/services/theme-engine/validators.server';
 import * as fs from 'fs/promises';
 import * as path from 'path';

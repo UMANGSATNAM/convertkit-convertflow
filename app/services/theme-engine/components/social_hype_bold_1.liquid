@@ -1,0 +1,263 @@
+{%- comment -%}
+  social_hype_bold_1.liquid — Bold Social Hype Bar
+  
+  "As seen on" scrolling marquee with social proof counts.
+  Creates FOMO and community belonging. 
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --shb-bg: var(--color-text, #0a0a0a);
+    --shb-text: var(--color-background, #fff);
+    --shb-accent: var(--color-accent, #ff3c00);
+    --shb-muted: color-mix(in srgb, var(--shb-text) 50%, transparent);
+    --shb-font: var(--font-body, 'Roboto Mono', monospace);
+    --shb-font-heading: var(--font-heading, 'Anton', sans-serif);
+  }
+
+  .bd-social-hype {
+    background: var(--shb-bg);
+    padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 4vw, 3rem);
+    overflow: hidden;
+    border-top: 3px solid var(--shb-accent);
+    border-bottom: 3px solid var(--shb-accent);
+  }
+
+  .bd-social-hype__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  /* Heading */
+  .bd-social-hype__heading {
+    font-family: var(--shb-font-heading);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    text-transform: uppercase;
+    color: var(--shb-text);
+    margin: 0 0 2rem 0;
+  }
+  .bd-social-hype__heading span {
+    color: var(--shb-accent);
+  }
+
+  /* Stats row */
+  .bd-social-hype__stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .bd-social-hype__stat {
+    text-align: center;
+    min-width: 100px;
+  }
+  .bd-social-hype__stat-num {
+    font-family: var(--shb-font-heading);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--shb-accent);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .bd-social-hype__stat-label {
+    font-family: var(--shb-font);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--shb-muted);
+  }
+
+  /* Scrolling marquee */
+  .bd-social-hype__marquee-track {
+    display: flex;
+    animation: shb-scroll 30s linear infinite;
+    width: max-content;
+  }
+  .bd-social-hype__marquee-item {
+    font-family: var(--shb-font);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--shb-muted);
+    white-space: nowrap;
+    padding: 0 2rem;
+  }
+  .bd-social-hype__marquee-item .shb-dot {
+    color: var(--shb-accent);
+    margin: 0 0.5rem;
+  }
+
+  @keyframes shb-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* CTA Row */
+  .bd-social-hype__cta {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .bd-social-hype__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--shb-font);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--shb-bg);
+    background: var(--shb-text);
+    text-decoration: none;
+    padding: 0.65rem 1.5rem;
+    border: 2px solid var(--shb-text);
+    transition: background 0.2s, color 0.2s;
+  }
+  .bd-social-hype__cta-btn:hover {
+    background: transparent;
+    color: var(--shb-text);
+  }
+  .bd-social-hype__cta-btn--accent {
+    background: var(--shb-accent);
+    border-color: var(--shb-accent);
+    color: var(--shb-bg);
+  }
+  .bd-social-hype__cta-btn--accent:hover {
+    background: transparent;
+    color: var(--shb-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bd-social-hype__marquee-track { animation: none; }
+  }
+</style>
+
+<section class="bd-social-hype">
+  <div class="bd-social-hype__inner">
+
+    <h2 class="bd-social-hype__heading">
+      {{ section.settings.heading_before | default: 'Join the' }}
+      <span>{{ section.settings.heading_accent | default: 'Movement' }}</span>
+    </h2>
+
+    <div class="bd-social-hype__stats">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'stat' -%}
+          <div class="bd-social-hype__stat" {{ block.shopify_attributes }}>
+            <div class="bd-social-hype__stat-num">{{ block.settings.number }}</div>
+            <div class="bd-social-hype__stat-label">{{ block.settings.label }}</div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.marquee_text != blank -%}
+      <div style="overflow: hidden;">
+        <div class="bd-social-hype__marquee-track">
+          {%- assign marquee_items = section.settings.marquee_text | split: '|' -%}
+          {%- for i in (1..2) -%}
+            {%- for item in marquee_items -%}
+              <span class="bd-social-hype__marquee-item">
+                <span class="shb-dot">●</span> {{ item | strip }}
+              </span>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="bd-social-hype__cta">
+      {%- if section.settings.cta1_text != blank -%}
+        <a href="{{ section.settings.cta1_url | default: '/collections/all' }}" class="bd-social-hype__cta-btn bd-social-hype__cta-btn--accent">
+          {{ section.settings.cta1_text }}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.cta2_text != blank -%}
+        <a href="{{ section.settings.cta2_url | default: '#' }}" class="bd-social-hype__cta-btn">
+          {{ section.settings.cta2_text }}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bold Social Hype",
+  "tag": "section",
+  "class": "section-social-hype-bold",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_before",
+      "label": "Heading (Before Accent)",
+      "default": "Join the"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading (Accent Word)",
+      "default": "Movement"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Marquee Items (pipe-separated)",
+      "default": "Free Shipping Worldwide|10K+ Happy Customers|As Seen on TikTok|Limited Drops Weekly",
+      "info": "Separate items with | character."
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta1_text",
+      "label": "Primary CTA Text",
+      "default": "Shop the Drop →"
+    },
+    {
+      "type": "url",
+      "id": "cta1_url",
+      "label": "Primary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "cta2_text",
+      "label": "Secondary CTA Text",
+      "default": "Follow @brand"
+    },
+    {
+      "type": "url",
+      "id": "cta2_url",
+      "label": "Secondary CTA Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "50K+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Community" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bold Social Hype",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "50K+", "label": "Community" } },
+        { "type": "stat", "settings": { "number": "1M+", "label": "Views on TikTok" } },
+        { "type": "stat", "settings": { "number": "98%", "label": "Would Recommend" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

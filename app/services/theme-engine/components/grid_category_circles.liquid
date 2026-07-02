@@ -1,0 +1,208 @@
+{%- comment -%}
+  grid_category_circles.liquid — Circular Category Grid / Story Bubbles
+  
+  DESIGN PHILOSOPHY:
+  Instagram-story style circular thumbnails for fast category browsing.
+  Features colorful hover rings, smooth zoom animation, and responsive
+  horizontal scrolling on mobile with clean grid alignment on desktop.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --gcc-bg: var(--color-background, #ffffff);
+    --gcc-text: var(--color-text, #18181b);
+    --gcc-muted: color-mix(in srgb, var(--gcc-text) 55%, transparent);
+    --gcc-ring: var(--color-accent, #6366f1);
+    --gcc-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --gcc-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .gcc-section {
+    background: var(--gcc-bg);
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+
+  .gcc-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .gcc-header {
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+  }
+  .gcc-title {
+    font-family: var(--gcc-font-head);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: var(--gcc-text);
+    margin: 0;
+  }
+  .gcc-desc {
+    font-family: var(--gcc-font);
+    font-size: 0.9rem;
+    color: var(--gcc-muted);
+    margin: 0.35rem 0 0 0;
+  }
+
+  .gcc-grid {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0.5rem 0.25rem 1.25rem;
+    scrollbar-width: none;
+    justify-content: flex-start;
+  }
+  @media (min-width: 768px) {
+    .gcc-grid {
+      justify-content: center;
+      flex-wrap: wrap;
+      overflow-x: visible;
+    }
+  }
+  .gcc-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gcc-item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--gcc-text);
+    width: clamp(84px, 14vw, 120px);
+  }
+
+  .gcc-circle-wrap {
+    width: clamp(76px, 13vw, 110px);
+    height: clamp(76px, 13vw, 110px);
+    border-radius: 50%;
+    padding: 3px;
+    background: color-mix(in srgb, var(--gcc-text) 15%, transparent);
+    transition: background 0.3s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    margin-bottom: 0.6rem;
+  }
+  .gcc-item:hover .gcc-circle-wrap {
+    background: linear-gradient(45deg, var(--gcc-ring), color-mix(in srgb, var(--gcc-ring) 50%, #ec4899));
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 12px 24px -8px color-mix(in srgb, var(--gcc-ring) 35%, transparent);
+  }
+
+  .gcc-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--gcc-bg);
+    border: 3px solid var(--gcc-bg);
+  }
+  .gcc-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .gcc-item:hover .gcc-circle img {
+    transform: scale(1.1);
+  }
+
+  .gcc-label {
+    font-family: var(--gcc-font);
+    font-size: clamp(0.75rem, 1.3vw, 0.88rem);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+</style>
+
+<section class="gcc-section" aria-labelledby="gcc-title-{{ section.id }}">
+  <div class="gcc-inner">
+    {%- if section.settings.title != blank or section.settings.description != blank -%}
+      <div class="gcc-header">
+        {%- if section.settings.title != blank -%}
+          <h2 id="gcc-title-{{ section.id }}" class="gcc-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank -%}
+          <p class="gcc-desc">{{ section.settings.description }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="gcc-grid">
+      {%- for block in section.blocks -%}
+        {%- assign coll = collections[block.settings.collection] -%}
+        <a href="{{ block.settings.url | default: coll.url | default: '#' }}" class="gcc-item" {{ block.shopify_attributes }}>
+          <div class="gcc-circle-wrap">
+            <div class="gcc-circle">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.title }}
+              {%- elsif coll.image != blank -%}
+                {{ coll.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: coll.title }}
+              {%- else -%}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--gcc-muted); font-size: 0.65rem;">
+                  {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+          <span class="gcc-label">{{ block.settings.title | default: coll.title | default: 'Category' }}</span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Circular Category Grid",
+  "tag": "section",
+  "class": "section-grid-circles",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Explore by Category"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Subtitle / Description",
+      "default": "Quick links to our most popular collections and seasonal edits."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "circle",
+      "name": "Category Bubble",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Shopify Collection" },
+        { "type": "image_picker", "id": "image", "label": "Custom Image (Override)" },
+        { "type": "text", "id": "title", "label": "Label Text (Override)", "default": "Sneakers" },
+        { "type": "url", "id": "url", "label": "Custom URL (Override)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Circular Category Grid",
+      "blocks": [
+        { "type": "circle", "settings": { "title": "New Drops" } },
+        { "type": "circle", "settings": { "title": "Outerwear" } },
+        { "type": "circle", "settings": { "title": "Footwear" } },
+        { "type": "circle", "settings": { "title": "Accessories" } },
+        { "type": "circle", "settings": { "title": "Best Sellers" } },
+        { "type": "circle", "settings": { "title": "Sale" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,85 @@
+<div class="sf-ig-shop sf-ig-{{ section.id }}">
+  <div class="sf-ig-header">
+    <h2>{{ section.settings.title }}</h2>
+    <p>{{ section.settings.subtitle }}</p>
+    {% if section.settings.handle != blank %}
+      <a href="https://instagram.com/{{ section.settings.handle | remove: '@' }}" target="_blank" class="sf-ig-handle">{{ section.settings.handle }}</a>
+    {% endif %}
+  </div>
+  
+  <div class="sf-ig-grid">
+    {% for block in section.blocks %}
+      <div class="sf-ig-item">
+        <div class="sf-ig-img-wrap">
+          {% if block.settings.image != blank %}
+            <img src="{{ block.settings.image | img_url: '400x400', crop: 'center' }}" alt="IG Image" loading="lazy">
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'sf-placeholder' }}
+          {% endif %}
+          <div class="sf-ig-overlay">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </div>
+        </div>
+        {% if block.settings.product != blank %}
+          {% assign ig_prod = all_products[block.settings.product] %}
+          <div class="sf-ig-product">
+            <img src="{{ ig_prod.featured_image | img_url: '50x50', crop: 'center' }}" alt="{{ ig_prod.title }}" loading="lazy">
+            <div class="sf-ig-product-info">
+              <span>{{ ig_prod.title }}</span>
+              <small>{{ ig_prod.price | money }}</small>
+            </div>
+            <a href="{{ ig_prod.url }}" class="sf-ig-buy">Buy</a>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .sf-ig-{{ section.id }} { padding: 4rem 1rem; max-width: 1400px; margin: 0 auto; text-align: center; }
+  .sf-ig-header { margin-bottom: 3rem; }
+  .sf-ig-header h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+  .sf-ig-header p { font-size: 1.1rem; opacity: 0.7; margin-bottom: 1rem; }
+  .sf-ig-handle { font-weight: bold; text-decoration: none; display: inline-block; padding: 8px 16px; background: var(--color-surface); border-radius: 50px; color: var(--color-text); }
+  
+  .sf-ig-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  @media (min-width: 768px) { .sf-ig-grid { grid-template-columns: repeat(4, 1fr); gap: 2rem; } }
+  
+  .sf-ig-item { display: flex; flex-direction: column; gap: 1rem; }
+  .sf-ig-img-wrap { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+  .sf-ig-img-wrap img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+  .sf-ig-overlay { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-text) 40%, transparent); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; color: white; }
+  .sf-ig-overlay svg { width: 32px; height: 32px; fill: currentColor; }
+  .sf-ig-item:hover .sf-ig-img-wrap img { transform: scale(1.05); }
+  .sf-ig-item:hover .sf-ig-overlay { opacity: 1; }
+  
+  .sf-ig-product { display: flex; align-items: center; gap: 10px; background: var(--color-background); padding: 8px; border-radius: 8px; box-shadow: 0 4px 10px color-mix(in srgb, var(--color-text) 5%, transparent); border: 1px solid var(--color-surface); text-align: left; }
+  .sf-ig-product img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+  .sf-ig-product-info { flex: 1; display: flex; flex-direction: column; }
+  .sf-ig-product-info span { font-size: 0.8rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+  .sf-ig-product-info small { font-size: 0.8rem; color: var(--color-text-secondary); }
+  .sf-ig-buy { background: var(--color-text); color: var(--color-background); font-size: 0.7rem; font-weight: bold; text-transform: uppercase; padding: 6px 12px; border-radius: 4px; text-decoration: none; }
+</style>
+
+{% schema %}
+{
+  "name": "Instagram Shop Grid",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Shop Our Instagram" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Tag us to be featured" },
+    { "type": "text", "id": "handle", "label": "Instagram Handle", "default": "@yourbrand" }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "post", "name": "IG Post",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Post Image" },
+        { "type": "product", "id": "product", "label": "Linked Product" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Instagram Shop Grid", "category": "Image" } ]
+}
+{% endschema %}

@@ -1,0 +1,205 @@
+{%- comment -%}
+  trust_modern_1.liquid — Modern Tech / Security Assurance Grid
+  
+  DESIGN PHILOSOPHY:
+  Sleek dark-mode ready glassmorphic cards with subtle gradient accents
+  and high-contrast typography. Highlights payment security, speed,
+  and satisfaction guarantees for tech-forward brands.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mdt-bg: var(--color-background, #0b0f19);
+    --mdt-card: color-mix(in srgb, var(--color-text, #fff) 4%, transparent);
+    --mdt-text: var(--color-text, #f1f5f9);
+    --mdt-muted: color-mix(in srgb, var(--mdt-text) 50%, transparent);
+    --mdt-border: color-mix(in srgb, var(--mdt-text) 10%, transparent);
+    --mdt-accent: var(--color-accent, #6366f1);
+    --mdt-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --mdt-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .mdt-section {
+    background: var(--mdt-bg);
+    padding: clamp(3rem, 7vw, 5.5rem) clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .mdt-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .mdt-header {
+    text-align: center;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+  .mdt-eyebrow {
+    font-family: var(--mdt-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--mdt-accent);
+    margin-bottom: 0.5rem;
+  }
+  .mdt-title {
+    font-family: var(--mdt-font-head);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--mdt-text);
+    margin: 0;
+  }
+
+  .mdt-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .mdt-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .mdt-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .mdt-card {
+    background: var(--mdt-card);
+    border: 1px solid var(--mdt-border);
+    border-radius: var(--radius-card, 16px);
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .mdt-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--mdt-accent) 50%, transparent);
+  }
+
+  .mdt-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--mdt-accent), transparent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .mdt-card:hover::before {
+    opacity: 1;
+  }
+
+  .mdt-stat {
+    font-family: var(--mdt-font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--mdt-text);
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--mdt-text), color-mix(in srgb, var(--mdt-text) 50%, var(--mdt-accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .mdt-card-title {
+    font-family: var(--mdt-font-head);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mdt-text);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .mdt-card-desc {
+    font-family: var(--mdt-font);
+    font-size: 0.85rem;
+    color: var(--mdt-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<section class="mdt-section" aria-labelledby="mdt-title-{{ section.id }}">
+  <div class="mdt-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="mdt-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="mdt-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="mdt-title-{{ section.id }}" class="mdt-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="mdt-grid">
+      {%- for block in section.blocks -%}
+        <div class="mdt-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.stat != blank -%}
+            <div class="mdt-stat">{{ block.settings.stat }}</div>
+          {%- endif -%}
+          <h3 class="mdt-card-title">{{ block.settings.title }}</h3>
+          <p class="mdt-card-desc">{{ block.settings.description }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Modern Security Grid",
+  "tag": "section",
+  "class": "section-trust-modern",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Peace of Mind"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Enterprise-Grade Reliability"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Assurance Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "stat",
+          "label": "Highlight / Stat",
+          "default": "256-Bit"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Encrypted Checkout"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "All transactions are secured with military-grade encryption and tokenization."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Security Grid",
+      "blocks": [
+        { "type": "card", "settings": { "stat": "99.9%", "title": "On-Time Delivery", "description": "Powered by automated logistics and real-time package tracking." } },
+        { "type": "card", "settings": { "stat": "256-Bit", "title": "Encrypted Checkout", "description": "All transactions are secured with bank-level SSL encryption." } },
+        { "type": "card", "settings": { "stat": "30-Day", "title": "Risk-Free Trial", "description": "Not completely satisfied? Return it hassle-free for a full refund." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

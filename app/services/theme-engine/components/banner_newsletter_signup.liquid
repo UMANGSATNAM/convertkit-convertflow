@@ -1,0 +1,205 @@
+{%- comment -%}
+  banner_newsletter_signup.liquid — Newsletter & Discount Signup Banner
+  
+  DESIGN PHILOSOPHY:
+  High-conversion lead capture banner. Clean form input with high contrast
+  CTA button, customizable incentive text (e.g. 15% off), and GDPR compliance
+  microcopy. Fully responsive for mobile and desktop.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --bnn-bg: var(--color-surface, var(--color-background, #f1f5f9));
+    --bnn-text: var(--color-text, #0f172a);
+    --bnn-muted: color-mix(in srgb, var(--bnn-text) 55%, transparent);
+    --bnn-border: color-mix(in srgb, var(--bnn-text) 12%, transparent);
+    --bnn-accent: var(--color-accent, #2563eb);
+    --bnn-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --bnn-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .bnn-section {
+    background: var(--bnn-bg);
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--bnn-border);
+    border-bottom: 1px solid var(--bnn-border);
+  }
+
+  .bnn-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .bnn-eyebrow {
+    font-family: var(--bnn-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--bnn-accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .bnn-title {
+    font-family: var(--bnn-font-head);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--bnn-text);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.25;
+  }
+
+  .bnn-desc {
+    font-family: var(--bnn-font);
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    color: var(--bnn-muted);
+    margin: 0 auto 2rem;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .bnn-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  @media (min-width: 600px) {
+    .bnn-form {
+      flex-direction: row;
+    }
+  }
+
+  .bnn-input {
+    flex: 1;
+    font-family: var(--bnn-font);
+    font-size: 0.95rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-btn, 100px);
+    border: 1px solid var(--bnn-border);
+    background: #ffffff;
+    color: #000000;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .bnn-input:focus {
+    border-color: var(--bnn-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bnn-accent) 20%, transparent);
+  }
+
+  .bnn-submit {
+    font-family: var(--bnn-font);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.85rem 1.75rem;
+    border-radius: var(--radius-btn, 100px);
+    background: var(--bnn-accent);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    white-space: nowrap;
+  }
+  .bnn-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  .bnn-submit:active {
+    transform: translateY(0);
+  }
+
+  .bnn-privacy {
+    font-family: var(--bnn-font);
+    font-size: 0.75rem;
+    color: var(--bnn-muted);
+    margin-top: 1rem;
+  }
+  .bnn-privacy a {
+    color: var(--bnn-text);
+    text-decoration: underline;
+  }
+</style>
+
+<section class="bnn-section" aria-labelledby="bnn-title-{{ section.id }}">
+  <div class="bnn-inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="bnn-eyebrow">{{ section.settings.eyebrow }}</div>
+    {%- endif -%}
+    {%- if section.settings.title != blank -%}
+      <h2 id="bnn-title-{{ section.id }}" class="bnn-title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <p class="bnn-desc">{{ section.settings.description }}</p>
+    {%- endif -%}
+
+    {% form 'customer', class: 'bnn-form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input
+        type="email"
+        name="contact[email]"
+        class="bnn-input"
+        placeholder="{{ section.settings.placeholder | default: 'Enter your email address' }}"
+        required
+        aria-label="Email address"
+      >
+      <button type="submit" class="bnn-submit">{{ section.settings.button_text | default: 'Join Now' }}</button>
+    {% endform %}
+
+    {%- if section.settings.privacy_text != blank -%}
+      <div class="bnn-privacy">{{ section.settings.privacy_text }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter Banner",
+  "tag": "section",
+  "class": "section-banner-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "VIP Access"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Unlock 15% Off Your First Order"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Subscribe to our newsletter for exclusive drops, early sale access, and insider stories delivered right to your inbox."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Enter your email address"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "privacy_text",
+      "label": "Privacy Notice Microcopy",
+      "default": "By subscribing you agree to our Terms of Service. Unsubscribe anytime."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter Banner"
+    }
+  ]
+}
+{% endschema %}

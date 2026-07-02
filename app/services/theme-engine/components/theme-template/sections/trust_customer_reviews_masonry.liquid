@@ -1,0 +1,71 @@
+<div class="sf-reviews sf-crm-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-crm-container">
+    <div class="sf-crm-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-crm-masonry">
+      {% for block in section.blocks %}
+        <div class="sf-crm-item" style="background: {{ section.settings.card_bg }};">
+          <div class="sf-crm-stars" style="color: {{ section.settings.star_color }};">
+            {% for i in (1..block.settings.stars) %}★{% endfor %}
+          </div>
+          <h3 style="color: {{ section.settings.text_color }};">{{ block.settings.title }}</h3>
+          <p class="sf-crm-text" style="color: {{ section.settings.text_color }};">"{{ block.settings.text }}"</p>
+          <div class="sf-crm-author" style="color: {{ section.settings.text_color }};">
+            <strong>{{ block.settings.author }}</strong>
+            {% if block.settings.verified %}
+              <span class="sf-crm-verified" style="color: green;">✓ Verified Buyer</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-crm-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-crm-container { max-width: 1400px; margin: 0 auto; }
+  .sf-crm-header { text-align: center; margin-bottom: 4rem; }
+  .sf-crm-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  
+  .sf-crm-masonry { column-count: 1; column-gap: 2rem; }
+  @media (min-width: 768px) { .sf-crm-masonry { column-count: 2; } }
+  @media (min-width: 1024px) { .sf-crm-masonry { column-count: 3; } }
+  
+  .sf-crm-item { break-inside: avoid; margin-bottom: 2rem; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px color-mix(in srgb, var(--color-text) 5%, transparent); }
+  .sf-crm-stars { font-size: 1.2rem; margin-bottom: 1rem; letter-spacing: 2px; }
+  .sf-crm-item h3 { font-size: 1.25rem; margin-bottom: 1rem; font-weight: bold; }
+  .sf-crm-text { font-size: 1.1rem; line-height: 1.6; opacity: 0.9; margin-bottom: 1.5rem; font-style: italic; }
+  .sf-crm-author strong { display: block; margin-bottom: 0.25rem; }
+  .sf-crm-verified { font-size: 0.85rem; font-weight: bold; }
+</style>
+
+{% schema %}
+{
+  "name": "Reviews Masonry",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f9f9f9" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "color", "id": "star_color", "label": "Star Color", "default": "#FFB800" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Loved by Thousands" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Don't just take our word for it." }
+  ],
+  "blocks": [
+    {
+      "type": "review", "name": "Review",
+      "settings": [
+        { "type": "range", "id": "stars", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "title", "label": "Review Title", "default": "Best purchase ever!" },
+        { "type": "textarea", "id": "text", "label": "Review Text", "default": "I absolutely love this product. It exceeded all my expectations and the quality is unmatched." },
+        { "type": "text", "id": "author", "label": "Author", "default": "Sarah M." },
+        { "type": "checkbox", "id": "verified", "label": "Show Verified Badge", "default": true }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Reviews Masonry", "category": "Trust", "blocks": [{"type":"review"},{"type":"review"},{"type":"review"}] } ]
+}
+{% endschema %}

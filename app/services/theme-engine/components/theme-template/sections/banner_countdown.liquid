@@ -1,0 +1,79 @@
+<div class="sf-countdown sf-cd-{{ section.id }}" style="background-color: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }};">
+  <div class="sf-cd-content">
+    <h2>{{ section.settings.title }}</h2>
+    <p>{{ section.settings.subtitle }}</p>
+  </div>
+  <div class="sf-cd-timer" data-date="{{ section.settings.end_date }}">
+    <div class="sf-cd-box"><span class="days">00</span><small>Days</small></div>
+    <div class="sf-cd-box"><span class="hours">00</span><small>Hours</small></div>
+    <div class="sf-cd-box"><span class="minutes">00</span><small>Mins</small></div>
+    <div class="sf-cd-box"><span class="seconds">00</span><small>Secs</small></div>
+  </div>
+  {% if section.settings.btn_link != blank %}
+    <a href="{{ section.settings.btn_link }}" class="sf-cd-btn" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">
+      {{ section.settings.btn_label }}
+    </a>
+  {% endif %}
+</div>
+
+<style>
+  .sf-cd-{{ section.id }} {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 3rem 1rem; text-align: center; gap: 2rem;
+  }
+  .sf-cd-content h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .sf-cd-timer { display: flex; gap: 1rem; }
+  .sf-cd-box {
+    display: flex; flex-direction: column; align-items: center;
+    background: color-mix(in srgb, var(--color-text) 10%, transparent); padding: 1rem; border-radius: 8px; min-width: 80px;
+  }
+  .sf-cd-box span { font-size: 2rem; font-weight: bold; line-height: 1; }
+  .sf-cd-box small { font-size: 0.8rem; text-transform: uppercase; margin-top: 0.5rem; }
+  .sf-cd-btn { padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; text-transform: uppercase; }
+  @media (min-width: 768px) {
+    .sf-cd-{{ section.id }} { flex-direction: row; justify-content: space-around; text-align: left; }
+    .sf-cd-content h2 { font-size: 3rem; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const timerEl = document.querySelector('.sf-cd-{{ section.id }} .sf-cd-timer');
+    const endDateStr = timerEl.getAttribute('data-date');
+    if(!endDateStr) return;
+    const countDownDate = new Date(endDateStr).getTime();
+    
+    setInterval(function() {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+      if (distance < 0) return;
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      timerEl.querySelector('.days').innerText = days < 10 ? '0'+days : days;
+      timerEl.querySelector('.hours').innerText = hours < 10 ? '0'+hours : hours;
+      timerEl.querySelector('.minutes').innerText = minutes < 10 ? '0'+minutes : minutes;
+      timerEl.querySelector('.seconds').innerText = seconds < 10 ? '0'+seconds : seconds;
+    }, 1000);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Countdown Banner",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "BG", "default": "#d93025" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#ffffff" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Flash Sale!" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Ends in:" },
+    { "type": "text", "id": "end_date", "label": "End Date", "info": "Format: Jan 5, 2026 15:37:25", "default": "Dec 31, 2026 23:59:59" },
+    { "type": "text", "id": "btn_label", "label": "Button", "default": "Shop Now" },
+    { "type": "url", "id": "btn_link", "label": "Link" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#ffffff" },
+    { "type": "color", "id": "btn_text", "label": "Button Text", "default": "#d93025" }
+  ],
+  "presets": [ { "name": "Countdown Banner", "category": "Banner" } ]
+}
+{% endschema %}

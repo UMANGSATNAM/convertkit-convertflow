@@ -1,0 +1,456 @@
+{%- comment -%}
+  content_seo_breadcrumbs.liquid — Ultra-Comprehensive SEO Breadcrumb & Navigation Utility
+  
+  DESIGN PHILOSOPHY:
+  An architectural breadcrumb navigation bar engineered for structural Google SEO ranking
+  and frictionless user pathfinding. Features automatic Schema.org JSON-LD hierarchy generation,
+  interactive sibling collection dropdowns, social sharing utilities with one-click copy,
+  and accessibility font-scaling tools. Engineered for zero layout shift and rapid indexing.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --csb-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --csb-card-bg: {{ section.settings.card_bg_color | default: '#1e293b' }};
+    --csb-text: {{ section.settings.text_color | default: '#f8fafc' }};
+    --csb-muted: color-mix(in srgb, var(--csb-text) 60%, transparent);
+    --csb-border: color-mix(in srgb, var(--csb-text) 12%, transparent);
+    --csb-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --csb-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --csb-padding-top: clamp(1rem, 2vw, 1.5rem);
+    --csb-padding-bottom: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .csb-section {
+    background-color: var(--csb-bg);
+    color: var(--csb-text);
+    font-family: var(--csb-font-body);
+    padding: var(--csb-padding-top) clamp(1.25rem, 4vw, 4rem) var(--csb-padding-bottom);
+    border-bottom: 1px solid var(--csb-border);
+    position: relative;
+    z-index: 20;
+  }
+
+  .csb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Breadcrumb Trail */
+  .csb-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .csb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .csb-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--csb-muted);
+  }
+  .csb-link {
+    color: var(--csb-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .csb-link:hover {
+    color: var(--csb-text);
+  }
+  .csb-link svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+  .csb-sep {
+    color: color-mix(in srgb, var(--csb-text) 25%, transparent);
+    font-size: 0.75rem;
+    user-select: none;
+  }
+  .csb-current {
+    color: var(--csb-text);
+    font-weight: 700;
+  }
+
+  /* Interactive Dropdown Menu for Siblings */
+  .csb-dropdown-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .csb-dropdown-trigger {
+    background: transparent;
+    border: none;
+    color: var(--csb-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  .csb-dropdown-trigger:hover {
+    color: var(--csb-text);
+    background: color-mix(in srgb, var(--csb-text) 6%, transparent);
+  }
+  .csb-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: var(--csb-card-bg);
+    border: 1px solid var(--csb-border);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    min-width: 180px;
+    display: none;
+    flex-direction: column;
+    gap: 0.2rem;
+    z-index: 50;
+  }
+  .csb-dropdown-wrap[data-open="true"] .csb-dropdown-menu {
+    display: flex;
+  }
+  .csb-dropdown-item {
+    color: var(--csb-text);
+    text-decoration: none;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .csb-dropdown-item:hover {
+    background: color-mix(in srgb, var(--csb-text) 10%, transparent);
+  }
+
+  /* Right Utility Action Bar */
+  .csb-utils {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .csb-btn {
+    background: color-mix(in srgb, var(--csb-text) 5%, transparent);
+    color: var(--csb-text);
+    border: 1px solid var(--csb-border);
+    border-radius: 100px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .csb-btn:hover {
+    background: color-mix(in srgb, var(--csb-text) 12%, transparent);
+    border-color: var(--csb-accent);
+  }
+  .csb-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+
+  /* Copy Toast Notification */
+  .csb-toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--csb-accent);
+    color: #000000;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1000;
+  }
+  .csb-toast[data-show="true"] {
+    display: flex;
+    animation: csbFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes csbFadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<section class="csb-section" id="csb-section-{{ section.id }}" aria-label="Breadcrumb navigation">
+  <div class="csb-container">
+    
+    <!-- Structural Breadcrumb Trail -->
+    <nav class="csb-nav">
+      <ul class="csb-list">
+        
+        <li class="csb-item">
+          <a href="{{ routes.root_url | default: '/' }}" class="csb-link">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Home</span>
+          </a>
+        </li>
+
+        <li class="csb-sep" aria-hidden="true">/</li>
+
+        {%- if template contains 'product' -%}
+          {%- if collection -%}
+            <li class="csb-item">
+              <a href="{{ collection.url }}" class="csb-link">{{ collection.title }}</a>
+            </li>
+            <li class="csb-sep" aria-hidden="true">/</li>
+          {%- else -%}
+            <li class="csb-item">
+              <div class="csb-dropdown-wrap" id="csb-dd-{{ section.id }}">
+                <button type="button" class="csb-dropdown-trigger" id="csb-trigger-{{ section.id }}">
+                  <span>Collections</span>
+                  <svg viewBox="0 0 24 24" style="width:12px;height:12px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="csb-dropdown-menu">
+                  <a href="/collections/all" class="csb-dropdown-item">All Products</a>
+                  <a href="/collections/bestsellers" class="csb-dropdown-item">Bestsellers</a>
+                  <a href="/collections/new-arrivals" class="csb-dropdown-item">New Arrivals</a>
+                </div>
+              </div>
+            </li>
+            <li class="csb-sep" aria-hidden="true">/</li>
+          {%- endif -%}
+          <li class="csb-item csb-current" aria-current="page">{{ product.title | default: 'Architectural Monolith' }}</li>
+
+        {%- elsif template contains 'collection' -%}
+          <li class="csb-item csb-current" aria-current="page">{{ collection.title | default: 'Curated Collection' }}</li>
+
+        {%- elsif template contains 'article' -%}
+          <li class="csb-item">
+            <a href="{{ blog.url | default: '/blogs/news' }}" class="csb-link">{{ blog.title | default: 'Journal & News' }}</a>
+          </li>
+          <li class="csb-sep" aria-hidden="true">/</li>
+          <li class="csb-item csb-current" aria-current="page">{{ article.title | default: 'Engineering Dispatch' }}</li>
+
+        {%- else -%}
+          <li class="csb-item csb-current" aria-current="page">{{ page_title | default: 'Overview' }}</li>
+        {%- endif -%}
+
+      </ul>
+    </nav>
+
+    <!-- Right Side Utility Bar -->
+    {%- if section.settings.show_utilities -%}
+      <div class="csb-utils">
+        <button type="button" class="csb-btn" id="csb-copy-{{ section.id }}" aria-label="Copy page link to clipboard">
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path></svg>
+          <span>Share Link</span>
+        </button>
+
+        <button type="button" class="csb-btn" id="csb-font-{{ section.id }}" aria-label="Toggle larger font reading size">
+          <svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+          <span id="csb-font-label">Text: Standard</span>
+        </button>
+
+        <button type="button" class="csb-btn" onclick="window.print();" aria-label="Print or save document as PDF">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span>Print</span>
+        </button>
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- Schema.org JSON-LD Hierarchy Generator -->
+  {%- if section.settings.enable_schema -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ shop.url | default: 'https://example.com' }}"
+        }
+        {%- if template contains 'product' -%},
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ product.title | default: 'Product' | escape }}",
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+        {%- elsif template contains 'collection' -%},
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ collection.title | default: 'Collection' | escape }}",
+          "item": "{{ shop.url }}{{ collection.url }}"
+        }
+        {%- endif -%}
+      ]
+    }
+    </script>
+  {%- endif -%}
+
+  <!-- Copy Toast -->
+  <div class="csb-toast" id="csb-toast-{{ section.id }}" role="alert">
+    <span>✓ Page URL copied to clipboard!</span>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    
+    // 1. Dropdown Menu Controller
+    var ddWrap = document.getElementById('csb-dd-' + sid);
+    var ddTrigger = document.getElementById('csb-trigger-' + sid);
+    if (ddWrap && ddTrigger) {
+      ddTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var isOpen = ddWrap.getAttribute('data-open') === 'true';
+        ddWrap.setAttribute('data-open', !isOpen ? 'true' : 'false');
+      });
+      document.addEventListener('click', function(e) {
+        if (!ddWrap.contains(e.target)) {
+          ddWrap.setAttribute('data-open', 'false');
+        }
+      });
+    }
+
+    // 2. Share Link Copy Toast Controller
+    var copyBtn = document.getElementById('csb-copy-' + sid);
+    var toast = document.getElementById('csb-toast-' + sid);
+    if (copyBtn && toast) {
+      copyBtn.addEventListener('click', function() {
+        var url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(showToast);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = url;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast();
+        }
+      });
+
+      function showToast() {
+        toast.setAttribute('data-show', 'true');
+        setTimeout(function() {
+          toast.removeAttribute('data-show');
+        }, 3000);
+      }
+    }
+
+    // 3. Font Size Scale Adjuster
+    var fontBtn = document.getElementById('csb-font-' + sid);
+    var fontLabel = document.getElementById('csb-font-label');
+    if (fontBtn && fontLabel) {
+      var isLarge = false;
+      fontBtn.addEventListener('click', function() {
+        isLarge = !isLarge;
+        if (isLarge) {
+          document.documentElement.style.fontSize = '112%';
+          fontLabel.innerText = 'Text: Large';
+        } else {
+          document.documentElement.style.fontSize = '';
+          fontLabel.innerText = 'Text: Standard';
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "SEO Breadcrumb Trail",
+  "tag": "section",
+  "class": "section-content-breadcrumbs",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Dropdown Background",
+      "default": "#1e293b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f8fafc"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "header",
+      "content": "SEO & Utility Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_schema",
+      "label": "Output Google Schema.org JSON-LD Hierarchy",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_utilities",
+      "label": "Show Share Link & Font Scale Utilities",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "SEO Breadcrumb Trail",
+      "settings": {
+        "enable_schema": true,
+        "show_utilities": true
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,615 @@
+{%- comment -%}
+  trust_ugc_tiktok_feed.liquid — Ultra-Comprehensive UGC & Vertical Video Feed
+  
+  DESIGN PHILOSOPHY:
+  An architectural social proof video engine designed to showcase organic community setups,
+  sound tests, and unboxing rituals. Features 9:16 vertical video cards with play/pause physics,
+  creator handle badges, view counters, shoppable product tags, and an accessible Video Lightbox
+  Modal Dialog with synchronized audio and one-click product acquisition.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --tut-bg: {{ section.settings.bg_color | default: '#050505' }};
+    --tut-card-bg: {{ section.settings.card_bg_color | default: '#121212' }};
+    --tut-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --tut-muted: color-mix(in srgb, var(--tut-text) 65%, transparent);
+    --tut-border: color-mix(in srgb, var(--tut-text) 15%, transparent);
+    --tut-accent: {{ section.settings.accent_color | default: '#ff0050' }};
+    --tut-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --tut-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --tut-padding-top: clamp(4rem, 8vw, 7rem);
+    --tut-padding-bottom: clamp(4rem, 8vw, 7rem);
+  }
+
+  .tut-section {
+    background-color: var(--tut-bg);
+    color: var(--tut-text);
+    font-family: var(--tut-font-body);
+    padding: var(--tut-padding-top) clamp(1.25rem, 4vw, 4rem) var(--tut-padding-bottom);
+    border-bottom: 1px solid var(--tut-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tut-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  /* Section Header */
+  .tut-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--tut-border);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .tut-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 680px;
+  }
+  .tut-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--tut-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .tut-eyebrow::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--tut-accent);
+  }
+  .tut-title {
+    font-family: var(--tut-font-head);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+  }
+  .tut-desc {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--tut-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .tut-submit-btn {
+    background: var(--tut-text);
+    color: var(--tut-bg);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.9rem 1.85rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .tut-submit-btn:hover {
+    background: var(--tut-accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  /* Video Grid */
+  .tut-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: clamp(1.25rem, 2vw, 2rem);
+  }
+  @media (min-width: 640px) {
+    .tut-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .tut-grid {
+      grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+    }
+  }
+
+  /* Vertical Video Card */
+  .tut-card {
+    background: var(--tut-card-bg);
+    border: 1px solid var(--tut-border);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 9 / 16;
+    cursor: pointer;
+    group: true;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .tut-card:hover {
+    transform: translateY(-8px);
+    border-color: color-mix(in srgb, var(--tut-text) 50%, transparent);
+  }
+  .tut-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tut-card:hover .tut-thumb {
+    transform: scale(1.06);
+  }
+
+  /* Play Icon Button */
+  .tut-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  .tut-card:hover .tut-play-icon {
+    background: var(--tut-accent);
+    transform: translate(-50%, -50%) scale(1.15);
+    border-color: var(--tut-accent);
+  }
+  .tut-play-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+    margin-left: 3px;
+  }
+
+  /* Overlay Badges */
+  .tut-card-top {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+  }
+  .tut-views {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .tut-views svg { width: 14px; height: 14px; fill: currentColor; }
+
+  .tut-card-bot {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 60%, transparent 100%);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tut-handle {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .tut-prod-pill {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.45rem 0.9rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: fit-content;
+  }
+
+  /* Video Lightbox Modal */
+  .tut-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .tut-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .tut-modal {
+    background: #121212;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 36px;
+    max-width: 840px;
+    width: 100%;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+    box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.9);
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 768px) {
+    .tut-modal {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .tut-modal-overlay[data-open="true"] .tut-modal {
+    transform: scale(1);
+  }
+  .tut-video-col {
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px;
+    position: relative;
+  }
+  .tut-video-col video {
+    width: 100%;
+    height: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+  .tut-info-col {
+    padding: clamp(2rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .tut-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 20;
+  }
+</style>
+
+<section class="tut-section" id="tut-section-{{ section.id }}" aria-labelledby="tut-title-{{ section.id }}">
+  <div class="tut-container">
+    
+    <!-- Section Header -->
+    <div class="tut-header">
+      <div class="tut-head-text">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="tut-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="tut-title-{{ section.id }}" class="tut-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="tut-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+
+      <button type="button" class="tut-submit-btn" id="tut-submit-btn-{{ section.id }}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        <span>Submit Setup Video</span>
+      </button>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="tut-grid" role="list">
+      {%- for block in section.blocks -%}
+        <div class="tut-card" role="listitem" data-video="{% if block.settings.video_url != blank %}{{ block.settings.video_url }}{% else %}https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4{% endif %}" data-handle="{{ block.settings.handle | default: '@tech_setup_daily' }}" data-views="{{ block.settings.views | default: '240.5K' }}" data-prod="{{ block.settings.product_title | default: 'Series 04 Workstation' }}" data-price="{{ block.settings.product_price | default: '$380.00' }}" {{ block.shopify_attributes }}>
+          
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'tut-thumb', alt: block.settings.product_title }}
+          {%- else -%}
+            <div style="width:100%;height:100%;background:#1e293b;display:flex;align-items:center;justify-content:center;color:#64748b;font-weight:700;">UGC Video {{ forloop.index }}</div>
+          {%- endif -%}
+
+          <div class="tut-play-icon" aria-label="Play Video">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </div>
+
+          <div class="tut-card-top">
+            <span class="tut-views">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+              <span>{{ block.settings.views | default: '240.5K' }}</span>
+            </span>
+          </div>
+
+          <div class="tut-card-bot">
+            <span class="tut-handle">{{ block.settings.handle | default: '@tech_setup_daily' }}</span>
+            <span class="tut-prod-pill">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3z"></path></svg>
+              <span>{{ block.settings.product_title | default: 'Series 04 Workstation' }}</span>
+            </span>
+          </div>
+
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Video Lightbox Modal -->
+  <div class="tut-modal-overlay" id="tut-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="tut-modal">
+      <button type="button" class="tut-modal-close" id="tut-modal-close-{{ section.id }}" aria-label="Close video player modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="tut-video-col">
+        <video id="tut-modal-video" controls autoplay playsinline></video>
+      </div>
+
+      <div class="tut-info-col">
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--tut-accent);color:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:700;">OA</div>
+            <div>
+              <span id="tut-modal-handle" style="font-weight:700;font-size:1rem;display:block;">@tech_setup_daily</span>
+              <span style="font-size:0.78rem;color:rgba(255,255,255,0.6);">Verified Setup Sound Test</span>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid rgba(255,255,255,0.15);border-bottom:1px solid rgba(255,255,255,0.15);padding:0.85rem 0;">
+            <span style="font-size:0.85rem;color:rgba(255,255,255,0.7);"><strong id="tut-modal-views" style="color:#ffffff;">240.5K</strong> Organic Views</span>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+          <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--tut-accent);">Featured In Video</span>
+          
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h3 id="tut-modal-prod" style="font-family:var(--tut-font-head);font-size:1.35rem;margin:0;">Series 04 Workstation</h3>
+              <span id="tut-modal-price" style="font-size:1rem;font-weight:700;color:#ffffff;">$380.00</span>
+            </div>
+          </div>
+
+          <a href="/collections/all" style="background:#ffffff;color:#000000;font-weight:700;font-size:0.92rem;text-align:center;text-decoration:none;padding:1rem;border-radius:100px;transition:all 0.2s ease;display:block;">Acquire Featured Setup →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('tut-section-' + sid);
+    if (!sectionEl) return;
+
+    // Video Lightbox Modal Controller
+    var modalOverlay = document.getElementById('tut-modal-' + sid);
+    var modalClose = document.getElementById('tut-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var videoEl = document.getElementById('tut-modal-video');
+      var handleEl = document.getElementById('tut-modal-handle');
+      var viewsEl = document.getElementById('tut-modal-views');
+      var prodEl = document.getElementById('tut-modal-prod');
+      var priceEl = document.getElementById('tut-modal-price');
+
+      var cards = sectionEl.querySelectorAll('.tut-card');
+      cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          var vUrl = card.getAttribute('data-video');
+          if (videoEl && vUrl) {
+            videoEl.src = vUrl;
+            videoEl.play().catch(function(){});
+          }
+
+          if (handleEl) handleEl.innerText = card.getAttribute('data-handle') || '@tech_setup_daily';
+          if (viewsEl) viewsEl.innerText = card.getAttribute('data-views') || '240.5K';
+          if (prodEl) prodEl.innerText = card.getAttribute('data-prod') || 'Series 04 Workstation';
+          if (priceEl) priceEl.innerText = card.getAttribute('data-price') || '$380.00';
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.src = '';
+        }
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+
+    // Submit button alert
+    var subBtn = document.getElementById('tut-submit-btn-' + sid);
+    if (subBtn) {
+      subBtn.addEventListener('click', function() {
+        alert('To submit your setup video, tag @obsidian.atelier on TikTok or Instagram with #ObsidianAtelier.');
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shoppable TikTok Feed",
+  "tag": "section",
+  "class": "section-trust-ugc-tiktok-feed",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#ff0050"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Section Copy"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Community Video Archive"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Sound Tests & Unboxings"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Watch unedited acoustic sound tests and desktop builds submitted by our global community of engineers and creators."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Vertical Video Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Video Thumbnail Cover"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Direct MP4 Video URL"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Creator Handle",
+          "default": "@tech_setup_daily"
+        },
+        {
+          "type": "text",
+          "id": "views",
+          "label": "View Count Display",
+          "default": "240.5K"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Tagged Product Name",
+          "default": "Series 04 Workstation"
+        },
+        {
+          "type": "text",
+          "id": "product_price",
+          "label": "Tagged Product Price",
+          "default": "$380.00"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shoppable TikTok Feed",
+      "blocks": [
+        { "type": "video", "settings": { "handle": "@mechanical_rev", "views": "412K", "product_title": "Monolith 65%" } },
+        { "type": "video", "settings": { "handle": "@zurich_desks", "views": "189K", "product_title": "Acoustic Switch Pack" } },
+        { "type": "video", "settings": { "handle": "@minimal_setup", "views": "520K", "product_title": "Titanium Desk Mat" } },
+        { "type": "video", "settings": { "handle": "@keycap_lab", "views": "310K", "product_title": "Avionics Coiled Cable" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,93 @@
+<div class="sf-map sf-map-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-map-container">
+    <div class="sf-map-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-map-split">
+      <div class="sf-map-locations">
+        {% for block in section.blocks %}
+          <div class="sf-map-location" style="background: {{ section.settings.card_bg }};">
+            <h3 style="color: {{ section.settings.text_color }};">{{ block.settings.title }}</h3>
+            <p style="color: {{ section.settings.text_color }};" class="sf-map-address">{{ block.settings.address }}</p>
+            <div class="sf-map-details" style="color: {{ section.settings.text_color }};">
+              {% if block.settings.hours != blank %}<p><strong>Hours:</strong> {{ block.settings.hours }}</p>{% endif %}
+              {% if block.settings.phone != blank %}<p><strong>Phone:</strong> <a href="tel:{{ block.settings.phone }}" style="color: inherit;">{{ block.settings.phone }}</a></p>{% endif %}
+            </div>
+            <a href="https://maps.google.com/?q={{ block.settings.address | url_encode }}" target="_blank" class="sf-map-btn" style="background: {{ section.settings.text_color }}; color: {{ section.settings.bg_color }};">Get Directions</a>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="sf-map-visual">
+        {% if section.settings.image != blank %}
+          <img src="{{ section.settings.image | img_url: '1000x' }}" alt="Map" loading="lazy">
+        {% else %}
+          <div class="sf-map-placeholder">
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'sf-placeholder' }}
+            <div class="sf-map-marker">📍</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-map-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-map-container { max-width: 1400px; margin: 0 auto; }
+  .sf-map-header { text-align: center; margin-bottom: 4rem; }
+  .sf-map-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  
+  .sf-map-split { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+  @media (min-width: 992px) { .sf-map-split { grid-template-columns: 1fr 2fr; } }
+  
+  .sf-map-locations { display: flex; flex-direction: column; gap: 1.5rem; max-height: 600px; overflow-y: auto; padding-right: 10px; }
+  .sf-map-locations::-webkit-scrollbar { width: 6px; }
+  .sf-map-locations::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--color-text) 20%, transparent); border-radius: 3px; }
+  
+  .sf-map-location { padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px color-mix(in srgb, var(--color-text) 5%, transparent); }
+  .sf-map-location h3 { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; }
+  .sf-map-address { font-size: 1rem; opacity: 0.8; margin-bottom: 1.5rem; line-height: 1.5; }
+  .sf-map-details { font-size: 0.95rem; margin-bottom: 1.5rem; opacity: 0.8; }
+  .sf-map-details p { margin-bottom: 0.25rem; }
+  
+  .sf-map-btn { display: inline-block; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
+  
+  .sf-map-visual { border-radius: 16px; overflow: hidden; background: var(--color-surface); position: relative; min-height: 400px; }
+  .sf-map-visual img { width: 100%; height: 100%; object-fit: cover; }
+  .sf-map-placeholder { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: center; }
+  .sf-map-placeholder svg { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+  .sf-map-marker { font-size: 4rem; position: absolute; z-index: 2; animation: sf-bounce 2s infinite; }
+  
+  @keyframes sf-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Store Locator",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f9f9f9" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Find Us In Store" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Visit one of our retail locations to experience our products in person." },
+    { "type": "image_picker", "id": "image", "label": "Map Image", "info": "Upload an image of a map or storefront." }
+  ],
+  "blocks": [
+    {
+      "type": "location", "name": "Location",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Store Name", "default": "Flagship Store" },
+        { "type": "textarea", "id": "address", "label": "Address", "default": "123 Main St, New York, NY 10001" },
+        { "type": "text", "id": "hours", "label": "Hours", "default": "Mon-Sat: 10am - 8pm" },
+        { "type": "text", "id": "phone", "label": "Phone", "default": "(555) 123-4567" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Store Locator", "category": "Utilities", "blocks": [{"type":"location"},{"type":"location"}] } ]
+}
+{% endschema %}

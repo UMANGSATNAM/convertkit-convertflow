@@ -1,0 +1,99 @@
+<div class="sf-ptabs sf-ptabs-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ptabs-header">
+    <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+    <div class="sf-ptabs-nav">
+      {% for block in section.blocks %}
+        <button class="sf-ptab-btn {% if forloop.first %}active{% endif %}" data-target="tab-{{ section.id }}-{{ forloop.index }}" style="color: {{ section.settings.text_color }}; border-color: {{ section.settings.text_color }};">{{ block.settings.title }}</button>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <div class="sf-ptabs-content">
+    {% for block in section.blocks %}
+      <div class="sf-ptab-pane {% if forloop.first %}active{% endif %}" id="tab-{{ section.id }}-{{ forloop.index }}">
+        <div class="sf-ptab-grid">
+          {% for product in collections[block.settings.collection].products limit: 4 %}
+            <div class="sf-ptab-item">
+              <a href="{{ product.url }}" class="sf-ptab-img-link">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}" loading="lazy">
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag: 'sf-placeholder' }}
+                {% endif %}
+              </a>
+              <h3><a href="{{ product.url }}" style="color: {{ section.settings.text_color }};">{{ product.title }}</a></h3>
+              <p style="color: {{ section.settings.text_color }};">{{ product.price | money }}</p>
+            </div>
+          {% else %}
+            {% for i in (1..4) %}
+              <div class="sf-ptab-item">
+                <a href="#" class="sf-ptab-img-link">{{ 'product-' | append: i | placeholder_svg_tag: 'sf-placeholder' }}</a>
+                <h3><a href="#" style="color: {{ section.settings.text_color }};">Product {{ i }}</a></h3>
+                <p style="color: {{ section.settings.text_color }};">$100.00</p>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .sf-ptabs-{{ section.id }} { padding: 4rem 1rem; max-width: 1200px; margin: 0 auto; }
+  .sf-ptabs-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 3rem; text-align: center; }
+  .sf-ptabs-header h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+  .sf-ptabs-nav { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .sf-ptab-btn { background: transparent; border: 1px solid transparent; padding: 8px 20px; font-size: 1rem; cursor: pointer; border-radius: 50px; font-weight: bold; transition: 0.3s; opacity: 0.5; }
+  .sf-ptab-btn.active { border-color: inherit; opacity: 1; }
+  .sf-ptab-btn:hover { opacity: 0.8; }
+  .sf-ptab-pane { display: none; }
+  .sf-ptab-pane.active { display: block; animation: sfFadeIn 0.5s; }
+  @keyframes sfFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .sf-ptab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (min-width: 768px) { .sf-ptab-grid { grid-template-columns: repeat(4, 1fr); } }
+  .sf-ptab-item { text-align: center; }
+  .sf-ptab-img-link { display: block; background: var(--color-surface); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; aspect-ratio: 1; }
+  .sf-ptab-img-link img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+  .sf-ptab-item:hover img { transform: scale(1.05); }
+  .sf-ptab-item h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .sf-ptab-item h3 a { text-decoration: none; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.sf-ptabs-{{ section.id }} .sf-ptab-btn');
+    const panes = document.querySelectorAll('.sf-ptabs-{{ section.id }} .sf-ptab-pane');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panes.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Tabs",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Our Collections" }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "tab", "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab Name", "default": "New In" },
+        { "type": "collection", "id": "collection", "label": "Collection" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Product Tabs", "category": "Collection" } ]
+}
+{% endschema %}

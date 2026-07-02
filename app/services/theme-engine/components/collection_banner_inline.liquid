@@ -1,0 +1,529 @@
+{%- comment -%}
+  collection_banner_inline.liquid — Ultra-Comprehensive Inline Collection Promotional Banner
+  
+  DESIGN PHILOSOPHY:
+  A high-converting promotional banner engineered to sit natively inside collection
+  product grids or category landing pages. Features a live promotional countdown timer,
+  glassmorphism content card, smooth image zoom hover effect, price comparison badges,
+  and responsive layout adjustments. Engineered for 60fps performance and zero layout shift.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --cbi-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --cbi-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --cbi-muted: color-mix(in srgb, var(--cbi-text) 70%, transparent);
+    --cbi-border: color-mix(in srgb, var(--cbi-text) 15%, transparent);
+    --cbi-accent: {{ section.settings.accent_color | default: '#38bdf8' }};
+    --cbi-card-bg: {{ section.settings.card_bg_color | default: 'rgba(15, 23, 42, 0.75)' }};
+    --cbi-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --cbi-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --cbi-height: clamp(320px, 45vh, 520px);
+    --cbi-radius: {{ section.settings.border_radius | default: 24 }}px;
+  }
+
+  .cbi-section {
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2.5rem);
+    font-family: var(--cbi-font-body);
+  }
+
+  .cbi-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: var(--cbi-radius);
+    overflow: hidden;
+    min-height: var(--cbi-height);
+    display: flex;
+    align-items: center;
+    justify-content: {{ section.settings.content_alignment | default: 'flex-start' }};
+    padding: clamp(2rem, 6vw, 4.5rem);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--cbi-border);
+  }
+
+  /* Background Media */
+  .cbi-media-wrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .cbi-media-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cbi-container:hover .cbi-media-wrap img {
+    transform: scale(1.06);
+  }
+  .cbi-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      {{ section.settings.overlay_direction | default: '90deg' }},
+      rgba(15, 23, 42, {{ section.settings.overlay_opacity | default: 85 }}%) 0%,
+      rgba(15, 23, 42, {{ section.settings.overlay_opacity | default: 85 | divided_by: 2 }}%) 60%,
+      rgba(15, 23, 42, 10%) 100%
+    );
+    z-index: 2;
+  }
+
+  /* Content Card */
+  .cbi-content {
+    position: relative;
+    z-index: 3;
+    max-width: 580px;
+    background: var(--cbi-card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--cbi-text) 18%, transparent);
+    border-radius: 20px;
+    padding: clamp(1.75rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    align-items: {{ section.settings.text_alignment | default: 'flex-start' }};
+    text-align: {{ section.settings.text_alignment | default: 'left' }};
+    gap: 1.25rem;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  }
+  .cbi-container:hover .cbi-content {
+    transform: translateY(-4px);
+    border-color: var(--cbi-accent);
+  }
+
+  /* Eyebrow Badge */
+  .cbi-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--cbi-accent);
+    background: color-mix(in srgb, var(--cbi-accent) 15%, transparent);
+    padding: 0.4rem 0.9rem;
+    border-radius: 100px;
+    border: 1px solid color-mix(in srgb, var(--cbi-accent) 35%, transparent);
+  }
+  .cbi-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cbi-accent);
+    animation: cbiPulse 1.5s infinite;
+  }
+  @keyframes cbiPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  /* Typography */
+  .cbi-title {
+    font-family: var(--cbi-font-head);
+    font-size: clamp(1.85rem, 4vw, 2.85rem);
+    font-weight: 700;
+    color: var(--cbi-text);
+    line-height: 1.15;
+    margin: 0;
+  }
+  .cbi-desc {
+    font-size: clamp(0.95rem, 2vw, 1.08rem);
+    color: var(--cbi-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Price Comparison Badge */
+  .cbi-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: -0.25rem;
+  }
+  .cbi-price {
+    font-family: var(--cbi-font-head);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--cbi-accent);
+  }
+  .cbi-compare {
+    font-size: 1.1rem;
+    color: var(--cbi-muted);
+    text-decoration: line-through;
+  }
+  .cbi-discount-pill {
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+
+  /* Countdown Timer */
+  .cbi-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: color-mix(in srgb, var(--cbi-text) 8%, transparent);
+    border: 1px solid var(--cbi-border);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    margin-top: 0.25rem;
+  }
+  .cbi-timer-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--cbi-muted);
+  }
+  .cbi-timer-digits {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--cbi-font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--cbi-accent);
+  }
+  .cbi-timer-unit {
+    background: color-mix(in srgb, var(--cbi-accent) 15%, transparent);
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    min-width: 32px;
+    text-align: center;
+  }
+
+  /* Action Button */
+  .cbi-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--cbi-font-body);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #000000;
+    background: var(--cbi-accent);
+    padding: 1rem 2.25rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--cbi-accent) 40%, transparent);
+    margin-top: 0.5rem;
+  }
+  .cbi-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px color-mix(in srgb, var(--cbi-accent) 55%, transparent);
+  }
+  .cbi-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    transition: transform 0.2s ease;
+  }
+  .cbi-btn:hover svg {
+    transform: translateX(4px);
+  }
+</style>
+
+<section class="cbi-section" id="cbi-section-{{ section.id }}" aria-label="Promotional Collection Banner">
+  <div class="cbi-container">
+    
+    <!-- Background Image & Gradient Overlay -->
+    <div class="cbi-media-wrap">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', alt: section.settings.title }}
+      {%- else -%}
+        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #1e293b, #0f172a, #312e81);"></div>
+      {%- endif -%}
+    </div>
+    <div class="cbi-overlay"></div>
+
+    <!-- Content Card -->
+    <div class="cbi-content">
+      {%- if section.settings.badge != blank -%}
+        <div class="cbi-badge">
+          <span class="cbi-badge-dot"></span>
+          <span>{{ section.settings.badge }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h2 class="cbi-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.subtitle != blank -%}
+        <p class="cbi-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+
+      <!-- Price Comparison Block -->
+      {%- if section.settings.show_price -%}
+        <div class="cbi-price-wrap">
+          <span class="cbi-price">{{ section.settings.price | default: '$49' }}</span>
+          {%- if section.settings.compare_price != blank -%}
+            <span class="cbi-compare">{{ section.settings.compare_price }}</span>
+            <span class="cbi-discount-pill">{{ section.settings.discount_text | default: 'Save 50%' }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <!-- Countdown Timer Block -->
+      {%- if section.settings.enable_timer -%}
+        <div class="cbi-timer" id="cbi-timer-{{ section.id }}" data-hours="{{ section.settings.timer_hours | default: 6 }}">
+          <span class="cbi-timer-label">{{ section.settings.timer_label | default: 'Offer Ends In:' }}</span>
+          <div class="cbi-timer-digits">
+            <span class="cbi-timer-unit" id="cbi-h-{{ section.id }}">05</span>:
+            <span class="cbi-timer-unit" id="cbi-m-{{ section.id }}">59</span>:
+            <span class="cbi-timer-unit" id="cbi-s-{{ section.id }}">59</span>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <!-- Action Button -->
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_link | default: '/collections/all' }}" class="cbi-btn">
+          <span>{{ section.settings.btn_label }}</span>
+          <svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var timerWrap = document.getElementById('cbi-timer-' + sid);
+    if (!timerWrap) return;
+
+    var hEl = document.getElementById('cbi-h-' + sid);
+    var mEl = document.getElementById('cbi-m-' + sid);
+    var sEl = document.getElementById('cbi-s-' + sid);
+    if (!hEl || !mEl || !sEl) return;
+
+    var hoursVal = parseInt(timerWrap.getAttribute('data-hours'), 10) || 6;
+    var totalSeconds = hoursVal * 3600;
+
+    function tick() {
+      if (totalSeconds <= 0) totalSeconds = hoursVal * 3600;
+      var h = Math.floor(totalSeconds / 3600);
+      var m = Math.floor((totalSeconds % 3600) / 60);
+      var s = totalSeconds % 60;
+
+      hEl.innerText = (h < 10 ? '0' : '') + h;
+      mEl.innerText = (m < 10 ? '0' : '') + m;
+      sEl.innerText = (s < 10 ? '0' : '') + s;
+      totalSeconds--;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Inline Collection Banner",
+  "tag": "section",
+  "class": "section-collection-banner-inline",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background Color",
+      "default": "rgba(15, 23, 42, 0.75)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "header",
+      "content": "Background Image & Overlay"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Gradient Overlay Opacity (%)",
+      "min": 20,
+      "max": 95,
+      "step": 5,
+      "default": 85
+    },
+    {
+      "type": "select",
+      "id": "overlay_direction",
+      "label": "Overlay Gradient Direction",
+      "options": [
+        { "value": "90deg", "label": "Left to Right" },
+        { "value": "270deg", "label": "Right to Left" },
+        { "value": "180deg", "label": "Top to Bottom" }
+      ],
+      "default": "90deg"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Positioning"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Card Horizontal Position",
+      "options": [
+        { "value": "flex-start", "label": "Left Aligned" },
+        { "value": "center", "label": "Centered" },
+        { "value": "flex-end", "label": "Right Aligned" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Card Text Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left Aligned" },
+        { "value": "center", "label": "Centered" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Container Corner Radius (px)",
+      "min": 0,
+      "max": 36,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Banner Content"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Eyebrow Badge",
+      "default": "Flash Deal Spotlight"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Elevate Your Everyday Essentials"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Unlock exclusive VIP pricing on our most coveted seasonal releases. Crafted with aerospace precision and guaranteed for life."
+    },
+    {
+      "type": "header",
+      "content": "Price Comparison (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show Price Comparison Callout",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Deal Price",
+      "default": "$79"
+    },
+    {
+      "type": "text",
+      "id": "compare_price",
+      "label": "Original Price",
+      "default": "$149"
+    },
+    {
+      "type": "text",
+      "id": "discount_text",
+      "label": "Discount Pill Text",
+      "default": "Save 45%"
+    },
+    {
+      "type": "header",
+      "content": "Countdown Timer (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_timer",
+      "label": "Show Live Countdown Timer",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "timer_label",
+      "label": "Timer Label Text",
+      "default": "Offer Ends In:"
+    },
+    {
+      "type": "range",
+      "id": "timer_hours",
+      "label": "Countdown Duration (Hours)",
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Action Button"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Exclusive Deal"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Inline Collection Banner"
+    }
+  ]
+}
+{% endschema %}

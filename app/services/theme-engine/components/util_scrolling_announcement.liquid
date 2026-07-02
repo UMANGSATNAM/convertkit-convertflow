@@ -1,0 +1,347 @@
+{%- comment -%}
+  util_scrolling_announcement.liquid — Ultra-Comprehensive Infinite Horizontal Marquee Ticker
+  
+  DESIGN PHILOSOPHY:
+  A high-energy visual ticker engineered to showcase brand achievements, USPs, press quotes,
+  and ongoing flash sales. Uses pure CSS hardware-accelerated transforms for 60fps infinite
+  looping without JavaScript jank. Features dynamic track duplication for ultra-wide monitors,
+  direction control, speed tuning, pause-on-hover, and interactive CTA links.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --usa-bg: {{ section.settings.bg_color | default: '#059669' }};
+    --usa-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --usa-accent: {{ section.settings.accent_color | default: '#fef08a' }};
+    --usa-border: color-mix(in srgb, var(--usa-text) 15%, transparent);
+    --usa-font: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+    --usa-padding: clamp(0.75rem, 2vw, 1.1rem) 0;
+    --usa-speed: {{ section.settings.scroll_speed | default: 25 }}s;
+    --usa-direction: {{ section.settings.scroll_direction | default: 'normal' }};
+  }
+
+  .usa-section {
+    background-color: var(--usa-bg);
+    color: var(--usa-text);
+    font-family: var(--usa-font);
+    padding: var(--usa-padding);
+    border-top: 1px solid var(--usa-border);
+    border-bottom: 1px solid var(--usa-border);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Marquee Track */
+  .usa-track-wrap {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+  }
+  .usa-track {
+    display: flex;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
+    flex-shrink: 0;
+    animation: usaMarquee var(--usa-speed) linear infinite var(--usa-direction);
+    will-change: transform;
+    padding-right: clamp(2rem, 5vw, 4rem);
+  }
+  @keyframes usaMarquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+  }
+
+  /* Pause on hover toggle */
+  {%- if section.settings.pause_on_hover -%}
+    .usa-section:hover .usa-track {
+      animation-play-state: paused;
+    }
+  {%- endif -%}
+
+  /* Individual Item */
+  .usa-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-transform: {{ section.settings.text_transform | default: 'uppercase' }};
+    color: var(--usa-text);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  a.usa-item:hover {
+    color: var(--usa-accent);
+    transform: scale(1.03);
+  }
+
+  /* Icon Wrap */
+  .usa-icon {
+    width: clamp(20px, 3vw, 26px);
+    height: clamp(20px, 3vw, 26px);
+    color: var(--usa-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .usa-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+
+  /* Separator Dot / Star */
+  .usa-separator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--usa-accent);
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  /* Gradient Edge Masks for smooth fade */
+  {%- if section.settings.show_gradient_mask -%}
+    .usa-section::before,
+    .usa-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: clamp(40px, 8vw, 120px);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .usa-section::before {
+      left: 0;
+      background: linear-gradient(90deg, var(--usa-bg) 0%, transparent 100%);
+    }
+    .usa-section::after {
+      right: 0;
+      background: linear-gradient(270deg, var(--usa-bg) 0%, transparent 100%);
+    }
+  {%- endif -%}
+</style>
+
+<section class="usa-section" id="usa-section-{{ section.id }}" aria-label="Infinite Announcement Ticker">
+  <div class="usa-track-wrap" id="usa-wrap-{{ section.id }}">
+    
+    {%- capture track_content -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="usa-item" {{ block.shopify_attributes }}>
+        {%- else -%}
+          <div class="usa-item" {{ block.shopify_attributes }}>
+        {%- endif -%}
+          
+          <div class="usa-icon">
+            {%- case block.settings.icon -%}
+              {%- when 'sparkle' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              {%- when 'lightning' -%}
+                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              {%- when 'globe' -%}
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"></path></svg>
+              {%- when 'tag' -%}
+                <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              {%- when 'heart' -%}
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+              {%- else -%}
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            {%- endcase -%}
+          </div>
+
+          <span>{{ block.settings.text }}</span>
+
+        {%- if block.settings.link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_separators -%}
+          <div class="usa-separator" aria-hidden="true"></div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    <!-- Track 1 -->
+    <div class="usa-track" aria-hidden="false">
+      {{ track_content }}
+    </div>
+
+    <!-- Track 2 (Clone for seamless CSS loop) -->
+    <div class="usa-track" aria-hidden="true">
+      {{ track_content }}
+    </div>
+
+    <!-- Track 3 (Extra clone for 4K ultrawide monitors) -->
+    <div class="usa-track" aria-hidden="true">
+      {{ track_content }}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var wrapEl = document.getElementById('usa-wrap-' + sid);
+    if (!wrapEl) return;
+
+    // Ensure enough track width dynamically for ultra-wide displays
+    function ensureLoopWidth() {
+      var track = wrapEl.querySelector('.usa-track');
+      if (!track) return;
+      var trackWidth = track.scrollWidth;
+      var viewportWidth = window.innerWidth;
+      
+      // If 2 tracks aren't enough to fill twice the screen width, clone more
+      if (trackWidth > 0 && trackWidth < viewportWidth * 1.5) {
+        var clone = track.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        wrapEl.appendChild(clone);
+      }
+    }
+
+    // Run on init and resize
+    ensureLoopWidth();
+    window.addEventListener('resize', ensureLoopWidth);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Scrolling Marquee Ticker",
+  "tag": "section",
+  "class": "section-scrolling-marquee",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#059669"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent & Icon Color",
+      "default": "#fef08a"
+    },
+    {
+      "type": "header",
+      "content": "Animation & Scrolling Controls"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Loop Duration / Speed (Seconds - Lower is faster)",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "scroll_direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "normal", "label": "Right to Left (Standard)" },
+        { "value": "reverse", "label": "Left to Right (Reverse)" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause Animation on Hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gradient_mask",
+      "label": "Show Smooth Edge Fade Gradient Masks",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separators",
+      "label": "Show Dot Separator Between Items",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Case",
+      "options": [
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "none", "label": "Normal Case" },
+        { "value": "capitalize", "label": "Capitalize Words" }
+      ],
+      "default": "uppercase"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Ticker Message",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "sparkle", "label": "✨ Sparkle / Star" },
+            { "value": "lightning", "label": "⚡ Lightning Bolt" },
+            { "value": "globe", "label": "🌍 Globe / Worldwide" },
+            { "value": "tag", "label": "🏷️ Price Tag / Sale" },
+            { "value": "heart", "label": "❤️ Heart / Favorite" }
+          ],
+          "default": "sparkle"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Message Text",
+          "default": "Free Worldwide Priority Shipping on Orders Over $100"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Optional CTA Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scrolling Marquee Ticker",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "sparkle", "text": "Over 50,000+ Verified 5-Star Reviews Worldwide" } },
+        { "type": "item", "settings": { "icon": "lightning", "text": "Flash Sale: Enjoy 20% Off Storewide with Code VIP20" } },
+        { "type": "item", "settings": { "icon": "globe", "text": "100% Carbon Neutral Production & Express Delivery" } },
+        { "type": "item", "settings": { "icon": "tag", "text": "Guaranteed Lifetime Warranty & Instant Easy Returns" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

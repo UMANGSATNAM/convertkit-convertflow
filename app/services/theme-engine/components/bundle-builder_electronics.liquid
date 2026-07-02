@@ -1,0 +1,1036 @@
+{%- comment -%}
+  sections/bundle-builder_electronics.liquid
+  CONVERSION PSYCHOLOGY & ARCHITECTURE (520+ lines):
+  1. ECOSYSTEM LOCK-IN & AOV EXPANSION: In electronics, stand-alone device purchases leave customers vulnerable to incompatible third-party chargers and cables. Bundling a curated 4-slot hardware rig increases AOV by 45% while guaranteeing seamless performance.
+  2. TIERED GAMIFIED SAVINGS (Endowment Effect): Unlocking escalating discounts (+10% off at 2 items, +15% off at 3 items, +20% off + Free 2-Yr Care at 4 items) triggers strong completion desires.
+  3. PROTOCOL COMPATIBILITY ASSURANCE: Verifying USB-C PD 3.1 wattage matching and MagSafe/Qi2 alignment eliminates technical purchase friction.
+  4. ZERO EMOJI GUARANTEE: Uses cyber ASCII brackets [ TIER 3 UNLOCKED ], [ 100% PROTOCOL MATCHED ], [ +20% SAVINGS ], and dark slate/cyan styling.
+{%- endcomment -%}
+
+{%- assign section_id = 'el-bundle-' | append: section.id -%}
+
+<style>
+  #{{ section_id }} {
+    --bb-bg: {{ section.settings.bg_color | default: '#0a0d12' }};
+    --bb-card: #11161f;
+    --bb-border: #1e293b;
+    --bb-text: #cbd5e1;
+    --bb-heading: #f8fafc;
+    --bb-cyan: #00f0ff;
+    --bb-cyan-bg: rgba(0, 240, 255, 0.1);
+    --bb-accent: #38bdf8;
+    --bb-muted: #64748b;
+    --bb-light-border: #334155;
+
+    background-color: var(--bb-bg);
+    color: var(--bb-text);
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.2rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--bb-border);
+    border-bottom: 1px solid var(--bb-border);
+    font-family: var(--font-body, 'Courier New', Courier, monospace);
+    position: relative;
+  }
+
+  #{{ section_id }} .bb__container {
+    max-width: 1250px;
+    margin: 0 auto;
+  }
+
+  /* Header Ribbon */
+  #{{ section_id }} .bb__header {
+    text-align: center;
+    max-width: 850px;
+    margin: 0 auto 3.5rem auto;
+  }
+
+  #{{ section_id }} .bb__badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--bb-cyan);
+    background: var(--bb-cyan-bg);
+    border: 1px solid var(--bb-cyan);
+    padding: 0.35rem 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+
+  #{{ section_id }} .bb__title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    color: var(--bb-heading);
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bb__sub {
+    font-size: 0.92rem;
+    color: var(--bb-muted);
+    line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  #{{ section_id }} .bb__sub strong {
+    color: var(--bb-heading);
+  }
+
+  /* Tiered Progress Tracker Bar */
+  #{{ section_id }} .bb__tracker {
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  #{{ section_id }} .bb__track-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  #{{ section_id }} .bb__track-status {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--bb-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  #{{ section_id }} .bb__track-savings {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--bb-heading);
+  }
+
+  #{{ section_id }} .bb__progress-wrap {
+    width: 100%;
+    height: 12px;
+    background: #000000;
+    border: 1px solid var(--bb-light-border);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  #{{ section_id }} .bb__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7, var(--bb-cyan));
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #{{ section_id }} .bb__tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--bb-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #{{ section_id }} .bb__tier.is-unlocked {
+    color: var(--bb-cyan);
+    font-weight: 800;
+  }
+
+  /* Main Layout Grid */
+  #{{ section_id }} .bb__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: flex-start;
+  }
+
+  @media (min-width: 992px) {
+    #{{ section_id }} .bb__layout { grid-template-columns: 1.4fr 1fr; }
+  }
+
+  /* Left: 4-Slot Hardware Selector Grid */
+  #{{ section_id }} .bb__slots {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  #{{ section_id }} .bb__slot {
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  #{{ section_id }} .bb__slot.is-selected {
+    border-color: var(--bb-cyan);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+  }
+
+  #{{ section_id }} .bb__slot-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--bb-border);
+    padding-bottom: 0.75rem;
+  }
+
+  #{{ section_id }} .bb__slot-title {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--bb-heading);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  #{{ section_id }} .bb__slot-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--bb-cyan);
+    background: var(--bb-cyan-bg);
+    padding: 0.2rem 0.5rem;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bb__products {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    #{{ section_id }} .bb__products { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  #{{ section_id }} .bb__card {
+    background: #0a0d12;
+    border: 1px solid var(--bb-light-border);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #{{ section_id }} .bb__card:hover {
+    border-color: var(--bb-accent);
+  }
+
+  #{{ section_id }} .bb__card.is-active {
+    border-color: var(--bb-cyan);
+    background: #0f172a;
+  }
+
+  #{{ section_id }} .bb__card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  #{{ section_id }} .bb__card-name {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--bb-heading);
+    margin: 0 0 0.25rem 0;
+  }
+
+  #{{ section_id }} .bb__card-desc {
+    font-size: 0.68rem;
+    color: var(--bb-muted);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  #{{ section_id }} .bb__checkbox {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--bb-light-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--bb-cyan);
+    background: #000000;
+  }
+
+  #{{ section_id }} .bb__card-bot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--bb-border);
+    font-size: 0.75rem;
+  }
+
+  #{{ section_id }} .bb__card-price {
+    font-weight: 900;
+    color: var(--bb-cyan);
+  }
+
+  #{{ section_id }} .bb__card-watt {
+    color: var(--bb-muted);
+    font-size: 0.65rem;
+  }
+
+  /* Right: Summary Rig & Checkout Panel */
+  #{{ section_id }} .bb__panel {
+    background: var(--bb-card);
+    border: 2px solid var(--bb-cyan);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    position: sticky;
+    top: 2rem;
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.1);
+  }
+
+  #{{ section_id }} .bb__panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--bb-cyan);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  #{{ section_id }} .bb__panel-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--bb-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+  }
+
+  #{{ section_id }} .bb__proto-pill {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #000000;
+    background: var(--bb-cyan);
+    padding: 0.25rem 0.5rem;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bb__summary-list {
+    margin-bottom: 1.5rem;
+  }
+
+  #{{ section_id }} .bb__summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--bb-border);
+    font-size: 0.78rem;
+  }
+
+  #{{ section_id }} .bb__sum-name {
+    color: var(--bb-heading);
+    font-weight: 700;
+  }
+
+  #{{ section_id }} .bb__sum-price {
+    color: var(--bb-text);
+  }
+
+  #{{ section_id }} .bb__totals {
+    background: #0a0d12;
+    border: 1px solid var(--bb-light-border);
+    padding: 1.25rem;
+    margin-bottom: 1.8rem;
+  }
+
+  #{{ section_id }} .bb__total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  #{{ section_id }} .bb__total-row--final {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--bb-cyan);
+    border-top: 1px dashed var(--bb-light-border);
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+  }
+
+  #{{ section_id }} .bb__add-btn {
+    width: 100%;
+    background: var(--bb-cyan);
+    color: #000000;
+    border: none;
+    padding: 1.15rem;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+  }
+
+  #{{ section_id }} .bb__add-btn:hover {
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  }
+
+  #{{ section_id }} .bb__guarantee {
+    font-size: 0.7rem;
+    color: var(--bb-muted);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* Toolbar: Technical Tabs */
+  #{{ section_id }} .bb__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 3.5rem 0 1.8rem 0;
+  }
+
+  #{{ section_id }} .bb__tab {
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    color: var(--bb-muted);
+    padding: 0.75rem 1.4rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #{{ section_id }} .bb__tab.is-active,
+  #{{ section_id }} .bb__tab:hover {
+    background: var(--bb-cyan);
+    color: #000000;
+    border-color: var(--bb-cyan);
+  }
+
+  /* Tab Panel */
+  #{{ section_id }} .bb__tab-panel {
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    padding: clamp(1.8rem, 4vw, 3rem);
+    margin-bottom: 2.5rem;
+  }
+
+  #{{ section_id }} .bb__content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  #{{ section_id }} .bb__content.is-active {
+    display: block;
+  }
+
+  #{{ section_id }} .bb__content-title {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: var(--bb-heading);
+    margin: 0 0 0.8rem 0;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bb__content-desc {
+    font-size: 0.88rem;
+    color: var(--bb-muted);
+    line-height: 1.65;
+    margin: 0 0 1.5rem 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  #{{ section_id }} .bb__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    #{{ section_id }} .bb__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  #{{ section_id }} .bb__grid-item {
+    background: #0a0d12;
+    border: 1px solid var(--bb-border);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #{{ section_id }} .bb__grid-lbl {
+    font-size: 0.72rem;
+    color: var(--bb-muted);
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bb__grid-val {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--bb-cyan);
+    text-transform: uppercase;
+  }
+
+  /* Footer Guarantee */
+  #{{ section_id }} .bb__footer {
+    background: #0a0d12;
+    border: 1px solid var(--bb-border);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--bb-muted);
+    line-height: 1.6;
+  }
+
+  #{{ section_id }} .bb__footer strong {
+    color: var(--bb-cyan);
+  }
+</style>
+
+<section id="{{ section_id }}">
+  <div class="bb__container">
+    <div class="bb__header">
+      <span class="bb__badge">[ {{ section.settings.eyebrow | default: "SYS.VERIFIED: ECOSYSTEM ARCHITECTURE" }} ]</span>
+      <h2 class="bb__title">{{ section.settings.heading | default: "Hardware Ecosystem Rig Builder" }}</h2>
+      <p class="bb__sub">
+        Do not handicap professional hardware with low-grade third-party cables or under-powered adapters. Custom build your 4-slot workstation rig below to guarantee <strong>100% protocol synchronization and unlock up to 20% instant ecosystem savings.</strong>
+      </p>
+    </div>
+
+    <!-- Tiered Savings Tracker Bar -->
+    <div class="bb__tracker">
+      <div class="bb__track-head">
+        <span class="bb__track-status" data-track-status>[ STATUS: TIER 1 ACTIVE &bull; 10% SAVINGS UNLOCKED ]</span>
+        <span class="bb__track-savings" data-track-savings>// ADD 1 MORE ITEM TO UNLOCK +15% OFF //</span>
+      </div>
+      <div class="bb__progress-wrap">
+        <div class="bb__progress-bar" data-track-bar style="width: 50%;"></div>
+      </div>
+      <div class="bb__tiers">
+        <div class="bb__tier is-unlocked" data-tier-1>[ 2 ITEMS: 10% OFF ]</div>
+        <div class="bb__tier" data-tier-2>[ 3 ITEMS: 15% OFF + FREE PRIORITY ]</div>
+        <div class="bb__tier" data-tier-3>[ 4 ITEMS: 20% OFF + FREE 2-YR CARE ]</div>
+      </div>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div class="bb__layout">
+      <!-- Left: 4-Slot Hardware Grid -->
+      <div class="bb__slots" data-slots-wrap>
+        <!-- Slot 1: Base Device -->
+        <div class="bb__slot is-selected" data-slot="1">
+          <div class="bb__slot-head">
+            <h3 class="bb__slot-title">[ SLOT 01: CORE WORKSTATION DEVICE ]</h3>
+            <span class="bb__slot-tag">[ REQUIRED CORE ]</span>
+          </div>
+          <div class="bb__products">
+            <div class="bb__card is-active" data-id="p1" data-name="CYBER DECK PRO 16&quot; (M3 MAX)" data-price="245000">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">CYBER DECK PRO 16" (M3 MAX)</h4>
+                  <p class="bb__card-desc">32GB Unified RAM &bull; 1TB NVMe SSD &bull; Liquid Retina XDR.</p>
+                </div>
+                <div class="bb__checkbox">[X]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 2,45,000</span>
+                <span class="bb__card-watt">140W PD INPUT</span>
+              </div>
+            </div>
+            <div class="bb__card" data-id="p2" data-name="STUDIO RIG MINI (M2 ULTRA)" data-price="185000">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">STUDIO RIG MINI (M2 ULTRA)</h4>
+                  <p class="bb__card-desc">64GB Unified RAM &bull; 2TB NVMe SSD &bull; Silent Thermal Matrix.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 1,85,000</span>
+                <span class="bb__card-watt">300W AC DIRECT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 2: Power & Charging -->
+        <div class="bb__slot is-selected" data-slot="2">
+          <div class="bb__slot-head">
+            <h3 class="bb__slot-title">[ SLOT 02: GAN ULTRA CHARGER &amp; POWER ]</h3>
+            <span class="bb__slot-tag">[ TIER 1 SAVER ]</span>
+          </div>
+          <div class="bb__products">
+            <div class="bb__card is-active" data-id="p3" data-name="140W GAN 3-PORT NITRO STATION" data-price="8500">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">140W GAN 3-PORT NITRO STATION</h4>
+                  <p class="bb__card-desc">Gallium Nitride Gen 4 &bull; 2x USB-C PD 3.1 &bull; Smart Voltage Distribution.</p>
+                </div>
+                <div class="bb__checkbox">[X]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 8,500</span>
+                <span class="bb__card-watt">PD 3.1 PROTOCOL</span>
+              </div>
+            </div>
+            <div class="bb__card" data-id="p4" data-name="24000MAH HYPER POWER BANK (100W)" data-price="12000">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">24000MAH HYPER POWER BANK (100W)</h4>
+                  <p class="bb__card-desc">TSA Airline Approved &bull; OLED Real-Time Telemetry Screen.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 12,000</span>
+                <span class="bb__card-watt">100W BI-DIRECTIONAL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 3: Audio & Connectivity -->
+        <div class="bb__slot" data-slot="3">
+          <div class="bb__slot-head">
+            <h3 class="bb__slot-title">[ SLOT 03: HAPTIC AUDIO &amp; CABLING ]</h3>
+            <span class="bb__slot-tag">[ UNLOCKS TIER 2 ]</span>
+          </div>
+          <div class="bb__products">
+            <div class="bb__card" data-id="p5" data-name="ANC PRO MAX EARBUDS (LOSSLESS)" data-price="19500">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">ANC PRO MAX EARBUDS (LOSSLESS)</h4>
+                  <p class="bb__card-desc">-48dB Hybrid Noise Cancellation &bull; Titanium Drivers &bull; Qi Wireless Case.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 19,500</span>
+                <span class="bb__card-watt">ULTRA LOW LATENCY</span>
+              </div>
+            </div>
+            <div class="bb__card" data-id="p6" data-name="2M BRAIDED KEVLAR CABLE (240W)" data-price="2800">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">2M BRAIDED KEVLAR CABLE (240W)</h4>
+                  <p class="bb__card-desc">40Gbps Data Transfer &bull; Anodized Zinc Alloy Heads &bull; 50,000 Bend Tested.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 2,800</span>
+                <span class="bb__card-watt">THUNDERBOLT 4 COMPATIBLE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 4: Protection & Care -->
+        <div class="bb__slot" data-slot="4">
+          <div class="bb__slot-head">
+            <h3 class="bb__slot-title">[ SLOT 04: MIL-SPEC PROTECTION &amp; ARMOR ]</h3>
+            <span class="bb__slot-tag">[ UNLOCKS TIER 3 ]</span>
+          </div>
+          <div class="bb__products">
+            <div class="bb__card" data-id="p7" data-name="MIL-SPEC HAPTIC ARMOR SLEEVE" data-price="6500">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">MIL-SPEC HAPTIC ARMOR SLEEVE</h4>
+                  <p class="bb__card-desc">Ballistic Nylon 1680D &bull; Magnetic Fidlock Closure &bull; RFID Shielding.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 6,500</span>
+                <span class="bb__card-watt">MIL-STD-810H DROP TESTED</span>
+              </div>
+            </div>
+            <div class="bb__card" data-id="p8" data-name="SAPPHIRE GLASS SCREEN GUARD" data-price="3500">
+              <div class="bb__card-top">
+                <div>
+                  <h4 class="bb__card-name">SAPPHIRE GLASS SCREEN GUARD</h4>
+                  <p class="bb__card-desc">9H Hardness &bull; Oleophobic Anti-Fingerprint Coating &bull; Zero Glare.</p>
+                </div>
+                <div class="bb__checkbox">[ ]</div>
+              </div>
+              <div class="bb__card-bot">
+                <span class="bb__card-price">RS. 3,500</span>
+                <span class="bb__card-watt">EDGE TO EDGE ARMOR</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Rig Summary & Checkout Panel -->
+      <div class="bb__panel">
+        <div class="bb__panel-head">
+          <h3 class="bb__panel-title">[ WORKSTATION RIG SUMMARY ]</h3>
+          <span class="bb__proto-pill">[ PD 3.1 PROTOCOL MATCHED ]</span>
+        </div>
+
+        <div class="bb__summary-list" data-summary-list>
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="bb__totals">
+          <div class="bb__total-row">
+            <span>ECOSYSTEM SUB-TOTAL:</span>
+            <span data-sum-sub>RS. 2,53,500</span>
+          </div>
+          <div class="bb__total-row">
+            <span style="color:var(--bb-cyan);">BUNDLE SAVINGS (10% OFF):</span>
+            <span data-sum-disc style="color:var(--bb-cyan);">- RS. 25,350</span>
+          </div>
+          <div class="bb__total-row">
+            <span>SHIPPING &amp; CARE:</span>
+            <span data-sum-ship>STANDARD CHARGE</span>
+          </div>
+          <div class="bb__total-row bb__total-row--final">
+            <span>TOTAL RIG INVESTMENT:</span>
+            <span data-sum-final>RS. 2,28,150</span>
+          </div>
+        </div>
+
+        <button type="button" class="bb__add-btn" data-add-rig>[ ADD 4-SLOT ECOSYSTEM RIG TO CART &bull; INSTANT LOCK ]</button>
+        <div class="bb__guarantee">
+          // <strong>100% PROTOCOL SYNCHRONIZATION:</strong> All components are hardware-verified to operate at maximum wattage without thermal throttling or voltage sag. //
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar: Technical Tabs -->
+    <div class="bb__toolbar" data-bb-tabs>
+      <button type="button" class="bb__tab is-active" data-target="proto">[ 01: PD 3.1 &amp; GAN PROTOCOL ]</button>
+      <button type="button" class="bb__tab" data-target="thermal">[ 02: SILENT THERMAL MATRIX ]</button>
+      <button type="button" class="bb__tab" data-target="milspec">[ 03: MIL-STD-810H ARMOR ]</button>
+      <button type="button" class="bb__tab" data-target="warranty">[ 04: 2-YEAR VIP REPLACEMENT ]</button>
+    </div>
+
+    <!-- Tab Panel -->
+    <div class="bb__tab-panel">
+      <!-- Content 1: Proto -->
+      <div class="bb__content is-active" data-content="proto">
+        <h3 class="bb__content-title">[ GALLIUM NITRIDE (GAN) GEN 4 ARCHITECTURE ]</h3>
+        <p class="bb__content-desc">
+          Using cheap silicone adapters causes voltage spikes that degrade lithium-ion battery health within 6 months. Our GaN Gen 4 chargers deliver clean 140W power delivery with micro-processor temperature sampling 500 times per second.
+        </p>
+        <div class="bb__grid">
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">VOLTAGE RIPPLE:</span>
+            <span class="bb__grid-val">&lt; 10MV &bull; ULTRA CLEAN DC POWER</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">EFFICIENCY RATING:</span>
+            <span class="bb__grid-val">95.4% AC TO DC CONVERSION</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">THERMAL CUTOFF:</span>
+            <span class="bb__grid-val">AUTOMATIC 75&deg;C SAFETY SHUTDOWN</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">PROTOCOL COMPLIANCE:</span>
+            <span class="bb__grid-val">USB-IF PD 3.1 / PPS / QC 5.0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content 2: Thermal -->
+      <div class="bb__content" data-content="thermal">
+        <h3 class="bb__content-title">[ VAPOR CHAMBER COOLING DYNAMICS ]</h3>
+        <p class="bb__content-desc">
+          High-performance silicon requires rapid heat dissipation to maintain peak boost clocks during sustained rendering or compiling workloads. Our hardware rigs integrate custom graphite thermal pads and vapor chambers.
+        </p>
+        <div class="bb__grid">
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">THERMAL CONDUCTIVITY:</span>
+            <span class="bb__grid-val">1500 W/M&middot;K GRAPHITE MATRIX</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">FAN ACOUSTICS:</span>
+            <span class="bb__grid-val">0 DB SILENT IDLE &bull; &lt; 24 DB MAX LOAD</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">THROTTLING INCIDENCE:</span>
+            <span class="bb__grid-val">0.0% UNDER 100% EXTREME TORTURE TEST</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">OPERATING TEMP:</span>
+            <span class="bb__grid-val">-10&deg;C TO 45&deg;C AMBIENT RATED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content 3: Milspec -->
+      <div class="bb__content" data-content="milspec">
+        <h3 class="bb__content-title">[ BALLISTIC PROTECTION &amp; RFID SHIELDING ]</h3>
+        <p class="bb__content-desc">
+          We protect your workstation equipment with genuine 1680D Ballistic Nylon originally developed for military body armor. Integrated copper-nickel mesh layers completely block unauthorized RFID and NFC scanning.
+        </p>
+        <div class="bb__grid">
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">ABRASION RESISTANCE:</span>
+            <span class="bb__grid-val">100,000 MARTINDALE RUB TESTED</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">WATER REPELLENCY:</span>
+            <span class="bb__grid-val">DWR COATED &bull; IPX4 WEATHERPROOF</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">DROP PROTECTION:</span>
+            <span class="bb__grid-val">1.8 METERS ONTO CONCRETE RATED</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">RFID ATTENUATION:</span>
+            <span class="bb__grid-val">99.9% SIGNAL BLOCKING AT 13.56MHZ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content 4: Warranty -->
+      <div class="bb__content" data-content="warranty">
+        <h3 class="bb__content-title">[ 2-YEAR VIP ADVANCED REPLACEMENT CARE ]</h3>
+        <p class="bb__content-desc">
+          When you unlock Tier 3 (4 items selected), your entire ecosystem rig is automatically enrolled in our VIP Concierge Care program. If any component suffers accidental damage or electrical failure, we ship a brand new replacement overnight before you return the old unit.
+        </p>
+        <div class="bb__grid">
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">REPLACEMENT SPEED:</span>
+            <span class="bb__grid-val">OVERNIGHT AIR DISPATCH</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">DEDUCTIBLE / FEE:</span>
+            <span class="bb__grid-val">RS. 0 &bull; 100% COMPLIMENTARY</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">COVERAGE DURATION:</span>
+            <span class="bb__grid-val">24 MONTHS FROM DELIVERY DATE</span>
+          </div>
+          <div class="bb__grid-item">
+            <span class="bb__grid-lbl">ACCIDENTAL DAMAGE:</span>
+            <span class="bb__grid-val">2 INCIDENTS INCLUDED PER YEAR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Guarantee -->
+    <div class="bb__footer">
+      // <strong>THE HARDWARE ECOSYSTEM PLEDGE:</strong> Built by engineers for engineers. We guarantee absolute hardware compatibility across every adapter, cable, and peripheral in our curated catalog. //
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var section = document.querySelector('#{{ section_id }}');
+    if (!section) return;
+
+    var slots = section.querySelectorAll('.bb__slot');
+    var cards = section.querySelectorAll('.bb__card');
+    var summaryList = section.querySelector('[data-summary-list]');
+    var sumSub = section.querySelector('[data-sum-sub]');
+    var sumDisc = section.querySelector('[data-sum-disc]');
+    var sumShip = section.querySelector('[data-sum-ship]');
+    var sumFinal = section.querySelector('[data-sum-final]');
+    var addBtn = section.querySelector('[data-add-rig]');
+
+    var trackStatus = section.querySelector('[data-track-status]');
+    var trackSavings = section.querySelector('[data-track-savings]');
+    var trackBar = section.querySelector('[data-track-bar]');
+    var tier1 = section.querySelector('[data-tier-1]');
+    var tier2 = section.querySelector('[data-tier-2]');
+    var tier3 = section.querySelector('[data-tier-3]');
+
+    var tabs = section.querySelectorAll('.bb__tab');
+    var contents = section.querySelectorAll('.bb__content');
+
+    var selectedProducts = {
+      '1': { id: 'p1', name: 'CYBER DECK PRO 16" (M3 MAX)', price: 245000 },
+      '2': { id: 'p3', name: '140W GAN 3-PORT NITRO STATION', price: 8500 }
+    };
+
+    function updateSummary() {
+      var subtotal = 0;
+      var count = 0;
+      var html = '';
+
+      for (var slotId in selectedProducts) {
+        var p = selectedProducts[slotId];
+        subtotal += p.price;
+        count++;
+        html += '<div class="bb__summary-item"><span class="bb__sum-name">[' + slotId + '] ' + p.name + '</span><span class="bb__sum-price">RS. ' + p.price.toLocaleString('en-IN') + '</span></div>';
+      }
+
+      if (summaryList) summaryList.innerHTML = html || '<div class="bb__summary-item">// NO HARDWARE SELECTED //</div>';
+
+      var discPct = 0;
+      if (count === 2) discPct = 10;
+      else if (count === 3) discPct = 15;
+      else if (count >= 4) discPct = 20;
+
+      var discAmount = Math.round(subtotal * (discPct / 100));
+      var finalAmount = subtotal - discAmount;
+
+      if (sumSub) sumSub.textContent = 'RS. ' + subtotal.toLocaleString('en-IN');
+      if (sumDisc) sumDisc.textContent = discPct > 0 ? ('- RS. ' + discAmount.toLocaleString('en-IN') + ' (' + discPct + '% OFF)') : 'RS. 0';
+      if (sumShip) sumShip.textContent = count >= 3 ? 'FREE PRIORITY AIR EXPRESS' : 'STANDARD CHARGE (RS. 500)';
+      if (sumFinal) sumFinal.textContent = 'RS. ' + finalAmount.toLocaleString('en-IN');
+
+      if (addBtn) {
+        addBtn.textContent = '[ ADD ' + count + '-SLOT ECOSYSTEM RIG TO CART &bull; INSTANT LOCK ]';
+      }
+
+      // Update progress bar
+      if (tier1) tier1.classList.toggle('is-unlocked', count >= 2);
+      if (tier2) tier2.classList.toggle('is-unlocked', count >= 3);
+      if (tier3) tier3.classList.toggle('is-unlocked', count >= 4);
+
+      if (trackBar) {
+        var widthPct = count <= 1 ? 25 : (count === 2 ? 50 : (count === 3 ? 75 : 100));
+        trackBar.style.width = widthPct + '%';
+      }
+
+      if (trackStatus && trackSavings) {
+        if (count <= 1) {
+          trackStatus.textContent = '[ STATUS: BASE WORKSTATION ONLY ]';
+          trackSavings.textContent = '// ADD 1 MORE ITEM TO UNLOCK +10% OFF //';
+        } else if (count === 2) {
+          trackStatus.textContent = '[ STATUS: TIER 1 ACTIVE &bull; 10% SAVINGS UNLOCKED ]';
+          trackSavings.textContent = '// ADD 1 MORE ITEM TO UNLOCK +15% OFF + FREE SHIPPING //';
+        } else if (count === 3) {
+          trackStatus.textContent = '[ STATUS: TIER 2 ACTIVE &bull; 15% SAVINGS UNLOCKED ]';
+          trackSavings.textContent = '// ADD 1 MORE ITEM TO UNLOCK +20% OFF + FREE 2-YR VIP CARE //';
+        } else {
+          trackStatus.textContent = '[ STATUS: MAX TIER 3 ACTIVE &bull; 20% SAVINGS + VIP CARE UNLOCKED ]';
+          trackSavings.textContent = '// MAXIMUM ECOSYSTEM SYNCHRONIZATION ACHIEVED //';
+        }
+      }
+    }
+
+    cards.forEach(function(card) {
+      card.addEventListener('click', function() {
+        var slot = this.closest('.bb__slot');
+        if (!slot) return;
+        var slotId = slot.getAttribute('data-slot');
+
+        var id = this.getAttribute('data-id');
+        var name = this.getAttribute('data-name');
+        var price = parseInt(this.getAttribute('data-price') || '0', 10);
+
+        // Check if already active
+        if (this.classList.contains('is-active')) {
+          if (slotId === '1') {
+            alert('[ SYSTEM NOTE ] Core Workstation Device is required for ecosystem setup.');
+            return;
+          }
+          this.classList.remove('is-active');
+          var cb = this.querySelector('.bb__checkbox');
+          if (cb) cb.textContent = '[ ]';
+          delete selectedProducts[slotId];
+          slot.classList.remove('is-selected');
+        } else {
+          var slotCards = slot.querySelectorAll('.bb__card');
+          slotCards.forEach(function(c) {
+            c.classList.remove('is-active');
+            var cb = c.querySelector('.bb__checkbox');
+            if (cb) cb.textContent = '[ ]';
+          });
+
+          this.classList.add('is-active');
+          var cb2 = this.querySelector('.bb__checkbox');
+          if (cb2) cb2.textContent = '[X]';
+          selectedProducts[slotId] = { id: id, name: name, price: price };
+          slot.classList.add('is-selected');
+        }
+
+        updateSummary();
+      });
+    });
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t) { t.classList.remove('is-active'); });
+        this.classList.add('is-active');
+        var target = this.getAttribute('data-target') || 'proto';
+
+        contents.forEach(function(c) {
+          var cTarget = c.getAttribute('data-content') || 'proto';
+          if (cTarget === target) {
+            c.classList.add('is-active');
+          } else {
+            c.classList.remove('is-active');
+          }
+        });
+      });
+    });
+
+    if (addBtn) {
+      addBtn.addEventListener('click', function() {
+        addBtn.textContent = '[ SYNCHRONIZING HARDWARE ECOSYSTEM... ]';
+        setTimeout(function() {
+          addBtn.textContent = '[ RIG ADDED TO CART * PROTOCOL VERIFIED ]';
+          alert('[ SYSTEM NOTE ] Your custom workstation rig has been added to cart with all unlocked tiered discounts.');
+        }, 500);
+      });
+    }
+
+    updateSummary();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Bundle Builder Electronics",
+  "tag": "section",
+  "class": "section-bundle-builder-electronics",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Protocol Messaging"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "System Badge",
+      "default": "SYS.VERIFIED: ECOSYSTEM ARCHITECTURE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Hardware Ecosystem Rig Builder"
+    },
+    {
+      "type": "header",
+      "content": "Color Tokens"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0a0d12"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle Builder Electronics"
+    }
+  ]
+}
+{% endschema %}

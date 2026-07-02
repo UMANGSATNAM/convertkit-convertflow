@@ -1,0 +1,647 @@
+{%- comment -%}
+  trust_video_testimonials.liquid — Ultra-Comprehensive Video Testimonial Cinema Showcase
+  
+  DESIGN PHILOSOPHY:
+  A high-converting cinematic social proof engine designed for vertical video case studies
+  (TikTok/Reels/YouTube Shorts style). Features glowing play button badges, duration tags,
+  verified professional credentials, and an accessible Cinema Modal Dialog that embeds
+  video playback alongside instant shoppable product specifications.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --tvt-bg: {{ section.settings.bg_color | default: '#0a0a0a' }};
+    --tvt-card-bg: {{ section.settings.card_bg_color | default: '#171717' }};
+    --tvt-text: {{ section.settings.text_color | default: '#f5f5f5' }};
+    --tvt-muted: color-mix(in srgb, var(--tvt-text) 65%, transparent);
+    --tvt-border: color-mix(in srgb, var(--tvt-text) 15%, transparent);
+    --tvt-accent: {{ section.settings.accent_color | default: '#e11d48' }};
+    --tvt-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --tvt-font-head: var(--font-heading, 'Playfair Display', serif);
+    --tvt-padding-top: clamp(3.5rem, 8vw, 6.5rem);
+    --tvt-padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+    --tvt-gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .tvt-section {
+    background-color: var(--tvt-bg);
+    color: var(--tvt-text);
+    font-family: var(--tvt-font-body);
+    padding: var(--tvt-padding-top) clamp(1.25rem, 4vw, 4rem) var(--tvt-padding-bottom);
+    border-bottom: 1px solid var(--tvt-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tvt-container {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* Section Header */
+  .tvt-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .tvt-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--tvt-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .tvt-eyebrow::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: var(--tvt-accent);
+  }
+  .tvt-title {
+    font-family: var(--tvt-font-head);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .tvt-desc {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--tvt-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Video Cards Grid */
+  .tvt-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: var(--tvt-gap);
+  }
+  @media (min-width: 640px) {
+    .tvt-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .tvt-grid {
+      grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    }
+  }
+
+  /* Video Testimonial Card */
+  .tvt-card {
+    background: var(--tvt-card-bg);
+    border: 1px solid var(--tvt-border);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    aspect-ratio: 9 / 14;
+    cursor: pointer;
+    box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.7);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.4s ease;
+  }
+  .tvt-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--tvt-accent);
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.9);
+  }
+
+  /* Thumbnail Media Background */
+  .tvt-media {
+    position: absolute;
+    inset: 0;
+    background: #000000;
+    z-index: 1;
+  }
+  .tvt-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  }
+  .tvt-card:hover .tvt-media img {
+    transform: scale(1.08);
+    opacity: 0.65;
+  }
+  .tvt-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.1) 100%);
+  }
+
+  /* Play Badge Overlay */
+  .tvt-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease;
+  }
+  .tvt-card:hover .tvt-play-btn {
+    transform: translate(-50%, -50%) scale(1.15);
+    background: var(--tvt-accent);
+    color: #ffffff;
+    box-shadow: 0 0 0 15px color-mix(in srgb, var(--tvt-accent) 35%, transparent);
+  }
+  .tvt-play-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    margin-left: 3px;
+  }
+
+  /* Duration Tag */
+  .tvt-duration {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 5;
+  }
+
+  /* Content Overlay */
+  .tvt-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .tvt-stars {
+    display: flex;
+    gap: 0.15rem;
+    color: #f59e0b;
+  }
+  .tvt-stars svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+  }
+  .tvt-quote {
+    font-family: var(--tvt-font-body);
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    color: #ffffff;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tvt-author-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.82rem;
+  }
+  .tvt-author-name {
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .tvt-author-role {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Cinema Modal Dialog */
+  .tvt-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .tvt-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .tvt-modal {
+    background: var(--tvt-card-bg);
+    color: var(--tvt-text);
+    border: 1px solid var(--tvt-border);
+    border-radius: 28px;
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.8);
+    display: grid;
+    grid-template-columns: 1fr;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 768px) {
+    .tvt-modal {
+      grid-template-columns: 1fr 1.1fr;
+    }
+  }
+  .tvt-modal-overlay[data-open="true"] .tvt-modal {
+    transform: scale(1);
+  }
+  .tvt-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .tvt-modal-player {
+    width: 100%;
+    min-height: 360px;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .tvt-modal-player iframe,
+  .tvt-modal-player video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tvt-modal-info {
+    padding: clamp(2rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .tvt-modal-quote {
+    font-family: var(--tvt-font-head);
+    font-size: 1.6rem;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .tvt-modal-author {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--tvt-accent);
+  }
+  .tvt-modal-desc {
+    font-size: 0.95rem;
+    color: var(--tvt-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .tvt-modal-cta {
+    margin-top: auto;
+    background: var(--tvt-text);
+    color: var(--tvt-bg);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    text-align: center;
+    transition: background 0.2s ease;
+  }
+  .tvt-modal-cta:hover {
+    background: var(--tvt-accent);
+    color: #ffffff;
+  }
+</style>
+
+<section class="tvt-section" id="tvt-section-{{ section.id }}" aria-labelledby="tvt-title-{{ section.id }}">
+  <div class="tvt-container">
+    
+    <!-- Section Header -->
+    <div class="tvt-header">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="tvt-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 id="tvt-title-{{ section.id }}" class="tvt-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="tvt-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <!-- Video Cards Grid -->
+    <div class="tvt-grid" id="tvt-grid-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div 
+          class="tvt-card" 
+          data-video="{{ block.settings.video_url | default: 'https://www.youtube.com/embed/dQw4w9WgXcQ' | escape }}"
+          data-quote="{{ block.settings.quote | escape }}"
+          data-author="{{ block.settings.author | default: 'Marcus Vance' | escape }}"
+          data-role="{{ block.settings.role | default: 'Principal Architect' | escape }}"
+          data-desc="{{ block.settings.desc | default: 'Case study recorded on location in Zürich, Switzerland.' | escape }}"
+          data-link="{{ block.settings.product_url | default: '/products/sample' }}"
+          {{ block.shopify_attributes }}
+        >
+          <div class="tvt-media">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: block.settings.author }}
+            {%- else -%}
+              <div style="width:100%;height:100%;background:#1f2937;"></div>
+            {%- endif -%}
+          </div>
+
+          <div class="tvt-play-btn" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+          </div>
+
+          <span class="tvt-duration">{{ block.settings.duration | default: '0:45' }}</span>
+
+          <div class="tvt-content">
+            <div class="tvt-stars">
+              {%- for i in (1..5) -%}<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>{%- endfor -%}
+            </div>
+            <p class="tvt-quote">"{{ block.settings.quote }}"</p>
+            <div class="tvt-author-row">
+              <span class="tvt-author-name">{{ block.settings.author }}</span>
+              <span class="tvt-author-role">{{ block.settings.role }}</span>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Cinema Video Modal -->
+  <div class="tvt-modal-overlay" id="tvt-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="tvt-modal">
+      <button type="button" class="tvt-modal-close" id="tvt-modal-close-{{ section.id }}" aria-label="Close video player">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="tvt-modal-player" id="tvt-modal-player">
+        <iframe src="" id="tvt-modal-iframe" title="Video Testimonial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:none;"></iframe>
+      </div>
+
+      <div class="tvt-modal-info">
+        <div class="tvt-stars" style="color:#f59e0b;display:flex;gap:0.2rem;">
+          {%- for i in (1..5) -%}<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>{%- endfor -%}
+        </div>
+        <blockquote class="tvt-modal-quote" id="tvt-modal-quote">"Testimonial quote."</blockquote>
+        <div>
+          <div class="tvt-modal-author" id="tvt-modal-author">Marcus Vance</div>
+          <span style="font-size:0.85rem;color:var(--tvt-muted);" id="tvt-modal-role">Principal Architect</span>
+        </div>
+        <p class="tvt-modal-desc" id="tvt-modal-desc">Full video case study details.</p>
+
+        <a href="/products/sample" class="tvt-modal-cta" id="tvt-modal-cta">Inspect Featured Workstation →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('tvt-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Cinema Modal Controller
+    var modalOverlay = document.getElementById('tvt-modal-' + sid);
+    var modalClose = document.getElementById('tvt-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var quoteEl = document.getElementById('tvt-modal-quote');
+      var authorEl = document.getElementById('tvt-modal-author');
+      var roleEl = document.getElementById('tvt-modal-role');
+      var descEl = document.getElementById('tvt-modal-desc');
+      var ctaEl = document.getElementById('tvt-modal-cta');
+      var iframeEl = document.getElementById('tvt-modal-iframe');
+
+      var cards = sectionEl.querySelectorAll('.tvt-card');
+      cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          if (quoteEl) quoteEl.innerText = '"' + (card.getAttribute('data-quote') || '') + '"';
+          if (authorEl) authorEl.innerText = card.getAttribute('data-author') || 'Customer';
+          if (roleEl) roleEl.innerText = card.getAttribute('data-role') || 'Verified Buyer';
+          if (descEl) descEl.innerText = card.getAttribute('data-desc') || '';
+          if (ctaEl) ctaEl.href = card.getAttribute('data-link') || '/products/sample';
+
+          var videoUrl = card.getAttribute('data-video');
+          if (iframeEl) {
+            if (videoUrl && videoUrl !== 'null' && videoUrl !== '') {
+              // Automatically append autoplay param if youtube embed
+              if (videoUrl.indexOf('youtube.com/embed') !== -1 && videoUrl.indexOf('autoplay') === -1) {
+                videoUrl += (videoUrl.indexOf('?') === -1 ? '?' : '&') + 'autoplay=1';
+              }
+              iframeEl.src = videoUrl;
+              iframeEl.style.display = 'block';
+            } else {
+              iframeEl.style.display = 'none';
+            }
+          }
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        if (iframeEl) iframeEl.src = '';
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Video Testimonials Cinema",
+  "tag": "section",
+  "class": "section-trust-video",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Modal & Card Background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#e11d48"
+    },
+    {
+      "type": "header",
+      "content": "Video Grid"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "In Their Own Words"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The Studio Case Studies"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Watch world-renowned architects, music producers, and researchers explain why they transitioned their entire daily workflows to our mechanical architecture."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video Testimonial",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Video Poster Thumbnail"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Embed Video URL (YouTube/Vimeo/MP4)",
+          "default": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+        },
+        {
+          "type": "text",
+          "id": "duration",
+          "label": "Video Duration Badge",
+          "default": "0:45"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Headline Quote Excerpt",
+          "default": "The acoustic damping changed our entire studio workflow overnight."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Customer Name",
+          "default": "Marcus Vance"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Professional Role / Credentials",
+          "default": "Principal Architect, Geneva"
+        },
+        {
+          "type": "textarea",
+          "id": "desc",
+          "label": "Full Case Study Description",
+          "default": "Recorded on location at the Vance & Partners architectural studio in Zurich. Discusses ergonomics, tactile feedback, and multi-year durability."
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Featured Product URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Testimonials Cinema",
+      "blocks": [
+        { "type": "video", "settings": { "author": "Marcus Vance", "role": "Principal Architect", "quote": "The acoustic damping changed our entire studio workflow overnight.", "duration": "0:45" } },
+        { "type": "video", "settings": { "author": "Dr. Elena Rostova", "role": "Bio-Acoustics Lead", "quote": "Zero mechanical fatigue after 14-hour research shifts. Unrivaled precision.", "duration": "1:12" } },
+        { "type": "video", "settings": { "author": "Julian Sterling", "role": "Film Editor", "quote": "Three years of daily editing and not a single key switch has wavered.", "duration": "0:58" } },
+        { "type": "video", "settings": { "author": "Sofia Alverez", "role": "Industrial Designer", "quote": "The tactile feedback sets an entirely new standard for consumer hardware.", "duration": "0:34" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

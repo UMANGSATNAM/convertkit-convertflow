@@ -1,0 +1,173 @@
+{%- comment -%}
+  faq_minimal_1.liquid — Minimal FAQ
+  
+  Clean, distraction-free accordion. Native <details>
+  elements for zero-JS operation. Smooth transitions.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mnfq-bg: var(--color-background, #fff);
+    --mnfq-text: var(--color-text, #333);
+    --mnfq-muted: color-mix(in srgb, var(--mnfq-text) 45%, transparent);
+    --mnfq-border: color-mix(in srgb, var(--mnfq-text) 8%, transparent);
+    --mnfq-font: var(--font-body, 'Helvetica Neue', sans-serif);
+    --mnfq-font-heading: var(--font-heading, 'Helvetica Neue', sans-serif);
+  }
+
+  .mn-faq {
+    background: var(--mnfq-bg);
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .mn-faq__inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .mn-faq__title {
+    font-family: var(--mnfq-font-heading);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 500;
+    text-align: center;
+    color: var(--mnfq-text);
+    margin: 0 0 2.5rem 0;
+  }
+
+  .mn-faq__item {
+    border-bottom: 1px solid var(--mnfq-border);
+  }
+  .mn-faq__item summary {
+    font-family: var(--mnfq-font);
+    font-size: 0.92rem;
+    font-weight: 400;
+    color: var(--mnfq-text);
+    cursor: pointer;
+    padding: 1.25rem 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.2s ease;
+  }
+  .mn-faq__item summary::-webkit-details-marker { display: none; }
+  .mn-faq__item summary:hover {
+    color: var(--mnfq-muted);
+  }
+  .mn-faq__icon {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+    color: var(--mnfq-muted);
+  }
+  .mn-faq__item[open] .mn-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .mn-faq__answer {
+    font-family: var(--mnfq-font);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--mnfq-muted);
+    padding: 0 0 1.25rem 0;
+    max-width: 90%;
+  }
+
+  /* Contact CTA */
+  .mn-faq__cta {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-family: var(--mnfq-font);
+    font-size: 0.82rem;
+    color: var(--mnfq-muted);
+  }
+  .mn-faq__cta a {
+    color: var(--mnfq-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+  .mn-faq__cta a:hover {
+    color: var(--mnfq-muted);
+  }
+</style>
+
+<section class="mn-faq">
+  <div class="mn-faq__inner">
+
+    <h2 class="mn-faq__title">{{ section.settings.title | default: 'Frequently Asked Questions' }}</h2>
+
+    {%- for block in section.blocks -%}
+      <details class="mn-faq__item" {{ block.shopify_attributes }}>
+        <summary>
+          {{ block.settings.question }}
+          <span class="mn-faq__icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="mn-faq__answer">{{ block.settings.answer }}</div>
+      </details>
+    {%- endfor -%}
+
+    {%- if section.settings.show_cta -%}
+      <div class="mn-faq__cta">
+        Still have questions? <a href="{{ section.settings.contact_link | default: '/pages/contact' }}">Get in touch</a>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Minimal FAQ",
+  "tag": "section",
+  "class": "section-faq-minimal",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show Contact CTA",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "contact_link",
+      "label": "Contact Page URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is your return policy?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer a 30-day return policy for all unused items in original packaging. Simply contact our support team to initiate a return.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal FAQ",
+      "blocks": [
+        { "type": "question", "settings": { "question": "What is your return policy?", "answer": "<p>We offer a 30-day return policy for all unused items in their original packaging.</p>" } },
+        { "type": "question", "settings": { "question": "How long does shipping take?", "answer": "<p>Standard shipping takes 5-7 business days. Express shipping is available at checkout for 2-3 day delivery.</p>" } },
+        { "type": "question", "settings": { "question": "Do you ship internationally?", "answer": "<p>Yes, we ship to most countries worldwide. International shipping typically takes 10-15 business days.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,196 @@
+{%- comment -%}
+  trust_press_logos_grid.liquid — Press Mention & Logo Showcase Grid
+  
+  DESIGN PHILOSOPHY:
+  Credibility booster featuring media publication logos ("As Seen In").
+  Includes clean grayscale-to-full-color hover transitions, optional
+  testimonial quotes below logos, and responsive layout spacing.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --plg-bg: var(--color-surface, var(--color-background, #ffffff));
+    --plg-text: var(--color-text, #111111);
+    --plg-muted: color-mix(in srgb, var(--plg-text) 50%, transparent);
+    --plg-border: color-mix(in srgb, var(--plg-text) 10%, transparent);
+    --plg-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --plg-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .plg-section {
+    background: var(--plg-bg);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--plg-border);
+    border-bottom: 1px solid var(--plg-border);
+  }
+
+  .plg-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .plg-header {
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+  .plg-eyebrow {
+    font-family: var(--plg-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--plg-muted);
+    margin-bottom: 0.4rem;
+  }
+  .plg-title {
+    font-family: var(--plg-font-head);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    color: var(--plg-text);
+    margin: 0;
+  }
+
+  .plg-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .plg-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 180px;
+    text-decoration: none;
+    color: var(--plg-text);
+    transition: transform 0.2s ease;
+  }
+  .plg-item:hover {
+    transform: translateY(-3px);
+  }
+
+  .plg-logo-wrap {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: var(--logo-opacity, 0.65);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+    filter: grayscale(100%);
+  }
+  .plg-item:hover .plg-logo-wrap {
+    opacity: 1;
+    filter: grayscale(0%);
+  }
+  .plg-logo-wrap img {
+    max-height: 100%;
+    max-width: 150px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .plg-placeholder {
+    font-family: var(--plg-font-head);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--plg-text);
+  }
+
+  .plg-quote {
+    font-family: var(--plg-font);
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--plg-muted);
+    line-height: 1.4;
+    margin: 0;
+  }
+</style>
+
+<section class="plg-section" aria-labelledby="plg-title-{{ section.id }}">
+  <div class="plg-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="plg-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="plg-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="plg-title-{{ section.id }}" class="plg-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="plg-grid" style="--logo-opacity: {{ section.settings.logo_opacity | default: 65 | divided_by: 100.0 }};">
+      {%- for block in section.blocks -%}
+        <div class="plg-item" {{ block.shopify_attributes }}>
+          <div class="plg-logo-wrap">
+            {%- if block.settings.logo != blank -%}
+              {{ block.settings.logo | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div class="plg-placeholder">{{ block.settings.title | default: 'PUBLICATION' }}</div>
+            {%- endif -%}
+          </div>
+          {%- if block.settings.quote != blank -%}
+            <p class="plg-quote">"{{ block.settings.quote }}"</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Press Logos Grid",
+  "tag": "section",
+  "class": "section-trust-press",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Credibility"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "As Seen In"
+    },
+    {
+      "type": "range",
+      "id": "logo_opacity",
+      "label": "Default Logo Opacity (%)",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 65
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Publication Logo",
+      "settings": [
+        { "type": "image_picker", "id": "logo", "label": "Logo Image" },
+        { "type": "text", "id": "title", "label": "Publication Name (Fallback)", "default": "VOGUE" },
+        { "type": "text", "id": "quote", "label": "Short Endorsement Quote (Optional)", "default": "The must-have brand of the year." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Press Logos Grid",
+      "blocks": [
+        { "type": "logo", "settings": { "title": "VOGUE", "quote": "A revolutionary design." } },
+        { "type": "logo", "settings": { "title": "GQ", "quote": "Essential everyday luxury." } },
+        { "type": "logo", "settings": { "title": "WIRED", "quote": "Next-gen craftsmanship." } },
+        { "type": "logo", "settings": { "title": "FORBES", "quote": "Setting a new industry standard." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

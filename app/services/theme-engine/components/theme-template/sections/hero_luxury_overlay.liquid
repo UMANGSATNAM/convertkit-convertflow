@@ -1,0 +1,139 @@
+<div class="sf-luxury-hero sf-luxury-hero-{{ section.id }}">
+  <div class="sf-luxury-hero__media">
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | img_url: 'master' }}" alt="{{ section.settings.title }}" loading="lazy" fetchpriority="high">
+    {% else %}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'sf-placeholder-svg' }}
+    {% endif %}
+    <div class="sf-luxury-hero__overlay" style="opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }}"></div>
+  </div>
+  <div class="sf-luxury-hero__content">
+    <h2 class="sf-luxury-hero__title">{{ section.settings.title }}</h2>
+    <p class="sf-luxury-hero__subtitle">{{ section.settings.subtitle }}</p>
+    {% if section.settings.button_link != blank and section.settings.button_text != blank %}
+      <a href="{{ section.settings.button_link }}" class="sf-btn-outline">
+        {{ section.settings.button_text }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .sf-luxury-hero-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+  }
+  .sf-luxury-hero__media {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+  }
+  .sf-luxury-hero__media img, .sf-luxury-hero__media svg {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .sf-luxury-hero__overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--color-text);
+  }
+  .sf-luxury-hero__content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 0 20px;
+  }
+  .sf-luxury-hero__title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    color: inherit;
+  }
+  .sf-luxury-hero__subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+    font-weight: 300;
+  }
+  .sf-btn-outline {
+    display: inline-block;
+    padding: 14px 32px;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .sf-btn-outline:hover {
+    background: {{ section.settings.text_color }};
+    color: var(--color-text);
+  }
+  @media (min-width: 768px) {
+    .sf-luxury-hero-{{ section.id }} { height: 90vh; }
+    .sf-luxury-hero__title { font-size: 5rem; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Luxury Overlay Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Timeless Elegance"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Discover the new collection."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0, "max": 100, "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury Overlay Hero",
+      "category": "Hero"
+    }
+  ]
+}
+{% endschema %}

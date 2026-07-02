@@ -1,0 +1,253 @@
+{%- comment -%}
+  trust_expert_endorsement.liquid — Authority & Expert Endorsement
+  
+  DESIGN PHILOSOPHY:
+  High-authority medical, professional, or industry expert approval section.
+  Features an expert portrait with verification checkmark, quote, credentials,
+  and optional signature or seal to dramatically elevate conversion trust.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --tee-bg: var(--color-surface, var(--color-background, #f8fafc));
+    --tee-card: #ffffff;
+    --tee-text: var(--color-text, #0f172a);
+    --tee-muted: color-mix(in srgb, var(--tee-text) 60%, transparent);
+    --tee-border: color-mix(in srgb, var(--tee-text) 12%, transparent);
+    --tee-accent: var(--color-accent, #0284c7);
+    --tee-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --tee-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .tee-section {
+    background: var(--tee-bg);
+    padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--tee-border);
+    border-bottom: 1px solid var(--tee-border);
+  }
+
+  .tee-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    background: var(--tee-card);
+    border: 1px solid var(--tee-border);
+    border-radius: var(--radius-card, 20px);
+    padding: clamp(2rem, 5vw, 4rem);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .tee-inner {
+      grid-template-columns: 280px 1fr;
+    }
+  }
+
+  .tee-photo-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 6px solid color-mix(in srgb, var(--tee-accent) 15%, transparent);
+    padding: 6px;
+  }
+  @media (min-width: 768px) {
+    .tee-photo-wrap {
+      width: 240px;
+      height: 240px;
+    }
+  }
+  .tee-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #e2e8f0;
+  }
+  .tee-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tee-badge-verified {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: var(--tee-accent);
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    border: 3px solid #ffffff;
+  }
+  .tee-badge-verified svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tee-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .tee-content {
+      text-align: left;
+    }
+  }
+
+  .tee-eyebrow {
+    font-family: var(--tee-font);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--tee-accent);
+  }
+
+  .tee-quote {
+    font-family: var(--tee-font-head);
+    font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--tee-text);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .tee-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-top: 0.5rem;
+  }
+  .tee-name {
+    font-family: var(--tee-font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--tee-text);
+  }
+  .tee-creds {
+    font-family: var(--tee-font);
+    font-size: 0.85rem;
+    color: var(--tee-muted);
+  }
+
+  .tee-sig {
+    height: 42px;
+    margin-top: 0.25rem;
+  }
+  @media (min-width: 768px) {
+    .tee-sig {
+      align-self: flex-start;
+    }
+  }
+  .tee-sig img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+</style>
+
+<section class="tee-section" aria-labelledby="tee-title-{{ section.id }}">
+  <div class="tee-inner">
+    <div class="tee-photo-wrap">
+      <div class="tee-photo">
+        {%- if section.settings.image != blank -%}
+          {{ section.settings.image | image_url: width: 500 | image_tag: loading: 'lazy', alt: section.settings.name }}
+        {%- else -%}
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #64748b;">
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+        {%- endif -%}
+      </div>
+      <div class="tee-badge-verified" title="Verified Professional Endorsement" aria-label="Verified Professional">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+    </div>
+
+    <div class="tee-content">
+      {%- if section.settings.eyebrow != blank -%}
+        <div id="tee-title-{{ section.id }}" class="tee-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      
+      {%- if section.settings.quote != blank -%}
+        <blockquote class="tee-quote">"{{ section.settings.quote }}"</blockquote>
+      {%- endif -%}
+
+      <div class="tee-meta">
+        <span class="tee-name">{{ section.settings.name | default: 'Dr. Sarah Jenkins, MD' }}</span>
+        <span class="tee-creds">{{ section.settings.creds | default: 'Board Certified Dermatologist & Clinical Researcher' }}</span>
+      </div>
+
+      {%- if section.settings.signature != blank -%}
+        <div class="tee-sig">
+          {{ section.settings.signature | image_url: width: 300 | image_tag: loading: 'lazy', alt: 'Signature' }}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Expert Endorsement",
+  "tag": "section",
+  "class": "section-trust-expert",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overhead Badge Text",
+      "default": "Expert Approved & Verified"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Endorsement Quote",
+      "default": "I have evaluated hundreds of formulations throughout my career. This stands out as a clear industry leader in quality, safety, and clinical efficacy."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Expert Photo Portrait"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Expert Name",
+      "default": "Dr. Sarah Jenkins, MD"
+    },
+    {
+      "type": "text",
+      "id": "creds",
+      "label": "Credentials & Title",
+      "default": "Board Certified Dermatologist & Clinical Researcher"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature",
+      "label": "Signature Image (Optional PNG)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Expert Endorsement"
+    }
+  ]
+}
+{% endschema %}

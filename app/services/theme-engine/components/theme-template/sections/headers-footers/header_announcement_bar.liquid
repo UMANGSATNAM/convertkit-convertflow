@@ -1,0 +1,87 @@
+<div class="announcement-bar bg-[var(--color-text)] text-[var(--color-background)] relative z-[60] overflow-hidden">
+  {%- if section.settings.link != blank -%}
+    <a href="{{ section.settings.link }}" class="block">
+  {%- endif -%}
+
+  <div class="w-full h-10 flex items-center justify-center relative">
+    
+    {%- if section.settings.enable_marquee -%}
+      <div class="w-full overflow-hidden whitespace-nowrap flex group">
+        <div class="animate-marquee-fast flex whitespace-nowrap group-hover:pause">
+          {%- for i in (1..10) -%}
+            <span class="mx-4 text-xs font-bold uppercase tracking-[0.2em]">{{ section.settings.text }}</span>
+          {%- endfor -%}
+        </div>
+        <div class="animate-marquee-fast flex whitespace-nowrap group-hover:pause" aria-hidden="true">
+          {%- for i in (1..10) -%}
+            <span class="mx-4 text-xs font-bold uppercase tracking-[0.2em]">{{ section.settings.text }}</span>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="text-center px-4 w-full">
+        <span class="text-xs font-bold uppercase tracking-[0.2em]">{{ section.settings.text }}</span>
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  {%- if section.settings.link != blank -%}
+    </a>
+  {%- endif -%}
+
+  {%- if section.settings.show_close -%}
+    <button class="absolute top-1/2 right-4 -translate-y-1/2 text-[var(--color-background)]/70 hover:text-[var(--color-background)]" onclick="this.closest('.announcement-bar').style.display='none'">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  {%- endif -%}
+</div>
+
+<style>
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee-fast {
+  animation: marquee 20s linear infinite;
+}
+.pause {
+  animation-play-state: paused;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Announcement Text",
+      "default": "FREE SHIPPING ON ALL ORDERS OVER $100"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Announcement Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_marquee",
+      "label": "Enable Scrolling Marquee",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close",
+      "label": "Show Close Button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar"
+    }
+  ]
+}
+{% endschema %}

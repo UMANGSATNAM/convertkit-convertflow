@@ -1,0 +1,241 @@
+{%- comment -%}
+  hero_parallax.liquid — Performance Parallax Hero
+  
+  DESIGN PHILOSOPHY:
+  Immersive storytelling hero with smooth parallax depth scrolling.
+  Uses requestAnimationFrame and CSS translate3d for 60fps performance
+  without mobile Safari background-attachment: fixed bugs.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hpl-text: var(--color-text, #ffffff);
+    --hpl-muted: color-mix(in srgb, var(--hpl-text) 80%, transparent);
+    --hpl-accent: var(--color-accent, #6366f1);
+    --hpl-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --hpl-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .hpl-section {
+    position: relative;
+    overflow: hidden;
+    min-height: clamp(520px, 75vh, 850px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .hpl-bg-wrap {
+    position: absolute;
+    top: -15%;
+    left: 0;
+    width: 100%;
+    height: 130%;
+    z-index: 1;
+    will-change: transform;
+    pointer-events: none;
+  }
+  .hpl-bg-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hpl-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
+    z-index: 2;
+  }
+
+  .hpl-content {
+    position: relative;
+    z-index: 3;
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hpl-eyebrow {
+    font-family: var(--hpl-font);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--hpl-muted);
+  }
+
+  .hpl-title {
+    font-family: var(--hpl-font-head);
+    font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--hpl-text);
+    margin: 0;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .hpl-desc {
+    font-family: var(--hpl-font);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--hpl-muted);
+    margin: 0;
+    max-width: 600px;
+    line-height: 1.6;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .hpl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--hpl-font);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #000000;
+    background: #ffffff;
+    padding: 1rem 2.25rem;
+    border-radius: 100px;
+    text-decoration: none;
+    margin-top: 0.5rem;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+  }
+  .hpl-btn:hover {
+    background: var(--hpl-accent);
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4);
+  }
+</style>
+
+<section class="hpl-section" id="hpl-sec-{{ section.id }}" aria-label="Parallax Story">
+  <div class="hpl-bg-wrap" id="hpl-bg-{{ section.id }}" aria-hidden="true">
+    {%- if section.settings.image != blank -%}
+      {{ section.settings.image | image_url: width: 2000 | image_tag: loading: 'lazy', alt: section.settings.title }}
+    {%- else -%}
+      <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #1e293b, #0f172a);"></div>
+    {%- endif -%}
+  </div>
+
+  <div class="hpl-overlay" style="opacity: {{ section.settings.overlay_opacity | default: 60 | divided_by: 100.0 }};"></div>
+
+  <div class="hpl-content">
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="hpl-eyebrow">{{ section.settings.eyebrow }}</div>
+    {%- endif -%}
+    {%- if section.settings.title != blank -%}
+      <h2 class="hpl-title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hpl-desc">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '/collections/all' }}" class="hpl-btn">{{ section.settings.btn_label }} →</a>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sec = document.getElementById('hpl-sec-' + sid);
+    var bg = document.getElementById('hpl-bg-' + sid);
+    if (!sec || !bg) return;
+
+    var speed = {{ section.settings.parallax_speed | default: 30 }} / 100;
+    var ticking = false;
+
+    function updateParallax() {
+      var rect = sec.getBoundingClientRect();
+      var winH = window.innerHeight || document.documentElement.clientHeight;
+      
+      if (rect.top <= winH && rect.bottom >= 0) {
+        var offset = (rect.top / winH) * 100 * speed;
+        bg.style.transform = 'translate3d(0, ' + offset + '%, 0)';
+      }
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    updateParallax();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Parallax Hero",
+  "tag": "section",
+  "class": "section-hero-parallax",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "label": "Overlay Opacity (%)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "parallax_speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "label": "Parallax Speed Intensity",
+      "default": 30
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "The Explorer Series"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Into The Wild"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "Engineered for extreme environments and unyielding durability."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Parallax Hero"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,213 @@
+{%- comment -%}
+  info_process_steps.liquid — Interactive Step-by-Step Process
+  
+  DESIGN PHILOSOPHY:
+  How-It-Works workflow visualizer. Simplifies onboarding or product
+  usage into 3 or 4 clear sequential steps. Features numbered badges,
+  desktop connecting progress lines, and clean card elevation.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --ips-bg: var(--color-surface, var(--color-background, #ffffff));
+    --ips-card: var(--color-background, #f8fafc);
+    --ips-text: var(--color-text, #0f172a);
+    --ips-muted: color-mix(in srgb, var(--ips-text) 60%, transparent);
+    --ips-border: color-mix(in srgb, var(--ips-text) 12%, transparent);
+    --ips-accent: var(--color-accent, #6366f1);
+    --ips-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --ips-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .ips-section {
+    background: var(--ips-bg);
+    padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--ips-border);
+  }
+
+  .ips-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .ips-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto clamp(2.5rem, 6vw, 5rem) auto;
+  }
+  .ips-eyebrow {
+    font-family: var(--ips-font);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ips-accent);
+    margin-bottom: 0.5rem;
+  }
+  .ips-title {
+    font-family: var(--ips-font-head);
+    font-size: clamp(1.85rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--ips-text);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.15;
+  }
+  .ips-desc {
+    font-family: var(--ips-font);
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--ips-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .ips-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .ips-grid {
+      grid-template-columns: repeat(var(--step-count, 3), 1fr);
+      gap: 2rem;
+    }
+    .ips-grid::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: 15%;
+      width: 70%;
+      height: 2px;
+      background: var(--ips-border);
+      z-index: 1;
+    }
+  }
+
+  .ips-card {
+    background: var(--ips-card);
+    border: 1px solid var(--ips-border);
+    border-radius: var(--radius-card, 16px);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .ips-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1);
+    border-color: var(--ips-accent);
+  }
+
+  .ips-num {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--ips-accent);
+    color: #ffffff;
+    font-family: var(--ips-font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 15px -3px color-mix(in srgb, var(--ips-accent) 40%, transparent);
+  }
+
+  .ips-card-title {
+    font-family: var(--ips-font-head);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ips-text);
+    margin: 0;
+  }
+
+  .ips-card-desc {
+    font-family: var(--ips-font);
+    font-size: 0.92rem;
+    color: var(--ips-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<section class="ips-section" aria-labelledby="ips-title-{{ section.id }}">
+  <div class="ips-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank -%}
+      <div class="ips-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="ips-eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="ips-title-{{ section.id }}" class="ips-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="ips-desc">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- assign count = section.blocks.size | default: 3 -%}
+    <div class="ips-grid" style="--step-count: {{ count }};">
+      {%- for block in section.blocks -%}
+        <div class="ips-card" {{ block.shopify_attributes }}>
+          <div class="ips-num">{{ forloop.index }}</div>
+          <h3 class="ips-card-title">{{ block.settings.title }}</h3>
+          <p class="ips-card-desc">{{ block.settings.text }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Process Steps",
+  "tag": "section",
+  "class": "section-info-process",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Simple Process"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "How It Works"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Section Description",
+      "default": "Get started in three effortless steps designed for maximum convenience and peace of mind."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Process Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Step Title", "default": "Choose Your Setup" },
+        { "type": "textarea", "id": "text", "label": "Step Description", "default": "Select the configuration that best matches your lifestyle and preferences from our curated collection." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Process Steps",
+      "blocks": [
+        { "type": "step", "settings": { "title": "Select Your Model", "text": "Browse our premium range and pick the exact specifications tailored to your daily needs." } },
+        { "type": "step", "settings": { "title": "Quick Customization", "text": "Personalize colors, finishes, and optional add-ons directly from your interactive dashboard." } },
+        { "type": "step", "settings": { "title": "Express Delivery", "text": "Enjoy complimentary carbon-neutral shipping straight to your doorstep with real-time GPS tracking." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

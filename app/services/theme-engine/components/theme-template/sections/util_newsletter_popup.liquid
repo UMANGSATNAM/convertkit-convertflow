@@ -1,0 +1,101 @@
+<div class="sf-popup sf-np-{{ section.id }}" id="sf-np-modal-{{ section.id }}" data-delay="{{ section.settings.delay }}">
+  <div class="sf-np-overlay" onclick="document.getElementById('sf-np-modal-{{ section.id }}').classList.remove('active'); sessionStorage.setItem('sf_popup_seen', 'true');"></div>
+  <div class="sf-np-content" style="background-color: {{ section.settings.bg_color }};">
+    <button class="sf-np-close" onclick="document.getElementById('sf-np-modal-{{ section.id }}').classList.remove('active'); sessionStorage.setItem('sf_popup_seen', 'true');" style="color: {{ section.settings.text_color }};">✕</button>
+    
+    <div class="sf-np-inner">
+      {% if section.settings.image != blank %}
+        <div class="sf-np-image">
+          <img src="{{ section.settings.image | img_url: '600x' }}" alt="Newsletter" loading="lazy">
+        </div>
+      {% endif %}
+      
+      <div class="sf-np-form-area">
+        <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+        <p style="color: {{ section.settings.text_color }};">{{ section.settings.text }}</p>
+        
+        {% form 'customer', class: 'sf-np-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="sf-np-input-group">
+            <input type="email" name="contact[email]" placeholder="Your email address" required style="border-color: {{ section.settings.text_color | color_modify: 'alpha', 0.2 }}; color: {{ section.settings.text_color }};">
+            <button type="submit" style="background: {{ section.settings.btn_bg }}; color: {{ section.settings.btn_text }};">{{ section.settings.btn_label }}</button>
+          </div>
+          {% if form.posted_successfully? %}
+            <p class="sf-np-success" style="color: green;">Thank you for subscribing!</p>
+            <script>document.getElementById('sf-np-modal-{{ section.id }}').classList.add('active');</script>
+          {% endif %}
+        {% endform %}
+        
+        <button class="sf-np-decline" onclick="document.getElementById('sf-np-modal-{{ section.id }}').classList.remove('active'); sessionStorage.setItem('sf_popup_seen', 'true');" style="color: {{ section.settings.text_color }};">No thanks, I'll pay full price</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-np-{{ section.id }} { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease; }
+  .sf-np-{{ section.id }}.active { display: flex; opacity: 1; }
+  .sf-np-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: color-mix(in srgb, var(--color-text) 60%, transparent); backdrop-filter: blur(2px); }
+  
+  .sf-np-content { position: relative; z-index: 10; width: 90%; max-width: 800px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px color-mix(in srgb, var(--color-text) 20%, transparent); transform: translateY(20px); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .sf-np-{{ section.id }}.active .sf-np-content { transform: translateY(0); }
+  
+  .sf-np-close { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; z-index: 20; opacity: 0.5; transition: opacity 0.3s; }
+  .sf-np-close:hover { opacity: 1; }
+  
+  .sf-np-inner { display: flex; flex-direction: column; }
+  @media (min-width: 768px) { .sf-np-inner { flex-direction: row; } }
+  
+  .sf-np-image { width: 100%; height: 200px; }
+  @media (min-width: 768px) { .sf-np-image { width: 45%; height: auto; } }
+  .sf-np-image img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .sf-np-form-area { padding: 3rem; flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .sf-np-form-area h2 { font-size: 2rem; margin-bottom: 1rem; }
+  .sf-np-form-area p { opacity: 0.8; margin-bottom: 2rem; line-height: 1.5; }
+  
+  .sf-np-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+  @media (min-width: 500px) { .sf-np-input-group { flex-direction: row; } }
+  .sf-np-input-group input { flex: 1; padding: 12px 15px; border: 1px solid; border-radius: 4px; background: transparent; outline: none; }
+  .sf-np-input-group button { padding: 12px 25px; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+  
+  .sf-np-success { margin-top: 1rem; font-weight: bold; }
+  .sf-np-decline { background: none; border: none; text-decoration: underline; font-size: 0.85rem; opacity: 0.6; cursor: pointer; margin-top: 1rem; }
+  .sf-np-decline:hover { opacity: 1; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only run if not in Shopify theme editor
+    if (window.Shopify && window.Shopify.designMode) return;
+    
+    const popup = document.getElementById('sf-np-modal-{{ section.id }}');
+    if (!popup) return;
+    
+    const delay = parseInt(popup.getAttribute('data-delay')) * 1000;
+    
+    if (!sessionStorage.getItem('sf_popup_seen')) {
+      setTimeout(() => {
+        popup.classList.add('active');
+      }, delay);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Newsletter Popup",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "image_picker", "id": "image", "label": "Side Image (Optional)" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Unlock 15% Off" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Join our newsletter and get 15% off your first order, plus exclusive access to new drops." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Subscribe" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#111111" },
+    { "type": "color", "id": "btn_text", "label": "Button Text", "default": "#ffffff" },
+    { "type": "range", "id": "delay", "label": "Delay (seconds)", "min": 0, "max": 30, "step": 1, "default": 5 }
+  ],
+  "presets": [ { "name": "Newsletter Popup", "category": "Utilities" } ]
+}
+{% endschema %}

@@ -1,0 +1,86 @@
+<div class="sf-sg sf-sg-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-sg-container">
+    <div class="sf-sg-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-sg-wrap">
+      <table class="sf-sg-table" style="color: {{ section.settings.text_color }};">
+        <thead>
+          <tr style="background: {{ section.settings.text_color | color_modify: 'alpha', 0.05 }};">
+            <th>Size</th>
+            <th>US</th>
+            <th>UK</th>
+            <th>EU</th>
+            <th>Chest (in)</th>
+            <th>Waist (in)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for block in section.blocks %}
+            <tr>
+              <td><strong>{{ block.settings.size }}</strong></td>
+              <td>{{ block.settings.us }}</td>
+              <td>{{ block.settings.uk }}</td>
+              <td>{{ block.settings.eu }}</td>
+              <td>{{ block.settings.chest }}</td>
+              <td>{{ block.settings.waist }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    {% if section.settings.image != blank %}
+      <div class="sf-sg-visual">
+        <img src="{{ section.settings.image | img_url: '1000x' }}" alt="How to measure" loading="lazy">
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .sf-sg-{{ section.id }} { padding: 4rem 1rem; }
+  .sf-sg-container { max-width: 1000px; margin: 0 auto; }
+  .sf-sg-header { text-align: center; margin-bottom: 3rem; }
+  .sf-sg-header h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+  .sf-sg-header p { opacity: 0.8; }
+  
+  .sf-sg-wrap { overflow-x: auto; margin-bottom: 3rem; border-radius: 8px; box-shadow: 0 4px 15px color-mix(in srgb, var(--color-text) 5%, transparent); border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent); }
+  .sf-sg-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  .sf-sg-table th, .sf-sg-table td { padding: 15px; text-align: center; border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent); }
+  .sf-sg-table th { font-weight: bold; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+  .sf-sg-table tr:last-child td { border-bottom: none; }
+  .sf-sg-table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 2%, transparent); }
+  
+  .sf-sg-visual { border-radius: 12px; overflow: hidden; background: var(--color-surface); }
+  .sf-sg-visual img { width: 100%; height: auto; display: block; }
+</style>
+
+{% schema %}
+{
+  "name": "Size Guide Table",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Size Guide" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Measurements in inches." },
+    { "type": "image_picker", "id": "image", "label": "How to Measure Image" }
+  ],
+  "blocks": [
+    {
+      "type": "row", "name": "Size Row",
+      "settings": [
+        { "type": "text", "id": "size", "label": "Size Label", "default": "M" },
+        { "type": "text", "id": "us", "label": "US", "default": "6-8" },
+        { "type": "text", "id": "uk", "label": "UK", "default": "10-12" },
+        { "type": "text", "id": "eu", "label": "EU", "default": "38-40" },
+        { "type": "text", "id": "chest", "label": "Chest", "default": "36-38" },
+        { "type": "text", "id": "waist", "label": "Waist", "default": "28-30" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Size Guide Table", "category": "Utilities", "blocks": [{"type":"row"},{"type":"row"},{"type":"row"}] } ]
+}
+{% endschema %}

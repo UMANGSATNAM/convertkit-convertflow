@@ -1,0 +1,79 @@
+<div class="sf-compare sf-ct-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  <div class="sf-ct-container">
+    <div class="sf-ct-header">
+      <h2 style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+      <p style="color: {{ section.settings.text_color }};">{{ section.settings.subtitle }}</p>
+    </div>
+    
+    <div class="sf-ct-table-wrap">
+      <table class="sf-ct-table" style="color: {{ section.settings.text_color }};">
+        <thead>
+          <tr>
+            <th>Features</th>
+            <th class="sf-ct-highlight" style="background: {{ section.settings.highlight_bg }}; color: {{ section.settings.highlight_text }};">Us</th>
+            <th>Them</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for block in section.blocks %}
+            <tr>
+              <td>{{ block.settings.feature }}</td>
+              <td class="sf-ct-highlight" style="background: {{ section.settings.highlight_bg | color_modify: 'alpha', 0.1 }};">
+                {% if block.settings.us_has %}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: green;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {% else %}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: red;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                {% endif %}
+              </td>
+              <td>
+                {% if block.settings.them_has %}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: green;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {% else %}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: red;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf-ct-{{ section.id }} { padding: 5rem 1rem; }
+  .sf-ct-container { max-width: 900px; margin: 0 auto; text-align: center; }
+  .sf-ct-header { margin-bottom: 3rem; }
+  .sf-ct-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+  .sf-ct-table-wrap { overflow-x: auto; border-radius: 12px; box-shadow: 0 10px 30px color-mix(in srgb, var(--color-text) 5%, transparent); border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent); }
+  .sf-ct-table { width: 100%; border-collapse: collapse; text-align: center; background: var(--color-background); }
+  .sf-ct-table th, .sf-ct-table td { padding: 1.5rem 1rem; border-bottom: 1px solid color-mix(in srgb, var(--color-text) 5%, transparent); }
+  .sf-ct-table th { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; }
+  .sf-ct-table th:first-child, .sf-ct-table td:first-child { text-align: left; padding-left: 2rem; font-weight: bold; }
+  .sf-ct-highlight { border-left: 1px solid color-mix(in srgb, var(--color-text) 5%, transparent); border-right: 1px solid color-mix(in srgb, var(--color-text) 5%, transparent); }
+</style>
+
+{% schema %}
+{
+  "name": "Comparison Table",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#fafafa" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111111" },
+    { "type": "color", "id": "highlight_bg", "label": "Our Column BG", "default": "#111111" },
+    { "type": "color", "id": "highlight_text", "label": "Our Column Text", "default": "#ffffff" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Why We're Better" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "See how we stack up against the competition." }
+  ],
+  "blocks": [
+    {
+      "type": "feature", "name": "Feature",
+      "settings": [
+        { "type": "text", "id": "feature", "label": "Feature Name", "default": "Premium Materials" },
+        { "type": "checkbox", "id": "us_has", "label": "We have it", "default": true },
+        { "type": "checkbox", "id": "them_has", "label": "They have it", "default": false }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Comparison Table", "category": "Information", "blocks": [{"type":"feature"}, {"type":"feature"}, {"type":"feature"}] } ]
+}
+{% endschema %}

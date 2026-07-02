@@ -1,0 +1,123 @@
+<footer class="sf-footer sf-footer-{{ section.id }}" style="background-color: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }};">
+  <div class="sf-footer-container">
+    
+    <div class="sf-footer-top">
+      <div class="sf-footer-brand">
+        {% if section.settings.logo != blank %}
+          <img src="{{ section.settings.logo | img_url: '300x' }}" alt="{{ shop.name }}" class="sf-footer-logo" loading="lazy">
+        {% else %}
+          <h2 class="sf-footer-logo-text">{{ shop.name }}</h2>
+        {% endif %}
+        <p class="sf-footer-desc">{{ section.settings.about_text }}</p>
+        
+        <div class="sf-footer-social">
+          {% if settings.social_instagram_link != blank %}
+            <a href="{{ settings.social_instagram_link }}" target="_blank">IG</a>
+          {% endif %}
+          {% if settings.social_tiktok_link != blank %}
+            <a href="{{ settings.social_tiktok_link }}" target="_blank">TK</a>
+          {% endif %}
+          {% if settings.social_facebook_link != blank %}
+            <a href="{{ settings.social_facebook_link }}" target="_blank">FB</a>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="sf-footer-links-wrap">
+        {% for block in section.blocks %}
+          <div class="sf-footer-col">
+            <h4 class="sf-footer-col-title">{{ block.settings.title }}</h4>
+            <ul class="sf-footer-menu">
+              {% for link in linklists[block.settings.menu].links %}
+                <li><a href="{{ link.url }}" style="color: {{ section.settings.text_color }};">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+      
+      <div class="sf-footer-newsletter">
+        <h4 class="sf-footer-col-title">Join the Club</h4>
+        <p>Subscribe for early access to new drops and exclusive offers.</p>
+        {% form 'customer', class: 'sf-footer-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="sf-footer-input-group">
+            <input type="email" name="contact[email]" placeholder="Email address" required style="border-color: {{ section.settings.text_color | color_modify: 'alpha', 0.2 }}; color: {{ section.settings.text_color }};">
+            <button type="submit" style="background: {{ section.settings.text_color }}; color: {{ section.settings.bg_color }};">→</button>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+    
+    <div class="sf-footer-bottom" style="border-top-color: {{ section.settings.text_color | color_modify: 'alpha', 0.1 }};">
+      <div class="sf-footer-copy">
+        &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
+      </div>
+      <div class="sf-footer-payment">
+        <!-- Payment icons placeholder -->
+        <span class="sf-payment-icon">Visa</span>
+        <span class="sf-payment-icon">MC</span>
+        <span class="sf-payment-icon">Amex</span>
+        <span class="sf-payment-icon">Apple</span>
+      </div>
+    </div>
+    
+  </div>
+</footer>
+
+<style>
+  .sf-footer-{{ section.id }} { padding: 5rem 1rem 2rem; font-size: 0.95rem; }
+  .sf-footer-container { max-width: 1400px; margin: 0 auto; }
+  
+  .sf-footer-top { display: grid; grid-template-columns: 1fr; gap: 4rem; margin-bottom: 4rem; }
+  @media (min-width: 992px) { .sf-footer-top { grid-template-columns: 2.5fr 5fr 2.5fr; } }
+  
+  .sf-footer-logo { max-width: 150px; margin-bottom: 1.5rem; }
+  .sf-footer-logo-text { font-size: 1.8rem; font-weight: bold; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+  .sf-footer-desc { opacity: 0.8; line-height: 1.6; margin-bottom: 1.5rem; }
+  
+  .sf-footer-social { display: flex; gap: 1rem; }
+  .sf-footer-social a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; font-size: 0.8rem; color: inherit; transition: opacity 0.3s; }
+  .sf-footer-social a:hover { opacity: 0.6; }
+  
+  .sf-footer-links-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; }
+  
+  .sf-footer-col-title { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-size: 0.9rem; }
+  .sf-footer-menu { list-style: none; padding: 0; margin: 0; }
+  .sf-footer-menu li { margin-bottom: 0.75rem; }
+  .sf-footer-menu a { text-decoration: none; opacity: 0.8; transition: opacity 0.3s; }
+  .sf-footer-menu a:hover { opacity: 1; text-decoration: underline; }
+  
+  .sf-footer-newsletter p { opacity: 0.8; margin-bottom: 1.5rem; line-height: 1.5; }
+  .sf-footer-input-group { display: flex; }
+  .sf-footer-input-group input { flex: 1; padding: 12px; border: 1px solid; border-right: none; background: transparent; outline: none; border-radius: 4px 0 0 4px; }
+  .sf-footer-input-group button { padding: 0 20px; border: none; font-size: 1.2rem; cursor: pointer; border-radius: 0 4px 4px 0; }
+  
+  .sf-footer-bottom { border-top: 1px solid; padding-top: 2rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; opacity: 0.8; font-size: 0.85rem; }
+  @media (min-width: 768px) { .sf-footer-bottom { flex-direction: row; } }
+  
+  .sf-footer-payment { display: flex; gap: 0.5rem; }
+  .sf-payment-icon { padding: 4px 8px; border: 1px solid currentColor; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+</style>
+
+{% schema %}
+{
+  "name": "Mega Footer",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#111111" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "image_picker", "id": "logo", "label": "Logo Image" },
+    { "type": "textarea", "id": "about_text", "label": "About Text", "default": "Crafting premium products for the modern individual. Designed with intention." }
+  ],
+  "blocks": [
+    {
+      "type": "menu", "name": "Footer Menu",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Heading", "default": "Shop" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Mega Footer", "category": "Layout", "blocks": [{"type":"menu"},{"type":"menu"}] } ]
+}
+{% endschema %}

@@ -1,0 +1,294 @@
+{%- comment -%}
+  grid_modern_1.liquid — Modern Tech & SaaS Feature/Product Grid
+  
+  DESIGN PHILOSOPHY:
+  High-tech, dark-mode ready bento/grid layout. Features glassmorphic cards,
+  subtle gradient hover glows, pill tags, and crisp typography.
+  Perfect for consumer tech, audio, digital goods, and modern brands.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mdg-bg: var(--color-background, #090d16);
+    --mdg-card: color-mix(in srgb, var(--color-text, #fff) 4%, transparent);
+    --mdg-text: var(--color-text, #f8fafc);
+    --mdg-muted: color-mix(in srgb, var(--mdg-text) 55%, transparent);
+    --mdg-border: color-mix(in srgb, var(--mdg-text) 10%, transparent);
+    --mdg-accent: var(--color-accent, #6366f1);
+    --mdg-font: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --mdg-font-head: var(--font-heading, 'Space Grotesk', -apple-system, sans-serif);
+  }
+
+  .mdg-section {
+    background: var(--mdg-bg);
+    padding: clamp(3.5rem, 8vw, 6.5rem) clamp(1.25rem, 4vw, 3.5rem);
+  }
+
+  .mdg-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  .mdg-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: clamp(2rem, 5vw, 4rem);
+  }
+  .mdg-eyebrow {
+    font-family: var(--mdg-font);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--mdg-accent);
+    margin-bottom: 0.5rem;
+  }
+  .mdg-title {
+    font-family: var(--mdg-font-head);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--mdg-text);
+    margin: 0;
+  }
+  .mdg-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mdg-font);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--mdg-text);
+    background: color-mix(in srgb, var(--mdg-text) 8%, transparent);
+    padding: 0.6rem 1.25rem;
+    border-radius: 100px;
+    text-decoration: none;
+    border: 1px solid var(--mdg-border);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .mdg-cta:hover {
+    background: color-mix(in srgb, var(--mdg-text) 14%, transparent);
+    border-color: var(--mdg-accent);
+  }
+
+  .mdg-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .mdg-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .mdg-grid[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+    .mdg-grid[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .mdg-card {
+    background: var(--mdg-card);
+    border: 1px solid var(--mdg-border);
+    border-radius: var(--radius-card, 20px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--mdg-text);
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .mdg-card:hover {
+    transform: translateY(-6px);
+    border-color: color-mix(in srgb, var(--mdg-accent) 60%, transparent);
+    box-shadow: 0 16px 32px -12px color-mix(in srgb, var(--mdg-accent) 25%, transparent);
+  }
+
+  .mdg-media {
+    aspect-ratio: var(--aspect, 16/10);
+    background: color-mix(in srgb, var(--mdg-text) 3%, transparent);
+    overflow: hidden;
+    position: relative;
+  }
+  .mdg-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .mdg-card:hover .mdg-media img {
+    transform: scale(1.05);
+  }
+
+  .mdg-tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: color-mix(in srgb, var(--mdg-bg) 80%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--mdg-text);
+    font-family: var(--mdg-font);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 100px;
+    border: 1px solid var(--mdg-border);
+    z-index: 2;
+  }
+
+  .mdg-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+  .mdg-card-title {
+    font-family: var(--mdg-font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.35;
+  }
+  .mdg-card-desc {
+    font-family: var(--mdg-font);
+    font-size: 0.85rem;
+    color: var(--mdg-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+  .mdg-card-price {
+    font-family: var(--mdg-font-head);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--mdg-accent);
+    margin-top: 0.5rem;
+  }
+</style>
+
+<section class="mdg-section" aria-labelledby="mdg-title-{{ section.id }}">
+  <div class="mdg-inner">
+    {%- if section.settings.title != blank or section.settings.eyebrow != blank or section.settings.cta_text != blank -%}
+      <div class="mdg-header">
+        <div>
+          {%- if section.settings.eyebrow != blank -%}
+            <div class="mdg-eyebrow">{{ section.settings.eyebrow }}</div>
+          {%- endif -%}
+          {%- if section.settings.title != blank -%}
+            <h2 id="mdg-title-{{ section.id }}" class="mdg-title">{{ section.settings.title }}</h2>
+          {%- endif -%}
+        </div>
+        {%- if section.settings.cta_text != blank -%}
+          <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="mdg-cta">{{ section.settings.cta_text }} →</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="mdg-grid" data-cols="{{ section.settings.columns | default: '3' }}" style="--aspect: {{ section.settings.aspect_ratio | default: '16/10' }};">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.url | default: '#' }}" class="mdg-card" {{ block.shopify_attributes }}>
+          <div class="mdg-media">
+            {%- if block.settings.tag != blank -%}
+              <span class="mdg-tag">{{ block.settings.tag }}</span>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: block.settings.title }}
+            {%- else -%}
+              <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--mdg-muted); font-size: 0.8rem;">
+                {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            {%- endif -%}
+          </div>
+          <div class="mdg-content">
+            <h3 class="mdg-card-title">{{ block.settings.title | default: 'Next-Gen Device' }}</h3>
+            {%- if block.settings.description != blank -%}
+              <p class="mdg-card-desc">{{ block.settings.description }}</p>
+            {%- endif -%}
+            {%- if block.settings.price != blank -%}
+              <div class="mdg-card-price">{{ block.settings.price }}</div>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Modern Grid",
+  "tag": "section",
+  "class": "section-grid-modern",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Hardware & Accessories"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Engineered for Performance"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "Explore All"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA URL"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "options": [
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "16/10", "label": "Widescreen (16:10)" },
+        { "value": "4/3", "label": "Standard (4:3)" }
+      ],
+      "default": "16/10"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Grid Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "tag", "label": "Tag Pill", "default": "Pro" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Neural Audio Headset" },
+        { "type": "text", "id": "description", "label": "Description", "default": "Active noise cancellation with ultra-low latency wireless audio." },
+        { "type": "text", "id": "price", "label": "Price", "default": "$349" },
+        { "type": "url", "id": "url", "label": "URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Grid",
+      "blocks": [
+        { "type": "card", "settings": { "tag": "New", "title": "Neural Audio Headset", "description": "Active noise cancellation with ultra-low latency.", "price": "$349" } },
+        { "type": "card", "settings": { "tag": "Best Seller", "title": "Ergo Mechanical Keyboard", "description": "Hot-swappable switches with aircraft-grade aluminum frame.", "price": "$199" } },
+        { "type": "card", "settings": { "tag": "Wireless", "title": "Precision Laser Mouse", "description": "26,000 DPI optical sensor with 80-hour battery life.", "price": "$129" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

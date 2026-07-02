@@ -1,0 +1,690 @@
+{%- comment -%}
+  hero_fashion_1.liquid — Ultra-Comprehensive High-Fashion Lookbook & Hotspot Hero
+  
+  DESIGN PHILOSOPHY:
+  An editorial runway lookbook hero engineered for high-fashion discovery and instant
+  shoppable gratification. Features interactive glowing X/Y product hotspot pins overlaying
+  cinematic photography, floating glassmorphic product preview cards, and an accessible
+  Quick Inspect Modal Dialog. Engineered for 60fps performance and zero layout shift.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hfa-bg: {{ section.settings.bg_color | default: '#0a0a0a' }};
+    --hfa-card-bg: {{ section.settings.card_bg_color | default: '#171717' }};
+    --hfa-text: {{ section.settings.text_color | default: '#f5f5f5' }};
+    --hfa-muted: color-mix(in srgb, var(--hfa-text) 65%, transparent);
+    --hfa-border: color-mix(in srgb, var(--hfa-text) 15%, transparent);
+    --hfa-accent: {{ section.settings.accent_color | default: '#e11d48' }};
+    --hfa-font-body: var(--font-body, 'Inter', -apple-system, sans-serif);
+    --hfa-font-head: var(--font-heading, 'Playfair Display', serif);
+    --hfa-padding-top: clamp(3.5rem, 8vw, 6.5rem);
+    --hfa-padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+  }
+
+  .hfa-section {
+    background-color: var(--hfa-bg);
+    color: var(--hfa-text);
+    font-family: var(--hfa-font-body);
+    padding: var(--hfa-padding-top) clamp(1.25rem, 4vw, 4rem) var(--hfa-padding-bottom);
+    border-bottom: 1px solid var(--hfa-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hfa-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .hfa-container {
+      grid-template-columns: 1fr 1.35fr;
+    }
+  }
+
+  /* Editorial Text Column */
+  .hfa-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 5;
+  }
+  .hfa-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--hfa-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hfa-eyebrow::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: var(--hfa-accent);
+  }
+  .hfa-title {
+    font-family: var(--hfa-font-head);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--hfa-text);
+    line-height: 1.08;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  .hfa-desc {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--hfa-muted);
+    line-height: 1.65;
+    margin: 0;
+    max-width: 540px;
+  }
+
+  /* Action Buttons */
+  .hfa-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .hfa-btn-pri {
+    background: var(--hfa-text);
+    color: var(--hfa-bg);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 1.15rem 2.5rem;
+    border-radius: 100px;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hfa-btn-pri:hover {
+    background: var(--hfa-accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px color-mix(in srgb, var(--hfa-accent) 50%, transparent);
+  }
+  .hfa-btn-sec {
+    background: transparent;
+    color: var(--hfa-text);
+    border: 1px solid var(--hfa-border);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 1.15rem 2.25rem;
+    border-radius: 100px;
+    transition: all 0.2s ease;
+  }
+  .hfa-btn-sec:hover {
+    background: color-mix(in srgb, var(--hfa-text) 10%, transparent);
+    border-color: var(--hfa-text);
+  }
+
+  /* Editorial Lookbook Media & Hotspots */
+  .hfa-lookbook {
+    position: relative;
+    border-radius: 32px;
+    overflow: hidden;
+    background: #171717;
+    border: 1px solid var(--hfa-border);
+    aspect-ratio: 4 / 5;
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.7);
+  }
+  .hfa-lookbook img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hfa-lookbook:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Glowing Hotspot Pin */
+  .hfa-pin {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--hfa-accent);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--hfa-accent) 35%, transparent);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+  }
+  .hfa-pin::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--hfa-accent);
+    animation: hfaPulse 2s infinite;
+  }
+  @keyframes hfaPulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  .hfa-pin:hover,
+  .hfa-pin.active {
+    transform: translate(-50%, -50%) scale(1.25);
+    background: #ffffff;
+    color: #000000;
+    border-color: var(--hfa-accent);
+  }
+
+  /* Hotspot Popover Card */
+  .hfa-popover {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(23, 23, 23, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 0.85rem;
+    width: 240px;
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 20;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .hfa-pin:hover .hfa-popover,
+  .hfa-pin.active .hfa-popover {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  .hfa-pop-img {
+    width: 56px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #000000;
+    flex-shrink: 0;
+  }
+  .hfa-pop-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: left;
+  }
+  .hfa-pop-title {
+    font-family: var(--hfa-font-body);
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 1.25;
+    margin: 0;
+  }
+  .hfa-pop-price {
+    font-size: 0.82rem;
+    color: var(--hfa-accent);
+    font-weight: 600;
+  }
+  .hfa-pop-cta {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  /* Quick Inspect Modal Dialog */
+  .hfa-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .hfa-modal-overlay[data-open="true"] {
+    display: flex;
+    opacity: 1;
+  }
+  .hfa-modal {
+    background: var(--hfa-card-bg);
+    color: var(--hfa-text);
+    border: 1px solid var(--hfa-border);
+    border-radius: 28px;
+    max-width: 760px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+    display: grid;
+    grid-template-columns: 1fr;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 768px) {
+    .hfa-modal {
+      grid-template-columns: 1fr 1.1fr;
+    }
+  }
+  .hfa-modal-overlay[data-open="true"] .hfa-modal {
+    transform: scale(1);
+  }
+  .hfa-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease;
+  }
+  .hfa-modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  .hfa-modal-media {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    background: #000000;
+    position: relative;
+  }
+  .hfa-modal-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hfa-modal-info {
+    padding: clamp(2rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .hfa-modal-title {
+    font-family: var(--hfa-font-head);
+    font-size: 2rem;
+    font-style: italic;
+    font-weight: 400;
+    margin: 0;
+  }
+  .hfa-modal-price {
+    font-size: 1.25rem;
+    color: var(--hfa-accent);
+    font-weight: 700;
+    margin-top: -0.75rem;
+  }
+  .hfa-modal-desc {
+    font-size: 0.95rem;
+    color: var(--hfa-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .hfa-modal-cta {
+    margin-top: auto;
+    background: var(--hfa-text);
+    color: var(--hfa-bg);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 1.1rem 2rem;
+    border-radius: 100px;
+    text-align: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .hfa-modal-cta:hover {
+    background: var(--hfa-accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+</style>
+
+<section class="hfa-section" id="hfa-section-{{ section.id }}" aria-labelledby="hfa-title-{{ section.id }}">
+  <div class="hfa-container">
+    
+    <!-- Editorial Text Column -->
+    <div class="hfa-content">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="hfa-eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h1 id="hfa-title-{{ section.id }}" class="hfa-title">{{ section.settings.title }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.subtitle != blank -%}
+        <p class="hfa-desc">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+
+      <div class="hfa-actions">
+        {%- if section.settings.btn_label != blank -%}
+          <a href="{{ section.settings.btn_link | default: '/collections/all' }}" class="hfa-btn-pri">
+            <span>{{ section.settings.btn_label }}</span>
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.btn_sec_label != blank -%}
+          <a href="{{ section.settings.btn_sec_link | default: '/pages/lookbook' }}" class="hfa-btn-sec">
+            <span>{{ section.settings.btn_sec_label }}</span>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <!-- Editorial Lookbook Photography & Hotspots -->
+    <div class="hfa-lookbook" id="hfa-lookbook-{{ section.id }}">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1400 | image_tag: loading: 'eager', alt: section.settings.title }}
+      {%- else -%}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#262626,#0a0a0a,#4c0519);display:flex;align-items:center;justify-content:center;color:#ffffff;font-family:var(--hfa-font-head);font-size:1.8rem;font-style:italic;">Lookbook Runway Feature</div>
+      {%- endif -%}
+
+      <!-- Hotspot Pins -->
+      {%- for block in section.blocks -%}
+        <div 
+          class="hfa-pin" 
+          style="top: {{ block.settings.pos_y | default: 50 }}%; left: {{ block.settings.pos_x | default: 50 }}%;"
+          data-title="{{ block.settings.title | escape }}"
+          data-price="{{ block.settings.price | default: '$450.00' | escape }}"
+          data-desc="{{ block.settings.desc | escape }}"
+          data-link="{{ block.settings.link | default: '/products/sample' }}"
+          data-img="{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 600 }}{% endif %}"
+          role="button"
+          tabindex="0"
+          aria-label="Inspect piece: {{ block.settings.title }}"
+          {{ block.shopify_attributes }}
+        >
+          <span>{{ forloop.index }}</span>
+
+          <!-- Popover Card -->
+          <div class="hfa-popover">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 120 | image_tag: loading: 'lazy', class: 'hfa-pop-img', alt: block.settings.title }}
+            {%- else -%}
+              <div class="hfa-pop-img" style="background:#333;"></div>
+            {%- endif -%}
+            <div class="hfa-pop-info">
+              <h4 class="hfa-pop-title">{{ block.settings.title }}</h4>
+              <span class="hfa-pop-price">{{ block.settings.price | default: '$450.00' }}</span>
+              <span class="hfa-pop-cta">Quick Inspect →</span>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+
+  <!-- Quick Inspect Modal -->
+  <div class="hfa-modal-overlay" id="hfa-modal-{{ section.id }}" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="hfa-modal">
+      <button type="button" class="hfa-modal-close" id="hfa-modal-close-{{ section.id }}" aria-label="Close modal">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="hfa-modal-media">
+        <img src="" id="hfa-modal-img" alt="Enlarged Piece" style="display:none;">
+      </div>
+
+      <div class="hfa-modal-info">
+        <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--hfa-accent);">Atelier Runway Edition</span>
+        <h3 class="hfa-modal-title" id="hfa-modal-title">Lookbook Silhouette</h3>
+        <span class="hfa-modal-price" id="hfa-modal-price">$450.00</span>
+        <p class="hfa-modal-desc" id="hfa-modal-desc">Tailored from Italian virgin wool with bespoke horn buttons and silk satin lining.</p>
+
+        <a href="/products/sample" class="hfa-modal-cta" id="hfa-modal-cta">Explore Piece Specifications →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var sid = '{{ section.id }}';
+    var sectionEl = document.getElementById('hfa-section-' + sid);
+    if (!sectionEl) return;
+
+    // 1. Hotspot Modal Controller
+    var modalOverlay = document.getElementById('hfa-modal-' + sid);
+    var modalClose = document.getElementById('hfa-modal-close-' + sid);
+    if (modalOverlay && modalClose) {
+      var titleEl = document.getElementById('hfa-modal-title');
+      var priceEl = document.getElementById('hfa-modal-price');
+      var descEl = document.getElementById('hfa-modal-desc');
+      var imgEl = document.getElementById('hfa-modal-img');
+      var ctaEl = document.getElementById('hfa-modal-cta');
+
+      var pins = sectionEl.querySelectorAll('.hfa-pin');
+      pins.forEach(function(pin) {
+        pin.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (titleEl) titleEl.innerText = pin.getAttribute('data-title') || 'Runway Piece';
+          if (priceEl) priceEl.innerText = pin.getAttribute('data-price') || '$450.00';
+          if (descEl) descEl.innerText = pin.getAttribute('data-desc') || '';
+          if (ctaEl) ctaEl.href = pin.getAttribute('data-link') || '/products/sample';
+
+          var imgSrc = pin.getAttribute('data-img');
+          if (imgEl) {
+            if (imgSrc && imgSrc !== 'null' && imgSrc !== '') {
+              imgEl.src = imgSrc;
+              imgEl.style.display = 'block';
+            } else {
+              imgEl.style.display = 'none';
+            }
+          }
+
+          modalOverlay.setAttribute('data-open', 'true');
+          modalOverlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeModal() {
+        modalOverlay.setAttribute('data-open', 'false');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.getAttribute('data-open') === 'true') {
+          closeModal();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Fashion Lookbook Hotspots",
+  "tag": "section",
+  "class": "section-hero-fashion-1",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Modal Background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / Hotspot Color",
+      "default": "#e11d48"
+    },
+    {
+      "type": "header",
+      "content": "Editorial Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Callout",
+      "default": "Lookbook 01 / Autumn"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The Nocturne Silhouette Series"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Description",
+      "default": "An exploration of architectural drape and uncompromising tailoring. Discover each serialized runway piece by interacting with the lookbook feature points."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Primary Button Label",
+      "default": "Shop Lookbook Series"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Primary Button URL"
+    },
+    {
+      "type": "text",
+      "id": "btn_sec_label",
+      "label": "Secondary Button Label",
+      "default": "Explore Runway Film"
+    },
+    {
+      "type": "url",
+      "id": "btn_sec_link",
+      "label": "Secondary Button URL"
+    },
+    {
+      "type": "header",
+      "content": "Lookbook Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Main Runway Lookbook Photography"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Product Hotspot Pin",
+      "settings": [
+        {
+          "type": "range",
+          "id": "pos_x",
+          "label": "Horizontal Position (Left %)",
+          "min": 10,
+          "max": 90,
+          "step": 1,
+          "default": 35
+        },
+        {
+          "type": "range",
+          "id": "pos_y",
+          "label": "Vertical Position (Top %)",
+          "min": 10,
+          "max": 90,
+          "step": 1,
+          "default": 40
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product Thumbnail Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Product Title",
+          "default": "Italian Cashmere Overcoat"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price Display",
+          "default": "$1,450.00"
+        },
+        {
+          "type": "textarea",
+          "id": "desc",
+          "label": "Specification Description",
+          "default": "Tailored from 100% Loro Piana cashmere with hand-finished horn buttons and satin lining."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Product Destination URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fashion Lookbook Hotspots",
+      "blocks": [
+        { "type": "hotspot", "settings": { "pos_x": 38, "pos_y": 32, "title": "Structured Wool Blazer", "price": "$890.00", "desc": "Double-breasted tailoring with sharp peak lapels." } },
+        { "type": "hotspot", "settings": { "pos_x": 55, "pos_y": 65, "title": "Pleated Silk Trousers", "price": "$520.00", "desc": "High-waisted fluid drape with concealed side zip." } },
+        { "type": "hotspot", "settings": { "pos_x": 72, "pos_y": 48, "title": "Calfskin Leather Satchel", "price": "$1,250.00", "desc": "Hand-stitched in Florence with custom brass hardware." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

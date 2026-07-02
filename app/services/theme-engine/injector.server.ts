@@ -1,5 +1,5 @@
 import { graphqlRequest } from "../shopify-api.server";
-import { StoreBlueprintData } from "./composer.server";
+import { StoreBlueprintData } from "./compiler.server";
 
 /**
  * Phase 7: Product Injection Engine

@@ -1,0 +1,253 @@
+{%- comment -%}
+  brand_story_minimal_1.liquid — Minimal Brand Story
+  
+  Full-viewport centered philosophy statement. Optionally
+  pairs with a founder image. Breathing room everywhere.
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mnbs-bg: var(--color-background, #fff);
+    --mnbs-text: var(--color-text, #333);
+    --mnbs-muted: color-mix(in srgb, var(--mnbs-text) 45%, transparent);
+    --mnbs-border: color-mix(in srgb, var(--mnbs-text) 8%, transparent);
+    --mnbs-font: var(--font-body, 'Helvetica Neue', sans-serif);
+    --mnbs-font-heading: var(--font-heading, 'Helvetica Neue', sans-serif);
+  }
+
+  .mn-brand-story {
+    background: var(--mnbs-bg);
+    padding: clamp(4rem, 12vw, 9rem) clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .mn-brand-story__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .mn-brand-story__inner[data-layout="split"] {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mn-brand-story__media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .mn-brand-story__content {
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .mn-brand-story__inner[data-layout="split"] .mn-brand-story__content {
+      text-align: left;
+    }
+  }
+
+  .mn-brand-story__eyebrow {
+    font-family: var(--mnbs-font);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--mnbs-muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .mn-brand-story__heading {
+    font-family: var(--mnbs-font-heading);
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--mnbs-text);
+    margin: 0 0 1.5rem 0;
+    max-width: 600px;
+  }
+  .mn-brand-story__content:not(:has(img)) .mn-brand-story__heading {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .mn-brand-story__body {
+    font-family: var(--mnbs-font);
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--mnbs-muted);
+    max-width: 540px;
+    margin-bottom: 2rem;
+  }
+  .mn-brand-story__content:not(:has(img)) .mn-brand-story__body {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .mn-brand-story__cta {
+    display: inline-block;
+    font-family: var(--mnbs-font);
+    font-size: 0.72rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--mnbs-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--mnbs-text);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .mn-brand-story__cta:hover {
+    color: var(--mnbs-muted);
+    border-color: var(--mnbs-muted);
+  }
+
+  /* Values row */
+  .mn-brand-story__values {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--mnbs-border);
+  }
+  .mn-brand-story__value {
+    text-align: center;
+  }
+  .mn-brand-story__value-num {
+    font-family: var(--mnbs-font-heading);
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--mnbs-text);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+  .mn-brand-story__value-label {
+    font-family: var(--mnbs-font);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mnbs-muted);
+  }
+</style>
+
+<section class="mn-brand-story">
+  <div class="mn-brand-story__inner" data-layout="{{ section.settings.layout | default: 'centered' }}">
+
+    {%- if section.settings.image != blank and section.settings.layout == 'split' -%}
+      <div class="mn-brand-story__media">
+        {{ section.settings.image | image_url: width: 800 | image_tag:
+           loading: 'lazy',
+           sizes: '(max-width: 767px) 100vw, 50vw',
+           widths: '400,600,800',
+           alt: section.settings.eyebrow | default: 'Brand story' }}
+      </div>
+    {%- endif -%}
+
+    <div class="mn-brand-story__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="mn-brand-story__eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      <h2 class="mn-brand-story__heading">{{ section.settings.heading | default: 'We believe in stripping away the non-essential to reveal the true essence of design.' }}</h2>
+      {%- if section.settings.body != blank -%}
+        <div class="mn-brand-story__body">{{ section.settings.body }}</div>
+      {%- endif -%}
+      {%- if section.settings.cta_text != blank -%}
+        <a href="{{ section.settings.cta_url | default: '/pages/about' }}" class="mn-brand-story__cta">
+          {{ section.settings.cta_text }}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="mn-brand-story__values">
+      {%- for block in section.blocks -%}
+        <div class="mn-brand-story__value" {{ block.shopify_attributes }}>
+          <div class="mn-brand-story__value-num">{{ block.settings.number }}</div>
+          <div class="mn-brand-story__value-label">{{ block.settings.label }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Minimal Brand Story",
+  "tag": "section",
+  "class": "section-brand-story-minimal",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "centered", "label": "Centered Text" },
+        { "value": "split", "label": "Image + Text Split" }
+      ],
+      "default": "centered"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Used in 'Split' layout."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Our Philosophy"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "We believe in stripping away the non-essential to reveal the true essence of design."
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body Text",
+      "default": "<p>Every product is a testament to clarity, purpose, and uncompromised quality.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Our Story →"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "50K+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Happy Customers" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal Brand Story",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "50K+", "label": "Happy Customers" } },
+        { "type": "stat", "settings": { "number": "100%", "label": "Sustainable" } },
+        { "type": "stat", "settings": { "number": "5★", "label": "Rated" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
