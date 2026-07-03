@@ -87,28 +87,34 @@ export function validateTemplateStructure(jsonContent: any) {
  * Validates section dependencies (e.g., product-grid needs product-card).
  * This ensures we don't push broken components to Shopify.
  */
-export function validateSectionDependencies(jsonContent: any) {
+export function validateSectionDependencies(jsonContent: any, availableSnippets?: Set<string>) {
   if (!jsonContent || !jsonContent.sections) return;
 
   const sectionTypes = Object.values(jsonContent.sections).map((s: any) => s.type);
 
-  // Define critical dependency rules
+  // Define deterministic snippet dependency rules for sections
   const dependencies: Record<string, string[]> = {
-    "product-grid": ["product-card"],
-    "collection-list": ["collection-card"],
-    "cart-drawer": ["cart-item"]
+    "product-grid": ["product-card", "price", "skeleton-loader"],
+    "grid-luxury-v1": ["product-card", "price", "skeleton-loader"],
+    "grid-bold-v1": ["product-card", "price"],
+    "grid-minimal-v1": ["product-card", "price"],
+    "grid-natural-v1": ["product-card", "price"],
+    "grid-tech-v1": ["product-card", "price"],
+    "main-cart": ["cart-drawer"],
+    "header": ["icon-search", "icon-cart"]
   };
 
+  // Default core snippets available in base-theme
+  const coreSnippets = availableSnippets || new Set([
+    "product-card", "price", "cart-drawer", "skeleton-loader", "icon-cart",
+    "icon-search", "icon-close", "icon-account", "icon-star", "pagination",
+    "meta-tags", "seo-head", "seo-schema", "social-icons"
+  ]);
+
   for (const [section, deps] of Object.entries(dependencies)) {
-    // If the section is present, check its dependencies
-    if (sectionTypes.some((t: any) => t && t.includes(section))) {
+    if (sectionTypes.some((t: any) => t && (t === section || t.includes(section)))) {
       for (const dep of deps) {
-        // This is a naive check; in reality, we'd check if the snippet exists in the theme.
-        // For the sake of this deterministic validation, we assume if the type relies on it,
-        // it must either be injected or pre-exist.
-        // If we strictly needed to check, we'd pass the `componentsToUpload` set here.
-        // For now, this is a placeholder enforcing the structural check.
-        if (!sectionTypes.some((t: any) => t && t.includes(dep)) && !global.process.env.SKIP_DEP_CHECKS) {
+        if (!coreSnippets.has(dep) && !sectionTypes.some((t: any) => t && t.includes(dep)) && !global.process.env.SKIP_DEP_CHECKS) {
           console.warn(`[Validator] Missing explicit dependency '${dep}' for section '${section}' (skipping strict throw for MVP)`);
         }
       }

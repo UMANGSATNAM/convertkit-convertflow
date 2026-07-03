@@ -28,7 +28,7 @@ let performanceCache: any = null;
 async function loadRegistries() {
   if (registryCache && compatibilityCache && performanceCache) return;
 
-  const basePath = path.resolve(process.cwd(), 'app/data/templates/theme-engine/component-registry');
+  const basePath = path.resolve(process.cwd(), 'app/data/templates/theme-engine');
 
   const [regFile, compFile, perfFile] = await Promise.all([
     fs.readFile(path.join(basePath, 'registry.json'), 'utf-8'),
