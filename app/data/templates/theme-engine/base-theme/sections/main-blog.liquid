@@ -97,6 +97,7 @@
     <h1 class="sf-blog__title">{{ blog.title | default: section.settings.title | default: 'Blog' }}</h1>
   </div>
 
+  {% paginate blog.articles by section.settings.columns %}
   <div class="sf-blog__grid" style="--blog-cols: {{ section.settings.columns | default: 3 }}">
     {%- for article in blog.articles -%}
       <article class="sf-blog__card">
@@ -104,7 +105,7 @@
           {%- if article.image -%}
             <img
               class="sf-blog__card-img"
-              src="{{ article.image | img_url: '800x533', crop: 'center' }}"
+              src="{{ article.image | image_url: width: 800, height: 533, crop: 'center' }}"
               alt="{{ article.image.alt | default: article.title | escape }}"
               loading="lazy"
               width="800"
@@ -135,6 +136,7 @@
       {{ paginate | default_pagination }}
     </div>
   {%- endif -%}
+  {% endpaginate %}
 </section>
 
 {% schema %}

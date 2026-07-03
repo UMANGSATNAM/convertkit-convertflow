@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { globSync } from 'glob';
+import * as crypto from 'crypto';
 
 interface ComponentEntry {
   componentId: string;
@@ -42,8 +43,22 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
       const chassisManifest = JSON.parse(fs.readFileSync(chassisManifestPath, 'utf-8'));
       const list = chassisManifest.files || [];
       chassisFilesCount = list.length;
-      for (const f of list) {
+      for (const item of list) {
+        const f = typeof item === 'string' ? item : item.file;
         allowedPaths.add(f.replace(/\\/g, '/'));
+        
+        // Hash verification
+        if (typeof item === 'object' && item.hash) {
+          const fullPath = path.join(themeEngineDir, f);
+          if (fs.existsSync(fullPath)) {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const normalizedContent = content.replace(/\r\n/g, '\n');
+            const hash = crypto.createHash('sha256').update(normalizedContent).digest('hex');
+            if (hash !== item.hash) {
+              errors.push(`Hash mismatch for chassis file: ${f}. Expected ${item.hash}, got ${hash}`);
+            }
+          }
+        }
       }
     } catch (e: any) {
       errors.push(`Failed to parse chassis-manifest.json: ${e.message}`);
