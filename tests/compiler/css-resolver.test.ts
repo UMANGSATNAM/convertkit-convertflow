@@ -5,7 +5,7 @@ describe('Stage 7: CSS Token Resolver', () => {
   it('should merge tokens from 4 layers and prioritize correctly', () => {
     const fetcher: TokenFileFetcher = (layer) => {
       if (layer === 'base-tokens') return {
-        '--color-primary': '#000',
+        '--color-text': '#000',
         '--color-bg': '#fff'
       };
       if (layer === 'theme-dna') return {

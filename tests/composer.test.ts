@@ -137,7 +137,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     // Setup directory structure mocks
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
       const dirName = getDirName(dirPath);
-      if (dirName === 'core') {
+      if (dirName === 'core' || dirName === 'base-theme') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },
@@ -204,7 +204,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
   it('should throw ValidationError if a required core file is missing', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
       const dirName = getDirName(dirPath);
-      if (dirName === 'core') {
+      if (dirName === 'core' || dirName === 'base-theme') {
         return [{ name: 'layout', isDirectory: () => true }] as any;
       }
       if (dirName === 'layout') {
@@ -228,7 +228,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
   it('should throw ValidationError if niche-tokens.css is empty in niche mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
       const dirName = getDirName(dirPath);
-      if (dirName === 'core' || dirName === 'niches') {
+      if (dirName === 'core' || dirName === 'base-theme' || dirName === 'niches') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },
@@ -289,7 +289,7 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
   it('should skip niche-tokens.css validation and empty validation in ai-custom mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
       const dirName = getDirName(dirPath);
-      if (dirName === 'core') {
+      if (dirName === 'core' || dirName === 'base-theme') {
         return [
           { name: 'layout', isDirectory: () => true },
           { name: 'config', isDirectory: () => true },

@@ -128,7 +128,8 @@ async function uploadLiquidWithRetry(
 function validateThemeIntegrity(
   filesToUpload: Record<string, string>,
   blueprint: StoreBlueprintData,
-  components: ComponentRegistry[]
+  components: ComponentRegistry[],
+  nicheId?: string
 ) {
   const requiredKeys = [
     "layout/theme.liquid",
@@ -140,7 +141,7 @@ function validateThemeIntegrity(
 
   for (const key of requiredKeys) {
     if (filesToUpload[key] === undefined) {
-      console.warn(`[Validator] Missing expected theme asset: ${key} (will rely on base shell)`);
+      throw new ValidationError(`Missing required core theme file: ${key}`);
     }
   }
 
@@ -158,8 +159,8 @@ function validateThemeIntegrity(
   }
 
   const tokensContent = filesToUpload["assets/niche-tokens.css"];
-  if (!tokensContent || !tokensContent.trim()) {
-    console.warn("[Validator] Niche tokens stylesheet is empty or invalid. Applying default variables.");
+  if (nicheId !== "ai-custom" && (!tokensContent || !tokensContent.trim())) {
+    throw new ValidationError("Niche tokens stylesheet is empty or invalid.");
   }
 }
 
@@ -281,77 +282,47 @@ function compType(id: string): string {
   return "custom";
 }
 
-async function resolveComponentLiquidContent(component: any): Promise<string | null> {
-  const candidates: string[] = [];
-  const cwd = process.cwd();
-
-  const addCandidate = (p?: string | null) => {
-    if (!p) return;
-    const clean = p.replace(/^(\/?app\/)+/, "app/").replace(/^\/+/, "");
-    const full1 = path.resolve(cwd, clean);
-    const full2 = path.resolve(cwd, p);
-    if (!candidates.includes(full1)) candidates.push(full1);
-    if (!candidates.includes(full2)) candidates.push(full2);
-    if (clean.startsWith("app/")) {
-      const full3 = path.resolve(cwd, clean.slice(4));
-      if (!candidates.includes(full3)) candidates.push(full3);
-    }
-  };
-
-  if (component.liquidPath) {
-    addCandidate(component.liquidPath);
-    addCandidate(path.join("app/data/templates/theme-engine", component.liquidPath));
-    addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.liquidPath)));
+export async function resolveComponentLiquidContent(component: any, customRegistryEntries?: any[], customRegistryPath?: string): Promise<string> {
+  const componentId = component.componentId || component.id;
+  if (!componentId) {
+    throw new Error(`[Resolver] Cannot resolve liquid content: Component ID is missing.`);
   }
 
-  if (component.filePath) {
-    addCandidate(component.filePath);
-    addCandidate(path.join("app/data/templates/theme-engine", component.filePath));
-    addCandidate(path.join("app/data/templates/theme-engine/components", path.basename(component.filePath)));
-  }
-
-  const id = component.componentId || component.sectionType;
-  if (id) {
-    const idUnderscore = id.replace(/-/g, "_");
-    const idHyphen = id.replace(/_/g, "-");
-    const idNoV = idUnderscore.replace(/_v(\d+)$/, "_$1");
-    const idNoVHyphen = idHyphen.replace(/-v(\d+)$/, "-$1");
-    const idV = idUnderscore.replace(/_(\d+)$/, "_v$1");
-    const idVHyphen = idHyphen.replace(/-(\d+)$/, "-v$1");
-
-    const variations = new Set([id, idUnderscore, idHyphen, idNoV, idNoVHyphen, idV, idVHyphen]);
-    const categories = [
-      "announcement", "brand-story", "bundle-builder", "collections", "faq",
-      "footer", "header", "hero", "newsletter", "popup", "product-grid",
-      "testimonials", "trust", "custom", component.sectionType || compType(id)
-    ];
-
-    const dirs = [
-      "app/data/templates/theme-engine/components"
-    ];
-
-    for (const dir of dirs) {
-      for (const varName of variations) {
-        addCandidate(path.join(dir, `${varName}.liquid`));
-      }
-      for (const cat of categories) {
-        if (!cat) continue;
-        for (const varName of variations) {
-          addCandidate(path.join(dir, cat, `${varName}.liquid`));
-        }
-      }
-    }
-  }
-
-  for (const candidatePath of candidates) {
+  // 1. Look up component strictly in registry to get its canonical liquidPath (ignoring passed-in component.liquidPath)
+  let entries = customRegistryEntries;
+  if (!entries) {
+    const registryPath = customRegistryPath || path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
     try {
-      const content = await fs.readFile(candidatePath, "utf-8");
-      return content;
-    } catch (e) {
-      // try next candidate
+      const registryRaw = await fs.readFile(registryPath, "utf-8");
+      const registryData = JSON.parse(registryRaw);
+      entries = registryData.components || [];
+    } catch (err: any) {
+      throw new Error(`[Resolver] Failed to load registry.json at ${registryPath}: ${err.message}`);
     }
   }
-  return null;
+
+  const matched = (entries || []).find((c: any) => c.componentId === componentId);
+  if (!matched || !matched.liquidPath) {
+    throw new Error(`[Resolver] Component "${componentId}" is not registered in registry.json (no liquidPath found).`);
+  }
+  const liquidPath = matched.liquidPath;
+
+  // 2. Resolve exact absolute path from liquidPath and enforce path containment within theme-engine root
+  const themeEngineRoot = path.resolve(process.cwd(), "app/data/templates/theme-engine");
+  const cleanRelPath = liquidPath.replace(/^(\/?app\/data\/templates\/theme-engine\/)+/, "");
+  const exactPath = path.resolve(themeEngineRoot, cleanRelPath);
+
+  if (!exactPath.startsWith(themeEngineRoot)) {
+    throw new Error(`[Resolver] Security Error: Path traversal attempt detected. Path "${exactPath}" escapes theme-engine root "${themeEngineRoot}".`);
+  }
+
+  // 3. Read file from exact path
+  try {
+    const content = await fs.readFile(exactPath, "utf-8");
+    return content;
+  } catch (err: any) {
+    throw new Error(`[Resolver] Failed to read liquid file for component "${componentId}" at attempted path: ${exactPath}. Error: ${err.message}`);
+  }
 }
 
 /**
@@ -472,7 +443,7 @@ export async function composeThemeFromBlueprint(
 
   // Step 5: Read and inject Liquid files for all resolved components
   for (const component of resolvedComponents) {
-    const liquidContent = await resolveComponentLiquidContent(component);
+    const liquidContent = await resolveComponentLiquidContent(component, components);
     const sectionType = component.sectionType || component.componentId;
     if (liquidContent) {
       filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
@@ -482,7 +453,7 @@ export async function composeThemeFromBlueprint(
   }
 
   // Step 6: Validate Theme Integrity
-  validateThemeIntegrity(filesToUpload, blueprint, components);
+  validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);
 
   // Step 7: Single-Batch Priority Upload to Shopify
   let uploadedCount = 0;

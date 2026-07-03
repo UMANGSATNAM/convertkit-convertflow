@@ -60,3 +60,15 @@
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
 - **Status:** **LOCKED**
+
+## Decision #8 — Additive Component Metadata Schema
+- **Rule:** Component metadata (`.meta.json` and registry entries) must follow an additive, structured schema including static CRO, performance, compatibility, and maintainability scores for the Component Ranking Engine.
+- **Reason:** Enables deterministic mathematical ranking of components without LLM hallucination or runtime guessing.
+- **Status:** **LOCKED**
+
+## Decision #10 — Component Library Expansion (Post-Gate-A Workstream)
+- **Rule:** The 199 legacy component files preserved under git tag `legacy-components-pre-gate0` (from commit `0ddb2e9`) will be systematically reviewed and expanded into the canonical component library in niche-by-niche batches as a scheduled post-Gate-A workstream.
+- **Workflow:** For each niche batch: dedupe against registered 57 components → rename to canonical convention → generate `.meta.json` with Decision #8 scores → add to `registry.json` → verify with Vitest.
+- **Batch Order:** Prioritized by launch niches: 1. Luxury / Jewellery (Aurelle / Jewel-Luxe vertical), 2. Fashion / Apparel, 3. Beauty / Organic, 4. Electronics / Tech, 5. Food / Supplements.
+- **Phase A Chassis Exception:** The legacy files `main-page_luxury_v1.liquid`, `main-404_luxury_v1.liquid`, and `main-password_luxury_v1.liquid` will be used immediately during Phase A as source material (generalized and adapted into the chassis) rather than writing those chassis sections from scratch.
+- **Status:** **LOCKED**
