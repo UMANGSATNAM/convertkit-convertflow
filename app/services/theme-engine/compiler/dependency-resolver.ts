@@ -72,6 +72,9 @@ export class DependencyResolver {
     const sortedComponentIds = [...componentIds].sort();
 
     for (const compId of sortedComponentIds) {
+      if (!flat.sections.includes(compId)) {
+        flat.sections.push(compId);
+      }
       const node = await this.resolveNode(compId, new Set());
       graph[compId] = node;
       this.flattenNode(node, flat);

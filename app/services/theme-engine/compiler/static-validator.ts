@@ -142,14 +142,18 @@ export class TechnicalValidator {
   }
 }
 
-export async function staticValidate(bundle: OptimizedBundle, manifest: ThemeBuildManifest): Promise<ValidationReport> {
+export async function staticValidate(
+  bundle: OptimizedBundle, 
+  manifest: ThemeBuildManifest,
+  customReadFile?: (path: string) => string
+): Promise<ValidationReport> {
   const validator = new TechnicalValidator();
   
   // Real file reading logic would map back to source component files
-  // We mock it for the orchestrator
-  const readFile = (path: string): string => {
+  // We mock it for the orchestrator unless a custom reader is provided
+  const readFile = customReadFile || ((path: string): string => {
     return "/* mock content */";
-  };
+  });
   
   return validator.validate(bundle, manifest, readFile);
 }
