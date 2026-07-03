@@ -33,10 +33,9 @@ describe('Chassis Group Resolution', () => {
         const sectionType = sections[sectionId].type;
         expect(sectionType).toBeDefined();
         
-        // Ensure the section type exists as a .liquid file in base-theme/sections/, OR it's a compiler-injected component
+        // Ensure the section type exists as a .liquid file in base-theme/sections/
         const liquidFile = path.join(sectionsDir, `${sectionType}.liquid`);
-        const isCompilerInjected = ['header', 'footer'].includes(sectionType);
-        expect(isCompilerInjected || fs.existsSync(liquidFile)).toBe(true);
+        expect(fs.existsSync(liquidFile)).toBe(true);
       }
     });
   });
