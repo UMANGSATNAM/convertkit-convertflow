@@ -59,4 +59,19 @@ describe('resolveComponentLiquidContent (Registry-Direct Resolution & Defenses)'
       resolveComponentLiquidContent({ componentId: 'hero-editorial-v1' }, undefined, fakeRegistryPath)
     ).rejects.toThrow(new RegExp(`Failed to load registry\\.json at.*${path.basename(fakeRegistryPath)}`, 'i'));
   });
+
+  it('case (f): sibling directory bypass (theme-engine-evil/) is blocked by path.sep containment check', async () => {
+    // Without path.sep fix, `theme-engine-evil/payload.liquid` passes
+    // `.startsWith("app/data/templates/theme-engine")` — classic prefix bypass.
+    // Fixed check requires `startsWith(root + path.sep)`, closing this hole.
+    const compId = 'sibling-dir-bypass-v1';
+    const siblingRelPath = '../theme-engine-evil/payload.liquid';
+    const testRegistry = [
+      { componentId: compId, liquidPath: siblingRelPath }
+    ];
+
+    await expect(
+      resolveComponentLiquidContent({ componentId: compId }, testRegistry)
+    ).rejects.toThrow(/Security Error: Path traversal attempt detected/i);
+  });
 });

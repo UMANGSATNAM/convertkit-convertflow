@@ -312,7 +312,7 @@ export async function resolveComponentLiquidContent(component: any, customRegist
   const cleanRelPath = liquidPath.replace(/^(\/?app\/data\/templates\/theme-engine\/)+/, "");
   const exactPath = path.resolve(themeEngineRoot, cleanRelPath);
 
-  if (!exactPath.startsWith(themeEngineRoot)) {
+  if (exactPath !== themeEngineRoot && !exactPath.startsWith(themeEngineRoot + path.sep)) {
     throw new Error(`[Resolver] Security Error: Path traversal attempt detected. Path "${exactPath}" escapes theme-engine root "${themeEngineRoot}".`);
   }
 
