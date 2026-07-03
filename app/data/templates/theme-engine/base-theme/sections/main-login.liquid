@@ -1,0 +1,185 @@
+<style>
+  #shopify-section-{{ section.id }} .sf-login {
+    background: var(--color-bg, #fff);
+    color: var(--color-text, #1a1a1a);
+    padding: var(--spacing-section-y, 80px) var(--spacing-section-x, 20px);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #shopify-section-{{ section.id }} .sf-login__box {
+    max-width: 440px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  #shopify-section-{{ section.id }} .sf-login__title {
+    font-family: var(--font-heading, inherit);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: 400;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+  #shopify-section-{{ section.id }} .sf-login__sub {
+    color: var(--color-text-muted, #888);
+    text-align: center;
+    font-size: 0.95rem;
+    margin: 0 0 32px;
+  }
+  #shopify-section-{{ section.id }} .sf-login__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #shopify-section-{{ section.id }} .sf-login__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #shopify-section-{{ section.id }} .sf-login__label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--color-text, #1a1a1a);
+  }
+  #shopify-section-{{ section.id }} .sf-login__input {
+    border: 1px solid var(--color-border, #e0e0e0);
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--color-text, #1a1a1a);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #shopify-section-{{ section.id }} .sf-login__input:focus { border-color: var(--color-primary, #1a1a1a); }
+  #shopify-section-{{ section.id }} .sf-login__submit {
+    border: none;
+    background: var(--color-primary, #1a1a1a);
+    color: var(--color-btn-text, #fff);
+    padding: 14px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 8px;
+  }
+  #shopify-section-{{ section.id }} .sf-login__submit:hover { opacity: 0.8; }
+  #shopify-section-{{ section.id }} .sf-login__links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 0.85rem;
+  }
+  #shopify-section-{{ section.id }} .sf-login__link {
+    color: var(--color-text-muted, #888);
+    text-decoration: underline;
+    transition: color 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  #shopify-section-{{ section.id }} .sf-login__link:hover { color: var(--color-primary, #1a1a1a); }
+  #shopify-section-{{ section.id }} .sf-login__recover { display: none; }
+  #shopify-section-{{ section.id }}:target .sf-login__main { display: none; }
+  #shopify-section-{{ section.id }}:target .sf-login__recover { display: block; }
+</style>
+
+<section id="shopify-section-{{ section.id }}" class="sf-login" data-section-id="{{ section.id }}" data-section-type="main-login">
+  <div class="sf-login__box">
+    <div class="sf-login__main" id="login-form">
+      <h1 class="sf-login__title">{{ 'customer.login_page.title' | t: default: 'Sign In' }}</h1>
+      <p class="sf-login__sub">{{ 'customer.login_page.subtitle' | t: default: 'Welcome back. Please enter your details.' }}</p>
+
+      {% form 'customer_login', class: 'sf-login__form' %}
+        {%- if form.errors -%}
+          <div style="color:#e44;font-size:0.85rem;margin-bottom:8px;">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+
+        <div class="sf-login__field">
+          <label class="sf-login__label" for="CustomerEmail">{{ 'customer.login_page.email' | t: default: 'Email' }}</label>
+          <input
+            type="email"
+            name="customer[email]"
+            id="CustomerEmail"
+            class="sf-login__input"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        {%- if form.password_needed -%}
+          <div class="sf-login__field">
+            <label class="sf-login__label" for="CustomerPassword">{{ 'customer.login_page.password' | t: default: 'Password' }}</label>
+            <input
+              type="password"
+              name="customer[password]"
+              id="CustomerPassword"
+              class="sf-login__input"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+        {%- endif -%}
+
+        <button type="submit" class="sf-login__submit">{{ 'customer.login_page.sign_in' | t: default: 'Sign In' }}</button>
+
+        <div class="sf-login__links">
+          {%- if form.password_needed -%}
+            <a href="#recover-form" class="sf-login__link" onclick="document.getElementById('recover-form').style.display='block';document.getElementById('login-form').style.display='none';return false;">
+              {{ 'customer.login_page.forgot_password' | t: default: 'Forgot your password?' }}
+            </a>
+          {%- endif -%}
+          <a href="{{ routes.account_register_url }}" class="sf-login__link">{{ 'customer.login_page.create_account' | t: default: 'Create an account' }}</a>
+        </div>
+      {% endform %}
+    </div>
+
+    <div class="sf-login__recover" id="recover-form">
+      <h2 class="sf-login__title">{{ 'customer.recover_password.title' | t: default: 'Reset Password' }}</h2>
+      <p class="sf-login__sub">{{ 'customer.recover_password.subtext' | t: default: 'We will send you an email to reset your password.' }}</p>
+
+      {% form 'recover_customer_password', class: 'sf-login__form' %}
+        {%- if form.errors -%}
+          <div style="color:#e44;font-size:0.85rem;margin-bottom:8px;">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+
+        <div class="sf-login__field">
+          <label class="sf-login__label" for="RecoverEmail">{{ 'customer.recover_password.email' | t: default: 'Email' }}</label>
+          <input
+            type="email"
+            name="email"
+            id="RecoverEmail"
+            class="sf-login__input"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <button type="submit" class="sf-login__submit">{{ 'customer.recover_password.submit' | t: default: 'Submit' }}</button>
+        <div style="text-align:center;margin-top:16px;">
+          <a href="#" class="sf-login__link" onclick="document.getElementById('recover-form').style.display='none';document.getElementById('login-form').style.display='block';return false;">
+            {{ 'customer.recover_password.cancel' | t: default: 'Cancel' }}
+          </a>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Login Main",
+  "tag": "section",
+  "class": "section-main-login",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Login Main"
+    }
+  ]
+}
+{% endschema %}

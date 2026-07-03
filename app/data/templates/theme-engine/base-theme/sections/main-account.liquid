@@ -1,0 +1,151 @@
+<style>
+  #shopify-section-{{ section.id }} .sf-account {
+    background: var(--color-bg, #fff);
+    color: var(--color-text, #1a1a1a);
+    padding: var(--spacing-section-y, 80px) var(--spacing-section-x, 40px);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  #shopify-section-{{ section.id }} .sf-account__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  #shopify-section-{{ section.id }} .sf-account__title {
+    font-family: var(--font-heading, inherit);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 400;
+    margin: 0;
+  }
+  #shopify-section-{{ section.id }} .sf-account__logout {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #888);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+  }
+  #shopify-section-{{ section.id }} .sf-account__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+  }
+  @media (max-width: 768px) { #shopify-section-{{ section.id }} .sf-account__grid { grid-template-columns: 1fr; } }
+  #shopify-section-{{ section.id }} h2 {
+    font-family: var(--font-heading, inherit);
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin: 0 0 24px;
+  }
+  #shopify-section-{{ section.id }} table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  #shopify-section-{{ section.id }} th,
+  #shopify-section-{{ section.id }} td {
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+  }
+  #shopify-section-{{ section.id }} th {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #888);
+    font-weight: 500;
+  }
+  #shopify-section-{{ section.id }} .sf-account__address-box {
+    padding: 24px;
+    border: 1px solid var(--color-border, #e0e0e0);
+    line-height: 1.8;
+    font-size: 0.95rem;
+  }
+  #shopify-section-{{ section.id }} .sf-account__link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary, #1a1a1a);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+</style>
+
+<section id="shopify-section-{{ section.id }}" class="sf-account" data-section-id="{{ section.id }}" data-section-type="main-account">
+  <div class="sf-account__header">
+    <h1 class="sf-account__title">{{ 'customer.account.title' | t: default: 'Account' }}</h1>
+    <a href="{{ routes.account_logout_url }}" class="sf-account__logout">{{ 'customer.log_out' | t: default: 'Log out' }}</a>
+  </div>
+
+  <div class="sf-account__grid">
+    <div>
+      <h2>{{ 'customer.orders.title' | t: default: 'Order History' }}</h2>
+      {% paginate customer.orders by 20 %}
+        {%- if customer.orders.size > 0 -%}
+          <table>
+            <thead>
+              <tr>
+                <th>{{ 'customer.orders.order_number' | t: default: 'Order' }}</th>
+                <th>{{ 'customer.orders.date' | t: default: 'Date' }}</th>
+                <th>{{ 'customer.orders.payment_status' | t: default: 'Payment' }}</th>
+                <th>{{ 'customer.orders.fulfillment_status' | t: default: 'Fulfillment' }}</th>
+                <th>{{ 'customer.orders.total' | t: default: 'Total' }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {%- for order in customer.orders -%}
+                <tr>
+                  <td><a href="{{ order.customer_url }}" style="color:var(--color-primary,#1a1a1a);font-weight:500;">{{ order.name }}</a></td>
+                  <td>{{ order.created_at | date: "%b %d, %Y" }}</td>
+                  <td>{{ order.financial_status_label }}</td>
+                  <td>{{ order.fulfillment_status_label }}</td>
+                  <td>{{ order.total_price | money }}</td>
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+          {%- if paginate.pages > 1 -%}<div style="margin-top:24px;text-align:center;">{{ paginate | default_pagination }}</div>{%- endif -%}
+        {%- else -%}
+          <p style="color:var(--color-text-muted,#888);">{{ 'customer.orders.none' | t: default: 'You haven\'t placed any orders yet.' }}</p>
+        {%- endif -%}
+      {% endpaginate %}
+    </div>
+
+    <div>
+      <h2>{{ 'customer.account.details' | t: default: 'Account Details' }}</h2>
+      <div class="sf-account__address-box">
+        <strong>{{ customer.name }}</strong><br>
+        {%- if customer.default_address -%}
+          {{ customer.default_address | format_address }}
+        {%- else -%}
+          <p style="color:var(--color-text-muted,#888);margin:8px 0;">{{ 'customer.addresses.no_default' | t: default: 'No default address saved.' }}</p>
+        {%- endif -%}
+        <a href="{{ routes.account_addresses_url }}" class="sf-account__link">
+          {{ 'customer.account.view_addresses' | t: count: customer.addresses_count | default: 'View Addresses' }} ({{ customer.addresses_count }})
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Account Main",
+  "tag": "section",
+  "class": "section-main-account",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Account Main"
+    }
+  ]
+}
+{% endschema %}
