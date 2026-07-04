@@ -77,7 +77,12 @@
 - **Phase A Chassis Exception:** The legacy files `main-page_luxury_v1.liquid`, `main-404_luxury_v1.liquid`, and `main-password_luxury_v1.liquid` will be used immediately during Phase A as source material (generalized and adapted into the chassis) rather than writing those chassis sections from scratch.
 - **Status:** **LOCKED**
 
-## Decision #11 — Component Replacement via JSON Type Swap (Phase A2 Stage 2)
+## Decision #11 — No Mockups, No Placeholders, No Simulated Output
+- **Rule:** The theme engine must only assemble real, fully-functional Liquid component source files and configuration assets. Generating mockups, writing temporary template placeholders, or simulating output results is strictly prohibited. Everything compiled and uploaded to Shopify must be production-ready and fully operational.
+- **Reason:** To prevent shipping non-functional skeleton layouts or placeholder code that breaks runtime operations or behaves differently from true production builds.
+- **Status:** **LOCKED**
+
+## Decision #12 — Component Replacement via JSON Type Swap (Phase A2 Stage 2)
 - **Rule:** Component replacement for layouts (such as header and footer) is performed purely at the section group JSON configuration level (swapping the target section's `type` field reference to the selected custom component's type) rather than mutating files on disk or performing regex injections on chassis layout templates.
 - **Enforcement:**
   1. The fallback layout files (e.g., `sections/header.liquid` and `sections/footer.liquid`) must be deleted/omitted from the compiled upload bundle when custom replacements are active.
