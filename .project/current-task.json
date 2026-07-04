@@ -7,16 +7,18 @@
   "startedAt": "2026-07-04T23:30:00Z",
   "completedAt": null,
   "deliverables": [
-    "Chassis-clone stage: compiler pipeline new first stage, manifest-driven copy of all 67 chassis files, hash-verified at clone time (tamper = compile fail)",
-    "Component replacement: replace fallback header.liquid and footer.liquid using blueprint's header-luxury-v1 / footer-luxury-v1 (section groups JSON type swap, delete-and-inject forbidden)",
-    "Template generation: compile blueprint to templates/*.json, including functional buy button in product template and main-collection grid in collection template",
-    "Pipeline validation gates: render-target linter + Theme Check compiled inside, theme packages failing 0-errors Theme Check do not become artifacts"
+    "Chassis-clone stage: manifest-driven clone of all 67 chassis files, hash-verified at clone time (tamper = compile fail)",
+    "Component replacement: replace fallback layout files using blueprint components via section groups JSON type swap (no delete-and-inject)",
+    "Template generation: compile blueprint to templates/*.json, generating product template mapping to functional buy button forms and collection mapping to grids",
+    "Pipeline validation gates: compile-time linter (render-target check + forbidden filters) + shopify theme check integrated into compiler"
   ],
   "acceptanceCriteria": [
-    "Chassis cloned cleanly with hash verification passing, throwing tamper errors on modified manifest files",
-    "Section groups JSON swapped types cleanly for header and footer without deleting/re-injecting liquid blocks",
-    "Compiled templates/*.json are valid Shopify templates with functional main-product (including buy buttons) and main-collection grid",
-    "Compiled theme successfully validated inside the pipeline by both design-linter and shopify theme check with exactly 0 errors",
-    "Vitest test suite updated with verification tests and passes 100% green"
+    "ChassisTamperError test: temporarily modifying a chassis file during compile throws compile-halting error containing file path; restoring it compiles cleanly (performed on safe temp copy)",
+    "Layout swap (luxury header variant): compiled bundle has fallback header.liquid removed, layout/theme.liquid section groups swapped to point to luxury variant",
+    "Layout swap (no component): compiled bundle keeps fallback header.liquid and section group points to fallback header (chassis renders alone check)",
+    "PDP static assertion: compiled main-product.liquid (or equivalent) contains {% form 'product' %}, submit button with name='add', variant ID input with name='id', and product.json references the section",
+    "Collection static assertion: compiled main-collection.liquid contains pagination block and product-card render loop",
+    "Linter scope boundary: compile process blocks on render-target violations, forbidden filters (ternary, pluralize, color_modify), and shopify theme check errors (WCAG/CLS scanners excluded from compiler)",
+    "Vitest test suite: includes tests for all positive/negative layout swaps, tamper checks, static assertions, and passes 100% green"
   ]
 }

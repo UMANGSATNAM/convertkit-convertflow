@@ -31,6 +31,7 @@
 ## Decision #5 — Phase 1 Foundation Officially Frozen
 - **Rule:** The Directory Consolidation (`app/data/templates/theme-engine/`), Read-Only Base Theme (`base-theme/`), Snippet Flattening, and Deterministic Dependency Graph Resolver (`compiler.server.ts`, `dependency-resolver.ts`, `validators.server.ts`).
 - **Enforcement:** No further modifications to these foundational components are permitted unless a critical production bug forces an intervention.
+- **Decision #5 Amendment (Phase A2):** `compiler.server.ts` opens for Phase A2 additive stages only; existing Gate-0 resolution logic remains untouched. Resolution-related test failures = stop work immediately.
 - **Status:** **PENDING (Waiting for Gate 0 proof — cannot be declared LOCKED until Gate 0 passes)**
 
 ## Decision #6 — Phase 2 Intelligence Infrastructure Order (AI Last)
