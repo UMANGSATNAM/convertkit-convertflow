@@ -18,8 +18,8 @@ describe('Stage 1: Chassis Clone Stage & Tamper Verification', () => {
     await fs.mkdir(path.join(baseThemeDir, 'snippets'), { recursive: true });
 
     // Define dummy file contents
-    const themeContent = '<html>{{ content_for_header }}</html>';
-    const snippetContent = '{%- comment -%}GST note{%- endcomment -%}';
+    const themeContent = '<html>\n{{ content_for_header }}\n</html>';
+    const snippetContent = '{%- comment -%}\nGST note\n{%- endcomment -%}';
 
     // Normalize hashes matching our normalization function (\r\n -> \n)
     const hashTheme = crypto.createHash('sha256').update(themeContent.replace(/\r\n/g, '\n')).digest('hex');
@@ -67,8 +67,8 @@ describe('Stage 1: Chassis Clone Stage & Tamper Verification', () => {
         'layout/theme.liquid',
         'snippets/gst-note.liquid'
       ]);
-      expect(cloned['layout/theme.liquid']).toBe('<html>{{ content_for_header }}</html>');
-      expect(cloned['snippets/gst-note.liquid']).toBe('{%- comment -%}GST note{%- endcomment -%}');
+      expect(cloned['layout/theme.liquid']).toBe('<html>\n{{ content_for_header }}\n</html>');
+      expect(cloned['snippets/gst-note.liquid']).toBe('{%- comment -%}\nGST note\n{%- endcomment -%}');
     } finally {
       await cleanTempChassisDir();
     }
@@ -105,6 +105,22 @@ describe('Stage 1: Chassis Clone Stage & Tamper Verification', () => {
       await expect(
         cloneChassis(tmpTestRoot)
       ).rejects.toThrow(/Hash mismatch for chassis file: base-theme\/layout\/theme\.liquid/);
+    } finally {
+      await cleanTempChassisDir();
+    }
+  });
+
+  it('Case (d): Positive - EOL normalization allows CRLF content to match LF hash', async () => {
+    const { baseThemeDir } = await setupTempChassisDir();
+    try {
+      // Overwrite layout/theme.liquid with CRLF content
+      // The manifest expected hash is based on normalized LF-only content
+      const crlfContent = '<html>\r\n{{ content_for_header }}\r\n</html>';
+      await fs.writeFile(path.join(baseThemeDir, 'layout/theme.liquid'), crlfContent, 'utf-8');
+
+      // cloneChassis must normalize CRLF to LF, hashing successfully without throwing ChassisTamperError
+      const cloned = await cloneChassis(tmpTestRoot);
+      expect(cloned['layout/theme.liquid']).toBe(crlfContent);
     } finally {
       await cleanTempChassisDir();
     }
