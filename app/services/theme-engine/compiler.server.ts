@@ -1,4 +1,5 @@
 import * as fs from "fs/promises";
+import { existsSync } from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
 import { resolveComponents } from "./compiler/component-resolver";
@@ -14,6 +15,61 @@ import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
 import { ValidationError, validateTemplateStructure, validateSectionDependencies } from "./validators.server";
+
+export class ChassisTamperError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ChassisTamperError";
+  }
+}
+
+/**
+ * Manifest-driven clone of all chassis files with SHA-256 hash verification.
+ */
+export async function cloneChassis(themeEngineDir: string): Promise<Record<string, string>> {
+  const manifestPath = path.join(themeEngineDir, "base-theme/chassis-manifest.json");
+  if (!existsSync(manifestPath)) {
+    throw new Error(`Chassis manifest not found at ${manifestPath}`);
+  }
+
+  let manifestRaw: string;
+  try {
+    manifestRaw = await fs.readFile(manifestPath, "utf-8");
+  } catch (err: any) {
+    throw new Error(`Failed to read chassis manifest: ${err.message}`);
+  }
+
+  const manifest = JSON.parse(manifestRaw);
+  const files = manifest.files || [];
+  const clonedFiles: Record<string, string> = {};
+
+  for (const item of files) {
+    const relPath = typeof item === "string" ? item : item.file;
+    const expectedHash = typeof item === "string" ? null : item.hash;
+
+    const fullPath = path.join(themeEngineDir, relPath);
+    let content: string;
+    try {
+      content = await fs.readFile(fullPath, "utf-8");
+    } catch (err: any) {
+      throw new ChassisTamperError(`Chassis file missing: ${relPath}. Expected file to exist at ${fullPath}`);
+    }
+
+    if (expectedHash) {
+      const normalizedContent = content.replace(/\r\n/g, "\n");
+      const hash = crypto.createHash("sha256").update(normalizedContent).digest("hex");
+      if (hash !== expectedHash) {
+        throw new ChassisTamperError(`Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
+      }
+    }
+
+    // Strip the 'base-theme/' prefix from relative path
+    const targetPath = relPath.replace(/^base-theme\//, "");
+    clonedFiles[targetPath] = content;
+  }
+
+  return clonedFiles;
+}
 
 export interface BlueprintSection {
   componentId: string;
@@ -180,6 +236,11 @@ export async function compileTheme(
 
   console.log(`[Compiler] Starting compilation run: ${runId}`);
   await saveArtifact(compileDir, "01-blueprint.json", blueprint);
+
+  // Stage 1: Chassis Clone Stage (Manifest-driven Copy & Hash Verification)
+  const themeEngineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
+  const chassisFiles = await cloneChassis(themeEngineDir);
+  await saveArtifact(compileDir, "00-chassis.json", Object.keys(chassisFiles));
 
   // Stage 2: Component Resolver
   const resolvedComponents = await resolveComponents(blueprint);
@@ -349,20 +410,11 @@ export async function composeThemeFromBlueprint(
     console.warn(`[Composer] Compiler stage generated warning: ${compilerErr.message}. Continuing with live upload.`);
   }
 
-  // Step 1: Read Read-Only Base Theme Files
-  const baseThemePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/base-theme");
-  const coreDir = baseThemePath;
-  const coreFiles = await readDirRecursive(coreDir, coreDir);
+  // Step 1: Clone read-only chassis files using hash verification
+  const themeEngineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
+  const coreFiles = await cloneChassis(themeEngineDir);
   for (const [relPath, content] of Object.entries(coreFiles)) {
     addShopifyFile(filesToUpload, relPath, content);
-  }
-
-  // Step 2: Ensure all core snippets are included flat (no subfolder 422 errors)
-  const snippetsDir = path.join(coreDir, "snippets");
-  const snippetFiles = await readDirRecursive(snippetsDir, snippetsDir).catch(() => ({}));
-  for (const [relPath, content] of Object.entries(snippetFiles)) {
-    const flatName = path.basename(relPath);
-    addShopifyFile(filesToUpload, `snippets/${flatName}`, content);
   }
 
   // Step 3: Generate Dynamic Niche Tokens CSS

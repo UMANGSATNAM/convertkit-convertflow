@@ -183,6 +183,20 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
     vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
       const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/theme.liquid",
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json",
+            "base-theme/assets/cart.js",
+            "base-theme/assets/variant-swap.js",
+            "base-theme/assets/theme.js"
+          ]
+        });
+      }
       if (fileStr.includes('theme.liquid')) return '<html>{{ content_for_header }}{{ content_for_layout }}</html>';
       if (fileStr.includes('password.liquid')) return 'password page';
       if (fileStr.includes('settings_schema.json')) return '[]';
@@ -218,7 +232,21 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       return { isDirectory: () => true } as any;
     });
 
-    vi.mocked(fs.readFile).mockResolvedValue('content');
+    vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
+      const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json",
+            "base-theme/assets/cart.js"
+          ]
+        });
+      }
+      return 'content';
+    });
 
     await expect(
       composeThemeFromBlueprint(mockShop, mockThemeId, mockBlueprint, mockRegistry, 'jewellery')
@@ -268,6 +296,18 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
     vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
       const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/theme.liquid",
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json",
+            "base-theme/assets/niche-tokens.css"
+          ]
+        });
+      }
       if (fileStr.includes('niche-tokens.css')) {
         return '   '; // only whitespace
       }
@@ -329,6 +369,17 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
     vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
       const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/theme.liquid",
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json"
+          ]
+        });
+      }
       if (fileStr.includes('hero-banner.liquid')) return 'hero liquid';
       if (fileStr.includes('featured-collection.liquid')) return 'featured collection liquid';
       return 'generic core content';
