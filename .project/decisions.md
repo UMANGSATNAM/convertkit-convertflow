@@ -53,13 +53,14 @@
 - **Chassis:** A frozen, read-only, hand-maintained OS 2.0 skeleton theme at `app/data/templates/theme-engine/base-theme/`. It is version-tagged (`chassis@1.0.0`) and changes only via explicit chassis releases with its own changelog.
 - **Injected Components:** Sections + snippets copied verbatim from the registry per the Blueprint. Zero transformation of Liquid at compile time except filename flattening.
 - **Generated Config:** `config/settings_data.json`, `templates/*.json`, `sections/*-group.json`, and `assets/tokens.css` — all generated deterministically from Blueprint JSON + Design Tokens. These are the ONLY files the compiler writes content into.
+- **EOL Normalization Note:** EOL normalization means the hash guarantees content integrity modulo line endings — by design.
+- **Chassis Tamper Failure Mode Note:** V3 compose path now hard-fails on chassis integrity violations (A2 Stage 1) — intentional.
 - **Status:** **PENDING (Becomes LOCKED only after Gate 0 passes)**
 
 ## Decision #9 — Standing Rules for the Agent
 - **Rule 1:** No tracker/percentage update without proof-of-work (test or command output) in the same message.
 - **Rule 2:** No phase begins until the previous gate's proof is pasted and approved by Umang.
 - **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent. Sign-off is a user-authored message. Any agent output containing the words "signed off" regarding a gate is itself a violation, even as a proposal.
-  - *EOL Normalization Note:* EOL normalization means the hash guarantees content integrity modulo line endings — by design.
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
 - **Status:** **LOCKED**
