@@ -103,6 +103,18 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     }
   }
 
+  // 3. Assert EVERY file inside base-theme/ (except chassis-manifest.json) is tracked in chassis-manifest.json
+  const baseThemeDirOnDisk = path.join(themeEngineDir, 'base-theme');
+  if (fs.existsSync(baseThemeDirOnDisk)) {
+    const allChassisFilesOnDisk = globSync('**/*', { cwd: baseThemeDirOnDisk, nodir: true }).map(f => `base-theme/${f.replace(/\\/g, '/')}`);
+    for (const fileOnDisk of allChassisFilesOnDisk) {
+      if (fileOnDisk === 'base-theme/chassis-manifest.json') continue;
+      if (!allowedPaths.has(fileOnDisk)) {
+        errors.push(`Untracked chassis file on disk: ${fileOnDisk}`);
+      }
+    }
+  }
+
   return {
     success: errors.length === 0,
     errors,

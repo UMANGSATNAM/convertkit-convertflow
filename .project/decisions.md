@@ -32,6 +32,7 @@
 - **Rule:** The Directory Consolidation (`app/data/templates/theme-engine/`), Read-Only Base Theme (`base-theme/`), Snippet Flattening, and Deterministic Dependency Graph Resolver (`compiler.server.ts`, `dependency-resolver.ts`, `validators.server.ts`).
 - **Enforcement:** No further modifications to these foundational components are permitted unless a critical production bug forces an intervention.
 - **Decision #5 Amendment (Phase A2):** `compiler.server.ts` opens for Phase A2 additive stages only; existing Gate-0 resolution logic remains untouched. Resolution-related test failures = stop work immediately.
+- **Gate A1 Audit Amendment (Phase A2):** Gate A1 shipped with the chassis manifest covering only 67/99 files on disk, omitting static assets, locale JSONs, and default templates. This gap was identified and closed in Phase A2 Stage 1 (commit 4dc2f9c), extending full hash integrity tracking to all 99 chassis files.
 - **Status:** **PENDING (Waiting for Gate 0 proof — cannot be declared LOCKED until Gate 0 passes)**
 
 ## Decision #6 — Phase 2 Intelligence Infrastructure Order (AI Last)
@@ -58,6 +59,7 @@
 - **Rule 1:** No tracker/percentage update without proof-of-work (test or command output) in the same message.
 - **Rule 2:** No phase begins until the previous gate's proof is pasted and approved by Umang.
 - **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent. Sign-off is a user-authored message. Any agent output containing the words "signed off" regarding a gate is itself a violation, even as a proposal.
+  - *EOL Normalization Note:* EOL normalization means the hash guarantees content integrity modulo line endings — by design.
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
 - **Status:** **LOCKED**
