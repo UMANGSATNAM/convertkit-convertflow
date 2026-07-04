@@ -89,3 +89,10 @@
   2. Every section type referenced in a layout group JSON config must exist inside the compiled theme bundle. If any referenced section type is missing from the bundle, the compiler must abort with a `ValidationError` (Orphan Check).
 - **Status:** **PENDING (Waiting for Gate A2 approval)**
 
+## Decision #13 — Single Source of Truth for Component Categorization
+- **Rule:** `registry.json` is the single source of truth for component schemas and attributes (including component types). Prisma database rows act as a read-only cache populated from it via `prisma/seed_components.ts`.
+- **Enforcement:**
+  1. The database seed script (`prisma/seed_components.ts`) maps `type` in the registry JSON to `category` in the database.
+  2. The linter validation script (`verify-registry.ts`) asserts that each registered component has a valid category type mapping to the set of supported slots.
+- **Status:** **LOCKED**
+
