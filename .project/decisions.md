@@ -56,7 +56,7 @@
 ## Decision #9 — Standing Rules for the Agent
 - **Rule 1:** No tracker/percentage update without proof-of-work (test or command output) in the same message.
 - **Rule 2:** No phase begins until the previous gate's proof is pasted and approved by Umang.
-- **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent.
+- **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent. Sign-off is a user-authored message. Any agent output containing the words "signed off" regarding a gate is itself a violation, even as a proposal.
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
 - **Status:** **LOCKED**
