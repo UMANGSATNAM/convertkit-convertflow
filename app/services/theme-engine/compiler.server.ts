@@ -504,6 +504,74 @@ export async function composeThemeFromBlueprint(
     }
   }
 
+  // Stage 2: Component Replacement (JSON Type Swap & Fallback Removal)
+  let activeHeaderComponent: ComponentRegistry | undefined;
+  let activeFooterComponent: ComponentRegistry | undefined;
+
+  if (blueprint.globalComponents && Array.isArray(blueprint.globalComponents)) {
+    for (const componentId of blueprint.globalComponents) {
+      const component = components.find(c => c.componentId === componentId);
+      if (component) {
+        if (component.category === "header" || component.componentId.startsWith("header-")) {
+          activeHeaderComponent = component;
+        }
+        if (component.category === "footer" || component.componentId.startsWith("footer-")) {
+          activeFooterComponent = component;
+        }
+      }
+    }
+  }
+
+  // Handle Header Swap
+  if (activeHeaderComponent) {
+    const newHeaderType = activeHeaderComponent.sectionType || activeHeaderComponent.componentId;
+    if (filesToUpload["sections/header-group.json"]) {
+      const group = JSON.parse(filesToUpload["sections/header-group.json"]);
+      if (group.sections && group.sections.header) {
+        group.sections.header.type = newHeaderType;
+      }
+      filesToUpload["sections/header-group.json"] = JSON.stringify(group, null, 2);
+    }
+    delete filesToUpload["sections/header.liquid"];
+  }
+
+  // Handle Footer Swap
+  if (activeFooterComponent) {
+    const newFooterType = activeFooterComponent.sectionType || activeFooterComponent.componentId;
+    if (filesToUpload["sections/footer-group.json"]) {
+      const group = JSON.parse(filesToUpload["sections/footer-group.json"]);
+      if (group.sections && group.sections.footer) {
+        group.sections.footer.type = newFooterType;
+      }
+      filesToUpload["sections/footer-group.json"] = JSON.stringify(group, null, 2);
+    }
+    delete filesToUpload["sections/footer.liquid"];
+  }
+
+  // Orphan Check for Header Group
+  if (filesToUpload["sections/header-group.json"]) {
+    const group = JSON.parse(filesToUpload["sections/header-group.json"]);
+    for (const secVal of Object.values(group.sections || {})) {
+      const sType = (secVal as any).type;
+      const targetFile = `sections/${sType}.liquid`;
+      if (!filesToUpload[targetFile]) {
+        throw new ValidationError(`Orphan reference in header-group: section type "${sType}" is missing.`);
+      }
+    }
+  }
+
+  // Orphan Check for Footer Group
+  if (filesToUpload["sections/footer-group.json"]) {
+    const group = JSON.parse(filesToUpload["sections/footer-group.json"]);
+    for (const secVal of Object.values(group.sections || {})) {
+      const sType = (secVal as any).type;
+      const targetFile = `sections/${sType}.liquid`;
+      if (!filesToUpload[targetFile]) {
+        throw new ValidationError(`Orphan reference in footer-group: section type "${sType}" is missing.`);
+      }
+    }
+  }
+
   // Step 6: Validate Theme Integrity
   validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);
 

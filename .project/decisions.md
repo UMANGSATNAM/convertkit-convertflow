@@ -76,3 +76,11 @@
 - **Batch Order:** Prioritized by launch niches: 1. Luxury / Jewellery (Aurelle / Jewel-Luxe vertical), 2. Fashion / Apparel, 3. Beauty / Organic, 4. Electronics / Tech, 5. Food / Supplements.
 - **Phase A Chassis Exception:** The legacy files `main-page_luxury_v1.liquid`, `main-404_luxury_v1.liquid`, and `main-password_luxury_v1.liquid` will be used immediately during Phase A as source material (generalized and adapted into the chassis) rather than writing those chassis sections from scratch.
 - **Status:** **LOCKED**
+
+## Decision #11 — Component Replacement via JSON Type Swap (Phase A2 Stage 2)
+- **Rule:** Component replacement for layouts (such as header and footer) is performed purely at the section group JSON configuration level (swapping the target section's `type` field reference to the selected custom component's type) rather than mutating files on disk or performing regex injections on chassis layout templates.
+- **Enforcement:**
+  1. The fallback layout files (e.g., `sections/header.liquid` and `sections/footer.liquid`) must be deleted/omitted from the compiled upload bundle when custom replacements are active.
+  2. Every section type referenced in a layout group JSON config must exist inside the compiled theme bundle. If any referenced section type is missing from the bundle, the compiler must abort with a `ValidationError` (Orphan Check).
+- **Status:** **PENDING (Waiting for Gate A2 approval)**
+
