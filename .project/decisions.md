@@ -92,7 +92,8 @@
 ## Decision #13 — Single Source of Truth for Component Categorization
 - **Rule:** `registry.json` is the single source of truth for component schemas and attributes (including component types). Prisma database rows act as a read-only cache populated from it via `prisma/seed_components.ts`.
 - **Enforcement:**
-  1. The database seed script (`prisma/seed_components.ts`) maps `type` in the registry JSON to `category` in the database.
-  2. The linter validation script (`verify-registry.ts`) asserts that each registered component has a valid category type mapping to the set of supported slots.
+  1. The linter validation script (`verify-registry.ts`) asserts each component's `type` field against the canonical 13 categories. No `category || type` fallback — `type` only.
+  2. The database seed script (`prisma/seed_components.ts`) maps `type` in registry JSON to `category` in the database, then runs a post-seed verification loop asserting `dbRow.category === jsonEntry.type` for all 57 entries, exiting with code 1 on any mismatch.
+  3. At compile-time, `composeThemeFromBlueprint` computes the SHA-256 hash of `registry.json` on disk and compares it against the hash stored in the database (seeded as a `registry-metadata-hash` record). If they differ, compilation aborts with a `ValidationError("Registry cache stale — run seed")`.
 - **Status:** **LOCKED**
 

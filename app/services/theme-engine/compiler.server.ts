@@ -1,5 +1,5 @@
 import * as fs from "fs/promises";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
 import { resolveComponents } from "./compiler/component-resolver";
@@ -15,6 +15,7 @@ import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
 import { ValidationError, validateTemplateStructure, validateSectionDependencies, assertNoOrphanSectionRefs } from "./validators.server";
+import prisma from "../../db.server";
 
 export class ChassisTamperError extends Error {
   constructor(message: string) {
@@ -400,7 +401,19 @@ export async function composeThemeFromBlueprint(
 ): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
   const startTime = Date.now();
   console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
-  
+
+  // Registry cache freshness check: compare on-disk registry.json hash against DB-stored hash
+  const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
+  const currentRegistryHash = crypto.createHash("sha256").update(readFileSync(registryJsonPath, "utf-8")).digest("hex");
+  const storedHashRecord = await prisma.componentRegistry.findUnique({ where: { componentId: "registry-metadata-hash" } });
+  if (!storedHashRecord) {
+    throw new ValidationError("Registry cache stale — run seed. No registry-metadata-hash record found in database.");
+  }
+  if (storedHashRecord.version !== currentRegistryHash) {
+    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${storedHashRecord.version}, Disk hash: ${currentRegistryHash}`);
+  }
+  console.log(`[Composer] Registry cache freshness verified (hash: ${currentRegistryHash.substring(0, 12)}...)`);
+
   const filesToUpload: Record<string, string> = {};
 
   // Execute deterministic compiler for safety artifacts & design token generation

@@ -69,6 +69,31 @@ vi.mock('../app/services/theme-engine/asset-cache.server', () => {
   };
 });
 
+// Mock db.server (prisma) to avoid real DB calls for registry cache freshness check
+vi.mock('../app/db.server', () => {
+  const path = require('path');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  return {
+    default: {
+      componentRegistry: {
+        findUnique: vi.fn(async ({ where }: any) => {
+          if (where.componentId === 'registry-metadata-hash') {
+            const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+            try {
+              const content = fs.readFileSync(registryPath, 'utf-8');
+              return { componentId: 'registry-metadata-hash', version: crypto.createHash('sha256').update(content).digest('hex') };
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        })
+      }
+    }
+  };
+});
+
 describe('Theme Composer Merging and Validation (Phase 2)', () => {
   const mockShop = { shopDomain: 'test.myshopify.com', accessToken: 'mock-token' };
   const mockThemeId = '12345';

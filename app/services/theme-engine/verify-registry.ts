@@ -8,6 +8,7 @@ interface ComponentEntry {
   liquidPath?: string;
   filePath?: string;
   metaPath?: string;
+  type?: string;
 }
 
 interface Registry {
@@ -89,16 +90,16 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
       }
     }
 
-    // Assert every component has a valid category/type
-    const category = (comp as any).category || (comp as any).type;
+    // Assert every component has a valid category type
+    const category = comp.type;
     const VALID_CATEGORIES = new Set([
       "header", "footer", "hero", "announcement", "product-grid",
-      "collection", "collections", "trust", "testimonials", "faq", "newsletter",
-      "brand-story", "popup", "bundle-builder", "custom"
+      "collection", "trust", "testimonials", "faq", "newsletter",
+      "brand-story", "popup", "bundle-builder"
     ]);
     if (!category || !VALID_CATEGORIES.has(category)) {
       errors.push(
-        `Component "${comp.componentId}" has missing/invalid category: "${category ?? "undefined"}"`
+        `Component "${comp.componentId}" has missing/invalid category type: "${category ?? "undefined"}"`
       );
     }
   }

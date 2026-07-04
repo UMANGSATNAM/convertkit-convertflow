@@ -1,10 +1,33 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { composeThemeFromBlueprint } from '../../app/services/theme-engine/compiler.server';
 import { ValidationError } from '../../app/services/theme-engine/validators.server';
+
+// Mock db.server (prisma) to avoid real DB calls and provide registry hash for freshness check
+vi.mock('../../app/db.server', () => {
+  return {
+    default: {
+      componentRegistry: {
+        findUnique: vi.fn(async ({ where }: any) => {
+          if (where.componentId === 'registry-metadata-hash') {
+            // Dynamically compute hash from the sandbox registry.json
+            const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+            try {
+              const content = readFileSync(registryPath, 'utf-8');
+              return { componentId: 'registry-metadata-hash', version: crypto.createHash('sha256').update(content).digest('hex') };
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        })
+      }
+    }
+  };
+});
 
 // Mock Shopify upload cache to avoid network calls
 vi.mock('../../app/services/theme-engine/asset-cache.server', () => {
@@ -114,6 +137,10 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
     }
 
     await fs.writeFile(path.join(baseThemeDir, 'chassis-manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
+
+    // Write minimal registry.json for compile-time cache freshness check
+    const minimalRegistry = { version: '1.0.0', components: [] };
+    await fs.writeFile(path.join(themeEngineDir, 'registry.json'), JSON.stringify(minimalRegistry, null, 2), 'utf-8');
 
     // Setup custom headers and footers mock directories under nested theme-engine path
     await fs.mkdir(path.join(themeEngineDir, 'components/header'), { recursive: true });

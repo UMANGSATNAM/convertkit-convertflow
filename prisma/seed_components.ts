@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -8,9 +9,11 @@ async function main() {
   console.log("Seeding ComponentRegistry for Design Systems V2...");
 
   // Load the new registry.json
-  const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'component-registry', 'registry.json');
+  const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'registry.json');
   const registryRaw = fs.readFileSync(registryPath, 'utf8');
   
+  const registryHash = crypto.createHash('sha256').update(registryRaw).digest('hex');
+
   // Parse ignoring comments using Function (since JSON.parse fails on // comments)
   const registry = new Function('return ' + registryRaw)();
   
@@ -45,6 +48,29 @@ async function main() {
     };
   });
 
+  // Seed the special registry meta-entry to store registry.json SHA-256 hash
+  components.push({
+    componentId: "registry-metadata-hash",
+    category: "metadata",
+    niche: "core",
+    sectionType: "metadata",
+    filePath: "",
+    liquidPath: "",
+    metaPath: "",
+    family: "",
+    archetypes: [],
+    visualStyle: "",
+    compatibleSlots: [],
+    industryTags: [],
+    styleTags: [],
+    croScore: 0.0,
+    mobileScore: 0.0,
+    version: registryHash,
+    status: "PUBLISHED",
+    isUniversal: false,
+    performanceScore: 0.0
+  });
+
   // Clean the current table
   await prisma.componentRegistry.deleteMany({});
   console.log("Cleared old ComponentRegistry.");
@@ -59,6 +85,29 @@ async function main() {
   }
 
   console.log("ComponentRegistry V2 seeding complete.");
+
+  // Post-seed verification loop to strictly enforce SSOT alignment
+  console.log("Starting DB post-seed verification audit...");
+  const dbComponents = await prisma.componentRegistry.findMany({});
+  for (const dbComp of dbComponents) {
+    if (dbComp.componentId === "registry-metadata-hash") {
+      if (dbComp.version !== registryHash) {
+        console.error(`[SeedVerification] Metadata hash mismatch! Expected ${registryHash}, got ${dbComp.version}`);
+        process.exit(1);
+      }
+      continue;
+    }
+    const jsonComp = registry.components.find((c: any) => c.componentId === dbComp.componentId);
+    if (!jsonComp) {
+      console.error(`[SeedVerification] DB Component "${dbComp.componentId}" not found in registry.json!`);
+      process.exit(1);
+    }
+    if (dbComp.category !== jsonComp.type) {
+      console.error(`[SeedVerification] Category drift detected: DB category "${dbComp.category}" !== JSON type "${jsonComp.type}" for "${dbComp.componentId}"`);
+      process.exit(1);
+    }
+  }
+  console.log("✅ DB post-seed verification audit SUCCESS! All database categories are fully aligned with registry.json types.");
 }
 
 main()
