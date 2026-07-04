@@ -14,7 +14,7 @@ import { staticValidate } from "./compiler/static-validator";
 import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
-import { ValidationError, validateTemplateStructure, validateSectionDependencies } from "./validators.server";
+import { ValidationError, validateTemplateStructure, validateSectionDependencies, assertNoOrphanSectionRefs } from "./validators.server";
 
 export class ChassisTamperError extends Error {
   constructor(message: string) {
@@ -504,73 +504,64 @@ export async function composeThemeFromBlueprint(
     }
   }
 
-  // Stage 2: Component Replacement (JSON Type Swap & Fallback Removal)
-  let activeHeaderComponent: ComponentRegistry | undefined;
-  let activeFooterComponent: ComponentRegistry | undefined;
+  // Stage 2.1: Category-only slot detection + Symmetrical replacement loop
+  const LAYOUT_SLOTS = ["header", "footer"] as const;
+  type LayoutSlot = typeof LAYOUT_SLOTS[number];
+
+  const activeLayoutComponents: Partial<Record<LayoutSlot, ComponentRegistry>> = {};
 
   if (blueprint.globalComponents && Array.isArray(blueprint.globalComponents)) {
     for (const componentId of blueprint.globalComponents) {
       const component = components.find(c => c.componentId === componentId);
-      if (component) {
-        if (component.category === "header" || component.componentId.startsWith("header-")) {
-          activeHeaderComponent = component;
+      if (!component) {
+        throw new ValidationError(
+          `[Stage2] Global component "${componentId}" not found in registry.`
+        );
+      }
+      const slot = component.category as LayoutSlot;
+      if (LAYOUT_SLOTS.includes(slot)) {
+        if (activeLayoutComponents[slot]) {
+          throw new ValidationError(
+            `[Stage2] Blueprint specifies multiple ${slot} components: ` +
+            `"${activeLayoutComponents[slot]!.componentId}" and "${component.componentId}" — exactly one allowed.`
+          );
         }
-        if (component.category === "footer" || component.componentId.startsWith("footer-")) {
-          activeFooterComponent = component;
-        }
+        activeLayoutComponents[slot] = component;
       }
     }
   }
 
-  // Handle Header Swap
-  if (activeHeaderComponent) {
-    const newHeaderType = activeHeaderComponent.sectionType || activeHeaderComponent.componentId;
-    if (filesToUpload["sections/header-group.json"]) {
-      const group = JSON.parse(filesToUpload["sections/header-group.json"]);
-      if (group.sections && group.sections.header) {
-        group.sections.header.type = newHeaderType;
-      }
-      filesToUpload["sections/header-group.json"] = JSON.stringify(group, null, 2);
+  // Fallback filename = group JSON ka native section type (chassis convention)
+  for (const slot of LAYOUT_SLOTS) {
+    const active = activeLayoutComponents[slot];
+    if (!active) continue;
+
+    const groupPath = `sections/${slot}-group.json`;
+    if (!filesToUpload[groupPath]) {
+      throw new ValidationError(`[Stage2] Chassis group file "${groupPath}" missing from bundle.`);
     }
-    delete filesToUpload["sections/header.liquid"];
+    const group = JSON.parse(filesToUpload[groupPath]);
+    const slotEntry = group.sections?.[slot];
+    if (!slotEntry) {
+      throw new ValidationError(`[Stage2] "${groupPath}" has no "${slot}" section entry.`);
+    }
+
+    const fallbackType = slotEntry.type;
+    const newType = active.sectionType || active.componentId;
+    slotEntry.type = newType;
+    filesToUpload[groupPath] = JSON.stringify(group, null, 2);
+
+    const fallbackFile = `sections/${fallbackType}.liquid`;
+    if (!(fallbackFile in filesToUpload)) {
+      throw new ValidationError(
+        `[Stage2] Expected fallback "${fallbackFile}" in bundle before removal — chassis convention drifted.`
+      );
+    }
+    delete filesToUpload[fallbackFile];
   }
 
-  // Handle Footer Swap
-  if (activeFooterComponent) {
-    const newFooterType = activeFooterComponent.sectionType || activeFooterComponent.componentId;
-    if (filesToUpload["sections/footer-group.json"]) {
-      const group = JSON.parse(filesToUpload["sections/footer-group.json"]);
-      if (group.sections && group.sections.footer) {
-        group.sections.footer.type = newFooterType;
-      }
-      filesToUpload["sections/footer-group.json"] = JSON.stringify(group, null, 2);
-    }
-    delete filesToUpload["sections/footer.liquid"];
-  }
-
-  // Orphan Check for Header Group
-  if (filesToUpload["sections/header-group.json"]) {
-    const group = JSON.parse(filesToUpload["sections/header-group.json"]);
-    for (const secVal of Object.values(group.sections || {})) {
-      const sType = (secVal as any).type;
-      const targetFile = `sections/${sType}.liquid`;
-      if (!filesToUpload[targetFile]) {
-        throw new ValidationError(`Orphan reference in header-group: section type "${sType}" is missing.`);
-      }
-    }
-  }
-
-  // Orphan Check for Footer Group
-  if (filesToUpload["sections/footer-group.json"]) {
-    const group = JSON.parse(filesToUpload["sections/footer-group.json"]);
-    for (const secVal of Object.values(group.sections || {})) {
-      const sType = (secVal as any).type;
-      const targetFile = `sections/${sType}.liquid`;
-      if (!filesToUpload[targetFile]) {
-        throw new ValidationError(`Orphan reference in footer-group: section type "${sType}" is missing.`);
-      }
-    }
-  }
+  // Assert no orphan section references inside layout groups and templates
+  assertNoOrphanSectionRefs(filesToUpload);
 
   // Step 6: Validate Theme Integrity
   validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);

@@ -44,7 +44,8 @@ vi.mock('../app/services/theme-engine/validators.server', () => {
     ValidationError,
     validateSettingsPatch: vi.fn(),
     validateTemplateStructure: vi.fn(),
-    validateSectionDependencies: vi.fn()
+    validateSectionDependencies: vi.fn(),
+    assertNoOrphanSectionRefs: vi.fn()
   };
 });
 

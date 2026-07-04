@@ -88,6 +88,19 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
         errors.push(`Component ${comp.componentId} references missing meta file: ${normMeta}`);
       }
     }
+
+    // Assert every component has a valid category/type
+    const category = (comp as any).category || (comp as any).type;
+    const VALID_CATEGORIES = new Set([
+      "header", "footer", "hero", "announcement", "product-grid",
+      "collection", "collections", "trust", "testimonials", "faq", "newsletter",
+      "brand-story", "popup", "bundle-builder", "custom"
+    ]);
+    if (!category || !VALID_CATEGORIES.has(category)) {
+      errors.push(
+        `Component "${comp.componentId}" has missing/invalid category: "${category ?? "undefined"}"`
+      );
+    }
   }
 
   // 2. Assert EVERY .liquid file under theme-engine is referenced by exactly one registry entry or chassis manifest

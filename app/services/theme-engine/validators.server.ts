@@ -121,3 +121,34 @@ export function validateSectionDependencies(jsonContent: any, availableSnippets?
     }
   }
 }
+
+const APP_SECTION_TYPES = /^@app/; // Shopify app-provided sections — theme bundle mein nahi hote
+
+export function assertNoOrphanSectionRefs(filesToUpload: Record<string, string>): void {
+  const jsonConfigPaths = Object.keys(filesToUpload).filter(
+    p => (p.startsWith("sections/") && p.endsWith("-group.json")) ||
+         (p.startsWith("templates/") && p.endsWith(".json"))
+  );
+
+  for (const configPath of jsonConfigPaths) {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(filesToUpload[configPath]);
+    } catch (e: any) {
+      throw new ValidationError(`[OrphanCheck] Invalid JSON in "${configPath}": ${e.message}`);
+    }
+    for (const [key, secVal] of Object.entries(parsed.sections || {})) {
+      const sType = (secVal as any).type;
+      if (!sType) {
+        throw new ValidationError(`[OrphanCheck] Section "${key}" in "${configPath}" has no type.`);
+      }
+      if (APP_SECTION_TYPES.test(sType)) continue; // documented exemption
+      if (!filesToUpload[`sections/${sType}.liquid`]) {
+        throw new ValidationError(
+          `[OrphanCheck] "${configPath}" references section type "${sType}" ` +
+          `but "sections/${sType}.liquid" is missing from the compiled bundle.`
+        );
+      }
+    }
+  }
+}

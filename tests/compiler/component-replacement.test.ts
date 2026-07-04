@@ -13,7 +13,7 @@ vi.mock('../../app/services/theme-engine/asset-cache.server', () => {
   };
 });
 
-describe('Stage 2: Component Replacement & JSON Type Swap', () => {
+describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
   const sandboxDir = path.join(process.cwd(), 'tmp', 'test-component-replacement');
   const themeEngineDir = path.join(sandboxDir, 'app/data/templates/theme-engine');
   const mockShop = { shopDomain: 'test.myshopify.com', accessToken: 'mock-token' };
@@ -28,6 +28,13 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
       filePath: 'components/header/header-luxury-v1.liquid'
     },
     {
+      componentId: 'header-bold-v1',
+      category: 'header',
+      sectionType: 'header-bold-v1',
+      liquidPath: 'components/header/header-bold-v1.liquid',
+      filePath: 'components/header/header-bold-v1.liquid'
+    },
+    {
       componentId: 'footer-luxury-v1',
       category: 'footer',
       sectionType: 'footer-luxury-v1',
@@ -37,6 +44,8 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
   ] as any[];
 
   beforeEach(async () => {
+    process.env.MOCK_SHOPIFY = 'true';
+
     // Setup a clean sandboxed theme-engine directory
     if (existsSync(sandboxDir)) {
       await fs.rm(sandboxDir, { recursive: true, force: true });
@@ -110,6 +119,7 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
     await fs.mkdir(path.join(themeEngineDir, 'components/header'), { recursive: true });
     await fs.mkdir(path.join(themeEngineDir, 'components/footer'), { recursive: true });
     await fs.writeFile(path.join(themeEngineDir, 'components/header/header-luxury-v1.liquid'), '<header>luxury header</header>', 'utf-8');
+    await fs.writeFile(path.join(themeEngineDir, 'components/header/header-bold-v1.liquid'), '<header>bold header</header>', 'utf-8');
     await fs.writeFile(path.join(themeEngineDir, 'components/footer/footer-luxury-v1.liquid'), '<footer>luxury footer</footer>', 'utf-8');
 
     // Mock process.cwd() to resolve paths correctly in our theme compiler server
@@ -118,6 +128,7 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
 
   afterEach(async () => {
     vi.restoreAllMocks();
+    delete process.env.MOCK_SHOPIFY;
     if (existsSync(sandboxDir)) {
       await fs.rm(sandboxDir, { recursive: true, force: true });
     }
@@ -130,7 +141,6 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
       settings: {}
     };
 
-    // Intercept composeThemeFromBlueprint filesToUpload by modifying uploadAssetWithCache spy
     const uploadMap: Record<string, string> = {};
     const { uploadAssetWithCache } = await import('../../app/services/theme-engine/asset-cache.server');
     vi.mocked(uploadAssetWithCache).mockImplementation(async (shop, themeId, key, content) => {
@@ -195,6 +205,38 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
     expect(footerGroup.sections.footer.type).toBe('footer');
   });
 
+  it('throws ValidationError when blueprint specifies two components for the same layout slot (multiple headers)', async () => {
+    const blueprint = {
+      globalComponents: ['header-luxury-v1', 'header-bold-v1'],
+      pages: {},
+      settings: {}
+    };
+
+    await expect(
+      composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
+    ).rejects.toThrow(ValidationError);
+
+    await expect(
+      composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
+    ).rejects.toThrow(/multiple header components: "header-luxury-v1" and "header-bold-v1"/i);
+  });
+
+  it('throws ValidationError when blueprint specifies an unrecognized component ID', async () => {
+    const blueprint = {
+      globalComponents: ['header-unrecognized-v1'],
+      pages: {},
+      settings: {}
+    };
+
+    await expect(
+      composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
+    ).rejects.toThrow(ValidationError);
+
+    await expect(
+      composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
+    ).rejects.toThrow(/Global component "header-unrecognized-v1" not found in registry/i);
+  });
+
   it('Orphan Check: throws ValidationError if swapped section type liquid is missing from output bundle', async () => {
     const blueprint = {
       globalComponents: ['header-luxury-v1'],
@@ -203,7 +245,7 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
     };
 
     // Overwrite the custom header liquid file with empty content so Step 5 loads it as falsy (not added to upload map)
-    await fs.writeFile(path.join(sandboxDir, 'app/data/templates/theme-engine/components/header/header-luxury-v1.liquid'), '', 'utf-8');
+    await fs.writeFile(path.join(themeEngineDir, 'components/header/header-luxury-v1.liquid'), '', 'utf-8');
 
     // Try composing, should throw ValidationError due to missing header-luxury-v1.liquid section file
     await expect(
@@ -212,6 +254,64 @@ describe('Stage 2: Component Replacement & JSON Type Swap', () => {
 
     await expect(
       composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
-    ).rejects.toThrow(/Orphan reference in header-group: section type "header-luxury-v1" is missing/);
+    ).rejects.toThrow(/references section type "header-luxury-v1" but "sections\/header-luxury-v1.liquid" is missing/i);
+  });
+
+  it('Orphan Check: @app block sections are exempted and pass validation', async () => {
+    const blueprint = {
+      globalComponents: [],
+      pages: {},
+      settings: {}
+    };
+
+    // Dynamically inject a custom header-group.json containing an app block reference ("@app")
+    const headerGroupWithApp = JSON.stringify({
+      name: "Header",
+      type: "header",
+      sections: {
+        header: { type: "header", settings: {} },
+        appSection: { type: "@app", settings: {} }
+      },
+      order: ["header", "appSection"]
+    }, null, 2);
+
+    // Overwrite the on-disk header-group.json to contain the app section reference
+    const baseThemeDir = path.join(themeEngineDir, 'base-theme');
+    await fs.writeFile(path.join(baseThemeDir, 'sections/header-group.json'), headerGroupWithApp, 'utf-8');
+
+    // Recompute manifest hashes sync so cloneChassis won't throw ChassisTamperError
+    const manifestFiles = [
+      'base-theme/layout/theme.liquid',
+      'base-theme/sections/header.liquid',
+      'base-theme/sections/footer.liquid',
+      'base-theme/sections/header-group.json',
+      'base-theme/sections/footer-group.json',
+      'base-theme/config/settings_schema.json',
+      'base-theme/config/settings_data.json',
+      'base-theme/locales/en.default.json',
+      'base-theme/assets/niche-tokens.css'
+    ];
+    const manifest: any = { version: '1.0.0', files: [] };
+    for (const file of manifestFiles) {
+      const p = path.join(themeEngineDir, file);
+      const c = await fs.readFile(p, 'utf-8');
+      const hash = crypto.createHash('sha256').update(c.replace(/\r\n/g, '\n')).digest('hex');
+      manifest.files.push({ file, hash });
+    }
+    await fs.writeFile(path.join(baseThemeDir, 'chassis-manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
+
+    // Should succeed because @app is exempted
+    const uploadMap: Record<string, string> = {};
+    const { uploadAssetWithCache } = await import('../../app/services/theme-engine/asset-cache.server');
+    vi.mocked(uploadAssetWithCache).mockImplementation(async (shop, themeId, key, content) => {
+      uploadMap[key] = content;
+      return true;
+    });
+
+    await expect(
+      composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, mockRegistry, 'jewellery')
+    ).resolves.toBeDefined();
+
+    expect(uploadMap['sections/header.liquid']).toBe('<header>fallback header</header>');
   });
 });
