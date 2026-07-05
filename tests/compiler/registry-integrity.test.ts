@@ -22,25 +22,29 @@ vi.mock('../../app/db.server', () => {
 describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
   const registryPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
   let realHash: string;
-  const mock57Components = Array(57).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+  let expectedCount: number;
+  let mockExpectedComponents: any[];
 
   beforeEach(() => {
     vi.resetAllMocks();
     const realContent = fs.readFileSync(registryPath, "utf-8");
     realHash = crypto.createHash("sha256").update(realContent).digest("hex");
+    const registryData = new Function("return " + realContent)();
+    expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
+    mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
   });
 
-  it('Case 1 (Positive): resolves components cleanly when disk registry.json hash matches RegistryMeta in DB and count is 57', async () => {
+  it('Case 1 (Positive): resolves components cleanly when disk registry.json hash matches RegistryMeta in DB and count aligns with registry.json', async () => {
     vi.mocked(prisma.registryMeta.findUnique).mockResolvedValue({
       id: 'singleton',
       registryHash: realHash,
       updatedAt: new Date()
     } as any);
 
-    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mock57Components);
+    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockExpectedComponents);
 
     const result = await loadVerifiedComponents();
-    expect(result).toHaveLength(57);
+    expect(result).toHaveLength(expectedCount);
     expect(prisma.registryMeta.findUnique).toHaveBeenCalledWith({ where: { id: 'singleton' } });
   });
 
@@ -60,29 +64,29 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
     await expect(loadVerifiedComponents()).rejects.toThrow(/No RegistryMeta record found in database/);
   });
 
-  it('Case 4 (Negative - Row Count Drift High): throws ValidationError when DB returns 58 components (e.g. sentinel pollution)', async () => {
+  it('Case 4 (Negative - Row Count Drift High): throws ValidationError when DB returns more components than registry.json (e.g. sentinel pollution)', async () => {
     vi.mocked(prisma.registryMeta.findUnique).mockResolvedValue({
       id: 'singleton',
       registryHash: realHash,
       updatedAt: new Date()
     } as any);
 
-    const mock58Components = Array(58).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
-    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mock58Components);
+    const mockHighComponents = Array(expectedCount + 1).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockHighComponents);
 
-    await expect(loadVerifiedComponents()).rejects.toThrow(/SSOT drift detected: expected exactly 57 published components in database, found 58/);
+    await expect(loadVerifiedComponents()).rejects.toThrow(new RegExp(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${expectedCount + 1}`));
   });
 
-  it('Case 5 (Negative - Row Count Drift Low): throws ValidationError when DB returns 56 components (e.g. accidental deletion)', async () => {
+  it('Case 5 (Negative - Row Count Drift Low): throws ValidationError when DB returns fewer components than registry.json (e.g. accidental deletion)', async () => {
     vi.mocked(prisma.registryMeta.findUnique).mockResolvedValue({
       id: 'singleton',
       registryHash: realHash,
       updatedAt: new Date()
     } as any);
 
-    const mock56Components = Array(56).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
-    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mock56Components);
+    const mockLowComponents = Array(expectedCount - 1).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockLowComponents);
 
-    await expect(loadVerifiedComponents()).rejects.toThrow(/SSOT drift detected: expected exactly 57 published components in database, found 56/);
+    await expect(loadVerifiedComponents()).rejects.toThrow(new RegExp(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${expectedCount - 1}`));
   });
 });

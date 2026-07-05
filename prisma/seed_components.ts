@@ -79,9 +79,10 @@ async function main() {
     process.exit(1);
   }
 
-  const dbComponents = await prisma.componentRegistry.findMany({});
-  if (dbComponents.length !== 57) {
-    console.error(`[SeedVerification] Expected exactly 57 components in DB, found ${dbComponents.length}!`);
+  const expectedCount = registry.components.filter((c: any) => c.status === "approved").length;
+  const dbComponents = await prisma.componentRegistry.findMany({ where: { status: "PUBLISHED" } });
+  if (dbComponents.length !== expectedCount) {
+    console.error(`[SeedVerification] Expected exactly ${expectedCount} published components in DB, found ${dbComponents.length}!`);
     process.exit(1);
   }
 
@@ -96,7 +97,7 @@ async function main() {
       process.exit(1);
     }
   }
-  console.log("✅ DB post-seed verification audit SUCCESS! All 57 database components and RegistryMeta are fully aligned with registry.json.");
+  console.log(`✅ DB post-seed verification audit SUCCESS! All ${expectedCount} database components and RegistryMeta are fully aligned with registry.json.`);
 }
 
 main()

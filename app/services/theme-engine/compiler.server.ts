@@ -228,8 +228,12 @@ function validateThemeIntegrity(
 export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
   let currentRegistryHash: string;
+  let expectedCount: number;
   try {
-    currentRegistryHash = crypto.createHash("sha256").update(readFileSync(registryJsonPath, "utf-8")).digest("hex");
+    const rawContent = readFileSync(registryJsonPath, "utf-8");
+    currentRegistryHash = crypto.createHash("sha256").update(rawContent).digest("hex");
+    const registryData = new Function("return " + rawContent)();
+    expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
   } catch (err: any) {
     throw new ValidationError(`Failed to read registry.json on disk: ${err.message}`);
   }
@@ -243,8 +247,8 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   const components = await prisma.componentRegistry.findMany({
     where: { status: "PUBLISHED" }
   });
-  if (components.length !== 57) {
-    throw new ValidationError(`SSOT drift detected: expected exactly 57 published components in database, found ${components.length}. Run seed script.`);
+  if (components.length !== expectedCount) {
+    throw new ValidationError(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${components.length}. Run seed script.`);
   }
   console.log(`[RegistryLoader] Verified SSOT registry freshness (hash: ${currentRegistryHash.substring(0, 12)}...) and loaded ${components.length} components.`);
   return components;

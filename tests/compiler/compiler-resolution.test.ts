@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveComponentLiquidContent } from './compiler.server';
+import { resolveComponentLiquidContent } from '../../app/services/theme-engine/compiler.server';
 import * as path from 'path';
 
 describe('resolveComponentLiquidContent (Registry-Direct Resolution & Defenses)', () => {

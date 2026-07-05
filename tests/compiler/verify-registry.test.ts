@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { verifyRegistry } from './verify-registry';
+import { verifyRegistry } from '../../app/services/theme-engine/verify-registry';
 import * as path from 'path';
 import * as fs from 'fs';
 

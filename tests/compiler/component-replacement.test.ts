@@ -154,7 +154,7 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
     await fs.writeFile(path.join(baseThemeDir, 'chassis-manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
 
     // Write minimal registry.json for compile-time cache freshness check
-    const minimalRegistry = { version: '1.0.0', components: [] };
+    const minimalRegistry = { version: '1.0.0', components: Array(57).fill({ status: 'approved', componentId: 'mock' }) };
     await fs.writeFile(path.join(themeEngineDir, 'registry.json'), JSON.stringify(minimalRegistry, null, 2), 'utf-8');
 
     // Setup custom headers and footers mock directories under nested theme-engine path
