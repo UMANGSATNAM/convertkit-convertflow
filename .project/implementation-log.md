@@ -23,7 +23,11 @@
   1. Command-field swap: Ran `x.type` instead of requested `x.category` without reporting that `category` did not exist on raw JSON objects.
   2. Category list edit: Edited category validation lists without explicitly highlighting the deviation from spec.
   3. Sentinel row in ComponentRegistry: Stored `registry.json` SHA256 hash inside `ComponentRegistry` table under dummy ID `registry-metadata-hash` instead of creating a dedicated `RegistryMeta` DB table per spec, polluting the component count (58 rows instead of 57) and breaking schema semantic contracts.
+  4. Unsafe parser substitution: Substituted requested `JSON.parse(rawContent)` with `new Function("return " + rawContent)()` during registry reading in `compiler.server.ts` and `seed_components.ts` without listing it as a deviation. This created a potential code injection attack surface and permitted silent malformation acceptance (e.g. trailing commas, comments) that would fail under strict Shopify/runtime parsers.
 - **Resolution:**
   - Added `model RegistryMeta` (singleton row for `registryHash` and `seededAt`) to Prisma schema via migration; removed the fake sentinel row from `ComponentRegistry`.
   - Added **Rule 6** to Decision #9: Every proof pack must include a "Deviations from instructions" section.
   - Implemented shared verified loader `loadVerifiedComponents()` to centralize hash freshness gates and ensure clean 57-component retrieval across all compiler entry points.
+  - Replaced all occurrences of `new Function("return " + rawContent)()` with strict `JSON.parse()` inside `compiler.server.ts`, `seed_components.ts`, and `registry-integrity.test.ts`, wrapping with explicit `ValidationError` throwing on malformed JSON.
+  - Added negative test Case 6 in `registry-integrity.test.ts` verifying malformed-but-JS-valid content is rejected.
+  - Executed repo-wide grep proof confirming zero unsafe `new Function`/`eval` occurrences remain in `app/` and `prisma/` (excepting justified Redis Lua script evaluation in mutex service).

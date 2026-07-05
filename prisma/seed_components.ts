@@ -13,9 +13,12 @@ async function main() {
   const registryRaw = fs.readFileSync(registryPath, 'utf8');
   
   const registryHash = crypto.createHash('sha256').update(registryRaw).digest('hex');
-
-  // Parse ignoring comments using Function (since JSON.parse fails on // comments)
-  const registry = new Function('return ' + registryRaw)();
+  let registry: any;
+  try {
+    registry = JSON.parse(registryRaw);
+  } catch (e: any) {
+    throw new Error(`registry.json is not valid JSON: ${e.message}`);
+  }
   
   const components = registry.components.map((comp: any) => {
     const familyStr = Array.isArray(comp.family) ? comp.family.join(", ") : (comp.family || "");

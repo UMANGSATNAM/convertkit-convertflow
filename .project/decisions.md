@@ -103,5 +103,6 @@
 - **Enforcement:**
   1. All runtime compiler queries (`loadVerifiedComponents`) and seed verification audits (`seed_components.ts`) must explicitly filter database queries by `where: { status: "PUBLISHED" }`.
   2. The expected component count must never be hardcoded as a magic number (such as `57`); it must be derived dynamically from `registry.json` by counting entries matching `status === "approved"`.
-- **Status:** **LOCKED**
+- **Migration Commitment:** Migration baseline (`prisma migrate diff` se initial migration) Phase B kickoff pe create hogi.
+- **Status:** **PENDING (Waiting for Gate A2 approval)**
 

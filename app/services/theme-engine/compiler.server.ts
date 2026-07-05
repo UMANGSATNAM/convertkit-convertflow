@@ -227,16 +227,20 @@ function validateThemeIntegrity(
  */
 export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
-  let currentRegistryHash: string;
-  let expectedCount: number;
+  let rawContent: string;
   try {
-    const rawContent = readFileSync(registryJsonPath, "utf-8");
-    currentRegistryHash = crypto.createHash("sha256").update(rawContent).digest("hex");
-    const registryData = new Function("return " + rawContent)();
-    expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
+    rawContent = readFileSync(registryJsonPath, "utf-8");
   } catch (err: any) {
     throw new ValidationError(`Failed to read registry.json on disk: ${err.message}`);
   }
+  const currentRegistryHash = crypto.createHash("sha256").update(rawContent).digest("hex");
+  let registryData: any;
+  try {
+    registryData = JSON.parse(rawContent);
+  } catch (e: any) {
+    throw new ValidationError(`registry.json is not valid JSON: ${e.message}`);
+  }
+  const expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
   const metaRecord = await prisma.registryMeta.findUnique({ where: { id: "singleton" } });
   if (!metaRecord) {
     throw new ValidationError("Registry cache stale — run seed. No RegistryMeta record found in database.");

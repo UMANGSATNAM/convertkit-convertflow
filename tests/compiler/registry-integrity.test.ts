@@ -19,6 +19,18 @@ vi.mock('../../app/db.server', () => {
   };
 });
 
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
+    readFileSync: vi.fn(actual.readFileSync),
+    default: {
+      ...actual,
+      readFileSync: vi.fn(actual.readFileSync),
+    }
+  };
+});
+
 describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
   const registryPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
   let realHash: string;
@@ -29,7 +41,7 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
     vi.resetAllMocks();
     const realContent = fs.readFileSync(registryPath, "utf-8");
     realHash = crypto.createHash("sha256").update(realContent).digest("hex");
-    const registryData = new Function("return " + realContent)();
+    const registryData = JSON.parse(realContent);
     expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
     mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
   });
@@ -89,4 +101,12 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
 
     await expect(loadVerifiedComponents()).rejects.toThrow(new RegExp(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${expectedCount - 1}`));
   });
+
+  it('Case 6 (Negative - Malformed JSON / JS-valid syntax): throws ValidationError when registry.json contains malformed JSON (e.g. trailing comma) even if valid JS object literal', async () => {
+    const malformedContent = `{ "components": [ { "componentId": "test", "status": "approved", } ] }`;
+    vi.mocked(fs.readFileSync).mockReturnValueOnce(malformedContent);
+
+    await expect(loadVerifiedComponents()).rejects.toThrow(/registry\.json is not valid JSON/);
+  });
 });
+
