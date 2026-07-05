@@ -1,4 +1,5 @@
 import * as fs from "fs/promises";
+import { existsSync, readFileSync } from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
 import { resolveComponents } from "./compiler/component-resolver";
@@ -13,7 +14,74 @@ import { staticValidate } from "./compiler/static-validator";
 import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
-import { ValidationError, validateTemplateStructure, validateSectionDependencies } from "./validators.server";
+import {
+  ValidationError,
+  validateTemplateStructure,
+  validateSectionDependencies,
+  assertNoOrphanSectionRefs,
+  validateProductTemplateBlocks,
+  validateCollectionTemplate,
+  assertNoForbiddenFilters,
+  runStage3Gates
+} from "./validators.server";
+import { generateTemplates } from "./template-generator";
+import { runThemeCheckStage } from "./compiler/theme-check";
+import prisma from "../../db.server";
+
+export class ChassisTamperError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ChassisTamperError";
+  }
+}
+
+/**
+ * Manifest-driven clone of all chassis files with SHA-256 hash verification.
+ */
+export async function cloneChassis(themeEngineDir: string): Promise<Record<string, string>> {
+  const manifestPath = path.join(themeEngineDir, "base-theme/chassis-manifest.json");
+  if (!existsSync(manifestPath)) {
+    throw new Error(`Chassis manifest not found at ${manifestPath}`);
+  }
+
+  let manifestRaw: string;
+  try {
+    manifestRaw = await fs.readFile(manifestPath, "utf-8");
+  } catch (err: any) {
+    throw new Error(`Failed to read chassis manifest: ${err.message}`);
+  }
+
+  const manifest = JSON.parse(manifestRaw);
+  const files = manifest.files || [];
+  const clonedFiles: Record<string, string> = {};
+
+  for (const item of files) {
+    const relPath = typeof item === "string" ? item : item.file;
+    const expectedHash = typeof item === "string" ? null : item.hash;
+
+    const fullPath = path.join(themeEngineDir, relPath);
+    let content: string;
+    try {
+      content = await fs.readFile(fullPath, "utf-8");
+    } catch (err: any) {
+      throw new ChassisTamperError(`Chassis file missing: ${relPath}. Expected file to exist at ${fullPath}`);
+    }
+
+    if (expectedHash) {
+      const normalizedContent = content.replace(/\r\n/g, "\n");
+      const hash = crypto.createHash("sha256").update(normalizedContent).digest("hex");
+      if (hash !== expectedHash) {
+        throw new ChassisTamperError(`Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
+      }
+    }
+
+    // Strip the 'base-theme/' prefix from relative path
+    const targetPath = relPath.replace(/^base-theme\//, "");
+    clonedFiles[targetPath] = content;
+  }
+
+  return clonedFiles;
+}
 
 export interface BlueprintSection {
   componentId: string;
@@ -37,6 +105,10 @@ export interface ThemeBuildArtifact {
   uploadBundle: Record<string, any>;
   validation: Record<string, any>;
   lint: Record<string, any>;
+  stage3?: Record<string, any>;
+  themeCheck?: Record<string, any>;
+  filesToUpload?: Record<string, string>;
+  templates?: Record<string, any>;
   metrics: Record<string, any>;
 }
 
@@ -125,7 +197,7 @@ async function uploadLiquidWithRetry(
 /**
  * Validates theme integrity before uploading to prevent shipping broken or missing files to live storefronts.
  */
-function validateThemeIntegrity(
+export function validateThemeIntegrity(
   filesToUpload: Record<string, string>,
   blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
@@ -165,6 +237,43 @@ function validateThemeIntegrity(
 }
 
 /**
+ * Loads published components from the database while asserting Single Source of Truth (SSOT) integrity.
+ * Checks on-disk registry.json SHA-256 against RegistryMeta table.
+ */
+export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
+  const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
+  let rawContent: string;
+  try {
+    rawContent = readFileSync(registryJsonPath, "utf-8");
+  } catch (err: any) {
+    throw new ValidationError(`Failed to read registry.json on disk: ${err.message}`);
+  }
+  const currentRegistryHash = crypto.createHash("sha256").update(rawContent).digest("hex");
+  let registryData: any;
+  try {
+    registryData = JSON.parse(rawContent);
+  } catch (e: any) {
+    throw new ValidationError(`registry.json is not valid JSON: ${e.message}`);
+  }
+  const expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
+  const metaRecord = await prisma.registryMeta.findUnique({ where: { id: "singleton" } });
+  if (!metaRecord) {
+    throw new ValidationError("Registry cache stale — run seed. No RegistryMeta record found in database.");
+  }
+  if (metaRecord.registryHash !== currentRegistryHash) {
+    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
+  }
+  const components = await prisma.componentRegistry.findMany({
+    where: { status: "PUBLISHED" }
+  });
+  if (components.length !== expectedCount) {
+    throw new ValidationError(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${components.length}. Run seed script.`);
+  }
+  console.log(`[RegistryLoader] Verified SSOT registry freshness (hash: ${currentRegistryHash.substring(0, 12)}...) and loaded ${components.length} components.`);
+  return components;
+}
+
+/**
  * Theme Compiler Orchestrator
  * Purely deterministic execution of compiler stages. No business logic.
  */
@@ -179,7 +288,17 @@ export async function compileTheme(
   await fs.mkdir(compileDir, { recursive: true });
 
   console.log(`[Compiler] Starting compilation run: ${runId}`);
+  await loadVerifiedComponents();
   await saveArtifact(compileDir, "01-blueprint.json", blueprint);
+
+  const { filesToUpload, templates, stage3Results } = await assembleThemeBundle(
+    blueprint,
+    componentsRegistry,
+    brandProfile?.industry || 'default'
+  );
+
+  // Stage 1: Chassis Clone Stage (Manifest-driven Copy & Hash Verification)
+  await saveArtifact(compileDir, "00-chassis.json", Object.keys(filesToUpload));
 
   // Stage 2: Component Resolver
   const resolvedComponents = await resolveComponents(blueprint);
@@ -224,17 +343,33 @@ export async function compileTheme(
   const uploadBundle = await optimizeBundle(manifest);
   await saveArtifact(compileDir, "09-build.json", uploadBundle);
 
-  // Stage 10a: Technical Validator
+  // Stage 10a: Technical Validator + Unified Stage 3 Gates
   const validation = await staticValidate(uploadBundle, manifest);
+  validation.checks = {
+    ...validation.checks,
+    ...stage3Results
+  };
   await saveArtifact(compileDir, "10a-validation.json", validation);
 
   // Stage 10b: Design Linter
   const lint = await designLint(cssTokens);
   await saveArtifact(compileDir, "10b-lint.json", lint);
 
-  const isDeployable = validation.passed && lint.passed;
+  // Stage 10c: Unified Stage 3 Gates Artifact
+  await saveArtifact(compileDir, "10c-stage3.json", stage3Results);
+
+  // Stage 11: Shopify Theme Check Linter Stage
+  const themeCheck = await runThemeCheckStage(compileDir, filesToUpload, cssTokens.cssOutput);
+  await saveArtifact(compileDir, "11-theme-check.json", themeCheck);
+
+  const isDeployable = validation.passed && lint.passed && themeCheck.passed;
   if (!isDeployable) {
-    console.warn(`[Compiler] Build had technical or design warnings. Technical: ${validation.passed ? 'PASS' : 'FAIL'}, Design: ${lint.passed ? 'PASS' : 'FAIL'}`);
+    const reasons = [
+      !validation.passed ? "Technical Validation Failed" : "",
+      !lint.passed ? "Design Lint Failed" : "",
+      !themeCheck.passed ? "Shopify Theme Check Failed" : ""
+    ].filter(Boolean).join(", ");
+    throw new ValidationError(`[Compiler] Aborting compilation: Theme bundle is not deployable (${reasons}).`);
   }
 
   const endTime = Date.now();
@@ -251,6 +386,10 @@ export async function compileTheme(
     uploadBundle,
     validation,
     lint,
+    stage3: stage3Results,
+    themeCheck,
+    filesToUpload,
+    templates,
     metrics
   };
 }
@@ -330,47 +469,28 @@ export async function resolveComponentLiquidContent(component: any, customRegist
  * It compiles the core files, niche files, and database sections into a single merged theme map.
  * It executes the 10-stage deterministic compiler, validates the structure, and uploads files in batch to Shopify.
  */
-export async function composeThemeFromBlueprint(
-  shop: any,
-  themeId: string,
+export async function assembleThemeBundle(
   blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
   nicheId: string
-): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
-  const startTime = Date.now();
-  console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
-  
+): Promise<{
+  filesToUpload: Record<string, string>;
+  assembledComponents: ComponentRegistry[];
+  templates: Record<string, any>;
+  stage3Results: Record<string, "pass" | "fail">;
+}> {
   const filesToUpload: Record<string, string> = {};
 
-  // Execute deterministic compiler for safety artifacts & design token generation
-  try {
-    await compileTheme(blueprint, components, { industry: nicheId });
-  } catch (compilerErr: any) {
-    console.warn(`[Composer] Compiler stage generated warning: ${compilerErr.message}. Continuing with live upload.`);
-  }
-
-  // Step 1: Read Read-Only Base Theme Files
-  const baseThemePath = path.resolve(process.cwd(), "app/data/templates/theme-engine/base-theme");
-  const coreDir = baseThemePath;
-  const coreFiles = await readDirRecursive(coreDir, coreDir);
+  // Step 1: Clone read-only chassis files using hash verification
+  const themeEngineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
+  const coreFiles = await cloneChassis(themeEngineDir);
   for (const [relPath, content] of Object.entries(coreFiles)) {
     addShopifyFile(filesToUpload, relPath, content);
   }
 
-  // Step 2: Ensure all core snippets are included flat (no subfolder 422 errors)
-  const snippetsDir = path.join(coreDir, "snippets");
-  const snippetFiles = await readDirRecursive(snippetsDir, snippetsDir).catch(() => ({}));
-  for (const [relPath, content] of Object.entries(snippetFiles)) {
-    const flatName = path.basename(relPath);
-    addShopifyFile(filesToUpload, `snippets/${flatName}`, content);
-  }
-
-  // Step 3: Generate Dynamic Niche Tokens CSS
+  // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
-  if (settings.__empty_tokens) {
-    filesToUpload["assets/niche-tokens.css"] = "";
-  } else {
-    filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
+  filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
   --color-background: ${settings.colors_background_1 || '#ffffff'};
   --color-text: ${settings.colors_accent_1 || '#1a1a1a'};
@@ -382,80 +502,147 @@ export async function composeThemeFromBlueprint(
   --button-radius: ${settings.button_style === 'pill' ? '50px' : settings.button_style === 'rounded' ? '8px' : '0px'};
   --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
 }`;
-  }
-  console.log(`[Composer] Generated dynamic CSS tokens from AI brand context.`);
 
-  // Step 4: Build & Inject JSON Templates
-  const resolvedComponents: ComponentRegistry[] = [];
+  // Step 3: Build & Inject JSON Templates
+  const assembledComponents: ComponentRegistry[] = [];
   const templates: Record<string, any> = {};
 
   if (blueprint.globalComponents && Array.isArray(blueprint.globalComponents)) {
     blueprint.globalComponents.forEach(componentId => {
       const component = components.find(c => c.componentId === componentId);
-      if (component && !resolvedComponents.some(c => c.componentId === component.componentId)) {
-        resolvedComponents.push(component);
+      if (component && !assembledComponents.some(c => c.componentId === component.componentId)) {
+        assembledComponents.push(component);
       }
     });
   }
 
-  for (const [pageHandle, pageData] of Object.entries(blueprint.pages || {})) {
-    const templateJson: any = {
-      sections: {},
-      order: []
-    };
-
-    (pageData.sections || []).forEach((section, index) => {
-      const component = components.find(c => c.componentId === section.componentId);
-      if (!component) {
-        console.warn(`[Composer] Component ${section.componentId} not found in registry. Skipping.`);
-        return;
-      }
-
-      const sectionType = component.sectionType || component.componentId;
-      const sectionKey = `${sectionType}_${index}`;
-
-      templateJson.sections[sectionKey] = {
-        type: sectionType,
-        settings: section.settings || {},
-        blocks: section.blocks || {}
-      };
-
-      templateJson.order.push(sectionKey);
-      
-      if (!resolvedComponents.some(c => c.componentId === component.componentId)) {
-        resolvedComponents.push(component);
-      }
-    });
-
-    try {
-      validateTemplateStructure(templateJson);
-      const availableSnippets = new Set(Object.keys(filesToUpload).filter(f => f.startsWith("snippets/")).map(f => path.basename(f, ".liquid")));
-      validateSectionDependencies(templateJson, availableSnippets);
-    } catch (valErr: any) {
-      console.warn(`[Composer] Template structural validation note for ${pageHandle}: ${valErr.message}`);
+  const usedComponents = await generateTemplates(blueprint, filesToUpload, components);
+  for (const comp of usedComponents) {
+    if (!assembledComponents.some(c => c.componentId === comp.componentId)) {
+      assembledComponents.push(comp);
     }
-
-    const templatePath = `templates/${pageHandle}.json`;
-    templates[templatePath] = templateJson;
-    filesToUpload[templatePath] = JSON.stringify(templateJson, null, 2);
-    console.log(`[Composer] Built template ${templatePath} with ${templateJson.order.length} sections`);
+  }
+  for (const [key, content] of Object.entries(filesToUpload)) {
+    if (key.startsWith("templates/") && key.endsWith(".json")) {
+      try {
+        templates[key] = JSON.parse(content);
+      } catch (e: any) {
+        throw new ValidationError(`[Stage3] Template "${key}" is invalid JSON: ${e.message}`);
+      }
+    }
   }
 
-  // Step 5: Read and inject Liquid files for all resolved components
-  for (const component of resolvedComponents) {
+  // Step 4: Read and inject Liquid files for all resolved components
+  // Note: Passing components (Prisma DB rows) as registry entries uses the read-only DB cache,
+  // whose freshness against registry.json is guaranteed by the Stage 2.2 SHA-256 freshness gate.
+  for (const component of assembledComponents) {
     const liquidContent = await resolveComponentLiquidContent(component, components);
     const sectionType = component.sectionType || component.componentId;
-    if (liquidContent) {
-      filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
-    } else {
-      console.error(`[Composer] Failed to resolve liquid component ${component.componentId} (${sectionType}) from all candidate paths.`);
+    filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
+  }
+
+  // Stage 2.1: Category-only slot detection + Symmetrical replacement loop
+  const LAYOUT_SLOTS = ["header", "footer"] as const;
+  type LayoutSlot = typeof LAYOUT_SLOTS[number];
+
+  const activeLayoutComponents: Partial<Record<LayoutSlot, ComponentRegistry>> = {};
+
+  if (blueprint.globalComponents && Array.isArray(blueprint.globalComponents)) {
+    for (const componentId of blueprint.globalComponents) {
+      const component = components.find(c => c.componentId === componentId);
+      if (!component) {
+        throw new ValidationError(
+          `[Stage2] Global component "${componentId}" not found in registry.`
+        );
+      }
+      const slot = component.category as LayoutSlot;
+      if (LAYOUT_SLOTS.includes(slot)) {
+        if (activeLayoutComponents[slot]) {
+          throw new ValidationError(
+            `[Stage2] Blueprint specifies multiple ${slot} components: ` +
+            `"${activeLayoutComponents[slot]!.componentId}" and "${component.componentId}" — exactly one allowed.`
+          );
+        }
+        activeLayoutComponents[slot] = component;
+      }
     }
   }
 
-  // Step 6: Validate Theme Integrity
+  // Fallback filename = group JSON ka native section type (chassis convention)
+  for (const slot of LAYOUT_SLOTS) {
+    const active = activeLayoutComponents[slot];
+    if (!active) continue;
+
+    const groupPath = `sections/${slot}-group.json`;
+    if (!filesToUpload[groupPath]) {
+      throw new ValidationError(`[Stage2] Chassis group file "${groupPath}" missing from bundle.`);
+    }
+    const group = JSON.parse(filesToUpload[groupPath]);
+    const slotEntry = group.sections?.[slot];
+    if (!slotEntry) {
+      throw new ValidationError(`[Stage2] "${groupPath}" has no "${slot}" section entry.`);
+    }
+
+    const fallbackType = slotEntry.type;
+    const newType = active.sectionType || active.componentId;
+    slotEntry.type = newType;
+    filesToUpload[groupPath] = JSON.stringify(group, null, 2);
+
+    const fallbackFile = `sections/${fallbackType}.liquid`;
+    if (!(fallbackFile in filesToUpload)) {
+      throw new ValidationError(
+        `[Stage2] Expected fallback "${fallbackFile}" in bundle before removal — chassis convention drifted.`
+      );
+    }
+    delete filesToUpload[fallbackFile];
+  }
+
+  // Stage 3: Unified Validation Gates
+  const stage3Results = runStage3Gates(filesToUpload);
+
+  // Validate Theme Integrity
   validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);
 
-  // Step 7: Single-Batch Priority Upload to Shopify
+  return { filesToUpload, assembledComponents, templates, stage3Results };
+}
+
+/**
+ * The Theme Composer takes the Store Blueprint and the matched components from the registry.
+ * It compiles the core files, niche files, and database sections into a single merged theme map.
+ * It executes the 10-stage deterministic compiler, validates the structure, and uploads files in batch to Shopify.
+ */
+export async function composeThemeFromBlueprint(
+  shop: any,
+  themeId: string,
+  blueprint: StoreBlueprintData,
+  components: ComponentRegistry[],
+  nicheId: string
+): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
+  const startTime = Date.now();
+  console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
+
+  // Enforce SSOT freshness gate and verify RegistryMeta
+  await loadVerifiedComponents();
+
+  let filesToUpload: Record<string, string>;
+  let templates: Record<string, any>;
+
+  // Execute deterministic compiler for safety artifacts & design token generation
+  try {
+    const compileResult = await compileTheme(blueprint, components, { industry: nicheId });
+    filesToUpload = compileResult.filesToUpload!;
+    templates = compileResult.templates!;
+  } catch (compilerErr: any) {
+    if (compilerErr instanceof ValidationError || compilerErr.name === 'ValidationError' || compilerErr.name === 'ChassisTamperError') {
+      throw compilerErr;
+    }
+    console.warn(`[Composer] Compiler stage generated warning/error: ${compilerErr.message}. Falling back to direct theme assembly.`);
+    const assembled = await assembleThemeBundle(blueprint, components, nicheId);
+    filesToUpload = assembled.filesToUpload;
+    templates = assembled.templates;
+  }
+
+  // Single-Batch Priority Upload to Shopify
   let uploadedCount = 0;
   const keysToUpload = Object.keys(filesToUpload).sort((a, b) => {
     const getPriority = (key: string): number => {

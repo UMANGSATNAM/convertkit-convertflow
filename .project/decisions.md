@@ -31,6 +31,8 @@
 ## Decision #5 — Phase 1 Foundation Officially Frozen
 - **Rule:** The Directory Consolidation (`app/data/templates/theme-engine/`), Read-Only Base Theme (`base-theme/`), Snippet Flattening, and Deterministic Dependency Graph Resolver (`compiler.server.ts`, `dependency-resolver.ts`, `validators.server.ts`).
 - **Enforcement:** No further modifications to these foundational components are permitted unless a critical production bug forces an intervention.
+- **Decision #5 Amendment (Phase A2):** `compiler.server.ts` opens for Phase A2 additive stages only; existing Gate-0 resolution logic remains untouched. Resolution-related test failures = stop work immediately.
+- **Gate A1 Audit Amendment (Phase A2):** Gate A1 shipped with the chassis manifest covering only 67/99 files on disk, omitting static assets, locale JSONs, and default templates. This gap was identified and closed in Phase A2 Stage 1 (commit 4dc2f9c), extending full hash integrity tracking to all 99 chassis files.
 - **Status:** **PENDING (Waiting for Gate 0 proof — cannot be declared LOCKED until Gate 0 passes)**
 
 ## Decision #6 — Phase 2 Intelligence Infrastructure Order (AI Last)
@@ -51,14 +53,17 @@
 - **Chassis:** A frozen, read-only, hand-maintained OS 2.0 skeleton theme at `app/data/templates/theme-engine/base-theme/`. It is version-tagged (`chassis@1.0.0`) and changes only via explicit chassis releases with its own changelog.
 - **Injected Components:** Sections + snippets copied verbatim from the registry per the Blueprint. Zero transformation of Liquid at compile time except filename flattening.
 - **Generated Config:** `config/settings_data.json`, `templates/*.json`, `sections/*-group.json`, and `assets/tokens.css` — all generated deterministically from Blueprint JSON + Design Tokens. These are the ONLY files the compiler writes content into.
+- **EOL Normalization Note:** EOL normalization means the hash guarantees content integrity modulo line endings — by design.
+- **Chassis Tamper Failure Mode Note:** V3 compose path now hard-fails on chassis integrity violations (A2 Stage 1) — intentional.
 - **Status:** **PENDING (Becomes LOCKED only after Gate 0 passes)**
 
 ## Decision #9 — Standing Rules for the Agent
 - **Rule 1:** No tracker/percentage update without proof-of-work (test or command output) in the same message.
 - **Rule 2:** No phase begins until the previous gate's proof is pasted and approved by Umang.
-- **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent.
+- **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent. Sign-off is a user-authored message. Any agent output containing the words "signed off" regarding a gate is itself a violation, even as a proposal.
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
+- **Rule 6:** Every proof pack must contain a "Deviations from instructions" section — either "none" or an itemized list with justification. An unlisted deviation discovered later is treated as a fabrication-class violation.
 - **Status:** **LOCKED**
 
 ## Decision #8 — Additive Component Metadata Schema
@@ -72,3 +77,32 @@
 - **Batch Order:** Prioritized by launch niches: 1. Luxury / Jewellery (Aurelle / Jewel-Luxe vertical), 2. Fashion / Apparel, 3. Beauty / Organic, 4. Electronics / Tech, 5. Food / Supplements.
 - **Phase A Chassis Exception:** The legacy files `main-page_luxury_v1.liquid`, `main-404_luxury_v1.liquid`, and `main-password_luxury_v1.liquid` will be used immediately during Phase A as source material (generalized and adapted into the chassis) rather than writing those chassis sections from scratch.
 - **Status:** **LOCKED**
+
+## Decision #11 — No Mockups, No Placeholders, No Simulated Output
+- **Rule:** The theme engine must only assemble real, fully-functional Liquid component source files and configuration assets. Generating mockups, writing temporary template placeholders, or simulating output results is strictly prohibited. Everything compiled and uploaded to Shopify must be production-ready and fully operational.
+- **Reason:** To prevent shipping non-functional skeleton layouts or placeholder code that breaks runtime operations or behaves differently from true production builds.
+- **Status:** **LOCKED**
+
+## Decision #12 — Component Replacement via JSON Type Swap (Phase A2 Stage 2)
+- **Rule:** Component replacement for layouts (such as header and footer) is performed purely at the section group JSON configuration level (swapping the target section's `type` field reference to the selected custom component's type) rather than mutating files on disk or performing regex injections on chassis layout templates.
+- **Enforcement:**
+  1. The fallback layout files (e.g., `sections/header.liquid` and `sections/footer.liquid`) must be deleted/omitted from the compiled upload bundle when custom replacements are active.
+  2. Every section type referenced in a layout group JSON config must exist inside the compiled theme bundle. If any referenced section type is missing from the bundle, the compiler must abort with a `ValidationError` (Orphan Check).
+- **Status:** **PENDING (Waiting for Gate A2 approval)**
+
+## Decision #13 — Single Source of Truth for Component Categorization
+- **Rule:** `registry.json` is the single source of truth for component schemas and attributes (including component types). Prisma database rows act as a read-only cache populated from it via `prisma/seed_components.ts`.
+- **Enforcement:**
+  1. The linter validation script (`verify-registry.ts`) asserts each component's `type` field against the canonical 13 categories. No `category || type` fallback — `type` only.
+  2. The database seed script (`prisma/seed_components.ts`) maps `type` in registry JSON to `category` in the database, converts `status === "approved"` to `"PUBLISHED"`, then runs a post-seed verification loop asserting `dbRow.category === jsonEntry.type` for all dynamically counted published entries, exiting with code 1 on any mismatch.
+  3. At compile-time, `composeThemeFromBlueprint` computes the SHA-256 hash of `registry.json` on disk and compares it against the hash stored in the database (stored in the dedicated `RegistryMeta` singleton model). If they differ, compilation aborts with a `ValidationError("Registry cache stale — run seed")`.
+- **Status:** **LOCKED**
+
+## Decision #14 — Component Status Enum & Filtering Contract
+- **Rule:** `ComponentRegistry` rows in Prisma must use `status: "PUBLISHED"` as the default for active production components, matching the conversion of `status: "approved"` in `registry.json` during seeding.
+- **Enforcement:**
+  1. All runtime compiler queries (`loadVerifiedComponents`) and seed verification audits (`seed_components.ts`) must explicitly filter database queries by `where: { status: "PUBLISHED" }`.
+  2. The expected component count must never be hardcoded as a magic number (such as `57`); it must be derived dynamically from `registry.json` by counting entries matching `status === "approved"`.
+- **Migration Commitment:** Migration baseline (`prisma migrate diff` se initial migration) Phase B kickoff pe create hogi.
+- **Status:** **LOCKED**
+

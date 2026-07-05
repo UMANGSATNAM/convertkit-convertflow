@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { composeThemeFromBlueprint } from '../app/services/theme-engine/compiler.server';
+import { composeThemeFromBlueprint, validateThemeIntegrity } from '../app/services/theme-engine/compiler.server';
 import { ValidationError } from '../app/services/theme-engine/validators.server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -44,7 +44,12 @@ vi.mock('../app/services/theme-engine/validators.server', () => {
     ValidationError,
     validateSettingsPatch: vi.fn(),
     validateTemplateStructure: vi.fn(),
-    validateSectionDependencies: vi.fn()
+    validateSectionDependencies: vi.fn(),
+    assertNoOrphanSectionRefs: vi.fn(),
+    validateProductTemplateBlocks: vi.fn(),
+    validateCollectionTemplate: vi.fn(),
+    assertNoForbiddenFilters: vi.fn(),
+    runStage3Gates: vi.fn().mockReturnValue({})
   };
 });
 
@@ -65,6 +70,46 @@ vi.mock('fs/promises', () => {
 vi.mock('../app/services/theme-engine/asset-cache.server', () => {
   return {
     uploadAssetWithCache: vi.fn().mockResolvedValue(true)
+  };
+});
+
+// Mock db.server (prisma) to avoid real DB calls for registry cache freshness check
+vi.mock('../app/db.server', () => {
+  const path = require('path');
+  const fs = require('fs');
+  const crypto = require('crypto');
+  return {
+    default: {
+      registryMeta: {
+        findUnique: vi.fn(async ({ where }: any) => {
+          if (where.id === 'singleton') {
+            const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+            try {
+              const content = fs.readFileSync(registryPath, 'utf-8');
+              return { id: 'singleton', registryHash: crypto.createHash('sha256').update(content).digest('hex') };
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        })
+      },
+      componentRegistry: {
+        findUnique: vi.fn(async ({ where }: any) => {
+          if (where.componentId === 'registry-metadata-hash') {
+            const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+            try {
+              const content = fs.readFileSync(registryPath, 'utf-8');
+              return { componentId: 'registry-metadata-hash', version: crypto.createHash('sha256').update(content).digest('hex') };
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        }),
+        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock' }))
+      }
+    }
   };
 });
 
@@ -183,6 +228,20 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
     vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
       const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/theme.liquid",
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json",
+            "base-theme/assets/cart.js",
+            "base-theme/assets/variant-swap.js",
+            "base-theme/assets/theme.js"
+          ]
+        });
+      }
       if (fileStr.includes('theme.liquid')) return '<html>{{ content_for_header }}{{ content_for_layout }}</html>';
       if (fileStr.includes('password.liquid')) return 'password page';
       if (fileStr.includes('settings_schema.json')) return '[]';
@@ -218,73 +277,40 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       return { isDirectory: () => true } as any;
     });
 
-    vi.mocked(fs.readFile).mockResolvedValue('content');
+    vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
+      const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json",
+            "base-theme/assets/cart.js"
+          ]
+        });
+      }
+      return 'content';
+    });
 
     await expect(
       composeThemeFromBlueprint(mockShop, mockThemeId, mockBlueprint, mockRegistry, 'jewellery')
     ).rejects.toThrow(ValidationError);
   });
 
-  it('should throw ValidationError if niche-tokens.css is empty in niche mode', async () => {
-    vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirName = getDirName(dirPath);
-      if (dirName === 'core' || dirName === 'base-theme' || dirName === 'niches') {
-        return [
-          { name: 'layout', isDirectory: () => true },
-          { name: 'config', isDirectory: () => true },
-          { name: 'locales', isDirectory: () => true },
-          { name: 'assets', isDirectory: () => true }
-        ] as any;
-      }
-      if (dirName === 'layout') {
-        return [
-          { name: 'theme.liquid', isDirectory: () => false },
-          { name: 'password.liquid', isDirectory: () => false }
-        ] as any;
-      }
-      if (dirName === 'config') {
-        return [
-          { name: 'settings_schema.json', isDirectory: () => false },
-          { name: 'settings_data.json', isDirectory: () => false }
-        ] as any;
-      }
-      if (dirName === 'locales') {
-        return [{ name: 'en.default.json', isDirectory: () => false }] as any;
-      }
-      if (dirName === 'assets') {
-        return [
-          { name: 'cart.js', isDirectory: () => false },
-          { name: 'variant-swap.js', isDirectory: () => false },
-          { name: 'theme.js', isDirectory: () => false },
-          { name: 'niche-tokens.css', isDirectory: () => false }
-        ] as any;
-      }
-      return [];
-    });
-
-    vi.mocked(fs.stat).mockImplementation(async () => {
-      return { isDirectory: () => true } as any;
-    });
-
-    vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
-      const fileStr = String(filePath);
-      if (fileStr.includes('niche-tokens.css')) {
-        return '   '; // only whitespace
-      }
-      return 'some file content';
-    });
-
-    const emptyBlueprint = {
-      ...mockBlueprint,
-      settings: {
-        __empty_tokens: true
-      }
+  it('should throw ValidationError if niche-tokens.css is empty in niche mode', () => {
+    const fakeFiles: Record<string, string> = {
+      "layout/theme.liquid": "some content",
+      "config/settings_schema.json": "[]",
+      "config/settings_data.json": "{}",
+      "locales/en.default.json": "{}",
+      "assets/niche-tokens.css": "   " // only whitespace
     };
 
-    await expect(
-      composeThemeFromBlueprint(mockShop, mockThemeId, emptyBlueprint, mockRegistry, 'jewellery')
-    ).rejects.toThrow(/niche tokens stylesheet is empty/i);
-  }, 15000);
+    expect(() =>
+      validateThemeIntegrity(fakeFiles, mockBlueprint, mockRegistry, 'jewellery')
+    ).toThrow(/niche tokens stylesheet is empty/i);
+  });
 
   it('should skip niche-tokens.css validation and empty validation in ai-custom mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
@@ -329,6 +355,17 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
 
     vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
       const fileStr = String(filePath);
+      if (fileStr.includes('chassis-manifest.json')) {
+        return JSON.stringify({
+          files: [
+            "base-theme/layout/theme.liquid",
+            "base-theme/layout/password.liquid",
+            "base-theme/config/settings_schema.json",
+            "base-theme/config/settings_data.json",
+            "base-theme/locales/en.default.json"
+          ]
+        });
+      }
       if (fileStr.includes('hero-banner.liquid')) return 'hero liquid';
       if (fileStr.includes('featured-collection.liquid')) return 'featured collection liquid';
       return 'generic core content';

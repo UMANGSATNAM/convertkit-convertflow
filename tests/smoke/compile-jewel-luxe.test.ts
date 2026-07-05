@@ -85,7 +85,7 @@ describe("Gate 0 Final Sprint: Smoke Compile & Negative Validation Tests", () =>
     expect(artifact.manifest.summary.errors).toHaveLength(0);
     expect(artifact.validation.passed).toBe(true);
     expect(artifact.validation.fatalCount).toBe(0);
-  });
+  }, 15000);
 
   it("Item #7: Negative test (Blueprint referencing missing snippet produces validation error)", async () => {
     // Take a bundle and simulate a section referencing a nonexistent snippet

@@ -1,0 +1,182 @@
+{% assign section_id = 'sf-404-' | append: section.id %}
+
+<style>
+  #{{ section_id }} {
+    background: var(--color-bg, #fff);
+    color: var(--color-text, #1a1a1a);
+    min-height: 70vh;
+    padding: var(--spacing-section-y, 80px) var(--spacing-section-x, 40px);
+    text-align: center;
+  }
+  #{{ section_id }} .sf-404__container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  #{{ section_id }} .sf-404__code {
+    font-size: clamp(6rem, 15vw, 10rem);
+    font-weight: 700;
+    color: var(--color-border, #e0e0e0);
+    line-height: 1;
+    margin: 0 0 24px;
+  }
+  #{{ section_id }} .sf-404__title {
+    font-family: var(--font-heading, inherit);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    margin: 0 0 16px;
+  }
+  #{{ section_id }} .sf-404__subtitle {
+    color: var(--color-text-muted, #888);
+    line-height: 1.7;
+    margin: 0 0 40px;
+  }
+  #{{ section_id }} .sf-404__search-form {
+    display: flex;
+    gap: 0;
+    margin: 0 0 24px;
+    border: 1px solid var(--color-border, #e0e0e0);
+  }
+  #{{ section_id }} .sf-404__search-input {
+    flex: 1;
+    border: none;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--color-text, #1a1a1a);
+    outline: none;
+  }
+  #{{ section_id }} .sf-404__search-submit {
+    border: none;
+    border-left: 1px solid var(--color-border, #e0e0e0);
+    padding: 14px 24px;
+    background: var(--color-primary, #1a1a1a);
+    color: var(--color-btn-text, #fff);
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+  }
+  #{{ section_id }} .sf-404__search-submit:hover { opacity: 0.8; }
+  #{{ section_id }} .sf-404__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  #{{ section_id }} .sf-404__pill {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border, #e0e0e0);
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #888);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #{{ section_id }} .sf-404__pill:hover {
+    border-color: var(--color-primary, #1a1a1a);
+    color: var(--color-primary, #1a1a1a);
+  }
+  #{{ section_id }} .sf-404__back-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--color-primary, #1a1a1a);
+    color: var(--color-btn-text, #fff);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+  }
+  #{{ section_id }} .sf-404__back-btn:hover { opacity: 0.8; }
+</style>
+
+<section id="{{ section_id }}" data-section-id="{{ section.id }}" data-section-type="404-error">
+  <div class="sf-404__container">
+    <div class="sf-404__code" aria-hidden="true">404</div>
+    <h1 class="sf-404__title">{{ section.settings.title | default: "Page Not Found" }}</h1>
+    <p class="sf-404__subtitle">{{ section.settings.subtitle | default: "The page you're looking for doesn't exist or has been moved." }}</p>
+
+    <form class="sf-404__search-form" action="{{ routes.search_url }}" method="get" role="search">
+      <input
+        class="sf-404__search-input"
+        type="search"
+        name="q"
+        placeholder="{{ section.settings.search_placeholder | default: 'Search...' }}"
+        aria-label="{{ 'general.search.placeholder' | t: default: 'Search' }}"
+        required
+      >
+      <button class="sf-404__search-submit" type="submit">{{ 'general.search.submit' | t: default: 'Search' }}</button>
+    </form>
+
+    {%- if section.settings.show_pills and section.settings.pill_tags != blank -%}
+      <div class="sf-404__pills">
+        {%- assign pills = section.settings.pill_tags | split: "," -%}
+        {%- for pill in pills -%}
+          {%- assign clean_pill = pill | strip -%}
+          <a href="{{ routes.search_url }}?q={{ clean_pill | url_encode }}" class="sf-404__pill">{{ clean_pill }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <a href="{{ routes.root_url }}" class="sf-404__back-btn">
+      {{ section.settings.back_btn_text | default: "Back to Home" }}
+    </a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404 Error",
+  "tag": "section",
+  "class": "section-404",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Page Not Found"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "The page you're looking for doesn't exist or has been moved."
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search Placeholder",
+      "default": "Search..."
+    },
+    {
+      "type": "text",
+      "id": "back_btn_text",
+      "label": "Back Button Text",
+      "default": "Back to Home"
+    },
+    {
+      "type": "header",
+      "content": "Quick Search Pills"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pills",
+      "label": "Show Search Pills",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "pill_tags",
+      "label": "Pill Tags (comma separated)",
+      "default": "New Arrivals,Best Sellers,Sale"
+    }
+  ],
+  "presets": [
+    {
+      "name": "404 Error"
+    }
+  ]
+}
+{% endschema %}

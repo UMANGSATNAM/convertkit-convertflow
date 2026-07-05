@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -8,11 +9,16 @@ async function main() {
   console.log("Seeding ComponentRegistry for Design Systems V2...");
 
   // Load the new registry.json
-  const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'component-registry', 'registry.json');
+  const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'registry.json');
   const registryRaw = fs.readFileSync(registryPath, 'utf8');
   
-  // Parse ignoring comments using Function (since JSON.parse fails on // comments)
-  const registry = new Function('return ' + registryRaw)();
+  const registryHash = crypto.createHash('sha256').update(registryRaw).digest('hex');
+  let registry: any;
+  try {
+    registry = JSON.parse(registryRaw);
+  } catch (e: any) {
+    throw new Error(`registry.json is not valid JSON: ${e.message}`);
+  }
   
   const components = registry.components.map((comp: any) => {
     const familyStr = Array.isArray(comp.family) ? comp.family.join(", ") : (comp.family || "");
@@ -58,7 +64,43 @@ async function main() {
     console.log(`Seeded component: ${comp.componentId}`);
   }
 
+  // Seed the RegistryMeta singleton table to store registry.json SHA-256 hash
+  await prisma.registryMeta.upsert({
+    where: { id: "singleton" },
+    update: { registryHash, seededAt: new Date() },
+    create: { id: "singleton", registryHash, seededAt: new Date() }
+  });
+  console.log(`Seeded RegistryMeta singleton with hash: ${registryHash}`);
+
   console.log("ComponentRegistry V2 seeding complete.");
+
+  // Post-seed verification loop to strictly enforce SSOT alignment
+  console.log("Starting DB post-seed verification audit...");
+  const metaRecord = await prisma.registryMeta.findUnique({ where: { id: "singleton" } });
+  if (!metaRecord || metaRecord.registryHash !== registryHash) {
+    console.error(`[SeedVerification] RegistryMeta hash mismatch! Expected ${registryHash}, got ${metaRecord?.registryHash}`);
+    process.exit(1);
+  }
+
+  const expectedCount = registry.components.filter((c: any) => c.status === "approved").length;
+  const dbComponents = await prisma.componentRegistry.findMany({ where: { status: "PUBLISHED" } });
+  if (dbComponents.length !== expectedCount) {
+    console.error(`[SeedVerification] Expected exactly ${expectedCount} published components in DB, found ${dbComponents.length}!`);
+    process.exit(1);
+  }
+
+  for (const dbComp of dbComponents) {
+    const jsonComp = registry.components.find((c: any) => c.componentId === dbComp.componentId);
+    if (!jsonComp) {
+      console.error(`[SeedVerification] DB Component "${dbComp.componentId}" not found in registry.json!`);
+      process.exit(1);
+    }
+    if (dbComp.category !== jsonComp.type) {
+      console.error(`[SeedVerification] Category drift detected: DB category "${dbComp.category}" !== JSON type "${jsonComp.type}" for "${dbComp.componentId}"`);
+      process.exit(1);
+    }
+  }
+  console.log(`✅ DB post-seed verification audit SUCCESS! All ${expectedCount} database components and RegistryMeta are fully aligned with registry.json.`);
 }
 
 main()

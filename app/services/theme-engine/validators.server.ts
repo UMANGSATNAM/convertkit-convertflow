@@ -121,3 +121,243 @@ export function validateSectionDependencies(jsonContent: any, availableSnippets?
     }
   }
 }
+
+const APP_SECTION_TYPES = /^@app/; // Shopify app-provided sections — theme bundle mein nahi hote
+
+export function assertNoOrphanSectionRefs(filesToUpload: Record<string, string>): void {
+  const jsonConfigPaths = Object.keys(filesToUpload).filter(
+    p => (p.startsWith("sections/") && p.endsWith("-group.json")) ||
+         (p.startsWith("templates/") && p.endsWith(".json"))
+  );
+
+  for (const configPath of jsonConfigPaths) {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(filesToUpload[configPath]);
+    } catch (e: any) {
+      throw new ValidationError(`[OrphanCheck] Invalid JSON in "${configPath}": ${e.message}`);
+    }
+    for (const [key, secVal] of Object.entries(parsed.sections || {})) {
+      const sType = (secVal as any).type;
+      if (!sType) {
+        throw new ValidationError(`[OrphanCheck] Section "${key}" in "${configPath}" has no type.`);
+      }
+      if (APP_SECTION_TYPES.test(sType)) continue; // documented exemption
+      if (!filesToUpload[`sections/${sType}.liquid`]) {
+        throw new ValidationError(
+          `[OrphanCheck] "${configPath}" references section type "${sType}" ` +
+          `but "sections/${sType}.liquid" is missing from the compiled bundle.`
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Stage 3 Validator: Product Template Blocks
+ * Enforces:
+ * 1. Primary section 'main-product' is present.
+ * 2. Unconditional Buy Button Check ("dono jagah"): buy_buttons must exist in both schema and template.
+ * 3. Mandatory essential blocks (title, price, variant_picker, buy_buttons) are present in template if defined in schema.
+ * 4. No undeclared block types are referenced in the template (except @app).
+ */
+export function validateProductTemplateBlocks(filesToUpload: Record<string, string>): void {
+  const productTemplateKeys = Object.keys(filesToUpload).filter(
+    k => k.startsWith("templates/product") && k.endsWith(".json")
+  );
+
+  for (const templatePath of productTemplateKeys) {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(filesToUpload[templatePath]);
+    } catch (e: any) {
+      throw new ValidationError(`[ProductValidator] Invalid JSON in "${templatePath}": ${e.message}`);
+    }
+
+    const sections = parsed.sections || {};
+    const order = parsed.order || [];
+
+    let mainSec: any = null;
+    for (const key of order) {
+      const sec = sections[key];
+      if (sec && (sec.type === "main-product" || key === "main")) {
+        mainSec = sec;
+        break;
+      }
+    }
+
+    if (!mainSec) {
+      throw new ValidationError(`[ProductValidator] Primary section 'main-product' is missing from product template "${templatePath}".`);
+    }
+
+    const liquidPath = `sections/${mainSec.type}.liquid`;
+    if (!filesToUpload[liquidPath]) {
+      throw new ValidationError(`[ProductValidator] Liquid file "${liquidPath}" required by product template "${templatePath}" is missing.`);
+    }
+
+    const liquidContent = filesToUpload[liquidPath];
+    const schemaMatch = liquidContent.match(/\{%\s*schema\s*%\}([\s\S]*?)\{%\s*endschema\s*%\}/);
+    if (!schemaMatch) {
+      throw new ValidationError(`[ProductValidator] No {% schema %} tag found in "${liquidPath}".`);
+    }
+
+    let schemaJson: any;
+    try {
+      schemaJson = JSON.parse(schemaMatch[1]);
+    } catch (e: any) {
+      throw new ValidationError(`[ProductValidator] Failed to parse {% schema %} JSON in "${liquidPath}": ${e.message}`);
+    }
+
+    const schemaBlocks = Array.isArray(schemaJson.blocks) ? schemaJson.blocks : [];
+    const templateBlocks = Object.values(mainSec.blocks || {}) as any[];
+
+    // Rule 2: Unconditional Buy Button Check ("dono jagah")
+    if (!schemaBlocks.some(b => b && b.type === "buy_buttons")) {
+      throw new ValidationError(
+        `[ProductValidator] Unconditional Buy Button check failed: 'buy_buttons' block is NOT defined in schema of "${liquidPath}". PDP cannot sell without buy buttons.`
+      );
+    }
+    if (!templateBlocks.some(b => b && b.type === "buy_buttons")) {
+      throw new ValidationError(
+        `[ProductValidator] Unconditional Buy Button check failed: 'buy_buttons' block is NOT configured in product template "${templatePath}". PDP cannot sell without buy buttons.`
+      );
+    }
+
+    // Rule 3: Mandatory essential blocks check
+    const mandatoryEssential = ["title", "price", "variant_picker", "buy_buttons"];
+    for (const reqType of mandatoryEssential) {
+      if (schemaBlocks.some(b => b && b.type === reqType)) {
+        if (!templateBlocks.some(b => b && b.type === reqType)) {
+          throw new ValidationError(
+            `[ProductValidator] Essential block '${reqType}' is defined in schema of "${liquidPath}" but missing from template configuration in "${templatePath}".`
+          );
+        }
+      }
+    }
+
+    // Rule 4: Undeclared schema block check
+    for (const block of templateBlocks) {
+      if (!block || !block.type) continue;
+      if (/^@app/.test(block.type)) continue;
+      if (!schemaBlocks.some(b => b && b.type === block.type)) {
+        throw new ValidationError(
+          `[ProductValidator] Template "${templatePath}" references undeclared block type '${block.type}' not defined in schema of "${liquidPath}".`
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Stage 3 Validator: Collection Template
+ * Enforces presence of paginate tag, product card rendering, and proper section linking.
+ */
+export function validateCollectionTemplate(filesToUpload: Record<string, string>): void {
+  const collectionTemplateKeys = Object.keys(filesToUpload).filter(
+    k => k.startsWith("templates/collection") && k.endsWith(".json")
+  );
+
+  for (const templatePath of collectionTemplateKeys) {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(filesToUpload[templatePath]);
+    } catch (e: any) {
+      throw new ValidationError(`[CollectionValidator] Invalid JSON in "${templatePath}": ${e.message}`);
+    }
+
+    const sections = parsed.sections || {};
+    const order = parsed.order || [];
+
+    let mainSec: any = null;
+    for (const key of order) {
+      const sec = sections[key];
+      if (sec && (sec.type === "main-collection" || key === "main")) {
+        mainSec = sec;
+        break;
+      }
+    }
+
+    if (!mainSec) {
+      throw new ValidationError(`[CollectionValidator] Primary section 'main-collection' is missing from collection template "${templatePath}".`);
+    }
+
+    const liquidPath = `sections/${mainSec.type}.liquid`;
+    if (!filesToUpload[liquidPath]) {
+      throw new ValidationError(`[CollectionValidator] Liquid file "${liquidPath}" required by collection template "${templatePath}" is missing.`);
+    }
+
+    const content = filesToUpload[liquidPath];
+    if (!/\{%\s*paginate\s+collection\.products/.test(content) && !/paginate\s+collection\.products/.test(content)) {
+      throw new ValidationError(`[CollectionValidator] Collection section "${liquidPath}" must use '{% paginate collection.products ... %}' tag.`);
+    }
+    if (!/render\s+['"]product-card['"]/.test(content) && !/include\s+['"]product-card['"]/.test(content)) {
+      throw new ValidationError(`[CollectionValidator] Collection section "${liquidPath}" must render product cards.`);
+    }
+  }
+}
+
+/**
+ * Stage 3 Validator: Forbidden Filters
+ * Scans all Liquid and JSON files in the bundle for deprecated/forbidden Liquid filters.
+ */
+export function assertNoForbiddenFilters(filesToUpload: Record<string, string>): void {
+  const FORBIDDEN_FILTERS = ["img_url", "ternary", "pluralize", "color_modify"];
+
+  for (const [filePath, content] of Object.entries(filesToUpload)) {
+    if (!filePath.endsWith(".liquid") && !filePath.endsWith(".json")) continue;
+
+    for (const filter of FORBIDDEN_FILTERS) {
+      const regex = new RegExp(`\\|\\s*${filter}\\b`);
+      if (regex.test(content)) {
+        throw new ValidationError(
+          `[ForbiddenFilter] File "${filePath}" uses forbidden Liquid filter '| ${filter}'. Modern Shopify themes must use updated filters (e.g., 'image_url' instead of 'img_url').`
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Unified Stage 3 Gates Runner
+ * Executes all Stage 3 validation gates and returns a deterministic pass/fail map.
+ * Throws ValidationError immediately if any gate fails.
+ */
+export function runStage3Gates(filesToUpload: Record<string, string>): Record<string, "pass" | "fail"> {
+  const results: Record<string, "pass" | "fail"> = {
+    productTemplateBlocks: "pass",
+    collectionTemplate: "pass",
+    forbiddenFilters: "pass",
+    orphanSectionRefs: "pass",
+  };
+
+  try {
+    validateProductTemplateBlocks(filesToUpload);
+  } catch (err) {
+    results.productTemplateBlocks = "fail";
+    throw err;
+  }
+
+  try {
+    validateCollectionTemplate(filesToUpload);
+  } catch (err) {
+    results.collectionTemplate = "fail";
+    throw err;
+  }
+
+  try {
+    assertNoForbiddenFilters(filesToUpload);
+  } catch (err) {
+    results.forbiddenFilters = "fail";
+    throw err;
+  }
+
+  try {
+    assertNoOrphanSectionRefs(filesToUpload);
+  } catch (err) {
+    results.orphanSectionRefs = "fail";
+    throw err;
+  }
+
+  return results;
+}
+

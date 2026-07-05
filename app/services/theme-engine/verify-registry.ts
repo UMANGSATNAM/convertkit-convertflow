@@ -1,12 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { globSync } from 'glob';
+import * as crypto from 'crypto';
 
 interface ComponentEntry {
   componentId: string;
   liquidPath?: string;
   filePath?: string;
   metaPath?: string;
+  type?: string;
 }
 
 interface Registry {
@@ -42,8 +44,22 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
       const chassisManifest = JSON.parse(fs.readFileSync(chassisManifestPath, 'utf-8'));
       const list = chassisManifest.files || [];
       chassisFilesCount = list.length;
-      for (const f of list) {
+      for (const item of list) {
+        const f = typeof item === 'string' ? item : item.file;
         allowedPaths.add(f.replace(/\\/g, '/'));
+        
+        // Hash verification
+        if (typeof item === 'object' && item.hash) {
+          const fullPath = path.join(themeEngineDir, f);
+          if (fs.existsSync(fullPath)) {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const normalizedContent = content.replace(/\r\n/g, '\n');
+            const hash = crypto.createHash('sha256').update(normalizedContent).digest('hex');
+            if (hash !== item.hash) {
+              errors.push(`Hash mismatch for chassis file: ${f}. Expected ${item.hash}, got ${hash}`);
+            }
+          }
+        }
       }
     } catch (e: any) {
       errors.push(`Failed to parse chassis-manifest.json: ${e.message}`);
@@ -73,6 +89,19 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
         errors.push(`Component ${comp.componentId} references missing meta file: ${normMeta}`);
       }
     }
+
+    // Assert every component has a valid category type
+    const category = comp.type;
+    const VALID_CATEGORIES = new Set([
+      "header", "footer", "hero", "announcement", "product-grid",
+      "collection", "trust", "testimonials", "faq", "newsletter",
+      "brand-story", "popup", "bundle-builder"
+    ]);
+    if (!category || !VALID_CATEGORIES.has(category)) {
+      errors.push(
+        `Component "${comp.componentId}" has missing/invalid category type: "${category ?? "undefined"}"`
+      );
+    }
   }
 
   // 2. Assert EVERY .liquid file under theme-engine is referenced by exactly one registry entry or chassis manifest
@@ -84,6 +113,18 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     for (const diskFile of diskFiles) {
       if (!allowedPaths.has(diskFile)) {
         errors.push(`Unreferenced orphan liquid file on disk: ${diskFile}`);
+      }
+    }
+  }
+
+  // 3. Assert EVERY file inside base-theme/ (except chassis-manifest.json) is tracked in chassis-manifest.json
+  const baseThemeDirOnDisk = path.join(themeEngineDir, 'base-theme');
+  if (fs.existsSync(baseThemeDirOnDisk)) {
+    const allChassisFilesOnDisk = globSync('**/*', { cwd: baseThemeDirOnDisk, nodir: true }).map(f => `base-theme/${f.replace(/\\/g, '/')}`);
+    for (const fileOnDisk of allChassisFilesOnDisk) {
+      if (fileOnDisk === 'base-theme/chassis-manifest.json') continue;
+      if (!allowedPaths.has(fileOnDisk)) {
+        errors.push(`Untracked chassis file on disk: ${fileOnDisk}`);
       }
     }
   }
