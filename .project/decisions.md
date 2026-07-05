@@ -94,7 +94,14 @@
 - **Rule:** `registry.json` is the single source of truth for component schemas and attributes (including component types). Prisma database rows act as a read-only cache populated from it via `prisma/seed_components.ts`.
 - **Enforcement:**
   1. The linter validation script (`verify-registry.ts`) asserts each component's `type` field against the canonical 13 categories. No `category || type` fallback — `type` only.
-  2. The database seed script (`prisma/seed_components.ts`) maps `type` in registry JSON to `category` in the database, then runs a post-seed verification loop asserting `dbRow.category === jsonEntry.type` for all 57 entries, exiting with code 1 on any mismatch.
-  3. At compile-time, `composeThemeFromBlueprint` computes the SHA-256 hash of `registry.json` on disk and compares it against the hash stored in the database (seeded as a `registry-metadata-hash` record). If they differ, compilation aborts with a `ValidationError("Registry cache stale — run seed")`.
+  2. The database seed script (`prisma/seed_components.ts`) maps `type` in registry JSON to `category` in the database, converts `status === "approved"` to `"PUBLISHED"`, then runs a post-seed verification loop asserting `dbRow.category === jsonEntry.type` for all dynamically counted published entries, exiting with code 1 on any mismatch.
+  3. At compile-time, `composeThemeFromBlueprint` computes the SHA-256 hash of `registry.json` on disk and compares it against the hash stored in the database (stored in the dedicated `RegistryMeta` singleton model). If they differ, compilation aborts with a `ValidationError("Registry cache stale — run seed")`.
+- **Status:** **LOCKED**
+
+## Decision #14 — Component Status Enum & Filtering Contract
+- **Rule:** `ComponentRegistry` rows in Prisma must use `status: "PUBLISHED"` as the default for active production components, matching the conversion of `status: "approved"` in `registry.json` during seeding.
+- **Enforcement:**
+  1. All runtime compiler queries (`loadVerifiedComponents`) and seed verification audits (`seed_components.ts`) must explicitly filter database queries by `where: { status: "PUBLISHED" }`.
+  2. The expected component count must never be hardcoded as a magic number (such as `57`); it must be derived dynamically from `registry.json` by counting entries matching `status === "approved"`.
 - **Status:** **LOCKED**
 
