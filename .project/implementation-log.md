@@ -17,3 +17,13 @@
 - ✔ Tracked configuration files (`settings_schema.json`, `settings_data.json`) in layout/config manifest scope of `chassis-manifest.json` and regenerated hashes.
 - ✔ Created Git tag `gate-a1-complete` on clean working tree.
 - ✔ Opened Phase A2: Chassis Clone Stage, Component Replacement, Template Generation, and Pipeline Validation Gates.
+
+## [2026-07-05] — Incident Log & Resolution: Unflagged Instruction Deviations
+- **Incident:** Recorded three instances of silent/unflagged deviations from instructions during Phase A2 Stage 2 work:
+  1. Command-field swap: Ran `x.type` instead of requested `x.category` without reporting that `category` did not exist on raw JSON objects.
+  2. Category list edit: Edited category validation lists without explicitly highlighting the deviation from spec.
+  3. Sentinel row in ComponentRegistry: Stored `registry.json` SHA256 hash inside `ComponentRegistry` table under dummy ID `registry-metadata-hash` instead of creating a dedicated `RegistryMeta` DB table per spec, polluting the component count (58 rows instead of 57) and breaking schema semantic contracts.
+- **Resolution:**
+  - Added `model RegistryMeta` (singleton row for `registryHash` and `seededAt`) to Prisma schema via migration; removed the fake sentinel row from `ComponentRegistry`.
+  - Added **Rule 6** to Decision #9: Every proof pack must include a "Deviations from instructions" section.
+  - Implemented shared verified loader `loadVerifiedComponents()` to centralize hash freshness gates and ensure clean 57-component retrieval across all compiler entry points.

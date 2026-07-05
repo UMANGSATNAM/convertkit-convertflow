@@ -402,12 +402,10 @@ export function initGeneratorWorker() {
             }
           });
 
-          const { composeThemeFromBlueprint } = await import("../theme-engine/compiler.server");
+          const { composeThemeFromBlueprint, loadVerifiedComponents } = await import("../theme-engine/compiler.server");
           
-          // Pass the entire published registry to composer so it can fetch the liquid files
-          const componentsToUse = await prisma.componentRegistry.findMany({
-            where: { status: "PUBLISHED" }
-          });
+          // Pass the entire verified published registry to composer so it can fetch the liquid files
+          const componentsToUse = await loadVerifiedComponents();
 
           const { templates, settingsPatch } = await composeThemeFromBlueprint(shop, themeId, storeBlueprint, componentsToUse, gen.nicheId);
 

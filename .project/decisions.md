@@ -63,6 +63,7 @@
 - **Rule 3:** "Frozen/Locked" may only be declared by Umang, never self-declared by the agent. Sign-off is a user-authored message. Any agent output containing the words "signed off" regarding a gate is itself a violation, even as a proposal.
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
+- **Rule 6:** Every proof pack must contain a "Deviations from instructions" section — either "none" or an itemized list with justification. An unlisted deviation discovered later is treated as a fabrication-class violation.
 - **Status:** **LOCKED**
 
 ## Decision #8 — Additive Component Metadata Schema

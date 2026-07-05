@@ -76,6 +76,20 @@ vi.mock('../app/db.server', () => {
   const crypto = require('crypto');
   return {
     default: {
+      registryMeta: {
+        findUnique: vi.fn(async ({ where }: any) => {
+          if (where.id === 'singleton') {
+            const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+            try {
+              const content = fs.readFileSync(registryPath, 'utf-8');
+              return { id: 'singleton', registryHash: crypto.createHash('sha256').update(content).digest('hex') };
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        })
+      },
       componentRegistry: {
         findUnique: vi.fn(async ({ where }: any) => {
           if (where.componentId === 'registry-metadata-hash') {
@@ -88,7 +102,8 @@ vi.mock('../app/db.server', () => {
             }
           }
           return null;
-        })
+        }),
+        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock' }))
       }
     }
   };

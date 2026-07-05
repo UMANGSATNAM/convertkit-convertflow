@@ -222,6 +222,35 @@ function validateThemeIntegrity(
 }
 
 /**
+ * Loads published components from the database while asserting Single Source of Truth (SSOT) integrity.
+ * Checks on-disk registry.json SHA-256 against RegistryMeta table.
+ */
+export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
+  const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
+  let currentRegistryHash: string;
+  try {
+    currentRegistryHash = crypto.createHash("sha256").update(readFileSync(registryJsonPath, "utf-8")).digest("hex");
+  } catch (err: any) {
+    throw new ValidationError(`Failed to read registry.json on disk: ${err.message}`);
+  }
+  const metaRecord = await prisma.registryMeta.findUnique({ where: { id: "singleton" } });
+  if (!metaRecord) {
+    throw new ValidationError("Registry cache stale — run seed. No RegistryMeta record found in database.");
+  }
+  if (metaRecord.registryHash !== currentRegistryHash) {
+    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
+  }
+  const components = await prisma.componentRegistry.findMany({
+    where: { status: "PUBLISHED" }
+  });
+  if (components.length !== 57) {
+    throw new ValidationError(`SSOT drift detected: expected exactly 57 published components in database, found ${components.length}. Run seed script.`);
+  }
+  console.log(`[RegistryLoader] Verified SSOT registry freshness (hash: ${currentRegistryHash.substring(0, 12)}...) and loaded ${components.length} components.`);
+  return components;
+}
+
+/**
  * Theme Compiler Orchestrator
  * Purely deterministic execution of compiler stages. No business logic.
  */
@@ -236,6 +265,7 @@ export async function compileTheme(
   await fs.mkdir(compileDir, { recursive: true });
 
   console.log(`[Compiler] Starting compilation run: ${runId}`);
+  await loadVerifiedComponents();
   await saveArtifact(compileDir, "01-blueprint.json", blueprint);
 
   // Stage 1: Chassis Clone Stage (Manifest-driven Copy & Hash Verification)
@@ -402,17 +432,8 @@ export async function composeThemeFromBlueprint(
   const startTime = Date.now();
   console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
 
-  // Registry cache freshness check: compare on-disk registry.json hash against DB-stored hash
-  const registryJsonPath = path.resolve(process.cwd(), "app/data/templates/theme-engine/registry.json");
-  const currentRegistryHash = crypto.createHash("sha256").update(readFileSync(registryJsonPath, "utf-8")).digest("hex");
-  const storedHashRecord = await prisma.componentRegistry.findUnique({ where: { componentId: "registry-metadata-hash" } });
-  if (!storedHashRecord) {
-    throw new ValidationError("Registry cache stale — run seed. No registry-metadata-hash record found in database.");
-  }
-  if (storedHashRecord.version !== currentRegistryHash) {
-    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${storedHashRecord.version}, Disk hash: ${currentRegistryHash}`);
-  }
-  console.log(`[Composer] Registry cache freshness verified (hash: ${currentRegistryHash.substring(0, 12)}...)`);
+  // Enforce SSOT freshness gate and verify RegistryMeta
+  await loadVerifiedComponents();
 
   const filesToUpload: Record<string, string> = {};
 
