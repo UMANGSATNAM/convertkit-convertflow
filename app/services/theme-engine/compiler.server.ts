@@ -197,7 +197,7 @@ async function uploadLiquidWithRetry(
 /**
  * Validates theme integrity before uploading to prevent shipping broken or missing files to live storefronts.
  */
-function validateThemeIntegrity(
+export function validateThemeIntegrity(
   filesToUpload: Record<string, string>,
   blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
@@ -364,7 +364,12 @@ export async function compileTheme(
 
   const isDeployable = validation.passed && lint.passed && themeCheck.passed;
   if (!isDeployable) {
-    console.warn(`[Compiler] Build had warnings/errors. Technical: ${validation.passed ? 'PASS' : 'FAIL'}, Design: ${lint.passed ? 'PASS' : 'FAIL'}, ThemeCheck: ${themeCheck.passed ? 'PASS' : 'FAIL'}`);
+    const reasons = [
+      !validation.passed ? "Technical Validation Failed" : "",
+      !lint.passed ? "Design Lint Failed" : "",
+      !themeCheck.passed ? "Shopify Theme Check Failed" : ""
+    ].filter(Boolean).join(", ");
+    throw new ValidationError(`[Compiler] Aborting compilation: Theme bundle is not deployable (${reasons}).`);
   }
 
   const endTime = Date.now();
@@ -485,10 +490,7 @@ export async function assembleThemeBundle(
 
   // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
-  if (settings.__empty_tokens) {
-    filesToUpload["assets/niche-tokens.css"] = "";
-  } else {
-    filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
+  filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
   --color-background: ${settings.colors_background_1 || '#ffffff'};
   --color-text: ${settings.colors_accent_1 || '#1a1a1a'};
@@ -500,7 +502,6 @@ export async function assembleThemeBundle(
   --button-radius: ${settings.button_style === 'pill' ? '50px' : settings.button_style === 'rounded' ? '8px' : '0px'};
   --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
 }`;
-  }
 
   // Step 3: Build & Inject JSON Templates
   const assembledComponents: ComponentRegistry[] = [];
@@ -525,19 +526,19 @@ export async function assembleThemeBundle(
     if (key.startsWith("templates/") && key.endsWith(".json")) {
       try {
         templates[key] = JSON.parse(content);
-      } catch (e) {}
+      } catch (e: any) {
+        throw new ValidationError(`[Stage3] Template "${key}" is invalid JSON: ${e.message}`);
+      }
     }
   }
 
   // Step 4: Read and inject Liquid files for all resolved components
+  // Note: Passing components (Prisma DB rows) as registry entries uses the read-only DB cache,
+  // whose freshness against registry.json is guaranteed by the Stage 2.2 SHA-256 freshness gate.
   for (const component of assembledComponents) {
     const liquidContent = await resolveComponentLiquidContent(component, components);
     const sectionType = component.sectionType || component.componentId;
-    if (liquidContent) {
-      filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
-    } else {
-      console.error(`[Composer] Failed to resolve liquid component ${component.componentId} (${sectionType}) from all candidate paths.`);
-    }
+    filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
   }
 
   // Stage 2.1: Category-only slot detection + Symmetrical replacement loop

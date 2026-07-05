@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { composeThemeFromBlueprint } from '../app/services/theme-engine/compiler.server';
+import { composeThemeFromBlueprint, validateThemeIntegrity } from '../app/services/theme-engine/compiler.server';
 import { ValidationError } from '../app/services/theme-engine/validators.server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -298,78 +298,19 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     ).rejects.toThrow(ValidationError);
   });
 
-  it('should throw ValidationError if niche-tokens.css is empty in niche mode', async () => {
-    vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
-      const dirName = getDirName(dirPath);
-      if (dirName === 'core' || dirName === 'base-theme' || dirName === 'niches') {
-        return [
-          { name: 'layout', isDirectory: () => true },
-          { name: 'config', isDirectory: () => true },
-          { name: 'locales', isDirectory: () => true },
-          { name: 'assets', isDirectory: () => true }
-        ] as any;
-      }
-      if (dirName === 'layout') {
-        return [
-          { name: 'theme.liquid', isDirectory: () => false },
-          { name: 'password.liquid', isDirectory: () => false }
-        ] as any;
-      }
-      if (dirName === 'config') {
-        return [
-          { name: 'settings_schema.json', isDirectory: () => false },
-          { name: 'settings_data.json', isDirectory: () => false }
-        ] as any;
-      }
-      if (dirName === 'locales') {
-        return [{ name: 'en.default.json', isDirectory: () => false }] as any;
-      }
-      if (dirName === 'assets') {
-        return [
-          { name: 'cart.js', isDirectory: () => false },
-          { name: 'variant-swap.js', isDirectory: () => false },
-          { name: 'theme.js', isDirectory: () => false },
-          { name: 'niche-tokens.css', isDirectory: () => false }
-        ] as any;
-      }
-      return [];
-    });
-
-    vi.mocked(fs.stat).mockImplementation(async () => {
-      return { isDirectory: () => true } as any;
-    });
-
-    vi.mocked(fs.readFile).mockImplementation(async (filePath: any) => {
-      const fileStr = String(filePath);
-      if (fileStr.includes('chassis-manifest.json')) {
-        return JSON.stringify({
-          files: [
-            "base-theme/layout/theme.liquid",
-            "base-theme/layout/password.liquid",
-            "base-theme/config/settings_schema.json",
-            "base-theme/config/settings_data.json",
-            "base-theme/locales/en.default.json",
-            "base-theme/assets/niche-tokens.css"
-          ]
-        });
-      }
-      if (fileStr.includes('niche-tokens.css')) {
-        return '   '; // only whitespace
-      }
-      return 'some file content';
-    });
-
-    const emptyBlueprint = {
-      ...mockBlueprint,
-      settings: {
-        __empty_tokens: true
-      }
+  it('should throw ValidationError if niche-tokens.css is empty in niche mode', () => {
+    const fakeFiles: Record<string, string> = {
+      "layout/theme.liquid": "some content",
+      "config/settings_schema.json": "[]",
+      "config/settings_data.json": "{}",
+      "locales/en.default.json": "{}",
+      "assets/niche-tokens.css": "   " // only whitespace
     };
 
-    await expect(
-      composeThemeFromBlueprint(mockShop, mockThemeId, emptyBlueprint, mockRegistry, 'jewellery')
-    ).rejects.toThrow(/niche tokens stylesheet is empty/i);
-  }, 15000);
+    expect(() =>
+      validateThemeIntegrity(fakeFiles, mockBlueprint, mockRegistry, 'jewellery')
+    ).toThrow(/niche tokens stylesheet is empty/i);
+  });
 
   it('should skip niche-tokens.css validation and empty validation in ai-custom mode', async () => {
     vi.mocked(fs.readdir).mockImplementation(async (dirPath: any) => {
