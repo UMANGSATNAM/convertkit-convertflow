@@ -14,7 +14,16 @@ import { staticValidate } from "./compiler/static-validator";
 import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { uploadAssetWithCache } from "./asset-cache.server";
-import { ValidationError, validateTemplateStructure, validateSectionDependencies, assertNoOrphanSectionRefs } from "./validators.server";
+import {
+  ValidationError,
+  validateTemplateStructure,
+  validateSectionDependencies,
+  assertNoOrphanSectionRefs,
+  validateProductTemplateBlocks,
+  validateCollectionTemplate,
+  assertNoForbiddenFilters
+} from "./validators.server";
+import { generateTemplates } from "./template-generator";
 import prisma from "../../db.server";
 
 export class ChassisTamperError extends Error {
@@ -492,47 +501,18 @@ export async function composeThemeFromBlueprint(
     });
   }
 
-  for (const [pageHandle, pageData] of Object.entries(blueprint.pages || {})) {
-    const templateJson: any = {
-      sections: {},
-      order: []
-    };
-
-    (pageData.sections || []).forEach((section, index) => {
-      const component = components.find(c => c.componentId === section.componentId);
-      if (!component) {
-        console.warn(`[Composer] Component ${section.componentId} not found in registry. Skipping.`);
-        return;
-      }
-
-      const sectionType = component.sectionType || component.componentId;
-      const sectionKey = `${sectionType}_${index}`;
-
-      templateJson.sections[sectionKey] = {
-        type: sectionType,
-        settings: section.settings || {},
-        blocks: section.blocks || {}
-      };
-
-      templateJson.order.push(sectionKey);
-      
-      if (!resolvedComponents.some(c => c.componentId === component.componentId)) {
-        resolvedComponents.push(component);
-      }
-    });
-
-    try {
-      validateTemplateStructure(templateJson);
-      const availableSnippets = new Set(Object.keys(filesToUpload).filter(f => f.startsWith("snippets/")).map(f => path.basename(f, ".liquid")));
-      validateSectionDependencies(templateJson, availableSnippets);
-    } catch (valErr: any) {
-      console.warn(`[Composer] Template structural validation note for ${pageHandle}: ${valErr.message}`);
+  const usedComponents = await generateTemplates(blueprint, filesToUpload, components);
+  for (const comp of usedComponents) {
+    if (!resolvedComponents.some(c => c.componentId === comp.componentId)) {
+      resolvedComponents.push(comp);
     }
-
-    const templatePath = `templates/${pageHandle}.json`;
-    templates[templatePath] = templateJson;
-    filesToUpload[templatePath] = JSON.stringify(templateJson, null, 2);
-    console.log(`[Composer] Built template ${templatePath} with ${templateJson.order.length} sections`);
+  }
+  for (const [key, content] of Object.entries(filesToUpload)) {
+    if (key.startsWith("templates/") && key.endsWith(".json")) {
+      try {
+        templates[key] = JSON.parse(content);
+      } catch (e) {}
+    }
   }
 
   // Step 5: Read and inject Liquid files for all resolved components
@@ -604,6 +584,9 @@ export async function composeThemeFromBlueprint(
 
   // Assert no orphan section references inside layout groups and templates
   assertNoOrphanSectionRefs(filesToUpload);
+  validateProductTemplateBlocks(filesToUpload);
+  validateCollectionTemplate(filesToUpload);
+  assertNoForbiddenFilters(filesToUpload);
 
   // Step 6: Validate Theme Integrity
   validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);
