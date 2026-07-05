@@ -48,7 +48,8 @@ vi.mock('../app/services/theme-engine/validators.server', () => {
     assertNoOrphanSectionRefs: vi.fn(),
     validateProductTemplateBlocks: vi.fn(),
     validateCollectionTemplate: vi.fn(),
-    assertNoForbiddenFilters: vi.fn()
+    assertNoForbiddenFilters: vi.fn(),
+    runStage3Gates: vi.fn().mockReturnValue({})
   };
 });
 

@@ -21,9 +21,11 @@ import {
   assertNoOrphanSectionRefs,
   validateProductTemplateBlocks,
   validateCollectionTemplate,
-  assertNoForbiddenFilters
+  assertNoForbiddenFilters,
+  runStage3Gates
 } from "./validators.server";
 import { generateTemplates } from "./template-generator";
+import { runThemeCheckStage } from "./compiler/theme-check";
 import prisma from "../../db.server";
 
 export class ChassisTamperError extends Error {
@@ -103,6 +105,10 @@ export interface ThemeBuildArtifact {
   uploadBundle: Record<string, any>;
   validation: Record<string, any>;
   lint: Record<string, any>;
+  stage3?: Record<string, any>;
+  themeCheck?: Record<string, any>;
+  filesToUpload?: Record<string, string>;
+  templates?: Record<string, any>;
   metrics: Record<string, any>;
 }
 
@@ -285,10 +291,14 @@ export async function compileTheme(
   await loadVerifiedComponents();
   await saveArtifact(compileDir, "01-blueprint.json", blueprint);
 
+  const { filesToUpload, templates, stage3Results } = await assembleThemeBundle(
+    blueprint,
+    componentsRegistry,
+    brandProfile?.industry || 'default'
+  );
+
   // Stage 1: Chassis Clone Stage (Manifest-driven Copy & Hash Verification)
-  const themeEngineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
-  const chassisFiles = await cloneChassis(themeEngineDir);
-  await saveArtifact(compileDir, "00-chassis.json", Object.keys(chassisFiles));
+  await saveArtifact(compileDir, "00-chassis.json", Object.keys(filesToUpload));
 
   // Stage 2: Component Resolver
   const resolvedComponents = await resolveComponents(blueprint);
@@ -333,17 +343,28 @@ export async function compileTheme(
   const uploadBundle = await optimizeBundle(manifest);
   await saveArtifact(compileDir, "09-build.json", uploadBundle);
 
-  // Stage 10a: Technical Validator
+  // Stage 10a: Technical Validator + Unified Stage 3 Gates
   const validation = await staticValidate(uploadBundle, manifest);
+  validation.checks = {
+    ...validation.checks,
+    ...stage3Results
+  };
   await saveArtifact(compileDir, "10a-validation.json", validation);
 
   // Stage 10b: Design Linter
   const lint = await designLint(cssTokens);
   await saveArtifact(compileDir, "10b-lint.json", lint);
 
-  const isDeployable = validation.passed && lint.passed;
+  // Stage 10c: Unified Stage 3 Gates Artifact
+  await saveArtifact(compileDir, "10c-stage3.json", stage3Results);
+
+  // Stage 11: Shopify Theme Check Linter Stage
+  const themeCheck = await runThemeCheckStage(compileDir, filesToUpload, cssTokens.cssOutput);
+  await saveArtifact(compileDir, "11-theme-check.json", themeCheck);
+
+  const isDeployable = validation.passed && lint.passed && themeCheck.passed;
   if (!isDeployable) {
-    console.warn(`[Compiler] Build had technical or design warnings. Technical: ${validation.passed ? 'PASS' : 'FAIL'}, Design: ${lint.passed ? 'PASS' : 'FAIL'}`);
+    console.warn(`[Compiler] Build had warnings/errors. Technical: ${validation.passed ? 'PASS' : 'FAIL'}, Design: ${lint.passed ? 'PASS' : 'FAIL'}, ThemeCheck: ${themeCheck.passed ? 'PASS' : 'FAIL'}`);
   }
 
   const endTime = Date.now();
@@ -360,6 +381,10 @@ export async function compileTheme(
     uploadBundle,
     validation,
     lint,
+    stage3: stage3Results,
+    themeCheck,
+    filesToUpload,
+    templates,
     metrics
   };
 }
@@ -439,27 +464,17 @@ export async function resolveComponentLiquidContent(component: any, customRegist
  * It compiles the core files, niche files, and database sections into a single merged theme map.
  * It executes the 10-stage deterministic compiler, validates the structure, and uploads files in batch to Shopify.
  */
-export async function composeThemeFromBlueprint(
-  shop: any,
-  themeId: string,
+export async function assembleThemeBundle(
   blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
   nicheId: string
-): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
-  const startTime = Date.now();
-  console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
-
-  // Enforce SSOT freshness gate and verify RegistryMeta
-  await loadVerifiedComponents();
-
+): Promise<{
+  filesToUpload: Record<string, string>;
+  assembledComponents: ComponentRegistry[];
+  templates: Record<string, any>;
+  stage3Results: Record<string, "pass" | "fail">;
+}> {
   const filesToUpload: Record<string, string> = {};
-
-  // Execute deterministic compiler for safety artifacts & design token generation
-  try {
-    await compileTheme(blueprint, components, { industry: nicheId });
-  } catch (compilerErr: any) {
-    console.warn(`[Composer] Compiler stage generated warning: ${compilerErr.message}. Continuing with live upload.`);
-  }
 
   // Step 1: Clone read-only chassis files using hash verification
   const themeEngineDir = path.resolve(process.cwd(), "app/data/templates/theme-engine");
@@ -468,7 +483,7 @@ export async function composeThemeFromBlueprint(
     addShopifyFile(filesToUpload, relPath, content);
   }
 
-  // Step 3: Generate Dynamic Niche Tokens CSS
+  // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
   if (settings.__empty_tokens) {
     filesToUpload["assets/niche-tokens.css"] = "";
@@ -486,25 +501,24 @@ export async function composeThemeFromBlueprint(
   --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
 }`;
   }
-  console.log(`[Composer] Generated dynamic CSS tokens from AI brand context.`);
 
-  // Step 4: Build & Inject JSON Templates
-  const resolvedComponents: ComponentRegistry[] = [];
+  // Step 3: Build & Inject JSON Templates
+  const assembledComponents: ComponentRegistry[] = [];
   const templates: Record<string, any> = {};
 
   if (blueprint.globalComponents && Array.isArray(blueprint.globalComponents)) {
     blueprint.globalComponents.forEach(componentId => {
       const component = components.find(c => c.componentId === componentId);
-      if (component && !resolvedComponents.some(c => c.componentId === component.componentId)) {
-        resolvedComponents.push(component);
+      if (component && !assembledComponents.some(c => c.componentId === component.componentId)) {
+        assembledComponents.push(component);
       }
     });
   }
 
   const usedComponents = await generateTemplates(blueprint, filesToUpload, components);
   for (const comp of usedComponents) {
-    if (!resolvedComponents.some(c => c.componentId === comp.componentId)) {
-      resolvedComponents.push(comp);
+    if (!assembledComponents.some(c => c.componentId === comp.componentId)) {
+      assembledComponents.push(comp);
     }
   }
   for (const [key, content] of Object.entries(filesToUpload)) {
@@ -515,8 +529,8 @@ export async function composeThemeFromBlueprint(
     }
   }
 
-  // Step 5: Read and inject Liquid files for all resolved components
-  for (const component of resolvedComponents) {
+  // Step 4: Read and inject Liquid files for all resolved components
+  for (const component of assembledComponents) {
     const liquidContent = await resolveComponentLiquidContent(component, components);
     const sectionType = component.sectionType || component.componentId;
     if (liquidContent) {
@@ -582,16 +596,52 @@ export async function composeThemeFromBlueprint(
     delete filesToUpload[fallbackFile];
   }
 
-  // Assert no orphan section references inside layout groups and templates
-  assertNoOrphanSectionRefs(filesToUpload);
-  validateProductTemplateBlocks(filesToUpload);
-  validateCollectionTemplate(filesToUpload);
-  assertNoForbiddenFilters(filesToUpload);
+  // Stage 3: Unified Validation Gates
+  const stage3Results = runStage3Gates(filesToUpload);
 
-  // Step 6: Validate Theme Integrity
+  // Validate Theme Integrity
   validateThemeIntegrity(filesToUpload, blueprint, components, nicheId);
 
-  // Step 7: Single-Batch Priority Upload to Shopify
+  return { filesToUpload, assembledComponents, templates, stage3Results };
+}
+
+/**
+ * The Theme Composer takes the Store Blueprint and the matched components from the registry.
+ * It compiles the core files, niche files, and database sections into a single merged theme map.
+ * It executes the 10-stage deterministic compiler, validates the structure, and uploads files in batch to Shopify.
+ */
+export async function composeThemeFromBlueprint(
+  shop: any,
+  themeId: string,
+  blueprint: StoreBlueprintData,
+  components: ComponentRegistry[],
+  nicheId: string
+): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
+  const startTime = Date.now();
+  console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
+
+  // Enforce SSOT freshness gate and verify RegistryMeta
+  await loadVerifiedComponents();
+
+  let filesToUpload: Record<string, string>;
+  let templates: Record<string, any>;
+
+  // Execute deterministic compiler for safety artifacts & design token generation
+  try {
+    const compileResult = await compileTheme(blueprint, components, { industry: nicheId });
+    filesToUpload = compileResult.filesToUpload!;
+    templates = compileResult.templates!;
+  } catch (compilerErr: any) {
+    if (compilerErr instanceof ValidationError || compilerErr.name === 'ValidationError' || compilerErr.name === 'ChassisTamperError') {
+      throw compilerErr;
+    }
+    console.warn(`[Composer] Compiler stage generated warning/error: ${compilerErr.message}. Falling back to direct theme assembly.`);
+    const assembled = await assembleThemeBundle(blueprint, components, nicheId);
+    filesToUpload = assembled.filesToUpload;
+    templates = assembled.templates;
+  }
+
+  // Single-Batch Priority Upload to Shopify
   let uploadedCount = 0;
   const keysToUpload = Object.keys(filesToUpload).sort((a, b) => {
     const getPriority = (key: string): number => {

@@ -316,3 +316,48 @@ export function assertNoForbiddenFilters(filesToUpload: Record<string, string>):
     }
   }
 }
+
+/**
+ * Unified Stage 3 Gates Runner
+ * Executes all Stage 3 validation gates and returns a deterministic pass/fail map.
+ * Throws ValidationError immediately if any gate fails.
+ */
+export function runStage3Gates(filesToUpload: Record<string, string>): Record<string, "pass" | "fail"> {
+  const results: Record<string, "pass" | "fail"> = {
+    productTemplateBlocks: "pass",
+    collectionTemplate: "pass",
+    forbiddenFilters: "pass",
+    orphanSectionRefs: "pass",
+  };
+
+  try {
+    validateProductTemplateBlocks(filesToUpload);
+  } catch (err) {
+    results.productTemplateBlocks = "fail";
+    throw err;
+  }
+
+  try {
+    validateCollectionTemplate(filesToUpload);
+  } catch (err) {
+    results.collectionTemplate = "fail";
+    throw err;
+  }
+
+  try {
+    assertNoForbiddenFilters(filesToUpload);
+  } catch (err) {
+    results.forbiddenFilters = "fail";
+    throw err;
+  }
+
+  try {
+    assertNoOrphanSectionRefs(filesToUpload);
+  } catch (err) {
+    results.orphanSectionRefs = "fail";
+    throw err;
+  }
+
+  return results;
+}
+
