@@ -107,3 +107,9 @@
 - **Migration Commitment:** Migration baseline (`prisma migrate diff` se initial migration) Phase B kickoff pe create hogi.
 - **Status:** **LOCKED**
 
+## Decision #15 — Offline Token Non-Expiring Contract & Scope Synchronization Contract
+- **Rule 1:** `expiringOfflineAccessTokens` must be set to `false` in `app/shopify.server.js` so background BullMQ workers executing deployment jobs receive permanent offline access tokens and do not crash with 401 expiration failures.
+- **Rule 2:** Scope changes require simultaneous `shopify.app.toml` + Railway `SCOPES` env update in the same deploy (`scopes = "write_products,read_products,write_orders,read_orders,write_discounts,read_discounts,read_customers,write_themes,read_themes,write_pages,read_pages,write_script_tags,read_script_tags,read_analytics"`).
+- **Status:** **LOCKED**
+
+
