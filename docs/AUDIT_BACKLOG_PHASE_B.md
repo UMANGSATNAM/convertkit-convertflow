@@ -4,6 +4,19 @@ This document captures critical architectural and security/compliance findings i
 
 ---
 
+## 0. PRODUCTION SAFETY CRITICAL: Replace `db push --accept-data-loss` with `prisma migrate deploy` (Top Priority — Kickoff Item #1)
+
+### Finding & Risk
+- Currently, `Dockerfile` CMD executes `npx prisma db push --accept-data-loss && npm start` on every container boot.
+- While safe during Phase A (where `ComponentRegistry` and `RegistryMeta` are disposable caches re-populated via seed), this poses a severe production data-wipe hazard once persistent merchant data models (`Shop`, `GenerationJob`, `ThemeDeployment`, `StoreDNA`) ship in Phase B.
+- Additionally, `prisma/seed_components.ts` executes `Cleared old ComponentRegistry`; once Phase B models ship, seeding scope must remain strictly locked to `ComponentRegistry` and `RegistryMeta`.
+
+### Phase B Audit Action Item
+1. **Replace Dockerfile CMD:** Replace `npx prisma db push --accept-data-loss` with `npx prisma migrate deploy` prior to shipping persistent merchant data models. This pairs directly with **Decision #14's migration-baseline commitment**.
+2. **Lock Seed Scope:** Ensure any DB seed routines never truncate or drop merchant tables (`Shop`, `GenerationJob`, `ThemeDeployment`, `StoreDNA`).
+
+---
+
 ## 1. Scope Drift & Scope Minimization Pass (High Priority — App Store Review Risk)
 
 ### Finding

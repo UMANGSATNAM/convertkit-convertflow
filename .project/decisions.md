@@ -111,6 +111,7 @@
 ## Decision #15 — Offline Token Non-Expiring Contract & Scope Synchronization Contract
 - **Rule 1:** `expiringOfflineAccessTokens` must be set to `false` in `app/shopify.server.js` so background BullMQ workers executing deployment jobs receive permanent offline access tokens and do not crash with 401 expiration failures.
 - **Rule 2:** Scope changes require simultaneous `shopify.app.toml` + Railway `SCOPES` env update in the same deploy (`scopes = "write_products,read_products,write_orders,read_orders,write_discounts,read_discounts,read_customers,write_themes,read_themes,write_pages,read_pages,write_script_tags,read_script_tags,read_analytics"`).
+- **Risk Note (Production Safety):** Currently `Dockerfile` CMD runs `npx prisma db push --accept-data-loss`. This MUST be replaced with `npx prisma migrate deploy` as Phase B Kickoff Item #1 prior to shipping persistent merchant tables (`Shop`, `GenerationJob`, `ThemeDeployment`, `StoreDNA`) to prevent accidental production data wipes.
 - **Status:** **LOCKED**
 
 
