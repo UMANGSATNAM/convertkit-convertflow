@@ -11,10 +11,7 @@ async function main() {
   console.log("🔍 Fetching sessions from DB...\n");
 
   const sessions = await (prisma as any).session.findMany({
-    where: {
-      shop: "uwyhex-nb.myshopify.com",
-    },
-    take: 5,
+    take: 20,
   });
 
   if (sessions.length === 0) {
@@ -34,7 +31,7 @@ async function main() {
     console.log(`   Testing token...`);
     try {
       const res = await fetch(
-        `https://${s.shop}/admin/api/2024-04/shop.json`,
+        `https://${s.shop}/admin/api/2024-10/shop.json`,
         {
           headers: {
             "X-Shopify-Access-Token": s.accessToken,
