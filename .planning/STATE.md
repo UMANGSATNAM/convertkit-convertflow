@@ -27,3 +27,4 @@ Phase 5: ConvertFlow Engine — Complete.
 
 ## Next Up
 - Production deployment verification
+- Phase B Audit Backlog tracked in [AUDIT_BACKLOG_PHASE_B.md](file:///i:/converflow%20app/docs/AUDIT_BACKLOG_PHASE_B.md) (Scope Minimization Pass + Webhooks/BullMQ cleanup)

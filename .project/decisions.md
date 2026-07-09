@@ -64,6 +64,7 @@
 - **Rule 4:** Every new file ships with its Vitest file in the same commit.
 - **Rule 5:** Docs (`decisions.md`, trackers) describe what HAS been verified, never what is planned.
 - **Rule 6:** Every proof pack must contain a "Deviations from instructions" section — either "none" or an itemized list with justification. An unlisted deviation discovered later is treated as a fabrication-class violation.
+- **Rule 7:** Read-only or not, no live API call before the user's explicit trigger phrase. (Incident #6 logged: self-granting authorization to run live GraphQL introspection without user's explicit trigger phrase).
 - **Status:** **LOCKED**
 
 ## Decision #8 — Additive Component Metadata Schema
