@@ -399,6 +399,10 @@ function addShopifyFile(files: Record<string, string>, relPath: string, content:
   const topLevelFolders = ["snippets/", "sections/", "assets/", "layout/", "locales/", "config/", "templates/"];
   for (const prefix of topLevelFolders) {
     if (relPath.startsWith(prefix)) {
+      if (relPath.startsWith("templates/customers/")) {
+        files[relPath] = content;
+        return;
+      }
       const subPath = relPath.substring(prefix.length);
       const cleanName = path.basename(subPath);
       files[`${prefix}${cleanName}`] = content;
@@ -655,16 +659,19 @@ export async function composeThemeFromBlueprint(
       ) {
         return 1;
       }
-      if (key.startsWith("sections/")) {
+      if (key.startsWith("sections/") && key.endsWith(".liquid")) {
         return 2;
       }
-      if (key.startsWith("templates/")) {
+      if (key.startsWith("sections/") && key.endsWith(".json")) {
         return 3;
       }
-      if (key.startsWith("config/")) {
+      if (key.startsWith("templates/")) {
         return 4;
       }
-      return 5;
+      if (key.startsWith("config/")) {
+        return 5;
+      }
+      return 6;
     };
     return getPriority(a) - getPriority(b);
   });
