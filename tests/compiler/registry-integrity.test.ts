@@ -44,7 +44,7 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
     realHash = crypto.createHash("sha256").update(canonicalContent).digest("hex");
     const registryData = JSON.parse(canonicalContent);
     expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
-    mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+    mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id', sectionType: 'mock-id' });
   });
 
   it('Case 1 (Positive): resolves components cleanly when disk registry.json hash matches RegistryMeta in DB and count aligns with registry.json', async () => {
@@ -84,7 +84,7 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
       updatedAt: new Date()
     } as any);
 
-    const mockHighComponents = Array(expectedCount + 1).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+    const mockHighComponents = Array(expectedCount + 1).fill({ status: 'PUBLISHED', componentId: 'mock-id', sectionType: 'mock-id' });
     vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockHighComponents);
 
     await expect(loadVerifiedComponents()).rejects.toThrow(new RegExp(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${expectedCount + 1}`));
@@ -97,7 +97,7 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
       updatedAt: new Date()
     } as any);
 
-    const mockLowComponents = Array(expectedCount - 1).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
+    const mockLowComponents = Array(expectedCount - 1).fill({ status: 'PUBLISHED', componentId: 'mock-id', sectionType: 'mock-id' });
     vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockLowComponents);
 
     await expect(loadVerifiedComponents()).rejects.toThrow(new RegExp(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${expectedCount - 1}`));

@@ -107,7 +107,7 @@ vi.mock('../app/db.server', () => {
           }
           return null;
         }),
-        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock' }))
+        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock', sectionType: 'mock' }))
       }
     }
   };

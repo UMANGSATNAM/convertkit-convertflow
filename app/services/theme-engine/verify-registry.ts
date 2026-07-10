@@ -102,6 +102,12 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
         `Component "${comp.componentId}" has missing/invalid category type: "${category ?? "undefined"}"`
       );
     }
+
+    // Assert sectionType does not collide with chassis fallback layout types
+    const sectionType = comp.sectionType || comp.componentId;
+    if (sectionType === 'header' || sectionType === 'footer') {
+      errors.push(`Component "${comp.componentId}" has illegal sectionType "${sectionType}". It cannot exactly match fallback layout types (header/footer).`);
+    }
   }
 
   // 2. Assert EVERY .liquid file under theme-engine is referenced by exactly one registry entry or chassis manifest

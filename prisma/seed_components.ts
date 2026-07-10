@@ -32,7 +32,7 @@ async function main() {
       componentId: comp.componentId,
       category: comp.type, // Map 'type' to 'category'
       niche: firstFamily ? String(firstFamily).toLowerCase() : "core",
-      sectionType: comp.type,
+      sectionType: comp.sectionType || comp.componentId,
       filePath: comp.liquidPath,
       liquidPath: comp.liquidPath,
       metaPath: comp.metaPath,

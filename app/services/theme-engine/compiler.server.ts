@@ -270,6 +270,18 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   if (components.length !== expectedCount) {
     throw new ValidationError(`SSOT drift detected: expected exactly ${expectedCount} published components in database, found ${components.length}. Run seed script.`);
   }
+
+  // Drift guard: ensure sectionType matches registry.json
+  const registryComponentMap = new Map(registryData.components.map((c: any) => [c.componentId, c]));
+  for (const dbComp of components) {
+    const jsonEntry = registryComponentMap.get(dbComp.componentId);
+    if (!jsonEntry) continue;
+    const expectedSectionType = jsonEntry.sectionType || jsonEntry.componentId;
+    if (dbComp.sectionType !== expectedSectionType) {
+      throw new ValidationError(`SSOT drift detected: component "${dbComp.componentId}" has sectionType "${dbComp.sectionType}" in DB but expected "${expectedSectionType}" based on registry.json. Run seed script.`);
+    }
+  }
+
   console.log(`[RegistryLoader] Verified SSOT registry freshness (hash: ${currentRegistryHash.substring(0, 12)}...) and loaded ${components.length} components.`);
   return components;
 }
@@ -556,6 +568,7 @@ export async function assembleThemeBundle(
     for (const componentId of blueprint.globalComponents) {
       const component = components.find(c => c.componentId === componentId);
       if (!component) {
+        console.log('DEBUG components array:', components.map(c => c.componentId));
         throw new ValidationError(
           `[Stage2] Global component "${componentId}" not found in registry.`
         );

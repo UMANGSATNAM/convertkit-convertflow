@@ -38,7 +38,7 @@ vi.mock('../../app/db.server', () => {
           }
           return null;
         }),
-        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock' }))
+        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock', sectionType: 'mock' }))
       }
     }
   };
@@ -357,4 +357,63 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
 
     expect(uploadMap['sections/header.liquid']).toBe('<header>fallback header</header>');
   });
+
+  it('Case D: Test-Mock Parity - Actual registry.json + DB seed mapping logic', async () => {
+    // Read the real registry and write it to the sandbox so the compiler reads it during the test
+    const originalCwd = path.resolve(__dirname, '../..');
+    const realRegistryPath = path.join(originalCwd, 'app/data/templates/theme-engine/registry.json');
+    const realRegistry = JSON.parse(await fs.readFile(realRegistryPath, 'utf8'));
+    
+    // Write the real registry into the sandboxed themeEngineDir
+    await fs.writeFile(path.join(themeEngineDir, 'registry.json'), JSON.stringify(realRegistry, null, 2), 'utf8');
+
+    // Use the exact DB seed mapping logic (sectionType: comp.sectionType || comp.componentId)
+    const realMappedRegistry = realRegistry.components.map((comp: any) => ({
+      componentId: comp.componentId,
+      category: comp.type,
+      sectionType: comp.sectionType || comp.componentId,
+      liquidPath: comp.liquidPath,
+      filePath: comp.liquidPath
+    })).filter((c: any) => c.componentId === 'header-minimal-v1' || c.componentId === 'footer-minimal-v1');
+
+    const { default: db } = await import('../../app/db.server');
+    vi.mocked(db.componentRegistry.findMany).mockResolvedValue(
+      realRegistry.components.map((comp: any) => ({
+        status: 'PUBLISHED',
+        componentId: comp.componentId,
+        sectionType: comp.sectionType || comp.componentId
+      }))
+    );
+
+    const blueprint = {
+      globalComponents: ['header-minimal-v1', 'footer-minimal-v1'],
+      pages: {},
+      settings: {}
+    };
+
+    const uploadMap: Record<string, string> = {};
+    const { uploadAssetWithCache } = await import('../../app/services/theme-engine/asset-cache.server');
+    vi.mocked(uploadAssetWithCache).mockImplementation(async (shop, themeId, key, content) => {
+      uploadMap[key] = content;
+      return true;
+    });
+
+    // Write components to sandboxed theme-engine
+    const compDir = path.join(themeEngineDir, 'components');
+    await fs.mkdir(path.join(compDir, 'header'), { recursive: true });
+    await fs.mkdir(path.join(compDir, 'footer'), { recursive: true });
+    await fs.writeFile(path.join(compDir, 'header/header-minimal-v1.liquid'), '<header>real header</header>');
+    await fs.writeFile(path.join(compDir, 'footer/footer-minimal-v1.liquid'), '<footer>real footer</footer>');
+
+    await composeThemeFromBlueprint(mockShop, mockThemeId, blueprint, realMappedRegistry, 'jewellery');
+
+    // 1. Fallback files are ABSENT
+    expect(uploadMap['sections/header.liquid']).toBeUndefined();
+    expect(uploadMap['sections/footer.liquid']).toBeUndefined();
+
+    // 2. Custom liquid files are PRESENT
+    expect(uploadMap['sections/header-minimal-v1.liquid']).toBe('<header>real header</header>');
+    expect(uploadMap['sections/footer-minimal-v1.liquid']).toBe('<footer>real footer</footer>');
+  });
 });
+
