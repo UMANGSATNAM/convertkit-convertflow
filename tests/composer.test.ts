@@ -85,7 +85,7 @@ vi.mock('../app/db.server', () => {
           if (where.id === 'singleton') {
             const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
             try {
-              const content = fs.readFileSync(registryPath, 'utf-8');
+              const content = fs.readFileSync(registryPath, 'utf-8').replace(/\r\n/g, '\n');
               return { id: 'singleton', registryHash: crypto.createHash('sha256').update(content).digest('hex') };
             } catch {
               return null;

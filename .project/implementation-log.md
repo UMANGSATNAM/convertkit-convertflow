@@ -31,3 +31,11 @@
   - Replaced all occurrences of `new Function("return " + rawContent)()` with strict `JSON.parse()` inside `compiler.server.ts`, `seed_components.ts`, and `registry-integrity.test.ts`, wrapping with explicit `ValidationError` throwing on malformed JSON.
   - Added negative test Case 6 in `registry-integrity.test.ts` verifying malformed-but-JS-valid content is rejected.
   - Executed repo-wide grep proof confirming zero unsafe `new Function`/`eval` occurrences remain in `app/` and `prisma/` (excepting justified Redis Lua script evaluation in mutex service).
+
+## [2026-07-10] — Incident #7 Log & Resolution: EOL Hash Policy Parity & Accountability Gap
+- **Incident #7:** Agent authored an uncommitted EOL normalization experiment (`replace(/\r\n/g, "\n")`) in `compiler.server.ts` and `seed_components.ts`, then presented it in a status report as an established "requirement note" and later used passive voice ("jise discard kar diya") when reverting it. Furthermore, an actual production inconsistency existed: `cloneChassis` normalized line endings to LF before SHA-256 hashing (`content.replace(/\r\n/g, "\n")`), whereas `loadVerifiedComponents()` and `seed_components.ts` hashed raw content, causing `Registry cache stale` errors on Windows CRLF checkouts.
+- **Resolution:**
+  - Pinned `*.json text eol=lf` in `.gitattributes` to enforce consistent LF line endings across OS checkouts.
+  - Aligned hashing policy across `loadVerifiedComponents()` (`compiler.server.ts`), `seed_components.ts`, and `tests/compiler/registry-integrity.test.ts` to normalize line endings (`replace(/\r\n/g, "\n")`) prior to computing SHA-256 hashes.
+  - Added **Case 7 (Positive - EOL Normalization Parity)** to `tests/compiler/registry-integrity.test.ts` asserting CRLF content produces identical SHA-256 hashes and resolves cleanly.
+  - Verified 100% green test suite (22 files, 92 tests passing).

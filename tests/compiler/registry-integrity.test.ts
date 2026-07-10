@@ -40,8 +40,9 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     const realContent = fs.readFileSync(registryPath, "utf-8");
-    realHash = crypto.createHash("sha256").update(realContent).digest("hex");
-    const registryData = JSON.parse(realContent);
+    const canonicalContent = realContent.replace(/\r\n/g, "\n");
+    realHash = crypto.createHash("sha256").update(canonicalContent).digest("hex");
+    const registryData = JSON.parse(canonicalContent);
     expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
     mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id' });
   });
@@ -107,6 +108,23 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
     vi.mocked(fs.readFileSync).mockReturnValueOnce(malformedContent);
 
     await expect(loadVerifiedComponents()).rejects.toThrow(/registry\.json is not valid JSON/);
+  });
+
+  it('Case 7 (Positive - EOL Normalization Parity): CRLF-formatted registry.json content produces exact LF hash and resolves cleanly', async () => {
+    vi.mocked(prisma.registryMeta.findUnique).mockResolvedValue({
+      id: 'singleton',
+      registryHash: realHash,
+      updatedAt: new Date()
+    } as any);
+
+    vi.mocked(prisma.componentRegistry.findMany).mockResolvedValue(mockExpectedComponents);
+
+    const realContent = fs.readFileSync(registryPath, "utf-8");
+    const crlfContent = realContent.replace(/\r?\n/g, "\r\n");
+    vi.mocked(fs.readFileSync).mockReturnValueOnce(crlfContent);
+
+    const result = await loadVerifiedComponents();
+    expect(result).toHaveLength(expectedCount);
   });
 });
 

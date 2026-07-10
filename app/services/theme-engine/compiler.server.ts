@@ -248,7 +248,8 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   } catch (err: any) {
     throw new ValidationError(`Failed to read registry.json on disk: ${err.message}`);
   }
-  const currentRegistryHash = crypto.createHash("sha256").update(rawContent).digest("hex");
+  const canonicalContent = rawContent.replace(/\r\n/g, "\n");
+  const currentRegistryHash = crypto.createHash("sha256").update(canonicalContent).digest("hex");
   let registryData: any;
   try {
     registryData = JSON.parse(rawContent);

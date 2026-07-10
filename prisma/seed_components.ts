@@ -12,7 +12,8 @@ async function main() {
   const registryPath = path.join(process.cwd(), 'app', 'data', 'templates', 'theme-engine', 'registry.json');
   const registryRaw = fs.readFileSync(registryPath, 'utf8');
   
-  const registryHash = crypto.createHash('sha256').update(registryRaw).digest('hex');
+  const canonicalRegistryRaw = registryRaw.replace(/\r\n/g, "\n");
+  const registryHash = crypto.createHash('sha256').update(canonicalRegistryRaw).digest('hex');
   let registry: any;
   try {
     registry = JSON.parse(registryRaw);
