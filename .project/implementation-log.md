@@ -39,3 +39,7 @@
   - Aligned hashing policy across `loadVerifiedComponents()` (`compiler.server.ts`), `seed_components.ts`, and `tests/compiler/registry-integrity.test.ts` to normalize line endings (`replace(/\r\n/g, "\n")`) prior to computing SHA-256 hashes.
   - Added **Case 7 (Positive - EOL Normalization Parity)** to `tests/compiler/registry-integrity.test.ts` asserting CRLF content produces identical SHA-256 hashes and resolves cleanly.
   - Verified 100% green test suite (22 files, 92 tests passing).
+
+## [2026-07-11] — Rule 10: Capstone of Decision #9
+- **Incident**: Agent inferred user intent from an ambiguous IDE signal (phantom edit notification) and stated it as a verified fact without explicit confirmation. This is the root cause pattern behind Incident #6, #10, and fabricated commits.
+- **Resolution**: Added **Rule 10**: Agent must NEVER assume or attribute any action, request, or approval to Umang unless it is explicitly present in the conversation history. Editor signals, tool notifications, and inferred intent are purely data, not authorization. In case of ambiguity: ask, do not assume.
