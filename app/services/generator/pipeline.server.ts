@@ -21,14 +21,37 @@ import { createGenerationProfile, logGenerationProfile, type ComponentSelection 
 import fs from "fs/promises";
 import path from "path";
 
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 255, g: 255, b: 255 };
+}
+
+function getLuminance(r: number, g: number, b: number) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function getContrast(hex1: string, hex2: string) {
+  const rgb1 = hexToRgb(hex1);
+  const rgb2 = hexToRgb(hex2);
+  const l1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+  const l2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+  const lightest = Math.max(l1, l2);
+  const darkest = Math.min(l1, l2);
+  return (lightest + 0.05) / (darkest + 0.05);
+}
+
 let generatorWorker: Worker | undefined;
 
 export function initGeneratorWorker() {
   if (generatorWorker) return;
 
   generatorWorker = new Worker(
-    "generator",
-    async (job) => {
+    "generator-local",
+    async (job: Job) => {
       const { generationId } = job.data;
       const gen = await prisma.storeGeneration.findUnique({
         where: { id: generationId },
@@ -172,7 +195,8 @@ export function initGeneratorWorker() {
             brandArchetype: brandContext.brand_archetype,
             catalogIndustry: catalogContext.industry,
             catalogStyle: catalogContext.style,
-            catalogVisualComplexity: catalogContext.visual_complexity
+            catalogVisualComplexity: catalogContext.visual_complexity,
+            exclude: resolvedSections.map(s => s.componentId)
           });
 
           if (matchedComponent && matchedComponent.componentId) {
@@ -226,15 +250,23 @@ export function initGeneratorWorker() {
         }
 
         const baseSettings = extractedColors || {
-          colors_accent_1: brandContext.colors?.primary || "#1A1A1A",
-          colors_accent_2: brandContext.colors?.secondary || "#C9A84C",
-          colors_background_1: brandContext.colors?.accent || "#FFFFFF",
+          colors_background_1: brandContext.colors?.background || brandContext.colors?.accent || "#FFFFFF",
+          colors_accent_1: brandContext.colors?.primary || "#111111",
+          colors_accent_2: brandContext.colors?.accent || "#C9A84C",
           fontHeading: brandContext.typography?.heading || "Inter",
           fontBody: brandContext.typography?.body || "Inter",
           button_style: brandContext.theme_tokens?.button_style || "rounded",
           card_style: brandContext.theme_tokens?.card_style || "soft",
           section_density: brandContext.theme_tokens?.section_density || "airy"
         };
+
+        const contrastRatio = getContrast(baseSettings.colors_background_1, baseSettings.colors_accent_1);
+        
+        if (contrastRatio < 4.5) {
+          console.warn(`[Color Guard] Invalid contrast (${contrastRatio.toFixed(2)}) for derived background ${baseSettings.colors_background_1} and text ${baseSettings.colors_accent_1}. Falling back to safe defaults.`);
+          baseSettings.colors_background_1 = "#FFFFFF";
+          baseSettings.colors_accent_1 = "#111111";
+        }
 
         const storeBlueprintAi = {
           pages: {
@@ -407,7 +439,22 @@ export function initGeneratorWorker() {
           // Pass the entire verified published registry to composer so it can fetch the liquid files
           const componentsToUse = await loadVerifiedComponents();
 
-          const { templates, settingsPatch } = await composeThemeFromBlueprint(shop, themeId, storeBlueprint, componentsToUse, gen.nicheId);
+          const { templates, settingsPatch, filesToUpload } = await composeThemeFromBlueprint(shop, themeId, storeBlueprint, componentsToUse, gen.nicheId);
+
+          // Automated Integrity Verification
+          await updateStatus("INSTALLING_THEME", "Verifying deployed theme integrity...");
+          const { scanAssets } = await import("../theme-engine/index");
+          const assetScan = await scanAssets(shop, themeId);
+          const remoteKeys = new Set(assetScan.files.map((f: any) => f.key));
+          const expectedKeys = Object.keys(filesToUpload);
+
+          const missingFiles = expectedKeys.filter(k => !remoteKeys.has(k));
+          const extraneousFiles = [...remoteKeys].filter(k => !filesToUpload.hasOwnProperty(k));
+
+          if (missingFiles.length > 0 || extraneousFiles.length > 0) {
+            throw new Error(`Theme integrity verification failed. Missing files: ${missingFiles.length > 0 ? missingFiles.join(", ") : 'none'}. Extraneous files: ${extraneousFiles.length > 0 ? extraneousFiles.join(", ") : 'none'}. Expected ${expectedKeys.length} files, found ${remoteKeys.size} remote files.`);
+          }
+          console.log(`[Pipeline] Theme integrity verified: Exact match of ${expectedKeys.length} files.`);
 
           // Apply Design Tokens
           const finalSettingsPatch: Record<string, any> = {};

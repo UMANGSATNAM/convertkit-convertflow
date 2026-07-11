@@ -176,7 +176,10 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     }
   }
 
-  if (!bestComponentId) return null;
+  if (!bestComponentId || highestScore < 50) {
+    console.warn(`[Retrieval] Skipping slot for "${params.sectionType}" - best component ${bestComponentId || 'none'} scored ${Math.round(highestScore)}, which is below threshold (50)`);
+    return null;
+  }
 
   console.log(
     `[Retrieval] Winner for "${params.sectionType}": ${bestComponentId} ` +
