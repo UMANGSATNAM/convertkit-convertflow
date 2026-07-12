@@ -1,4 +1,4 @@
-/**
+﻿/**
  * check-token-fresh.ts
  * Checks the DB sessions and tests the token directly via REST
  */
@@ -15,7 +15,7 @@ async function main() {
   });
 
   if (sessions.length === 0) {
-    console.log("❌ No sessions found for uwyhex-nb.myshopify.com");
+    console.log("❌ No sessions found for peri-beauty-bcuauhsj.myshopify.com");
     return;
   }
 

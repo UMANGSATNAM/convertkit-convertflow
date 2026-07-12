@@ -1,9 +1,9 @@
-import { publishTheme } from "../app/services/theme-engine/index";
+﻿import { publishTheme } from "../app/services/theme-engine/index";
 import { restRequest, graphqlRequest } from "../app/services/shopify-api.server";
 
 async function test() {
   const shop = {
-    shopDomain: "uwyhex-nb.myshopify.com",
+    shopDomain: "peri-beauty-bcuauhsj.myshopify.com",
     accessToken: "shpat_fake" // We don't have the real one, but we can see the exact error
   };
   

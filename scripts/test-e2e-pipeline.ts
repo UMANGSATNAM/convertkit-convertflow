@@ -1,4 +1,4 @@
-import "dotenv/config";
+﻿import "dotenv/config";
 import { Queue, Worker } from "bullmq";
 import { redis } from "../app/services/redis.server.js";
 import prisma from "../app/db.server.js";
@@ -10,11 +10,11 @@ async function runE2E() {
   // 1. Find or create a shop
   // 1. Find the real shop
   const shop = await prisma.shop.findFirst({
-    where: { shopDomain: "uwyhex-nb.myshopify.com" }
+    where: { shopDomain: "peri-beauty-bcuauhsj.myshopify.com" }
   });
 
   if (!shop || !shop.accessToken) {
-    throw new Error("Could not find the real shop uwyhex-nb.myshopify.com with a valid access token in the DB");
+    throw new Error("Could not find the real shop peri-beauty-bcuauhsj.myshopify.com with a valid access token in the DB");
   }
   
   // 2. Find or create a niche
@@ -66,7 +66,7 @@ async function runE2E() {
   initGeneratorWorker();
 
   // 5. Add job to Queue
-  const generatorQueue = new Queue("generator", { connection: redis as any });
+  const generatorQueue = new Queue("generator-local", { connection: redis as any });
   await generatorQueue.add("generate-store", { generationId: gen.id });
   
   console.log("Job added to queue. Waiting for pipeline to execute...");

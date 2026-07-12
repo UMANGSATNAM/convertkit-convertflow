@@ -245,20 +245,31 @@ export function initGeneratorWorker() {
         // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
         let extractedColors = null;
         if (aiData?.logoBase64) {
-          const rawExtracted = await BrandExtractionService.extractBrandAesthetics(aiData.logoBase64);
+          const rawExtracted = await BrandExtractionService.extractBrandAesthetics(aiData.logoBase64, "image/jpeg", catalogContext.industry);
+          if (rawExtracted.extractionFailed) {
+            console.warn(`\n\n======================================================`);
+            console.warn(`[WARNING] Brand Extraction Failed! Using fallback for: ${catalogContext.industry}`);
+            console.warn(`======================================================\n\n`);
+          }
           extractedColors = BrandExtractionService.mapToTokens(rawExtracted, false); // Light variant default
         }
 
-        const baseSettings = extractedColors || {
+        const fallbackSettings = {
           colors_background_1: brandContext.colors?.background || brandContext.colors?.accent || "#FFFFFF",
           colors_accent_1: brandContext.colors?.primary || "#111111",
           colors_accent_2: brandContext.colors?.accent || "#C9A84C",
+          colors_text_1: brandContext.colors?.text || "#111111",
+          colors_surface: "#F4F4F4",
           fontHeading: brandContext.typography?.heading || "Inter",
           fontBody: brandContext.typography?.body || "Inter",
           button_style: brandContext.theme_tokens?.button_style || "rounded",
           card_style: brandContext.theme_tokens?.card_style || "soft",
           section_density: brandContext.theme_tokens?.section_density || "airy"
         };
+        
+        const baseSettings = extractedColors 
+          ? { ...fallbackSettings, ...extractedColors } 
+          : fallbackSettings;
 
         const contrastRatio = getContrast(baseSettings.colors_background_1, baseSettings.colors_accent_1);
         
