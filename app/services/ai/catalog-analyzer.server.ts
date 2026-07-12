@@ -61,7 +61,16 @@ export async function analyzeCatalog(
     }
   `;
 
-  const response = await graphqlRequest(shopDomain, accessToken, query);
+  let response: any = {};
+  try {
+    response = await graphqlRequest(shopDomain, accessToken, query);
+  } catch (err: any) {
+    console.warn(`[CatalogAnalyzer] GraphQL failed, mocking response: ${err.message}`);
+    response = {
+      products: { nodes: [] },
+      collections: { nodes: [] }
+    };
+  }
 
   const products = response.products?.nodes || [];
   const collections = response.collections?.nodes || [];

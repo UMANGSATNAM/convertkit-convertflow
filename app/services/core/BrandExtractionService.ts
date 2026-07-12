@@ -5,20 +5,27 @@ export class BrandExtractionService {
    * Extracts brand colors and typography from an image base64 (e.g. logo or moodboard).
    * Falls back to a deterministic minimal palette if extraction fails.
    */
-  static async extractBrandAesthetics(imageBase64: string, mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif" = "image/jpeg"): Promise<ExtractedStoreData> {
+  static async extractBrandAesthetics(imageBase64: string, mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif" = "image/jpeg", industry: string = "default"): Promise<ExtractedStoreData & { extractionFailed?: boolean }> {
     try {
       console.log("[BrandExtractionService] Analyzing image via Vision API...");
       const extractedData = await analyzeStoreScreenshot(imageBase64, mediaType);
       return extractedData;
     } catch (error) {
-      console.error("[BrandExtractionService] Extraction failed, falling back to defaults", error);
+      console.error("[BrandExtractionService] WARNING: Brand aesthetics extraction failed. Using deterministic niche-based fallback.", error);
+      
+      const fallbacks: Record<string, any> = {
+        jewellery: { primary: "#C9A84C", secondary: "#F4F1EB", background: "#FAF9F6", text: "#2A2A2A" },
+        beauty: { primary: "#E8C8C8", secondary: "#F8F1F1", background: "#FCFAFA", text: "#3B3333" },
+        clothing: { primary: "#4A5568", secondary: "#E2E8F0", background: "#F7FAFC", text: "#1A202C" },
+        grooming: { primary: "#2D3748", secondary: "#E2E8F0", background: "#F7FAFC", text: "#1A202C" },
+        default: { primary: "#1A1A1A", secondary: "#C9A84C", background: "#FFFFFF", text: "#111111" }
+      };
+      
+      const fallbackColors = fallbacks[industry] || fallbacks.default;
+
       return {
-        colors: {
-          primary: "#1A1A1A",
-          secondary: "#C9A84C",
-          background: "#FFFFFF",
-          text: "#111111"
-        },
+        extractionFailed: true,
+        colors: fallbackColors,
         typography: {
           headingFont: "Inter",
           bodyFont: "Inter"

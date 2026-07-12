@@ -39,14 +39,105 @@ export async function uploadAsset(shop: any, themeId: string, key: string, value
 }
 
 export async function installTheme(shop: any, themeName: string, sourceUrl: string): Promise<{ themeId: string }> {
-  console.log(`Installing theme ${themeName} from ${sourceUrl}`);
+  console.log(`Installing blank theme shell: ${themeName}`);
+  
+  // Layer 1: Empty Theme via REST API
+  // We bypass GraphQL source: URL! requirement by creating a 100% blank theme using REST
+  const data = await restRequest(shop.shopDomain, shop.accessToken, "POST", "themes.json", {
+    theme: {
+      name: themeName,
+      role: "unpublished"
+    }
+  });
+
+  if (!data.theme || !data.theme.id) {
+    throw new Error(`Failed to create theme: ${JSON.stringify(data)}`);
+  }
+
+  const themeId = data.theme.id.toString();
+  
+  // Wait a moment for Shopify to fully propagate the empty theme
+  await new Promise(r => setTimeout(r, 2000));
+  
+  return { themeId };
+}
+
+export async function upsertThemeFilesBatched(shop: any, themeId: string, filesToUpload: Record<string, string>) {
+  console.log(`Starting batched upsert of ${Object.keys(filesToUpload).length} files to theme ${themeId}`);
+  const themeGid = `gid://shopify/OnlineStoreTheme/${themeId}`;
+  
+  const getSortWeight = (filename: string) => {
+    if (filename.endsWith(".liquid")) {
+      if (filename.startsWith("layout/")) return 1;
+      if (filename.startsWith("snippets/")) return 2;
+      if (filename.startsWith("sections/")) return 3;
+      return 4;
+    }
+    if (filename.endsWith(".js") || filename.endsWith(".css")) return 5;
+    if (filename === "config/settings_schema.json") return 6;
+    if (filename === "config/settings_data.json") return 10;
+    
+    if (filename.startsWith("locales/")) return 7;
+    if (filename.startsWith("sections/")) return 8; // e.g. footer-group.json
+    if (filename.startsWith("templates/")) return 9;
+    
+    return 11;
+  };
+
+  const filesArray = Object.entries(filesToUpload)
+    .sort((a, b) => getSortWeight(a[0]) - getSortWeight(b[0]))
+    .map(([filename, content]) => {
+    // If it's a binary file (e.g. image base64), Shopify expects body.value with type BASE64.
+    // For our chassis, everything is text.
+    return {
+      filename,
+      body: { type: "TEXT", value: content }
+    };
+  });
+
+  // Layer 2: Empirical batch size determination
+  // User directive: probe with 51 to capture API error, otherwise use what API dictates or default to 5.
+  let batchSize = 5;
+  const probeBatch = filesArray.slice(0, 51);
+  
+  if (probeBatch.length > 5) {
+    console.log("Probing API limit with a 51-file batch...");
+    const query = `
+      mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
+        themeFilesUpsert(themeId: $themeId, files: $files) {
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+    try {
+      const probeRes = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { themeId: themeGid, files: probeBatch }, true);
+      if (probeRes.themeFilesUpsert?.userErrors?.length > 0) {
+        const msg = probeRes.themeFilesUpsert.userErrors[0].message;
+        console.log(`Probe caught API userError: ${msg}`);
+        // Extract number from message (e.g., "Cannot upload more than 20 files")
+        const match = msg.match(/(\d+)/);
+        if (match) {
+          batchSize = parseInt(match[1], 10);
+          console.log(`Empirically determined batch limit: ${batchSize}`);
+        }
+      } else {
+        // If 51 surprisingly succeeds, use 51!
+        console.log("Probe succeeded with 51 files! Using 51 as batch size.");
+        batchSize = 51;
+      }
+    } catch (e: any) {
+      console.log(`Probe request failed entirely, falling back to batch size 5. Error: ${e.message}`);
+    }
+  }
+
+  console.log(`Proceeding with batch size: ${batchSize}`);
   
   const query = `
-    mutation themeCreate($source: URL!, $name: String!) {
-      themeCreate(source: $source, name: $name) {
-        theme {
-          id
-        }
+    mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
+      themeFilesUpsert(themeId: $themeId, files: $files) {
         userErrors {
           field
           message
@@ -55,35 +146,28 @@ export async function installTheme(shop: any, themeName: string, sourceUrl: stri
     }
   `;
 
-  const data = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { source: sourceUrl, name: themeName }, true);
-  if (data.themeCreate?.userErrors?.length > 0) {
-    throw new Error(`Failed to create theme: ${data.themeCreate.userErrors[0].message}`);
-  }
-
-  const themeIdGid = data.themeCreate.theme.id;
-  const themeId = themeIdGid.split('/').pop();
-
-  // Poll until processing is complete
-  const pollQuery = `
-    query getTheme($id: ID!) {
-      theme(id: $id) {
-        processing
+  // Process all files in dynamically sized batches
+  for (let i = 0; i < filesArray.length; i += batchSize) {
+    const batch = filesArray.slice(i, i + batchSize);
+    console.log(`Uploading batch ${i / batchSize + 1} of ${Math.ceil(filesArray.length / batchSize)} (${batch.length} files)...`);
+    
+    // Shopify GraphQL retry logic
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const res = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { themeId: themeGid, files: batch }, true);
+        if (res.themeFilesUpsert?.userErrors?.length > 0) {
+          throw new Error(`Batch upload userError: ${res.themeFilesUpsert.userErrors[0].message}`);
+        }
+        break; // Success
+      } catch (err: any) {
+        retries--;
+        console.error(`Batch upload failed. Retries left: ${retries}. Error: ${err.message}`);
+        if (retries === 0) throw err;
+        await new Promise(r => setTimeout(r, 2000));
       }
     }
-  `;
-
-  const startTime = Date.now();
-  const timeoutMs = 5 * 60 * 1000; // 5 minutes
-
-  while (Date.now() - startTime < timeoutMs) {
-    const pollData = await graphqlRequest(shop.shopDomain, shop.accessToken, pollQuery, { id: themeIdGid });
-    if (!pollData.theme?.processing) {
-      return { themeId };
-    }
-    await new Promise(resolve => setTimeout(resolve, 3000));
   }
-
-  throw new Error("Theme creation timed out");
 }
 
 export async function publishTheme(shop: any, themeId: string) {

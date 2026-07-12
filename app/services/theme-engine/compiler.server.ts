@@ -147,52 +147,7 @@ async function readDirRecursive(dirPath: string, baseDir: string): Promise<Recor
   return result;
 }
 
-/**
- * Upload a single liquid file with retry on SSL/network errors.
- * Returns true if uploaded, false if skipped/failed (non-fatal).
- */
-async function uploadLiquidWithRetry(
-  shop: any,
-  themeId: string,
-  shopifyAssetKey: string,
-  liquidContent: string,
-  maxRetries = 5
-): Promise<boolean> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const uploaded = await uploadAssetWithCache(shop, themeId, shopifyAssetKey, liquidContent);
-      if (uploaded) {
-        console.log(`[Composer] Uploaded: ${shopifyAssetKey}`);
-      } else {
-        console.log(`[Composer] Cache hit (no change): ${shopifyAssetKey}`);
-      }
-      return true;
-    } catch (err: any) {
-      const rootErr = err.cause || err;
-      const isRetryable =
-        rootErr.code === "EPROTO" ||
-        rootErr.code === "ECONNRESET" ||
-        rootErr.code === "ETIMEDOUT" ||
-        (rootErr.message && rootErr.message.includes("SSL")) ||
-        (err.message && err.message.includes("EPROTO")) ||
-        (err.message && err.message.includes("SSL"));
-
-      if (isRetryable && attempt < maxRetries - 1) {
-        const delay = Math.pow(2, attempt) * 3000 + Math.random() * 1000;
-        console.warn(
-          `[Composer] SSL/Network error uploading ${shopifyAssetKey}. Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${maxRetries})`
-        );
-        await sleep(delay);
-        continue;
-      }
-      console.error(
-        `[Composer] WARN: Failed to upload ${shopifyAssetKey} after ${attempt + 1} attempts: ${err.message}. Continuing...`
-      );
-      return false;
-    }
-  }
-  return false;
-}
+// Note: uploadLiquidWithRetry has been superseded by upsertThemeFilesBatched.
 
 /**
  * Validates theme integrity before uploading to prevent shipping broken or missing files to live storefronts.
@@ -635,7 +590,7 @@ export async function composeThemeFromBlueprint(
   blueprint: StoreBlueprintData,
   components: ComponentRegistry[],
   nicheId: string
-): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any> }> {
+): Promise<{ templates: Record<string, any>; settingsPatch: Record<string, any>; filesToUpload: Record<string, string> }> {
   const startTime = Date.now();
   console.log(`[Composer] Starting theme composition and live Shopify upload for theme ${themeId} (Niche: ${nicheId})`);
 
@@ -660,50 +615,13 @@ export async function composeThemeFromBlueprint(
     templates = assembled.templates;
   }
 
-  // Single-Batch Priority Upload to Shopify
-  let uploadedCount = 0;
-  const keysToUpload = Object.keys(filesToUpload).sort((a, b) => {
-    const getPriority = (key: string): number => {
-      if (
-        key.startsWith("layout/") ||
-        key.startsWith("assets/") ||
-        key.startsWith("snippets/") ||
-        key.startsWith("locales/")
-      ) {
-        return 1;
-      }
-      if (key.startsWith("sections/") && key.endsWith(".liquid")) {
-        return 2;
-      }
-      if (key.startsWith("sections/") && key.endsWith(".json")) {
-        return 3;
-      }
-      if (key.startsWith("templates/")) {
-        return 4;
-      }
-      if (key.startsWith("config/")) {
-        return 5;
-      }
-      return 6;
-    };
-    return getPriority(a) - getPriority(b);
-  });
-
-  console.log(`[Composer] Starting single-batch upload of ${keysToUpload.length} files to Shopify theme ${themeId}`);
-
-  for (const assetKey of keysToUpload) {
-    const content = filesToUpload[assetKey];
-    const success = await uploadLiquidWithRetry(shop, themeId, assetKey, content);
-    if (success) {
-      uploadedCount++;
-    }
-    if (process.env.MOCK_SHOPIFY !== "true") {
-      await sleep(300);
-    }
-  }
+  // Single-Batch Priority Upload to Shopify using Graphql themeFilesUpsert
+  const { upsertThemeFilesBatched } = await import("./index");
+  
+  await upsertThemeFilesBatched(shop, themeId, filesToUpload);
 
   const durationMs = Date.now() - startTime;
-  console.log(`[Composer] Batch upload complete: ${uploadedCount}/${keysToUpload.length} files processed in ${durationMs}ms.`);
+  console.log(`[Composer] Batched upload complete for theme ${themeId} in ${durationMs}ms.`);
 
-  return { templates, settingsPatch: blueprint.settings };
+  return { templates, settingsPatch: blueprint.settings, filesToUpload };
 }
