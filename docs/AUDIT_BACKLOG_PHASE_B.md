@@ -55,3 +55,19 @@ An audit comparing `shopify.app.toml` against active granted session scopes reve
 1. **Worker Handler Inspection:** Inspect the BullMQ worker processors listening to `checkouts/create`, `checkouts/update`, and `orders/create`.
 2. **Webhook Cleanup:** If these webhooks do not power an active core conversion/theme feature, unregister them from `shopify.app.toml` to reduce unnecessary background event processing and webhook delivery load.
 3. **Queue Optimization:** Ensure `GenerationJob` task processing utilizes the existing idempotency table for safe retry semantics.
+
+---
+
+## 3. Chassis Quality & Compliance Gaps (Blocking "Pro" Quality / App Store Rejection Risk)
+
+### Finding
+An audit of the current chassis and generated theme bundle identified 8 blocking quality and compliance gaps that must be resolved:
+1. **`templates/gift_card.liquid` MISSING:** Mandatory for Shopify OS 2.0 themes; absence causes automatic App Store / theme validation rejection.
+2. **`assets/motion.js` MISSING:** Does not exist (~3KB). Required for scroll reveals, hover lift, image zoom, and smooth transitions (the single biggest visual-quality gap).
+3. **Typography Scale missing in Token Engine:** While `Playfair Display` and body fonts are extracted, display hierarchy scales, tracking, and leading are not compiled into CSS tokens.
+4. **Font Preload missing in `layout/theme.liquid`:** Causes Flash of Unstyled Text (FOUT) on storefront load.
+5. **JSON-LD Structured Data Incomplete:** Must include `Organization`, `WebSite` + `SearchAction`, `Product` (with `offers` & `aggregateRating`), `BreadcrumbList`, `FAQPage`, `Article`, and `ItemList`.
+6. **`sections/overlay-group.json` MISSING:** Popups and modals have no layout group to anchor to.
+7. **`locales/en.default.schema.json` Verification:** Verify existence so theme editor renders human-readable labels instead of raw schema translation keys.
+8. **`snippets/predictive-search.liquid` MISSING:** Required for instant search drawer and accessible search experience.
+

@@ -114,4 +114,22 @@
 - **Risk Note (Production Safety):** Currently `Dockerfile` CMD runs `npx prisma db push --accept-data-loss`. This MUST be replaced with `npx prisma migrate deploy` as Phase B Kickoff Item #1 prior to shipping persistent merchant tables (`Shop`, `GenerationJob`, `ThemeDeployment`, `StoreDNA`) to prevent accidental production data wipes.
 - **Status:** **LOCKED**
 
+## Decision #16 — Product positioning: Store OS, not theme generator
+- **Rule:** Shop Forge is not a one-time theme generator (that's a ₹5-10k one-time sale that gets uninstalled). It is a recurring-use Store OS.
+- **Structural Advantage:** We compile the theme, so we can deliver natively in Liquid what merchants currently pay 10 separate CRO apps for (~₹12,300/mo) — with zero injected JS and a faster store.
+- **Long-term Modules:** CRO Suite (app replacement), Campaign/Festival Engine, Conversion Diagnostics, A/B Testing.
+- **Status:** **LOCKED**
 
+## Decision #17 — Variety comes from combinatorics, not unlimited components
+- **Rule:** ~45 section types × 5 design directions (LUXURY / MINIMAL / BOLD / EDITORIAL / PLAYFUL) = ~225 components, + 30 PDP blocks + 8 card variants ≈ 260 total. With ~10 homepage slots × ~5 candidates each = ~10^7 homepage permutations, multiplied by extracted token palettes, DNA-driven section order, and AI content.
+- **Principle:** We do not build 1,000 components. We build 260 excellent ones and let combinatorics create the infinity.
+- **Status:** **LOCKED**
+
+## Decision #18 — Section order is DNA-driven, never random
+- **Rule:** Order recipes are selected by Store DNA (catalog size, price band, review count, brand archetype):
+  - Small catalog + high price → storytelling-first (hero → brand story → craftsmanship → few products → testimonials)
+  - Large catalog + mid price → discovery-first (hero → USP → categories → bestsellers → deals)
+  - New store, low reviews → trust-compensating (hero → USP → founder note → guarantee → FAQ)
+  - Established, high reviews → social-proof-first (hero → reviews → bestsellers → UGC → press)
+- **Enforcement:** This supersedes the reverted jitter experiment (Incident #8). Randomness is banned; variety is deterministic.
+- **Status:** **LOCKED**
