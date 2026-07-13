@@ -255,7 +255,7 @@ export function initGeneratorWorker() {
         }
 
         const fallbackSettings = {
-          colors_background_1: brandContext.colors?.background || brandContext.colors?.accent || "#FFFFFF",
+          colors_background_1: brandContext.colors?.background || "#FFFFFF",
           colors_accent_1: brandContext.colors?.primary || "#111111",
           colors_accent_2: brandContext.colors?.accent || "#C9A84C",
           colors_text_1: brandContext.colors?.text || "#111111",

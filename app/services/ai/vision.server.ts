@@ -51,7 +51,7 @@ You must return ONLY a JSON object matching this schema:
 
 Guidelines:
 1. Analyze the exact layout from top to bottom and map them to the available section types.
-2. Extract the exact hex codes for colors.
+2. Extract the exact hex codes for colors. CRITICAL: The background MUST be a neutral color (e.g. #FFFFFF, #F4F4F4, or a very dark shade for dark mode). NEVER assign vibrant, highly saturated accent colors (like gold, crimson, bright blue) to the background field. If the store uses a vibrant color purely as an accent, put it in primary or secondary.
 3. Guess the closest Google Font for typography.
 `;
 

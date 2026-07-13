@@ -291,6 +291,9 @@ export async function compileTheme(
   // Stage 7: CSS Token Resolver (4 Deterministic Layers)
   const cssTokens = await resolveCSSTokens(blueprint, dependencies);
   await saveArtifact(compileDir, "07-css.json", cssTokens);
+  
+  // Inject generated tokens into the upload payload, overwriting the Stage 2 hardcoded placeholder
+  filesToUpload["assets/niche-tokens.css"] = cssTokens.cssOutput;
 
   // Stage 8: Manifest Builder
   const manifest = await buildManifest({

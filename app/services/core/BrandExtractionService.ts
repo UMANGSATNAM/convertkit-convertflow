@@ -9,9 +9,15 @@ export class BrandExtractionService {
     try {
       console.log("[BrandExtractionService] Analyzing image via Vision API...");
       const extractedData = await analyzeStoreScreenshot(imageBase64, mediaType);
+      
+      console.log(`[BrandExtractionService] 🟢 SUCCESS! Extracted Brand DNA:`);
+      console.log(`   Archetype: ${extractedData.archetype} | Tone: ${extractedData.tone}`);
+      console.log(`   Colors: Primary=${extractedData.colors?.primary}, Secondary=${extractedData.colors?.secondary}, Accent=${extractedData.colors?.accent}, Background=${extractedData.colors?.background}`);
+      console.log(`   Fonts: Heading=${extractedData.typography?.headingFont}, Body=${extractedData.typography?.bodyFont}`);
+      
       return extractedData;
     } catch (error) {
-      console.error("[BrandExtractionService] WARNING: Brand aesthetics extraction failed. Using deterministic niche-based fallback.", error);
+      console.error("[BrandExtractionService] 🔴 WARNING: Brand aesthetics extraction failed. Using deterministic niche-based fallback.", error);
       
       const fallbacks: Record<string, any> = {
         jewellery: { primary: "#C9A84C", secondary: "#F4F1EB", background: "#FAF9F6", text: "#2A2A2A" },
@@ -50,11 +56,13 @@ export class BrandExtractionService {
     }
 
     return {
-      colors_accent_1: extractedData.colors.primary || "#1A1A1A",
-      colors_accent_2: extractedData.colors.secondary || "#C9A84C",
-      colors_background_1: extractedData.colors.background || "#FFFFFF",
-      colors_text_1: extractedData.colors.text || "#111111",
-      colors_surface: "#F4F4F4"         // Standard light surface
+      colors_accent_1: extractedData.colors.secondary || extractedData.colors.text || "#1A1A1A",   // Main Text
+      colors_accent_2: extractedData.colors.primary || extractedData.colors.accent || "#C9A84C",    // CTA/Accent
+      colors_background_1: (extractedData.colors.background && extractedData.colors.background.startsWith("#")) ? extractedData.colors.background : "#FFFFFF",                            // Background (never use accent)
+      colors_text_1: extractedData.colors.secondary || extractedData.colors.text || "#111111",      // Body Text
+      colors_surface: "#F4F4F4",                                                                    // Surface
+      fontHeading: extractedData.typography?.headingFont || "Inter",
+      fontBody: extractedData.typography?.bodyFont || "Inter"
     };
   }
 }

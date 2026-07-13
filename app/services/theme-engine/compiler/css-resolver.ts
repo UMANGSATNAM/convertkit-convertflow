@@ -49,6 +49,9 @@ export type TokenFileFetcher = (layer: "base-tokens" | "theme-dna", input: CSSRe
 function generateMerchantTokens(
   overrides: Record<string, string>
 ): Record<string, string> {
+  const tokens: Record<string, string> = {};
+  
+  // Legacy map support
   const MERCHANT_TOKEN_MAP: Record<string, string> = {
     color_primary:    "--color-primary",
     color_secondary:  "--color-secondary",
@@ -59,13 +62,32 @@ function generateMerchantTokens(
     font_body:        "--font-body",
     border_radius:    "--radius-base",
   };
-
-  const tokens: Record<string, string> = {};
   for (const [settingKey, cssVar] of Object.entries(MERCHANT_TOKEN_MAP)) {
     if (overrides[settingKey]) {
       tokens[cssVar] = overrides[settingKey];
     }
   }
+
+  // Modern Blueprint Settings map support
+  if (overrides.colors_background_1) tokens["--color-background"] = overrides.colors_background_1;
+  if (overrides.colors_accent_1) tokens["--color-text"] = overrides.colors_accent_1;
+  if (overrides.colors_accent_2) tokens["--color-accent"] = overrides.colors_accent_2;
+  if (overrides.colors_text_1) tokens["--color-text-body"] = overrides.colors_text_1;
+  if (overrides.colors_surface) tokens["--color-surface"] = overrides.colors_surface;
+  
+  if (overrides.fontHeading) tokens["--font-heading-family"] = `'${overrides.fontHeading}', sans-serif`;
+  if (overrides.fontBody) tokens["--font-body-family"] = `'${overrides.fontBody}', sans-serif`;
+  
+  if (overrides.card_style) {
+    tokens["--card-radius"] = overrides.card_style === 'soft' ? '12px' : overrides.card_style === 'rounded' ? '24px' : '0px';
+  }
+  if (overrides.button_style) {
+    tokens["--button-radius"] = overrides.button_style === 'pill' ? '50px' : overrides.button_style === 'rounded' ? '8px' : '0px';
+  }
+  if (overrides.section_density) {
+    tokens["--section-padding-y"] = overrides.section_density === 'airy' ? '80px' : overrides.section_density === 'tight' ? '40px' : '60px';
+  }
+  
   return tokens;
 }
 
