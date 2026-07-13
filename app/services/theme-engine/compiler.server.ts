@@ -172,6 +172,28 @@ export function validateThemeIntegrity(
     }
   }
 
+  // Ensure settings_schema.json font_picker defaults use valid Shopify font IDs
+  try {
+    const schemaContent = filesToUpload["config/settings_schema.json"];
+    const schemaJson = JSON.parse(schemaContent);
+    if (Array.isArray(schemaJson)) {
+      for (const group of schemaJson) {
+        if (Array.isArray(group.settings)) {
+          for (const s of group.settings) {
+            if (s && s.type === "font_picker" && s.default) {
+              if (!/^[a-z0-9_]+_[ni]\d$/.test(s.default)) {
+                throw new ValidationError(`Invalid Shopify font_picker default '${s.default}' for setting '${s.id}' in config/settings_schema.json`);
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    if (err instanceof ValidationError) throw err;
+    throw new ValidationError(`Failed to validate config/settings_schema.json: ${err.message}`);
+  }
+
   for (const [pageHandle, pageData] of Object.entries(blueprint.pages || {})) {
     for (const section of pageData.sections || []) {
       const component = components.find(c => c.componentId === section.componentId);
@@ -256,12 +278,14 @@ export async function compileTheme(
   await fs.mkdir(compileDir, { recursive: true });
 
   console.log(`[Compiler] Starting compilation run: ${runId}`);
-  await loadVerifiedComponents();
+  const componentsRegistryArray = Array.isArray(componentsRegistry)
+    ? componentsRegistry
+    : await loadVerifiedComponents();
   await saveArtifact(compileDir, "01-blueprint.json", blueprint);
 
   const { filesToUpload, templates, stage3Results } = await assembleThemeBundle(
     blueprint,
-    componentsRegistry,
+    componentsRegistryArray,
     brandProfile?.industry || 'default'
   );
 

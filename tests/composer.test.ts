@@ -53,16 +53,22 @@ vi.mock('../app/services/theme-engine/validators.server', () => {
   };
 });
 
+vi.mock('../app/services/theme-engine/index', () => ({
+  upsertThemeFilesBatched: vi.fn().mockResolvedValue({ uploaded: [], errors: [] })
+}));
+
 vi.mock('fs/promises', () => {
   return {
     default: {
       readdir: vi.fn(),
       readFile: vi.fn(),
-      stat: vi.fn()
+      stat: vi.fn(),
+      mkdir: vi.fn()
     },
     readdir: vi.fn(),
     readFile: vi.fn(),
-    stat: vi.fn()
+    stat: vi.fn(),
+    mkdir: vi.fn()
   };
 });
 
@@ -366,6 +372,9 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
           ]
         });
       }
+      if (fileStr.includes('settings_schema.json')) return '[]';
+      if (fileStr.includes('settings_data.json')) return '{}';
+      if (fileStr.includes('en.default.json')) return '{}';
       if (fileStr.includes('hero-banner.liquid')) return 'hero liquid';
       if (fileStr.includes('featured-collection.liquid')) return 'featured collection liquid';
       return 'generic core content';
@@ -375,7 +384,66 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     const result = await composeThemeFromBlueprint(mockShop, mockThemeId, mockBlueprint, mockRegistry, 'ai-custom');
 
     expect(result).toBeDefined();
-    // It should have injected the default fallback token content
     expect(result.templates['templates/index.json']).toBeDefined();
   }, 15000);
+
+  describe('validateThemeIntegrity font_picker guards', () => {
+    it('rejects theme with invalid font_picker defaults in settings_schema.json', () => {
+      const invalidSchema = JSON.stringify([
+        {
+          name: 'Typography',
+          settings: [
+            {
+              type: 'font_picker',
+              id: 'font_heading',
+              default: 'sans-serif'
+            }
+          ]
+        }
+      ]);
+
+      expect(() =>
+        validateThemeIntegrity(
+          {
+            'layout/theme.liquid': '<html></html>',
+            'config/settings_schema.json': invalidSchema,
+            'config/settings_data.json': '{}',
+            'locales/en.default.json': '{}',
+            'assets/niche-tokens.css': ':root {}'
+          },
+          { pages: {} } as any,
+          []
+        )
+      ).toThrowError(ValidationError);
+    });
+
+    it('passes valid settings_schema.json with Shopify-conformant font IDs', () => {
+      const validSchema = JSON.stringify([
+        {
+          name: 'Typography',
+          settings: [
+            {
+              type: 'font_picker',
+              id: 'font_heading',
+              default: 'assistant_n4'
+            }
+          ]
+        }
+      ]);
+
+      expect(() =>
+        validateThemeIntegrity(
+          {
+            'layout/theme.liquid': '<html></html>',
+            'config/settings_schema.json': validSchema,
+            'config/settings_data.json': '{}',
+            'locales/en.default.json': '{}',
+            'assets/niche-tokens.css': ':root {}'
+          },
+          { pages: {} } as any,
+          []
+        )
+      ).not.toThrow();
+    });
+  });
 });
