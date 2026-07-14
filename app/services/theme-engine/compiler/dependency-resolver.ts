@@ -177,7 +177,9 @@ export async function resolveDependencies(
     }
 
     // Try reading metaPath from filesystem if available
-    const registryEntry = componentsRegistry.find(c => c.componentId === id || c.componentId.includes(id));
+    const registryEntry = Array.isArray(componentsRegistry)
+      ? componentsRegistry.find(c => c.componentId === id || c.componentId.includes(id))
+      : undefined;
     if (registryEntry && (registryEntry as any).metaPath) {
       try {
         const metaPath = (registryEntry as any).metaPath;

@@ -64,6 +64,14 @@ export async function installTheme(shop: any, themeName: string, sourceUrl: stri
 
 export async function upsertThemeFilesBatched(shop: any, themeId: string, filesToUpload: Record<string, string>) {
   console.log(`Starting batched upsert of ${Object.keys(filesToUpload).length} files to theme ${themeId}`);
+  if (process.env.MOCK_SHOPIFY === "true") {
+    console.log(`[Mock Upload Batch] MOCK_SHOPIFY=true, bypassing GraphQL upload for ${Object.keys(filesToUpload).length} files.`);
+    const { uploadAssetWithCache } = await import("./asset-cache.server");
+    for (const [filename, content] of Object.entries(filesToUpload)) {
+      await uploadAssetWithCache(shop, themeId, filename, content);
+    }
+    return;
+  }
   const themeGid = `gid://shopify/OnlineStoreTheme/${themeId}`;
   
   const getSortWeight = (filename: string) => {
@@ -96,12 +104,12 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
   });
 
   // Layer 2: Empirical batch size determination
-  // User directive: probe with 51 to capture API error, otherwise use what API dictates or default to 5.
-  let batchSize = 5;
-  const probeBatch = filesArray.slice(0, 51);
+  let batchSize = 50;
+  let startIndex = 0;
+  const probeBatch = filesArray.slice(0, Math.min(filesArray.length, 50));
   
   if (probeBatch.length > 5) {
-    console.log("Probing API limit with a 51-file batch...");
+    console.log(`Probing API limit with a ${probeBatch.length}-file batch...`);
     const query = `
       mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
         themeFilesUpsert(themeId: $themeId, files: $files) {
@@ -117,23 +125,34 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
       if (probeRes.themeFilesUpsert?.userErrors?.length > 0) {
         const msg = probeRes.themeFilesUpsert.userErrors[0].message;
         console.log(`Probe caught API userError: ${msg}`);
-        // Extract number from message (e.g., "Cannot upload more than 20 files")
         const match = msg.match(/(\d+)/);
         if (match) {
-          batchSize = parseInt(match[1], 10);
+          batchSize = Math.min(parseInt(match[1], 10), 50);
           console.log(`Empirically determined batch limit: ${batchSize}`);
+        } else {
+          batchSize = 5;
         }
+        startIndex = 0;
       } else {
-        // If 51 surprisingly succeeds, use 51!
-        console.log("Probe succeeded with 51 files! Using 51 as batch size.");
-        batchSize = 51;
+        console.log(`Probe succeeded! First ${probeBatch.length} files uploaded.`);
+        batchSize = 50;
+        startIndex = probeBatch.length;
       }
     } catch (e: any) {
+      if (
+        e.name === "NonRetryableShopifyError" ||
+        (e.message && (e.message.includes("401") || e.message.includes("403") || e.message.includes("Invalid API key")))
+      ) {
+        throw e;
+      }
       console.log(`Probe request failed entirely, falling back to batch size 5. Error: ${e.message}`);
+      batchSize = 5;
+      startIndex = 0;
     }
   }
 
-  console.log(`Proceeding with batch size: ${batchSize}`);
+  batchSize = Math.min(batchSize, 50);
+  console.log(`Proceeding with batch size: ${batchSize} starting from index ${startIndex}`);
   
   const query = `
     mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
@@ -146,8 +165,8 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
     }
   `;
 
-  // Process all files in dynamically sized batches
-  for (let i = 0; i < filesArray.length; i += batchSize) {
+  // Process remaining files in dynamically sized batches
+  for (let i = startIndex; i < filesArray.length; i += batchSize) {
     const batch = filesArray.slice(i, i + batchSize);
     console.log(`Uploading batch ${i / batchSize + 1} of ${Math.ceil(filesArray.length / batchSize)} (${batch.length} files)...`);
     
@@ -161,10 +180,18 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
         }
         break; // Success
       } catch (err: any) {
+        if (
+          err.name === "NonRetryableShopifyError" ||
+          (err.message && (err.message.includes("401") || err.message.includes("403") || err.message.includes("Invalid API key")))
+        ) {
+          throw err;
+        }
         retries--;
         console.error(`Batch upload failed. Retries left: ${retries}. Error: ${err.message}`);
         if (retries === 0) throw err;
-        await new Promise(r => setTimeout(r, 2000));
+        const isThrottled = err.message && (err.message.includes("THROTTLED") || err.message.includes("429"));
+        const delayMs = isThrottled ? Math.pow(2, 3 - retries) * 100 : 50;
+        await new Promise(r => setTimeout(r, delayMs));
       }
     }
   }

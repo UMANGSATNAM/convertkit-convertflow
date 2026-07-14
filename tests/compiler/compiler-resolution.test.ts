@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveComponentLiquidContent } from '../../app/services/theme-engine/compiler.server';
+import { resolveComponentLiquidContent, generateGoogleFontsHeadLinks } from '../../app/services/theme-engine/compiler.server';
 import * as path from 'path';
 
 describe('resolveComponentLiquidContent (Registry-Direct Resolution & Defenses)', () => {
@@ -73,5 +73,18 @@ describe('resolveComponentLiquidContent (Registry-Direct Resolution & Defenses)'
     await expect(
       resolveComponentLiquidContent({ componentId: compId }, testRegistry)
     ).rejects.toThrow(/Security Error: Path traversal attempt detected/i);
+  });
+});
+
+describe('generateGoogleFontsHeadLinks (Dynamic Google Webfont Head Injection)', () => {
+  it('generates single family query when heading and body fonts are identical', () => {
+    const markup = generateGoogleFontsHeadLinks('Inter', 'Inter');
+    expect(markup).toContain('family=Inter:wght@400;500;600;700&display=swap');
+    expect(markup).toContain('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>');
+  });
+
+  it('generates dual family query when heading and body fonts differ', () => {
+    const markup = generateGoogleFontsHeadLinks('Playfair Display', 'Inter');
+    expect(markup).toContain('family=Playfair+Display:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
   });
 });

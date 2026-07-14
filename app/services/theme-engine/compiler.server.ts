@@ -464,6 +464,21 @@ export async function resolveComponentLiquidContent(component: any, customRegist
 }
 
 /**
+ * Dynamic Google Fonts link generator for theme.liquid head injection.
+ */
+export function generateGoogleFontsHeadLinks(headingFontInput?: string, bodyFontInput?: string): string {
+  const heading = (headingFontInput || 'Inter').trim().replace(/['"]/g, '').replace(/\s+/g, '+');
+  const body = (bodyFontInput || 'Inter').trim().replace(/['"]/g, '').replace(/\s+/g, '+');
+  let familiesQuery = '';
+  if (heading === body) {
+    familiesQuery = `family=${heading}:wght@400;500;600;700`;
+  } else {
+    familiesQuery = `family=${heading}:wght@400;500;700&family=${body}:wght@400;500;600`;
+  }
+  return `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${familiesQuery}&display=swap">`;
+}
+
+/**
  * The Theme Composer takes the Store Blueprint and the matched components from the registry.
  * It compiles the core files, niche files, and database sections into a single merged theme map.
  * It executes the 10-stage deterministic compiler, validates the structure, and uploads files in batch to Shopify.
@@ -489,18 +504,51 @@ export async function assembleThemeBundle(
 
   // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
+  const fontHeading = settings.fontHeading || settings.font_heading || 'Inter';
+  const fontBody = settings.fontBody || settings.font_body || 'Inter';
+  const isLuxury = settings.designDirection === 'LUXURY';
+  const isBold = settings.designDirection === 'BOLD';
+
   filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
   --color-background: ${settings.colors_background_1 || '#ffffff'};
-  --color-text: ${settings.colors_accent_1 || '#1a1a1a'};
+  --color-text: ${settings.colors_text_1 || settings.colors_accent_1 || '#1a1a1a'};
+  --color-text-muted: #64748b;
+  --color-text-secondary: #64748b;
   --color-accent: ${settings.colors_accent_2 || '#008060'};
   --color-border: #e2e8f0;
-  --font-heading-family: '${settings.fontHeading || 'Inter'}', sans-serif;
-  --font-body-family: '${settings.fontBody || 'Inter'}', sans-serif;
+  --color-surface: ${settings.colors_surface || '#f8fafc'};
+  --font-heading-family: '${fontHeading}', sans-serif;
+  --font-body-family: '${fontBody}', sans-serif;
   --card-radius: ${settings.card_style === 'soft' ? '12px' : settings.card_style === 'rounded' ? '24px' : '0px'};
   --button-radius: ${settings.button_style === 'pill' ? '50px' : settings.button_style === 'rounded' ? '8px' : '0px'};
   --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
+  --font-display: ${isLuxury ? 'clamp(2.75rem, 6.5vw, 5.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)'};
+  --font-h1: clamp(2rem, 4vw, 3.5rem);
+  --font-h2: clamp(1.5rem, 3vw, 2.5rem);
+  --font-h3: 1.25rem;
+  --font-body: 1rem;
+  --font-small: 0.875rem;
+  --font-eyebrow: 0.75rem;
+  --tracking-tight: ${isBold ? '-0.04em' : '-0.02em'};
+  --tracking-wide: ${isLuxury ? '0.2em' : '0.15em'};
+  --leading-tight: ${isBold ? '1.05' : isLuxury ? '1.15' : '1.1'};
+  --leading-body: 1.6;
 }`;
+
+  const googleFontsLinks = generateGoogleFontsHeadLinks(fontHeading, fontBody);
+  if (filesToUpload["layout/theme.liquid"]) {
+    filesToUpload["layout/theme.liquid"] = filesToUpload["layout/theme.liquid"].replace(
+      /<!-- Structural and Niche Styling Files -->/,
+      `${googleFontsLinks}\n    <!-- Structural and Niche Styling Files -->`
+    );
+  }
+  if (filesToUpload["layout/password.liquid"]) {
+    filesToUpload["layout/password.liquid"] = filesToUpload["layout/password.liquid"].replace(
+      /{{ 'base-tokens\.css' \| asset_url \| stylesheet_tag }}/,
+      `${googleFontsLinks}\n    {{ 'base-tokens.css' | asset_url | stylesheet_tag }}`
+    );
+  }
 
   // Step 3: Build & Inject JSON Templates
   const assembledComponents: ComponentRegistry[] = [];

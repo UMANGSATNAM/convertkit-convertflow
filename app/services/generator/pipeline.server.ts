@@ -9,6 +9,7 @@ import { analyzeCatalog } from "../ai/catalog-analyzer.server";
 import { analyzeVisualAssets } from "../ai/visual-analyzer.server";
 import { analyzeBrand } from "../ai/brand-analyzer.server";
 import { BrandExtractionService } from "../core/BrandExtractionService";
+import { ContentGenerationService } from "../core/ContentGenerationService";
 import { analyzeCRO } from "../ai/cro-analyzer.server";
 import { repairSectionJSON } from "../ai/repair-engine.server";
 import { retrieveBestComponent } from "../theme-engine/retrieval.server";
@@ -281,13 +282,32 @@ export function initGeneratorWorker() {
 
         const storeBlueprintAi = {
           pages: {
-            "index": { sections: resolvedSections },             // Variant 1: Light (Default)
-            "index.alternate": { sections: resolvedSections }    // Variant 2: Dark
+            "index": { sections: resolvedSections }
           },
           settings: baseSettings,
           globalComponents
         };
         console.log("Store Blueprint assembled with sections:", resolvedSections.length);
+
+        // 9b. GENERATE & INJECT NICHE COPY (SECTION INSTANCE KEYED)
+        await updateStatus("GENERATING_COPY", "Crafting culturally tailored Indian D2C copy...");
+        const copyResult = await ContentGenerationService.generateStoreContent({
+          shopDomain: shop.shopDomain,
+          storeName: shop.name || "Store",
+          industry: catalogContext.industry || "General",
+          brandArchetype: brandContext.brand_archetype,
+          tone: brandContext.tone_of_voice,
+          blueprint: storeBlueprintAi,
+          catalogSummary: {
+            totalProducts: catalogContext.productCount || 10,
+            topCategories: catalogContext.categories || [],
+            priceRange: catalogContext.priceRange,
+            heroProduct: catalogContext.heroProduct,
+            topProducts: catalogContext.topProducts || []
+          }
+        });
+        ContentGenerationService.injectContentIntoBlueprint(storeBlueprintAi, copyResult.content);
+        console.log("[Pipeline] Store content generated and injected into storeBlueprintAi. Fallback used:", copyResult.isFallback);
 
         const matchedComponentsList = resolvedSections;
         console.log("Matched components retrieved count:", matchedComponentsList.length);

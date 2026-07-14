@@ -51,10 +51,6 @@ vi.mock('../../app/services/theme-engine/asset-cache.server', () => {
   };
 });
 
-vi.mock('../../app/services/theme-engine/index', () => ({
-  upsertThemeFilesBatched: vi.fn().mockResolvedValue(undefined)
-}));
-
 describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
   vi.setConfig({ testTimeout: 15000 });
   const sandboxDir = path.join(process.cwd(), 'tmp', 'test-component-replacement');

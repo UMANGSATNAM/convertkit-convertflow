@@ -70,13 +70,17 @@ function generateMerchantTokens(
 
   // Modern Blueprint Settings map support
   if (overrides.colors_background_1) tokens["--color-background"] = overrides.colors_background_1;
-  if (overrides.colors_accent_1) tokens["--color-text"] = overrides.colors_accent_1;
+  if (overrides.colors_text_1 || overrides.colors_accent_1) tokens["--color-text"] = overrides.colors_text_1 || overrides.colors_accent_1;
   if (overrides.colors_accent_2) tokens["--color-accent"] = overrides.colors_accent_2;
-  if (overrides.colors_text_1) tokens["--color-text-body"] = overrides.colors_text_1;
   if (overrides.colors_surface) tokens["--color-surface"] = overrides.colors_surface;
+  tokens["--color-text-muted"] = "#64748b";
+  tokens["--color-text-secondary"] = "#64748b";
+  tokens["--color-border"] = "#e2e8f0";
   
-  if (overrides.fontHeading) tokens["--font-heading-family"] = `'${overrides.fontHeading}', sans-serif`;
-  if (overrides.fontBody) tokens["--font-body-family"] = `'${overrides.fontBody}', sans-serif`;
+  const headingFont = overrides.fontHeading || overrides.font_heading;
+  const bodyFont = overrides.fontBody || overrides.font_body;
+  if (headingFont) tokens["--font-heading-family"] = `'${headingFont}', sans-serif`;
+  if (bodyFont) tokens["--font-body-family"] = `'${bodyFont}', sans-serif`;
   
   if (overrides.card_style) {
     tokens["--card-radius"] = overrides.card_style === 'soft' ? '12px' : overrides.card_style === 'rounded' ? '24px' : '0px';
@@ -87,6 +91,20 @@ function generateMerchantTokens(
   if (overrides.section_density) {
     tokens["--section-padding-y"] = overrides.section_density === 'airy' ? '80px' : overrides.section_density === 'tight' ? '40px' : '60px';
   }
+
+  const isLuxury = overrides.designDirection === 'LUXURY';
+  const isBold = overrides.designDirection === 'BOLD';
+  tokens["--font-display"] = isLuxury ? 'clamp(2.75rem, 6.5vw, 5.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)';
+  tokens["--font-h1"] = 'clamp(2rem, 4vw, 3.5rem)';
+  tokens["--font-h2"] = 'clamp(1.5rem, 3vw, 2.5rem)';
+  tokens["--font-h3"] = '1.25rem';
+  tokens["--font-body"] = '1rem';
+  tokens["--font-small"] = '0.875rem';
+  tokens["--font-eyebrow"] = '0.75rem';
+  tokens["--tracking-tight"] = isBold ? '-0.04em' : '-0.02em';
+  tokens["--tracking-wide"] = isLuxury ? '0.2em' : '0.15em';
+  tokens["--leading-tight"] = isBold ? '1.05' : isLuxury ? '1.15' : '1.1';
+  tokens["--leading-body"] = '1.6';
   
   return tokens;
 }
