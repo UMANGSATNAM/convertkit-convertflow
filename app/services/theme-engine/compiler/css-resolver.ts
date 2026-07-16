@@ -46,7 +46,7 @@ export type TokenFileFetcher = (layer: "base-tokens" | "theme-dna", input: CSSRe
 
 // ─── Merchant Override Generator ─────────────────────────────────────────────
 
-function generateMerchantTokens(
+export function generateMerchantTokens(
   overrides: Record<string, string>
 ): Record<string, string> {
   const tokens: Record<string, string> = {};
@@ -70,17 +70,28 @@ function generateMerchantTokens(
 
   // Modern Blueprint Settings map support
   if (overrides.colors_background_1) tokens["--color-background"] = overrides.colors_background_1;
-  if (overrides.colors_text_1 || overrides.colors_accent_1) tokens["--color-text"] = overrides.colors_text_1 || overrides.colors_accent_1;
+  if (overrides.colors_text_1 || overrides.colors_text || overrides.colors_accent_1) tokens["--color-text"] = overrides.colors_text_1 || overrides.colors_text || overrides.colors_accent_1;
   if (overrides.colors_accent_2) tokens["--color-accent"] = overrides.colors_accent_2;
   if (overrides.colors_surface) tokens["--color-surface"] = overrides.colors_surface;
   tokens["--color-text-muted"] = "#64748b";
   tokens["--color-text-secondary"] = "#64748b";
   tokens["--color-border"] = "#e2e8f0";
   
+  const isLuxury = overrides.designDirection === 'LUXURY';
+  const isBold = overrides.designDirection === 'BOLD';
+
   const headingFont = overrides.fontHeading || overrides.font_heading;
   const bodyFont = overrides.fontBody || overrides.font_body;
-  if (headingFont) tokens["--font-heading-family"] = `'${headingFont}', sans-serif`;
-  if (bodyFont) tokens["--font-body-family"] = `'${bodyFont}', sans-serif`;
+  if (headingFont) {
+    tokens["--font-heading-family"] = `'${headingFont}', sans-serif`;
+  } else if (isLuxury) {
+    tokens["--font-heading-family"] = "'Playfair Display', Georgia, serif";
+  }
+  if (bodyFont) {
+    tokens["--font-body-family"] = `'${bodyFont}', sans-serif`;
+  } else {
+    tokens["--font-body-family"] = "'Inter', -apple-system, sans-serif";
+  }
   
   if (overrides.card_style) {
     tokens["--card-radius"] = overrides.card_style === 'soft' ? '12px' : overrides.card_style === 'rounded' ? '24px' : '0px';
@@ -92,19 +103,28 @@ function generateMerchantTokens(
     tokens["--section-padding-y"] = overrides.section_density === 'airy' ? '80px' : overrides.section_density === 'tight' ? '40px' : '60px';
   }
 
-  const isLuxury = overrides.designDirection === 'LUXURY';
-  const isBold = overrides.designDirection === 'BOLD';
-  tokens["--font-display"] = isLuxury ? 'clamp(2.75rem, 6.5vw, 5.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)';
-  tokens["--font-h1"] = 'clamp(2rem, 4vw, 3.5rem)';
-  tokens["--font-h2"] = 'clamp(1.5rem, 3vw, 2.5rem)';
+  tokens["--weight-display"] = isLuxury ? "400" : "700";
+  tokens["--weight-heading"] = isLuxury ? "500" : "600";
+  tokens["--weight-body"] = "400";
+  tokens["--weight-emphasis"] = "600";
+
+  tokens["--font-display"] = isLuxury ? 'clamp(2.75rem, 5.5vw, 4.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)';
+  tokens["--font-h1"] = isLuxury ? 'clamp(2rem, 4vw, 3rem)' : 'clamp(2rem, 4vw, 3.5rem)';
+  tokens["--font-h2"] = isLuxury ? 'clamp(1.5rem, 3vw, 2.25rem)' : 'clamp(1.5rem, 3vw, 2.5rem)';
   tokens["--font-h3"] = '1.25rem';
   tokens["--font-body"] = '1rem';
-  tokens["--font-small"] = '0.875rem';
-  tokens["--font-eyebrow"] = '0.75rem';
-  tokens["--tracking-tight"] = isBold ? '-0.04em' : '-0.02em';
+  tokens["--font-small"] = isLuxury ? '0.8125rem' : '0.875rem';
+  tokens["--font-eyebrow"] = isLuxury ? '0.6875rem' : '0.75rem';
+
+  tokens["--tracking-eyebrow"] = isLuxury ? '0.2em' : '0.15em';
+  tokens["--tracking-display"] = isLuxury ? '-0.01em' : isBold ? '-0.04em' : '-0.02em';
+  tokens["--tracking-body"] = '0';
+  tokens["--tracking-tight"] = isBold ? '-0.04em' : '-0.01em';
   tokens["--tracking-wide"] = isLuxury ? '0.2em' : '0.15em';
-  tokens["--leading-tight"] = isBold ? '1.05' : isLuxury ? '1.15' : '1.1';
-  tokens["--leading-body"] = '1.6';
+
+  tokens["--leading-display"] = isLuxury ? '1.1' : isBold ? '1.05' : '1.1';
+  tokens["--leading-tight"] = isBold ? '1.05' : isLuxury ? '1.1' : '1.1';
+  tokens["--leading-body"] = isLuxury ? '1.65' : '1.6';
   
   return tokens;
 }

@@ -95,8 +95,14 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
   const filesArray = Object.entries(filesToUpload)
     .sort((a, b) => getSortWeight(a[0]) - getSortWeight(b[0]))
     .map(([filename, content]) => {
-    // If it's a binary file (e.g. image base64), Shopify expects body.value with type BASE64.
-    // For our chassis, everything is text.
+    // If the content is a URL, Shopify can fetch and upload it automatically
+    if (content.startsWith("http://") || content.startsWith("https://")) {
+      return {
+        filename,
+        body: { type: "URL", value: content }
+      };
+    }
+    // Otherwise, treat as a TEXT file
     return {
       filename,
       body: { type: "TEXT", value: content }

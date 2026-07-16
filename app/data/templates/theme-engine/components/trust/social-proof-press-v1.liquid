@@ -1,0 +1,165 @@
+{% comment %} Press Marquee / As Seen In — Elegant continuous scrolling publication logos with tokenized styling {% endcomment %}
+
+<section class="sf-press sf-press-{{ section.id }}" id="sf-press-{{ section.id }}">
+  <div class="sf-press-inner sf-reveal">
+    {% if section.settings.title != blank %}
+      <div class="sf-press-header">
+        <h3 class="sf-press-title">{{ section.settings.title }}</h3>
+      </div>
+    {% endif %}
+
+    <div class="sf-press-marquee-wrapper">
+      <div class="sf-press-marquee">
+        {%- comment -%} Two copies for seamless loop {%- endcomment -%}
+        {% for pass in (1..2) %}
+          {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+              <div class="sf-press-logo" {{ block.shopify_attributes }}>
+                {% if block.settings.logo != blank %}
+                  <img src="{{ block.settings.logo | image_url: width: 300 }}" alt="{{ block.settings.logo.alt | default: block.settings.text | escape }}" loading="lazy" width="140" height="40">
+                {% else %}
+                  <span class="sf-press-text-logo">{{ block.settings.text | default: 'VOGUE' }}</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% assign default_logos = "VOGUE|FORBES|GQ|ELLE|HARPER'S BAZAAR|VANITY FAIR" | split: '|' %}
+            {% for text in default_logos %}
+              <div class="sf-press-logo">
+                <span class="sf-press-text-logo">{{ text }}</span>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sf-press-{{ section.id }} {
+    padding: var(--space-48, 3rem) 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+  .sf-press-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .sf-press-header {
+    text-align: center;
+    margin-bottom: var(--space-32, 2rem);
+    padding: 0 var(--space-20, 1.25rem);
+  }
+  .sf-press-title {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.725rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--color-text-secondary, var(--color-text));
+    margin: 0;
+  }
+  .sf-press-marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .sf-press-marquee {
+    display: flex;
+    align-items: center;
+    gap: var(--space-64, 4.5rem);
+    width: max-content;
+    animation: sfPressScroll 40s linear infinite;
+  }
+  .sf-press-marquee:hover {
+    animation-play-state: paused;
+  }
+  .sf-press-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 var(--space-16, 1rem);
+  }
+  .sf-press-logo img {
+    max-width: 140px;
+    max-height: 38px;
+    object-fit: contain;
+    filter: grayscale(100%) opacity(0.65);
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+  .sf-press-logo:hover img {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.04);
+  }
+  .sf-press-text-logo {
+    font-family: var(--font-heading-family, serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary, var(--color-text));
+    opacity: 0.7;
+    transition: opacity 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+  }
+  .sf-press-logo:hover .sf-press-text-logo {
+    opacity: 1;
+    color: var(--color-text);
+  }
+  @keyframes sfPressScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sf-press-marquee { animation: none !important; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Press Marquee",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "As Featured In"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Publication Name",
+          "default": "VOGUE"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Press Marquee",
+      "category": "Trust",
+      "blocks": [
+        { "type": "logo", "settings": { "text": "VOGUE" } },
+        { "type": "logo", "settings": { "text": "FORBES" } },
+        { "type": "logo", "settings": { "text": "GQ" } },
+        { "type": "logo", "settings": { "text": "ELLE" } },
+        { "type": "logo", "settings": { "text": "HARPER'S BAZAAR" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

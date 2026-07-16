@@ -20,6 +20,8 @@ export interface CatalogContext {
   productTypes: string[];
   priceRange: { min: number, max: number };
   sampleImageUrls: string[];
+  rawProducts?: Array<{ title: string; handle: string; imageUrl?: string; price?: number }>;
+  rawCollections?: Array<{ title: string; handle: string }>;
 }
 
 /**
@@ -35,6 +37,7 @@ export async function analyzeCatalog(
       products(first: 100) {
         nodes {
           title
+          handle
           vendor
           productType
           tags
@@ -56,6 +59,7 @@ export async function analyzeCatalog(
       collections(first: 50) {
         nodes {
           title
+          handle
         }
       }
     }
@@ -81,6 +85,11 @@ export async function analyzeCatalog(
   const tags = new Set<string>();
   const titles: string[] = [];
   const sampleImageUrls: string[] = [];
+  const rawProducts: Array<{ title: string; handle: string; imageUrl?: string; price?: number }> = [];
+  const rawCollections: Array<{ title: string; handle: string }> = collections.map((c: any) => ({
+    title: c.title || "Collection",
+    handle: c.handle || ""
+  })).filter((c: any) => c.handle !== "");
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
@@ -106,12 +115,23 @@ export async function analyzeCatalog(
     }
 
     const variants = product.variants?.nodes || [];
+    let firstPrice: number | undefined;
     for (const variant of variants) {
       const price = parseFloat(variant.price);
       if (!isNaN(price)) {
+        if (firstPrice === undefined) firstPrice = price;
         if (price < minPrice) minPrice = price;
         if (price > maxPrice) maxPrice = price;
       }
+    }
+
+    if (product.handle) {
+      rawProducts.push({
+        title: product.title || "Product",
+        handle: product.handle,
+        imageUrl: product.images?.nodes?.[0]?.url,
+        price: firstPrice
+      });
     }
   }
 
@@ -212,6 +232,8 @@ export async function analyzeCatalog(
     vendors: Array.from(vendors),
     productTypes: Array.from(productTypes),
     priceRange: { min: minPrice, max: maxPrice },
-    sampleImageUrls
+    sampleImageUrls,
+    rawProducts,
+    rawCollections
   };
 }

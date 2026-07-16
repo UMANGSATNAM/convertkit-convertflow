@@ -1,0 +1,441 @@
+{%- comment -%}
+  sections/appointment-booking_luxury.liquid
+  
+  CONVERSION PSYCHOLOGY & ARCHITECTURE:
+  1. HIGH-TOUCH CONVERSION BRIDGE -- For ultra-high-ticket luxury (Rs. 1 Lakh+),
+     direct 'Add to Cart' conversion can encounter price resistance. Offering
+     a private salon viewing or virtual consultation bridges digital discovery
+     with high-touch personal sales closing.
+  2. RECIPROCITY & VIP STATUS -- Framing the appointment as a "Champagne Service
+     Private Viewing" elevates customer status and triggers reciprocal buying desire.
+  3. FRICTIONLESS CONSULTATION ROUTING -- Clear segmentation between In-Salon,
+     Virtual HD, and Bespoke Commission consultations allows the sales team to
+     prepare curated product trays prior to the client's arrival.
+  4. ZERO EMOJI POLICY -- Strict editorial ASCII typography [ LIKE THIS ] for all
+     booking tiers and form inputs.
+{%- endcomment -%}
+
+<style>
+  .lx-appoint {
+    background: var(--appoint-bg, #0a0a0a);
+    color: var(--appoint-color, #fff);
+    padding: clamp(4rem, 8vw, 8rem) 1.5rem;
+    font-family: var(--font-body, sans-serif);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+  }
+
+  .lx-appoint__inner {
+    max-width: var(--max-width, 1300px);
+    margin: 0 auto;
+  }
+
+  /* Header Section */
+  .lx-appoint__header {
+    text-align: center;
+    max-width: 750px;
+    margin: 0 auto 4.5rem auto;
+  }
+
+  .lx-appoint__subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lx-appoint__title {
+    font-family: var(--font-heading, serif);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 400;
+    margin: 0 0 1.25rem 0;
+    line-height: 1.15;
+  }
+
+  .lx-appoint__desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* 2-Column Booking Layout */
+  .lx-appoint__grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  @media (max-width: 1024px) {
+    .lx-appoint__grid {
+      grid-template-columns: 1fr;
+      gap: 4rem;
+    }
+  }
+
+  /* Left Column: Consultation Tiers */
+  .lx-appoint__tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .lx-appoint__tier-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2rem;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .lx-appoint__tier-card:hover,
+  .lx-appoint__tier-card.is-selected {
+    border-color: #c9a96e;
+    background: rgba(201, 169, 110, 0.03);
+  }
+
+  .lx-appoint__tier-card.is-selected::after {
+    content: "[ SELECTED ]";
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: #c9a96e;
+    font-weight: 600;
+  }
+
+  .lx-appoint__tier-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .lx-appoint__tier-title {
+    font-family: var(--font-heading, serif);
+    font-size: 1.35rem;
+    margin: 0 0 0.75rem 0;
+    color: #fff;
+  }
+
+  .lx-appoint__tier-desc {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Right Column: Interactive Scheduling Form */
+  .lx-appoint__form-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(201, 169, 110, 0.25);
+    padding: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .lx-appoint__form-title {
+    font-family: var(--font-heading, serif);
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .lx-appoint__form-sub {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+  }
+
+  .lx-appoint__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .lx-appoint__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 600px) {
+    .lx-appoint__form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lx-appoint__label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin-bottom: 0.4rem;
+  }
+
+  .lx-appoint__input,
+  .lx-appoint__select,
+  .lx-appoint__textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.9rem 1rem;
+    color: #fff;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.25s ease;
+    box-sizing: border-box;
+  }
+
+  .lx-appoint__input:focus,
+  .lx-appoint__select:focus,
+  .lx-appoint__textarea:focus {
+    border-color: #c9a96e;
+  }
+
+  .lx-appoint__select {
+    cursor: pointer;
+  }
+
+  .lx-appoint__select option {
+    background: #0a0a0a;
+    color: #fff;
+  }
+
+  .lx-appoint__textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .lx-appoint__submit-btn {
+    background: #c9a96e;
+    color: #080808;
+    border: none;
+    padding: 1.1rem 2rem;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-top: 0.5rem;
+  }
+
+  .lx-appoint__submit-btn:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  .lx-appoint__privacy-note {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.5;
+  }
+</style>
+
+<section
+  class="lx-appoint"
+  data-section-id="{{ section.id }}"
+  data-section-type="appointment-booking">
+  
+  <div class="lx-appoint__inner">
+    {%- comment -%} Header {%- endcomment -%}
+    <div class="lx-appoint__header">
+      <span class="lx-appoint__subtitle">{{ section.settings.subtitle | default: "[ PRIVATE CONCIERGE ]" }}</span>
+      <h2 class="lx-appoint__title">{{ section.settings.title | default: "Bespoke Salon Consultations" }}</h2>
+      <p class="lx-appoint__desc">
+        {{ section.settings.description | default: "Whether selecting an engagement jewel, curating a bridal trousseau, or commissioning a bespoke architectural creation, our senior gemologists are dedicated to your private service." }}
+      </p>
+    </div>
+
+    {%- comment -%} 2-Column Booking Layout {%- endcomment -%}
+    <div class="lx-appoint__grid">
+      {%- comment -%} Left: Consultation Tiers {%- endcomment -%}
+      <div class="lx-appoint__tiers" data-tier-container>
+        
+        <div class="lx-appoint__tier-card is-selected" data-tier="flagship" role="button" tabindex="0" aria-pressed="true">
+          <span class="lx-appoint__tier-num">[ TIER 01 ]</span>
+          <h3 class="lx-appoint__tier-title">Private Flagship Salon Viewing</h3>
+          <p class="lx-appoint__tier-desc">
+            Experience our creations in the serenity of our private viewing suites in Mumbai, New Delhi, London, or New York. Accompanied by champagne service and a dedicated gemologist curator.
+          </p>
+        </div>
+
+        <div class="lx-appoint__tier-card" data-tier="virtual" role="button" tabindex="0" aria-pressed="false">
+          <span class="lx-appoint__tier-num">[ TIER 02 ]</span>
+          <h3 class="lx-appoint__tier-title">Virtual High-Definition Consultation</h3>
+          <p class="lx-appoint__tier-desc">
+            Connect 1-on-1 via high-definition video link. We broadcast live under studio macro lighting, allowing you to examine diamond fire, gemstone clarity, and scale from anywhere in the world.
+          </p>
+        </div>
+
+        <div class="lx-appoint__tier-card" data-tier="bespoke" role="button" tabindex="0" aria-pressed="false">
+          <span class="lx-appoint__tier-num">[ TIER 03 ]</span>
+          <h3 class="lx-appoint__tier-title">Bespoke Commission & Atelier Studio</h3>
+          <p class="lx-appoint__tier-desc">
+            Collaborate directly with our master CAD architects and head goldsmiths to design an entirely unique custom jewel or remodel an existing family heirloom with modern precision.
+          </p>
+        </div>
+
+      </div>
+
+      {%- comment -%} Right: Interactive Scheduling Form {%- endcomment -%}
+      <div class="lx-appoint__form-box">
+        <h3 class="lx-appoint__form-title">Request Your Appointment</h3>
+        <p class="lx-appoint__form-sub">Our concierge will contact you within 4 hours to confirm your private session and curate your viewing tray.</p>
+
+        <form class="lx-appoint__form" action="/contact#appointment-success" method="post" data-appoint-form>
+          <input type="hidden" name="contact[tags]" value="vip-appointment">
+          <input type="hidden" name="contact[selected_tier]" value="Private Flagship Salon Viewing" data-hidden-tier>
+
+          <div class="lx-appoint__form-row">
+            <div>
+              <label class="lx-appoint__label" for="app-name">Full Name *</label>
+              <input type="text" id="app-name" name="contact[name]" class="lx-appoint__input" required placeholder="SABYASACHI MUKHERJEE">
+            </div>
+            <div>
+              <label class="lx-appoint__label" for="app-phone">Phone / WhatsApp *</label>
+              <input type="tel" id="app-phone" name="contact[phone]" class="lx-appoint__input" required placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <div class="lx-appoint__form-row">
+            <div>
+              <label class="lx-appoint__label" for="app-email">Email Address *</label>
+              <input type="email" id="app-email" name="contact[email]" class="lx-appoint__input" required placeholder="CONCIERGE@BRAND.COM">
+            </div>
+            <div>
+              <label class="lx-appoint__label" for="app-location">Preferred Salon / Medium *</label>
+              <select id="app-location" name="contact[location]" class="lx-appoint__select" required>
+                <option value="Mumbai Flagship (Kala Ghoda)">Mumbai Flagship (Kala Ghoda)</option>
+                <option value="New Delhi Atelier (Mehrauli)">New Delhi Atelier (Mehrauli)</option>
+                <option value="London Salon (Mayfair)">London Salon (Mayfair)</option>
+                <option value="New York Boutique (5th Ave)">New York Boutique (5th Ave)</option>
+                <option value="Virtual High-Definition Zoom">Virtual High-Definition Zoom</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="lx-appoint__form-row">
+            <div>
+              <label class="lx-appoint__label" for="app-date">Preferred Date *</label>
+              <input type="date" id="app-date" name="contact[date]" class="lx-appoint__input" required>
+            </div>
+            <div>
+              <label class="lx-appoint__label" for="app-time">Preferred Time Slot *</label>
+              <select id="app-time" name="contact[time]" class="lx-appoint__select" required>
+                <option value="Morning (11:00 AM - 01:00 PM)">Morning (11:00 AM -- 01:00 PM)</option>
+                <option value="Afternoon (02:00 PM - 05:00 PM)">Afternoon (02:00 PM -- 05:00 PM)</option>
+                <option value="Evening VIP (05:00 PM - 07:30 PM)">Evening VIP (05:00 PM -- 07:30 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="lx-appoint__label" for="app-notes">Curated Interests / Custom Notes</label>
+            <textarea
+              id="app-notes"
+              name="contact[body]"
+              class="lx-appoint__textarea"
+              placeholder="Please share specific collections, gemstone preferences, or bridal dates you wish our curators to prepare..."></textarea>
+          </div>
+
+          <button type="submit" class="lx-appoint__submit-btn">
+            [ SUBMIT CONCIERGE REQUEST ]
+          </button>
+
+          <p class="lx-appoint__privacy-note">
+            * By requesting an appointment, you agree to our strict sovereign client confidentiality charter. Your contact details are never shared.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const container = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!container) return;
+
+    const cards = container.querySelectorAll('.lx-appoint__tier-card');
+    const hiddenTierInput = container.querySelector('[data-hidden-tier]');
+    const selectLocation = container.querySelector('#app-location');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => {
+          c.classList.remove('is-selected');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('is-selected');
+        card.setAttribute('aria-pressed', 'true');
+
+        const tierTitle = card.querySelector('.lx-appoint__tier-title');
+        if (tierTitle && hiddenTierInput) {
+          hiddenTierInput.value = tierTitle.textContent.trim();
+        }
+
+        // Auto-adjust location dropdown based on virtual vs physical selection
+        const tierType = card.getAttribute('data-tier');
+        if (tierType === 'virtual' && selectLocation) {
+          selectLocation.value = 'Virtual High-Definition Zoom';
+        } else if (tierType === 'flagship' && selectLocation && selectLocation.value === 'Virtual High-Definition Zoom') {
+          selectLocation.value = 'Mumbai Flagship (Kala Ghoda)';
+        }
+      });
+    });
+
+    const form = container.querySelector('[data-appoint-form]');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = form.querySelector('#app-name') ? form.querySelector('#app-name').value : 'Client';
+        const tier = hiddenTierInput ? hiddenTierInput.value : 'Private Consultation';
+        alert('[ VIP CONCIERGE APPOINTMENT RECEIVED ]\n\nThank you, ' + name + '.\n\nYour request for the "' + tier + '" has been logged. Our head gemologist will contact your WhatsApp/phone within 4 hours to confirm your private tray.');
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "VIP Appointment Booking",
+  "tag": "section",
+  "class": "section-appointment-booking",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "[ PRIVATE CONCIERGE ]"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Bespoke Salon Consultations"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Whether selecting an engagement jewel, curating a bridal trousseau, or commissioning a bespoke architectural creation, our senior gemologists are dedicated to your private service."
+    }
+  ],
+  "presets": [
+    {
+      "name": "VIP Booking (Lux)"
+    }
+  ]
+}
+{% endschema %}

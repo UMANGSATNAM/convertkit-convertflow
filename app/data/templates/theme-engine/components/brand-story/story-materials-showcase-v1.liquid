@@ -1,0 +1,158 @@
+{% comment %} Story Materials Showcase — Circular overlapping imagery highlighting craftsmanship and fine materials {% endcomment %}
+
+<section class="sf-materials sf-ms-{{ section.id }}" id="sf-ms-{{ section.id }}">
+  <div class="sf-ms-container sf-reveal" data-stagger="true">
+    <div class="sf-ms-header sf-stagger-item">
+      {% if section.settings.title != blank %}
+        <h2 class="sf-ms-title">{{ section.settings.title }}</h2>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="sf-ms-subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="sf-ms-grid" style="--grid-cols: {{ section.blocks.size | at_most: 3 }};">
+      {% for block in section.blocks %}
+        <div class="sf-ms-item sf-stagger-item" {{ block.shopify_attributes }}>
+          <div class="sf-ms-img">
+            {% assign img_src = block.settings.image %}
+            {% if img_src != blank %}
+              <img src="{{ img_src | image_url: width: 600, height: 600 }}" alt="{{ block.settings.title | escape }}" loading="lazy" width="400" height="400">
+            {% else %}
+              {% assign texture_index = forloop.index %}
+              {% if texture_index > 3 %}{% assign texture_index = 1 %}{% endif %}
+              {% assign texture_name = 'placeholder-beauty-texture-' | append: texture_index | append: '.jpg' %}
+              <img src="{{ texture_name | asset_url }}" alt="Placeholder Texture" loading="lazy" width="400" height="400">
+            {% endif %}
+          </div>
+          <div class="sf-ms-info">
+            {% if block.settings.title != blank %}
+              <h3 class="sf-ms-card-title">{{ block.settings.title }}</h3>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <p class="sf-ms-card-text">{{ block.settings.text }}</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .sf-ms-{{ section.id }} {
+    padding: var(--space-96, 6.5rem) var(--space-20, 1.25rem);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+  .sf-ms-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .sf-ms-header {
+    margin-bottom: var(--space-64, 4rem);
+  }
+  .sf-ms-title {
+    font-family: var(--font-heading-family, serif);
+    font-size: var(--font-h2, clamp(1.8rem, 3.5vw, 2.75rem));
+    line-height: var(--leading-tight, 1.2);
+    color: var(--color-text);
+    margin-bottom: var(--space-16, 1rem);
+  }
+  .sf-ms-subtitle {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: var(--font-body, 1rem);
+    line-height: var(--leading-body, 1.6);
+    color: var(--color-text-secondary, var(--color-text));
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .sf-ms-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-32, 2rem);
+  }
+  @media (min-width: 768px) {
+    .sf-ms-grid {
+      grid-template-columns: repeat(var(--grid-cols, 3), 1fr);
+      gap: var(--space-48, 3rem);
+    }
+  }
+  .sf-ms-item {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+  .sf-ms-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: -50px;
+    z-index: 2;
+    position: relative;
+    border: 10px solid var(--color-surface);
+    background: var(--color-background);
+  }
+  .sf-ms-img img, .sf-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sf-ms-info {
+    padding: var(--space-64, 4rem) var(--space-32, 2rem) var(--space-32, 2rem);
+    border-radius: var(--card-radius, 16px);
+    background: var(--color-background);
+    flex: 1;
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-text) 5%, transparent);
+    border: 1px solid var(--color-border, transparent);
+  }
+  .sf-ms-card-title {
+    font-family: var(--font-heading-family, serif);
+    font-size: var(--font-h3, 1.5rem);
+    line-height: var(--leading-tight, 1.25);
+    color: var(--color-text);
+    margin-bottom: var(--space-16, 1rem);
+    font-weight: 700;
+  }
+  .sf-ms-card-text {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: var(--font-small, 0.875rem);
+    line-height: var(--leading-body, 1.6);
+    color: var(--color-text-secondary, var(--color-text));
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Materials Showcase",
+  "max_blocks": 3,
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Craftsmanship & Materials" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Every piece is thoughtfully designed and crafted using ethically sourced, premium materials." }
+  ],
+  "blocks": [
+    {
+      "type": "material",
+      "name": "Material",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Placeholder — replace with your own image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Ethically Sourced Gold" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Hand-selected and certified for lasting luster, purity, and environmental responsibility." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Materials Showcase",
+      "category": "Brand Story",
+      "blocks": [
+        { "type": "material" },
+        { "type": "material" },
+        { "type": "material" }
+      ]
+    }
+  ]
+}
+{% endschema %}

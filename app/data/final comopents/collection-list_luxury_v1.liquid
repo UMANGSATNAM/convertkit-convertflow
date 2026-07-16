@@ -1,0 +1,503 @@
+{%- comment -%}
+  sections/collection-list_luxury_v1.liquid
+  CONVERSION PSYCHOLOGY & ARCHITECTURE (380+ lines):
+  1. COGNITIVE CHUNKING & VISUAL HIERARCHY: Grouping vast jewelry inventories into distinct archival collections ([ BRIDAL ], [ HIGH SALON ], [ EVERYDAY HERITAGE ]) reduces decision fatigue (George Miller, 1956).
+  2. CURIOSITY GAP & ABUNDANCE ANCHORING: Displaying live collection inventory counts ([ 24 ARCHIVAL CREATIONS ]) and micro-narrative tags signals abundance and prestige, enticing deeper exploration.
+  3. INTERACTIVE SPATIAL CONTROLS: An interactive grid mode toggle allows visitors to switch between an immersive editorial 3-column layout and a panoramic widescreen 2-column showcase.
+  4. BESPOKE COMMISSION ESCALATION: A dedicated VIP card at the culmination of the grid invites high-net-worth clients to initiate bespoke custom jewelry commissions directly via WhatsApp concierge.
+  5. ZERO EMOJI GUARANTEE: Uses ASCII brackets [ EXPLORE SALON ], [ BESPOKE ATELIER ] and SVG typography.
+{%- endcomment -%}
+
+{%- assign section_id = 'lx-collist-' | append: section.id -%}
+
+<style>
+  #{{ section_id }} {
+    --lx-bg: {{ section.settings.bg_color | default: '#ffffff' }};
+    --lx-text: {{ section.settings.text_color | default: '#1a1a1a' }};
+    --lx-gold: {{ section.settings.gold_accent | default: '#c9a96e' }};
+    --lx-muted: rgba(26, 26, 26, 0.6);
+    --lx-border: rgba(26, 26, 26, 0.08);
+    --lx-card-bg: #fcfbf9;
+    
+    background-color: var(--lx-bg);
+    color: var(--lx-text);
+    padding: clamp(4.5rem, 9vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+    border-top: 1px solid var(--lx-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .lx-collist__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    max-width: 1400px;
+    margin: 0 auto 3.5rem auto;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--lx-border);
+  }
+
+  @media (max-width: 768px) {
+    #{{ section_id }} .lx-collist__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.2rem;
+    }
+  }
+
+  #{{ section_id }} .lx-collist__eyebrow {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--lx-gold);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  #{{ section_id }} .lx-collist__title {
+    font-family: var(--font-heading, 'Times New Roman', serif);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  /* Interactive Layout Controls */
+  #{{ section_id }} .lx-collist__controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #{{ section_id }} .lx-collist__ctrl-label {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--lx-muted);
+  }
+
+  #{{ section_id }} .lx-collist__btn {
+    padding: 0.5rem 0.9rem;
+    background: transparent;
+    border: 1px solid var(--lx-border);
+    color: var(--lx-muted);
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  #{{ section_id }} .lx-collist__btn.is-active,
+  #{{ section_id }} .lx-collist__btn:hover {
+    background: var(--lx-text);
+    color: #ffffff;
+    border-color: var(--lx-text);
+  }
+
+  /* Collections Grid Architecture */
+  #{{ section_id }} .lx-collist__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.2rem, 3vw, 2.2rem);
+    max-width: 1400px;
+    margin: 0 auto;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (min-width: 768px) {
+    #{{ section_id }} .lx-collist__grid--cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #{{ section_id }} .lx-collist__grid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  #{{ section_id }} .lx-collist__card {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--lx-card-bg);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    group: card;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+  }
+
+  #{{ section_id }} .lx-collist__card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+    border-color: var(--lx-gold);
+  }
+
+  #{{ section_id }} .lx-collist__img-wrap {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #f0eee9;
+  }
+
+  #{{ section_id }} .lx-collist__grid--cols-2 .lx-collist__img-wrap {
+    aspect-ratio: 16 / 10;
+  }
+
+  #{{ section_id }} .lx-collist__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #{{ section_id }} .lx-collist__card:hover .lx-collist__img {
+    transform: scale(1.06);
+  }
+
+  #{{ section_id }} .lx-collist__tag {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.2rem;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: 0.4rem 0.85rem;
+    z-index: 2;
+  }
+
+  #{{ section_id }} .lx-collist__tag--gold {
+    background: var(--lx-gold);
+    color: #000000;
+    font-weight: 600;
+  }
+
+  #{{ section_id }} .lx-collist__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 40%, transparent 80%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.2rem;
+    color: #ffffff;
+  }
+
+  #{{ section_id }} .lx-collist__count {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--lx-gold);
+    margin-bottom: 0.4rem;
+  }
+
+  #{{ section_id }} .lx-collist__card-title {
+    font-family: var(--font-heading, 'Times New Roman', serif);
+    font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    font-weight: 300;
+    margin: 0 0 1.2rem 0;
+    line-height: 1.15;
+  }
+
+  #{{ section_id }} .lx-collist__cta {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    padding-bottom: 0.3rem;
+    width: fit-content;
+    transition: gap 0.3s ease, border-color 0.3s ease;
+  }
+
+  #{{ section_id }} .lx-collist__card:hover .lx-collist__cta {
+    gap: 1.1rem;
+    border-color: var(--lx-gold);
+    color: var(--lx-gold);
+  }
+
+  /* Bespoke Commission Card Architecture */
+  #{{ section_id }} .lx-collist__bespoke {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid var(--lx-gold);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 2.5rem;
+    text-decoration: none;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  }
+
+  #{{ section_id }} .lx-collist__bespoke:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  }
+
+  #{{ section_id }} .lx-collist__bespoke-title {
+    font-family: var(--font-heading, 'Times New Roman', serif);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 300;
+    margin: 0.8rem 0 1rem 0;
+    color: #ffffff;
+  }
+
+  #{{ section_id }} .lx-collist__bespoke-sub {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 320px;
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+  }
+
+  #{{ section_id }} .lx-collist__bespoke-btn {
+    padding: 1rem 2.2rem;
+    background: var(--lx-gold);
+    color: #000000;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    transition: background 0.25s ease;
+  }
+
+  #{{ section_id }} .lx-collist__bespoke:hover .lx-collist__bespoke-btn {
+    background: #ffffff;
+  }
+</style>
+
+<section id="{{ section_id }}">
+  <div class="lx-collist__header">
+    <div>
+      <span class="lx-collist__eyebrow">[ {{ section.settings.eyebrow | default: "ARCHIVAL SELECTIONS" }} ]</span>
+      <h2 class="lx-collist__title">{{ section.settings.heading | default: "Shop by Salon Collection" }}</h2>
+    </div>
+
+    {%- if section.settings.show_layout_toggle -%}
+      <div class="lx-collist__controls">
+        <span class="lx-collist__ctrl-label">[ VIEW: ]</span>
+        <button type="button" class="lx-collist__btn is-active" data-layout="3">[ 3 COLUMNS ]</button>
+        <button type="button" class="lx-collist__btn" data-layout="2">[ 2 COLUMNS ]</button>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="lx-collist__grid lx-collist__grid--cols-3" data-col-grid>
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'collection' -%}
+        {%- assign col = collections[block.settings.collection] -%}
+        <a href="{{ col.url | default: '#' }}" class="lx-collist__card" {{ block.shopify_attributes }}>
+          <div class="lx-collist__img-wrap">
+            {%- if forloop.index == 1 -%}
+              <span class="lx-collist__tag lx-collist__tag--gold">[ ARCHIVAL APEX ]</span>
+            {%- elsif forloop.index == 2 -%}
+              <span class="lx-collist__tag">[ BRIDAL HERITAGE ]</span>
+            {%- endif -%}
+
+            {%- if block.settings.image != blank -%}
+              <img 
+                class="lx-collist__img" 
+                src="{{ block.settings.image | image_url: crop: 'center' }}" 
+                alt="{{ block.settings.title | default: col.title | escape }}" 
+                loading="lazy" 
+                width="800" 
+                height="1000"
+              >
+            {%- elsif col.image != blank -%}
+              <img 
+                class="lx-collist__img" 
+                src="{{ col.image | image_url: crop: 'center' }}" 
+                alt="{{ col.title | escape }}" 
+                loading="lazy" 
+                width="800" 
+                height="1000"
+              >
+            {%- else -%}
+              <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.9rem;">[ ARCHIVAL COLLECTION ]</div>
+            {%- endif -%}
+          </div>
+
+          <div class="lx-collist__overlay">
+            <span class="lx-collist__count">[ {{ col.all_products_count | default: "18" }} CREATIONS ]</span>
+            <h3 class="lx-collist__card-title">{{ block.settings.title | default: col.title | default: "High Salon Jewelry" }}</h3>
+            <span class="lx-collist__cta">[ EXPLORE SALON ] &rarr;</span>
+          </div>
+        </a>
+      {%- elsif block.type == 'bespoke' -%}
+        <a href="https://wa.me/{{ settings.whatsapp_number | default: '919876543210' }}?text=Hello%20Atelier,%20I%20wish%20to%20commission%20a%20bespoke%20creation." target="_blank" rel="noopener" class="lx-collist__bespoke" {{ block.shopify_attributes }}>
+          <span class="lx-collist__eyebrow" style="color:var(--lx-gold);">[ BESPOKE ATELIER ]</span>
+          <h3 class="lx-collist__bespoke-title">{{ block.settings.title | default: "Custom Commissions" }}</h3>
+          <p class="lx-collist__bespoke-sub">{{ block.settings.subtext | default: "Work privately with our master designers to engineer an archival heirloom tailored exclusively to your personal specification." }}</p>
+          <span class="lx-collist__bespoke-btn">[ INITIATE CONSULTATION ]</span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var section = document.querySelector('#{{ section_id }}');
+    if (!section) return;
+
+    var grid = section.querySelector('[data-col-grid]');
+    var btns = section.querySelectorAll('[data-layout]');
+
+    btns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        btns.forEach(function(b) { b.classList.remove('is-active'); });
+        this.classList.add('is-active');
+        var cols = this.getAttribute('data-layout') || '3';
+
+        if (grid) {
+          grid.className = 'lx-collist__grid lx-collist__grid--cols-' + cols;
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Luxury Collection List",
+  "tag": "section",
+  "class": "section-collection-list-luxury",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Editorial Messaging"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Badge",
+      "default": "ARCHIVAL SELECTIONS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Salon Collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_layout_toggle",
+      "label": "Show 2-Col / 3-Col Layout Controls",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Color Tokens"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "gold_accent",
+      "label": "Gold Accent Color",
+      "default": "#c9a96e"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Editorial Title",
+          "info": "Leave blank to use default Shopify collection title."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Archival Image"
+        }
+      ]
+    },
+    {
+      "type": "bespoke",
+      "name": "Bespoke Commission Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Title",
+          "default": "Custom Commissions"
+        },
+        {
+          "type": "textarea",
+          "id": "subtext",
+          "label": "Card Description",
+          "default": "Work privately with our master designers to engineer an archival heirloom tailored exclusively to your personal specification."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury Collection List",
+      "blocks": [
+        {
+          "type": "collection",
+          "settings": { "title": "High Salon Bridal" }
+        },
+        {
+          "type": "collection",
+          "settings": { "title": "Archival Diamond Rings" }
+        },
+        {
+          "type": "collection",
+          "settings": { "title": "Royal Heritage Emeralds" }
+        },
+        {
+          "type": "collection",
+          "settings": { "title": "Everyday Gold Purity" }
+        },
+        {
+          "type": "collection",
+          "settings": { "title": "Men's Sovereignty" }
+        },
+        {
+          "type": "bespoke",
+          "settings": {
+            "title": "Custom Commissions",
+            "subtext": "Work privately with our master designers to engineer an archival heirloom tailored exclusively to your personal specification."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

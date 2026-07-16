@@ -24,9 +24,10 @@ export interface ComponentRankingResult {
 let registryCache: any = null;
 let compatibilityCache: any = null;
 let performanceCache: any = null;
+let playbooksCache: Record<string, any> | null = null;
 
 async function loadRegistries() {
-  if (registryCache && compatibilityCache && performanceCache) return;
+  if (registryCache && compatibilityCache && performanceCache && playbooksCache) return;
 
   const basePath = path.resolve(process.cwd(), 'app/data/templates/theme-engine');
 
@@ -40,6 +41,26 @@ async function loadRegistries() {
   compatibilityCache = JSON.parse(compFile);
   performanceCache = JSON.parse(perfFile);
 
+  playbooksCache = {};
+  const playbooksDir = path.join(basePath, 'playbooks');
+  try {
+    const files = await fs.readdir(playbooksDir);
+    for (const file of files) {
+      if (file.endsWith('.json')) {
+        try {
+          const content = await fs.readFile(path.join(playbooksDir, file), 'utf-8');
+          const pb = JSON.parse(content);
+          const key = `${(pb.niche || "").toLowerCase()}_${(pb.designDirection || "").toLowerCase()}`;
+          playbooksCache[key] = pb;
+        } catch (e) {
+          console.warn(`[Retrieval] Failed to parse playbook ${file}:`, e);
+        }
+      }
+    }
+  } catch (e) {
+    // Playbooks directory might not exist yet
+  }
+
   // Warn if either data file is empty — ranking will be degraded
   const compatEmpty = Object.keys(compatibilityCache).filter(k => !k.startsWith('_')).length === 0;
   const perfEmpty = Object.keys(performanceCache).filter(k => !k.startsWith('_')).length === 0;
@@ -52,6 +73,7 @@ export function invalidateRegistryCache() {
   registryCache = null;
   compatibilityCache = null;
   performanceCache = null;
+  playbooksCache = null;
 }
 
 /**
@@ -76,9 +98,49 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     "image-banner": "hero",
     "image-with-text": "brand-story",
     "rich-text": "brand-story",
+    "craftsmanship": "brand-story",
+    "process": "brand-story",
+    "brand_story": "brand-story",
+    "product_grid": "product-grid",
+    "lookbook": "product-grid",
+    "trust_pillars": "trust",
+    "trust-pillars": "trust",
+    "press_mentions": "trust",
+    "press-mentions": "trust",
+    "press": "trust",
+    "testimonials_marquee": "testimonials",
+    "featured": "product-grid"
   };
 
   const registryType = typeMapping[params.sectionType] || params.sectionType;
+
+  // Stage 0: Playbook Resolution (Curated taste pins over math scoring)
+  if (playbooksCache) {
+    const nicheKey = (params.catalogIndustry || "").toLowerCase();
+    const styleKey = (params.catalogStyle || "").toLowerCase();
+    const playbookKey = `${nicheKey}_${styleKey}`;
+    const playbook = playbooksCache[playbookKey];
+
+    if (playbook && playbook.slots) {
+      const pinnedId = playbook.slots[params.sectionType] || playbook.slots[registryType];
+      if (pinnedId && (!params.exclude || !params.exclude.includes(pinnedId))) {
+        const pinnedComp = (registryCache.components as any[]).find((c: any) => c.componentId === pinnedId && c.status === 'approved');
+        if (pinnedComp) {
+          console.log(`[Retrieval:Playbook] Curated resolution for [${params.sectionType}] -> ${pinnedId} (${playbookKey})`);
+          return {
+            componentId: pinnedId,
+            score: 100.0,
+            breakdown: {
+              compatibility: 40,
+              performance: 30,
+              archetypeMatch: 20,
+              diversityBonus: 10
+            }
+          };
+        }
+      }
+    }
+  }
 
   const components = (registryCache.components as any[]).filter(
     (c: any) => c.type === registryType && c.status === 'approved' && (!params.exclude || !params.exclude.includes(c.componentId))
@@ -118,15 +180,17 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
       compatScore += 10; // Universal component
     }
 
-    // visualStyle match to catalogStyle (15 pts)
-    const visualStyle = (comp.visualStyle || '').toLowerCase();
+    // designDirection match to catalogStyle (15 pts) — Bug 1 fix (separate from layoutVariant)
+    const designDirection = (comp.designDirection || comp.visualStyle || '').toLowerCase();
     const catalogStyle = (params.catalogStyle || '').toLowerCase();
-    if (visualStyle === catalogStyle && catalogStyle !== '') {
+    if (designDirection === catalogStyle && catalogStyle !== '') {
       compatScore += 15;
-    } else if (visualStyle === 'minimal' && ['clean', 'simple', 'organic'].includes(catalogStyle)) {
+    } else if (designDirection === 'minimal' && ['clean', 'simple', 'organic'].includes(catalogStyle)) {
       compatScore += 8; // Soft match
-    } else if (visualStyle === 'luxury' && ['premium', 'editorial'].includes(catalogStyle)) {
+    } else if (designDirection === 'luxury' && ['premium', 'editorial'].includes(catalogStyle)) {
       compatScore += 8;
+    } else if (designDirection === 'editorial' && ['luxury', 'premium'].includes(catalogStyle)) {
+      compatScore += 8; // Editorial and luxury share strong affinity
     }
 
     // ── 2. PERFORMANCE (30 pts max) ────────────────────────────────────────
@@ -139,27 +203,47 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     perfScore += (mobileScore / 100) * 10;    // 10 pts for mobile
     perfScore += (engagementScore / 100) * 5; // 5 pts for engagement
 
-    // ── 3. ARCHETYPE MATCH (20 pts) ────────────────────────────────────────
+    // ── 3. ARCHETYPE MATCH (20 pts max) ────────────────────────────────────
+    // Make archetype functional by checking exact primary specialization vs secondary or wildcard (Bug 4 fix)
     const compatArchetypes: string[] = (compatData.archetypes || comp.archetypes || [])
       .map((a: string) => a.toLowerCase());
-
     const targetArchetype = (params.brandArchetype || '').toLowerCase();
-    if (targetArchetype !== '' && compatArchetypes.includes(targetArchetype)) {
-      archetypeScore = 20;
-    } else if (compatArchetypes.includes('*')) {
-      archetypeScore = 10; // Universal wildcard partial score
+    if (targetArchetype !== '') {
+      if (compatArchetypes[0] === targetArchetype) {
+        archetypeScore = 20; // Primary archetype exact specialization
+      } else if (compatArchetypes.includes(targetArchetype)) {
+        archetypeScore = 12; // Secondary archetype match
+      } else if (compatArchetypes.includes('*') || compatArchetypes.includes('universal')) {
+        archetypeScore = 6;  // Universal wildcard partial score
+      }
+    } else if (compatArchetypes.includes('*') || compatArchetypes.includes('universal')) {
+      archetypeScore = 6;
     }
 
-    // ── 4. DIVERSITY BONUS (10 pts) ────────────────────────────────────────
-    if (comp.status === 'approved') diversityScore += 5;
+    // ── 4. DIVERSITY & COMPLEXITY BONUS (10 pts max) ────────────────────────
+    // Make diversity functional based on layoutVariant richness vs catalog complexity requirement (Bug 4 fix)
+    const layoutVariant = (comp.layoutVariant || comp.visualStyle || 'standard').toLowerCase();
+    const richVariants = ['mega', 'marquee', 'lookbook', 'carousel', 'split', 'overlay', 'transparent-overlay', 'magazine', 'product-spotlight', 'editorial', 'drawer', 'wheel'];
+    const cleanVariants = ['minimal', 'simple', 'clean', 'standard', 'grid', 'accordion', 'card', 'badges', 'stats'];
 
-    // Visual complexity: prefer richer components for visually complex catalogs
-    if (params.catalogVisualComplexity === 'high' && ['editorial', 'magazine', 'carousel', 'luxury'].includes(visualStyle)) {
-      diversityScore += 5;
-    } else if (params.catalogVisualComplexity === 'low' && ['minimal', 'natural', 'tech'].includes(visualStyle)) {
-      diversityScore += 5;
+    if (params.catalogVisualComplexity === 'high') {
+      if (richVariants.includes(layoutVariant)) {
+        diversityScore = 10;
+      } else if (cleanVariants.includes(layoutVariant)) {
+        diversityScore = 4;
+      } else {
+        diversityScore = 7;
+      }
+    } else if (params.catalogVisualComplexity === 'low') {
+      if (cleanVariants.includes(layoutVariant)) {
+        diversityScore = 10;
+      } else if (richVariants.includes(layoutVariant)) {
+        diversityScore = 4;
+      } else {
+        diversityScore = 7;
+      }
     } else {
-      diversityScore += 2; // Neutral bonus
+      diversityScore = 7; // Neutral complexity
     }
 
     const totalScore = compatScore + perfScore + archetypeScore + diversityScore;

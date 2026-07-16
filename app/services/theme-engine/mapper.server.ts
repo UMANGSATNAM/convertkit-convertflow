@@ -48,8 +48,8 @@ export function mapAiDataToShopifyTheme(aiData: ExtractedStoreData) {
     colors_text: aiData.colors.text,
     colors_background_1: aiData.colors.background,
     colors_outline_button_labels: aiData.colors.primary,
-    type_header_font: aiData.typography.headingFont,
-    type_body_font: aiData.typography.bodyFont,
+    fontHeading: aiData.typography.headingFont,
+    fontBody: aiData.typography.bodyFont,
   };
 
   return { indexJson, settingsPatch };

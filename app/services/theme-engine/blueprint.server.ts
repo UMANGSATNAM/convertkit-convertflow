@@ -19,64 +19,67 @@ export function generateStoreBlueprint(
   catalogContext: CatalogContext, 
   brandContext: BrandContext
 ): StoreBlueprint {
-  
-  const indexSections: string[] = []; // Headers and footers are OS 2.0 global section groups
-  
-  // 1. Hero Section (Always needed, but which type?)
-  // We just request a 'hero' and let the ranking engine find the best fit.
-  indexSections.push("hero");
+  let indexSections: string[] = [];
 
-  // 2. Immediate Trust / Value Proposition
-  if (brandContext.trust_level === "high" || catalogContext.price_band === "high") {
-    indexSections.push("logo-list"); // High-end brands show press/logos
+  const isHighPrice = catalogContext.price_band === "high" || brandContext.brand_archetype === "editorial_luxury";
+  const isSmallCatalog = catalogContext.product_count <= 15;
+  const isLargeCatalog = catalogContext.product_count > 30;
+  const isEstablished = catalogContext.catalog_strength > 70;
+  const isNewStore = catalogContext.catalog_strength < 40;
+
+  // Decision #18 & PRO-STORE-MANIFEST.md DNA-Driven Order Recipes
+  if (isSmallCatalog && isHighPrice) {
+    // Small catalog + high price -> storytelling-first
+    indexSections = [
+      "hero",
+      "brand-story",
+      "craftsmanship",
+      "featured-collection",
+      "testimonials",
+      "press",
+      "newsletter"
+    ];
+  } else if (isLargeCatalog) {
+    // Large catalog + mid/low price -> discovery-first
+    indexSections = [
+      "hero",
+      "usp-bar",
+      "collection-list",
+      "featured-collection",
+      "testimonials",
+      "newsletter"
+    ];
+  } else if (isNewStore) {
+    // New store, low reviews -> trust-compensating
+    indexSections = [
+      "hero",
+      "usp-bar",
+      "brand-story",
+      "trust-pillars",
+      "faq",
+      "newsletter"
+    ];
+  } else if (isEstablished) {
+    // Established, high reviews -> social-proof-first
+    indexSections = [
+      "hero",
+      "testimonials",
+      "featured-collection",
+      "lookbook",
+      "press",
+      "newsletter"
+    ];
   } else {
-    indexSections.push("usp-bar"); // Standard brands show free shipping/returns
+    // Standard balanced fallback
+    indexSections = [
+      "hero",
+      "usp-bar",
+      "featured-collection",
+      "brand-story",
+      "testimonials",
+      "newsletter"
+    ];
   }
-
-  // 3. Catalog Display Strategy
-  if (catalogContext.collection_count > 3) {
-    // If they have a deep catalog, show collections first
-    indexSections.push("collection-list");
-    indexSections.push("featured-collection");
-  } else if (catalogContext.product_count <= 5) {
-    // Micro-catalog: highlight a single product immediately
-    indexSections.push("featured-product");
-    if (catalogContext.product_count > 1) {
-      indexSections.push("featured-collection"); // Show the rest
-    }
-  } else {
-    // Standard catalog
-    indexSections.push("featured-collection");
-    indexSections.push("collection-list");
-  }
-
-  // 4. Storytelling / Brand Depth
-  if (
-    brandContext.brand_archetype === "artisan_handcrafted" || 
-    brandContext.brand_archetype === "heritage_classic" ||
-    brandContext.brand_archetype === "natural_organic"
-  ) {
-    indexSections.push("brand-story"); // Origin story is critical for these
-    indexSections.push("image-with-text");
-  } else if (
-    brandContext.brand_archetype === "technical_performance" || 
-    brandContext.brand_archetype === "editorial_luxury"
-  ) {
-    indexSections.push("image-banner"); // High visual impact
-    indexSections.push("rich-text"); // Manifesto
-  }
-
-  // 5. Social Proof
-  if (catalogContext.catalog_strength > 60) {
-    indexSections.push("testimonials");
-  }
-
-  // 6. Final Conversion Push
-  if (catalogContext.product_count > 10) {
-    indexSections.push("featured-collection"); // Another row of products
-  }
-  
-  indexSections.push("newsletter");
 
   return {
     pages: {

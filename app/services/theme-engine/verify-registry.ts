@@ -27,11 +27,17 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
   }
 
   let registry: Registry;
+  let compatibilityData: Record<string, any> = {};
+  let performanceData: Record<string, any> = {};
   try {
     const content = fs.readFileSync(registryPath, 'utf-8');
     registry = JSON.parse(content);
+    const compPath = path.join(themeEngineDir, 'compatibility.json');
+    const perfPath = path.join(themeEngineDir, 'performance.json');
+    if (fs.existsSync(compPath)) compatibilityData = JSON.parse(fs.readFileSync(compPath, 'utf-8'));
+    if (fs.existsSync(perfPath)) performanceData = JSON.parse(fs.readFileSync(perfPath, 'utf-8'));
   } catch (e: any) {
-    return { success: false, errors: [`Failed to parse registry.json: ${e.message}`], stats: { totalComponents: 0, totalLiquidFiles: 0, totalChassisFiles: 0 } };
+    return { success: false, errors: [`Failed to parse registry or data json: ${e.message}`], stats: { totalComponents: 0, totalLiquidFiles: 0, totalChassisFiles: 0 } };
   }
 
   let chassisFilesCount = 0;
@@ -90,7 +96,7 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
       }
     }
 
-    // Assert every component has a valid category type
+    // Assert every component has a valid category type reachable by blueprint vocabulary
     const category = comp.type;
     const VALID_CATEGORIES = new Set([
       "header", "footer", "hero", "announcement", "product-grid",
@@ -103,10 +109,34 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
       );
     }
 
-    // Assert sectionType does not collide with chassis fallback layout types
+    // Assert sectionType rules for normal sections vs layout components
     const sectionType = comp.sectionType || comp.componentId;
-    if (sectionType === 'header' || sectionType === 'footer') {
-      errors.push(`Component "${comp.componentId}" has illegal sectionType "${sectionType}". It cannot exactly match fallback layout types (header/footer).`);
+    if (comp.type === 'header' || comp.type === 'footer') {
+      if (sectionType === 'header' || sectionType === 'footer') {
+        errors.push(`Component "${comp.componentId}" has illegal sectionType "${sectionType}". It cannot exactly match fallback layout types (header/footer).`);
+      }
+    } else {
+      if (sectionType === comp.componentId) {
+        errors.push(`Component "${comp.componentId}" has illegal sectionType "${sectionType}". Must be canonical section type from blueprint vocabulary ("${comp.type}"), never a component ID.`);
+      }
+      if (sectionType !== comp.type) {
+        errors.push(`Component "${comp.componentId}" has sectionType "${sectionType}" mismatching its canonical type "${comp.type}".`);
+      }
+    }
+
+    // Assert designDirection is exactly one of the 5 canonical values
+    const VALID_DESIGN_DIRECTIONS = new Set(['luxury', 'minimal', 'bold', 'editorial', 'playful']);
+    const designDir = (comp as any).designDirection;
+    if (!designDir || !VALID_DESIGN_DIRECTIONS.has(designDir)) {
+      errors.push(`Component "${comp.componentId}" has invalid or missing designDirection: "${designDir}". Must be one of: luxury, minimal, bold, editorial, playful.`);
+    }
+
+    // Assert mandatory performance.json and compatibility.json entries (Bug 2 Fix)
+    if (!performanceData[comp.componentId]) {
+      errors.push(`Component "${comp.componentId}" is missing mandatory entry in performance.json.`);
+    }
+    if (!compatibilityData[comp.componentId]) {
+      errors.push(`Component "${comp.componentId}" is missing mandatory entry in compatibility.json.`);
     }
   }
 

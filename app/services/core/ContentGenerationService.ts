@@ -80,7 +80,7 @@ export function extractBlueprintSectionInstances(
 
       const parsed = JSON.parse(match[1]);
       return (parsed.settings || [])
-        .filter((s: any) => ["text", "richtext", "inline_richtext"].includes(s.type))
+        .filter((s: any) => ["text", "richtext", "inline_richtext", "textarea", "html", "liquid"].includes(s.type))
         .map((s: any) => ({
           id: s.id,
           type: s.type,
@@ -123,10 +123,10 @@ export function buildDynamicZodSchema(instances: SectionInstance[]): z.ZodTypeAn
     const compShape: Record<string, z.ZodTypeAny> = {};
     for (const setting of instance.settingsSchema) {
       let maxLen = 180;
-      if (setting.id.includes("subheading") || setting.id.includes("description")) {
-        maxLen = 180;
+      if (setting.type === "textarea" || setting.id.includes("subheading") || setting.id.includes("description") || setting.id.includes("subtitle") || setting.id.includes("subtext")) {
+        maxLen = 300;
       } else if (setting.id.includes("heading") || setting.id.includes("title")) {
-        maxLen = 70;
+        maxLen = 80;
       } else if (setting.id.includes("button") || setting.id.includes("label") || setting.id.includes("cta")) {
         maxLen = 35;
       }
@@ -368,9 +368,21 @@ Generate specific, distinct Indian D2C copy for every required section instance.
 
         const sectionKey = `${pageName}:${idx}:${compId}`;
         if (generatedContent[sectionKey]) {
+          const safeContent: Record<string, any> = {};
+          const RICHTEXT_KEYS = ["subtext", "quote", "richtext", "content"];
+          const isBrandStory = compId.includes("story") || compId.includes("brand-story");
+          for (const [k, v] of Object.entries(generatedContent[sectionKey])) {
+            if (!k.endsWith("_url") && !k.endsWith("_link") && !k.includes("image") && !k.includes("video") && !k.includes("avatar") && !k.includes("logo")) {
+              if (typeof v === "string" && v.trim().length > 0 && (RICHTEXT_KEYS.includes(k) || (isBrandStory && k === "text"))) {
+                safeContent[k] = /^\s*<(p|ul|ol|h[1-6])/i.test(v) ? v : `<p>${v.trim()}</p>`;
+              } else {
+                safeContent[k] = v;
+              }
+            }
+          }
           section.settings = {
             ...(section.settings || {}),
-            ...generatedContent[sectionKey]
+            ...safeContent
           };
         }
       });

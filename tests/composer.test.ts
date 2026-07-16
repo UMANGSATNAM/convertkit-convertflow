@@ -113,7 +113,20 @@ vi.mock('../app/db.server', () => {
           }
           return null;
         }),
-        findMany: vi.fn(async () => Array(57).fill({ status: 'PUBLISHED', componentId: 'mock', sectionType: 'mock' }))
+        findMany: vi.fn(async () => {
+          const registryPath = path.join(process.cwd(), 'app/data/templates/theme-engine/registry.json');
+          try {
+            const content = fs.readFileSync(registryPath, 'utf-8');
+            const reg = JSON.parse(content);
+            return reg.components.map((c: any) => ({
+              status: 'PUBLISHED',
+              componentId: c.componentId,
+              sectionType: c.sectionType || c.componentId
+            }));
+          } catch {
+            return Array(67).fill({ status: 'PUBLISHED', componentId: 'mock', sectionType: 'mock' });
+          }
+        })
       }
     }
   };

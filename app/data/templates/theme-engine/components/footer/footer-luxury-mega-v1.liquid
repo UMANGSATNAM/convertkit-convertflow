@@ -1,0 +1,338 @@
+{% comment %} Footer Luxury Mega — Multi-column editorial footer with top accent rule, certification badges, and newsletter {% endcomment %}
+
+<footer class="sf-fl sf-fl-{{ section.id }}" id="sf-fl-{{ section.id }}">
+  <div class="sf-fl-top-border" aria-hidden="true"></div>
+
+  <div class="sf-fl-inner">
+    {%- comment -%} Brand Column {%- endcomment -%}
+    <div class="sf-fl-brand">
+      {% if section.settings.logo != blank %}
+        <img class="sf-fl-logo" src="{{ section.settings.logo | image_url: width: 280 }}" alt="{{ shop.name | escape }}" loading="lazy" width="140" height="48">
+      {% else %}
+        <h3 class="sf-fl-shop-name">{{ shop.name }}</h3>
+      {% endif %}
+
+      {% if section.settings.tagline != blank %}
+        <p class="sf-fl-tagline">{{ section.settings.tagline }}</p>
+      {% endif %}
+
+      <div class="sf-fl-social">
+        {% if section.settings.instagram != blank %}
+          <a href="{{ section.settings.instagram }}" class="sf-fl-social-link" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        {% endif %}
+        {% if section.settings.facebook != blank %}
+          <a href="{{ section.settings.facebook }}" class="sf-fl-social-link" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+        {% endif %}
+        {% if section.settings.pinterest != blank %}
+          <a href="{{ section.settings.pinterest }}" class="sf-fl-social-link" aria-label="Pinterest">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </a>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_certs %}
+        <div class="sf-fl-certs">
+          <span class="sf-fl-cert">CERTIFIED AUTHENTIC</span>
+          <span class="sf-fl-cert">ETHICALLY SOURCED</span>
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Navigation Columns {%- endcomment -%}
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        {% if block.type == 'nav_column' %}
+          <div class="sf-fl-nav-col" {{ block.shopify_attributes }}>
+            {% if block.settings.title != blank %}
+              <h4 class="sf-fl-nav-title">{{ block.settings.title }}</h4>
+            {% endif %}
+            <ul class="sf-fl-nav-list">
+              {% if block.settings.menu != blank %}
+                {% for link in linklists[block.settings.menu].links %}
+                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              {% elsif block.settings.links != blank %}
+                {% assign raw_links = block.settings.links | split: ',' %}
+                {% for raw in raw_links %}
+                  <li><a href="#">{{ raw | strip }}</a></li>
+                {% endfor %}
+              {% else %}
+                <li><a href="#">New Releases</a></li>
+                <li><a href="#">Signature Collection</a></li>
+                <li><a href="#">Bespoke Inquiry</a></li>
+              {% endif %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {%- comment -%} Default fallback columns {%- endcomment -%}
+      <div class="sf-fl-nav-col">
+        <h4 class="sf-fl-nav-title">Collections</h4>
+        <ul class="sf-fl-nav-list">
+          <li><a href="#">Fine Jewellery</a></li>
+          <li><a href="#">Bridal Suite</a></li>
+          <li><a href="#">Signature Watches</a></li>
+          <li><a href="#">High Jewelry</a></li>
+        </ul>
+      </div>
+      <div class="sf-fl-nav-col">
+        <h4 class="sf-fl-nav-title">Maison</h4>
+        <ul class="sf-fl-nav-list">
+          <li><a href="#">Our Heritage</a></li>
+          <li><a href="#">Craftsmanship</a></li>
+          <li><a href="#">Press & Articles</a></li>
+          <li><a href="#">Private Appointments</a></li>
+        </ul>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Newsletter Column {%- endcomment -%}
+    <div class="sf-fl-newsletter">
+      <h4 class="sf-fl-nav-title">{{ section.settings.newsletter_title | default: 'Join the Inner Circle' }}</h4>
+      {% if section.settings.newsletter_desc != blank %}
+        <p class="sf-fl-newsletter-desc">{{ section.settings.newsletter_desc }}</p>
+      {% endif %}
+      {% form 'customer', class: 'sf-fl-form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="sf-fl-input-wrap">
+          <input type="email" name="contact[email]" placeholder="your@email.com" class="sf-fl-input" required aria-label="Email address">
+          <button type="submit" class="sf-fl-submit" aria-label="Subscribe">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M0 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+
+  {%- comment -%} Bottom bar {%- endcomment -%}
+  <div class="sf-fl-bottom">
+    <div class="sf-fl-bottom-inner">
+      <p class="sf-fl-copy">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.
+        {{ section.settings.copy_suffix | default: 'All rights reserved.' }}
+      </p>
+      <div class="sf-fl-bottom-links">
+        {% if shop.privacy_policy != blank %}<a href="{{ shop.privacy_policy.url }}">Privacy Policy</a>{% endif %}
+        {% if shop.terms_of_service != blank %}<a href="{{ shop.terms_of_service.url }}">Terms of Service</a>{% endif %}
+        {% if shop.refund_policy != blank %}<a href="{{ shop.refund_policy.url }}">Refund Policy</a>{% endif %}
+      </div>
+      <div class="sf-fl-payments">
+        {% for type in shop.enabled_payment_types %}
+          {{ type | payment_type_svg_tag: class: 'sf-fl-pay-icon' }}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .sf-fl-{{ section.id }} {
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+  .sf-fl-top-border {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 50%, var(--color-accent) 80%, transparent 100%);
+  }
+  .sf-fl-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-64, 5rem) var(--space-32, 2rem) var(--space-48, 4rem);
+    display: grid;
+    grid-template-columns: 1.5fr repeat(2, 1fr) 1.3fr;
+    gap: var(--space-48, 3rem);
+  }
+  @media (max-width: 1100px) {
+    .sf-fl-inner { grid-template-columns: 1fr 1fr; gap: var(--space-32, 2.5rem); }
+  }
+  @media (max-width: 600px) {
+    .sf-fl-inner { grid-template-columns: 1fr; gap: var(--space-32, 2rem); padding: var(--space-40, 3rem) var(--space-20, 1.25rem); }
+  }
+  .sf-fl-logo {
+    max-width: 160px;
+    height: auto;
+    margin-bottom: var(--space-16, 1rem);
+  }
+  .sf-fl-shop-name {
+    font-family: var(--font-heading-family, serif);
+    font-size: var(--font-h3, 1.4rem);
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-12, 0.75rem);
+  }
+  .sf-fl-tagline {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: var(--font-small, 0.85rem);
+    color: var(--color-text-secondary, var(--color-text));
+    line-height: var(--leading-body, 1.6);
+    max-width: 280px;
+    margin-bottom: var(--space-24, 1.5rem);
+  }
+  .sf-fl-social {
+    display: flex;
+    gap: 12px;
+    margin-bottom: var(--space-24, 1.5rem);
+  }
+  .sf-fl-social-link {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary, var(--color-text));
+    transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  }
+  .sf-fl-social-link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+  .sf-fl-certs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sf-fl-cert {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary, var(--color-text));
+    border-radius: 2px;
+  }
+  .sf-fl-nav-title {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.725rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin-bottom: var(--space-20, 1.25rem);
+    padding-bottom: var(--space-12, 0.75rem);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .sf-fl-nav-list { list-style: none; padding: 0; margin: 0; }
+  .sf-fl-nav-list li { margin-bottom: var(--space-12, 0.75rem); }
+  .sf-fl-nav-list a {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, var(--color-text));
+    line-height: var(--leading-body, 1.5);
+    text-decoration: none;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+  }
+  .sf-fl-nav-list a:hover {
+    color: var(--color-text);
+    padding-left: 4px;
+  }
+  .sf-fl-newsletter-desc {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, var(--color-text));
+    line-height: var(--leading-body, 1.6);
+    margin-bottom: var(--space-20, 1.25rem);
+  }
+  .sf-fl-input-wrap {
+    display: flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 4px);
+    overflow: hidden;
+  }
+  .sf-fl-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 14px;
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    min-width: 0;
+  }
+  .sf-fl-input::placeholder { color: var(--color-text-secondary, var(--color-text)); opacity: 0.7; }
+  .sf-fl-submit {
+    padding: 0 18px;
+    background: var(--color-accent);
+    border: none;
+    cursor: pointer;
+    color: var(--color-background);
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sf-fl-submit:hover { opacity: 0.9; }
+  .sf-fl-bottom {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-24, 1.5rem) 0;
+  }
+  .sf-fl-bottom-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-32, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16, 1rem);
+    flex-wrap: wrap;
+  }
+  @media (max-width: 768px) {
+    .sf-fl-bottom-inner { padding: 0 var(--space-20, 1.25rem); flex-direction: column; text-align: center; }
+  }
+  .sf-fl-copy {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, var(--color-text));
+    margin: 0;
+  }
+  .sf-fl-bottom-links { display: flex; gap: var(--space-20, 1.25rem); }
+  .sf-fl-bottom-links a {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, var(--color-text));
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .sf-fl-bottom-links a:hover { color: var(--color-accent); }
+  .sf-fl-payments { display: flex; gap: 8px; align-items: center; }
+  .sf-fl-pay-icon { height: 22px; filter: grayscale(100%) opacity(0.7); transition: filter 0.3s ease; }
+  .sf-fl-pay-icon:hover { filter: grayscale(0%) opacity(1); }
+</style>
+
+{% schema %}
+{
+  "name": "Footer — Luxury Mega",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Brand Logo" },
+    { "type": "textarea", "id": "tagline", "label": "Brand Tagline", "default": "Crafted for timeless moments and discerning connoisseurs." },
+    { "type": "text", "id": "newsletter_title", "label": "Newsletter Heading", "default": "Join the Inner Circle" },
+    { "type": "textarea", "id": "newsletter_desc", "label": "Newsletter Description", "default": "Be first to discover new collections, private releases, and editorial stories." },
+    { "type": "text", "id": "copy_suffix", "label": "Copyright Suffix", "default": "All rights reserved. Crafted with distinction." },
+    { "type": "header", "content": "Social Links" },
+    { "type": "url", "id": "instagram", "label": "Instagram URL" },
+    { "type": "url", "id": "facebook", "label": "Facebook URL" },
+    { "type": "url", "id": "pinterest", "label": "Pinterest URL" },
+    { "type": "checkbox", "id": "show_certs", "label": "Show Certification Badges", "default": true }
+  ],
+  "blocks": [
+    {
+      "name": "Nav Column",
+      "type": "nav_column",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Column Title", "default": "Collections" },
+        { "type": "link_list", "id": "menu", "label": "Navigation Menu" },
+        { "type": "textarea", "id": "links", "label": "Or enter links manually (comma separated)", "info": "Only used if no menu is selected above" }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "presets": [{ "name": "Footer — Luxury Mega", "category": "Footer" }]
+}
+{% endschema %}

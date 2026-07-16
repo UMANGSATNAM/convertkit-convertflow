@@ -1,0 +1,67 @@
+<div class="sf-masonry-gallery sf-mg-{{ section.id }}" style="background-color: {{ section.settings.bg_color }};">
+  {% if section.settings.title != blank %}
+    <h2 class="sf-mg-title" style="color: {{ section.settings.text_color }};">{{ section.settings.title }}</h2>
+  {% endif %}
+  <div class="sf-mg-grid">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.link }}" class="sf-mg-item sf-mg-item-{{ forloop.index }}">
+        {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | image_url: width: 2048 }}" alt="Gallery Image" loading="lazy">
+        {% else %}
+          {{ 'image' | placeholder_svg_tag: 'sf-placeholder' }}
+        {% endif %}
+        <div class="sf-mg-overlay">
+          <span>{{ block.settings.caption }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .sf-mg-{{ section.id }} { padding: 4rem 1rem; text-align: center; }
+  .sf-mg-title { font-size: 2.5rem; margin-bottom: 2rem; font-weight: bold; text-transform: uppercase; }
+  .sf-mg-grid {
+    display: grid; gap: 1rem; max-width: 1200px; margin: 0 auto;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 200px;
+  }
+  @media (min-width: 768px) {
+    .sf-mg-grid { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 250px; }
+  }
+  .sf-mg-item { position: relative; overflow: hidden; border-radius: 8px; display: block; }
+  .sf-mg-item:nth-child(1) { grid-row: span 2; }
+  .sf-mg-item:nth-child(4) { grid-row: span 2; }
+  .sf-mg-item:nth-child(5) { grid-column: span 2; }
+  .sf-mg-item img, .sf-placeholder { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+  .sf-mg-item:hover img { transform: scale(1.05); }
+  .sf-mg-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, color-mix(in srgb, var(--color-text) 70%, transparent));
+    padding: 2rem 1rem 1rem; color: var(--color-background); transform: translateY(100%); transition: transform 0.3s;
+    display: flex; align-items: flex-end; justify-content: center; font-weight: bold; text-transform: uppercase;
+  }
+  .sf-mg-item:hover .sf-mg-overlay { transform: translateY(0); }
+</style>
+
+{% schema %}
+{
+  "name": "Masonry Gallery",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Title Color", "default": "#111111" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Shop The Look" }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "image", "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "caption", "label": "Caption", "default": "View Product" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Masonry Gallery", "category": "Image" } ]
+}
+{% endschema %}

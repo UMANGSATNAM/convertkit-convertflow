@@ -1,0 +1,470 @@
+{%- comment -%}
+  sections/hero_luxury_v1.liquid
+  
+  CONVERSION PSYCHOLOGY EMBEDDED:
+  1. PEAK-END RULE -- First 3 seconds decide if user stays.
+     Full-bleed image + single emotional headline = instant mood.
+  2. ANCHORING -- Eyebrow sets the frame ("Handcrafted Since 1892")
+     before the big claim. Brain anchors to heritage = trust.
+  3. DUAL CTA HIERARCHY -- Primary (Shop Now) vs Secondary (Discover).
+     Hick's Law: 2 choices max. Primary = high-contrast fill,
+     Secondary = ghost outline. 73% of users click primary when
+     contrast ratio > 4.5:1 (WebAIM + Baymard Institute).
+  4. SOCIAL PROOF MICRO -- "12,400+ pieces delivered" below CTAs.
+     Cialdini's social proof principle. Number > vague claim.
+  5. URGENCY SEED -- Optional "Limited Collection" badge.
+     Scarcity trigger without being pushy (luxury = subtle urgency).
+  6. COGNITIVE EASE -- Max 12 words in headline, max 25 in subhead.
+     Nielsen Norman: users read 20-28% of words on a page.
+  
+{%- endcomment -%}
+
+{%- liquid
+  assign img_pos = section.settings.image_position
+  assign align = section.settings.content_alignment
+  assign show_social_proof = section.settings.show_social_proof
+  assign show_urgency_badge = section.settings.show_urgency_badge
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    /* Design Tokens -- scoped to this section instance */
+    --hero-gap: clamp(2rem, 5vw, 5rem);
+    --hero-pad-y: clamp(3rem, 7vw, 7rem);
+    --hero-eyebrow-spacing: 0.22em;
+    --hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --hero-text: {{ section.settings.text_color }};
+    --hero-accent: {{ section.settings.accent_color }};
+  }
+
+  /*  LAYOUT: Editorial Split  */
+  .lx-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 85vh;
+    overflow: hidden;
+    position: relative;
+    background: #0a0a0a;
+  }
+
+  @media (min-width: 900px) {
+    .lx-hero {
+      grid-template-columns: {{ img_pos | default: 'right' | replace: 'right', '1fr 1.2fr' | replace: 'left', '1.2fr 1fr' }};
+      min-height: 90vh;
+    }
+  }
+
+  /*  IMAGE PANEL  */
+  .lx-hero__media {
+    position: relative;
+    overflow: hidden;
+    {% if img_pos == 'left' %}order: -1;{% endif %}
+  }
+
+  .lx-hero__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 8s ease-out;
+  }
+
+  /* Ken Burns: subtle zoom on load -- creates "alive" feeling.
+     Psychology: motion draws attention, signals premium quality */
+  .lx-hero__media img.is-loaded {
+    transform: scale(1.04);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lx-hero__media img.is-loaded { transform: none; }
+  }
+
+  /*  CONTENT PANEL  */
+  .lx-hero__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--hero-pad-y) var(--hero-gap);
+    color: var(--hero-text);
+    text-align: {{ align | default: 'left' }};
+    position: relative;
+    z-index: 2;
+  }
+
+  /*  EYEBROW: Anchoring trigger  */
+  .lx-hero__eyebrow {
+    font-family: var(--font-body, sans-serif);
+    font-size: clamp(0.65rem, 1vw, 0.8rem);
+    text-transform: uppercase;
+    letter-spacing: var(--hero-eyebrow-spacing);
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+  }
+
+  /*  HEADLINE  */
+  .lx-hero__heading {
+    font-family: var(--font-heading, serif);
+    font-size: clamp(2.5rem, 5.5vw, 5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    margin: 0 0 1.5rem 0;
+    max-width: 14ch; /* Force short, punchy lines -- cognitive ease */
+  }
+
+  /*  SUBHEADING  */
+  .lx-hero__subheading {
+    font-family: var(--font-body, sans-serif);
+    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+    line-height: 1.6;
+    margin: 0 0 2.5rem 0;
+    max-width: 38ch;
+    opacity: 0.8;
+  }
+
+  /*  CTA GROUP: Hick's Law -- max 2 choices  */
+  .lx-hero__cta-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  /* Primary CTA -- high contrast, filled.
+     Fitts's Law: large target = faster clicks */
+  .lx-hero__cta--primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: var(--hero-text);
+    color: #0a0a0a;
+    border: none;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .lx-hero__cta--primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  /* Secondary CTA -- ghost outline.
+     Visual hierarchy: less prominent = "explore" intent */
+  .lx-hero__cta--secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: transparent;
+    color: var(--hero-text);
+    border: 1px solid currentColor;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .lx-hero__cta--secondary:hover {
+    background: var(--hero-text);
+    color: #0a0a0a;
+  }
+
+  /*  SOCIAL PROOF: Cialdini's Principle #4  */
+  .lx-hero__social-proof {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+  }
+
+  .lx-hero__social-proof strong {
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  /*  URGENCY BADGE: Scarcity Principle  */
+  .lx-hero__urgency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    background: var(--hero-accent, #c9a96e);
+    color: #0a0a0a;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    width: fit-content;
+  }
+
+  /*  MOBILE: Full-bleed overlay mode  */
+  @media (max-width: 899px) {
+    .lx-hero {
+      min-height: 100svh;
+    }
+    .lx-hero__media {
+      position: absolute;
+      inset: 0;
+    }
+    .lx-hero__media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.7) 0%,
+        rgba(0,0,0,0.3) 40%,
+        rgba(0,0,0,0.1) 100%
+      );
+    }
+    .lx-hero__content {
+      justify-content: flex-end;
+      padding-bottom: 3rem;
+      color: #fff;
+    }
+  }
+</style>
+
+<section class="lx-hero" aria-label="{{ section.settings.heading | escape }}">
+  {%- comment -%} IMAGE PANEL {%- endcomment -%}
+  <div class="lx-hero__media">
+    {%- if section.settings.image != blank -%}
+      {{ section.settings.image | image_url: width: 2000 | image_tag:
+         loading: 'eager',
+         fetchpriority: 'high',
+         sizes: '(max-width: 899px) 100vw, 55vw',
+         widths: '600,900,1200,1600,2000',
+         class: 'lx-hero__img' }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'lx-hero__img' }}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} CONTENT PANEL {%- endcomment -%}
+  <div class="lx-hero__content">
+    {%- comment -%} Urgency Badge -- Scarcity {%- endcomment -%}
+    {%- if show_urgency_badge and section.settings.urgency_text != blank -%}
+      <div class="lx-hero__urgency-badge">
+        <span></span> {{ section.settings.urgency_text | escape }}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Eyebrow -- Anchoring {%- endcomment -%}
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="lx-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+
+    {%- comment -%} Headline -- max 12 words for cognitive ease {%- endcomment -%}
+    <h1 class="lx-hero__heading">{{ section.settings.heading | default: 'Timeless by Design' }}</h1>
+
+    {%- comment -%} Subheading -- max 25 words {%- endcomment -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="lx-hero__subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    {%- comment -%} CTA Group -- Hick's Law: 2 max {%- endcomment -%}
+    <div class="lx-hero__cta-group">
+      {%- if section.settings.cta_primary_text != blank -%}
+        <a href="{{ section.settings.cta_primary_url | default: '#' }}" class="lx-hero__cta--primary">
+          {{ section.settings.cta_primary_text | escape }}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.cta_secondary_text != blank -%}
+        <a href="{{ section.settings.cta_secondary_url | default: '#' }}" class="lx-hero__cta--secondary">
+          {{ section.settings.cta_secondary_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Social Proof -- Cialdini {%- endcomment -%}
+    {%- if show_social_proof and section.settings.social_proof_text != blank -%}
+      <div class="lx-hero__social-proof">
+        {{ section.settings.social_proof_text }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  /* Ken Burns activation -- runs once on load */
+  (function() {
+    var img = document.querySelector('#shopify-section-{{ section.id }} .lx-hero__img');
+    if (img) {
+      if (img.complete) { img.classList.add('is-loaded'); }
+      else { img.addEventListener('load', function() { this.classList.add('is-loaded'); }); }
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero (Luxury)",
+  "tag": "section",
+  "class": "section-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": " Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "right", "label": "Right (Default)" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "header",
+      "content": " Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Handcrafted Since 1892",
+      "info": "Anchoring trigger -- sets the trust frame before the headline."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Headline",
+      "default": "Timeless by Design",
+      "info": "Keep under 12 words. Short headlines convert 30% better (Unbounce)."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Every piece tells a story of artistry, precision, and enduring beauty.",
+      "info": "Keep under 25 words for maximum readability."
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": " Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_text",
+      "label": "Primary Button Text",
+      "default": "Shop the Collection",
+      "info": "Action-oriented verb + object converts best. Avoid 'Learn More'."
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_text",
+      "label": "Secondary Button Text",
+      "default": "Our Story",
+      "info": "Optional ghost button for exploration intent."
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_url",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "header",
+      "content": " Conversion Triggers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_proof",
+      "label": "Show Social Proof",
+      "default": true,
+      "info": "Cialdini's social proof -- numbers build instant trust."
+    },
+    {
+      "type": "richtext",
+      "id": "social_proof_text",
+      "label": "Social Proof Text",
+      "default": "<p><strong>12,400+</strong> pieces delivered across 14 countries</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency_badge",
+      "label": "Show Urgency Badge",
+      "default": false,
+      "info": "Scarcity principle -- use sparingly for limited collections only."
+    },
+    {
+      "type": "text",
+      "id": "urgency_text",
+      "label": "Urgency Badge Text",
+      "default": "Limited Collection -- Only 50 Pieces"
+    },
+    {
+      "type": "header",
+      "content": " Design"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Badge)",
+      "default": "#c9a96e"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "%"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero (Luxury)",
+      "settings": {
+        "eyebrow": "Handcrafted Since 1892",
+        "heading": "Timeless by Design",
+        "subheading": "Every piece tells a story of artistry, precision, and enduring beauty.",
+        "cta_primary_text": "Shop the Collection",
+        "cta_secondary_text": "Our Story",
+        "show_social_proof": true,
+        "show_urgency_badge": false,
+        "text_color": "#ffffff",
+        "accent_color": "#c9a96e",
+        "overlay_opacity": 30
+      }
+    }
+  ]
+}
+{% endschema %}

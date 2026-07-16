@@ -34,10 +34,10 @@ async function checkManifestCount() {
 
   const baseTokensContent = compiled.filesToUpload["assets/base-tokens.css"];
   console.log("base-tokens.css present:", !!baseTokensContent);
-  if (baseTokensContent) {
-    console.log("Contains accent #008060:", baseTokensContent.includes("#008060"));
-    console.log("Contains playfair font:", baseTokensContent.toLowerCase().includes("playfair"));
-  }
+  const nicheTokensContent = compiled.filesToUpload["assets/niche-tokens.css"];
+  console.log("=== GENERATED NICHE-TOKENS.CSS FULL CONTENTS ===");
+  console.log(nicheTokensContent || "NOT FOUND");
+  console.log("================================================");
 }
 
 checkManifestCount().catch((err) => {

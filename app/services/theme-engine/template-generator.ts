@@ -19,6 +19,23 @@ import path from "path";
  * 4. Deterministic Keys: Uses `${componentId}-${counter}` format for all appended sections.
  * 5. Child Block Support: Constructs `blocks` and `block_order` for nested block configurations.
  */
+function sanitizeRichtextSettings(settings: Record<string, any>, compId: string): Record<string, any> {
+  if (!settings || typeof settings !== "object") return settings;
+  const sanitized: Record<string, any> = { ...settings };
+  const RICHTEXT_KEYS = ["subtext", "quote", "richtext", "content"];
+  const isBrandStory = compId.includes("story") || compId.includes("brand-story");
+  
+  for (const [k, v] of Object.entries(sanitized)) {
+    if (typeof v === "string" && v.trim().length > 0) {
+      const isKnownRichtextKey = RICHTEXT_KEYS.includes(k) || (isBrandStory && k === "text");
+      if (isKnownRichtextKey && !/^\s*<(p|ul|ol|h[1-6])/i.test(v)) {
+        sanitized[k] = `<p>${v.trim()}</p>`;
+      }
+    }
+  }
+  return sanitized;
+}
+
 export async function generateTemplates(
   blueprint: StoreBlueprintData,
   filesToUpload: Record<string, string>,
@@ -67,17 +84,42 @@ export async function generateTemplates(
         mainSection = {
           type: "main-product",
           blocks: {
+            breadcrumbs: { type: "breadcrumbs", settings: {} },
+            vendor: { type: "vendor", settings: {} },
             title: { type: "title", settings: {} },
+            rating: { type: "rating", settings: {} },
             price: { type: "price", settings: {} },
-            variant_picker: { type: "variant_picker", settings: {} },
-            buy_buttons: { type: "buy_buttons", settings: {} }
+            variant_picker: { type: "variant_picker", settings: { picker_type: "button" } },
+            quantity_selector: { type: "quantity_selector", settings: {} },
+            buy_buttons: { type: "buy_buttons", settings: { show_dynamic_checkout: true } },
+            urgency_bar: { type: "urgency_bar", settings: { text: "Selling fast! Only 3 left in stock." } },
+            delivery_estimate: { type: "delivery_estimate", settings: {} },
+            trust_triad: { type: "trust_triad", settings: {} },
+            trust_badges: { type: "trust_badges", settings: {} },
+            offers_strip: { type: "offers_strip", settings: { text: "Get 10% off with code WELCOME10" } },
+            accordion_details: { type: "accordion", settings: { heading: "Product Details", country_of_origin: "India", manufacturer: "Aurelle Luxe Pvt Ltd, Mumbai, India" } },
+            accordion_shipping: { type: "accordion", settings: { heading: "Shipping", shipping_policy: "Free Insured Shipping across India via Express Courier (3-5 working days)." } },
+            description: { type: "description", settings: {} },
+            payment_icons: { type: "payment_icons", settings: {} },
+            reviews: { type: "reviews", settings: {} },
+            related_products: { type: "related_products", settings: {} },
+            recently_viewed: { type: "recently_viewed", settings: {} }
           },
-          block_order: ["title", "price", "variant_picker", "buy_buttons"],
+          block_order: [
+            "breadcrumbs", "vendor", "title", "rating", "price", "variant_picker",
+            "quantity_selector", "buy_buttons", "urgency_bar", "delivery_estimate",
+            "trust_triad", "trust_badges", "offers_strip", "accordion_details",
+            "accordion_shipping", "description", "payment_icons", "reviews",
+            "related_products", "recently_viewed"
+          ],
           settings: {
             enable_sticky_info: true,
             enable_image_zoom: true
           }
         };
+      }
+      if (pageData.mainSectionType || pageData.mainComponentId) {
+        mainSection.type = pageData.mainSectionType || pageData.mainComponentId;
       }
       newSections[mainKey] = mainSection;
       newOrder.push(mainKey);
@@ -126,7 +168,7 @@ export async function generateTemplates(
         usedComponents.push(comp);
       }
 
-      const sectionType = comp.sectionType || comp.componentId;
+      const sectionType = comp.componentId;
       const cleanId = section.componentId.replace(/[^a-z0-9-]/gi, "-");
       const currentCount = (counterMap.get(cleanId) || 0) + 1;
       counterMap.set(cleanId, currentCount);
@@ -134,7 +176,7 @@ export async function generateTemplates(
 
       const sectionObj: any = {
         type: sectionType,
-        settings: section.settings || {}
+        settings: sanitizeRichtextSettings(section.settings || {}, comp.componentId)
       };
 
       // Support child blocks if defined in blueprint
@@ -146,13 +188,19 @@ export async function generateTemplates(
             const blkKey = blk.id || `block-${idx + 1}`;
             sectionObj.blocks[blkKey] = {
               type: blk.type || "text",
-              settings: blk.settings || {}
+              settings: sanitizeRichtextSettings(blk.settings || {}, comp.componentId)
             };
             sectionObj.block_order.push(blkKey);
           });
         } else if (typeof section.blocks === "object") {
-          sectionObj.blocks = section.blocks;
+          sectionObj.blocks = {};
           sectionObj.block_order = Object.keys(section.blocks);
+          for (const [bKey, bVal] of Object.entries(section.blocks as Record<string, any>)) {
+            sectionObj.blocks[bKey] = {
+              type: bVal?.type || "text",
+              settings: sanitizeRichtextSettings(bVal?.settings || {}, comp.componentId)
+            };
+          }
         }
       }
 

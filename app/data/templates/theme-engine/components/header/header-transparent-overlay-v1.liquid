@@ -1,0 +1,253 @@
+{% comment %} Header Transparent Overlay Luxury — Sticky/absolute transparent header with scroll-triggered background and tokenized state transitions {% endcomment %}
+
+<header class="sf-hto sf-hto-header sf-hto-{{ section.id }} {% if section.settings.enable_sticky %}is-sticky{% endif %}" id="sf-hto-{{ section.id }}">
+  <div class="sf-hto-bg-layer" aria-hidden="true"></div>
+  
+  <div class="sf-hto-inner">
+    {%- comment -%} Brand Logo {%- endcomment -%}
+    <div class="sf-hto-logo-wrap">
+      <a href="{{ routes.root_url }}" class="sf-hto-logo-link">
+        {% if section.settings.logo_light != blank and section.settings.logo_dark != blank %}
+          <img src="{{ section.settings.logo_light | image_url: width: 400 }}" alt="{{ shop.name | escape }}" class="sf-hto-logo-img sf-hto-logo-light" loading="lazy" width="160" height="40">
+          <img src="{{ section.settings.logo_dark | image_url: width: 400 }}" alt="{{ shop.name | escape }}" class="sf-hto-logo-img sf-hto-logo-dark" loading="lazy" width="160" height="40">
+        {% elsif section.settings.logo_light != blank %}
+          <img src="{{ section.settings.logo_light | image_url: width: 400 }}" alt="{{ shop.name | escape }}" class="sf-hto-logo-img" loading="lazy" width="160" height="40">
+        {% else %}
+          <span class="sf-hto-logo-text">{{ shop.name }}</span>
+        {% endif %}
+      </a>
+    </div>
+
+    {%- comment -%} Navigation {%- endcomment -%}
+    <nav class="sf-hto-nav" aria-label="Main navigation">
+      {% if section.settings.menu != blank and linklists[section.settings.menu].links.size > 0 %}
+        {% for link in linklists[section.settings.menu].links %}
+          <a href="{{ link.url }}" class="sf-hto-nav-link">{{ link.title }}</a>
+        {% endfor %}
+      {% else %}
+        <a href="{{ routes.collections_url }}" class="sf-hto-nav-link">Collections</a>
+        <a href="{{ routes.all_products_collection_url }}" class="sf-hto-nav-link">Signature Creations</a>
+        <a href="#" class="sf-hto-nav-link">Maison</a>
+        <a href="#" class="sf-hto-nav-link">Bespoke</a>
+      {% endif %}
+    </nav>
+
+    {%- comment -%} Actions {%- endcomment -%}
+    <div class="sf-hto-actions">
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ routes.account_url }}" class="sf-hto-action-link" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% endif %}
+
+      <a href="{{ routes.cart_url }}" class="sf-hto-action-link sf-hto-cart-link" aria-label="Cart">
+        <span class="sf-hto-cart-text">Bag</span>
+        <span class="sf-hto-cart-badge">{{ cart.item_count | default: 0 }}</span>
+      </a>
+
+      <button type="button" class="sf-hto-mobile-toggle" aria-label="Open navigation menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .sf-hto-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+    border-bottom: 1px solid transparent;
+  }
+  .sf-hto-header.is-sticky {
+    position: fixed;
+  }
+  .sf-hto-bg-layer {
+    position: absolute;
+    inset: 0;
+    background: var(--color-background);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+  }
+  .sf-hto-header.is-scrolled {
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--color-text) 5%, transparent);
+  }
+  .sf-hto-header.is-scrolled .sf-hto-bg-layer {
+    opacity: 1;
+  }
+  .sf-hto-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-32, 2rem);
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-32, 2rem);
+  }
+  @media (max-width: 900px) {
+    .sf-hto-inner {
+      height: 72px;
+      padding: 0 var(--space-20, 1.25rem);
+    }
+  }
+  .sf-hto-logo-wrap {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+  .sf-hto-logo-link {
+    display: block;
+    text-decoration: none;
+    position: relative;
+  }
+  .sf-hto-logo-img {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.4s ease;
+  }
+  .sf-hto-logo-dark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  .sf-hto-header.is-scrolled .sf-hto-logo-light {
+    opacity: 0;
+  }
+  .sf-hto-header.is-scrolled .sf-hto-logo-dark {
+    opacity: 1;
+  }
+  .sf-hto-logo-text {
+    font-family: var(--font-heading-family, serif);
+    font-size: var(--font-h4, 1.4rem);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-surface);
+    transition: color 0.4s ease;
+  }
+  .sf-hto-header.is-scrolled .sf-hto-logo-text {
+    color: var(--color-text);
+  }
+  .sf-hto-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-32, 2rem);
+  }
+  @media (max-width: 900px) {
+    .sf-hto-nav { display: none; }
+  }
+  .sf-hto-nav-link {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-surface);
+    text-decoration: none;
+    transition: color 0.4s ease, opacity 0.3s ease;
+  }
+  .sf-hto-nav-link:hover {
+    opacity: 0.7;
+  }
+  .sf-hto-header.is-scrolled .sf-hto-nav-link {
+    color: var(--color-text);
+  }
+  .sf-hto-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-20, 1.25rem);
+  }
+  .sf-hto-action-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-surface);
+    text-decoration: none;
+    transition: color 0.4s ease, opacity 0.3s ease;
+  }
+  .sf-hto-action-link:hover { opacity: 0.7; }
+  .sf-hto-header.is-scrolled .sf-hto-action-link {
+    color: var(--color-text);
+  }
+  .sf-hto-cart-text {
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .sf-hto-cart-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-body-family, sans-serif);
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+  .sf-hto-header.is-scrolled .sf-hto-cart-badge {
+    background: var(--color-text);
+    color: var(--color-background);
+  }
+  .sf-hto-mobile-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--color-surface);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.4s ease;
+  }
+  @media (max-width: 900px) {
+    .sf-hto-mobile-toggle { display: block; }
+  }
+  .sf-hto-header.is-scrolled .sf-hto-mobile-toggle {
+    color: var(--color-text);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var header = document.getElementById('sf-hto-{{ section.id }}');
+    if (!header) return;
+    
+    function onScroll() {
+      if (window.scrollY > 40) {
+        header.classList.add('is-scrolled');
+      } else {
+        header.classList.remove('is-scrolled');
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Header Overlay",
+  "settings": [
+    { "type": "checkbox", "id": "enable_sticky", "label": "Enable Sticky Header on Scroll", "default": true },
+    { "type": "image_picker", "id": "logo_light", "label": "Logo (Light for Transparent State)" },
+    { "type": "image_picker", "id": "logo_dark", "label": "Logo (Dark for Scrolled State)" },
+    { "type": "link_list", "id": "menu", "label": "Navigation Menu", "default": "main-menu" }
+  ],
+  "presets": [{ "name": "Header Overlay", "category": "Header" }]
+}
+{% endschema %}

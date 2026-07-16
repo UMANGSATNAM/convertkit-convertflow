@@ -198,7 +198,7 @@ export function validateThemeIntegrity(
     for (const section of pageData.sections || []) {
       const component = components.find(c => c.componentId === section.componentId);
       if (component) {
-        const sectionType = component.sectionType || component.componentId;
+        const sectionType = component.componentId;
         const targetKey = `sections/${sectionType}.liquid`;
         if (!filesToUpload[targetKey]) {
           console.warn(`[Validator] Section file missing in merged theme: ${targetKey}. Ensure file exists in components registry.`);
@@ -445,13 +445,20 @@ export async function resolveComponentLiquidContent(component: any, customRegist
   }
   const liquidPath = matched.liquidPath;
 
-  // 2. Resolve exact absolute path from liquidPath and enforce path containment within theme-engine root
+  // 2. Resolve exact absolute path from liquidPath and enforce path containment within theme-engine root or app/data root
   const themeEngineRoot = path.resolve(process.cwd(), "app/data/templates/theme-engine");
-  const cleanRelPath = liquidPath.replace(/^(\/?app\/data\/templates\/theme-engine\/)+/, "");
-  const exactPath = path.resolve(themeEngineRoot, cleanRelPath);
+  const appDataRoot = path.resolve(process.cwd(), "app/data");
+  let exactPath: string;
+  if (liquidPath.startsWith("app/data/") || liquidPath.startsWith("..") || liquidPath.includes("_beauty") || liquidPath.includes("_luxury") || liquidPath.includes("_streetwear") || liquidPath.includes("_supplements") || liquidPath.includes("_electronics")) {
+    const rel = liquidPath.replace(/^(\/?app\/data\/)+/, "").replace(/^(\.\.\/)+/, "").replace(/^(components\/[^\/]+\/)+/, "");
+    exactPath = path.resolve(appDataRoot, rel);
+  } else {
+    const cleanRelPath = liquidPath.replace(/^(\/?app\/data\/templates\/theme-engine\/)+/, "");
+    exactPath = path.resolve(themeEngineRoot, cleanRelPath);
+  }
 
-  if (exactPath !== themeEngineRoot && !exactPath.startsWith(themeEngineRoot + path.sep)) {
-    throw new Error(`[Resolver] Security Error: Path traversal attempt detected. Path "${exactPath}" escapes theme-engine root "${themeEngineRoot}".`);
+  if (!exactPath.startsWith(themeEngineRoot + path.sep) && !exactPath.startsWith(appDataRoot + path.sep) && exactPath !== themeEngineRoot && exactPath !== appDataRoot) {
+    throw new Error(`[Resolver] Security Error: Path traversal attempt detected. Path "${exactPath}" escapes allowed roots.`);
   }
 
   // 3. Read file from exact path
@@ -502,12 +509,69 @@ export async function assembleThemeBundle(
     addShopifyFile(filesToUpload, relPath, content);
   }
 
+  // Step 1.1: Auto-bundle Indian & custom snippets from app/data/snippets
+  const snippetsDir = path.resolve(process.cwd(), "app/data/snippets");
+  if (existsSync(snippetsDir)) {
+    const snippetFiles = await fs.readdir(snippetsDir);
+    for (const file of snippetFiles) {
+      if (file.endsWith(".liquid")) {
+        const content = await fs.readFile(path.join(snippetsDir, file), "utf-8");
+        addShopifyFile(filesToUpload, `snippets/${file}`, content);
+      }
+    }
+  }
+
+  // Step 1.2: Auto-bundle all real custom sections from app/data/*.liquid into filesToUpload['sections/']
+  const appDataDir = path.resolve(process.cwd(), "app/data");
+  if (existsSync(appDataDir)) {
+    const sectionFiles = await fs.readdir(appDataDir);
+    for (const file of sectionFiles) {
+      if (file.endsWith(".liquid")) {
+        const content = await fs.readFile(path.join(appDataDir, file), "utf-8");
+        const baseName = file.replace(/\.liquid$/, "");
+        addShopifyFile(filesToUpload, `sections/${baseName}.liquid`, content);
+        // Also ensure it exists in components array if referenced by blueprint
+        if (!components.some(c => c.componentId === baseName)) {
+          components.push({
+            componentId: baseName,
+            category: baseName.startsWith("header") ? "header" : baseName.startsWith("footer") ? "footer" : baseName.startsWith("hero") ? "hero" : "trust",
+            niche: "beauty",
+            sectionType: baseName,
+            filePath: `app/data/${file}`,
+            liquidPath: `app/data/${file}`,
+            metaPath: "",
+            family: "Beauty",
+            archetypes: ["premium", "luxury"],
+            visualStyle: "editorial",
+            compatibleSlots: [],
+            industryTags: ["beauty", "luxury"],
+            styleTags: [],
+            searchKeywords: [baseName],
+            croScore: 95,
+            mobileScore: 95,
+            version: "1",
+            status: "PUBLISHED",
+            isUniversal: true,
+            performanceScore: 95
+          } as any);
+        }
+      }
+    }
+  }
+
   // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
-  const fontHeading = settings.fontHeading || settings.font_heading || 'Inter';
-  const fontBody = settings.fontBody || settings.font_body || 'Inter';
   const isLuxury = settings.designDirection === 'LUXURY';
   const isBold = settings.designDirection === 'BOLD';
+  const isMinimal = settings.designDirection === 'MINIMAL';
+  const isPlayful = settings.designDirection === 'PLAYFUL';
+
+  const fontHeading = settings.fontHeading || settings.font_heading || (isLuxury ? 'Playfair Display' : 'Inter');
+  const fontBody = settings.fontBody || settings.font_body || 'Inter';
+  
+  const motionDuration = isLuxury ? '800ms' : isBold ? '250ms' : isMinimal ? '400ms' : isPlayful ? '500ms' : '600ms';
+  const motionDistance = (isLuxury || settings.designDirection === 'EDITORIAL') ? '20px' : isMinimal ? '12px' : isBold ? '30px' : '20px';
+  const motionZoom = isBold ? '2.0' : isLuxury ? '1.6' : '1.8';
 
   filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
@@ -518,22 +582,37 @@ export async function assembleThemeBundle(
   --color-accent: ${settings.colors_accent_2 || '#008060'};
   --color-border: #e2e8f0;
   --color-surface: ${settings.colors_surface || '#f8fafc'};
-  --font-heading-family: '${fontHeading}', sans-serif;
-  --font-body-family: '${fontBody}', sans-serif;
+  --font-heading-family: '${fontHeading}', Georgia, serif;
+  --font-body-family: '${fontBody}', -apple-system, sans-serif;
+  --weight-display: ${isLuxury ? '400' : '700'};
+  --weight-heading: ${isLuxury ? '500' : '600'};
+  --weight-body: 400;
+  --weight-emphasis: 600;
   --card-radius: ${settings.card_style === 'soft' ? '12px' : settings.card_style === 'rounded' ? '24px' : '0px'};
   --button-radius: ${settings.button_style === 'pill' ? '50px' : settings.button_style === 'rounded' ? '8px' : '0px'};
   --section-padding-y: ${settings.section_density === 'airy' ? '80px' : settings.section_density === 'tight' ? '40px' : '60px'};
-  --font-display: ${isLuxury ? 'clamp(2.75rem, 6.5vw, 5.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)'};
-  --font-h1: clamp(2rem, 4vw, 3.5rem);
-  --font-h2: clamp(1.5rem, 3vw, 2.5rem);
+  --font-display: ${isLuxury ? 'clamp(2.75rem, 5.5vw, 4.5rem)' : isBold ? 'clamp(3rem, 7vw, 6rem)' : 'clamp(2.5rem, 6vw, 5rem)'};
+  --font-h1: ${isLuxury ? 'clamp(2rem, 4vw, 3rem)' : 'clamp(2rem, 4vw, 3.5rem)'};
+  --font-h2: ${isLuxury ? 'clamp(1.5rem, 3vw, 2.25rem)' : 'clamp(1.5rem, 3vw, 2.5rem)'};
   --font-h3: 1.25rem;
   --font-body: 1rem;
-  --font-small: 0.875rem;
-  --font-eyebrow: 0.75rem;
-  --tracking-tight: ${isBold ? '-0.04em' : '-0.02em'};
+  --font-small: ${isLuxury ? '0.8125rem' : '0.875rem'};
+  --font-eyebrow: ${isLuxury ? '0.6875rem' : '0.75rem'};
+  --tracking-eyebrow: ${isLuxury ? '0.2em' : '0.15em'};
+  --tracking-display: ${isLuxury ? '-0.01em' : isBold ? '-0.04em' : '-0.02em'};
+  --tracking-body: 0;
+  --tracking-tight: ${isBold ? '-0.04em' : '-0.01em'};
   --tracking-wide: ${isLuxury ? '0.2em' : '0.15em'};
-  --leading-tight: ${isBold ? '1.05' : isLuxury ? '1.15' : '1.1'};
-  --leading-body: 1.6;
+  --leading-display: ${isLuxury ? '1.1' : isBold ? '1.05' : '1.1'};
+  --leading-tight: ${isBold ? '1.05' : isLuxury ? '1.1' : '1.1'};
+  --leading-body: ${isLuxury ? '1.65' : '1.6'};
+  
+  /* Motion Tokens Layer */
+  --motion-duration: ${motionDuration};
+  --motion-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-distance: ${motionDistance};
+  --motion-stagger: 60ms;
+  --motion-zoom: ${motionZoom};
 }`;
 
   const googleFontsLinks = generateGoogleFontsHeadLinks(fontHeading, fontBody);
@@ -584,7 +663,7 @@ export async function assembleThemeBundle(
   // whose freshness against registry.json is guaranteed by the Stage 2.2 SHA-256 freshness gate.
   for (const component of assembledComponents) {
     const liquidContent = await resolveComponentLiquidContent(component, components);
-    const sectionType = component.sectionType || component.componentId;
+    const sectionType = component.componentId;
     filesToUpload[`sections/${sectionType}.liquid`] = liquidContent;
   }
 
@@ -632,7 +711,7 @@ export async function assembleThemeBundle(
     }
 
     const fallbackType = slotEntry.type;
-    const newType = active.sectionType || active.componentId;
+    const newType = active.componentId;
     slotEntry.type = newType;
     filesToUpload[groupPath] = JSON.stringify(group, null, 2);
 

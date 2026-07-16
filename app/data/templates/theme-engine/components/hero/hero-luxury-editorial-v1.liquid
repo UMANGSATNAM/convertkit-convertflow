@@ -1,0 +1,250 @@
+{% comment %} Hero Luxury Editorial — Full-screen editorial hero with text reveal and decorative accents {% endcomment %}
+
+<section class="sf-lux sf-hero-editorial sf-hle-{{ section.id }}" id="sf-hero-{{ section.id }}">
+
+  {%- comment -%} Background layer {%- endcomment -%}
+  <div class="sf-hle-bg">
+    {% assign img_src = section.settings.bg_image %}
+    {% if section.settings.bg_video_url != blank %}
+      <video class="sf-hle-video" autoplay muted loop playsinline>
+        <source src="{{ section.settings.bg_video_url }}">
+      </video>
+    {% elsif img_src != blank %}
+      <img src="{{ img_src | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="eager" fetchpriority="high">
+    {% else %}
+      {% comment %} Tier 3: Built-in placeholder fallback {% endcomment %}
+      <img src="{{ 'placeholder-beauty-hero-1.jpg' | asset_url }}" alt="Placeholder Hero" loading="eager" fetchpriority="high">
+    {% endif %}
+    <div class="sf-hle-overlay" style="opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"></div>
+  </div>
+
+  {%- comment -%} Decorative vertical lines {%- endcomment -%}
+  <div class="sf-hle-deco-left"></div>
+  <div class="sf-hle-deco-right"></div>
+
+  {%- comment -%} Content {%- endcomment -%}
+  <div class="sf-hle-content sf-hle-align-{{ section.settings.content_align }}">
+    {% if section.settings.eyebrow != blank %}
+      <p class="sf-hle-eyebrow" id="sf-hle-eyebrow-{{ section.id }}">
+        <span class="sf-hle-eyebrow-line"></span>
+        {{ section.settings.eyebrow }}
+        <span class="sf-hle-eyebrow-line"></span>
+      </p>
+    {% endif %}
+
+    {% if section.settings.title != blank %}
+      <h1 class="sf-hle-title sf-stagger-item" id="sf-hle-title-{{ section.id }}">
+        {{ section.settings.title | newline_to_br }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+      <p class="sf-hle-subtitle sf-stagger-item" id="sf-hle-sub-{{ section.id }}">{{ section.settings.subtitle }}</p>
+    {% endif %}
+
+    <div class="sf-hle-cta-row sf-stagger-item" id="sf-hle-cta-{{ section.id }}">
+      {% if section.settings.btn1_label != blank and section.settings.btn1_link != blank %}
+        <a href="{{ section.settings.btn1_link }}" class="sf-btn-accent">
+          <span>{{ section.settings.btn1_label }}</span>
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" style="position:relative;z-index:1">
+            <path d="M0 4H14M14 4L10 1M14 4L10 7" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </a>
+      {% endif %}
+      {% if section.settings.btn2_label != blank and section.settings.btn2_link != blank %}
+        <a href="{{ section.settings.btn2_link }}" class="sf-btn-ghost">
+          <span>{{ section.settings.btn2_label }}</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {%- comment -%} Scroll indicator {%- endcomment -%}
+  <div class="sf-hle-scroll-indicator" id="sf-hle-scroll-{{ section.id }}">
+    <span class="sf-hle-scroll-text">Scroll</span>
+    <div class="sf-hle-scroll-line"><div class="sf-hle-scroll-dot"></div></div>
+  </div>
+
+  {%- comment -%} Corner badge {%- endcomment -%}
+  {% if section.settings.badge_text != blank %}
+    <div class="sf-hle-badge">
+      <span>{{ section.settings.badge_text }}</span>
+    </div>
+  {% endif %}
+
+</section>
+
+<style>
+  .sf-hle-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    min-height: {{ section.settings.height_vh }}vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  /* Background */
+  .sf-hle-bg { position: absolute; inset: 0; }
+  .sf-hle-video, .sf-hle-bg > img { width: 100%; height: 100%; object-fit: cover; }
+  .sf-hle-gradient-bg {
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse 80% 80% at 20% 50%, var(--color-text) 0%, var(--color-background) 60%),
+                linear-gradient(135deg, var(--color-text) 0%, var(--color-text) 50%, var(--color-text) 100%);
+  }
+  .sf-hle-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--color-text) 40%, transparent) 0%, color-mix(in srgb, var(--color-text) 85%, transparent) 100%);
+  }
+
+  /* Decorative vertical lines */
+  .sf-hle-deco-left, .sf-hle-deco-right {
+    position: absolute; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent 0%, var(--color-accent) 30%, var(--color-accent) 70%, transparent 100%);
+    opacity: 0.15;
+  }
+  .sf-hle-deco-left { left: var(--space-64, 60px); }
+  .sf-hle-deco-right { right: var(--space-64, 60px); }
+  @media (max-width: 768px) { .sf-hle-deco-left { left: var(--space-20, 20px); } .sf-hle-deco-right { right: var(--space-20, 20px); } }
+
+  /* Content layout */
+  .sf-hle-content {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 1200px;
+    padding: 0 var(--space-64, 80px);
+  }
+  .sf-hle-align-center { text-align: center; }
+  .sf-hle-align-left { text-align: left; }
+  @media (max-width: 768px) { .sf-hle-content { padding: 0 var(--space-24, 24px); } }
+
+  /* Eyebrow */
+  .sf-hle-eyebrow {
+    display: flex; align-items: center; gap: 12px;
+    font-size: var(--font-eyebrow, 0.75rem); font-weight: 500; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--color-surface);
+    margin-bottom: var(--space-24, 1.5rem);
+    opacity: 0; animation: sfHleEyebrowIn 1s var(--transition-base, ease) 0.3s forwards;
+  }
+  .sf-hle-align-center .sf-hle-eyebrow { justify-content: center; }
+  .sf-hle-eyebrow-line {
+    display: block; flex: none; width: 32px; height: 1px; background: var(--color-accent); opacity: 0.6;
+  }
+
+  /* Title */
+  .sf-hle-title {
+    font-family: var(--font-heading-family, serif); font-weight: 400;
+    font-size: var(--font-display, clamp(2.8rem, 6vw, 5.5rem));
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--color-surface);
+    margin-bottom: var(--space-24, 1.5rem);
+    clip-path: inset(0 0 0 0);
+    opacity: 0; animation: sfHleTitleIn 1.2s var(--transition-base, ease) 0.5s forwards;
+  }
+  .sf-hle-title em { font-style: italic; color: var(--color-surface); }
+
+  /* Subtitle */
+  .sf-hle-subtitle {
+    font-family: var(--font-body-family, sans-serif); font-weight: 300;
+    font-size: var(--font-body, clamp(0.9rem, 1.5vw, 1.1rem));
+    line-height: var(--leading-body, 1.6); color: color-mix(in srgb, var(--color-surface) 75%, transparent);
+    max-width: 520px; margin-bottom: var(--space-40, 2.5rem);
+    opacity: 0; animation: sfHleSubIn 1s var(--transition-base, ease) 0.7s forwards;
+  }
+  .sf-hle-align-center .sf-hle-subtitle { margin-left: auto; margin-right: auto; }
+
+  /* CTA Row */
+  .sf-hle-cta-row {
+    display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center;
+    opacity: 0; animation: sfHleCtaIn 1s var(--transition-base, ease) 0.9s forwards;
+  }
+  .sf-hle-align-center .sf-hle-cta-row { justify-content: center; }
+
+  .sf-btn-accent {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 28px; background: var(--color-accent); color: #ffffff;
+    font-family: var(--font-body-family, sans-serif); font-size: var(--font-small, 0.875rem);
+    font-weight: 600; text-decoration: none; border-radius: var(--button-radius, 8px);
+    transition: opacity 0.2s ease;
+  }
+  .sf-btn-accent:hover { opacity: 0.9; }
+
+  .sf-btn-ghost {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 28px; background: transparent; color: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-surface) 40%, transparent);
+    font-family: var(--font-body-family, sans-serif); font-size: var(--font-small, 0.875rem);
+    font-weight: 600; text-decoration: none; border-radius: var(--button-radius, 8px);
+    transition: all 0.2s ease;
+  }
+  .sf-btn-ghost:hover { border-color: var(--color-surface); }
+
+  /* Scroll indicator */
+  .sf-hle-scroll-indicator {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    opacity: 0; animation: sfHleScrollIn 1s var(--transition-base, ease) 1.4s forwards;
+  }
+  .sf-hle-scroll-text {
+    font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-surface) 60%, transparent); writing-mode: horizontal-tb;
+  }
+  .sf-hle-scroll-line {
+    width: 1px; height: 48px; background: color-mix(in srgb, var(--color-surface) 20%, transparent);
+    position: relative; overflow: hidden;
+  }
+  .sf-hle-scroll-dot {
+    position: absolute; top: -6px; left: -1px; width: 3px; height: 12px;
+    background: var(--color-surface); border-radius: 2px;
+    animation: sfScrollDrop 1.8s ease-in-out infinite;
+  }
+
+  /* Corner badge */
+  .sf-hle-badge {
+    position: absolute; top: 40px; right: 80px; z-index: 3;
+    width: 80px; height: 80px; border: 1px solid color-mix(in srgb, var(--color-surface) 30%, transparent);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.58rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--color-surface); text-align: center;
+    animation: sfRotate 20s linear infinite;
+  }
+  @media (max-width: 768px) { .sf-hle-badge { top: 20px; right: 20px; width: 60px; height: 60px; } }
+
+  /* Keyframes */
+  @keyframes sfHleEyebrowIn { to { opacity: 1; } }
+  @keyframes sfHleTitleIn { to { opacity: 1; } }
+  @keyframes sfHleSubIn { to { opacity: 1; } }
+  @keyframes sfHleCtaIn { to { opacity: 1; } }
+  @keyframes sfHleScrollIn { to { opacity: 1; } }
+  @keyframes sfScrollDrop { 0%,100% { transform: translateY(-6px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(54px); opacity: 0; } }
+  @keyframes sfRotate { to { transform: rotate(360deg); } }
+</style>
+
+{% schema %}
+{
+  "name": "Hero — Luxury Editorial",
+  "settings": [
+    { "type": "header", "content": "Background" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background Image", "info": "Placeholder — replace with your own image" },
+    { "type": "text", "id": "bg_video_url", "label": "Background Video URL (.mp4)" },
+    { "type": "range", "id": "overlay_opacity", "min": 30, "max": 95, "step": 5, "label": "Overlay Darkness", "default": 60 },
+    { "type": "range", "id": "height_vh", "min": 70, "max": 100, "step": 5, "label": "Height (vh)", "default": 100 },
+    { "type": "header", "content": "Content" },
+    { "type": "select", "id": "content_align", "label": "Alignment", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"}], "default": "left" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow Label", "default": "Featured Collection" },
+    { "type": "textarea", "id": "title", "label": "Title (use line breaks)", "default": "Timeless\nElegance" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Discover superior craftsmanship and design built to last." },
+    { "type": "text", "id": "badge_text", "label": "Corner Badge Text", "default": "Premium Quality" },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "btn1_label", "label": "Primary Button", "default": "Shop Now" },
+    { "type": "url", "id": "btn1_link", "label": "Primary Link" },
+    { "type": "text", "id": "btn2_label", "label": "Secondary Button", "default": "Our Story" },
+    { "type": "url", "id": "btn2_link", "label": "Secondary Link" }
+  ],
+  "presets": [{ "name": "Hero — Luxury Editorial", "category": "Hero" }]
+}
+{% endschema %}

@@ -92,6 +92,17 @@ function checkSchemaValidity(content) {
   return errors;
 }
 
+function checkMotionClasses(content) {
+  const warnings = [];
+  if (!content.includes('sf-reveal')) {
+    warnings.push(`Warning: Missing 'sf-reveal' class for motion layer.`);
+  }
+  if (!content.includes('sf-stagger-parent') && !content.includes('sf-stagger-item')) {
+    warnings.push(`Warning: Missing 'sf-stagger-item' or 'sf-stagger-parent' for motion layer.`);
+  }
+  return warnings;
+}
+
 function validateFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const styleContent = extractStyleBlocksAndAttributes(content);
@@ -101,6 +112,12 @@ function validateFile(filePath) {
     ...checkValidCSSVariables(styleContent),
     ...checkSchemaValidity(content)
   ];
+  const warnings = checkMotionClasses(content);
+
+  if (warnings.length > 0) {
+    console.warn(`\n⚠️ Warnings for ${path.relative(SECTIONS_DIR, filePath)}`);
+    warnings.forEach(warn => console.warn(`   - ${warn}`));
+  }
 
   if (errors.length > 0) {
     console.error(`\n❌ Validation failed for ${path.relative(SECTIONS_DIR, filePath)}`);

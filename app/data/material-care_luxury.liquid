@@ -1,0 +1,404 @@
+{%- comment -%}
+  sections/material-care_luxury.liquid
+  
+  CONVERSION PSYCHOLOGY & ARCHITECTURE:
+  1. HEIRLOOM VALUE ELEVATION (ENDOWMENT EFFECT) -- Educating buyers on how to
+     care for fine jewelry shifts their psychological framing from a simple
+     retail purchase to the acquisition of an enduring heirloom asset.
+  2. POST-PURCHASE REASSURANCE -- By offering an explicit guarantee of
+     "Complimentary Annual Ultrasonic Cleaning & Prong Inspection", we remove
+     maintenance anxiety and foster lifetime brand loyalty.
+  3. INTERACTIVE ACCORDION ARCHITECTURE -- Organizes complex gemological care
+     instructions into clean, scannable panels (Gold, Diamonds, Pearls, Platinum).
+  4. ZERO EMOJI POLICY -- Strict editorial ASCII typography [ LIKE THIS ] for all
+     material categories and maintenance protocols.
+{%- endcomment -%}
+
+<style>
+  .lx-care {
+    background: var(--care-bg, #080808);
+    color: var(--care-color, #f5f5f5);
+    padding: clamp(4rem, 8vw, 7rem) 1.5rem;
+    font-family: var(--font-body, sans-serif);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+  }
+
+  .lx-care__inner {
+    max-width: var(--max-width, 1200px);
+    margin: 0 auto;
+  }
+
+  /* Header Section */
+  .lx-care__header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 4rem auto;
+  }
+
+  .lx-care__subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lx-care__title {
+    font-family: var(--font-heading, serif);
+    font-size: clamp(2rem, 3.8vw, 3.25rem);
+    font-weight: 400;
+    margin: 0 0 1.25rem 0;
+    line-height: 1.2;
+  }
+
+  .lx-care__desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.98rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Layout Grid: Accordion Left, Service Anchor Right */
+  .lx-care__grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(3rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  @media (max-width: 968px) {
+    .lx-care__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Accordion Styles */
+  .lx-care__accordion {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .lx-care__item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .lx-care__trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 1.75rem 0;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: var(--font-heading, serif);
+    font-size: 1.35rem;
+    transition: color 0.3s ease;
+  }
+
+  .lx-care__trigger:hover {
+    color: #c9a96e;
+  }
+
+  .lx-care__trigger-icon {
+    font-family: monospace;
+    font-size: 1rem;
+    color: #c9a96e;
+    transition: transform 0.3s ease;
+  }
+
+  .lx-care__item.is-open .lx-care__trigger-icon {
+    transform: rotate(45deg);
+  }
+
+  .lx-care__item.is-open .lx-care__trigger {
+    color: #c9a96e;
+  }
+
+  .lx-care__panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lx-care__panel-inner {
+    padding-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .lx-care__list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+  }
+
+  .lx-care__list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .lx-care__list li::before {
+    content: "*";
+    position: absolute;
+    left: 0;
+    color: #c9a96e;
+  }
+
+  /* Right Column: Spa & Maintenance Box */
+  .lx-care__spa-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    padding: clamp(2rem, 4vw, 3.5rem);
+    text-align: center;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .lx-care__spa-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    border: 1px solid rgba(201, 169, 110, 0.4);
+    padding: 0.4rem 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .lx-care__spa-title {
+    font-family: var(--font-heading, serif);
+    font-size: 1.75rem;
+    margin: 0 0 1rem 0;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .lx-care__spa-desc {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    margin: 0 0 2rem 0;
+  }
+
+  .lx-care__spa-btn {
+    display: inline-block;
+    width: 100%;
+    background: #c9a96e;
+    color: #080808;
+    border: none;
+    padding: 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .lx-care__spa-btn:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  .lx-care__spa-note {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 1.25rem;
+  }
+</style>
+
+<section
+  class="lx-care"
+  data-section-id="{{ section.id }}"
+  data-section-type="material-care">
+  
+  <div class="lx-care__inner">
+    {%- comment -%} Header {%- endcomment -%}
+    <div class="lx-care__header">
+      <span class="lx-care__subtitle">{{ section.settings.subtitle | default: "[ LONGEVITY & HERITAGE ]" }}</span>
+      <h2 class="lx-care__title">{{ section.settings.title | default: "Preserving Your Heirloom" }}</h2>
+      <p class="lx-care__desc">
+        {{ section.settings.description | default: "Precious metals and natural gemstones possess enduring vitality when accorded proper reverence. Follow our specialized gemological protocols to ensure your jewels retain their original brilliance across generations." }}
+      </p>
+    </div>
+
+    {%- comment -%} Content Grid {%- endcomment -%}
+    <div class="lx-care__grid">
+      {%- comment -%} Left: Accordion Panels {%- endcomment -%}
+      <div class="lx-care__accordion" data-accordion-container>
+        
+        <div class="lx-care__item is-open">
+          <button type="button" class="lx-care__trigger" aria-expanded="true">
+            <span>22K & 18K Sovereign Gold</span>
+            <span class="lx-care__trigger-icon">[ + ]</span>
+          </button>
+          <div class="lx-care__panel" style="max-height: 500px;">
+            <div class="lx-care__panel-inner">
+              Gold is a noble metal famed for its rich luster and natural malleability. High-karat gold (22K and 18K) develops a subtle, distinguished patina over decades of wear.
+              <ul class="lx-care__list">
+                <li>Remove gold jewelry before bathing in chlorinated pools, ocean water, or engaging in intense physical training.</li>
+                <li>Clean gently using lukewarm water infused with a drop of botanical soap and a soft-bristled sable brush.</li>
+                <li>Dry immediately with the complimentary chamois polishing cloth provided in your signature coffer.</li>
+                <li>Store individual pieces in separate velvet pouchettes to prevent surface friction with harder gemstones.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="lx-care__item">
+          <button type="button" class="lx-care__trigger" aria-expanded="false">
+            <span>Natural & Lab-Grown Diamonds</span>
+            <span class="lx-care__trigger-icon">[ + ]</span>
+          </button>
+          <div class="lx-care__panel">
+            <div class="lx-care__panel-inner">
+              While diamonds are the hardest known mineral on earth (ranking 10 on the Mohs scale), they possess natural cleavage planes and have a strong chemical affinity for grease and oils.
+              <ul class="lx-care__list">
+                <li>Avoid applying cosmetics, perfumes, or hand lotions while wearing diamond rings or bracelets, as oil films dull light refraction.</li>
+                <li>To restore fire and scintillation, soak jewels in a solution of warm water and mild ammonia-free degreaser for 15 minutes.</li>
+                <li>Subject micro-pave and prong-set diamonds to an annual professional inspection to verify claw setting security.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="lx-care__item">
+          <button type="button" class="lx-care__trigger" aria-expanded="false">
+            <span>Pearls & Organic Gemstones</span>
+            <span class="lx-care__trigger-icon">[ + ]</span>
+          </button>
+          <div class="lx-care__panel">
+            <div class="lx-care__panel-inner">
+              Pearls, emeralds, and opals are organic or delicate gemstones requiring gentle preservation. Pearls contain natural moisture that can dehydrate if stored in airtight vaults for extended periods.
+              <ul class="lx-care__list">
+                <li>Adhere strictly to the golden rule of fine pearls: 'Last on when dressing, first off when undressing.'</li>
+                <li>Never expose emeralds or pearls to ultrasonic cleaning baths, steam cleaners, or harsh chemical detergents.</li>
+                <li>After wear, wipe pearls delicately with a damp microfiber cloth to remove skin acidity and natural oils.</li>
+                <li>We recommend restringing fine pearl necklaces on knotted silk thread every two years with regular wear.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="lx-care__item">
+          <button type="button" class="lx-care__trigger" aria-expanded="false">
+            <span>Platinum & Bespoke Alloys</span>
+            <span class="lx-care__trigger-icon">[ + ]</span>
+          </button>
+          <div class="lx-care__panel">
+            <div class="lx-care__panel-inner">
+              Platinum is an exceptionally dense, pure metal that does not lose surface mass when scratched; instead, the metal displaces to create a satin-like finish known as a platinum patina.
+              <ul class="lx-care__list">
+                <li>Embrace the natural patina as a mark of authenticity and timeless character, or request professional buffing to restore high polish.</li>
+                <li>For white gold alloys, our ateliers offer complimentary rhodium re-plating to maintain an icy, brilliant white finish.</li>
+                <li>Keep platinum bands separated from diamond jewelry during storage to prevent mutual surface abrasion.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {%- comment -%} Right: Spa & Maintenance Box {%- endcomment -%}
+      <div class="lx-care__spa-box">
+        <span class="lx-care__spa-badge">[ COMPLIMENTARY SERVICE ]</span>
+        <h3 class="lx-care__spa-title">The White-Glove Spa Service</h3>
+        <p class="lx-care__spa-desc">
+          As a registered custodian of our creations, you are entitled to complimentary lifetime maintenance. Bring your jewels to any of our global boutiques for deep ultrasonic cleaning, steam polishing, and microscopic prong inspection.
+        </p>
+        <a href="{{ section.settings.booking_link | default: '/pages/book-appointment' }}" class="lx-care__spa-btn">
+          [ BOOK A SPA CONCIERGE ]
+        </a>
+        <p class="lx-care__spa-note">* Available in all flagship ateliers and select partner salons.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const container = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!container) return;
+
+    const items = container.querySelectorAll('.lx-care__item');
+
+    items.forEach(item => {
+      const trigger = item.querySelector('.lx-care__trigger');
+      const panel = item.querySelector('.lx-care__panel');
+
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener('click', () => {
+        const isOpen = item.classList.contains('is-open');
+
+        // Close all other accordions for clean cognitive focus
+        items.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('is-open');
+            const otherTrigger = otherItem.querySelector('.lx-care__trigger');
+            const otherPanel = otherItem.querySelector('.lx-care__panel');
+            if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+            if (otherPanel) otherPanel.style.maxHeight = null;
+          }
+        });
+
+        if (isOpen) {
+          item.classList.remove('is-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          panel.style.maxHeight = null;
+        } else {
+          item.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Material Care Guide",
+  "tag": "section",
+  "class": "section-material-care",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "[ LONGEVITY & HERITAGE ]"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Preserving Your Heirloom"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Precious metals and natural gemstones possess enduring vitality when accorded proper reverence. Follow our specialized gemological protocols to ensure your jewels retain their original brilliance across generations."
+    },
+    {
+      "type": "header",
+      "content": "Spa Service Link"
+    },
+    {
+      "type": "url",
+      "id": "booking_link",
+      "label": "Concierge Booking Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Material Care (Lux)"
+    }
+  ]
+}
+{% endschema %}

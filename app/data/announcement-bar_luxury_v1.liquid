@@ -1,0 +1,473 @@
+{%- comment -%}
+  sections/announcement-bar_luxury_v1.liquid
+  
+  CONVERSION PSYCHOLOGY & ARCHITECTURE:
+  1. RECIPROCITY TRIGGER -- Leads with "Complimentary Shipping" or a VIP gift.
+     In luxury e-commerce, framing shipping as "Complimentary" (vs "Free") elevates
+     brand status while activating Cialdini's reciprocity rule.
+  2. ATTENTION RHYTHM (THE ZEIGARNIK EFFECT) -- Rotating messages create subtle
+     visual movement that draws the eye without banner blindness or tacky flashing.
+  3. INSTANT AUTHORITY -- Second and third slides reinforce institutional trust
+     (BIS Hallmark, GIA Certification, 30-Day White-Glove Returns).
+  4. SCARCITY & TIMED DROPS -- Integrated optional countdown ticker for limited
+     collection drops. Time-bound scarcity increases dopamine anticipation.
+  5. ZERO EMOJI POLICY -- Strict editorial bracket typography [ LIKE THIS ]
+     ensures a timeless, Cartier/Chanel aesthetic.
+{%- endcomment -%}
+
+<style>
+  .lx-announcement-bar {
+    position: relative;
+    z-index: 1000;
+    background: var(--announcement-bg, #080808);
+    color: var(--announcement-color, #f5f5f5);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+    font-family: var(--font-body, sans-serif);
+    font-size: clamp(0.7rem, 1.2vw, 0.75rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .lx-announcement-bar__inner {
+    max-width: var(--max-width, 1440px);
+    margin: 0 auto;
+    padding: 0.6rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .lx-announcement-bar__inner {
+      grid-template-columns: 1fr;
+      padding: 0.5rem 1rem;
+      text-align: center;
+    }
+  }
+
+  /* Left slot: VIP / Localization placeholder */
+  .lx-announcement-bar__left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-self: start;
+  }
+
+  @media (max-width: 768px) {
+    .lx-announcement-bar__left,
+    .lx-announcement-bar__right {
+      display: none;
+    }
+  }
+
+  .lx-announcement-bar__link {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    font-size: 0.65rem;
+  }
+
+  .lx-announcement-bar__link:hover {
+    opacity: 1;
+    color: #c9a96e;
+  }
+
+  /* Center slot: Rotating Slider */
+  .lx-announcement-bar__slider {
+    justify-self: center;
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lx-announcement-bar__slide {
+    display: none;
+    width: 100%;
+    animation: lxSlideFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .lx-announcement-bar__slide.is-active {
+    display: block;
+  }
+
+  @keyframes lxSlideFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .lx-announcement-bar__slide-text {
+    display: inline-block;
+    padding: 0 1.5rem;
+  }
+
+  .lx-announcement-bar__slide-text strong {
+    color: #c9a96e;
+    font-weight: 600;
+  }
+
+  .lx-announcement-bar__slide-text a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(201, 169, 110, 0.5);
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .lx-announcement-bar__slide-text a:hover {
+    text-decoration-color: #c9a96e;
+  }
+
+  /* Optional Countdown Ticker */
+  .lx-announcement-bar__countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    background: rgba(201, 169, 110, 0.12);
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    color: #c9a96e;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+  }
+
+  /* Right slot: Controls or Concierge */
+  .lx-announcement-bar__right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .lx-announcement-bar__nav-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0.2rem;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lx-announcement-bar__nav-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .lx-announcement-bar__nav-btn:focus-visible {
+    outline: 1px solid #c9a96e;
+    opacity: 1;
+  }
+</style>
+
+<section
+  class="lx-announcement-bar"
+  data-section-id="{{ section.id }}"
+  data-section-type="announcement-bar"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+  role="region"
+  aria-label="Store Announcements">
+  
+  <div class="lx-announcement-bar__inner">
+    {%- comment -%} Left Column: VIP & Localization {%- endcomment -%}
+    <div class="lx-announcement-bar__left">
+      {%- if section.settings.show_vip_link -%}
+        <a href="{{ section.settings.vip_link | default: '/account' }}" class="lx-announcement-bar__link">
+          [ VIP CONCIERGE ]
+        </a>
+      {%- endif -%}
+      {%- if section.settings.show_store_locator -%}
+        <a href="{{ section.settings.store_locator_link | default: '/pages/stores' }}" class="lx-announcement-bar__link">
+          [ BOUTIQUES ]
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Center Column: Rotating Announcements {%- endcomment -%}
+    <div
+      class="lx-announcement-bar__slider"
+      data-slider-container
+      aria-live="polite">
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          <div
+            class="lx-announcement-bar__slide {% if forloop.first %}is-active{% endif %}"
+            data-slide-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}>
+            <div class="lx-announcement-bar__slide-text">
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}">
+              {%- endif -%}
+
+              {{ block.settings.text }}
+
+              {%- if block.settings.show_countdown and block.settings.countdown_date != blank -%}
+                <span class="lx-announcement-bar__countdown" data-countdown="{{ block.settings.countdown_date }}">
+                  <span data-days>00</span>d : <span data-hours>00</span>h : <span data-mins>00</span>m : <span data-secs>00</span>s
+                </span>
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                </a>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        <div class="lx-announcement-bar__slide is-active">
+          <div class="lx-announcement-bar__slide-text">
+            [ COMPLIMENTARY EXPEDITED SHIPPING ON ORDERS OVER Rs. 999 ]
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Right Column: Slider Controls {%- endcomment -%}
+    <div class="lx-announcement-bar__right">
+      {%- if section.blocks.size > 1 -%}
+        <button
+          type="button"
+          class="lx-announcement-bar__nav-btn"
+          data-slide-prev
+          aria-label="Previous announcement">
+          [ &larr; ]
+        </button>
+        <button
+          type="button"
+          class="lx-announcement-bar__nav-btn"
+          data-slide-next
+          aria-label="Next announcement">
+          [ &rarr; ]
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const container = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!container) return;
+
+    const slides = container.querySelectorAll('.lx-announcement-bar__slide');
+    const prevBtn = container.querySelector('[data-slide-prev]');
+    const nextBtn = container.querySelector('[data-slide-next]');
+    const autoplay = container.dataset.autoplay === 'true';
+    const speed = parseInt(container.dataset.speed || '5000', 10);
+
+    let currentIndex = 0;
+    let timer = null;
+
+    function showSlide(index) {
+      if (slides.length <= 1) return;
+      slides.forEach((slide, i) => {
+        if (i === index) {
+          slide.classList.add('is-active');
+        } else {
+          slide.classList.remove('is-active');
+        }
+      });
+      currentIndex = index;
+    }
+
+    function nextSlide() {
+      let next = (currentIndex + 1) % slides.length;
+      showSlide(next);
+    }
+
+    function prevSlide() {
+      let prev = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(prev);
+    }
+
+    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetTimer(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetTimer(); });
+
+    function startTimer() {
+      if (!autoplay || slides.length <= 1) return;
+      timer = setInterval(nextSlide, speed);
+    }
+
+    function resetTimer() {
+      if (timer) clearInterval(timer);
+      startTimer();
+    }
+
+    // Pause on hover for Zeigarnik attention retention without frustration
+    container.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
+    container.addEventListener('mouseleave', () => { startTimer(); });
+
+    startTimer();
+
+    // Countdown Logic for Timed Scarcity
+    const countdowns = container.querySelectorAll('[data-countdown]');
+    countdowns.forEach(el => {
+      const targetDate = new Date(el.dataset.countdown).getTime();
+      if (isNaN(targetDate)) return;
+
+      const updateCountdown = () => {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance < 0) {
+          el.style.display = 'none';
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = el.querySelector('[data-days]');
+        const hoursEl = el.querySelector('[data-hours]');
+        const minsEl = el.querySelector('[data-mins]');
+        const secsEl = el.querySelector('[data-secs]');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minsEl) minsEl.textContent = String(minutes).padStart(2, '0');
+        if (secsEl) secsEl.textContent = String(seconds).padStart(2, '0');
+      };
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "tag": "section",
+  "class": "section-announcement-bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate announcements",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "sec",
+      "label": "Change slide every",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "VIP & Boutique Links"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vip_link",
+      "label": "Show VIP Concierge link",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "vip_link",
+      "label": "VIP Concierge URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_store_locator",
+      "label": "Show Boutiques link",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "store_locator_link",
+      "label": "Boutiques URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Announcement Text",
+          "default": "[ COMPLIMENTARY EXPEDITED SHIPPING ON ORDERS OVER Rs. 999 ]"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        },
+        {
+          "type": "header",
+          "content": "Scarcity & Urgency Timer"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_countdown",
+          "label": "Show countdown timer",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "countdown_date",
+          "label": "Target Date (YYYY-MM-DD HH:MM:SS)",
+          "info": "Example: 2026-12-31 23:59:59. Creates dopamine anticipation for drops."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar (Luxury)",
+      "blocks": [
+        {
+          "type": "announcement",
+          "settings": {
+            "text": "[ COMPLIMENTARY EXPEDITED SHIPPING ON ORDERS OVER Rs. 999 ]"
+          }
+        },
+        {
+          "type": "announcement",
+          "settings": {
+            "text": "[ BIS HALLMARK CERTIFIED & GIA GRADED DIAMONDS ]"
+          }
+        },
+        {
+          "type": "announcement",
+          "settings": {
+            "text": "[ PRIVATE CONCIERGE APPOINTMENTS AVAILABLE IN-STORE & VIRTUAL ]"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

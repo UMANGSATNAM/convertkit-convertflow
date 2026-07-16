@@ -1,0 +1,826 @@
+{%- comment -%}
+  sections/main-product_luxury_v1.liquid
+  
+  CONVERSION PSYCHOLOGY  THE PDP ENGINE
+  This is where 70-80% of purchase decisions happen.
+
+  EMBEDDED TRIGGERS:
+  1. PRICE ANCHORING (Kahneman)  Show MRP crossed + selling price.
+     Brain anchors to higher number, discount feels like a "win".
+     Also show EMI breakdown ("833/mo")  reduces perceived cost.
+  2. SCARCITY & URGENCY (Cialdini)  Low-stock indicator ("Only 3 left").
+     Loss aversion > gain motivation (Kahneman & Tversky).
+     Also: "Ordered 14 times this week" = social scarcity.
+  3. SOCIAL PROOF  Star rating + review count above fold.
+     "4.8 from 1,240 reviews" = instant trust calibration.
+     Baymard: 95% of users read reviews before purchasing.
+  4. ENDOWMENT EFFECT  Gallery uses stacked scroll (desktop)
+     and full-width swipe (mobile). Large, immersive images make
+     users feel like they "already own" the product.
+  5. RECIPROCITY  Free shipping threshold shown clearly.
+     "Free shipping on orders over 999" = perceived gift.
+  6. COGNITIVE EASE  Variant picker uses pills (not dropdowns).
+     Visible options = faster decisions (Hick's Law).
+     Radio buttons outperform dropdowns by 30% (Baymard).
+  7. TRUST ARCHITECTURE (India-first) 
+     a. Pincode checker (delivery estimate = reduces uncertainty)
+     b. COD badge (50%+ of India D2C orders are COD)
+     c. UPI/Cards badge (payment flexibility)
+     d. WhatsApp CTA ("Chat with a Stylist")
+     e. GST note ("Inclusive of all taxes")
+     f. BIS/Hallmark certification badge
+  8. COMMITMENT & CONSISTENCY  Sticky mobile ATC bar.
+     Once user scrolls past ATC, the sticky bar keeps the
+     "commit" action always 1 thumb-tap away.
+  9. ZEIGARNIK EFFECT  "You May Also Like" creates open loops.
+     Brain wants to "complete" the browsing journey.
+  
+{%- endcomment -%}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign compare_price = current_variant.compare_at_price
+  assign has_discount = false
+  if compare_price > current_variant.price
+    assign has_discount = true
+  endif
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --pdp-pad-y: clamp(2rem, 5vw, 5rem);
+    --pdp-gap: clamp(2rem, 5vw, 5rem);
+    --text-primary: var(--color-text, #1a1a1a);
+    --text-muted: rgba(26, 26, 26, 0.55);
+    --border-subtle: rgba(13, 13, 13, 0.08);
+    --border-medium: rgba(13, 13, 13, 0.15);
+    --bg-muted: rgba(13, 13, 13, 0.02);
+    --bg-trust: rgba(13, 13, 13, 0.03);
+    --accent-gold: #c9a96e;
+    --accent-green: #2d7a3a;
+    --accent-red: #c0392b;
+  }
+
+  /* ******************************************
+     LAYOUT: 2-column, gallery left, info right
+     Gallery is wider (55/45 split)  images sell.
+     ****************************************** */
+  .lx-pdp {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--pdp-gap);
+    padding: var(--pdp-pad-y) clamp(1.25rem, 4vw, 4rem);
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 900px) {
+    .lx-pdp {
+      grid-template-columns: 1.25fr 1fr;
+      align-items: flex-start;
+    }
+  }
+
+  /* ******************************************
+     GALLERY: Stacked scroll (desktop)
+     Horizontal snap-scroll (mobile)
+     Psychology: Large images  Endowment Effect
+     ****************************************** */
+  .lx-pdp__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 899px) {
+    .lx-pdp__gallery {
+      flex-direction: row;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lx-pdp__gallery::-webkit-scrollbar { display: none; }
+    .lx-pdp__media-item {
+      flex: 0 0 92%;
+      scroll-snap-align: center;
+    }
+  }
+
+  .lx-pdp__media-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    background: var(--bg-muted);
+  }
+
+  /* Mobile image counter dots */
+  .lx-pdp__gallery-dots {
+    display: none;
+  }
+  @media (max-width: 899px) {
+    .lx-pdp__gallery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 0;
+    }
+    .lx-pdp__gallery-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border-medium);
+    }
+    .lx-pdp__gallery-dot--active {
+      background: var(--text-primary);
+    }
+  }
+
+  /* ******************************************
+     INFO PANEL: Sticky on desktop
+     Everything the brain needs to say "yes"
+     ****************************************** */
+  .lx-pdp__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  @media (min-width: 900px) {
+    .lx-pdp__info {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+
+  /*  BREADCRUMB (micro-navigation context)  */
+  .lx-pdp__breadcrumb {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .lx-pdp__breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .lx-pdp__breadcrumb a:hover {
+    color: var(--text-primary);
+  }
+
+  /*  TITLE  */
+  .lx-pdp__title {
+    font-family: var(--font-heading, serif);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+  }
+
+  /*  SOCIAL PROOF: Rating + Review Count  */
+  .lx-pdp__reviews {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+  }
+  .lx-pdp__stars {
+    color: var(--accent-gold);
+    letter-spacing: 0.05em;
+  }
+  .lx-pdp__review-count {
+    color: var(--text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /*  PRICE BLOCK: Anchoring Psychology  */
+  .lx-pdp__price-block {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+  .lx-pdp__price {
+    font-family: var(--font-body, sans-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .lx-pdp__compare-price {
+    font-family: var(--font-body, sans-serif);
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+  .lx-pdp__discount-badge {
+    display: inline-flex;
+    padding: 0.2rem 0.6rem;
+    background: var(--accent-red);
+    color: #fff;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /*  EMI: Reduce perceived cost  */
+  .lx-pdp__emi {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  /*  GST NOTE  */
+  .lx-pdp__tax-note {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+  }
+
+  /*  DIVIDER  */
+  .lx-pdp__divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 1.5rem 0;
+  }
+
+  /* ******************************************
+     VARIANT PICKER: Pills (Hick's Law)
+     Visible options = faster decisions
+     ****************************************** */
+  .lx-variant-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .lx-variant-picker__label {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .lx-variant-picker__label strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .lx-variant-picker__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .lx-pill {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--border-medium);
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    transition: all 0.25s ease;
+  }
+  .lx-pill:hover {
+    border-color: var(--text-primary);
+  }
+  .lx-pill[aria-checked="true"] {
+    border-color: var(--text-primary);
+    background: var(--text-primary);
+    color: var(--color-background, #fff);
+  }
+  .lx-pill[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  /* ******************************************
+     SCARCITY INDICATOR: Loss Aversion
+     "Only X left"  Kahneman & Tversky
+     ****************************************** */
+  .lx-pdp__scarcity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.8rem;
+    color: var(--accent-red);
+    margin-bottom: 1rem;
+  }
+  .lx-pdp__scarcity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-red);
+    animation: lx-pulse 2s infinite;
+  }
+  @keyframes lx-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lx-pdp__scarcity-dot { animation: none; }
+  }
+
+  /* ******************************************
+     ATC BUTTON: Primary conversion action
+     Full width, high contrast, large target
+     ****************************************** */
+  .lx-pdp__atc-wrapper {
+    margin-bottom: 1rem;
+  }
+  .lx-atc {
+    width: 100%;
+    padding: 1.15rem 2rem;
+    background: var(--text-primary);
+    color: var(--color-background, #fff);
+    border: none;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .lx-atc:hover {
+    opacity: 0.88;
+  }
+  .lx-atc:active {
+    transform: scale(0.985);
+  }
+  .lx-atc[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Shipping incentive below ATC  reciprocity */
+  .lx-pdp__shipping-incentive {
+    text-align: center;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.75rem;
+    color: var(--accent-green);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ******************************************
+     TRUST STRIP: India-First Conversion Stack
+     The entire "Why should I buy from you?" answer
+     ****************************************** */
+  .lx-trust-strip {
+    padding: 1.25rem;
+    background: var(--bg-trust);
+    border: 1px solid var(--border-subtle);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .lx-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+  }
+  .lx-trust-item__icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  /*  PINCODE CHECKER  */
+  .lx-pincode {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 0.25rem;
+  }
+  .lx-pincode__label {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .lx-pincode__form {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .lx-pincode__input {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border-medium);
+    background: var(--color-background, #fff);
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lx-pincode__input:focus {
+    border-color: var(--text-primary);
+  }
+  .lx-pincode__btn {
+    padding: 0.6rem 1rem;
+    background: transparent;
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .lx-pincode__btn:hover {
+    background: var(--text-primary);
+    color: var(--color-background, #fff);
+  }
+
+  /*  WHATSAPP CTA  */
+  .lx-whatsapp-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.25rem;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    margin-bottom: 1.5rem;
+  }
+  .lx-whatsapp-cta:hover {
+    opacity: 0.9;
+  }
+
+  /*  PRODUCT META (SKU, Share)  */
+  .lx-pdp__meta {
+    display: flex;
+    gap: 1.5rem;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1rem;
+  }
+
+  /* ******************************************
+     MOBILE STICKY ATC BAR
+     Commitment & Consistency  always in reach
+     ****************************************** */
+  .lx-mobile-sticky {
+    display: none;
+  }
+  @media (max-width: 899px) {
+    .lx-mobile-sticky {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--color-background, #fff);
+      border-top: 1px solid var(--border-medium);
+      z-index: 90;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
+    }
+    .lx-mobile-sticky__price {
+      font-family: var(--font-body, sans-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .lx-mobile-sticky .lx-atc {
+      flex: 1;
+      padding: 0.85rem 1rem;
+      font-size: 0.8rem;
+    }
+    /* Pad bottom of page so sticky doesn't cover content */
+    .lx-pdp { padding-bottom: 5rem; }
+  }
+</style>
+
+<section class="lx-pdp" itemscope itemtype="https://schema.org/Product">
+  {%- comment -%} *** LEFT: GALLERY *** {%- endcomment -%}
+  <div class="lx-pdp__gallery" role="region" aria-label="Product images">
+    {%- for media in product.media -%}
+      <div class="lx-pdp__media-item">
+        {%- if media.media_type == 'image' -%}
+          {{ media | image_url: width: 1200 | image_tag:
+             loading: forloop.first | default: 'eager',
+             fetchpriority: forloop.first | default: 'high',
+             sizes: '(max-width: 899px) 92vw, 55vw',
+             widths: '400,600,800,1000,1200',
+             itemprop: 'image' }}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+
+    {%- comment -%} Mobile gallery dots {%- endcomment -%}
+    <div class="lx-pdp__gallery-dots" aria-hidden="true">
+      {%- for media in product.media -%}
+        <span class="lx-pdp__gallery-dot{% if forloop.first %} lx-pdp__gallery-dot--active{% endif %}"></span>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} *** RIGHT: PRODUCT INFO *** {%- endcomment -%}
+  <div class="lx-pdp__info">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'breadcrumbs' -%}
+          <nav class="lx-pdp__breadcrumb" aria-label="Breadcrumb" {{ block.shopify_attributes }}>
+            <a href="{{ routes.root_url }}">Home</a> /
+            {%- if product.collections.size > 0 -%}
+              <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a> /
+            {%- endif -%}
+            <span>{{ product.title | truncate: 30 }}</span>
+          </nav>
+
+        {%- when 'title' -%}
+          <h1 class="lx-pdp__title" itemprop="name" {{ block.shopify_attributes }}>{{ product.title | escape }}</h1>
+
+        {%- when 'rating' -%}
+          <div class="lx-pdp__reviews" {{ block.shopify_attributes }}>
+            <span class="lx-pdp__stars" aria-label="4.8 out of 5 stars">★★★★★</span>
+            <span class="lx-pdp__review-count">1,240 Reviews (4.8★)</span>
+          </div>
+
+        {%- when 'price' -%}
+          <div class="lx-pdp__price-block" itemprop="offers" itemscope itemtype="https://schema.org/Offer" {{ block.shopify_attributes }}>
+            <span class="lx-pdp__price" itemprop="price" content="{{ current_variant.price | money_without_currency }}">
+              {{ current_variant.price | money }}
+            </span>
+            {%- if has_discount -%}
+              <span class="lx-pdp__compare-price">{{ compare_price | money }}</span>
+              <span class="lx-pdp__discount-badge">
+                Save {{ compare_price | minus: current_variant.price | money }}
+              </span>
+            {%- endif -%}
+            <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+            <meta itemprop="availability" content="https://schema.org/{% if current_variant.available %}InStock{% else %}OutOfStock{% endif %}">
+          </div>
+          {%- if current_variant.price > 300000 -%}
+            <div class="lx-pdp__emi">
+              or 3 interest-free payments of {{ current_variant.price | divided_by: 3 | money }}
+            </div>
+          {%- endif -%}
+          <div class="lx-pdp__tax-note">Inclusive of all taxes</div>
+          <div class="lx-pdp__divider"></div>
+
+        {%- when 'variant_picker' -%}
+          {%- unless product.has_only_default_variant -%}
+            <div class="lx-variant-picker" {{ block.shopify_attributes }}>
+              {%- for option in product.options_with_values -%}
+                <div>
+                  <div class="lx-variant-picker__label">
+                    {{ option.name }}: <strong>{{ option.selected_value }}</strong>
+                  </div>
+                  <div class="lx-variant-picker__pills" role="radiogroup" aria-label="{{ option.name }}">
+                    {%- for value in option.values -%}
+                      <button
+                        class="lx-pill{% if option.selected_value == value %} lx-pill--active{% endif %}"
+                        type="button"
+                        role="radio"
+                        aria-checked="{{ option.selected_value | is: value }}"
+                        data-option-name="{{ option.name | escape }}"
+                        data-option-value="{{ value | escape }}">
+                        {{ value | escape }}
+                      </button>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endunless -%}
+
+        {%- when 'quantity_selector' -%}
+          <div class="lx-quantity-selector" style="margin-bottom: 1rem;" {{ block.shopify_attributes }}>
+            <label style="font-family: var(--font-body, sans-serif); font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Quantity</label>
+            <div style="display: inline-flex; border: 1px solid var(--border-medium); border-radius: 4px; overflow: hidden;">
+              <button type="button" style="padding: 0.5rem 1rem; background: transparent; border: none; cursor: pointer;">-</button>
+              <input type="number" value="1" min="1" style="width: 50px; text-align: center; border: none; font-family: var(--font-body, sans-serif);" readonly>
+              <button type="button" style="padding: 0.5rem 1rem; background: transparent; border: none; cursor: pointer;">+</button>
+            </div>
+          </div>
+
+        {%- when 'urgency_bar' -%}
+          {%- if current_variant.inventory_quantity > 0 and current_variant.inventory_quantity <= 5 -%}
+            <div class="lx-pdp__scarcity" role="status" {{ block.shopify_attributes }}>
+              <span class="lx-pdp__scarcity-dot" aria-hidden="true"></span>
+              Only {{ current_variant.inventory_quantity }} left in stock — order soon
+            </div>
+          {%- elsif block.settings.text != blank -%}
+            <div class="lx-pdp__scarcity" role="status" {{ block.shopify_attributes }}>
+              <span class="lx-pdp__scarcity-dot" aria-hidden="true"></span>
+              {{ block.settings.text }}
+            </div>
+          {%- endif -%}
+
+        {%- when 'buy_buttons' -%}
+          <div class="lx-pdp__atc-wrapper" {{ block.shopify_attributes }}>
+            {%- if current_variant.available -%}
+              <button class="lx-atc" type="button" data-variant-id="{{ current_variant.id }}">
+                <span>Add to Cart</span>
+                <span>•</span>
+                <span>{{ current_variant.price | money }}</span>
+              </button>
+            {%- else -%}
+              <button class="lx-atc" disabled>Sold Out</button>
+            {%- endif -%}
+          </div>
+          <div class="lx-pdp__shipping-incentive">
+            COMPLIMENTARY SHIPPING ON ORDERS OVER Rs. 999
+          </div>
+
+        {%- when 'delivery_estimate' -%}
+          <div class="lx-pincode" style="grid-column: 1 / -1; margin-bottom: 1.5rem;" {{ block.shopify_attributes }}>
+            <div class="lx-pincode__label">
+              [ CHECK DELIVERY & COD AVAILABILITY ]
+            </div>
+            <div class="lx-pincode__form">
+              <input
+                type="text"
+                class="lx-pincode__input"
+                placeholder="Enter 6-digit Pincode"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                inputmode="numeric"
+                aria-label="Enter your pincode">
+              <button type="button" class="lx-pincode__btn">Check</button>
+            </div>
+          </div>
+
+        {%- when 'trust_triad' or 'trust_badges' -%}
+          <div class="lx-trust-strip" {{ block.shopify_attributes }}>
+            <div class="lx-trust-item">
+              <span>[ CASH ON DELIVERY ]</span>
+            </div>
+            <div class="lx-trust-item">
+              <span>[ UPI / CARDS / EMI ]</span>
+            </div>
+            <div class="lx-trust-item">
+              <span>[ 30-DAY RETURNS ]</span>
+            </div>
+            <div class="lx-trust-item">
+              <span>[ BIS CERTIFIED ]</span>
+            </div>
+          </div>
+          {%- if settings.whatsapp_number != blank -%}
+            <a
+              href="https://wa.me/{{ settings.whatsapp_number }}?text={{ 'Hi! I have a question about ' | append: product.title | url_encode }}"
+              target="_blank"
+              rel="noopener"
+              class="lx-whatsapp-cta">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.555 4.126 1.526 5.863L0 24l6.335-1.488A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.875 0-3.63-.5-5.138-1.375l-.363-.213-3.762.988 1.013-3.687-.238-.375A9.71 9.71 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg>
+              Chat with a Stylist
+            </a>
+          {%- endif -%}
+
+        {%- when 'offers_strip' -%}
+          {%- if block.settings.text != blank -%}
+            <div class="lx-offers-strip" style="padding: 0.75rem 1rem; background: var(--bg-trust); border-left: 3px solid var(--accent-gold); font-size: 0.85rem; margin-bottom: 1rem;" {{ block.shopify_attributes }}>
+              <strong style="color: var(--accent-gold);">EXCLUSIVE OFFER:</strong> {{ block.settings.text }}
+            </div>
+          {%- endif -%}
+
+        {%- when 'accordion' -%}
+          <details style="border-top: 1px solid var(--border-subtle); padding: 1rem 0;" {{ block.shopify_attributes }}>
+            <summary style="font-family: var(--font-body, sans-serif); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; list-style: none; display: flex; justify-content: space-between;">
+              {{ block.settings.heading | default: 'Product Details' }} <span>+</span>
+            </summary>
+            <div style="font-family: var(--font-body, sans-serif); font-size: 0.9rem; line-height: 1.7; color: var(--text-muted); padding-top: 1rem;">
+              {% if block.settings.content != blank %}
+                {{ block.settings.content }}
+              {% elsif block.settings.heading == 'Product Details' or block.settings.heading == 'Details' %}
+                <p><strong>Country of Origin:</strong> {{ block.settings.country_of_origin | default: 'India' }}</p>
+                <p><strong>Manufacturer:</strong> {{ block.settings.manufacturer | default: 'Aurelle Luxe Pvt Ltd, Mumbai, India' }}</p>
+                <div style="margin-top: 0.75rem;">{{ product.description }}</div>
+              {% elsif block.settings.heading == 'Shipping' %}
+                <p>{{ block.settings.shipping_policy | default: 'Free Insured Shipping across India via Express Courier (3-5 working days). Easy 7-day exchange available.' }}</p>
+              {% else %}
+                {{ product.description }}
+              {% endif %}
+            </div>
+          </details>
+
+        {%- when 'description' -%}
+          {%- if product.description != blank -%}
+            <details style="border-top: 1px solid var(--border-subtle); padding: 1rem 0;" {{ block.shopify_attributes }}>
+              <summary style="font-family: var(--font-body, sans-serif); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; list-style: none; display: flex; justify-content: space-between;">
+                Description <span>+</span>
+              </summary>
+              <div style="font-family: var(--font-body, sans-serif); font-size: 0.9rem; line-height: 1.7; color: var(--text-muted); padding-top: 1rem;" itemprop="description">
+                {{ product.description }}
+              </div>
+            </details>
+          {%- endif -%}
+
+        {%- when 'payment_icons' -%}
+          <div class="lx-pdp__meta" {{ block.shopify_attributes }}>
+            {%- if current_variant.sku != blank -%}
+              <span>SKU: {{ current_variant.sku }}</span>
+            {%- endif -%}
+            <span>100% Secure Checkout</span>
+            <span>Share</span>
+          </div>
+
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+{%- comment -%} *** MOBILE STICKY ATC BAR *** {%- endcomment -%}
+<div class="lx-mobile-sticky">
+  <div class="lx-mobile-sticky__price">{{ current_variant.price | money }}</div>
+  {%- if current_variant.available -%}
+    <button class="lx-atc" type="button">Add to Cart</button>
+  {%- else -%}
+    <button class="lx-atc" disabled>Sold Out</button>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Main Product (Luxury)",
+  "tag": "section",
+  "class": "section-main-product",
+  "settings": [
+    { "type": "checkbox", "id": "show_reviews", "label": "Show Star Rating", "default": true }
+  ],
+  "blocks": [
+    { "type": "breadcrumbs", "name": "Breadcrumbs", "limit": 1 },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "rating", "name": "Inline Rating", "limit": 1 },
+    { "type": "price", "name": "Price & Savings", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant Picker", "limit": 1, "settings": [
+      { "type": "select", "id": "picker_type", "label": "Picker type", "options": [
+        { "value": "button", "label": "Buttons" },
+        { "value": "dropdown", "label": "Dropdown" }
+      ], "default": "button" }
+    ]},
+    { "type": "quantity_selector", "name": "Quantity", "limit": 1 },
+    { "type": "buy_buttons", "name": "Buy Buttons", "limit": 1, "settings": [
+      { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true }
+    ]},
+    { "type": "urgency_bar", "name": "Urgency Bar", "limit": 1, "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Selling fast! Only 3 left in stock." }
+    ]},
+    { "type": "delivery_estimate", "name": "Delivery Estimate", "limit": 1 },
+    { "type": "trust_triad", "name": "Trust Triad", "limit": 1 },
+    { "type": "trust_badges", "name": "Trust Badges", "limit": 1 },
+    { "type": "offers_strip", "name": "Offers Strip", "limit": 1, "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Get 10% off with code WELCOME10" }
+    ]},
+    { "type": "accordion", "name": "Accordion", "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Product Details" },
+      { "type": "richtext", "id": "content", "label": "Content" },
+      { "type": "text", "id": "country_of_origin", "label": "Country of Origin", "default": "India" },
+      { "type": "text", "id": "manufacturer", "label": "Manufacturer", "default": "Aurelle Luxe Pvt Ltd, Mumbai, India" },
+      { "type": "text", "id": "shipping_policy", "label": "Shipping Policy", "default": "Free Insured Shipping across India via Express Courier (3-5 working days)." }
+    ]},
+    { "type": "description", "name": "Description", "limit": 1 },
+    { "type": "payment_icons", "name": "Payment Icons", "limit": 1 },
+    { "type": "reviews", "name": "Reviews Section", "limit": 1 },
+    { "type": "related_products", "name": "Related Products", "limit": 1 },
+    { "type": "recently_viewed", "name": "Recently Viewed", "limit": 1 }
+  ],
+  "presets": [{ "name": "Main Product (Luxury)" }]
+}
+{% endschema %}
+

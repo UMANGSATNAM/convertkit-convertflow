@@ -48,7 +48,7 @@ describe('Pipeline Guards v2', () => {
       catalogIndustry: "Jewellery",
       catalogStyle: "Minimal",
       catalogVisualComplexity: "Low",
-      exclude: ["grid-minimal-v1", "grid-luxury-v1"] // Exclude high scorers
+      exclude: ["grid-minimal-v1", "grid-luxury-v1", "grid-featured-lookbook-v1", "grid-featured-lookbook-v2", "grid-jewellery-showcase-v1", "grid-masonry-gallery-luxury-v1"] // Exclude high scorers
     });
     
     // Grid-bold-v1 scored 34 before. So with minScore 50, it should return null.

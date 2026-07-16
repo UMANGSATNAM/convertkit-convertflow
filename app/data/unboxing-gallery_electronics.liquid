@@ -1,0 +1,603 @@
+{%- comment -%}
+  sections/unboxing-gallery_electronics.liquid
+  CONVERSION PSYCHOLOGY & ARCHITECTURE (380+ lines):
+  1. UNBOXING ANTICIPATION & COMPLETENESS ASSURANCE (Zeigarnik Effect): Tech consumers experience anxiety regarding missing cables, adapters, or protective cases. Displaying an interactive, verifiable inventory grid guarantees a complete out-of-the-box experience.
+  2. BUNDLE UPGRADE ANCHORING: Toggling between [ STANDARD RETAIL KIT ] and [ PRO AUDIOPHILE BUNDLE ] exposes visitors to high-margin accessory bundles (flight adapters, desk stands) at the exact moment they envision unboxing.
+  3. INTERACTIVE CHECKLIST VALIDATION: Clicking [ VERIFY INCLUDED ] on each item simulates ownership and physical inspection, activating endowment effect psychology.
+  4. ZERO GREENWASHING & ARCHIVAL PRESENTATION: Highlights 100% biodegradable molded pulp packaging and ballistic nylon protective cases, justifying flagship valuation.
+  5. ZERO EMOJI GUARANTEE: Uses cyber-precision ASCII brackets [ INVENTORY ], [ VERIFIED ], [ ITEM 01 ], and monospace terminal aesthetics.
+{%- endcomment -%}
+
+{%- assign section_id = 'el-box-' | append: section.id -%}
+
+<style>
+  #{{ section_id }} {
+    --bx-bg: {{ section.settings.bg_color | default: '#0d1117' }};
+    --bx-card: #161b22;
+    --bx-border: #30363d;
+    --bx-text: #c9d1d9;
+    --bx-heading: #ffffff;
+    --bx-green: #3fb950;
+    --bx-blue: #58a6ff;
+    --bx-muted: #8b949e;
+
+    background-color: var(--bx-bg);
+    color: var(--bx-text);
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.2rem, 4vw, 3.5rem);
+    border-top: 1px solid var(--bx-border);
+    border-bottom: 1px solid var(--bx-border);
+    font-family: var(--font-body, 'Courier New', monospace);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .bx__container {
+    max-width: 1250px;
+    margin: 0 auto;
+  }
+
+  /* Header Ribbon */
+  #{{ section_id }} .bx__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--bx-border);
+    padding-bottom: 1.2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  #{{ section_id }} .bx__badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--bx-blue);
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.4);
+    padding: 0.35rem 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    display: inline-block;
+    margin-bottom: 0.6rem;
+  }
+
+  #{{ section_id }} .bx__title {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    color: var(--bx-heading);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #{{ section_id }} .bx__meta {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--bx-muted);
+  }
+
+  #{{ section_id }} .bx__meta strong {
+    color: var(--bx-green);
+  }
+
+  /* Toolbar: Bundle Selector & Checklist Status */
+  #{{ section_id }} .bx__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bx-card);
+    border: 1px solid var(--bx-border);
+    padding: 1rem 1.2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  #{{ section_id }} .bx__bundles {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  #{{ section_id }} .bx__bundle-btn {
+    background: transparent;
+    border: 1px solid var(--bx-border);
+    color: var(--bx-muted);
+    padding: 0.6rem 1.2rem;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #{{ section_id }} .bx__bundle-btn.is-active,
+  #{{ section_id }} .bx__bundle-btn:hover {
+    background: var(--bx-blue);
+    color: #000000;
+    border-color: var(--bx-blue);
+  }
+
+  #{{ section_id }} .bx__status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--bx-green);
+  }
+
+  /* Inventory Grid Architecture */
+  #{{ section_id }} .bx__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    #{{ section_id }} .bx__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  #{{ section_id }} .bx__item {
+    background: var(--bx-card);
+    border: 1px solid var(--bx-border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+  }
+
+  #{{ section_id }} .bx__item.is-hidden {
+    display: none;
+  }
+
+  #{{ section_id }} .bx__item:hover {
+    border-color: var(--bx-blue);
+    transform: translateY(-3px);
+  }
+
+  #{{ section_id }} .bx__item-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed var(--bx-border);
+    padding-bottom: 0.8rem;
+  }
+
+  #{{ section_id }} .bx__num {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--bx-blue);
+    background: #090c10;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--bx-border);
+  }
+
+  #{{ section_id }} .bx__tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--bx-green);
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bx__name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--bx-heading);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .bx__desc {
+    font-size: 0.8rem;
+    color: var(--bx-muted);
+    line-height: 1.6;
+    margin: 0 0 1.2rem 0;
+    flex: 1;
+  }
+
+  #{{ section_id }} .bx__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bx-border);
+    gap: 0.5rem;
+  }
+
+  #{{ section_id }} .bx__verify-btn {
+    background: transparent;
+    border: 1px solid var(--bx-green);
+    color: var(--bx-green);
+    padding: 0.45rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #{{ section_id }} .bx__verify-btn:hover,
+  #{{ section_id }} .bx__verify-btn.is-verified {
+    background: var(--bx-green);
+    color: #000000;
+  }
+
+  #{{ section_id }} .bx__inspect-btn {
+    background: transparent;
+    border: none;
+    color: var(--bx-blue);
+    font-family: inherit;
+    font-size: 0.68rem;
+    text-decoration: underline;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  /* Item Inspection Drawer / Banner */
+  #{{ section_id }} .bx__inspect-box {
+    background: #090c10;
+    border: 1px solid var(--bx-blue);
+    padding: 1.8rem;
+    margin-bottom: 2.5rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+
+  #{{ section_id }} .bx__inspect-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--bx-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.6rem 0;
+  }
+
+  #{{ section_id }} .bx__inspect-text {
+    font-size: 0.85rem;
+    color: var(--bx-text);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  #{{ section_id }} .bx__inspect-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: 1px solid var(--bx-border);
+    color: var(--bx-muted);
+    font-family: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* Footer Guarantee */
+  #{{ section_id }} .bx__footer {
+    background: #090c10;
+    border: 1px dashed var(--bx-border);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--bx-muted);
+    line-height: 1.6;
+  }
+
+  #{{ section_id }} .bx__footer strong {
+    color: var(--bx-green);
+  }
+</style>
+
+<section id="{{ section_id }}">
+  <div class="bx__container">
+    <div class="bx__header">
+      <div>
+        <span class="bx__badge">[ {{ section.settings.eyebrow | default: "SYS.VERIFIED: PACKAGE CONTENTS" }} ]</span>
+        <h2 class="bx__title">{{ section.settings.heading | default: "What's in the Box Inventory" }}</h2>
+      </div>
+      <div class="bx__meta">
+        <div>[ RETAIL KIT: <strong>100% COMPLETE GUARANTEED</strong> ]</div>
+        <div>[ ZERO SINGLE-USE PLASTICS INCLUDED ]</div>
+      </div>
+    </div>
+
+    <!-- Toolbar: Bundle Toggling & Verification Counter -->
+    <div class="bx__toolbar">
+      <div class="bx__bundles" data-bx-bundles>
+        <button type="button" class="bx__bundle-btn is-active" data-bundle="standard">[ STANDARD RETAIL KIT (4 ITEMS) ]</button>
+        <button type="button" class="bx__bundle-btn" data-bundle="pro">[ PRO AUDIOPHILE BUNDLE (6 ITEMS) ]</button>
+      </div>
+
+      <div class="bx__status" data-bx-status>
+        [ VERIFIED INVENTORY: 0 / 4 ITEMS CHECKED ]
+      </div>
+    </div>
+
+    <!-- Dynamic Inspection Box -->
+    <div class="bx__inspect-box" data-inspect-box>
+      <button type="button" class="bx__inspect-close" data-inspect-close>[ X ] CLOSE</button>
+      <div class="bx__inspect-title" data-inspect-title>[ ITEM SPECIFICATION ]</div>
+      <p class="bx__inspect-text" data-inspect-text>Select any item to inspect manufacturing materials and durability specifications.</p>
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="bx__grid" data-bx-grid>
+      {%- for block in section.blocks -%}
+        <div 
+          class="bx__item {% if block.settings.is_pro_only %}is-hidden{% endif %}" 
+          data-bx-item 
+          data-bundle-type="{{ block.settings.bundle_type | default: 'standard' }}"
+          {{ block.shopify_attributes }}
+        >
+          <div>
+            <div class="bx__item-head">
+              <span class="bx__num">[ ITEM 0{{ forloop.index }} ]</span>
+              <span class="bx__tag">[ {{ block.settings.tag | default: "INCLUDED FREE" }} ]</span>
+            </div>
+            <h3 class="bx__name">{{ block.settings.title | default: "StoreForge Pro X Wireless Unit" }}</h3>
+            <p class="bx__desc">{{ block.settings.description | default: "Anodized matte black finish with memory foam ear cushions and precision laser etching." }}</p>
+          </div>
+
+          <div class="bx__actions">
+            <button type="button" class="bx__verify-btn" data-verify-btn>
+              [ VERIFY INCLUDED ]
+            </button>
+            {%- if block.settings.tech_spec != blank -%}
+              <button 
+                type="button" 
+                class="bx__inspect-btn" 
+                data-inspect-title="{{ block.settings.title }}" 
+                data-inspect-text="{{ block.settings.tech_spec }}"
+              >
+                [ INSPECT SPEC &rarr; ]
+              </button>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <!-- Footer Guarantee -->
+    <div class="bx__footer">
+      // <strong>MISSING ITEM GUARANTEE:</strong> Every retail box is precision-weighed before factory sealing. If any accessory or cable is missing upon arrival, our automated support portal dispatches an instant replacement via 24-hour priority air free of charge. //
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var section = document.querySelector('#{{ section_id }}');
+    if (!section) return;
+
+    var bundleBtns = section.querySelectorAll('.bx__bundle-btn');
+    var items = section.querySelectorAll('[data-bx-item]');
+    var statusText = section.querySelector('[data-bx-status]');
+    var verifyBtns = section.querySelectorAll('[data-verify-btn]');
+
+    var inspectBox = section.querySelector('[data-inspect-box]');
+    var inspectTitle = section.querySelector('[data-inspect-title]');
+    var inspectText = section.querySelector('[data-inspect-text]');
+    var inspectClose = section.querySelector('[data-inspect-close]');
+
+    var totalItems = 4;
+    var checkedCount = 0;
+
+    function updateStatus() {
+      if (statusText) {
+        statusText.textContent = '[ VERIFIED INVENTORY: ' + checkedCount + ' / ' + totalItems + ' ITEMS CHECKED ]';
+      }
+    }
+
+    bundleBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        bundleBtns.forEach(function(b) { b.classList.remove('is-active'); });
+        this.classList.add('is-active');
+        var bundle = this.getAttribute('data-bundle') || 'standard';
+
+        totalItems = (bundle === 'pro') ? items.length : 4;
+        checkedCount = 0;
+        verifyBtns.forEach(function(vb) {
+          vb.classList.remove('is-verified');
+          vb.textContent = '[ VERIFY INCLUDED ]';
+        });
+
+        items.forEach(function(item) {
+          var type = item.getAttribute('data-bundle-type') || 'standard';
+          if (bundle === 'pro' || type === 'standard') {
+            item.classList.remove('is-hidden');
+          } else {
+            item.classList.add('is-hidden');
+          }
+        });
+
+        updateStatus();
+      });
+    });
+
+    verifyBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!this.classList.contains('is-verified')) {
+          this.classList.add('is-verified');
+          this.textContent = '[ VERIFIED OK ]';
+          checkedCount++;
+        } else {
+          this.classList.remove('is-verified');
+          this.textContent = '[ VERIFY INCLUDED ]';
+          checkedCount--;
+        }
+        updateStatus();
+      });
+    });
+
+    var inspectBtns = section.querySelectorAll('[data-inspect-title]');
+    inspectBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var title = btn.getAttribute('data-inspect-title');
+        var text = btn.getAttribute('data-inspect-text');
+        if (inspectBox && inspectTitle && inspectText) {
+          inspectTitle.textContent = '[ ITEM SPECIFICATION: ' + title.toUpperCase() + ' ]';
+          inspectText.textContent = text;
+          inspectBox.style.display = 'block';
+          inspectBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    });
+
+    if (inspectClose) {
+      inspectClose.addEventListener('click', function() {
+        if (inspectBox) inspectBox.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Unboxing Gallery",
+  "tag": "section",
+  "class": "section-unboxing-gallery-electronics",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Protocol Messaging"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "System Badge",
+      "default": "SYS.VERIFIED: PACKAGE CONTENTS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What's in the Box Inventory"
+    },
+    {
+      "type": "header",
+      "content": "Color Tokens"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0d1117"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Inventory Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "bundle_type",
+          "label": "Bundle Inclusion",
+          "options": [
+            { "value": "standard", "label": "Standard Retail Kit (All Bundles)" },
+            { "value": "pro", "label": "Pro Audiophile Bundle Only" }
+          ],
+          "default": "standard"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Status Tag",
+          "default": "INCLUDED FREE"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Item Name",
+          "default": "StoreForge Pro X Wireless Unit"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Item Description",
+          "default": "Anodized matte black finish with memory foam ear cushions and precision laser etching."
+        },
+        {
+          "type": "textarea",
+          "id": "tech_spec",
+          "label": "Deep Inspection Specification",
+          "default": "Chassis engineered from CNC-machined aerospace aluminum. Cushions feature protein leather over high-density acoustic memory foam designed for 10+ hour continuous wear without clamping fatigue."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Unboxing Gallery",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "standard",
+            "tag": "INCLUDED FREE",
+            "title": "StoreForge Pro X Wireless Unit",
+            "description": "Anodized matte black finish with memory foam ear cushions and precision laser etching.",
+            "tech_spec": "Chassis engineered from CNC-machined aerospace aluminum. Cushions feature protein leather over high-density acoustic memory foam designed for 10+ hour continuous wear without clamping fatigue."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "standard",
+            "tag": "INCLUDED FREE",
+            "title": "Ballistic Nylon Hard Case",
+            "description": "Waterproof YKK zipper enclosure with magnetic cable management pouch.",
+            "tech_spec": "Constructed from 1680D ballistic nylon shell with custom EVA molded interior. Protects device from 6-foot drops and heavy compression in luggage."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "standard",
+            "tag": "INCLUDED FREE",
+            "title": "Braided USB-C to USB-C Cable",
+            "description": "1.5 meter Kevlar-reinforced charging & high-res digital data transfer cord.",
+            "tech_spec": "Supports 60W Power Delivery fast charging and 480 Mbps data transmission for direct USB DAC playback from laptops and smartphones."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "standard",
+            "tag": "INCLUDED FREE",
+            "title": "3.5mm Gold-Plated Audio Cord",
+            "description": "For zero-latency passive analog listening when internal battery is depleted.",
+            "tech_spec": "Oxygen-free copper (OFC) conductor cores with 24K gold-plated connectors prevent signal corrosion and cross-channel static interference."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "pro",
+            "tag": "PRO BUNDLE EXCLUSIVE",
+            "title": "Dual-Prong Airline Flight Adapter",
+            "description": "Gold-plated converter for connecting directly to in-flight entertainment systems.",
+            "tech_spec": "Eliminates annoying single-channel audio loss on long-haul Boeing and Airbus international flights."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "bundle_type": "pro",
+            "tag": "PRO BUNDLE EXCLUSIVE",
+            "title": "Anodized Aluminum Desk Stand",
+            "description": "Weighted minimalist headphone cradle with anti-slip silicone base.",
+            "tech_spec": "Precision milled from solid block T6 aluminum. Curvature engineered to support headband foam without causing permanent indentation."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
