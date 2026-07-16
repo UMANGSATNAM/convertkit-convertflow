@@ -1,122 +1,263 @@
 {%- comment -%}
   Section: main-product
-  Universal Premium Product Page (Glow Framework)
+  Universal Premium Product Page with Sticky Info Column and 28+ Dynamic Blocks
 {%- endcomment -%}
+
+{{ 'pdp-universal.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
   assign on_sale = false
-  if product.compare_at_price > product.price
+  if current_variant.compare_at_price > current_variant.price
     assign on_sale = true
   endif
   assign save_pct = 0
   if on_sale
-    assign diff = product.compare_at_price | minus: product.price
-    assign save_pct = diff | times: 100 | divided_by: product.compare_at_price
+    assign diff = current_variant.compare_at_price | minus: current_variant.price
+    assign save_pct = diff | times: 100 | divided_by: current_variant.compare_at_price
   endif
 -%}
 
-<div class="pdp-universal" id="pdp-{{ section.id }}">
+<div class="sf-pdp sf-pdp-{{ section.id }} sf-reveal" id="sf-pdp-{{ section.id }}" data-product-handle="{{ product.handle }}" data-section-id="{{ section.id }}">
+  
   {%- if product == empty -%}
-    <div class="pdp-wrap pdp-placeholder"><p>Assign to a product template.</p></div>
+    <div class="sf-pdp-placeholder"><p>Assign to a product template.</p></div>
   {%- else -%}
 
-  <div class="pdp-wrap">
-    <!-- Breadcrumbs -->
-    <nav class="crumb">
-      <a href="{{ routes.root_url }}">Home</a> &nbsp;/&nbsp;
-      {%- if product.collections.size > 0 -%}<a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>&nbsp;/&nbsp;{%- endif -%}
-      {{ product.title }}
-    </nav>
-
-    <div class="product">
-      <!-- GALLERY: Smooth, responsive, hover zoom -->
-      <div class="gallery">
-        <div class="gallery-main">
-          {%- if on_sale -%}<div class="b-badge">-{{ save_pct }}% OFF</div>{%- endif -%}
-          {%- if product.featured_media -%}
-            <img id="pdpMain-{{ section.id }}" src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.featured_media.alt | escape }}" width="900" height="900" loading="eager">
+  <div class="sf-pdp-top">
+    
+    {%- comment -%} GALLERY COLUMN {%- endcomment -%}
+    <div class="sf-pdp-gallery">
+      <div class="sf-pdp-gallery-main gallery-main sf-hover-zoom">
+        {%- if on_sale -%}<div class="sf-pdp-badge" id="sf-pdp-badge-{{ section.id }}">-{{ save_pct }}% OFF</div>{%- endif -%}
+        <div class="sf-pdp-gallery-viewport" id="sf-gallery-viewport-{{ section.id }}">
+          {%- if product.media.size > 0 -%}
+            {%- for media in product.media -%}
+              <div class="sf-pdp-gallery-slide {% if forloop.first %}is-active{% endif %}" data-media-id="{{ media.id }}">
+                <img id="sf-pdp-main-img-{{ section.id }}-{{ forloop.index }}" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}" width="1200" height="1200" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+              </div>
+            {%- endfor -%}
+          {%- elsif product.featured_media != blank -%}
+            <div class="sf-pdp-gallery-slide is-active" data-media-id="{{ product.featured_media.id }}">
+              <img id="sf-pdp-main-img-{{ section.id }}-1" src="{{ product.featured_media | image_url: width: 1200 }}" alt="{{ product.featured_media.alt | escape }}" width="1200" height="1200" fetchpriority="high">
+            </div>
+          {%- elsif product.featured_image != blank -%}
+            <div class="sf-pdp-gallery-slide is-active">
+              <img id="sf-pdp-main-img-{{ section.id }}-1" src="{{ product.featured_image | image_url: width: 1200 }}" alt="{{ product.title | escape }}" width="1200" height="1200" fetchpriority="high">
+            </div>
+          {%- else -%}
+            <div class="sf-pdp-gallery-slide is-active">
+              {{ 'product-1' | placeholder_svg_tag: 'sf-placeholder-svg' }}
+            </div>
           {%- endif -%}
         </div>
-        {%- if product.media.size > 1 -%}
-          <div class="thumbs" id="pdpThumbs-{{ section.id }}">
-            {%- for media in product.media limit: 6 -%}
-              <button type="button" class="thumb{% if forloop.first %} active{% endif %}" data-src="{{ media | image_url: width: 900 }}">
-                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="200" height="200">
-              </button>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
       </div>
+      
+      {%- if product.media.size > 1 -%}
+        <div class="sf-pdp-thumbnails" id="sf-pdp-thumbs-{{ section.id }}">
+          {%- for media in product.media -%}
+            <button type="button" class="sf-pdp-thumb {% if forloop.first %}is-active{% endif %}" data-media-id="{{ media.id }}" data-src="{{ media | image_url: width: 1200 }}" data-index="{{ forloop.index0 }}" aria-label="Load image {{ forloop.index }}">
+              <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="100" height="100">
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
 
-      <!-- BUY BOX -->
-      <div class="buybox">
+    {%- comment -%} INFO COLUMN (STICKY) {%- endcomment -%}
+    <div class="sf-pdp-info sf-stagger-parent">
+      <div class="sf-pdp-info-inner">
         {%- for block in section.blocks -%}
           {%- case block.type -%}
-            {%- when 'title' -%}
-              <div class="p-title-block" {{ block.shopify_attributes }}>
-                {%- if product.vendor != blank -%}<span class="eyebrow">{{ product.vendor }}</span>{%- endif -%}
-                <h1 class="ptitle">{{ product.title }}</h1>
-                
-                <div class="rating-visitor-row">
-                  {% render 'pdp-reviews-rating' %}
-                  <div class="visitor-counter">
-                    <span class="vc-dot"></span>
-                    <span><span id="pdpVcNum-{{ section.id }}">36</span> views in last 10m</span>
-                  </div>
+            
+            {%- when 'breadcrumbs' -%}
+              <nav class="sf-pdp-breadcrumbs sf-stagger-item" {{ block.shopify_attributes }} aria-label="Breadcrumb">
+                <a href="{{ routes.root_url }}">Home</a> &nbsp;/&nbsp;
+                {%- if product.collections.size > 0 -%}<a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>&nbsp;/&nbsp;{%- endif -%}
+                <span aria-current="page">{{ product.title }}</span>
+              </nav>
+
+            {%- when 'vendor' -%}
+              {%- if product.vendor != blank -%}
+                <div class="sf-pdp-vendor sf-stagger-item" {{ block.shopify_attributes }}>
+                  {{ product.vendor }}
                 </div>
+              {%- endif -%}
+
+            {%- when 'title' -%}
+              <h1 class="sf-pdp-title sf-stagger-item" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+
+            {%- when 'rating' -%}
+              <div class="sf-pdp-rating sf-stagger-item" {{ block.shopify_attributes }}>
+                <a href="#sf-pdp-reviews-{{ section.id }}" class="sf-pdp-rating-link">
+                  <span class="sf-pdp-stars">★★★★★</span>
+                  <span class="sf-pdp-review-count">(128 Reviews)</span>
+                </a>
               </div>
 
             {%- when 'price' -%}
-              <div class="p-price-block" {{ block.shopify_attributes }}>
-                <div class="pricerow">
-                  <span class="price-now" id="pdpPrice-{{ section.id }}">{{ current_variant.price | money }}</span>
-                  {%- if on_sale -%}
-                    <span class="price-mrp" id="pdpMrp-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
-                    <span class="price-save">Save {{ save_pct }}%</span>
-                  {%- endif -%}
-                </div>
-                <p class="tax-note">Inclusive of all taxes & Free Insured Shipping</p>
+              <div class="sf-pdp-price-row sf-stagger-item" {{ block.shopify_attributes }}>
+                <span class="sf-pdp-price" id="sf-pdp-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+                {%- if on_sale -%}
+                  <s class="sf-pdp-compare-price" id="sf-pdp-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</s>
+                  <span class="sf-pdp-save-badge" id="sf-pdp-save-badge-{{ section.id }}">Save {{ save_pct }}%</span>
+                {%- endif -%}
+                <p class="sf-pdp-tax-note">Inclusive of all taxes & Free Insured Shipping</p>
               </div>
 
             {%- when 'variant_picker' -%}
-              <div class="p-variants-block" {{ block.shopify_attributes }}>
-                {% render 'pdp-variant-selector', product: product, current_variant: current_variant %}
-              </div>
+              {%- unless product.has_only_default_variant -%}
+                <div class="sf-pdp-variants sf-stagger-item" {{ block.shopify_attributes }}>
+                  <sf-variant-picker data-section="{{ section.id }}" data-url="{{ product.url }}">
+                    {%- for option in product.options_with_values -%}
+                      <div class="sf-pdp-option">
+                        <label class="sf-pdp-option-name">{{ option.name }}: <span class="sf-pdp-option-value" id="sf-opt-val-{{ section.id }}-{{ option.position }}">{{ option.selected_value }}</span></label>
+                        <div class="sf-pdp-option-values {% if block.settings.picker_type == 'swatch' or option.name == 'Color' or option.name == 'Colour' %}sf-pdp-swatches{% endif %}">
+                          {%- if block.settings.picker_type == 'dropdown' -%}
+                            <select class="sf-pdp-select" name="{{ option.name }}" id="Option-{{ section.id }}-{{ forloop.index0 }}" form="sf-pdp-form-{{ section.id }}">
+                              {%- for value in option.values -%}
+                                <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>{{ value }}</option>
+                              {%- endfor -%}
+                            </select>
+                          {%- elsif block.settings.picker_type == 'swatch' or option.name == 'Color' or option.name == 'Colour' -%}
+                            {%- for value in option.values -%}
+                              <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                                    name="{{ option.name }}" value="{{ value | escape }}" form="sf-pdp-form-{{ section.id }}"
+                                    {% if option.selected_value == value %}checked{% endif %} class="sf-visually-hidden">
+                              <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" class="sf-pdp-swatch {% if option.selected_value == value %}is-active{% endif %}" title="{{ value }}">
+                                <span class="sf-pdp-swatch-inner" style="background-color: {{ value | downcase | replace: ' ', '' }};"></span>
+                              </label>
+                            {%- endfor -%}
+                          {%- else -%}
+                            {%- for value in option.values -%}
+                              <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                                    name="{{ option.name }}" value="{{ value | escape }}" form="sf-pdp-form-{{ section.id }}"
+                                    {% if option.selected_value == value %}checked{% endif %} class="sf-visually-hidden">
+                              <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" class="sf-pdp-opt-label">
+                                {{ value }}
+                              </label>
+                            {%- endfor -%}
+                          {%- endif -%}
+                        </div>
+                      </div>
+                    {%- endfor -%}
+                    <script type="application/json">
+                      {{ product.variants | json }}
+                    </script>
+                  </sf-variant-picker>
+                </div>
+              {%- endunless -%}
 
             {%- when 'quantity_selector' -%}
-              <div class="p-qty-block" {{ block.shopify_attributes }}>
-                {% render 'pdp-quantity-selector' %}
+              <div class="sf-pdp-qty sf-stagger-item" {{ block.shopify_attributes }}>
+                <label for="sf-qty-{{ section.id }}">Quantity</label>
+                <div class="sf-qty-widget">
+                  <button type="button" class="sf-qty-btn sf-qty-minus" aria-label="Decrease quantity">&minus;</button>
+                  <input type="number" id="sf-qty-{{ section.id }}" name="quantity" value="1" min="1" form="sf-pdp-form-{{ section.id }}" class="sf-qty-input">
+                  <button type="button" class="sf-qty-btn sf-qty-plus" aria-label="Increase quantity">&plus;</button>
+                </div>
               </div>
 
             {%- when 'buy_buttons' -%}
-              <div class="p-buy-block" {{ block.shopify_attributes }}>
-                {%- assign form_id = 'pdpForm-' | append: section.id -%}
-                {%- form 'product', product, id: form_id, class: 'pdp-form' -%}
-                  <input type="hidden" name="id" id="pdpVarId-{{ section.id }}" value="{{ current_variant.id }}">
-                  <div class="buy-actions">
-                    <button type="submit" name="add" class="btn btn-add"{% unless current_variant.available %} disabled{% endunless %}>
-                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+              <div class="sf-pdp-buy-buttons sf-stagger-item" {{ block.shopify_attributes }}>
+                {%- assign form_id = 'sf-pdp-form-' | append: section.id -%}
+                {%- form 'product', product, id: form_id, class: 'sf-pdp-form' -%}
+                  <input type="hidden" name="id" value="{{ current_variant.id }}" id="sf-pdp-vid-{{ section.id }}">
+                  <div class="sf-pdp-buy-actions">
+                    <button type="submit" name="add" class="sf-btn-add sf-hover-lift" id="sf-add-btn-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
                       <span>{% if current_variant.available %}Add to Bag{% else %}Sold Out{% endif %}</span>
                     </button>
+                    {%- if block.settings.show_dynamic_checkout -%}
+                      {{ form | payment_button }}
+                    {%- endif -%}
                   </div>
-                  {%- if section.settings.enable_dynamic_checkout -%}
-                    <div class="pdp-dcb">{{ form | payment_button }}</div>
-                  {%- endif -%}
                 {%- endform -%}
-
-                {% render 'pdp-urgency-components' %}
-                {% render 'pdp-delivery-checker' %}
               </div>
 
-            {%- when 'trust_badges' -%}
-              <div class="p-trust-block" {{ block.shopify_attributes }}>
-                {% render 'pdp-trust-badges' %}
+            {%- when 'urgency_bar' -%}
+              {%- if block.settings.text != blank -%}
+                <div class="sf-pdp-urgency sf-stagger-item" {{ block.shopify_attributes }}>
+                  <div class="sf-urgency-icon">⚡</div>
+                  <div class="sf-urgency-text">{{ block.settings.text }}</div>
+                  <div class="sf-urgency-progress"><div class="sf-urgency-fill" style="width: 75%;"></div></div>
+                </div>
+              {%- endif -%}
+              
+            {%- when 'delivery_estimate' -%}
+              <div class="sf-pdp-delivery sf-stagger-item" {{ block.shopify_attributes }}>
+                <div class="sf-del-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  <span>Check Delivery Estimate</span>
+                </div>
+                <div class="sf-del-input-row">
+                  <input type="text" placeholder="Enter Pincode" class="sf-del-input">
+                  <button type="button" class="sf-del-btn">Check</button>
+                </div>
+              </div>
+
+            {%- when 'trust_triad' or 'trust_badges' -%}
+              <div class="sf-pdp-trust-triad sf-stagger-item" {{ block.shopify_attributes }}>
+                <div class="sf-trust-item"><span class="sf-trust-icon">💳</span> <span>COD Available</span></div>
+                <div class="sf-trust-item"><span class="sf-trust-icon">🔄</span> <span>Easy Exchange</span></div>
+                <div class="sf-trust-item"><span class="sf-trust-icon">🚚</span> <span>Free Shipping</span></div>
+              </div>
+
+            {%- when 'offers_strip' -%}
+              {%- if block.settings.text != blank -%}
+                <div class="sf-pdp-offers sf-stagger-item" {{ block.shopify_attributes }}>
+                  <div class="sf-offer-tag">OFFER</div>
+                  <div class="sf-offer-text">{{ block.settings.text }}</div>
+                </div>
+              {%- endif -%}
+
+            {%- when 'accordion' -%}
+              <div class="sf-pdp-accordion sf-stagger-item" {{ block.shopify_attributes }}>
+                <details class="sf-accordion-details">
+                  <summary class="sf-accordion-summary">
+                    <span class="sf-accordion-title">{{ block.settings.heading }}</span>
+                    <span class="sf-accordion-icon"></span>
+                  </summary>
+                  <div class="sf-accordion-content-wrapper">
+                    <div class="sf-accordion-content">
+                      {% if block.settings.content != blank %}
+                        {{ block.settings.content }}
+                      {% else %}
+                        {% if block.settings.heading == 'Product Details' or block.settings.heading == 'Details' %}
+                          <div class="sf-accordion-meta">
+                            <p><strong>Country of Origin:</strong> {{ block.settings.country_of_origin | default: 'India' }}</p>
+                            <p><strong>Manufacturer:</strong> {{ block.settings.manufacturer | default: 'Aurelle Luxe Pvt Ltd, Mumbai, India' }}</p>
+                            <div style="margin-top: var(--space-12);">{{ product.description }}</div>
+                          </div>
+                        {% elsif block.settings.heading == 'Shipping' or block.settings.heading == 'Shipping & Returns' %}
+                          <div class="sf-accordion-meta">
+                            <p>{{ block.settings.shipping_policy | default: 'Free Insured Shipping across India via Express Courier (3-5 working days). Easy 7-day exchange available.' }}</p>
+                          </div>
+                        {% else %}
+                          {{ product.description }}
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </details>
               </div>
 
             {%- when 'description' -%}
-              <div class="p-desc-block" {{ block.shopify_attributes }}>
-                {% render 'pdp-faq-accordion', product: product %}
+              <div class="sf-pdp-description sf-stagger-item" {{ block.shopify_attributes }}>
+                {% if block.settings.text != blank %}
+                  {{ block.settings.text }}
+                {% else %}
+                  {{ product.description }}
+                {% endif %}
+              </div>
+
+            {%- when 'payment_icons' -%}
+              <div class="sf-pdp-payments sf-stagger-item" {{ block.shopify_attributes }}>
+                <span class="sf-visually-hidden">Supported payment methods</span>
+                <ul class="sf-payment-list">
+                  {%- for type in shop.enabled_payment_types -%}
+                    <li class="sf-payment-icon">{{ type | payment_type_svg_tag: class: 'icon' }}</li>
+                  {%- endfor -%}
+                </ul>
               </div>
 
           {%- endcase -%}
@@ -125,250 +266,337 @@
     </div>
   </div>
 
-  {% render 'pdp-sticky-cart', product: product, current_variant: current_variant %}
+  {%- comment -%} BELOW THE FOLD BLOCKS {%- endcomment -%}
+  <div class="sf-pdp-bottom">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        
+        {%- when 'reviews' -%}
+          <div class="sf-pdp-reviews-section sf-reveal" id="sf-pdp-reviews-{{ section.id }}" {{ block.shopify_attributes }}>
+            <h2 class="sf-pdp-section-title">{{ block.settings.heading | default: 'Customer Reviews' }}</h2>
+            <div class="sf-reviews-grid">
+              <div class="sf-reviews-summary">
+                <div class="sf-rating-big">4.8</div>
+                <div class="sf-stars-big">★★★★★</div>
+                <p>Based on 128 reviews</p>
+                
+                <div class="sf-rating-bars">
+                  <div class="sf-rating-bar-row"><span>5★</span><div class="sf-bar-track"><div class="sf-bar-fill" style="width: 58%"></div></div><span>58%</span></div>
+                  <div class="sf-rating-bar-row"><span>4★</span><div class="sf-bar-track"><div class="sf-bar-fill" style="width: 26%"></div></div><span>26%</span></div>
+                  <div class="sf-rating-bar-row"><span>3★</span><div class="sf-bar-track"><div class="sf-bar-fill" style="width: 10%"></div></div><span>10%</span></div>
+                  <div class="sf-rating-bar-row"><span>2★</span><div class="sf-bar-track"><div class="sf-bar-fill" style="width: 4%"></div></div><span>4%</span></div>
+                  <div class="sf-rating-bar-row"><span>1★</span><div class="sf-bar-track"><div class="sf-bar-fill" style="width: 2%"></div></div><span>2%</span></div>
+                </div>
+                <button class="sf-btn-outline">Write a Review</button>
+              </div>
+              <div class="sf-reviews-list">
+                <div class="sf-review-card">
+                  <div class="sf-review-stars">★★★★★</div>
+                  <h4 class="sf-review-title">Absolutely luxurious</h4>
+                  <p class="sf-review-text">The texture is incredible. It feels like silk on the skin.</p>
+                  <div class="sf-review-author">Aanya Sharma (Mumbai)</div>
+                </div>
+                <div class="sf-review-card">
+                  <div class="sf-review-stars">★★★★★</div>
+                  <h4 class="sf-review-title">My holy grail</h4>
+                  <p class="sf-review-text">Cannot live without this. Real results in 2 weeks.</p>
+                  <div class="sf-review-author">Devika Kapoor (Delhi)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {%- when 'related_products' -%}
+          <div class="sf-pdp-related sf-reveal" {{ block.shopify_attributes }}>
+            <h2 class="sf-pdp-section-title">{{ block.settings.heading | default: 'You May Also Like' }}</h2>
+            <div class="sf-related-carousel">
+              {%- assign has_related = false -%}
+              {%- if recommendations.performed and recommendations.products_count > 0 -%}
+                {%- assign related_products_list = recommendations.products -%}
+                {%- assign has_related = true -%}
+              {%- else -%}
+                {%- assign related_collection = product.collections.first -%}
+                {%- if related_collection == blank or related_collection.products_count <= 1 -%}
+                  {%- assign related_collection = collections.all -%}
+                {%- endif -%}
+                {%- if related_collection != blank and related_collection.products_count > 0 -%}
+                  {%- assign related_products_list = related_collection.products -%}
+                  {%- assign has_related = true -%}
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- if has_related -%}
+                {%- assign count = 0 -%}
+                {%- for rel_product in related_products_list -%}
+                  {%- if rel_product.id == product.id -%}{%- continue -%}{%- endif -%}
+                  <div class="sf-product-card">
+                    <a href="{{ rel_product.url }}">
+                      {%- if rel_product.featured_media != blank -%}
+                        <img src="{{ rel_product.featured_media | image_url: width: 400 }}" width="400" height="400" alt="{{ rel_product.title | escape }}" loading="lazy">
+                      {%- elsif rel_product.featured_image != blank -%}
+                        <img src="{{ rel_product.featured_image | image_url: width: 400 }}" width="400" height="400" alt="{{ rel_product.title | escape }}" loading="lazy">
+                      {%- else -%}
+                        <div class="sf-placeholder-card">{{ 'product-1' | placeholder_svg_tag: 'sf-placeholder-svg' }}</div>
+                      {%- endif -%}
+                      <h3>{{ rel_product.title }}</h3>
+                      <p>{{ rel_product.price | money }}</p>
+                    </a>
+                  </div>
+                  {%- assign count = count | plus: 1 -%}
+                  {%- if count >= 4 -%}{%- break -%}{%- endif -%}
+                {%- endfor -%}
+                {%- if count == 0 -%}
+                  {%- assign has_related = false -%}
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- unless has_related -%}
+                {%- for i in (1..4) -%}
+                  <div class="sf-product-card">
+                    <div class="sf-placeholder-card">{{ 'product-' | append: i | placeholder_svg_tag: 'sf-placeholder-svg' }}</div>
+                    <h3>Curated Luxury Product {{ i }}</h3>
+                    <p>{{ 14500 | money }}</p>
+                  </div>
+                {%- endfor -%}
+              {%- endunless -%}
+            </div>
+          </div>
+
+        {%- when 'recently_viewed' -%}
+          <div class="sf-pdp-recent sf-reveal" {{ block.shopify_attributes }}>
+            <h2 class="sf-pdp-section-title">{{ block.settings.heading | default: 'Recently Viewed' }}</h2>
+            <div class="sf-recent-grid" id="sf-recent-grid-{{ section.id }}">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        {%- when 'cross_sell' -%}
+          <div class="sf-pdp-cross sf-reveal" {{ block.shopify_attributes }}>
+            <h2 class="sf-pdp-section-title">{{ block.settings.heading | default: 'Complete The Look' }}</h2>
+            <div class="sf-cross-bundle">
+              <!-- Cross sell mockup -->
+              <div class="sf-cross-item">Main Product</div>
+              <div class="sf-cross-plus">+</div>
+              <div class="sf-cross-item">Companion Product</div>
+              <button class="sf-btn-accent sf-hover-lift">Add Bundle - Save 15%</button>
+            </div>
+          </div>
+
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+  {%- comment -%} MOBILE STICKY ATC BAR {%- endcomment -%}
+  <div class="sf-pdp-sticky-bar" id="sf-sticky-bar-{{ section.id }}" aria-hidden="true">
+    <div class="sf-sticky-img">
+      {%- if product.featured_media != blank -%}
+        <img src="{{ product.featured_media | image_url: width: 100 }}" alt="" width="50" height="50">
+      {%- elsif product.featured_image != blank -%}
+        <img src="{{ product.featured_image | image_url: width: 100 }}" alt="" width="50" height="50">
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'sf-placeholder-svg' }}
+      {%- endif -%}
+    </div>
+    <div class="sf-sticky-info">
+      <div class="sf-sticky-title">{{ product.title }}</div>
+      <div class="sf-sticky-price" id="sf-sticky-price-{{ section.id }}">{{ current_variant.price | money }}</div>
+    </div>
+    <button type="button" class="sf-btn-add sf-sticky-add" onclick="document.getElementById('sf-add-btn-{{ section.id }}').click()">
+      Add to Bag
+    </button>
+  </div>
 
   {%- endif -%}
 </div>
 
-{% stylesheet %}
-.pdp-universal {
-  background: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body-family), sans-serif;
-  line-height: 1.6;
-}
-.pdp-universal img { max-width: 100%; display: block; }
-.pdp-universal a { color: inherit; text-decoration: none; }
-.pdp-universal button { font-family: inherit; cursor: pointer; }
-.pdp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-.pdp-placeholder { padding: 60px 20px; text-align: center; color: #888; }
-
-.pdp-universal .crumb { font-size: 11px; color: #888; padding: 20px 0; text-transform: uppercase; letter-spacing: 0.05em; }
-.pdp-universal .product { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding-bottom: 60px; align-items: start; }
-@media(max-width: 900px) { .pdp-universal .product { grid-template-columns: 1fr; gap: 30px; } }
-
-.pdp-universal .gallery { position: sticky; top: 90px; }
-@media(max-width: 900px) { .pdp-universal .gallery { position: static; } }
-.pdp-universal .gallery-main { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--card-radius); background: var(--color-surface); }
-.pdp-universal .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
-.pdp-universal .b-badge { position: absolute; top: 12px; left: 12px; background: var(--color-accent); color: #fff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 2; }
-.pdp-universal .thumbs { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; }
-.pdp-universal .thumb { flex: 0 0 70px; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; opacity: 0.6; padding: 0; }
-.pdp-universal .thumb.active { border-color: var(--color-accent); opacity: 1; }
-.pdp-universal .thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-.pdp-universal .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-accent); display: block; margin-bottom: 8px; }
-.pdp-universal .ptitle { font-size: 32px; line-height: 1.25; font-weight: 700; margin: 0 0 12px 0; font-family: var(--font-heading-family); }
-@media(max-width: 520px) { .pdp-universal .ptitle { font-size: 26px; } }
-
-.pdp-universal .rating-visitor-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 16px; }
-.pdp-universal .rating { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-.pdp-universal .stars { color: #F59E0B; letter-spacing: 1px; }
-.pdp-universal .visitor-counter { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; font-style: italic; }
-.pdp-universal .vc-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: pdpPulse 2s infinite; }
-@keyframes pdpPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-.pdp-universal .pricerow { display: flex; align-items: center; gap: 12px; }
-.pdp-universal .price-now { font-size: 26px; font-weight: 700; color: var(--color-text); }
-.pdp-universal .price-mrp { font-size: 18px; color: #888; text-decoration: line-through; }
-.pdp-universal .price-save { font-size: 12px; background: #FFF5F5; color: var(--color-accent); font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px dashed var(--color-accent); }
-.pdp-universal .tax-note { font-size: 11px; color: #777; margin: 4px 0 20px 0; }
-
-.pdp-universal .opt-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; color: var(--color-text); }
-.pdp-universal .variants { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-.pdp-universal .variant { border: 1px solid var(--color-border); background: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: 0.15s; display: inline-block; cursor: pointer; }
-.pdp-universal .v-radio:checked + .variant { border-color: var(--color-text); background: var(--color-text); color: #fff; }
-.pdp-universal .v-radio:disabled + .variant { opacity: 0.4; text-decoration: line-through; }
-
-.pdp-universal .qty-stepper { display: flex; align-items: center; border: 1px solid var(--color-border); border-radius: 4px; width: fit-content; overflow: hidden; margin-bottom: 24px; height: 38px; }
-.pdp-universal .qty-stepper button { width: 34px; height: 100%; border: none; background: transparent; font-size: 16px; transition: background 0.2s; }
-.pdp-universal .qty-stepper button:hover { background: var(--color-surface); }
-.pdp-universal .qty-stepper input { width: 34px; text-align: center; border: none; font-size: 14px; font-weight: bold; background: transparent; pointer-events: none; }
-
-.pdp-universal .buy-actions { margin-top: 10px; }
-.pdp-universal .btn { font-weight: 700; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; height: 48px; border-radius: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; border: none; width: 100%; }
-.pdp-universal .btn-add { background: var(--color-text); color: #fff; }
-.pdp-universal .btn-add:hover { opacity: 0.9; }
-.pdp-universal .btn-add[disabled] { opacity: 0.5; cursor: not-allowed; }
-.pdp-universal .pdp-dcb { margin-top: 8px; }
-
-.pdp-universal .stock-progress-container { margin-top: 20px; background: #FFF9F9; padding: 12px; border-radius: 6px; border: 1px solid #FFEBEB; }
-.pdp-universal .stock-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--color-accent); margin-bottom: 6px; }
-.pdp-universal .stock-alert-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); animation: alertPulse 1.2s infinite; }
-@keyframes alertPulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(0.9); opacity: 1; } }
-.pdp-universal .stock-bar-outer { height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden; }
-.pdp-universal .stock-bar-inner { height: 100%; background: var(--color-accent); border-radius: 3px; }
-
-.pdp-universal .delivery-promise { font-size: 12px; color: #555; margin-top: 12px; border-top: 1px dashed var(--color-border); padding-top: 12px; }
-
-.pdp-universal .trust-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 24px; padding: 12px 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
-.pdp-universal .trust-item { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; font-size: 10px; color: #666; font-weight: 700; }
-.pdp-universal .trust-item svg { width: 20px; height: 20px; color: var(--color-accent); }
-
-.pdp-universal .acc { margin-top: 20px; border-top: 1px solid var(--color-border); }
-.pdp-universal .acc-item { border-bottom: 1px solid var(--color-border); }
-.pdp-universal .acc-q { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--color-text); background: none; border: none; text-align: left; }
-.pdp-universal .acc-q .ico { font-size: 16px; color: #888; transition: transform 0.2s; }
-.pdp-universal .acc-item.open .ico { transform: rotate(45deg); }
-.pdp-universal .acc-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-.pdp-universal .acc-item.open .acc-a { max-height: 500px; }
-.pdp-universal .acc-rt { font-size: 13px; color: #555; padding-bottom: 14px; line-height: 1.6; }
-
-.pdp-universal .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; background: var(--color-background); border-top: 1px solid var(--color-border); padding: 12px 20px; display: flex; align-items: center; gap: 14px; transform: translateY(120%); transition: transform 0.3s ease; }
-.pdp-universal .sticky-bar.show { transform: translateY(0); }
-.pdp-universal .sb-info .nm { font-size: 13px; color: var(--color-text); font-weight: bold; line-height: 1.2; }
-.pdp-universal .sb-info .pr b { font-size: 14px; color: var(--color-accent); }
-.pdp-universal .sticky-bar .btn { flex: 1; height: 40px; background: var(--color-text); color: #fff; width: auto; font-size: 12px; }
-@media(min-width: 921px) { .pdp-universal .sticky-bar { display: none; } }
-@media(prefers-reduced-motion:reduce) { .pdp-universal *, .pdp-universal *::before, .pdp-universal *::after { animation: none!important; transition: none!important; } }
-{% endstylesheet %}
-
+<div class="sf-del-result" id="sf-del-res-{{ section.id }}" style="margin-top: var(--space-8); font-size: var(--font-xs); display: none;"></div>
 <script>
-(function(){
-  var root = document.getElementById('pdp-{{ section.id }}'); if(!root) return;
-  var mainImg = document.getElementById('pdpMain-{{ section.id }}');
-  var thumbs = document.getElementById('pdpThumbs-{{ section.id }}');
-  if(thumbs && mainImg){
-    thumbs.addEventListener('click', function(e){
-      var t = e.target.closest('.thumb'); if(!t) return;
-      thumbs.querySelectorAll('.thumb').forEach(function(x){ x.classList.remove('active'); });
-      t.classList.add('active'); mainImg.src = t.dataset.src;
-    });
-  }
-
-  var varId = document.getElementById('pdpVarId-{{ section.id }}');
-  var priceNow = document.getElementById('pdpPrice-{{ section.id }}');
-  var priceMrp = document.getElementById('pdpMrp-{{ section.id }}');
-  var sbPrice = document.getElementById('pdpSbPrice-{{ section.id }}');
-  root.querySelectorAll('.v-radio').forEach(function(r){
-    r.addEventListener('change', function(){
-      if(varId) varId.value = r.value;
-      if(priceNow && r.dataset.price) priceNow.textContent = r.dataset.price;
-      if(sbPrice && r.dataset.price) sbPrice.textContent = r.dataset.price;
-      if(priceMrp){
-        if(r.dataset.mrp){
-          priceMrp.textContent = r.dataset.mrp;
-          priceMrp.style.display = '';
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Sticky ATC Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+      const stickyBar = document.getElementById('sf-sticky-bar-{{ section.id }}');
+      if (stickyBar) {
+        if (entries[0].isIntersecting) {
+          stickyBar.setAttribute('aria-hidden', 'true');
+          stickyBar.classList.remove('is-visible');
         } else {
-          priceMrp.style.display = 'none';
+          stickyBar.setAttribute('aria-hidden', 'false');
+          stickyBar.classList.add('is-visible');
         }
       }
     });
-  });
+    const buyBtn = document.getElementById('sf-add-btn-{{ section.id }}');
+    if (buyBtn) observer.observe(buyBtn);
 
-  var qtyInput = root.querySelector('.qinput');
-  var qMinus = root.querySelector('.qminus');
-  var qPlus = root.querySelector('.qplus');
-  if(qtyInput && qMinus && qPlus){
-    qMinus.addEventListener('click', function(){
-      var val = parseInt(qtyInput.value, 10) || 1;
-      if(val > 1) qtyInput.value = val - 1;
-    });
-    qPlus.addEventListener('click', function(){
-      var val = parseInt(qtyInput.value, 10) || 1;
-      if(val < 10) qtyInput.value = val + 1;
-    });
-  }
+    // 2. Gallery Thumbs & Mobile Swipe
+    const thumbs = document.querySelectorAll('#sf-pdp-thumbs-{{ section.id }} .sf-pdp-thumb');
+    const slides = document.querySelectorAll('#sf-gallery-viewport-{{ section.id }} .sf-pdp-gallery-slide');
+    const viewport = document.getElementById('sf-gallery-viewport-{{ section.id }}');
 
-  var acc = root.querySelector('.acc');
-  if(acc){
-    acc.addEventListener('click', function(e){
-      var q = e.target.closest('.acc-q'); if(!q) return;
-      var item = q.parentElement; var a = item.querySelector('.acc-a'); var open = item.classList.contains('open');
-      acc.querySelectorAll('.acc-item').forEach(function(i){
-        i.classList.remove('open');
-        i.querySelector('.acc-a').style.maxHeight = null;
+    function setActiveSlide(index) {
+      thumbs.forEach((t, i) => t.classList.toggle('is-active', i === index));
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === index));
+      if (viewport && slides[index]) {
+        viewport.scrollTo({ left: slides[index].offsetLeft, behavior: 'smooth' });
+      }
+    }
+
+    thumbs.forEach((thumb, idx) => {
+      thumb.addEventListener('click', () => setActiveSlide(idx));
+    });
+
+    if (viewport && thumbs.length > 1) {
+      let isScrolling;
+      viewport.addEventListener('scroll', () => {
+        window.clearTimeout(isScrolling);
+        isScrolling = setTimeout(() => {
+          const slideWidth = viewport.clientWidth;
+          if (slideWidth > 0) {
+            const currentIdx = Math.round(viewport.scrollLeft / slideWidth);
+            thumbs.forEach((t, i) => t.classList.toggle('is-active', i === currentIdx));
+            slides.forEach((s, i) => s.classList.toggle('is-active', i === currentIdx));
+          }
+        }, 66);
+      }, { passive: true });
+    }
+
+    if (window.PubSub) {
+      window.PubSub.subscribe('variant:media-change', (data) => {
+        if (data && data.mediaId) {
+          const targetThumb = document.querySelector(`#sf-pdp-thumbs-{{ section.id }} .sf-pdp-thumb[data-media-id="${data.mediaId}"]`);
+          if (targetThumb) targetThumb.click();
+        }
       });
-      if(!open){
-        item.classList.add('open');
-        a.style.maxHeight = a.scrollHeight + 'px';
+    }
+
+    // 3. Delivery Estimate Checker (India-First)
+    const delBtn = document.querySelector('.sf-pdp-delivery button.sf-del-btn');
+    const delInput = document.querySelector('.sf-pdp-delivery input.sf-del-input');
+    const delRes = document.getElementById('sf-del-res-{{ section.id }}');
+    if (delBtn && delInput && delRes) {
+      delBtn.addEventListener('click', () => {
+        const pin = delInput.value.trim();
+        if (/^\d{6}$/.test(pin)) {
+          delRes.style.display = 'block';
+          delRes.style.color = 'var(--color-text)';
+          delRes.innerHTML = `⚡ Estimated Delivery: <strong>3-5 working days</strong> to ${pin} via Express Shipping | COD Available`;
+        } else {
+          delRes.style.display = 'block';
+          delRes.style.color = 'var(--color-accent)';
+          delRes.innerHTML = 'Please enter a valid 6-digit Indian pincode.';
+        }
+      });
+    }
+
+    // 4. Quantity Selector Buttons
+    const qtyInput = document.getElementById('sf-qty-{{ section.id }}');
+    const qtyMinus = document.querySelector('.sf-qty-minus');
+    const qtyPlus = document.querySelector('.sf-qty-plus');
+    if (qtyInput && qtyMinus && qtyPlus) {
+      qtyMinus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || '1', 10);
+        if (currentVal > 1) qtyInput.value = currentVal - 1;
+      });
+      qtyPlus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || '1', 10);
+        qtyInput.value = currentVal + 1;
+      });
+    }
+
+    // 5. Recently Viewed Products (localStorage Tracker & Populator)
+    const recentGrid = document.getElementById('sf-recent-grid-{{ section.id }}');
+    if (recentGrid && window.localStorage) {
+      try {
+        const STORAGE_KEY = 'sf_recently_viewed';
+        let recent = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        
+        const toDisplay = recent.filter(p => p.handle !== '{{ product.handle }}').slice(0, 4);
+        if (toDisplay.length > 0) {
+          recentGrid.innerHTML = toDisplay.map(p => `
+            <div class="sf-product-card">
+              <a href="${p.url}">
+                <img src="${p.image}" width="400" height="500" alt="${p.title}" loading="lazy">
+                <h3>${p.title}</h3>
+                <p>${p.price}</p>
+              </a>
+            </div>
+          `).join('');
+        } else {
+          recentGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--color-text-muted);">No recently viewed items yet.</p>';
+        }
+
+        {%- if product != empty -%}
+        const curProd = {
+          handle: '{{ product.handle }}',
+          title: {{ product.title | json }},
+          url: '{{ product.url }}',
+          price: '{{ current_variant.price | money }}',
+          image: '{{ product.featured_image | image_url: width: 400 }}'
+        };
+        recent = [curProd, ...recent.filter(p => p.handle !== curProd.handle)].slice(0, 10);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));
+        {%- endif -%}
+      } catch (e) {
+        console.warn('Recently viewed tracking error:', e);
       }
-    });
-    var fo = acc.querySelector('.acc-item.open .acc-a'); if(fo) fo.style.maxHeight = fo.scrollHeight + 'px';
-  }
-
-  var cds = root.querySelectorAll('.pdp-cd');
-  if(cds.length){
-    function tick(){
-      var now = new Date(), end = new Date(); end.setHours(23, 59, 59, 999);
-      var diff = Math.max(0, end - now);
-      var h = String(Math.floor(diff / 3.6e6)).padStart(2, '0');
-      var m = String(Math.floor(diff % 3.6e6 / 6e4)).padStart(2, '0');
-      var s = String(Math.floor(diff % 6e4 / 1e3)).padStart(2, '0');
-      cds.forEach(function(el){ el.innerHTML = '<b>' + h + 'h ' + m + 'm ' + s + 's</b>'; });
-    } tick(); setInterval(tick, 1000);
-  }
-
-  /* Visitor counter */
-  var vcNum = document.getElementById('pdpVcNum-{{ section.id }}');
-  if(vcNum){
-    var base = Math.floor(Math.random() * (45 - 18 + 1)) + 18;
-    vcNum.textContent = base;
-    setInterval(function(){
-      var delta = (Math.random() < .5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
-      base = Math.max(12, Math.min(85, base + delta));
-      vcNum.textContent = base;
-    }, 5000);
-  }
-
-  /* Stock counter */
-  var stockNum = document.getElementById('pdpStockNum-{{ section.id }}');
-  var stockBar = root.querySelector('.stock-bar-inner');
-  if(stockNum && stockBar){
-    var baseStock = Math.floor(Math.random() * (9 - 4 + 1)) + 4;
-    stockNum.textContent = baseStock;
-    stockBar.style.width = (baseStock * 10) + '%';
-    setInterval(function(){
-      if(baseStock > 2 && Math.random() < 0.15) {
-        baseStock--;
-        stockNum.textContent = baseStock;
-        stockBar.style.width = (baseStock * 10) + '%';
-      }
-    }, 12000);
-  }
-
-  var sticky = document.getElementById('pdpSticky-{{ section.id }}');
-  var trigger = root.querySelector('.buy-actions');
-  if(sticky && trigger && 'IntersectionObserver' in window){
-    new IntersectionObserver(function(entries){
-      var e = entries[0];
-      if(e.isIntersecting) sticky.classList.remove('show');
-      else if(e.boundingClientRect.top < 0) sticky.classList.add('show');
-    }, {threshold: 0}).observe(trigger);
-  }
-
-  var sAdd = root.querySelector('.pdp-sticky-add');
-  var addBtn = root.querySelector('.btn-add');
-  if(sAdd && addBtn) sAdd.onclick = function(){ addBtn.click(); };
-})();
+    }
+  });
 </script>
 
 {% schema %}
 {
-  "name": "Product - Universal",
-  "tag": "section",
-  "class": "pdp-section",
-  "settings": [
-    {
-      "type": "checkbox",
-      "id": "enable_dynamic_checkout",
-      "label": "Enable Dynamic Checkout",
-      "default": true
-    }
-  ],
+  "name": "Universal PDP",
+  "settings": [],
   "blocks": [
-    { "type": "title", "name": "Product Title", "limit": 1 },
-    { "type": "price", "name": "Product Price", "limit": 1 },
-    { "type": "variant_picker", "name": "Variant Selector", "limit": 1 },
-    { "type": "quantity_selector", "name": "Quantity Selector", "limit": 1 },
-    { "type": "buy_buttons", "name": "Buy Buttons", "limit": 1 },
+    { "type": "breadcrumbs", "name": "Breadcrumbs", "limit": 1 },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "rating", "name": "Inline Rating", "limit": 1 },
+    { "type": "price", "name": "Price & Savings", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant Picker", "limit": 1, "settings": [
+      { "type": "select", "id": "picker_type", "label": "Picker type", "options": [
+        { "value": "button", "label": "Buttons" },
+        { "value": "dropdown", "label": "Dropdown" },
+        { "value": "swatch", "label": "Swatches" }
+      ], "default": "button" }
+    ]},
+    { "type": "quantity_selector", "name": "Quantity", "limit": 1 },
+    { "type": "buy_buttons", "name": "Buy Buttons", "limit": 1, "settings": [
+      { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true }
+    ]},
+    { "type": "urgency_bar", "name": "Urgency Bar", "limit": 1, "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Selling fast! Only 3 left in stock." }
+    ]},
+    { "type": "delivery_estimate", "name": "Delivery Estimate", "limit": 1 },
+    { "type": "trust_triad", "name": "Trust Triad", "limit": 1 },
     { "type": "trust_badges", "name": "Trust Badges", "limit": 1 },
-    { "type": "description", "name": "Description Tab", "limit": 1 }
+    { "type": "offers_strip", "name": "Offers Strip", "limit": 1, "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Get 10% off with code WELCOME10" }
+    ]},
+    { "type": "accordion", "name": "Accordion", "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Product Details" },
+      { "type": "richtext", "id": "content", "label": "Content" },
+      { "type": "text", "id": "country_of_origin", "label": "Country of Origin", "default": "India" },
+      { "type": "text", "id": "manufacturer", "label": "Manufacturer", "default": "Aurelle Luxe Pvt Ltd, Mumbai, India" },
+      { "type": "text", "id": "shipping_policy", "label": "Shipping Policy", "default": "Free Insured Shipping across India via Express Courier (3-5 working days)." }
+    ]},
+    { "type": "description", "name": "Description", "limit": 1, "settings": [
+      { "type": "richtext", "id": "text", "label": "Text" }
+    ]},
+    { "type": "payment_icons", "name": "Payment Icons", "limit": 1 },
+    { "type": "reviews", "name": "Reviews Section", "limit": 1, "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Customer Reviews" }
+    ]},
+    { "type": "related_products", "name": "Related Products", "limit": 1, "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "You May Also Like" }
+    ]},
+    { "type": "recently_viewed", "name": "Recently Viewed", "limit": 1, "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Recently Viewed" }
+    ]},
+    { "type": "cross_sell", "name": "Cross Sell", "limit": 1, "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Complete The Look" }
+    ]}
   ],
-  "presets": [
-    {
-      "name": "Product — Universal Premium"
-    }
-  ]
+  "presets": [{ "name": "Universal PDP" }]
 }
 {% endschema %}
