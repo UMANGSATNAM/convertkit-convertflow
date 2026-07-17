@@ -1,3 +1,9 @@
+/**
+ * 🔴 [DEPRECATED - DO NOT USE FOR E2E PUBLISHING]
+ * This is a static bypass/debug script that skips ContentGenerationService and retrieveBestComponent().
+ * For canonical end-to-end publishing with dynamic AI copy and image assignment, ALWAYS run:
+ * npx tsx scripts/run_real_pipeline_peri_beauty.ts
+ */
 import prisma from "../app/db.server.js";
 import { BrandExtractionService } from "../app/services/core/BrandExtractionService.js";
 import { compileTheme } from "../app/services/theme-engine/compiler.server.js";

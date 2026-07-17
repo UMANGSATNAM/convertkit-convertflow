@@ -151,13 +151,13 @@ export function getNicheFallbackContent(
   > = {
     beauty: {
       heading: "Mindful Indian Beauty & Skincare",
-      subheading: "Formulated for Indian skin rituals. Dermatologically tested, cruelty-free, and clean.",
+      subheading: "Crafted for Indian beauty rituals. Pure ingredients, conscious formulations.",
       cta: "Explore Skincare",
       title: "Festive & Daily Rituals"
     },
     jewellery: {
       heading: "Handcrafted Heritage & Contemporary Elegance",
-      subheading: "Timeless craftsmanship designed for modern Indian celebrations. BIS Hallmarked quality.",
+      subheading: "Timeless craftsmanship for modern Indian celebrations.",
       cta: "Explore Jewels",
       title: "Featured Adornments"
     },

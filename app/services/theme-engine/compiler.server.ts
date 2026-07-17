@@ -367,6 +367,30 @@ export async function compileTheme(
     throw new ValidationError(`[Compiler] Aborting compilation: Theme bundle is not deployable (${reasons}).`);
   }
 
+  // Soft Warn Gate: Check for unfilled generic placeholders in compiled output
+  try {
+    let unfilledCount = 0;
+    const nicheData = JSON.parse(readFileSync(path.resolve(process.cwd(), "app/data/niche-vocabulary.json"), "utf-8"));
+    const placeholderPatterns = nicheData.placeholder_patterns || [];
+    
+    for (const [relPath, content] of Object.entries(filesToUpload)) {
+      if (!relPath.endsWith('.liquid') && !relPath.endsWith('.json')) continue;
+      
+      for (const placeholder of placeholderPatterns) {
+        if (content.includes(placeholder)) {
+          console.warn(`[WARNING] Unfilled placeholder found: "${placeholder}" in ${relPath}`);
+          unfilledCount++;
+        }
+      }
+    }
+    
+    if (unfilledCount > 0) {
+      console.warn(`[Compiler] ⚠️ SOFT WARN: Found ${unfilledCount} instances of unfilled generic placeholders in the final compiled bundle. Content injection may have missed fields.`);
+    }
+  } catch (err: any) {
+    console.warn(`[Compiler] Could not run placeholder scan: ${err.message}`);
+  }
+
   const endTime = Date.now();
   const metrics = {
     runId,

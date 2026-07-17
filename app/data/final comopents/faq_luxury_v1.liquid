@@ -5,7 +5,7 @@
   2. PROGRESSIVE DISCLOSURE & CATEGORY FILTERING: Structuring answers into intuitive category tabs ([ ALL ], [ LOGISTICS ], [ PROVENANCE ], [ RETURNS ]) prevents cognitive overload and speeds up answer discovery.
   3. REAL-TIME QUESTION MATCHING: An embedded live search bar allows instant filtering of questions, creating frictionless cognitive ease.
   4. VIP CONCIERGE ESCALATION MODAL: When a question falls outside standard FAQs, an interactive trigger ([ SPEAK WITH CONCIERGE ]) opens a bespoke private consultation drawer.
-  5. ZERO EMOJI GUARANTEE: Uses ASCII brackets [ SEARCH ARCHIVAL KNOWLEDGE ], [ VIEW CATEGORY ] and SVG typography.
+  5. ZERO EMOJI GUARANTEE: Uses ASCII brackets [ SEARCH KNOWLEDGE BASE ], [ VIEW CATEGORY ] and SVG typography.
 {%- endcomment -%}
 
 {%- assign section_id = 'lx-faq-' | append: section.id -%}
@@ -282,9 +282,9 @@
 
 <section id="{{ section_id }}" itemscope itemtype="https://schema.org/FAQPage">
   <div class="lx-faq__header">
-    <span class="lx-faq__eyebrow">[ {{ section.settings.eyebrow | default: "ARCHIVAL KNOWLEDGE" }} ]</span>
+    <span class="lx-faq__eyebrow">[ {{ section.settings.eyebrow | default: "EXPERT KNOWLEDGE" }} ]</span>
     <h2 class="lx-faq__title">{{ section.settings.heading | default: "Frequently Asked Questions" }}</h2>
-    <p class="lx-faq__sub">{{ section.settings.subheading | default: "Comprehensive guidance regarding our archival provenance, worldwide logistical security, and private salon acquisition terms." }}</p>
+    <p class="lx-faq__sub">{{ section.settings.subheading | default: "Comprehensive guidance regarding our verified creation, worldwide logistical security, and private consultation terms." }}</p>
   </div>
 
   {%- if section.settings.show_search -%}
@@ -292,7 +292,7 @@
       <input 
         type="text" 
         class="lx-faq__search-input" 
-        placeholder="{{ section.settings.search_placeholder | default: 'Search archival questions...' }}" 
+        placeholder="{{ section.settings.search_placeholder | default: 'Search questions...' }}" 
         aria-label="Search FAQs"
         data-faq-search
       >
@@ -300,11 +300,25 @@
   {%- endif -%}
 
   {%- if section.settings.show_categories -%}
+    {%- assign _seen_cats = ",all," -%}
+    {%- assign _cat_labels = "" -%}
+    {%- for block in section.blocks -%}
+      {%- assign _cat_raw = block.settings.category | default: "general" -%}
+      {%- assign _cat_handle = _cat_raw | handleize -%}
+      {%- assign _cat_probe = "," | append: _cat_handle | append: "," -%}
+      {%- unless _seen_cats contains _cat_probe -%}
+        {%- assign _seen_cats = _seen_cats | append: _cat_handle | append: "," -%}
+        {%- assign _cat_labels = _cat_labels | append: _cat_raw | append: "|||" -%}
+      {%- endunless -%}
+    {%- endfor -%}
     <div class="lx-faq__tabs" data-faq-tabs>
-      <button type="button" class="lx-faq__tab is-active" data-cat="all">[ ALL ARCHIVES ]</button>
-      <button type="button" class="lx-faq__tab" data-cat="logistics">[ LOGISTICS &amp; TRANSIT ]</button>
-      <button type="button" class="lx-faq__tab" data-cat="provenance">[ PROVENANCE &amp; PURITY ]</button>
-      <button type="button" class="lx-faq__tab" data-cat="terms">[ ACQUISITION TERMS ]</button>
+      <button type="button" class="lx-faq__tab is-active" data-cat="all">[ ALL ]</button>
+      {%- assign _cat_arr = _cat_labels | split: "|||" -%}
+      {%- for _cat_label in _cat_arr -%}
+        {%- if _cat_label != "" -%}
+          <button type="button" class="lx-faq__tab" data-cat="{{ _cat_label | handleize }}">[ {{ _cat_label | upcase }} ]</button>
+        {%- endif -%}
+      {%- endfor -%}
     </div>
   {%- endif -%}
 
@@ -313,7 +327,7 @@
       <details 
         class="lx-faq__item" 
         data-faq-item 
-        data-category="{{ block.settings.category | default: 'all' }}"
+        data-category="{{ block.settings.category | default: 'general' | handleize }}"
         data-question-text="{{ block.settings.question | downcase | escape }}"
         {{ block.shopify_attributes }} 
         itemscope 
@@ -332,14 +346,14 @@
   </div>
 
   <div class="lx-faq__empty" data-faq-empty>
-    <p>[ NO MATCHING ARCHIVAL QUESTIONS FOUND ]</p>
+    <p>[ NO MATCHING QUESTIONS FOUND ]</p>
     <p style="font-size:0.8rem; margin-top:0.5rem;">Please alter your search parameters or speak directly with our private concierge.</p>
   </div>
 
   <div class="lx-faq__footer">
     <h3 class="lx-faq__footer-title">{{ section.settings.footer_heading | default: "Require Bespoke Assistance?" }}</h3>
-    <p class="lx-faq__footer-sub">{{ section.settings.footer_sub | default: "Our private salon stylists and master gemologists are at your disposal for confidential consultation." }}</p>
-    <button type="button" class="lx-faq__concierge-btn" data-open-modal>[ SPEAK WITH ARCHIVAL CONCIERGE ]</button>
+    <p class="lx-faq__footer-sub">{{ section.settings.footer_sub | default: "Our private beauty advisors and verified personal care specialists are at your disposal for confidential consultation." }}</p>
+    <button type="button" class="lx-faq__concierge-btn" data-open-modal>[ SPEAK WITH BEAUTY CONCIERGE ]</button>
   </div>
 
   <!-- Interactive VIP Concierge Modal -->
@@ -347,10 +361,10 @@
     <div class="lx-faq__modal-box">
       <button type="button" class="lx-faq__modal-close" aria-label="Close modal" data-close-modal>[ &times; ]</button>
       <h3 style="font-family:var(--font-heading,serif); font-size:1.6rem; margin:0 0 0.5rem 0;">Private Concierge</h3>
-      <p style="font-size:0.85rem; color:var(--lx-muted); margin:0 0 2rem 0;">Direct WhatsApp line with senior salon gemologists.</p>
+      <p style="font-size:0.85rem; color:var(--lx-muted); margin:0 0 2rem 0;">Direct WhatsApp line with senior specialist.</p>
       
       <a 
-        href="https://wa.me/{{ settings.whatsapp_number | default: '919876543210' }}?text=Hello%20Concierge,%20I%20have%20an%20inquiry%20regarding%20an%20archival%20creation." 
+        href="https://wa.me/{{ settings.whatsapp_number | default: '919876543210' }}?text=Hello%20Concierge,%20I%20have%20an%20inquiry%20regarding%20a%20skincare%20formulation." 
         target="_blank" 
         rel="noopener"
         style="display:block; width:100%; padding:1rem; background:var(--lx-gold); color:#000000; text-decoration:none; font-family:var(--font-body,sans-serif); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.18em; font-weight:600;"
@@ -445,7 +459,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow Badge",
-      "default": "ARCHIVAL KNOWLEDGE"
+      "default": "EXPERT KNOWLEDGE"
     },
     {
       "type": "text",
@@ -457,7 +471,7 @@
       "type": "textarea",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Comprehensive guidance regarding our archival provenance, worldwide logistical security, and private salon acquisition terms."
+      "default": "Comprehensive guidance regarding our verified creation, worldwide logistical security, and private consultation terms."
     },
     {
       "type": "header",
@@ -473,7 +487,7 @@
       "type": "text",
       "id": "search_placeholder",
       "label": "Search Placeholder Text",
-      "default": "Search archival questions..."
+      "default": "Search questions..."
     },
     {
       "type": "checkbox",
@@ -495,7 +509,7 @@
       "type": "textarea",
       "id": "footer_sub",
       "label": "Footer Subtitle",
-      "default": "Our private salon stylists and master gemologists are at your disposal for confidential consultation."
+      "default": "Our private beauty advisors and verified personal care specialists are at your disposal for confidential consultation."
     },
     {
       "type": "header",
@@ -526,15 +540,10 @@
       "name": "FAQ Item",
       "settings": [
         {
-          "type": "select",
+          "type": "text",
           "id": "category",
           "label": "Question Category",
-          "options": [
-            { "value": "logistics", "label": "Logistics & Transit" },
-            { "value": "provenance", "label": "Provenance & Purity" },
-            { "value": "terms", "label": "Acquisition Terms" }
-          ],
-          "default": "logistics"
+          "default": "general"
         },
         {
           "type": "text",
@@ -567,15 +576,15 @@
           "type": "question",
           "settings": {
             "category": "provenance",
-            "question": "Is your jewelry accompanied by official BIS Hallmark certification?",
-            "answer": "<p>Absolutely. Every precious metal creation carries official Bureau of Indian Standards (BIS) hallmark certification engraving—India's sovereign guarantee of purity. A physical certificate of provenance is included in every archival vault box.</p>"
+            "question": "Are your creation accompanied by official verified quality certification?",
+            "answer": "<p>Absolutely. Every creation carries official independent specialist testing certification—a sovereign guarantee of skin safety and active ingredient purity. A physical certificate of provenance is included in every luxury vault box.</p>"
           }
         },
         {
           "type": "question",
           "settings": {
             "category": "terms",
-            "question": "What is your archival return and exchange policy?",
+            "question": "What is your return and exchange policy?",
             "answer": "<p>We offer a no-questions-asked 30-day return policy. Should your creation not harmonize with your wardrobe, our concierge team will arrange a complimentary private armored courier pickup directly from your residence.</p>"
           }
         },
@@ -591,8 +600,8 @@
           "type": "question",
           "settings": {
             "category": "provenance",
-            "question": "How can I verify the ethical sourcing of my natural diamonds?",
-            "answer": "<p>Every natural diamond exceeding 0.30 carats is individually graded by GIA or IGI and accompanied by a unique laser inscription and conflict-free Kimberly Process certification.</p>"
+            "question": "How can I verify the ethical sourcing of your premium actives?",
+            "answer": "<p>Every premium extract is independently verified through high-performance liquid chromatography assay and accompanied by a unique batch traceability code and sustainably-harvested certification.</p>"
           }
         }
       ]

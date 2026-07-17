@@ -2,10 +2,10 @@
   sections/testimonials_luxury_v1.liquid
   CONVERSION PSYCHOLOGY & ARCHITECTURE (420+ lines):
   1. HIGH-AUTHORITY SOCIAL PROOF (Cialdini's Consensus): Over 92% of luxury buyers inspect peer reviews prior to high-ticket acquisitions (BrightLocal). Verified purchase dossiers with city names and dates eliminate skepticism.
-  2. CATEGORY INTENT SEGREGATION: Structuring reviews by collection ([ ALL ], [ BRIDAL ], [ DIAMOND RINGS ], [ BESPOKE ]) allows visitors to immediately locate validation from buyers matching their specific demographic and occasion.
-  3. PRODUCT ACQUISITION FUNNELING: Embedding direct product links ([ ACQUIRED: SOVEREIGN RING ]) within testimonial cards transforms passive social reading into an active add-to-cart discovery vector.
+  2. CATEGORY INTENT SEGREGATION: Structuring reviews by collection ([ ALL ], [ verified ], [ product ], [ BESPOKE ]) allows visitors to immediately locate validation from buyers matching their specific demographic and occasion.
+  3. PRODUCT ACQUISITION FUNNELING: Embedding direct product links ([ ACQUIRED: SOVEREIGN product ]) within testimonial cards transforms passive social reading into an active add-to-cart discovery vector.
   4. INTERACTIVE HELPFUL VALIDATION: Allows prospective buyers to endorse reviews ([ MARK AS HELPFUL (24) ]), leveraging interactive micro-commitments to build personal conviction.
-  5. ZERO EMOJI GUARANTEE: Uses ASCII ratings [ * * * * * ], [ VERIFIED SALON ACQUISITION ], and SVG typography.
+  5. ZERO EMOJI GUARANTEE: Uses ASCII ratings [ * * * * * ], [ VERIFIED PURCHASE ], and SVG typography.
 {%- endcomment -%}
 
 {%- assign section_id = 'lx-test-' | append: section.id -%}
@@ -258,25 +258,39 @@
 <section id="{{ section_id }}">
   <div class="lx-test__header">
     <span class="lx-test__eyebrow">[ {{ section.settings.eyebrow | default: "CLIENT DOSSIERS" }} ]</span>
-    <h2 class="lx-test__heading">{{ section.settings.heading | default: "Voices of Archival Distinction" }}</h2>
+    <h2 class="lx-test__heading">{{ section.settings.heading | default: "Voices of Distinguished Patrons" }}</h2>
     <p class="lx-test__score">
-      Rated <strong>4.9 / 5.0</strong> from over <strong>{{ section.settings.total_reviews | default: '3,200+' }}</strong> verified private salon acquisitions.
+      Rated <strong>4.9 / 5.0</strong> from over <strong>{{ section.settings.total_reviews | default: '3,200+' }}</strong> verified private acquisitions.
     </p>
-    <div class="lx-test__rating-badge">[ * * * * * BIS HALLMARK GUARANTEED ]</div>
+    <div class="lx-test__rating-badge">[ * * * * * independently verified ]</div>
   </div>
 
   {%- if section.settings.show_tabs -%}
+    {%- assign _seen_cats = ",all," -%}
+    {%- assign _cat_labels = "" -%}
+    {%- for block in section.blocks -%}
+      {%- assign _cat_raw = block.settings.category | default: "general" -%}
+      {%- assign _cat_handle = _cat_raw | handleize -%}
+      {%- assign _cat_probe = "," | append: _cat_handle | append: "," -%}
+      {%- unless _seen_cats contains _cat_probe -%}
+        {%- assign _seen_cats = _seen_cats | append: _cat_handle | append: "," -%}
+        {%- assign _cat_labels = _cat_labels | append: _cat_raw | append: "|||" -%}
+      {%- endunless -%}
+    {%- endfor -%}
     <div class="lx-test__tabs" data-test-tabs>
-      <button type="button" class="lx-test__tab is-active" data-cat="all">[ ALL ARCHIVAL VOICES ]</button>
-      <button type="button" class="lx-test__tab" data-cat="bridal">[ BRIDAL &amp; HEIRLOOM ]</button>
-      <button type="button" class="lx-test__tab" data-cat="rings">[ DIAMOND RINGS ]</button>
-      <button type="button" class="lx-test__tab" data-cat="bespoke">[ BESPOKE COMMISSIONS ]</button>
+      <button type="button" class="lx-test__tab is-active" data-cat="all">[ ALL ]</button>
+      {%- assign _cat_arr = _cat_labels | split: "|||" -%}
+      {%- for _cat_label in _cat_arr -%}
+        {%- if _cat_label != "" -%}
+          <button type="button" class="lx-test__tab" data-cat="{{ _cat_label | handleize }}">[ {{ _cat_label | upcase }} ]</button>
+        {%- endif -%}
+      {%- endfor -%}
     </div>
   {%- endif -%}
 
   <div class="lx-test__grid" data-test-grid>
     {%- for block in section.blocks -%}
-      <div class="lx-test__card" data-test-item data-category="{{ block.settings.category | default: 'all' }}" {{ block.shopify_attributes }}>
+      <div class="lx-test__card" data-test-item data-category="{{ block.settings.category | default: 'general' | handleize }}" {{ block.shopify_attributes }}>
         <div>
           <div class="lx-test__stars">[ * * * * * ]</div>
           <p class="lx-test__quote">"{{ block.settings.review_text }}"</p>
@@ -382,7 +396,7 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Voices of Archival Distinction"
+      "default": "Voices of Distinguished Patrons"
     },
     {
       "type": "text",
@@ -425,21 +439,16 @@
       "name": "Client Testimonial",
       "settings": [
         {
-          "type": "select",
+          "type": "text",
           "id": "category",
           "label": "Review Category",
-          "options": [
-            { "value": "bridal", "label": "Bridal & Heirloom" },
-            { "value": "rings", "label": "Diamond Rings" },
-            { "value": "bespoke", "label": "Bespoke Commissions" }
-          ],
-          "default": "rings"
+          "default": "general"
         },
         {
           "type": "textarea",
           "id": "review_text",
           "label": "Testimonial Quote",
-          "default": "The microscopic setting and light refraction are extraordinary. Three months following my wedding ceremony, every diamond facet continues to capture attention. Truly an archival heirloom."
+          "default": "The premium infusion and deep absorption are extraordinary. Three months following my first application, my skin texture has transformed completely. Truly a true masterpiece."
         },
         {
           "type": "text",
@@ -463,7 +472,7 @@
           "type": "text",
           "id": "product_title",
           "label": "Acquired Product Title",
-          "default": "Sovereign Solitaire Diamond Ring"
+          "default": "Sovereign premium recovery product"
         },
         {
           "type": "url",
@@ -486,24 +495,24 @@
         {
           "type": "review",
           "settings": {
-            "category": "rings",
-            "review_text": "The microscopic setting and light refraction are extraordinary. Three months following my wedding ceremony, every diamond facet continues to capture attention. Truly an archival heirloom.",
+            "category": "product",
+            "review_text": "The premium infusion and deep absorption are extraordinary. Three months following my first application, my skin texture has transformed completely. Truly a true masterpiece.",
             "author": "Priya S.",
             "location": "New Delhi, India",
             "date": "May 2026",
-            "product_title": "Sovereign Solitaire Diamond Ring",
+            "product_title": "Sovereign premium recovery product",
             "helpful_count": 31
           }
         },
         {
           "type": "review",
           "settings": {
-            "category": "bridal",
-            "review_text": "I was apprehensive regarding online bridal jewelry acquisition, but the BIS Hallmark certification dossier and personal armored courier delivery exceeded all expectations. Flawless execution.",
+            "category": "verified",
+            "review_text": "I was apprehensive regarding online premium personal care acquisition, but the verified quality certification dossier and personal concierge delivery exceeded all expectations. Flawless execution.",
             "author": "Ankita & Vikram M.",
             "location": "Mumbai, India",
             "date": "April 2026",
-            "product_title": "Maharani Heritage Diamond Choker",
+            "product_title": "Maharani Heritage renewal Set",
             "helpful_count": 42
           }
         },
@@ -511,7 +520,7 @@
           "type": "review",
           "settings": {
             "category": "bespoke",
-            "review_text": "Working privately with the salon gemologists via WhatsApp to customize our anniversary necklace was seamless. They provided 3D CAD renderings and video updates at every stage of casting.",
+            "review_text": "Working privately with the specialist via WhatsApp to customize our bespoke facial protocol was seamless. They provided ingredient analyses and progress updates at every stage of creation.",
             "author": "Rahul K.",
             "location": "Bengaluru, India",
             "date": "June 2026",
