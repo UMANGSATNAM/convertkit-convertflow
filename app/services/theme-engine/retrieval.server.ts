@@ -143,7 +143,10 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
   }
 
   const components = (registryCache.components as any[]).filter(
-    (c: any) => c.type === registryType && c.status === 'approved' && (!params.exclude || !params.exclude.includes(c.componentId))
+    (c: any) =>
+      (c.category === registryType || c.sectionType === registryType) &&
+      (c.status === 'approved' || c.status === 'production' || c.status === 'PUBLISHED') && 
+      (!params.exclude || !params.exclude.includes(c.componentId))
   );
 
   if (!components || components.length === 0) {

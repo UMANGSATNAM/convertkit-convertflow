@@ -1,0 +1,16 @@
+{%- unless product.has_only_default_variant -%}
+  <label class="opt-label">{{ product.options.first }}</label>
+  <div class="variants" id="pdpVariants-{{ section.id }}">
+    {%- for variant in product.variants -%}
+      <input class="v-radio" type="radio" name="pdp-v-{{ section.id }}" id="pv-{{ section.id }}-{{ variant.id }}" value="{{ variant.id }}"
+        data-price="{{ variant.price | money }}"
+        {% if variant.compare_at_price > variant.price %}data-mrp="{{ variant.compare_at_price | money }}"{% endif %}
+        {% unless variant.available %}disabled{% endunless %}
+        {% if variant.id == current_variant.id %}checked{% endif %} hidden>
+      <label class="variant" for="pv-{{ section.id }}-{{ variant.id }}">
+        {{ variant.title }}
+        {%- unless variant.available -%}<small>Unavailable</small>{%- endunless -%}
+      </label>
+    {%- endfor -%}
+  </div>
+{%- endunless -%}

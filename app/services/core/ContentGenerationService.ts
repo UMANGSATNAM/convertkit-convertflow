@@ -207,14 +207,16 @@ async function defaultClaudeCaller(userPrompt: string, systemPrompt: string): Pr
   }
 
   const msg = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
+    model: process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-latest",
     max_tokens: 2048,
     temperature: 0,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }]
   });
 
-  return msg.content[0].type === "text" ? msg.content[0].text : "{}";
+  const textOutput = msg.content[0].type === "text" ? msg.content[0].text : "{}";
+  console.log("[ContentGenerationService] Raw Claude JSON output:", textOutput);
+  return textOutput;
 }
 
 export class ContentGenerationService {
@@ -352,26 +354,93 @@ Generate specific, distinct Indian D2C copy for every required section instance.
     };
   }
 
-  static injectContentIntoBlueprint(
+  private static schemaKeyCache: Record<string, { allKeys: Set<string>, assetKeys: Set<string> }> = {};
+
+  static async injectContentIntoBlueprint(
     blueprint: any,
-    generatedContent: Record<string, Record<string, string>>
-  ): any {
+    generatedContent: Record<string, Record<string, string>>,
+    resolvedSections: any[] = []
+  ): Promise<any> {
     if (!blueprint || !blueprint.pages) return blueprint;
+
+    const baseDir = "app/data/templates/theme-engine";
 
     for (const [pageName, pageData] of Object.entries(blueprint.pages)) {
       const sections = (pageData as any).sections;
       if (!Array.isArray(sections)) continue;
 
-      sections.forEach((section: any, idx: number) => {
+      for (let idx = 0; idx < sections.length; idx++) {
+        const section = sections[idx];
         const compId = section.componentId;
-        if (!compId) return;
+        if (!compId) continue;
 
         const sectionKey = `${pageName}:${idx}:${compId}`;
         if (generatedContent[sectionKey]) {
+          
+          if (!this.schemaKeyCache[compId]) {
+             const compMeta = resolvedSections.find(c => c.componentId === compId);
+             let allKeys = new Set<string>();
+             let assetKeys = new Set<string>();
+             
+             if (compMeta?.liquidPath) {
+                const fullPath = path.join(baseDir, compMeta.liquidPath);
+                if (fs.existsSync(fullPath)) {
+                   const liquid = fs.readFileSync(fullPath, "utf-8");
+                   const match = liquid.match(/{% schema %}([\s\S]*?){% endschema %}/);
+                   if (match) {
+                      try {
+                         const parsed = JSON.parse(match[1]);
+                         
+                         (parsed.settings || []).forEach((s: any) => {
+                            if (s.id) {
+                               allKeys.add(s.id);
+                               if (["image_picker", "video", "url", "video_url"].includes(s.type)) {
+                                  assetKeys.add(s.id);
+                               }
+                            }
+                         });
+                         
+                         (parsed.blocks || []).forEach((b: any) => {
+                            (b.settings || []).forEach((s: any) => {
+                               if (s.id) {
+                                  allKeys.add(s.id);
+                                  if (["image_picker", "video", "url", "video_url"].includes(s.type)) {
+                                     assetKeys.add(s.id);
+                                  }
+                               }
+                            });
+                         });
+                      } catch(e) {}
+                   }
+                }
+             }
+             this.schemaKeyCache[compId] = { allKeys, assetKeys };
+          }
+          
+          const { allKeys, assetKeys } = this.schemaKeyCache[compId];
+
           const safeContent: Record<string, any> = {};
           const RICHTEXT_KEYS = ["subtext", "quote", "richtext", "content"];
           const isBrandStory = compId.includes("story") || compId.includes("brand-story");
+          
           for (const [k, v] of Object.entries(generatedContent[sectionKey])) {
+            
+            if (allKeys.size > 0 && !allKeys.has(k)) {
+                throw new Error(`OrphanKeyError: AI generated key "${k}" not found in schema for section "${compId}"`);
+            }
+            
+            if (allKeys.size > 0 && assetKeys.has(k)) {
+                throw new Error(`AssetFieldViolation: AI attempted to generate content for asset field "${k}" in "${compId}"`);
+            }
+            if (typeof v === "string" && (v.includes("http://") || v.includes("https://"))) {
+                throw new Error(`DomainLeakageError: AI generated an external URL in field "${k}" for "${compId}"`);
+            }
+            
+            // NEW: Compliance Guard for fabricated reviews/ratings (cache-path validation)
+            if (typeof v === "string" && (v.toLowerCase().includes("verified review") || v.toLowerCase().includes("verified buyer"))) {
+                throw new Error(`ComplianceError: AI generated fabricated review count "${v}" in field "${k}" for "${compId}"`);
+            }
+
             if (!k.endsWith("_url") && !k.endsWith("_link") && !k.includes("image") && !k.includes("video") && !k.includes("avatar") && !k.includes("logo")) {
               if (typeof v === "string" && v.trim().length > 0 && (RICHTEXT_KEYS.includes(k) || (isBrandStory && k === "text"))) {
                 safeContent[k] = /^\s*<(p|ul|ol|h[1-6])/i.test(v) ? v : `<p>${v.trim()}</p>`;
@@ -385,7 +454,7 @@ Generate specific, distinct Indian D2C copy for every required section instance.
             ...safeContent
           };
         }
-      });
+      }
     }
 
     return blueprint;

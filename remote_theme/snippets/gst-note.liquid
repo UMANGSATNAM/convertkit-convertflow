@@ -1,0 +1,239 @@
+{%- comment -%}
+  =============================================================================
+  STOREFORGE SHARED INDIA-FIRST SNIPPET: CORPORATE GST & TAX COMPLIANCE NOTE
+  =============================================================================
+  Psychological Conversion Framework:
+  1. Corporate ITC (Input Tax Credit) Psychology: For purchases exceeding ₹10,000, corporate buyers and business owners actively look for GST Input Tax Credit eligibility (saving 18% to 28%). Assuring them of a 100% compliant tax invoice with GSTIN breakdown converts high-ticket B2B/HNWI shoppers.
+  2. Transparency Authority: Eliminates gray-market skepticism by highlighting official HSN classification and government compliance.
+  3. Seamless Checkout Guidance: Clickable modal explains exactly where to input company GSTIN during the Shopify checkout flow.
+  
+  Design Aesthetics & Rules:
+  - 0% Emoji Policy: Clean ASCII brackets [ 100% GST COMPLIANT ] and SVG file iconography.
+  - Universal Theme Heritage: Clean typography and subtle border styling across all 5 niches.
+  =============================================================================
+{%- endcomment -%}
+
+{%- if settings.enable_gst_note -%}
+<div class="sf-gst-note" data-gst-note>
+  <style>
+    .sf-gst-note {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background-color: transparent;
+      border: 1px dashed var(--color-border, rgba(0, 0, 0, 0.2));
+      font-family: var(--font-body-family, sans-serif);
+      font-size: 0.7rem;
+      color: var(--color-text-muted, #666666);
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .sf-gst-note:hover {
+      color: var(--color-text, #111111);
+      border-color: var(--color-text, #111111);
+    }
+
+    .sf-gst__icon {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
+    .sf-gst__text {
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sf-gst__text strong {
+      color: var(--color-text, #111111);
+      font-weight: 600;
+    }
+
+    /* Modal / Tooltip Drawer */
+    .sf-gst__modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .sf-gst__modal-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sf-gst__modal {
+      background-color: var(--color-background, #ffffff);
+      border: 1px solid var(--color-border, #222222);
+      max-width: 440px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      transform: translateY(12px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .sf-gst__modal-overlay.is-active .sf-gst__modal {
+      transform: translateY(0);
+    }
+
+    .sf-gst__modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--color-text, #111111);
+      padding: 0.25rem;
+    }
+
+    .sf-gst__modal-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--color-text, #111111);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sf-gst__modal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .sf-gst__modal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--color-text, #111111);
+      margin-bottom: 0.85rem;
+    }
+
+    .sf-gst__modal-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .sf-gst__item-bullet {
+      font-weight: 700;
+      color: var(--color-primary, #000000);
+      font-size: 0.75rem;
+      margin-top: 0.1rem;
+    }
+
+    .sf-gst__modal-footer {
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border, rgba(0, 0, 0, 0.1));
+      font-size: 0.7rem;
+      color: var(--color-text-muted, #666666);
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <svg class="sf-gst__icon" viewBox="0 0 24 24">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+    <polyline points="10 9 9 9 8 9"/>
+  </svg>
+  
+  <span class="sf-gst__text">
+    [ <strong>{{ settings.gst_note_text | default: 'INCLUSIVE OF ALL TAXES' | upcase }}</strong> &middot; CORPORATE GST INVOICE AVAILABLE ]
+  </span>
+
+  <div class="sf-gst__modal-overlay" data-gst-modal role="dialog" aria-modal="true" aria-label="GST Compliance Information">
+    <div class="sf-gst__modal" onclick="event.stopPropagation();">
+      <button type="button" class="sf-gst__modal-close" data-gst-close aria-label="Close">&times;</button>
+      
+      <div class="sf-gst__modal-title">
+        <span>[ CORPORATE GSTIN & ITC ACCORD ]</span>
+      </div>
+
+      <ul class="sf-gst__modal-list">
+        <li class="sf-gst__modal-item">
+          <span class="sf-gst__item-bullet">[ 01 ]</span>
+          <div>
+            <strong>100% Genuine HSN/SAC Invoice:</strong> Every shipment is accompanied by a digitally signed tax invoice detailing HSN code, CGST, SGST, and IGST components.
+          </div>
+        </li>
+        <li class="sf-gst__modal-item">
+          <span class="sf-gst__item-bullet">[ 02 ]</span>
+          <div>
+            <strong>Claim Input Tax Credit (ITC):</strong> Registered businesses can claim up to 18%-28% Input Tax Credit on this purchase against their corporate GSTIN.
+          </div>
+        </li>
+        <li class="sf-gst__modal-item">
+          <span class="sf-gst__item-bullet">[ 03 ]</span>
+          <div>
+            <strong>How to Submit GSTIN:</strong> During checkout, simply enter your Company Name and 15-digit GSTIN in the "Order Notes / Tax Registration" field on the shipping screen.
+          </div>
+        </li>
+      </ul>
+
+      <div class="sf-gst__modal-footer">
+        [ FULL GOVT COMPLIANCE & REVERSE CHARGE READY ]
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const note = document.querySelector('[data-gst-note]');
+      if (!note) return;
+
+      const modal = note.querySelector('[data-gst-modal]');
+      const closeBtn = note.querySelector('[data-gst-close]');
+
+      note.addEventListener('click', function() {
+        if (modal) {
+          modal.classList.add('is-active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+
+      function closeModal(e) {
+        if (e) e.stopPropagation();
+        if (modal) {
+          modal.classList.remove('is-active');
+          document.body.style.overflow = '';
+        }
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (modal) modal.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('is-active')) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
+</div>
+{%- endif -%}

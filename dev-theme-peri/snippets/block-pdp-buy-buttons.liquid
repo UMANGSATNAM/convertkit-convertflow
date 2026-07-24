@@ -1,0 +1,19 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+<div class="sf-pdp-buy-buttons sf-stagger-item" {{ block.shopify_attributes }}>
+  {%- assign form_id = 'sf-pdp-form-' | append: section.id -%}
+  {%- form 'product', product, id: form_id, class: 'sf-pdp-form' -%}
+    <input type="hidden" name="id" value="{{ current_variant.id }}" id="sf-pdp-vid-{{ section.id }}">
+                    <div class="sf-pdp-buy-actions">
+                      <button type="submit" name="add" class="sf-btn-add sf-hover-lift" id="sf-add-btn-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+                        <span>{% if current_variant.available %}Add to Bag{% else %}Sold Out{% endif %}</span>
+                      </button>
+                      {%- if block.settings.show_dynamic_checkout -%}
+                        
+                        {{ form | payment_button }}
+                      {%- endif -%}
+                    </div>
+                  {%- endform -%}
+                </div>
+                <hr class="sf-pdp-divider sf-stagger-item">

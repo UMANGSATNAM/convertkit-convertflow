@@ -1,0 +1,24 @@
+{%- unless product.has_only_default_variant -%}
+                  <div class="sf-pdp-variants sf-stagger-item" {{ block.shopify_attributes }}>
+                    <sf-variant-picker data-section="{{ section.id }}" data-url="{{ product.url }}">
+                      {%- for option in product.options_with_values -%}
+                        <div class="sf-pdp-option">
+                          <label class="sf-pdp-option-name">Select {{ option.name }}: <span class="sf-pdp-option-value" id="sf-opt-val-{{ section.id }}-{{ option.position }}">{{ option.selected_value }}</span></label>
+                          <div class="sf-pdp-option-values sf-pdp-pills">
+                            {%- for value in option.values -%}
+                              <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                                    name="{{ option.name }}" value="{{ value | escape }}" form="sf-pdp-form-{{ section.id }}"
+                                    {% if option.selected_value == value %}checked{% endif %} class="sf-visually-hidden">
+                              <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" class="sf-pdp-opt-label">
+                                {{ value }}
+                              </label>
+                            {%- endfor -%}
+                          </div>
+                        </div>
+                      {%- endfor -%}
+                      <script type="application/json">
+                        {{ product.variants | json }}
+                      </script>
+                    </sf-variant-picker>
+                  </div>
+                {%- endunless -%}

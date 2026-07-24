@@ -228,7 +228,7 @@ export function initGeneratorWorker() {
         };
 
         const globalComponents: string[] = [];
-        const globalSectionTypes = ["header", "footer"];
+        const globalSectionTypes = ["announcement", "header", "footer"];
         
         for (const sectionType of globalSectionTypes) {
           const matchedComponent = await retrieveBestComponent({
@@ -291,23 +291,45 @@ export function initGeneratorWorker() {
 
         // 9b. GENERATE & INJECT NICHE COPY (SECTION INSTANCE KEYED)
         await updateStatus("GENERATING_COPY", "Crafting culturally tailored Indian D2C copy...");
-        const copyResult = await ContentGenerationService.generateStoreContent({
-          shopDomain: shop.shopDomain,
-          storeName: shop.name || "Store",
-          industry: catalogContext.industry || "General",
-          brandArchetype: brandContext.brand_archetype,
-          tone: brandContext.tone_of_voice,
-          blueprint: storeBlueprintAi,
-          catalogSummary: {
-            totalProducts: catalogContext.productCount || 10,
-            topCategories: catalogContext.categories || [],
-            priceRange: catalogContext.priceRange,
-            heroProduct: catalogContext.heroProduct,
-            topProducts: catalogContext.topProducts || []
+        
+        let copyResult: any;
+        let injectionSuccess = false;
+        let generationAttempts = 0;
+        
+        while (!injectionSuccess && generationAttempts < 3) {
+          generationAttempts++;
+          try {
+            copyResult = await ContentGenerationService.generateStoreContent({
+              shopDomain: shop.shopDomain,
+              storeName: shop.name || "Store",
+              industry: catalogContext.industry || "General",
+              brandArchetype: brandContext.brand_archetype,
+              tone: brandContext.tone_of_voice,
+              blueprint: storeBlueprintAi,
+              catalogSummary: {
+                totalProducts: catalogContext.productCount || 10,
+                topCategories: catalogContext.categories || [],
+                priceRange: catalogContext.priceRange,
+                heroProduct: catalogContext.heroProduct,
+                topProducts: catalogContext.topProducts || []
+              }
+            });
+            await ContentGenerationService.injectContentIntoBlueprint(storeBlueprintAi, copyResult.content, resolvedSections);
+            injectionSuccess = true;
+          } catch (err: any) {
+             console.error(`[Pipeline] Content generation/injection error on attempt ${generationAttempts}: ${err.message}`);
+             if (copyResult?.cacheKey) {
+                console.log(`[Pipeline] Flushing cache key ${copyResult.cacheKey} due to compliance violation.`);
+                const { redis } = await import("../redis.server.js");
+                await redis.del(copyResult.cacheKey);
+             }
+             if (generationAttempts >= 3) {
+                throw new Error(`Failed to inject AI copy into blueprint after 3 attempts: ${err.message}`);
+             }
           }
-        });
-        ContentGenerationService.injectContentIntoBlueprint(storeBlueprintAi, copyResult.content);
-        console.log("[Pipeline] Store content generated and injected into storeBlueprintAi. Fallback used:", copyResult.isFallback);
+        }
+        
+        console.log("[Pipeline] Store content generated and injected into storeBlueprintAi. Fallback used:", copyResult?.isFallback);
 
         const matchedComponentsList = resolvedSections;
         console.log("Matched components retrieved count:", matchedComponentsList.length);

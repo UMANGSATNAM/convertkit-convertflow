@@ -1,0 +1,103 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_accent }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags -%} &ndash; tagged "{{ current_tags | join: ', ' }}"{%- endif -%}
+      {%- if current_page != 1 -%} &ndash; Page {{ current_page }}{%- endif -%}
+      {%- unless page_title contains shop.name -%} &ndash; {{ shop.name }}{%- endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    <!-- Schema.org Organization Markup -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": {{ shop.name | json }},
+        {% if settings.social_logo_link != blank %}
+          "logo": {{ settings.social_logo_link | json }},
+        {% endif %}
+        "sameAs": [
+          {{ settings.social_twitter_link | json }},
+          {{ settings.social_facebook_link | json }},
+          {{ settings.social_instagram_link | json }},
+          {{ settings.social_tiktok_link | json }},
+          {{ settings.social_pinterest_link | json }},
+          {{ settings.social_youtube_link | json }}
+        ],
+        "url": {{ request.origin | append: page.url | json }}
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+    <!-- Structural and Niche Styling Files -->
+    {{ 'base-tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'responsive.css' | asset_url | stylesheet_tag }}
+    {{ 'animations.css' | asset_url | stylesheet_tag }}
+    {{ 'design-language-fresh.css' | asset_url | stylesheet_tag }}
+    {{ 'motion.css' | asset_url | stylesheet_tag }}
+
+    <!-- Deferred Framework-Agnostic JavaScript Operations -->
+    <script src="{{ 'utils.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart.js' | asset_url }}" defer></script>
+    <script src="{{ 'variant-swap.js' | asset_url }}" defer></script>
+    <script src="{{ 'search.js' | asset_url }}" defer></script>
+    <script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+    <script src="{{ 'countdown.js' | asset_url }}" defer></script>
+    <script src="{{ 'sticky-atc.js' | asset_url }}" defer></script>
+    <script src="{{ 'motion.js' | asset_url }}" defer></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="theme-layout-body">
+    <!-- Accessibility Skip link -->
+    <a href="#MainContent" class="skip-to-content-link button visually-hidden">
+      {{ 'accessibility.skip_to_content' | t }}
+    </a>
+
+    <!-- Global Layout Header Groups -->
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    <!-- Global Layout Footer Groups -->
+    {% sections 'footer-group' %}
+
+    <!-- Cart Drawer Container -->
+    {% render 'cart-drawer' %}
+
+    <!-- Predictive Search Drawer Placeholder -->
+    <div id="predictive-search-drawer" class="predictive-search-drawer-wrapper" aria-hidden="true" role="dialog">
+      <div class="search-drawer-inner">
+        <button type="button" class="search-drawer-close-btn" aria-label="{{ 'general.search.close' | t }}">
+          {% render 'icon-close' %}
+        </button>
+        <div class="search-drawer-search-box">
+          <input type="search" id="SearchDrawerInput" class="search-drawer-input" placeholder="{{ 'general.search.placeholder' | t }}" autocomplete="off">
+          <div id="predictive-search-results" class="predictive-search-results-container"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<style>
+  #shopify-section-{{ section.id }} .sf-article {
+    background: var(--color-bg, #fff);
+    color: var(--color-text, #1a1a1a);
+    padding: var(--spacing-section-y, 80px) var(--spacing-section-x, 40px);
+  }
+  #shopify-section-{{ section.id }} .sf-article__inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  #shopify-section-{{ section.id }} .sf-article__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #888);
+    text-decoration: none;
+    margin-bottom: 40px;
+    transition: color 0.2s;
+  }
+  #shopify-section-{{ section.id }} .sf-article__back:hover { color: var(--color-primary, #1a1a1a); }
+  #shopify-section-{{ section.id }} .sf-article__meta {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #888);
+    margin-bottom: 16px;
+  }
+  #shopify-section-{{ section.id }} .sf-article__title {
+    font-family: var(--font-heading, inherit);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.25;
+    margin: 0 0 24px;
+  }
+  #shopify-section-{{ section.id }} .sf-article__hero-img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-bottom: 40px;
+  }
+  #shopify-section-{{ section.id }} .sf-article__body {
+    line-height: 1.9;
+    font-size: 1.05rem;
+  }
+  #shopify-section-{{ section.id }} .sf-article__body h2,
+  #shopify-section-{{ section.id }} .sf-article__body h3 {
+    font-family: var(--font-heading, inherit);
+    font-weight: 500;
+    margin: 2.5rem 0 1rem;
+  }
+  #shopify-section-{{ section.id }} .sf-article__body img { max-width: 100%; height: auto; }
+  #shopify-section-{{ section.id }} .sf-article__body blockquote {
+    border-left: 3px solid var(--color-primary, #1a1a1a);
+    margin: 2rem 0;
+    padding: 0 0 0 24px;
+    font-style: italic;
+    color: var(--color-text-muted, #888);
+  }
+  #shopify-section-{{ section.id }} .sf-article__share {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--color-border, #e0e0e0);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  #shopify-section-{{ section.id }} .sf-article__share-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #888);
+  }
+  #shopify-section-{{ section.id }} .sf-article__share-link {
+    font-size: 0.8rem;
+    color: var(--color-text, #1a1a1a);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
+  }
+  #shopify-section-{{ section.id }} .sf-article__share-link:hover { opacity: 0.6; }
+</style>
+
+<section
+  id="shopify-section-{{ section.id }}"
+  class="sf-article"
+  data-section-id="{{ section.id }}"
+  data-section-type="main-article">
+
+  <div class="sf-article__inner">
+    <a href="{{ blog.url }}" class="sf-article__back" aria-label="{{ 'blogs.article.back_to_blog' | t: blog_title: blog.title | default: 'Back to blog' }}">
+      &larr; {{ 'blogs.article.back_to_blog' | t: blog_title: blog.title | default: blog.title | default: 'Back' }}
+    </a>
+
+    <div class="sf-article__meta">
+      {{ article.published_at | date: "%B %d, %Y" }}
+      {%- if article.author != blank %} &middot; {{ article.author }}{%- endif -%}
+    </div>
+
+    <h1 class="sf-article__title">{{ article.title }}</h1>
+
+    {%- if article.image and section.settings.show_hero_image -%}
+      <img
+        class="sf-article__hero-img"
+        src="{{ article.image | image_url: width: 1200, height: 675, crop: 'center' }}"
+        alt="{{ article.image.alt | default: article.title | escape }}"
+        loading="eager"
+        width="1200"
+        height="675"
+      >
+    {%- endif -%}
+
+    <div class="sf-article__body">{{ article.content }}</div>
+
+    {%- if section.settings.show_share -%}
+      <div class="sf-article__share">
+        <span class="sf-article__share-label">{{ 'blogs.article.share' | t: default: 'Share' }}</span>
+        <a
+          href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url }}{{ article.url | url_encode }}"
+          class="sf-article__share-link"
+          target="_blank"
+          rel="noopener"
+        >X / Twitter</a>
+        <a
+          href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ article.url | url_encode }}"
+          class="sf-article__share-link"
+          target="_blank"
+          rel="noopener"
+        >Facebook</a>
+        <a
+          href="https://wa.me/?text={{ article.title | url_encode }}%20{{ shop.url }}{{ article.url | url_encode }}"
+          class="sf-article__share-link"
+          target="_blank"
+          rel="noopener"
+        >WhatsApp</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Main Article",
+  "tag": "section",
+  "class": "section-main-article",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_hero_image",
+      "label": "Show Hero Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "Show Share Links",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Main Article"
+    }
+  ]
+}
+{% endschema %}

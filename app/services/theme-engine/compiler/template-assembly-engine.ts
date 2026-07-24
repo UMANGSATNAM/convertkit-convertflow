@@ -5,21 +5,35 @@ export interface TemplateArtifact {
 
 export class SectionGroupBuilder {
   buildHeaderGroup(components: any[]): TemplateArtifact {
-    // Find header component. In real code, filter by component semantics or tags.
-    const headerComponent = components.find(c => c.componentId?.includes("header")) || { componentId: "header_default" };
+    const headerComponent = components.find(c => c.componentId?.includes("header")) || { componentId: "header-commerce-v2" };
+    const announcementComponent = components.find(c => c.componentId?.includes("announcement")) || { componentId: "announcement-bar-v2" };
     
+    const sections: any = {};
+    const order: string[] = [];
+
+    if (announcementComponent) {
+      sections["announcement"] = {
+        type: announcementComponent.componentId,
+        settings: {}
+      };
+      order.push("announcement");
+    }
+
+    if (headerComponent) {
+      sections["header"] = {
+        type: headerComponent.componentId,
+        settings: {}
+      };
+      order.push("header");
+    }
+
     return {
       shopifyPath: "sections/header-group.json",
       content: {
         name: "Header",
         type: "header",
-        sections: {
-          header: {
-            type: headerComponent.componentId,
-            settings: {}
-          }
-        },
-        order: ["header"]
+        sections,
+        order
       }
     };
   }

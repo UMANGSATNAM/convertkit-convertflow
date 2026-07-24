@@ -1,0 +1,270 @@
+{%- comment -%}
+  =============================================================================
+  STOREFORGE SHARED INDIA-FIRST SNIPPET: CASH ON DELIVERY (COD) ASSURANCE BADGE
+  =============================================================================
+  Psychological Conversion Framework:
+  1. Absolute Risk Reversal (Cialdini): Eliminates first-time buyer trust barriers by guaranteeing zero upfront financial commitment and no hidden delivery fees.
+  2. Doorstep UPI Education: 30%+ of Indian COD orders fail due to lack of physical cash. Informing buyers upfront that delivery agents accept GPay/PhonePe/Paytm QR at doorstep drastically reduces RTO (Return to Origin).
+  3. Micro-Interaction Assurance: Clickable badge reveals a modal/tooltip explaining security verification and inspection guidelines.
+  
+  Design Aesthetics & Rules:
+  - 0% Emoji Policy: Clean ASCII brackets [ COD VERIFIED ] and SVG shield iconography.
+  - Universal Theme Heritage: Adapts seamlessly across Luxury, Streetwear, Beauty, Tech, and Supplements palettes.
+  =============================================================================
+{%- endcomment -%}
+
+{%- if settings.enable_cod_badge -%}
+<div class="sf-cod-badge" data-cod-badge>
+  <style>
+    .sf-cod-badge {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.65rem 0.9rem;
+      background-color: var(--color-background, #ffffff);
+      border: 1px solid var(--color-border, rgba(0, 0, 0, 0.15));
+      font-family: var(--font-body-family, sans-serif);
+      font-size: 0.75rem;
+      color: var(--color-text, #111111);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sf-cod-badge:hover {
+      border-color: var(--color-primary, #000000);
+      background-color: var(--color-background-secondary, rgba(0, 0, 0, 0.02));
+    }
+
+    .sf-cod__icon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: var(--color-text, #111111);
+      color: var(--color-background, #ffffff);
+      flex-shrink: 0;
+    }
+
+    .sf-cod__icon {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .sf-cod__text-group {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
+
+    .sf-cod__label {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+    }
+
+    .sf-cod__subtext {
+      font-size: 0.65rem;
+      color: var(--color-text-muted, #666666);
+      letter-spacing: 0.02em;
+    }
+
+    .sf-cod__subtext strong {
+      color: var(--color-text, #111111);
+      font-weight: 600;
+    }
+
+    /* Modal / Tooltip Drawer */
+    .sf-cod__modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .sf-cod__modal-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sf-cod__modal {
+      background-color: var(--color-background, #ffffff);
+      border: 1px solid var(--color-border, #222222);
+      max-width: 440px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      transform: translateY(12px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .sf-cod__modal-overlay.is-active .sf-cod__modal {
+      transform: translateY(0);
+    }
+
+    .sf-cod__modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--color-text, #111111);
+      padding: 0.25rem;
+    }
+
+    .sf-cod__modal-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--color-text, #111111);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sf-cod__modal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .sf-cod__modal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--color-text, #111111);
+      margin-bottom: 0.85rem;
+    }
+
+    .sf-cod__modal-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .sf-cod__item-bullet {
+      font-weight: 700;
+      color: var(--color-primary, #000000);
+      font-size: 0.75rem;
+      margin-top: 0.1rem;
+    }
+
+    .sf-cod__modal-footer {
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border, rgba(0, 0, 0, 0.1));
+      font-size: 0.7rem;
+      color: var(--color-text-muted, #666666);
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <div class="sf-cod__icon-wrapper">
+    <svg class="sf-cod__icon" viewBox="0 0 24 24">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  </div>
+  
+  <div class="sf-cod__text-group">
+    <span class="sf-cod__label">
+      {%- if settings.cod_note != blank -%}
+        [ {{ settings.cod_note | upcase }} ]
+      {%- else -%}
+        [ COD AVAILABLE ]
+      {%- endif -%}
+    </span>
+    <span class="sf-cod__subtext">Pay Cash or <strong>UPI QR at Doorstep</strong></span>
+  </div>
+
+  <div class="sf-cod__modal-overlay" data-cod-modal role="dialog" aria-modal="true" aria-label="Cash on Delivery Information">
+    <div class="sf-cod__modal" onclick="event.stopPropagation();">
+      <button type="button" class="sf-cod__modal-close" data-cod-close aria-label="Close">&times;</button>
+      
+      <div class="sf-cod__modal-title">
+        <span>[ CASH ON DELIVERY PROTOCOL ]</span>
+      </div>
+
+      <ul class="sf-cod__modal-list">
+        <li class="sf-cod__modal-item">
+          <span class="sf-cod__item-bullet">[ 01 ]</span>
+          <div>
+            <strong>Zero Upfront Payment Required:</strong> Place your order with absolute confidence. You only pay when the package arrives at your delivery location.
+          </div>
+        </li>
+        <li class="sf-cod__modal-item">
+          <span class="sf-cod__item-bullet">[ 02 ]</span>
+          <div>
+            <strong>UPI Accepted at Doorstep:</strong> No need to keep physical cash ready. Our courier executives carry digital scanners for GPay, PhonePe, Paytm, and BHIM UPI.
+          </div>
+        </li>
+        <li class="sf-cod__modal-item">
+          <span class="sf-cod__item-bullet">[ 03 ]</span>
+          <div>
+            <strong>Tamper-Proof Seal Guarantee:</strong> Every parcel is sealed in high-tensile security packaging. If the seal appears compromised, you may refuse delivery without charge.
+          </div>
+        </li>
+      </ul>
+
+      <div class="sf-cod__modal-footer">
+        [ 100% SECURE & VERIFIED DELIVERY NETWORK ]
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const badge = document.querySelector('[data-cod-badge]');
+      if (!badge) return;
+
+      const modal = badge.querySelector('[data-cod-modal]');
+      const closeBtn = badge.querySelector('[data-cod-close]');
+
+      badge.addEventListener('click', function() {
+        if (modal) {
+          modal.classList.add('is-active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+
+      function closeModal(e) {
+        if (e) e.stopPropagation();
+        if (modal) {
+          modal.classList.remove('is-active');
+          document.body.style.overflow = '';
+        }
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (modal) modal.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('is-active')) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
+</div>
+{%- endif -%}

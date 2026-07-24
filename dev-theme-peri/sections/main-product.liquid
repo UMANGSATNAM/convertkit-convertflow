@@ -1,0 +1,315 @@
+{%- comment -%}
+  Section: main-product
+  Universal Premium Product Page (Fresh Commerce - Round 4)
+{%- endcomment -%}
+
+{{ 'pdp-universal.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+  assign save_pct = 0
+  assign diff = 0
+  if on_sale
+    assign diff = current_variant.compare_at_price | minus: current_variant.price
+    assign save_pct = diff | times: 100 | divided_by: current_variant.compare_at_price
+  endif
+-%}
+
+<div class="sf-pdp sf-pdp-{{ section.id }} sf-reveal" id="sf-pdp-{{ section.id }}" data-product-handle="{{ product.handle }}" data-section-id="{{ section.id }}">
+  
+  {%- if product == empty -%}
+    <div class="sf-pdp-placeholder"><p>Assign to a product template.</p></div>
+  {%- else -%}
+
+  <div class="page-width">
+    <div class="sf-pdp-top">
+      
+      {%- comment -%} GALLERY COLUMN {%- endcomment -%}
+      <div class="sf-pdp-gallery">
+        
+        {%- if product.media.size > 1 -%}
+          <div class="sf-pdp-thumbnails" id="sf-pdp-thumbs-{{ section.id }}">
+            {%- assign loop_idx = 0 -%}
+            {%- for media in product.media -%}
+              <button type="button" class="sf-pdp-thumb {% if loop_idx == 0 %}is-active{% endif %}" data-media-id="{{ media.id }}" data-index="{{ loop_idx }}" aria-label="Load image {{ loop_idx | plus: 1 }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy" width="100" height="100">
+              </button>
+              {%- assign loop_idx = loop_idx | plus: 1 -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <div class="sf-pdp-gallery-main gallery-main sf-hover-zoom">
+          {%- if on_sale -%}<div class="sf-pdp-badge" id="sf-pdp-badge-{{ section.id }}">Save ₹{{ diff | money_without_currency | remove: '.00' }}</div>{%- endif -%}
+          <div class="sf-pdp-gallery-viewport" id="sf-gallery-viewport-{{ section.id }}">
+            {%- if product.featured_image != blank and product.media.size > 0 -%}
+              {%- assign loop_idx = 0 -%}
+              {%- for media in product.media -%}
+                <div class="sf-pdp-gallery-slide {% if loop_idx == 0 %}is-active{% endif %}" data-media-id="{{ media.id }}">
+                  <img id="sf-pdp-main-img-{{ section.id }}-{{ loop_idx }}" src="{{ media | image_url: width: 1200 }}" alt="{{ media.alt | escape }}" width="1200" height="1200" {% if loop_idx == 0 %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+                </div>
+                {%- assign loop_idx = loop_idx | plus: 1 -%}
+              {%- endfor -%}
+            {%- elsif product.featured_media != blank and product.featured_image != blank -%}
+              <div class="sf-pdp-gallery-slide is-active" data-media-id="{{ product.featured_media.id }}">
+                <img id="sf-pdp-main-img-{{ section.id }}-1" src="{{ product.featured_media | image_url: width: 1200 }}" alt="{{ product.featured_media.alt | escape }}" width="1200" height="1200" fetchpriority="high">
+              </div>
+            {%- else -%}
+              <div class="sf-pdp-gallery-slide is-active">
+                <div class="sf-placeholder-svg" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); width: 100%; aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 32px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.45; margin-bottom: 16px; color: var(--primary);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <span style="font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85;">{{ shop.name | default: 'AURELLE BEAUTY' }}</span>
+                  <span style="font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.5; margin-top: 6px;">Botanical Formula Showcase</span>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+        
+      </div>
+
+      {%- comment -%} INFO COLUMN (STICKY) {%- endcomment -%}
+      <div class="sf-pdp-info sf-stagger-parent">
+        <div class="sf-pdp-info-inner">
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when 'breadcrumbs' -%}
+                {%- render 'block-pdp-breadcrumbs', block: block, product: product, section: section -%}
+              {%- when 'vendor' -%}
+                {%- render 'block-pdp-vendor', block: block, product: product, section: section -%}
+              {%- when 'title' -%}
+                {%- render 'block-pdp-title', block: block, product: product, section: section -%}
+              {%- when 'rating' -%}
+                {%- render 'block-pdp-rating', block: block, product: product, section: section -%}
+              {%- when 'short_desc' -%}
+                {%- render 'block-pdp-short-desc', block: block, product: product, section: section -%}
+              {%- when 'price' -%}
+                {%- render 'block-pdp-price', block: block, product: product, section: section -%}
+              {%- when 'variant_picker' -%}
+                {%- render 'block-pdp-variant-picker', block: block, product: product, section: section -%}
+              {%- when 'stock_status' -%}
+                {%- render 'block-pdp-stock-status', block: block, product: product, section: section -%}
+              {%- when 'quantity_selector' -%}
+                {%- render 'block-pdp-quantity-selector', block: block, product: product, section: section -%}
+              {%- when 'buy_buttons' -%}
+                {%- render 'block-pdp-buy-buttons', block: block, product: product, section: section -%}
+              {%- when 'free_shipping_bar' -%}
+                {%- render 'block-pdp-free-shipping-bar', block: block, product: product, section: section -%}
+              {%- when 'pincode_checker' -%}
+                {%- render 'block-pdp-pincode-checker', block: block, product: product, section: section -%}
+              {%- when 'key_benefits' -%}
+                {%- render 'block-pdp-key-benefits', block: block, product: product, section: section -%}
+              {%- when 'spec_tiles' -%}
+                {%- render 'block-pdp-spec-tiles', block: block, product: product, section: section -%}
+              {%- when 'trust_badges' -%}
+                {%- render 'block-pdp-trust-badges', block: block, product: product, section: section -%}
+              {%- when 'tabs' -%}
+                {%- render 'block-pdp-tabs', block: block, product: product, section: section -%}
+              {%- when 'reviews_section' -%}
+                {%- render 'block-pdp-reviews-section', block: block, product: product, section: section -%}
+              {%- when 'product_bullets' -%}
+                {%- render 'block-pdp-product-bullets', block: block, product: product, section: section -%}
+            {%- endcase -%}
+          {%- endfor -%}
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} BELOW THE FOLD BLOCKS {%- endcomment -%}
+  <div class="sf-pdp-bottom page-width">
+    {%- for block in section.blocks -%}
+  {%- assign snippet_name = 'block-pdp-' | append: block.type | replace: '_', '-' -%}
+  {%- capture snippet_content -%}{% render snippet_name, block: block, product: product, section: section %}{%- endcapture -%}
+  {%- if snippet_content contains 'Liquid error' -%}
+    {%- comment -%} Fallback if snippet doesn't exist, but our snippet names match block types {%- endcomment -%}
+    {%- case block.type -%}
+      {%- when 'breadcrumbs' -%}
+        {%- render 'block-pdp-breadcrumbs', block: block, product: product, section: section -%}
+      {%- when 'vendor' -%}
+        {%- render 'block-pdp-vendor', block: block, product: product, section: section -%}
+      {%- when 'title' -%}
+        {%- render 'block-pdp-title', block: block, product: product, section: section -%}
+      {%- when 'rating' -%}
+        {%- render 'block-pdp-rating', block: block, product: product, section: section -%}
+      {%- when 'short_desc' -%}
+        {%- render 'block-pdp-short-desc', block: block, product: product, section: section -%}
+      {%- when 'price' -%}
+        {%- render 'block-pdp-price', block: block, product: product, section: section -%}
+      {%- when 'variant_picker' -%}
+        {%- render 'block-pdp-variant-picker', block: block, product: product, section: section -%}
+      {%- when 'stock_status' -%}
+        {%- render 'block-pdp-stock-status', block: block, product: product, section: section -%}
+      {%- when 'quantity_selector' -%}
+        {%- render 'block-pdp-quantity-selector', block: block, product: product, section: section -%}
+      {%- when 'buy_buttons' -%}
+        {%- render 'block-pdp-buy-buttons', block: block, product: product, section: section -%}
+      {%- when 'free_shipping_bar' -%}
+        {%- render 'block-pdp-free-shipping-bar', block: block, product: product, section: section -%}
+      {%- when 'pincode_checker' -%}
+        {%- render 'block-pdp-pincode-checker', block: block, product: product, section: section -%}
+      {%- when 'key_benefits' -%}
+        {%- render 'block-pdp-key-benefits', block: block, product: product, section: section -%}
+      {%- when 'spec_tiles' -%}
+        {%- render 'block-pdp-spec-tiles', block: block, product: product, section: section -%}
+      {%- when 'trust_badges' -%}
+        {%- render 'block-pdp-trust-badges', block: block, product: product, section: section -%}
+      {%- when 'tabs' -%}
+        {%- render 'block-pdp-tabs', block: block, product: product, section: section -%}
+      {%- when 'reviews_section' -%}
+        {%- render 'block-pdp-reviews-section', block: block, product: product, section: section -%}
+      {%- when 'product_bullets' -%}
+        {%- render 'block-pdp-product-bullets', block: block, product: product, section: section -%}
+    {%- endcase -%}
+  {%- else -%}
+    {{ snippet_content }}
+  {%- endif -%}
+{%- endfor -%}
+  </div>
+  {%- endif -%}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Gallery Thumbs
+    const thumbs = document.querySelectorAll('#sf-pdp-thumbs-{{ section.id }} .sf-pdp-thumb');
+    const slides = document.querySelectorAll('#sf-gallery-viewport-{{ section.id }} .sf-pdp-gallery-slide');
+    const viewport = document.getElementById('sf-gallery-viewport-{{ section.id }}');
+
+    function setActiveSlide(index) {
+      thumbs.forEach((t, i) => t.classList.toggle('is-active', i === index));
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === index));
+      if (viewport && slides[index]) {
+        viewport.scrollTo({ left: slides[index].offsetLeft, behavior: 'smooth' });
+      }
+    }
+
+    thumbs.forEach((thumb, idx) => {
+      thumb.addEventListener('click', () => setActiveSlide(idx));
+    });
+
+    // Quantity & Live Total
+    const qtyInput = document.getElementById('sf-qty-{{ section.id }}');
+    const qtyMinus = document.querySelector('.sf-qty-minus');
+    const qtyPlus = document.querySelector('.sf-qty-plus');
+    const liveTotal = document.getElementById('sf-live-total-{{ section.id }}');
+    const freeShipBar = document.getElementById('sf-free-ship-bar-{{ section.id }}');
+    const freeShipRemaining = document.getElementById('sf-free-ship-remaining-{{ section.id }}');
+    
+    // Convert variant price to float
+    const basePrice = {{ current_variant.price | divided_by: 100.0 }};
+    const threshold = 500;
+
+    function updateTotal() {
+      if(!qtyInput || !liveTotal) return;
+      const qty = parseInt(qtyInput.value || '1', 10);
+      const total = basePrice * qty;
+      liveTotal.textContent = '₹' + total;
+      
+      if(freeShipBar && freeShipRemaining) {
+        if(total >= threshold) {
+          freeShipBar.style.width = '100%';
+          freeShipRemaining.innerHTML = 'You have unlocked <strong>FREE shipping!</strong>';
+          freeShipRemaining.parentElement.innerHTML = freeShipRemaining.innerHTML;
+        } else {
+          const remaining = threshold - total;
+          freeShipBar.style.width = ((total / threshold) * 100) + '%';
+          if(freeShipRemaining) freeShipRemaining.textContent = '₹' + remaining;
+        }
+      }
+    }
+
+    if (qtyInput && qtyMinus && qtyPlus) {
+      qtyMinus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || '1', 10);
+        if (currentVal > 1) { qtyInput.value = currentVal - 1; updateTotal(); }
+      });
+      qtyPlus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || '1', 10);
+        qtyInput.value = currentVal + 1;
+        updateTotal();
+      });
+      qtyInput.addEventListener('change', updateTotal);
+    }
+
+    // Tabs
+    const tabBtns = document.querySelectorAll('.sf-tab-btn');
+    const tabPanes = document.querySelectorAll('.sf-tab-pane');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        tabBtns.forEach(b => b.classList.remove('is-active'));
+        tabPanes.forEach(p => p.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        document.getElementById('sf-tab-' + target).classList.add('is-active');
+      });
+    });
+
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Universal PDP",
+  "settings": [],
+  "blocks": [
+    { "type": "breadcrumbs", "name": "Breadcrumbs", "limit": 1 },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "rating", "name": "Rating Row", "limit": 1, "settings": [
+      { "type": "text", "id": "rating_value", "label": "Rating (e.g. 4.9)", "default": "4.9" },
+      { "type": "text", "id": "rating_count", "label": "Review Count", "default": "128" }
+    ]},
+    { "type": "short_desc", "name": "Short Description", "limit": 1, "settings": [
+      { "type": "textarea", "id": "text", "label": "Text", "default": "A luxurious serum formulated with botanical extracts." }
+    ]},
+    { "type": "product_bullets", "name": "Product Bullets", "limit": 1, "settings": [
+      { "type": "text", "id": "bullet_1", "label": "Bullet 1", "default": "Made in India" },
+      { "type": "text", "id": "bullet_2", "label": "Bullet 2", "default": "100% Organic" },
+      { "type": "text", "id": "bullet_3", "label": "Bullet 3", "default": "No added colors" }
+    ]},
+    { "type": "price", "name": "Price & Savings", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant Picker", "limit": 1 },
+    { "type": "stock_status", "name": "Stock Status", "limit": 1 },
+    { "type": "quantity_selector", "name": "Quantity & Live Total", "limit": 1 },
+    { "type": "buy_buttons", "name": "Buy Buttons", "limit": 1, "settings": [
+      { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show Buy Now Button", "default": true }
+    ]},
+    { "type": "free_shipping_bar", "name": "Free Shipping Bar", "limit": 1 },
+    { "type": "pincode_checker", "name": "Pincode Checker", "limit": 1 },
+    { "type": "key_benefits", "name": "Key Benefits Checklist", "limit": 1, "settings": [
+      { "type": "text", "id": "benefit_1", "label": "Benefit 1", "default": "100% Vegan & Cruelty Free" },
+      { "type": "text", "id": "benefit_2", "label": "Benefit 2", "default": "Dermatologically Tested" },
+      { "type": "text", "id": "benefit_3", "label": "Benefit 3", "default": "No Parabens or Sulfates" },
+      { "type": "text", "id": "benefit_4", "label": "Benefit 4", "default": "Sustainably Sourced" }
+    ]},
+    { "type": "spec_tiles", "name": "Spec Tiles", "limit": 1, "settings": [
+      { "type": "text", "id": "spec_name_1", "label": "Spec 1 Name", "default": "Shelf Life" },
+      { "type": "text", "id": "spec_val_1", "label": "Spec 1 Value", "default": "24 Months" },
+      { "type": "text", "id": "spec_name_2", "label": "Spec 2 Name", "default": "Volume" },
+      { "type": "text", "id": "spec_val_2", "label": "Spec 2 Value", "default": "50ml" },
+      { "type": "text", "id": "spec_name_3", "label": "Spec 3 Name", "default": "Weight" },
+      { "type": "text", "id": "spec_val_3", "label": "Spec 3 Value", "default": "150g" }
+    ]},
+    { "type": "trust_badges", "name": "Trust Badges Card", "limit": 1 },
+    { "type": "tabs", "name": "Tabs (Desc / FAQ)", "limit": 1, "settings": [
+      { "type": "richtext", "id": "faq_content", "label": "FAQ Content", "default": "<p>Free returns within 7 days. COD available.</p>" }
+    ]},
+    { "type": "reviews_section", "name": "Reviews (Blocks Driven)", "limit": 1, "settings": [
+      { "type": "text", "id": "heading", "label": "Heading", "default": "Customer Reviews" },
+      { "type": "text", "id": "review_1_title", "label": "Review 1 Title" },
+      { "type": "text", "id": "review_1_text", "label": "Review 1 Text" },
+      { "type": "text", "id": "review_1_author", "label": "Review 1 Author" },
+      { "type": "text", "id": "review_2_title", "label": "Review 2 Title" },
+      { "type": "text", "id": "review_2_text", "label": "Review 2 Text" },
+      { "type": "text", "id": "review_2_author", "label": "Review 2 Author" }
+    ]}
+  ],
+  "presets": [{ "name": "Universal PDP" }]
+}
+{% endschema %}

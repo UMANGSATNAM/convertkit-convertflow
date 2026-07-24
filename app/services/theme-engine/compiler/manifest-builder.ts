@@ -81,9 +81,9 @@ export interface ManifestBuilderInput {
   components: ResolvedComponents;
   dependencies: ResolvedDependencies;
   resources: ResourceCategoryMap;
-  settings: SettingsArtifact;
   locales: LocaleArtifact;
   css: CSSTokenArtifact;
+  filesToUpload: Record<string, string>;
 }
 
 // ─── Main Builder ─────────────────────────────────────────────────────────────
@@ -116,6 +116,8 @@ export class ManifestBuilder {
       settings: input.settings,
       locales: input.locales,
       css: input.css,
+      // filesToUpload is intentionally excluded from the output manifest JSON
+      // as it's too large, but we use it to build the uploadBundle
     };
   }
 
@@ -175,45 +177,17 @@ export class ManifestBuilder {
   // ─── Upload Bundle Builder ─────────────────────────────────────────────────
 
   private buildUploadBundle(input: ManifestBuilderInput): UploadBundle {
-    const { dependencies, resources, css } = input;
+    const { css, filesToUpload } = input;
+    const allFiles = Object.keys(filesToUpload);
 
-    // Use specific arrays directly if available, otherwise flat output
     return {
-      sections: dependencies.flat.sections.map((s) => `sections/${s}.liquid`).sort(),
-      snippets: dependencies.flat.snippets.map((s) => `snippets/${s}.liquid`).sort(),
-      assets: [
-        ...resources.css.required.map((f) => `assets/${f}`),
-        ...resources.js.required.map((f) => `assets/${f}`),
-        ...resources.fonts.required.map((f) => `assets/${f}`),
-        ...resources.svg.required.map((f) => `assets/${f}`),
-        ...resources.images.required.map((f) => `assets/${f}`),
-      ].sort(),
-      locales: ["locales/en.default.json"],
-      config: [
-        "config/settings_schema.json",
-        "config/settings_data.json",
-      ],
-      templates: [
-        "templates/404.json",
-        "templates/article.json",
-        "templates/blog.json",
-        "templates/cart.json",
-        "templates/collection.json",
-        "templates/customers/account.json",
-        "templates/customers/activate_account.json",
-        "templates/customers/addresses.json",
-        "templates/customers/login.json",
-        "templates/customers/order.json",
-        "templates/customers/register.json",
-        "templates/customers/reset_password.json",
-        "templates/index.json",
-        "templates/list-collections.json",
-        "templates/page.json",
-        "templates/password.json",
-        "templates/product.json",
-        "templates/search.json",
-      ].sort(),
-      layout: ["layout/theme.liquid"],
+      sections: allFiles.filter(f => f.startsWith("sections/")).sort(),
+      snippets: allFiles.filter(f => f.startsWith("snippets/")).sort(),
+      assets: allFiles.filter(f => f.startsWith("assets/")).sort(),
+      locales: allFiles.filter(f => f.startsWith("locales/")).sort(),
+      config: allFiles.filter(f => f.startsWith("config/")).sort(),
+      templates: allFiles.filter(f => f.startsWith("templates/")).sort(),
+      layout: allFiles.filter(f => f.startsWith("layout/")).sort(),
       cssOutput: css.cssOutput,
     };
   }

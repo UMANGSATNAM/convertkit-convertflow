@@ -46,7 +46,7 @@ async function main() {
       croScore: 95.0,
       mobileScore: 95.0,
       version: String(comp.version || "1"),
-      status: comp.status === "approved" ? "PUBLISHED" : "DRAFT",
+      status: comp.status === "production" ? "PUBLISHED" : "DRAFT",
       isUniversal: !!comp.isUniversal,
       performanceScore: 95.0
     };
@@ -83,7 +83,7 @@ async function main() {
     process.exit(1);
   }
 
-  const expectedCount = registry.components.filter((c: any) => c.status === "approved").length;
+  const expectedCount = registry.components.filter((c: any) => c.status === "production").length;
   const dbComponents = await prisma.componentRegistry.findMany({ where: { status: "PUBLISHED" } });
   if (dbComponents.length !== expectedCount) {
     console.error(`[SeedVerification] Expected exactly ${expectedCount} published components in DB, found ${dbComponents.length}!`);

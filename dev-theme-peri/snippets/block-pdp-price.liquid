@@ -1,0 +1,19 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+  assign diff = 0
+  if on_sale
+    assign diff = current_variant.compare_at_price | minus: current_variant.price
+  endif
+-%}
+<div class="sf-pdp-price-row sf-stagger-item" {{ block.shopify_attributes }}>
+  <span class="sf-pdp-price" id="sf-pdp-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+  {%- if on_sale -%}
+    <s class="sf-pdp-compare-price" id="sf-pdp-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</s>
+    <span class="sf-pdp-save-badge" id="sf-pdp-save-badge-{{ section.id }}">Save {{ diff | money }}</span>
+  {%- endif -%}
+  <p class="sf-pdp-tax-note">Inclusive of all taxes & Free Insured Shipping</p>
+</div>

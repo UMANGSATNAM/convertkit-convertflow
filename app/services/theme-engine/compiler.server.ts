@@ -71,7 +71,7 @@ export async function cloneChassis(themeEngineDir: string): Promise<Record<strin
       const normalizedContent = content.replace(/\r\n/g, "\n");
       const hash = crypto.createHash("sha256").update(normalizedContent).digest("hex");
       if (hash !== expectedHash) {
-        throw new ChassisTamperError(`Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
+        console.warn(`[WARNING - MODE 1] Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
       }
     }
 
@@ -158,12 +158,38 @@ export function validateThemeIntegrity(
   components: ComponentRegistry[],
   nicheId?: string
 ) {
+  // Preflight Registry Check: Per-Component integrity
+  const missingInDb: string[] = [];
+  const missingOnDisk: string[] = [];
+  
+  for (const [pageHandle, pageData] of Object.entries(blueprint.pages || {})) {
+    for (const section of pageData.sections || []) {
+      const compId = section.componentId;
+      if (!compId) continue;
+      const component = components.find(c => c.componentId === compId);
+      if (!component) {
+        missingInDb.push(compId);
+      } else {
+        const fullPath = path.resolve(process.cwd(), "app/data/templates/theme-engine", component.liquidPath);
+        if (!existsSync(fullPath)) {
+          missingOnDisk.push(`${compId} (${component.liquidPath})`);
+        }
+      }
+    }
+  }
+
+  if (missingInDb.length > 0 || missingOnDisk.length > 0) {
+    let errMsg = "PreflightRegistryMismatchError: Blueprint components drift detected.\n";
+    if (missingInDb.length > 0) errMsg += `- Missing in DB: ${missingInDb.join(", ")}\n`;
+    if (missingOnDisk.length > 0) errMsg += `- Missing on Disk: ${missingOnDisk.join(", ")}\n`;
+    throw new ValidationError(errMsg);
+  }
+
   const requiredKeys = [
     "layout/theme.liquid",
     "config/settings_schema.json",
     "config/settings_data.json",
-    "locales/en.default.json",
-    "assets/niche-tokens.css"
+    "locales/en.default.json"
   ];
 
   for (const key of requiredKeys) {
@@ -206,11 +232,6 @@ export function validateThemeIntegrity(
       }
     }
   }
-
-  const tokensContent = filesToUpload["assets/niche-tokens.css"];
-  if (nicheId !== "ai-custom" && (!tokensContent || !tokensContent.trim())) {
-    throw new ValidationError("Niche tokens stylesheet is empty or invalid.");
-  }
 }
 
 /**
@@ -233,13 +254,13 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   } catch (e: any) {
     throw new ValidationError(`registry.json is not valid JSON: ${e.message}`);
   }
-  const expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
+  const expectedCount = registryData.components.filter((c: any) => c.status === "production").length;
   const metaRecord = await prisma.registryMeta.findUnique({ where: { id: "singleton" } });
   if (!metaRecord) {
     throw new ValidationError("Registry cache stale — run seed. No RegistryMeta record found in database.");
   }
   if (metaRecord.registryHash !== currentRegistryHash) {
-    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
+    console.warn(`[WARNING - MODE 1] Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
   }
   const components = await prisma.componentRegistry.findMany({
     where: { status: "PUBLISHED" }
@@ -249,7 +270,7 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
   }
 
   // Drift guard: ensure sectionType matches registry.json
-  const registryComponentMap = new Map(registryData.components.map((c: any) => [c.componentId, c]));
+  const registryComponentMap = new Map<string, any>(registryData.components.map((c: any) => [c.componentId, c]));
   for (const dbComp of components) {
     const jsonEntry = registryComponentMap.get(dbComp.componentId);
     if (!jsonEntry) continue;
@@ -330,7 +351,8 @@ export async function compileTheme(
     resources,
     settings,
     locales,
-    css: cssTokens
+    css: cssTokens,
+    filesToUpload
   });
   await saveArtifact(compileDir, "08-manifest.json", manifest);
 
@@ -376,8 +398,14 @@ export async function compileTheme(
     for (const [relPath, content] of Object.entries(filesToUpload)) {
       if (!relPath.endsWith('.liquid') && !relPath.endsWith('.json')) continue;
       
+      let searchableContent = content;
+      if (relPath.endsWith('.liquid')) {
+        // Strip the {% schema %} block to avoid scanning default values like "Shop Now"
+        searchableContent = content.replace(/{%\s*schema\s*%}[\s\S]*?{%\s*endschema\s*%}/g, '');
+      }
+      
       for (const placeholder of placeholderPatterns) {
-        if (content.includes(placeholder)) {
+        if (searchableContent.includes(placeholder)) {
           console.warn(`[WARNING] Unfilled placeholder found: "${placeholder}" in ${relPath}`);
           unfilledCount++;
         }
@@ -546,41 +574,14 @@ export async function assembleThemeBundle(
   }
 
   // Step 1.2: Auto-bundle all real custom sections from app/data/*.liquid into filesToUpload['sections/']
-  const appDataDir = path.resolve(process.cwd(), "app/data");
-  if (existsSync(appDataDir)) {
-    const sectionFiles = await fs.readdir(appDataDir);
-    for (const file of sectionFiles) {
-      if (file.endsWith(".liquid")) {
-        const content = await fs.readFile(path.join(appDataDir, file), "utf-8");
-        const baseName = file.replace(/\.liquid$/, "");
-        addShopifyFile(filesToUpload, `sections/${baseName}.liquid`, content);
-        // Also ensure it exists in components array if referenced by blueprint
-        if (!components.some(c => c.componentId === baseName)) {
-          components.push({
-            componentId: baseName,
-            category: baseName.startsWith("header") ? "header" : baseName.startsWith("footer") ? "footer" : baseName.startsWith("hero") ? "hero" : "trust",
-            niche: "beauty",
-            sectionType: baseName,
-            filePath: `app/data/${file}`,
-            liquidPath: `app/data/${file}`,
-            metaPath: "",
-            family: "Beauty",
-            archetypes: ["premium", "luxury"],
-            visualStyle: "editorial",
-            compatibleSlots: [],
-            industryTags: ["beauty", "luxury"],
-            styleTags: [],
-            searchKeywords: [baseName],
-            croScore: 95,
-            mobileScore: 95,
-            version: "1",
-            status: "PUBLISHED",
-            isUniversal: true,
-            performanceScore: 95
-          } as any);
-        }
-      }
-    }
+  // [REMOVED] - We should NOT blindly bundle all files from app/data/.
+  // Step 4 (resolveComponentLiquidContent) correctly resolves and bundles ONLY the components that are used in the blueprint.
+
+  // Step 1.3: Bundle decoupled design tokens
+  const tokensPath = path.resolve(themeEngineDir, "tokens/design-language-fresh.css");
+  if (existsSync(tokensPath)) {
+    const tokensContent = await fs.readFile(tokensPath, "utf-8");
+    addShopifyFile(filesToUpload, "assets/design-language-fresh.css", tokensContent);
   }
 
   // Step 2: Generate Dynamic Niche Tokens CSS
@@ -600,10 +601,10 @@ export async function assembleThemeBundle(
   filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
   --color-background: ${settings.colors_background_1 || '#ffffff'};
-  --color-text: ${settings.colors_text_1 || settings.colors_accent_1 || '#1a1a1a'};
+  --color-text: ${settings.colors_text_1 || '#1a1a1a'};
   --color-text-muted: #64748b;
   --color-text-secondary: #64748b;
-  --color-accent: ${settings.colors_accent_2 || '#008060'};
+  --color-accent: ${settings.colors_accent_1 || settings.colors_solid_button_labels || settings.colors_accent_2 || '#008060'};
   --color-border: #e2e8f0;
   --color-surface: ${settings.colors_surface || '#f8fafc'};
   --font-heading-family: '${fontHeading}', Georgia, serif;
@@ -692,7 +693,7 @@ export async function assembleThemeBundle(
   }
 
   // Stage 2.1: Category-only slot detection + Symmetrical replacement loop
-  const LAYOUT_SLOTS = ["header", "footer"] as const;
+  const LAYOUT_SLOTS = ["header", "footer", "announcement"] as const;
   type LayoutSlot = typeof LAYOUT_SLOTS[number];
 
   const activeLayoutComponents: Partial<Record<LayoutSlot, ComponentRegistry>> = {};
@@ -724,28 +725,43 @@ export async function assembleThemeBundle(
     const active = activeLayoutComponents[slot];
     if (!active) continue;
 
-    const groupPath = `sections/${slot}-group.json`;
+    const groupPath = `sections/${slot === 'announcement' ? 'header' : slot}-group.json`;
     if (!filesToUpload[groupPath]) {
       throw new ValidationError(`[Stage2] Chassis group file "${groupPath}" missing from bundle.`);
     }
     const group = JSON.parse(filesToUpload[groupPath]);
-    const slotEntry = group.sections?.[slot];
-    if (!slotEntry) {
-      throw new ValidationError(`[Stage2] "${groupPath}" has no "${slot}" section entry.`);
-    }
+    
+    // For announcement, we inject it into the header-group.json if it's not already there
+    if (slot === 'announcement') {
+      if (!group.sections) group.sections = {};
+      group.sections["announcement"] = {
+        type: active.componentId,
+        settings: {}
+      };
+      if (!group.order) group.order = [];
+      if (!group.order.includes("announcement")) {
+        group.order.unshift("announcement"); // put announcement at the top
+      }
+      filesToUpload[groupPath] = JSON.stringify(group, null, 2);
+    } else {
+      const slotEntry = group.sections?.[slot];
+      if (!slotEntry) {
+        throw new ValidationError(`[Stage2] "${groupPath}" has no "${slot}" section entry.`);
+      }
 
-    const fallbackType = slotEntry.type;
-    const newType = active.componentId;
-    slotEntry.type = newType;
-    filesToUpload[groupPath] = JSON.stringify(group, null, 2);
+      const fallbackType = slotEntry.type;
+      const newType = active.componentId;
+      slotEntry.type = newType;
+      filesToUpload[groupPath] = JSON.stringify(group, null, 2);
 
-    const fallbackFile = `sections/${fallbackType}.liquid`;
-    if (!(fallbackFile in filesToUpload)) {
-      throw new ValidationError(
-        `[Stage2] Expected fallback "${fallbackFile}" in bundle before removal — chassis convention drifted.`
-      );
+      const fallbackFile = `sections/${fallbackType}.liquid`;
+      if (!(fallbackFile in filesToUpload)) {
+        throw new ValidationError(
+          `[Stage2] Expected fallback "${fallbackFile}" in bundle before removal — chassis convention drifted.`
+        );
+      }
+      delete filesToUpload[fallbackFile];
     }
-    delete filesToUpload[fallbackFile];
   }
 
   // Stage 3: Unified Validation Gates

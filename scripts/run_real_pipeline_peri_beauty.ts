@@ -120,7 +120,20 @@ async function main() {
 
     // Also retrieve global header and footer
     const globalComponents: Array<{ sectionType: string; componentId: string; settings?: any }> = [];
-    for (const sectionType of ["header", "footer"]) {
+    
+    // Force new header and announcement bar
+    globalComponents.push({
+      sectionType: "announcement-bar",
+      componentId: "announcement-bar-v2",
+      settings: {}
+    });
+    globalComponents.push({
+      sectionType: "header",
+      componentId: "header-commerce-v2",
+      settings: {}
+    });
+
+    for (const sectionType of ["footer"]) {
       const matchedComponent = await retrieveBestComponent({
         sectionType,
         brandArchetype: brandContext.brand_archetype,
@@ -239,7 +252,8 @@ async function main() {
     console.log("\n--- RAW CLAUDE COPY GENERATION JSON RESULT ---");
     console.log(JSON.stringify(copyResult.content, null, 2));
     
-    ContentGenerationService.injectContentIntoBlueprint(fullBlueprint, copyResult.content);
+    const allDbComponents = await prisma.componentRegistry.findMany();
+    await ContentGenerationService.injectContentIntoBlueprint(fullBlueprint, copyResult.content, allDbComponents);
     console.log(`✅ Injected AI generated copy into ${Object.keys(copyResult.content).length} sections!`);
 
     // 6. Step 4 of Pipeline: Deterministic Theme Compiler
