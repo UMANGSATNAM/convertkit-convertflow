@@ -1,0 +1,598 @@
+﻿{%- comment -%}
+  PDP V13: HIGH-END STREETWEAR & SNEAKER HYPE
+  Aesthetic: Premium Dark Mode, Sleek, Glassmorphism accents, Neon Green/White.
+  CRO: Urgency counters, Size Scarcity, StockX style data, Cross-sells, Upsells.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_viewing = 'now' | date: '%s' | modulo: 150 | plus: 50 -%}
+{%- assign random_sold = 'now' | date: '%s' | modulo: 80 | plus: 20 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --v13-bg: #0A0A0A;
+    --v13-surface: #141414;
+    --v13-surface-light: #1E1E1E;
+    --v13-text: #FFFFFF;
+    --v13-text-dim: #A0A0A0;
+    --v13-accent: #00FF66; /* Neon Green */
+    --v13-border: #2A2A2A;
+    --v13-danger: #FF3366;
+    --v13-font-head: 'Syncopate', sans-serif;
+    --v13-font-body: 'Manrope', sans-serif;
+  }
+
+  .pdp-v13 {
+    background-color: var(--v13-bg);
+    color: var(--v13-text);
+    font-family: var(--v13-font-body);
+    line-height: 1.6;
+    padding-bottom: 120px;
+  }
+
+  .pdp-v13__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+  }
+  @media (min-width: 992px) {
+    .pdp-v13__container { grid-template-columns: 1fr 480px; }
+  }
+
+  /* --- LEFT GALLERY --- */
+  .pdp-v13__gallery {
+    background: radial-gradient(circle at center, #1E1E1E 0%, #0A0A0A 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    border-right: 1px solid var(--v13-border);
+  }
+  @media (min-width: 992px) {
+    .pdp-v13__gallery { height: 100vh; position: sticky; top: 0; }
+  }
+  .pdp-v13__gallery img, .pdp-v13__gallery svg {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,255,102,0.15));
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .pdp-v13__gallery:hover img { transform: scale(1.05) rotate(-2deg); }
+
+  .pdp-v13__badge-overlay {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-family: var(--v13-font-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--v13-accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pdp-v13__badge-overlay span { width: 8px; height: 8px; background: var(--v13-accent); border-radius: 50%; box-shadow: 0 0 10px var(--v13-accent); }
+
+  /* --- RIGHT INFO BOX --- */
+  .pdp-v13__info {
+    padding: 30px 24px;
+    background: var(--v13-bg);
+  }
+  @media (min-width: 992px) {
+    .pdp-v13__info { padding: 60px 40px; }
+  }
+
+  .pdp-v13__breadcrumbs { font-size: 12px; color: var(--v13-text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .pdp-v13__breadcrumbs span { color: var(--v13-text); font-weight: 600; }
+
+  .pdp-v13__title {
+    font-family: var(--v13-font-head);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    margin: 0 0 16px 0;
+  }
+
+  .pdp-v13__price-row {
+    display: flex; align-items: flex-end; gap: 16px; margin-bottom: 24px;
+    padding-bottom: 24px; border-bottom: 1px solid var(--v13-border);
+  }
+  .pdp-v13__price { font-size: 36px; font-weight: 800; line-height: 1; color: var(--v13-accent); }
+  .pdp-v13__compare { font-size: 18px; color: var(--v13-text-dim); text-decoration: line-through; margin-bottom: 4px; }
+  .pdp-v13__tax { font-size: 12px; color: var(--v13-text-dim); margin-bottom: 6px; }
+
+  /* --- URGENCY BANNER --- */
+  .pdp-v13__urgency {
+    background: rgba(255, 51, 102, 0.1);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .pdp-v13__urgency svg { width: 20px; height: 20px; color: var(--v13-danger); }
+  .pdp-v13__urgency-text { font-size: 13px; font-weight: 600; }
+  .pdp-v13__urgency-text strong { color: var(--v13-danger); }
+
+  /* --- SIZES --- */
+  .pdp-v13__section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; justify-content: space-between; }
+  .pdp-v13__size-guide { color: var(--v13-text-dim); text-decoration: underline; cursor: pointer; font-size: 12px; font-family: var(--v13-font-body); }
+  
+  .pdp-v13__sizes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; }
+  .pdp-v13__size {
+    background: var(--v13-surface);
+    border: 1px solid var(--v13-border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pdp-v13__size-val { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .pdp-v13__size-price { font-size: 11px; color: var(--v13-text-dim); }
+  
+  .pdp-v13__size:hover { border-color: var(--v13-text-dim); }
+  .pdp-v13__size.active { background: var(--v13-text); color: var(--v13-bg); border-color: var(--v13-text); }
+  .pdp-v13__size.active .pdp-v13__size-price { color: var(--v13-bg); opacity: 0.8; }
+  .pdp-v13__size.few { border-color: rgba(255, 51, 102, 0.5); }
+  .pdp-v13__size.few .pdp-v13__size-price { color: var(--v13-danger); font-weight: 700; }
+
+  .pdp-v13__size-msg { font-size: 12px; color: var(--v13-danger); text-align: right; margin-bottom: 32px; font-weight: 600; }
+
+  /* --- ATC BUTTON --- */
+  .pdp-v13__atc {
+    width: 100%;
+    background: var(--v13-accent);
+    color: var(--v13-bg);
+    border: none;
+    padding: 20px;
+    font-family: var(--v13-font-head);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(0, 255, 102, 0.2);
+  }
+  .pdp-v13__atc:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0, 255, 102, 0.3); }
+
+  .pdp-v13__viewing { text-align: center; font-size: 13px; color: var(--v13-text-dim); margin-bottom: 40px; }
+  .pdp-v13__viewing strong { color: var(--v13-text); }
+
+  /* --- UPSELL (PROTECTION / CLEANING KIT) --- */
+  .pdp-v13__upsell {
+    background: var(--v13-surface);
+    border: 1px solid var(--v13-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 40px;
+  }
+  .pdp-v13__upsell-head { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+  .pdp-v13__upsell-img { width: 60px; height: 60px; background: #FFF; border-radius: 8px; padding: 4px; object-fit: contain; }
+  .pdp-v13__upsell-info h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 700; }
+  .pdp-v13__upsell-info p { margin: 0; font-size: 12px; color: var(--v13-text-dim); }
+  .pdp-v13__upsell-action {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--v13-surface-light); padding: 12px; border-radius: 8px;
+  }
+  .pdp-v13__upsell-price { font-weight: 800; font-size: 16px; color: var(--v13-accent); }
+  .pdp-v13__upsell-btn {
+    background: transparent; color: var(--v13-text); border: 1px solid var(--v13-text);
+    padding: 8px 24px; border-radius: 30px; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+  }
+  .pdp-v13__upsell-btn:hover { background: var(--v13-text); color: var(--v13-bg); }
+
+  /* --- MARKET DATA (STOCKX STYLE) --- */
+  .pdp-v13__market {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px;
+  }
+  .pdp-v13__m-box {
+    background: var(--v13-surface); padding: 16px; border-radius: 8px; border: 1px solid var(--v13-border);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .pdp-v13__m-label { font-size: 11px; text-transform: uppercase; color: var(--v13-text-dim); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+  .pdp-v13__m-val { font-size: 20px; font-weight: 800; font-family: var(--v13-font-head); }
+  .pdp-v13__m-trend { font-size: 12px; color: var(--v13-accent); margin-top: 4px; font-weight: 600; }
+
+  /* --- ACCORDIONS --- */
+  .pdp-v13__acc-wrap { border-top: 1px solid var(--v13-border); }
+  .pdp-v13__acc { border-bottom: 1px solid var(--v13-border); }
+  .pdp-v13__acc-btn {
+    width: 100%; background: none; border: none; color: var(--v13-text);
+    display: flex; justify-content: space-between; padding: 24px 0;
+    font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+  }
+  .pdp-v13__acc-content { padding-bottom: 24px; font-size: 14px; color: var(--v13-text-dim); display: none; }
+  .pdp-v13__acc-content.open { display: block; }
+  
+  .pdp-v13__specs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .pdp-v13__spec-label { font-size: 11px; text-transform: uppercase; color: var(--v13-text-dim); margin-bottom: 4px; }
+  .pdp-v13__spec-val { font-size: 14px; font-weight: 700; color: var(--v13-text); }
+
+  /* --- FULL WIDTH SECTIONS (CROSS SELL & RECENT) --- */
+  .pdp-v13__fw-section { max-width: 1440px; margin: 80px auto; padding: 0 24px; }
+  .pdp-v13__fw-title { font-family: var(--v13-font-head); font-size: 24px; text-transform: uppercase; margin-bottom: 32px; text-align: center; }
+  
+  .pdp-v13__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .pdp-v13__card { background: var(--v13-surface); border: 1px solid var(--v13-border); border-radius: 12px; padding: 20px; transition: transform 0.3s; }
+  .pdp-v13__card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+  .pdp-v13__card-img { width: 100%; height: 200px; object-fit: contain; margin-bottom: 16px; }
+  .pdp-v13__card-brand { font-size: 11px; text-transform: uppercase; color: var(--v13-text-dim); font-weight: 700; margin-bottom: 4px; }
+  .pdp-v13__card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+  .pdp-v13__card-price { font-size: 16px; font-weight: 800; color: var(--v13-accent); margin-bottom: 16px; }
+  .pdp-v13__card-btn { width: 100%; background: var(--v13-surface-light); color: var(--v13-text); border: none; padding: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+  .pdp-v13__card-btn:hover { background: var(--v13-text); color: var(--v13-bg); }
+
+  /* --- STICKY ATC --- */
+  .pdp-v13-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px);
+    border-top: 1px solid var(--v13-border); z-index: 999; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center; transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pdp-v13-sticky.visible { bottom: 0; }
+  .pdp-v13-sticky__left { display: flex; align-items: center; gap: 16px; }
+  .pdp-v13-sticky__img { width: 48px; height: 48px; object-fit: contain; background: #FFF; border-radius: 4px; }
+  .pdp-v13-sticky__info h5 { margin: 0 0 4px 0; font-size: 14px; font-weight: 700; }
+  .pdp-v13-sticky__info p { margin: 0; font-size: 14px; font-weight: 800; color: var(--v13-accent); }
+  .pdp-v13-sticky__btn {
+    background: var(--v13-accent); color: var(--v13-bg); border: none; padding: 14px 40px;
+    font-family: var(--v13-font-head); font-size: 14px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer;
+  }
+  @media (max-width: 768px) {
+    .pdp-v13-sticky__left { display: none; }
+    .pdp-v13-sticky__btn { width: 100%; }
+  }
+
+</style>
+
+<div class="pdp-v13" data-section="{{ section.id }}">
+  
+  <div class="pdp-v13__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v13__gallery">
+      <div class="pdp-v13__badge-overlay">
+        <span></span> Verified Authentic
+      </div>
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="pdp-v13__info">
+      
+      <div class="pdp-v13__breadcrumbs">Brands / Jordan / <span>Retro High</span></div>
+
+      <h1 class="pdp-v13__title">{{ product.title | default: "Jordan 1 Retro High OG" }}</h1>
+      
+      <div class="pdp-v13__price-row">
+        <div>
+          <div class="pdp-v13__compare">{{ current_variant.compare_at_price | money | default: "â‚¹21,999" }}</div>
+          <div class="pdp-v13__price">{{ current_variant.price | money | default: "â‚¹16,999" }}</div>
+        </div>
+        <div class="pdp-v13__tax">Incl. of all taxes</div>
+      </div>
+
+      <!-- URGENCY -->
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v13__urgency">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div class="pdp-v13__urgency-text">
+            High Demand: <strong>{{ random_sold }} sold</strong> in the last 24 hours.
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- SIZE SELECTOR -->
+      <div class="pdp-v13__section-title">
+        Select Size (US)
+        <span class="pdp-v13__size-guide">Size Guide</span>
+      </div>
+      <div class="pdp-v13__sizes">
+        <div class="pdp-v13__size">
+          <div class="pdp-v13__size-val">7</div>
+          <div class="pdp-v13__size-price">â‚¹15k</div>
+        </div>
+        <div class="pdp-v13__size active">
+          <div class="pdp-v13__size-val">8</div>
+          <div class="pdp-v13__size-price">â‚¹16.9k</div>
+        </div>
+        <div class="pdp-v13__size">
+          <div class="pdp-v13__size-val">9</div>
+          <div class="pdp-v13__size-price">â‚¹16.9k</div>
+        </div>
+        <div class="pdp-v13__size few">
+          <div class="pdp-v13__size-val">10</div>
+          <div class="pdp-v13__size-price">â‚¹18k (Last 1)</div>
+        </div>
+        <div class="pdp-v13__size">
+          <div class="pdp-v13__size-val">11</div>
+          <div class="pdp-v13__size-price">â‚¹16.5k</div>
+        </div>
+        <div class="pdp-v13__size">
+          <div class="pdp-v13__size-val">12</div>
+          <div class="pdp-v13__size-price">â‚¹17k</div>
+        </div>
+      </div>
+      <div class="pdp-v13__size-msg">Prices vary by size due to market demand.</div>
+
+      <!-- ADD TO CART -->
+      <button class="pdp-v13__atc" id="v13-atc">Purchase Now</button>
+      
+      <div class="pdp-v13__viewing">
+        ðŸ‘ï¸ <strong>{{ random_viewing }}</strong> people are viewing this right now
+      </div>
+
+      <!-- UPSELL -->
+      {% if section.settings.show_upsell %}
+        <div class="pdp-v13__upsell">
+          <div class="pdp-v13__upsell-head">
+            {{ 'product-2' | placeholder_svg_tag: 'pdp-v13__upsell-img' }}
+            <div class="pdp-v13__upsell-info">
+              <h4>Premium Sneaker Care Kit</h4>
+              <p>Keep 'em deadstock clean. Includes brush & solution.</p>
+            </div>
+          </div>
+          <div class="pdp-v13__upsell-action">
+            <span class="pdp-v13__upsell-price">+ â‚¹1,299</span>
+            <button class="pdp-v13__upsell-btn">Add to order</button>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- MARKET DATA -->
+      {% if section.settings.show_market %}
+        <div class="pdp-v13__section-title" style="margin-bottom:12px;">Market Data</div>
+        <div class="pdp-v13__market">
+          <div class="pdp-v13__m-box">
+            <div class="pdp-v13__m-label">Last Sale</div>
+            <div class="pdp-v13__m-val">â‚¹17,500</div>
+            <div class="pdp-v13__m-trend">â†‘ â‚¹501 (3%)</div>
+          </div>
+          <div class="pdp-v13__m-box">
+            <div class="pdp-v13__m-label">52 Week High</div>
+            <div class="pdp-v13__m-val">â‚¹24,000</div>
+            <div class="pdp-v13__m-trend" style="color:var(--v13-text-dim);">Historical</div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- ACCORDIONS -->
+      <div class="pdp-v13__acc-wrap">
+        
+        <div class="pdp-v13__acc">
+          <button class="pdp-v13__acc-btn">Details & Specs <span class="icon">+</span></button>
+          <div class="pdp-v13__acc-content">
+            {{ product.description | strip_html | default: "The iconic silhouette returns in a timeless colorway. Premium leather upper, encapsulated Air-Sole unit, and solid rubber outsole." }}
+            <div class="pdp-v13__specs">
+              <div>
+                <div class="pdp-v13__spec-label">Style Code</div>
+                <div class="pdp-v13__spec-val">DZ5485-052</div>
+              </div>
+              <div>
+                <div class="pdp-v13__spec-label">Colorway</div>
+                <div class="pdp-v13__spec-val">Black/White/Volt</div>
+              </div>
+              <div>
+                <div class="pdp-v13__spec-label">Release Date</div>
+                <div class="pdp-v13__spec-val">08/12/2023</div>
+              </div>
+              <div>
+                <div class="pdp-v13__spec-label">Retail Price</div>
+                <div class="pdp-v13__spec-val">â‚¹16,995</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pdp-v13__acc">
+          <button class="pdp-v13__acc-btn">Authenticity Guarantee <span class="icon">+</span></button>
+          <div class="pdp-v13__acc-content">
+            Every item is verified by our team of expert authenticators. We check the materials, stitching, labels, and packaging to ensure 100% authenticity.
+          </div>
+        </div>
+        
+        <div class="pdp-v13__acc">
+          <button class="pdp-v13__acc-btn">Shipping & Returns <span class="icon">+</span></button>
+          <div class="pdp-v13__acc-content">
+            Usually ships within 3-5 business days. All sales are final on marketplace items.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 40px; border-top: 1px solid var(--v13-border); border-bottom: 1px solid var(--v13-border);">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'style="width: 100%; height: 70vh; object-fit: cover;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(10,10,10,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; color: #FFF; padding: 40px;">
+        <h2 style="font-family: var(--v13-font-head); font-size: 5vw; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; line-height: 1; letter-spacing: -1px; text-shadow: 0 10px 20px rgba(0,0,0,0.5);">DON'T SLEEP ON THIS.</h2>
+        <p style="font-size: 16px; font-weight: 600; max-width: 600px; margin-bottom: 32px; color: var(--v13-text-dim);">Extremely limited stock. Verified authentic. Ships within 24 hours.</p>
+        <button style="background: var(--v13-accent); color: var(--v13-bg); border: none; padding: 16px 40px; font-family: var(--v13-font-head); font-weight: 700; font-size: 18px; cursor: pointer; text-transform: uppercase; border-radius: 4px; transition: transform 0.2s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">COP NOW</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- CROSS SELL SECTION -->
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v13__fw-section">
+      <h2 class="pdp-v13__fw-title">Complete The Fit</h2>
+      <div class="pdp-v13__grid">
+        <div class="pdp-v13__card">
+          {{ 'product-3' | placeholder_svg_tag: 'pdp-v13__card-img' }}
+          <div class="pdp-v13__card-brand">Fear of God Essentials</div>
+          <div class="pdp-v13__card-title">Heavyweight Boxy Hoodie - Jet Black</div>
+          <div class="pdp-v13__card-price">â‚¹8,500</div>
+          <button class="pdp-v13__card-btn">View Product</button>
+        </div>
+        <div class="pdp-v13__card">
+          {{ 'product-4' | placeholder_svg_tag: 'pdp-v13__card-img' }}
+          <div class="pdp-v13__card-brand">Nike</div>
+          <div class="pdp-v13__card-title">No-Show Socks (3-Pack)</div>
+          <div class="pdp-v13__card-price">â‚¹1,195</div>
+          <button class="pdp-v13__card-btn">View Product</button>
+        </div>
+        <div class="pdp-v13__card">
+          {{ 'product-5' | placeholder_svg_tag: 'pdp-v13__card-img' }}
+          <div class="pdp-v13__card-brand">Jordan</div>
+          <div class="pdp-v13__card-title">Flight Utility Cargo Pants</div>
+          <div class="pdp-v13__card-price">â‚¹6,295</div>
+          <button class="pdp-v13__card-btn">View Product</button>
+        </div>
+        <div class="pdp-v13__card">
+          {{ 'product-6' | placeholder_svg_tag: 'pdp-v13__card-img' }}
+          <div class="pdp-v13__card-brand">New Era</div>
+          <div class="pdp-v13__card-title">59FIFTY Fitted Cap - NY Yankees</div>
+          <div class="pdp-v13__card-price">â‚¹2,999</div>
+          <button class="pdp-v13__card-btn">View Product</button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED SECTION -->
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v13__fw-section" style="margin-top:0;">
+      <h2 class="pdp-v13__fw-title" style="text-align:left;">Recently Viewed</h2>
+      <div class="pdp-v13__grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+        {% for i in (1..5) %}
+          <div class="pdp-v13__card" style="padding: 16px;">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag: 'pdp-v13__card-img' }}
+            <div class="pdp-v13__card-title" style="font-size:13px; margin-bottom:8px;">Yeezy Boost 350 V2</div>
+            <div class="pdp-v13__card-price" style="font-size:14px; margin-bottom:0;">â‚¹22,000</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v13-sticky" id="v13-sticky">
+    <div class="pdp-v13-sticky__left">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 100 }}" class="pdp-v13-sticky__img">
+      {% else %}
+        <div class="pdp-v13-sticky__img" style="background:#FFF;">{{ 'product-1' | placeholder_svg_tag: 'style="width:100%;height:100%;"' }}</div>
+      {% endif %}
+      <div class="pdp-v13-sticky__info">
+        <h5>{{ product.title | default: "Jordan 1 Retro High OG" }}</h5>
+        <p>{{ current_variant.price | money | default: "â‚¹16,999" }}</p>
+      </div>
+    </div>
+    <button class="pdp-v13-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Purchase Now</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Accordions
+      const accBtns = document.querySelectorAll('.pdp-v13__acc-btn');
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('.icon');
+          if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            icon.innerText = "+";
+          } else {
+            content.classList.add('open');
+            icon.innerText = "-";
+          }
+        });
+      });
+
+      // Sticky ATC
+      const stickyBar = document.getElementById('v13-sticky');
+      const mainAtc = document.getElementById('v13-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V13 - Sneaker Hype",
+  "settings": [
+    {
+      "type": "header",
+      "content": "CRO & Urgency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show High Demand Banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_market",
+      "label": "Show Market Data (Last Sale)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Upsell & Cross-Sell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show In-Box Upsell (Cleaning Kit)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Complete The Fit'",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V13 - Sneaker Hype"
+    }
+  ]
+}
+{% endschema %}

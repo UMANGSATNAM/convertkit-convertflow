@@ -1,0 +1,363 @@
+﻿{%- comment -%}
+  PDP V23: PREMIUM FURNITURE
+  Aesthetic: Minimalist, luxury, neutral colors, elegant typography.
+  Features: Pincode Checker, Product Reels, Material/Dimensions Specs, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 5 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --v23-bg: #F9F8F6; /* Warm off-white */
+    --v23-text: #2C2C2C;
+    --v23-text-light: #666666;
+    --v23-primary: #8C7355; /* Muted Gold / Wood */
+    --v23-border: #E5E0D8;
+    --v23-font-heading: 'Playfair Display', serif;
+    --v23-font-body: 'Inter', sans-serif;
+  }
+
+  .pdp-v23 {
+    background-color: var(--v23-bg);
+    color: var(--v23-text);
+    font-family: var(--v23-font-body);
+    line-height: 1.6;
+  }
+
+  .pdp-v23__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v23__container { grid-template-columns: 55% 45%; padding: 60px 40px; gap: 80px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v23__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .pdp-v23__img-main { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #EEE; }
+  .pdp-v23__img-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pdp-v23__img-thumbs img, .pdp-v23__img-thumbs svg { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #EEE; cursor: pointer; transition: opacity 0.3s; }
+  .pdp-v23__img-thumbs img:hover { opacity: 0.7; }
+
+  /* --- INFO --- */
+  .pdp-v23__title {
+    font-family: var(--v23-font-heading);
+    font-size: 42px; font-weight: 600; margin: 0 0 16px 0; color: var(--v23-text); line-height: 1.1;
+  }
+  .pdp-v23__desc-short {
+    font-size: 16px; color: var(--v23-text-light); margin-bottom: 30px; font-weight: 300;
+  }
+  
+  .pdp-v23__price-wrap {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 40px; border-bottom: 1px solid var(--v23-border); padding-bottom: 30px;
+  }
+  .pdp-v23__price { font-family: var(--v23-font-heading); font-size: 32px; font-weight: 600; color: var(--v23-text); }
+  .pdp-v23__compare { font-size: 18px; color: #999; text-decoration: line-through; }
+
+  /* --- URGENCY --- */
+  .pdp-v23__urgency {
+    display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #8C5555; margin-bottom: 30px;
+  }
+  .pdp-v23__urgency svg { width: 18px; height: 18px; }
+
+  /* --- VARIANTS (FINISHES) --- */
+  .pdp-v23__sizes { margin-bottom: 30px; }
+  .pdp-v23__s-head { font-weight: 500; margin-bottom: 16px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--v23-text-light); }
+  .pdp-v23__s-grid { display: flex; gap: 16px; }
+  .pdp-v23__s-item {
+    width: 48px; height: 48px; border-radius: 50%;
+    cursor: pointer; border: 1px solid transparent; padding: 4px;
+    transition: all 0.3s;
+  }
+  .pdp-v23__s-item.active { border-color: var(--v23-text); }
+  .pdp-v23__s-inner { width: 100%; height: 100%; border-radius: 50%; }
+  .pdp-v23__s-inner.wood1 { background: #8B5A2B; }
+  .pdp-v23__s-inner.wood2 { background: #3E2723; }
+  .pdp-v23__s-inner.wood3 { background: #D7CCC8; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v23__pincode { margin-bottom: 40px; }
+  .pdp-v23__pin-title { font-weight: 500; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--v23-text-light); }
+  .pdp-v23__pin-input-wrap { display: flex; border-bottom: 1px solid var(--v23-text); padding-bottom: 8px; }
+  .pdp-v23__pin-input { flex: 1; background: transparent; border: none; font-family: var(--v23-font-body); font-size: 16px; outline: none; color: var(--v23-text); }
+  .pdp-v23__pin-btn { background: transparent; color: var(--v23-text); border: none; font-weight: 600; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v23__pin-msg { margin-top: 12px; font-size: 14px; color: var(--v23-primary); display: none; font-style: italic; }
+
+  /* --- ATC --- */
+  .pdp-v23__atc {
+    width: 100%; background: var(--v23-text); color: #FFF; border: none; padding: 20px; font-size: 16px; font-weight: 400; cursor: pointer; margin-bottom: 24px; font-family: var(--v23-font-body); letter-spacing: 2px; text-transform: uppercase; transition: background 0.3s;
+  }
+  .pdp-v23__atc:hover { background: var(--v23-primary); }
+
+  /* --- PRODUCT REELS (SHOWCASE) --- */
+  .pdp-v23__reels-wrap { margin-bottom: 40px; margin-top: 60px; }
+  .pdp-v23__reels-title { font-family: var(--v23-font-heading); font-size: 28px; margin-bottom: 20px; }
+  .pdp-v23__reels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pdp-v23__reel { aspect-ratio: 9/16; background: #EEE; position: relative; overflow: hidden; }
+  .pdp-v23__reel img, .pdp-v23__reel svg { width: 100%; height: 100%; object-fit: cover; transition: transform 2s ease; }
+  .pdp-v23__reel:hover img { transform: scale(1.05); }
+  .pdp-v23__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 1px solid #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); cursor: pointer; transition: background 0.3s; }
+  .pdp-v23__reel-play:hover { background: rgba(0,0,0,0.4); }
+
+  /* --- SPECS ACCORDION --- */
+  .pdp-v23__specs { border-top: 1px solid var(--v23-border); }
+  .pdp-v23__spec-item { border-bottom: 1px solid var(--v23-border); padding: 20px 0; display: flex; justify-content: space-between; cursor: pointer; font-size: 16px; font-weight: 500; }
+  .pdp-v23__spec-content { padding-bottom: 20px; font-size: 15px; color: var(--v23-text-light); font-weight: 300; line-height: 1.8; }
+
+  /* --- FULL WIDTH LIFESTYLE --- */
+  .pdp-v23__lifestyle { width: 100%; margin: 80px 0; }
+  .pdp-v23__lifestyle img, .pdp-v23__lifestyle svg { width: 100%; height: 80vh; object-fit: cover; display: block; }
+
+  /* --- GRIDS --- */
+  .pdp-v23__section { padding: 0 40px 80px 40px; max-width: 1400px; margin: 0 auto; }
+  .pdp-v23__sec-title { font-family: var(--v23-font-heading); font-size: 36px; margin-bottom: 40px; text-align: center; }
+  .pdp-v23__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (min-width: 768px) { .pdp-v23__grid { grid-template-columns: repeat(4, 1fr); gap: 40px; } }
+  .pdp-v23__card { text-align: center; }
+  .pdp-v23__card img { width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 20px; background: #EEE; }
+  .pdp-v23__card-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; font-family: var(--v23-font-heading); }
+  .pdp-v23__card-price { font-weight: 400; color: var(--v23-text-light); }
+
+</style>
+
+<div class="pdp-v23" data-section="{{ section.id }}">
+  <div class="pdp-v23__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v23__gallery">
+      {% if product.featured_media %}
+        <img class="pdp-v23__img-main" src="{{ product.featured_media | image_url: width: 1200 }}" alt="{{ product.title }}">
+        <div class="pdp-v23__img-thumbs">
+          {% for media in product.media offset: 1 limit: 3 %}
+            <img src="{{ media | image_url: width: 400 }}" alt="{{ product.title }}">
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="pdp-v23__img-main">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v23__img-thumbs">
+          {{ 'product-2' | placeholder_svg_tag }}
+          {{ 'product-3' | placeholder_svg_tag }}
+          {{ 'product-4' | placeholder_svg_tag }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v23__info">
+      <h1 class="pdp-v23__title">{{ product.title | default: "The Modesto Lounge Chair" }}</h1>
+      <p class="pdp-v23__desc-short">Crafted from solid walnut and upholstered in premium Italian leather, bringing timeless mid-century modern design to your living space.</p>
+      
+      <div class="pdp-v23__price-wrap">
+        <span class="pdp-v23__price">{{ current_variant.price | money | default: "â‚¹45,999" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v23__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v23__urgency">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Limited Availability. Only {{ random_stock }} remaining in this finish.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v23__sizes">
+        <div class="pdp-v23__s-head">Select Finish</div>
+        <div class="pdp-v23__s-grid">
+          <div class="pdp-v23__s-item active"><div class="pdp-v23__s-inner wood1"></div></div>
+          <div class="pdp-v23__s-item"><div class="pdp-v23__s-inner wood2"></div></div>
+          <div class="pdp-v23__s-item"><div class="pdp-v23__s-inner wood3"></div></div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v23__pincode">
+          <div class="pdp-v23__pin-title">White Glove Delivery Estimate</div>
+          <div class="pdp-v23__pin-input-wrap">
+            <input type="text" class="pdp-v23__pin-input" id="v23-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v23__pin-btn" onclick="document.getElementById('v23-pin-msg').style.display='block'">Check</button>
+          </div>
+          <div class="pdp-v23__pin-msg" id="v23-pin-msg">Estimated Delivery: 7-10 Business Days. Assembly included.</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v23__atc" id="v23-atc">Add to Cart</button>
+
+      <div class="pdp-v23__specs">
+        <div class="pdp-v23__spec-item">Dimensions & Details <span>+</span></div>
+        <div class="pdp-v23__spec-content">
+          Overall: 32" W x 34" D x 34" H<br>
+          Seat Depth: 22"<br>
+          Weight Capacity: 300 lbs<br><br>
+          Material: Kiln-dried solid walnut frame. Top-grain semi-aniline leather. High-resiliency foam cushions.
+        </div>
+        <div class="pdp-v23__spec-item" style="border-top:none;">Care Instructions <span>+</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if section.settings.show_reels %}
+    <div class="pdp-v23__section">
+      <div class="pdp-v23__reels-wrap">
+        <h2 class="pdp-v23__reels-title">In the Wild</h2>
+        <div class="pdp-v23__reels">
+          <div class="pdp-v23__reel">
+            {{ 'lifestyle-1' | placeholder_svg_tag }}
+            <div class="pdp-v23__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v23__reel">
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
+            <div class="pdp-v23__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v23__reel">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="pdp-v23__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v23__lifestyle">
+      {{ 'collection-3' | placeholder_svg_tag }}
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v23__section">
+      <h2 class="pdp-v23__sec-title">Curated Pairings</h2>
+      <div class="pdp-v23__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v23__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v23__card-title">Walnut Side Table</div>
+            <div class="pdp-v23__card-price">â‚¹12,999</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; top: -100px; left: 0; width: 100%; /* Top sticky for luxury feel */
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--v23-border);
+    z-index: 999; padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: top 0.4s ease; font-family: var(--v23-font-body);
+  }
+  .sticky-atc-{{ section.id }}.visible { top: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 20px; }
+  .sticky-atc-{{ section.id }}__img { width: 60px; height: 60px; object-fit: cover; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 500; font-size: 16px; color: var(--v23-text); font-family: var(--v23-font-heading); }
+  .sticky-atc-{{ section.id }}__price { font-weight: 400; color: var(--v23-text-light); font-size: 15px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v23-text); color: #FFF; border: none; padding: 12px 30px; font-weight: 400; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }} { top: auto; bottom: -100px; border-bottom: none; border-top: 1px solid var(--v23-border); padding: 16px; }
+    .sticky-atc-{{ section.id }}.visible { top: auto; bottom: 0; }
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "The Modesto Lounge Chair" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹45,999" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Add To Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v23-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V23 - Furniture",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Low Stock Banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show White Glove Pincode",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show 'In The Wild' Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Curated Pairings'",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V23 - Furniture"
+    }
+  ]
+}
+{% endschema %}

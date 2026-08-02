@@ -1,0 +1,439 @@
+﻿{%- comment -%}
+  PDP V9: BEWAKOOF STYLE (Quirky, Youth-centric)
+  Aesthetic: Yellow/Black, Bold, Fun, Mobile-first.
+  Features: Full schema control for Tribe Upsells, Trending Badges, Cross-sells.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_bought = 'now' | date: '%s' | modulo: 50 | plus: 15 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+
+  :root {
+    --v9-bg: #FFFFFF;
+    --v9-text: #000000;
+    --v9-primary: #FFD700; /* Bewakoof Yellow */
+    --v9-border: #EEEEEE;
+    --v9-font: 'Montserrat', sans-serif;
+  }
+
+  .pdp-v9 {
+    background-color: var(--v9-bg);
+    color: var(--v9-text);
+    font-family: var(--v9-font);
+    line-height: 1.4;
+  }
+
+  .pdp-v9__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+    display: grid;
+    gap: 20px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v9__container { grid-template-columns: 1fr 1fr; gap: 40px; padding: 40px 20px; }
+  }
+
+  /* --- GALLERY (Vertical scroll mobile, grid desktop) --- */
+  .pdp-v9__gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v9__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+  }
+  .pdp-v9__img-wrap {
+    min-width: 85%;
+    scroll-snap-align: start;
+  }
+  @media (min-width: 992px) {
+    .pdp-v9__img-wrap { min-width: 100%; }
+  }
+  .pdp-v9__gallery img, .pdp-v9__gallery svg {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #F5F5F5;
+  }
+
+  /* --- INFO BOX --- */
+  .pdp-v9__title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #555555;
+  }
+  
+  .pdp-v9__price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .pdp-v9__price { font-size: 24px; font-weight: 800; }
+  .pdp-v9__compare { font-size: 16px; color: #888; text-decoration: line-through; }
+  .pdp-v9__tax { font-size: 12px; color: #888; margin-bottom: 24px; font-weight: 600; }
+
+  /* --- TRENDING BADGE --- */
+  .pdp-v9__trending {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF3E0;
+    color: #E65100;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    border: 1px solid #FFE0B2;
+  }
+  .pdp-v9__trending svg { width: 16px; height: 16px; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+  /* --- TRIBE UPSELL --- */
+  .pdp-v9__tribe {
+    background: #FFF9C4;
+    border: 2px dashed var(--v9-primary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pdp-v9__tr-left { font-weight: 700; font-size: 14px; }
+  .pdp-v9__tr-price { color: #E65100; font-weight: 900; font-size: 18px; }
+  .pdp-v9__tr-add { background: var(--v9-text); color: #FFF; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+
+  /* --- SIZES --- */
+  .pdp-v9__sizes { margin-bottom: 24px; }
+  .pdp-v9__s-head { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 12px; font-size: 14px; }
+  .pdp-v9__s-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pdp-v9__s-item {
+    border: 2px solid var(--v9-border);
+    border-radius: 8px;
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pdp-v9__s-item.active { border-color: var(--v9-text); background: var(--v9-text); color: #FFF; }
+  .pdp-v9__s-item.disabled { opacity: 0.3; text-decoration: line-through; pointer-events: none; }
+
+  /* --- ATC --- */
+  .pdp-v9__atc-wrap { display: flex; gap: 10px; margin-bottom: 24px; }
+  .pdp-v9__atc {
+    flex: 1;
+    background: var(--v9-primary);
+    color: var(--v9-text);
+    border: none;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+  }
+  .pdp-v9__wish {
+    width: 54px;
+    border: 2px solid var(--v9-border);
+    border-radius: 8px;
+    background: #FFF;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* --- ACCORDIONS --- */
+  .pdp-v9__acc { border-top: 1px solid var(--v9-border); }
+  .pdp-v9__acc-btn {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 16px 0; font-size: 14px; font-weight: 700;
+    display: flex; justify-content: space-between; cursor: pointer;
+  }
+  .pdp-v9__acc-content { padding-bottom: 16px; font-size: 14px; color: #555; }
+
+  /* --- SECTION GRIDS (Cross Sell / Recents) --- */
+  .pdp-v9__section { margin-top: 40px; padding: 0 16px 40px 16px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+  .pdp-v9__sec-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+  .pdp-v9__grid { display: flex; overflow-x: auto; gap: 16px; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+  @media (min-width: 768px) { .pdp-v9__grid { display: grid; grid-template-columns: repeat(4, 1fr); overflow-x: visible; } }
+  .pdp-v9__card { min-width: 160px; scroll-snap-align: start; }
+  @media (min-width: 768px) { .pdp-v9__card { min-width: 100%; } }
+  .pdp-v9__card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: #F5F5F5; }
+  .pdp-v9__card-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pdp-v9__card-price { font-weight: 800; font-size: 14px; }
+
+</style>
+
+<div class="pdp-v9" data-section="{{ section.id }}">
+  
+  <div class="pdp-v9__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v9__gallery">
+      {% if product.featured_media %}
+        <div class="pdp-v9__img-wrap"><img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        <div class="pdp-v9__img-wrap"><img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        <div class="pdp-v9__img-wrap"><img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+      {% else %}
+        <div class="pdp-v9__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v9__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v9__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v9__info">
+      
+      <h1 class="pdp-v9__title">{{ product.title | default: "Oversized Fit Graphic Printed T-Shirt" }}</h1>
+      
+      {% if section.settings.show_trending_badge %}
+        <div class="pdp-v9__trending">
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.5 12a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0Zm-5.5 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+          Trending! {{ random_bought }} bought this recently.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v9__price-wrap">
+        <span class="pdp-v9__price">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v9__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+      <div class="pdp-v9__tax">inclusive of all taxes</div>
+
+      {% if section.settings.show_tribe_upsell %}
+        <div class="pdp-v9__tribe">
+          <div class="pdp-v9__tr-left">
+            <div>TriBe Member Price</div>
+            <div class="pdp-v9__tr-price">â‚¹499</div>
+          </div>
+          <button class="pdp-v9__tr-add">Add Pass</button>
+        </div>
+      {% endif %}
+
+      <div class="pdp-v9__sizes">
+        <div class="pdp-v9__s-head">
+          <span>Select Size</span>
+          <span style="color:#007BFF; cursor:pointer;">Size Guide</span>
+        </div>
+        <div class="pdp-v9__s-grid">
+          <div class="pdp-v9__s-item disabled">S</div>
+          <div class="pdp-v9__s-item active">M</div>
+          <div class="pdp-v9__s-item">L</div>
+          <div class="pdp-v9__s-item">XL</div>
+          <div class="pdp-v9__s-item">2XL</div>
+          <div class="pdp-v9__s-item">3XL</div>
+        </div>
+      </div>
+
+      <div class="pdp-v9__atc-wrap">
+        <button class="pdp-v9__atc" id="v9-atc">ADD TO BAG</button>
+        <button class="pdp-v9__wish">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+        </button>
+      </div>
+
+      <div class="pdp-v9__acc">
+        <button class="pdp-v9__acc-btn">Product Description <span>+</span></button>
+        <div class="pdp-v9__acc-content">
+          {{ product.description | strip_html | default: "Drop shoulder, oversized fit. 100% Cotton, 220 GSM bio-washed fabric for premium quality and comfort." }}
+        </div>
+      </div>
+      <div class="pdp-v9__acc">
+        <button class="pdp-v9__acc-btn">15 Day Returns & Exchange <span>+</span></button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 40px; margin-bottom: 20px;">
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'style="width: 100%; height: 50vh; object-fit: cover; display: block;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 215, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #000; padding: 40px 20px;">
+        <h2 style="font-family: var(--v9-font); font-size: 36px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase;">Design of the Week.</h2>
+        <p style="font-size: 16px; font-weight: 600; max-width: 600px; margin-bottom: 24px;">Grab this exclusive drop before it's gone. Premium bio-wash cotton, oversized fit, maximum drip.</p>
+        <button style="background: #000; color: #FFF; border: none; padding: 14px 40px; font-family: var(--v9-font); font-weight: 800; font-size: 14px; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: transform 0.2s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">Snag Yours Now</button>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v9__section">
+      <h2 class="pdp-v9__sec-title">Perfect Matches</h2>
+      <div class="pdp-v9__grid">
+        {% for i in (1..6) %}
+          <div class="pdp-v9__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v9__card-title">Quirky Boxers Pack</div>
+            <div class="pdp-v9__card-price">â‚¹499</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v9__section">
+      <h2 class="pdp-v9__sec-title">Recently Viewed</h2>
+      <div class="pdp-v9__grid">
+        {% for i in (4..6) %}
+          <div class="pdp-v9__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v9__card-title">Graphic Printed Tee</div>
+            <div class="pdp-v9__card-price">â‚¹599</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s ease-in-out;
+    border-top: 1px solid #eee;
+  }
+  .sticky-atc-{{ section.id }}.visible {
+    bottom: 0;
+  }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 10px; }
+  .sticky-atc-{{ section.id }}__img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: #000; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: #D32F2F; font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: #000; color: #FFF; border: none; padding: 12px 24px; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+  .sticky-atc-{{ section.id }}__btn:hover { opacity: 0.8; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 14px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ product.selected_or_first_available_variant.price | money }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v9-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    } else if (stickyBar) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+
+{
+  "name": "PDP V9 - Bewakoof Style",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trending_badge",
+      "label": "Show 'Trending' Badge",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Upsell Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tribe_upsell",
+      "label": "Show Tribe Membership Upsell",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sell Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Perfect Matches'",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Recently Viewed"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V9 - Bewakoof Style"
+    }
+  ]
+}
+{% endschema %}

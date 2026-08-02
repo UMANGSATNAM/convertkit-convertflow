@@ -1,0 +1,467 @@
+﻿{%- comment -%}
+  PDP V16: PREMIUM HARDWARE & WATCHES
+  Aesthetic: Pitch Black, Metallic accents, Precision, Swiss luxury.
+  CRO: 3-Year Protection Upsell, Strap Cross-sells, Technical Specs, Urgency.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 8 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+
+  :root {
+    --v16-bg: #050505;
+    --v16-surface: #111111;
+    --v16-surface-hover: #1A1A1A;
+    --v16-text: #FFFFFF;
+    --v16-text-dim: #999999;
+    --v16-accent: #C5A059; /* Luxury Gold */
+    --v16-border: #2A2A2A;
+    --v16-font-head: 'Cinzel', serif;
+    --v16-font-body: 'Jost', sans-serif;
+  }
+
+  .pdp-v16 {
+    background-color: var(--v16-bg);
+    color: var(--v16-text);
+    font-family: var(--v16-font-body);
+    line-height: 1.6;
+    padding-bottom: 100px;
+  }
+
+  .pdp-v16__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+  }
+  @media (min-width: 992px) {
+    .pdp-v16__container { grid-template-columns: 1.2fr 1fr; }
+  }
+
+  /* --- LEFT GALLERY --- */
+  .pdp-v16__gallery {
+    background: #0A0A0A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    border-right: 1px solid var(--v16-border);
+  }
+  @media (min-width: 992px) {
+    .pdp-v16__gallery { height: 100vh; position: sticky; top: 0; }
+  }
+  .pdp-v16__gallery img, .pdp-v16__gallery svg {
+    width: 100%; max-width: 600px; height: auto; object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+  }
+  .pdp-v16__gallery-badge {
+    position: absolute; top: 40px; right: 40px;
+    border: 1px solid var(--v16-accent); color: var(--v16-accent);
+    padding: 8px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  }
+
+  /* --- RIGHT INFO BOX --- */
+  .pdp-v16__info { padding: 40px 24px; background: var(--v16-bg); }
+  @media (min-width: 992px) { .pdp-v16__info { padding: 60px 80px 60px 60px; } }
+
+  .pdp-v16__subtitle { font-size: 12px; color: var(--v16-accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
+  .pdp-v16__title { font-family: var(--v16-font-head); font-size: 36px; font-weight: 500; margin: 0 0 16px 0; line-height: 1.2; }
+  
+  .pdp-v16__price-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; }
+  .pdp-v16__price { font-size: 32px; font-weight: 400; font-family: var(--v16-font-head); }
+  .pdp-v16__compare { font-size: 18px; color: var(--v16-text-dim); text-decoration: line-through; }
+
+  /* --- URGENCY --- */
+  .pdp-v16__urgency {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; background: rgba(197, 160, 89, 0.05);
+    border-left: 2px solid var(--v16-accent); margin-bottom: 32px;
+  }
+  .pdp-v16__urgency-text { font-size: 13px; font-weight: 500; color: var(--v16-text-dim); }
+  .pdp-v16__urgency-text strong { color: var(--v16-text); }
+
+  /* --- VARIANTS (STRAPS) --- */
+  .pdp-v16__var-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--v16-text-dim); margin-bottom: 12px; display: block; }
+  .pdp-v16__var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+  .pdp-v16__var-btn {
+    border: 1px solid var(--v16-border); background: var(--v16-surface); color: var(--v16-text-dim);
+    padding: 16px; font-family: var(--v16-font-body); font-size: 13px; font-weight: 500;
+    cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;
+  }
+  .pdp-v16__var-btn:hover { border-color: var(--v16-text-dim); }
+  .pdp-v16__var-btn.active { border-color: var(--v16-accent); color: var(--v16-accent); background: rgba(197, 160, 89, 0.05); }
+
+  /* --- PROTECTION UPSELL --- */
+  .pdp-v16__protect {
+    background: var(--v16-surface); border: 1px solid var(--v16-border); padding: 20px; margin-bottom: 40px;
+    display: flex; gap: 16px; align-items: center; cursor: pointer; transition: border 0.3s;
+  }
+  .pdp-v16__protect:hover { border-color: var(--v16-text-dim); }
+  .pdp-v16__protect-check {
+    appearance: none; width: 24px; height: 24px; border: 1px solid var(--v16-text-dim); background: transparent; cursor: pointer; position: relative; border-radius: 50%;
+  }
+  .pdp-v16__protect-check:checked { border-color: var(--v16-accent); background: var(--v16-accent); }
+  .pdp-v16__protect-check:checked::after {
+    content: ''; position: absolute; width: 8px; height: 8px; background: var(--v16-bg); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  .pdp-v16__protect-info { flex: 1; }
+  .pdp-v16__protect-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v16__protect-desc { font-size: 13px; color: var(--v16-text-dim); }
+  .pdp-v16__protect-price { color: var(--v16-accent); font-family: var(--v16-font-head); }
+
+  /* --- ATC --- */
+  .pdp-v16__atc {
+    width: 100%; background: var(--v16-accent); color: var(--v16-bg); border: none; padding: 20px;
+    font-family: var(--v16-font-body); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px;
+    cursor: pointer; margin-bottom: 24px; transition: opacity 0.3s;
+  }
+  .pdp-v16__atc:hover { opacity: 0.9; }
+
+  /* --- TRUST ICONS --- */
+  .pdp-v16__trust { display: flex; justify-content: space-between; margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid var(--v16-border); }
+  .pdp-v16__trust-item { text-align: center; color: var(--v16-text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v16__trust-item svg { width: 24px; height: 24px; margin-bottom: 8px; color: var(--v16-text); }
+
+  /* --- ENGINEERING SPECS --- */
+  .pdp-v16__specs { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+  .pdp-v16__spec-val { font-family: var(--v16-font-head); font-size: 18px; margin-bottom: 4px; color: var(--v16-accent); }
+  .pdp-v16__spec-label { font-size: 12px; color: var(--v16-text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* --- ACCORDIONS --- */
+  .pdp-v16__acc-wrap { border-top: 1px solid var(--v16-border); }
+  .pdp-v16__acc { border-bottom: 1px solid var(--v16-border); }
+  .pdp-v16__acc-btn {
+    width: 100%; text-align: left; background: none; border: none; padding: 24px 0; color: var(--v16-text);
+    font-family: var(--v16-font-body); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px;
+    display: flex; justify-content: space-between; cursor: pointer; align-items: center;
+  }
+  .pdp-v16__acc-content { padding-bottom: 24px; font-size: 14px; color: var(--v16-text-dim); display: none; line-height: 1.8; }
+  .pdp-v16__acc-content.open { display: block; }
+
+  /* --- FULL WIDTH SECTIONS --- */
+  .pdp-v16__section { max-width: 1440px; margin: 80px auto; padding: 0 24px; }
+  .pdp-v16__sec-title { font-family: var(--v16-font-head); font-size: 28px; text-align: center; margin-bottom: 40px; }
+  .pdp-v16__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+  
+  .pdp-v16__card { background: var(--v16-surface); padding: 24px; text-align: center; border: 1px solid var(--v16-border); transition: border 0.3s; }
+  .pdp-v16__card:hover { border-color: var(--v16-accent); }
+  .pdp-v16__card img, .pdp-v16__card svg { width: 100%; height: 200px; object-fit: contain; margin-bottom: 20px; }
+  .pdp-v16__card-title { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pdp-v16__card-price { font-family: var(--v16-font-head); color: var(--v16-accent); font-size: 16px; margin-bottom: 20px; }
+  .pdp-v16__card-btn { background: transparent; color: var(--v16-text); border: 1px solid var(--v16-text); padding: 12px 24px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
+  .pdp-v16__card-btn:hover { background: var(--v16-text); color: var(--v16-bg); }
+
+  /* --- STICKY ATC --- */
+  .pdp-v16-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: var(--v16-surface);
+    border-top: 1px solid var(--v16-border); z-index: 999; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center; transition: bottom 0.4s ease;
+  }
+  .pdp-v16-sticky.visible { bottom: 0; }
+  .pdp-v16-sticky__left { display: flex; align-items: center; gap: 20px; }
+  .pdp-v16-sticky__img { width: 50px; height: 50px; object-fit: contain; }
+  .pdp-v16-sticky__info h5 { margin: 0 0 4px 0; font-family: var(--v16-font-head); font-size: 16px; font-weight: 500; }
+  .pdp-v16-sticky__info p { margin: 0; font-size: 14px; color: var(--v16-accent); }
+  .pdp-v16-sticky__btn {
+    background: var(--v16-accent); color: var(--v16-bg); border: none; padding: 14px 40px;
+    font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+  }
+  @media (max-width: 768px) {
+    .pdp-v16-sticky__left { display: none; }
+    .pdp-v16-sticky__btn { width: 100%; }
+  }
+
+</style>
+
+<div class="pdp-v16" data-section="{{ section.id }}">
+  
+  <div class="pdp-v16__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v16__gallery">
+      <div class="pdp-v16__gallery-badge">Automatic</div>
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="pdp-v16__info">
+      
+      <div class="pdp-v16__subtitle">Aerospace Grade / Sapphire Crystal</div>
+      <h1 class="pdp-v16__title">{{ product.title | default: "Titanium Chronograph MKII" }}</h1>
+      
+      <div class="pdp-v16__price-row">
+        <span class="pdp-v16__price">{{ current_variant.price | money | default: "â‚¹24,999" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v16__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      <!-- URGENCY -->
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v16__urgency">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <div class="pdp-v16__urgency-text">
+            Limited Production. Only <strong>{{ random_stock }} pieces</strong> remain in stock.
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- VARIANTS -->
+      <div class="pdp-v16__vars">
+        <span class="pdp-v16__var-label">Select Strap Material</span>
+        <div class="pdp-v16__var-grid">
+          <button class="pdp-v16__var-btn active">Titanium Link</button>
+          <button class="pdp-v16__var-btn">Fluoroelastomer</button>
+        </div>
+      </div>
+
+      <!-- PROTECTION UPSELL -->
+      {% if section.settings.show_protection %}
+        <label class="pdp-v16__protect">
+          <input type="checkbox" class="pdp-v16__protect-check">
+          <div class="pdp-v16__protect-info">
+            <div class="pdp-v16__protect-title">Add 3-Year Protection Plan <span class="pdp-v16__protect-price">â‚¹1,999</span></div>
+            <div class="pdp-v16__protect-desc">Covers accidental damage, cracked crystal, and mechanism failure.</div>
+          </div>
+        </label>
+      {% endif %}
+
+      <button class="pdp-v16__atc" id="v16-atc">Acquire Now</button>
+
+      <!-- TRUST -->
+      {% if section.settings.show_trust %}
+        <div class="pdp-v16__trust">
+          <div class="pdp-v16__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg><br>Secure Checkout
+          </div>
+          <div class="pdp-v16__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><br>2-Year Warranty
+          </div>
+          <div class="pdp-v16__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg><br>Free Global Shipping
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- SPECS -->
+      <div class="pdp-v16__specs">
+        <div class="pdp-v16__spec">
+          <div class="pdp-v16__spec-val">42MM</div>
+          <div class="pdp-v16__spec-label">Case Size</div>
+        </div>
+        <div class="pdp-v16__spec">
+          <div class="pdp-v16__spec-val">10 ATM</div>
+          <div class="pdp-v16__spec-label">Water Resistance</div>
+        </div>
+        <div class="pdp-v16__spec">
+          <div class="pdp-v16__spec-val">Sapphire</div>
+          <div class="pdp-v16__spec-label">Glass Material</div>
+        </div>
+        <div class="pdp-v16__spec">
+          <div class="pdp-v16__spec-val">Automatic</div>
+          <div class="pdp-v16__spec-label">Movement</div>
+        </div>
+      </div>
+
+      <!-- ACCORDIONS -->
+      <div class="pdp-v16__acc-wrap">
+        <div class="pdp-v16__acc">
+          <button class="pdp-v16__acc-btn">Engineering details <span class="icon">+</span></button>
+          <div class="pdp-v16__acc-content">
+            {{ product.description | strip_html | default: "Forged from a single block of aerospace-grade titanium. Lighter than steel, exponentially stronger. Features an exhibition caseback." }}
+          </div>
+        </div>
+        <div class="pdp-v16__acc">
+          <button class="pdp-v16__acc-btn">Shipping & Returns <span class="icon">+</span></button>
+          <div class="pdp-v16__acc-content">
+            Dispatched in secure vault packaging within 24 hours. Comes with a standard 1-year mechanical warranty. Free returns within 14 days of receipt.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 40px; border-top: 1px solid var(--v16-border); border-bottom: 1px solid var(--v16-border);">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'style="width: 100%; height: 70vh; object-fit: cover; filter: grayscale(100%);"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(5,5,5,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; color: #FFF; padding: 60px 40px;">
+        <h2 style="font-family: var(--v16-font-head); font-size: 36px; font-weight: 500; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 4px; color: var(--v16-accent);">Precision Engineered</h2>
+        <p style="font-size: 16px; font-weight: 300; max-width: 600px; margin-bottom: 32px; color: var(--v16-text-dim); line-height: 1.8;">Built for the harshest environments. Crafted with microscopic tolerances. Designed for those who demand excellence in every second.</p>
+        <button style="background: transparent; color: var(--v16-accent); border: 1px solid var(--v16-accent); padding: 14px 40px; font-family: var(--v16-font-body); font-weight: 500; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 3px; transition: all 0.3s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmouseover="this.style.background='var(--v16-accent)'; this.style.color='var(--v16-bg)';" onmouseout="this.style.background='transparent'; this.style.color='var(--v16-accent)';">View Collection</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- CROSS SELL -->
+  {% if section.settings.show_accessories %}
+    <div class="pdp-v16__section">
+      <h2 class="pdp-v16__sec-title">Premium Accessories</h2>
+      <div class="pdp-v16__grid">
+        <div class="pdp-v16__card">
+          {{ 'product-2' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title">Italian Leather Strap</div>
+          <div class="pdp-v16__card-price">â‚¹4,500</div>
+          <button class="pdp-v16__card-btn">Add to Cart</button>
+        </div>
+        <div class="pdp-v16__card">
+          {{ 'product-3' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title">Titanium Travel Case</div>
+          <div class="pdp-v16__card-price">â‚¹8,999</div>
+          <button class="pdp-v16__card-btn">Add to Cart</button>
+        </div>
+        <div class="pdp-v16__card">
+          {{ 'product-4' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title">Automatic Watch Winder</div>
+          <div class="pdp-v16__card-price">â‚¹12,499</div>
+          <button class="pdp-v16__card-btn">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED -->
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v16__section" style="margin-top:0; padding-top:40px; border-top: 1px solid var(--v16-border);">
+      <h2 class="pdp-v16__sec-title">Recently Viewed</h2>
+      <div class="pdp-v16__grid">
+        <div class="pdp-v16__card" style="padding: 16px;">
+          {{ 'product-5' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title" style="font-size:12px;">Chronograph MK I</div>
+          <div class="pdp-v16__card-price" style="font-size:14px; margin-bottom:0;">â‚¹19,999</div>
+        </div>
+        <div class="pdp-v16__card" style="padding: 16px;">
+          {{ 'product-6' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title" style="font-size:12px;">Diver Automatic Pro</div>
+          <div class="pdp-v16__card-price" style="font-size:14px; margin-bottom:0;">â‚¹28,500</div>
+        </div>
+        <div class="pdp-v16__card" style="padding: 16px;">
+          {{ 'product-1' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title" style="font-size:12px;">Minimalist Leather</div>
+          <div class="pdp-v16__card-price" style="font-size:14px; margin-bottom:0;">â‚¹12,999</div>
+        </div>
+        <div class="pdp-v16__card" style="padding: 16px;">
+          {{ 'product-2' | placeholder_svg_tag }}
+          <div class="pdp-v16__card-title" style="font-size:12px;">Carbon Fiber Tool Watch</div>
+          <div class="pdp-v16__card-price" style="font-size:14px; margin-bottom:0;">â‚¹31,000</div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v16-sticky" id="v16-sticky">
+    <div class="pdp-v16-sticky__left">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 100 }}" class="pdp-v16-sticky__img">
+      {% else %}
+        <div class="pdp-v16-sticky__img" style="background:#FFF;">{{ 'product-1' | placeholder_svg_tag: 'style="width:100%;height:100%;"' }}</div>
+      {% endif %}
+      <div class="pdp-v16-sticky__info">
+        <h5>{{ product.title | default: "Titanium Chrono" }}</h5>
+        <p>{{ current_variant.price | money | default: "â‚¹24,999" }}</p>
+      </div>
+    </div>
+    <button class="pdp-v16-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Acquire Now</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Accordions
+      const accBtns = document.querySelectorAll('.pdp-v16__acc-btn');
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('.icon');
+          if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            icon.innerText = "+";
+          } else {
+            content.classList.add('open');
+            icon.innerText = "-";
+          }
+        });
+      });
+
+      // Sticky ATC
+      const stickyBar = document.getElementById('v16-sticky');
+      const mainAtc = document.getElementById('v16-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V16 - Hardware",
+  "settings": [
+    {
+      "type": "header",
+      "content": "CRO & Urgency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Low Stock Urgency",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "Show Trust Icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Upsell & Cross Sell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_protection",
+      "label": "Show Protection Plan Upsell",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_accessories",
+      "label": "Show Premium Accessories (Cross Sell)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V16 - Hardware"
+    }
+  ]
+}
+{% endschema %}

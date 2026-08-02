@@ -1,0 +1,390 @@
+﻿{%- comment -%}
+  PDP V18: TRAVEL & LUGGAGE (Away / Monos Style)
+  Aesthetic: Utility, Grid-based, Minimalist.
+  CRO: Packing cube cross-sells, Dimension guides, Color swatches.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root {
+    --v18-bg: #FFFFFF;
+    --v18-surface: #F4F4F4;
+    --v18-text: #1C1C1E;
+    --v18-text-light: #8E8E93;
+    --v18-border: #E5E5EA;
+    --v18-accent: #007AFF; /* Tech Blue */
+    --v18-font: 'Space Grotesk', sans-serif;
+  }
+
+  .pdp-v18 {
+    background-color: var(--v18-bg);
+    color: var(--v18-text);
+    font-family: var(--v18-font);
+    line-height: 1.5;
+  }
+
+  .pdp-v18__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+  }
+  @media (min-width: 992px) {
+    .pdp-v18__container { grid-template-columns: 1fr 500px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v18__gallery {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--v18-bg);
+  }
+  .pdp-v18__gallery img, .pdp-v18__gallery svg {
+    width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/5; background: var(--v18-surface);
+  }
+  .pdp-v18__gallery-hero { grid-column: 1 / -1; aspect-ratio: 16/9 !important; }
+
+  /* --- INFO --- */
+  .pdp-v18__info {
+    padding: 32px 24px;
+    border-left: 1px solid var(--v18-border);
+  }
+  @media (min-width: 992px) {
+    .pdp-v18__info { padding: 40px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  }
+
+  .pdp-v18__title { font-size: 32px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -1px; }
+  .pdp-v18__subtitle { font-size: 16px; color: var(--v18-text-light); margin-bottom: 24px; }
+  
+  .pdp-v18__price-wrap { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+  .pdp-v18__price { font-size: 24px; font-weight: 600; }
+
+  /* --- SWATCHES --- */
+  .pdp-v18__colors { margin-bottom: 24px; }
+  .pdp-v18__label { font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 1px; }
+  .pdp-v18__swatch-wrap { display: flex; gap: 12px; }
+  .pdp-v18__swatch {
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+    padding: 2px; transition: all 0.2s;
+  }
+  .pdp-v18__swatch-inner { width: 100%; height: 100%; border-radius: 50%; }
+  .pdp-v18__swatch.active { border-color: var(--v18-text); }
+
+  /* --- DIMENSIONS UI --- */
+  .pdp-v18__dims {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--v18-border);
+    border: 1px solid var(--v18-border); border-radius: 8px; overflow: hidden; margin-bottom: 32px;
+  }
+  .pdp-v18__dim { background: var(--v18-bg); padding: 16px; text-align: center; }
+  .pdp-v18__dim-val { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .pdp-v18__dim-label { font-size: 11px; color: var(--v18-text-light); text-transform: uppercase; }
+
+  /* --- ATC --- */
+  .pdp-v18__atc {
+    width: 100%; background: var(--v18-text); color: #FFF; border: none; padding: 20px;
+    font-family: var(--v18-font); font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    border-radius: 8px; cursor: pointer; margin-bottom: 32px; transition: opacity 0.2s;
+  }
+  .pdp-v18__atc:hover { opacity: 0.9; }
+
+  /* --- ADD-ON (CROSS SELL) --- */
+  .pdp-v18__addon {
+    border: 1px solid var(--v18-border); border-radius: 8px; padding: 16px; display: flex; gap: 16px; align-items: center; margin-bottom: 32px;
+  }
+  .pdp-v18__addon-img { width: 60px; height: 60px; background: var(--v18-surface); border-radius: 4px; object-fit: cover; }
+  .pdp-v18__addon-info { flex: 1; }
+  .pdp-v18__addon-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .pdp-v18__addon-price { font-size: 13px; color: var(--v18-text-light); }
+  .pdp-v18__addon-add {
+    background: var(--v18-surface); border: none; padding: 8px 16px; font-family: var(--v18-font); font-weight: 600; font-size: 12px;
+    border-radius: 20px; cursor: pointer; text-transform: uppercase;
+  }
+
+  /* --- ACCORDIONS --- */
+  .pdp-v18__acc { border-top: 1px solid var(--v18-border); }
+  .pdp-v18__acc-btn {
+    width: 100%; text-align: left; background: none; border: none; padding: 20px 0;
+    font-family: var(--v18-font); font-size: 15px; font-weight: 600; text-transform: uppercase;
+    display: flex; justify-content: space-between; cursor: pointer;
+  }
+  .pdp-v18__acc-content { padding-bottom: 20px; font-size: 14px; color: var(--v18-text-light); line-height: 1.6; }
+
+  /* --- STICKY ATC --- */
+  .pdp-v18-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: #FFF; box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    z-index: 999; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease; border-top: 1px solid var(--v18-border);
+  }
+  .pdp-v18-sticky.visible { bottom: 0; }
+  .pdp-v18-sticky__title { font-weight: 700; font-size: 16px; }
+  .pdp-v18-sticky__btn {
+    background: var(--v18-text); color: #FFF; border: none; padding: 12px 32px;
+    font-family: var(--v18-font); font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 8px; cursor: pointer;
+  }
+
+</style>
+
+<div class="pdp-v18" data-section="{{ section.id }}">
+  
+  <div class="pdp-v18__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v18__gallery">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 1000 }}" class="pdp-v18__gallery-hero">
+        <img src="{{ product.featured_media | image_url: width: 600 }}">
+        <img src="{{ product.featured_media | image_url: width: 600 }}">
+      {% else %}
+        <div class="pdp-v18__gallery-hero">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div>{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div>{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="pdp-v18__info">
+      
+      <h1 class="pdp-v18__title">{{ product.title | default: "The Carry-On Pro" }}</h1>
+      <div class="pdp-v18__subtitle">Aerospace-grade polycarbonate shell</div>
+
+      <!-- URGENCY SECTION -->
+      {% if section.settings.show_urgency %}
+        <div style="background: rgba(0, 122, 255, 0.05); border-left: 3px solid var(--v18-accent); padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 24px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--v18-accent)" stroke-width="2" style="margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <div>
+            <div style="font-weight: 700; font-size: 13px; color: var(--v18-text); margin-bottom: 2px;">In High Demand</div>
+            <div style="font-size: 12px; color: var(--v18-text-light);">This colorway usually sells out during peak travel season.</div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <div class="pdp-v18__price-wrap">
+        <span class="pdp-v18__price">{{ current_variant.price | money }}</span>
+      </div>
+
+      <div class="pdp-v18__colors">
+        <span class="pdp-v18__label">Color: Midnight Black</span>
+        <div class="pdp-v18__swatch-wrap">
+          <div class="pdp-v18__swatch active"><div class="pdp-v18__swatch-inner" style="background: #1C1C1E;"></div></div>
+          <div class="pdp-v18__swatch"><div class="pdp-v18__swatch-inner" style="background: #E5E5EA;"></div></div>
+          <div class="pdp-v18__swatch"><div class="pdp-v18__swatch-inner" style="background: #5C6E58;"></div></div>
+        </div>
+      </div>
+
+      <!-- DIMENSIONS UI -->
+      {% if section.settings.show_dims %}
+        <div class="pdp-v18__dims">
+          <div class="pdp-v18__dim">
+            <div class="pdp-v18__dim-val">22.7"</div>
+            <div class="pdp-v18__dim-label">Height</div>
+          </div>
+          <div class="pdp-v18__dim">
+            <div class="pdp-v18__dim-val">14.7"</div>
+            <div class="pdp-v18__dim-label">Width</div>
+          </div>
+          <div class="pdp-v18__dim">
+            <div class="pdp-v18__dim-val">7.1 lbs</div>
+            <div class="pdp-v18__dim-label">Weight</div>
+          </div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v18__atc" id="v18-atc">ADD TO CART</button>
+
+      <!-- PACKING CUBE CROSS SELL -->
+      {% if section.settings.show_addon %}
+        <span class="pdp-v18__label">Pair With</span>
+        <div class="pdp-v18__addon">
+          {{ 'product-4' | placeholder_svg_tag: 'pdp-v18__addon-img' }}
+          <div class="pdp-v18__addon-info">
+            <div class="pdp-v18__addon-title">Set of 4 Packing Cubes</div>
+            <div class="pdp-v18__addon-price">â‚¹2,499</div>
+          </div>
+          <button class="pdp-v18__addon-add">+ ADD</button>
+        </div>
+      {% endif %}
+
+      <!-- ACCORDIONS -->
+      <div class="pdp-v18__acc">
+        <button class="pdp-v18__acc-btn">Details <span>+</span></button>
+        <div class="pdp-v18__acc-content">
+          {{ product.description | strip_html | default: "Designed to fit in the overhead bin of almost any flight, anywhere in the world. Features a durable polycarbonate hard shell, 360Â° spinner wheels, and an interior compression system." }}
+        </div>
+      </div>
+      <div class="pdp-v18__acc">
+        <button class="pdp-v18__acc-btn">Materials <span>+</span></button>
+        <div class="pdp-v18__acc-content" style="display:none;">
+          Polycarbonate shell, aluminum telescopic handle, vegan leather details, water-resistant nylon lining.
+        </div>
+      </div>
+      <div class="pdp-v18__acc" style="border-bottom: 1px solid var(--v18-border);">
+        <button class="pdp-v18__acc-btn">100-Day Trial <span>+</span></button>
+        <div class="pdp-v18__acc-content" style="display:none;">
+          Travel with it for 100 days. If you don't love it, return it for a full refund. Covered by our Lifetime Limited Warranty.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative;">
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'style="width: 100%; height: 70vh; object-fit: cover;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.7), transparent); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; color: #FFF; padding: 40px; padding-left: 8%;">
+        <h2 style="font-family: var(--v18-font); font-size: 48px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.1;">Built for the Journey.</h2>
+        <p style="font-size: 16px; max-width: 450px; margin-bottom: 40px; color: #E5E5EA; line-height: 1.6;">Engineered with an unbreakable shell, whisper-quiet wheels, and an interior compression system to fit more of what matters.</p>
+        <button style="background: #FFF; color: var(--v18-text); border: none; padding: 16px 40px; font-family: var(--v18-font); font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; border-radius: 4px; transition: background 0.2s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmouseover="this.style.background='#F4F4F4'" onmouseout="this.style.background='#FFF'">Explore Details</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- CROSS SELL / FEATURED -->
+  {% if section.settings.show_cross_sell %}
+    <div style="background: var(--v18-surface); padding: 80px 20px;">
+      <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 style="font-family: var(--v18-font); font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 48px; color: var(--v18-text); letter-spacing: -1px;">The Travel System</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px;">
+          <div style="background: #FFF; padding: 24px; text-align: center; border-radius: 8px;">
+            {{ 'product-2' | placeholder_svg_tag: 'style="width:100%; height:240px; object-fit:cover; margin-bottom:20px; border-radius:4px; background:var(--v18-surface);"' }}
+            <h3 style="font-family: var(--v18-font); font-size: 18px; font-weight: 600; margin-bottom: 8px;">The Everywhere Bag</h3>
+            <p style="color: var(--v18-text-light); font-size: 15px; margin-bottom: 20px;">â‚¹14,500</p>
+            <button style="width: 100%; background: transparent; color: var(--v18-text); border: 2px solid var(--v18-text); padding: 14px; font-family: var(--v18-font); font-weight: 600; font-size: 13px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--v18-text)'; this.style.color='#FFF';" onmouseout="this.style.background='transparent'; this.style.color='var(--v18-text)';">Add to Cart</button>
+          </div>
+          <div style="background: #FFF; padding: 24px; text-align: center; border-radius: 8px;">
+            {{ 'product-3' | placeholder_svg_tag: 'style="width:100%; height:240px; object-fit:cover; margin-bottom:20px; border-radius:4px; background:var(--v18-surface);"' }}
+            <h3 style="font-family: var(--v18-font); font-size: 18px; font-weight: 600; margin-bottom: 8px;">The Medium Checked</h3>
+            <p style="color: var(--v18-text-light); font-size: 15px; margin-bottom: 20px;">â‚¹28,000</p>
+            <button style="width: 100%; background: transparent; color: var(--v18-text); border: 2px solid var(--v18-text); padding: 14px; font-family: var(--v18-font); font-weight: 600; font-size: 13px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--v18-text)'; this.style.color='#FFF';" onmouseout="this.style.background='transparent'; this.style.color='var(--v18-text)';">Add to Cart</button>
+          </div>
+          <div style="background: #FFF; padding: 24px; text-align: center; border-radius: 8px;">
+            {{ 'product-4' | placeholder_svg_tag: 'style="width:100%; height:240px; object-fit:cover; margin-bottom:20px; border-radius:4px; background:var(--v18-surface);"' }}
+            <h3 style="font-family: var(--v18-font); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Tech Organizer</h3>
+            <p style="color: var(--v18-text-light); font-size: 15px; margin-bottom: 20px;">â‚¹4,200</p>
+            <button style="width: 100%; background: transparent; color: var(--v18-text); border: 2px solid var(--v18-text); padding: 14px; font-family: var(--v18-font); font-weight: 600; font-size: 13px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--v18-text)'; this.style.color='#FFF';" onmouseout="this.style.background='transparent'; this.style.color='var(--v18-text)';">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED SECTION -->
+  {% if section.settings.show_recently_viewed %}
+    <div style="max-width: 1440px; margin: 60px auto 100px auto; padding: 0 40px;">
+      <h2 style="font-family: var(--v18-font); font-size: 24px; font-weight: 700; margin-bottom: 32px; color: var(--v18-text); border-bottom: 1px solid var(--v18-border); padding-bottom: 16px;">Recently Viewed</h2>
+      <div style="display: flex; gap: 24px; overflow-x: auto; padding-bottom: 24px;">
+        {% for i in (1..4) %}
+          <div style="min-width: 240px;">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag: 'style="width:100%; aspect-ratio:4/5; object-fit:cover; margin-bottom:16px; background:var(--v18-surface);"' }}
+            <h4 style="font-family: var(--v18-font); font-size: 16px; font-weight: 600; margin: 0 0 6px 0; color: var(--v18-text);">The Large Backpack</h4>
+            <div style="font-size: 14px; color: var(--v18-text-light);">â‚¹12,000</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v18-sticky" id="v18-sticky">
+    <div class="pdp-v18-sticky__title">{{ product.title | default: "The Carry-On" }} - {{ current_variant.price | money }}</div>
+    <button class="pdp-v18-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const accBtns = document.querySelectorAll('.pdp-v18__acc-btn');
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          if (content.style.display === "none" || content.style.display === "") {
+            content.style.display = "block";
+            this.querySelector('span').innerText = "-";
+          } else {
+            content.style.display = "none";
+            this.querySelector('span').innerText = "+";
+          }
+        });
+      });
+
+      const stickyBar = document.getElementById('v18-sticky');
+      const mainAtc = document.getElementById('v18-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V18 - Luggage",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Specs"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dims",
+      "label": "Show Dimension Grid",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_addon",
+      "label": "Show Accessory Add-on",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Urgency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show 'High Demand' Urgency",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'The Travel System' Cross Sell",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V18 - Luggage"
+    }
+  ]
+}
+{% endschema %}

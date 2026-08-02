@@ -1,0 +1,528 @@
+﻿{%- comment -%}
+  PDP V21: CHILDREN'S CLOTHING
+  Aesthetic: Playful, pastel colors, soft rounded corners, trustworthy.
+  Features: Pincode Checker, Product Reels, Urgency, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 12 | plus: 3 -%}
+{%- assign random_viewers = 'now' | date: '%s' | modulo: 30 | plus: 15 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  :root {
+    --v21-bg: #FAFAFA;
+    --v21-text: #333333;
+    --v21-primary: #FF9A9E; /* Playful Pastel Pink */
+    --v21-secondary: #FECFEF;
+    --v21-accent: #A1C4FD; /* Pastel Blue */
+    --v21-border: #EAEAEA;
+    --v21-font: 'Nunito', sans-serif;
+  }
+
+  .pdp-v21 {
+    background-color: var(--v21-bg);
+    color: var(--v21-text);
+    font-family: var(--v21-font);
+    line-height: 1.5;
+  }
+
+  .pdp-v21__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+    display: grid;
+    gap: 20px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v21__container { grid-template-columns: 1.2fr 1fr; gap: 40px; padding: 40px 20px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v21__gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v21__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+  }
+  .pdp-v21__img-wrap {
+    min-width: 90%;
+    scroll-snap-align: start;
+  }
+  @media (min-width: 992px) {
+    .pdp-v21__img-wrap { min-width: 100%; }
+    .pdp-v21__img-wrap:first-child { grid-column: 1 / -1; }
+  }
+  .pdp-v21__gallery img, .pdp-v21__gallery svg {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: 20px;
+    background: #FFF;
+    border: 2px solid var(--v21-border);
+  }
+
+  /* --- INFO --- */
+  .pdp-v21__info {
+    background: #FFF;
+    padding: 24px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  }
+  .pdp-v21__title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0 0 12px 0;
+    color: var(--v21-text);
+  }
+  
+  .pdp-v21__price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .pdp-v21__price { font-size: 28px; font-weight: 900; color: var(--v21-primary); }
+  .pdp-v21__compare { font-size: 16px; color: #999; text-decoration: line-through; }
+  .pdp-v21__discount { background: var(--v21-secondary); color: var(--v21-primary); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+
+  /* --- URGENCY --- */
+  .pdp-v21__urgency {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFF0F0;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #E53935;
+    margin-bottom: 24px;
+    border: 1px dashed #FFCDD2;
+  }
+  .pdp-v21__urgency svg { width: 20px; height: 20px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+  /* --- SIZES --- */
+  .pdp-v21__sizes { margin-bottom: 24px; }
+  .pdp-v21__s-head { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 12px; }
+  .pdp-v21__s-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdp-v21__s-item {
+    border: 2px solid var(--v21-border);
+    border-radius: 16px;
+    padding: 10px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #FAFAFA;
+    transition: all 0.2s;
+  }
+  .pdp-v21__s-item.active { border-color: var(--v21-primary); background: var(--v21-primary); color: #FFF; box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3); }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v21__pincode {
+    background: #F4F7FF;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 24px;
+    border: 1px solid #E0E8FF;
+  }
+  .pdp-v21__pin-title { font-weight: 800; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; color: #444; }
+  .pdp-v21__pin-input-wrap { display: flex; gap: 8px; }
+  .pdp-v21__pin-input { flex: 1; border: 2px solid #D0D9FF; border-radius: 12px; padding: 12px; font-family: var(--v21-font); font-weight: 600; outline: none; }
+  .pdp-v21__pin-input:focus { border-color: var(--v21-accent); }
+  .pdp-v21__pin-btn { background: var(--v21-accent); color: #FFF; border: none; border-radius: 12px; padding: 0 20px; font-weight: 800; cursor: pointer; font-family: var(--v21-font); }
+  .pdp-v21__pin-msg { margin-top: 10px; font-size: 13px; font-weight: 700; color: #2E7D32; display: none; }
+
+  /* --- ATC --- */
+  .pdp-v21__atc {
+    width: 100%;
+    background: var(--v21-primary);
+    color: #FFF;
+    border: none;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: 900;
+    border-radius: 16px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+    transition: transform 0.2s;
+    font-family: var(--v21-font);
+  }
+  .pdp-v21__atc:hover { transform: translateY(-2px); }
+
+  /* --- TRUST BADGES --- */
+  .pdp-v21__trust {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 0;
+    background: #FAFAFA;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  .pdp-v21__t-item { text-align: center; }
+  .pdp-v21__t-item svg { width: 28px; height: 28px; color: var(--v21-accent); margin-bottom: 6px; }
+  .pdp-v21__t-item span { display: block; font-size: 11px; font-weight: 800; color: #666; text-transform: uppercase; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v21__reels-wrap { margin-bottom: 30px; }
+  .pdp-v21__reels-title { font-weight: 800; font-size: 16px; margin-bottom: 12px; }
+  .pdp-v21__reels {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+  }
+  .pdp-v21__reel {
+    min-width: 140px;
+    height: 240px;
+    border-radius: 16px;
+    background: #EAEAEA;
+    position: relative;
+    scroll-snap-align: start;
+    overflow: hidden;
+    flex: 1;
+  }
+  @media (min-width: 768px) {
+    .pdp-v21__reel { min-width: 0; } /* Allow flex shrink on desktop */
+  }
+  .pdp-v21__reel img, .pdp-v21__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v21__reel-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #FFF;
+  }
+
+  /* --- FULL WIDTH LIFESTYLE --- */
+  .pdp-v21__lifestyle {
+    width: 100%;
+    position: relative;
+    margin: 40px 0;
+  }
+  .pdp-v21__lifestyle img, .pdp-v21__lifestyle svg {
+    width: 100%; height: 60vh; object-fit: cover; display: block;
+  }
+  .pdp-v21__life-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(255,154,158,0.9), transparent);
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    text-align: center; color: #FFF; padding: 40px 20px;
+  }
+  .pdp-v21__life-title { font-size: 32px; font-weight: 900; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  .pdp-v21__life-desc { font-size: 16px; font-weight: 700; max-width: 600px; margin-bottom: 24px; }
+
+  /* --- GRIDS --- */
+  .pdp-v21__section { padding: 0 16px 40px 16px; max-width: 1200px; margin: 0 auto; }
+  .pdp-v21__sec-title { font-size: 24px; font-weight: 900; margin-bottom: 20px; text-align: center; }
+  .pdp-v21__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (min-width: 768px) { .pdp-v21__grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+  .pdp-v21__card { background: #FFF; border-radius: 20px; padding: 10px; border: 1px solid var(--v21-border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+  .pdp-v21__card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+  .pdp-v21__card-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; color: var(--v21-text); }
+  .pdp-v21__card-price { font-weight: 900; color: var(--v21-primary); }
+
+</style>
+
+<div class="pdp-v21" data-section="{{ section.id }}">
+  
+  <div class="pdp-v21__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v21__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 4 %}
+          <div class="pdp-v21__img-wrap"><img src="{{ media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v21__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v21__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v21__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v21__info">
+      
+      <h1 class="pdp-v21__title">{{ product.title | default: "Premium Cotton Kids Romper" }}</h1>
+      
+      <div class="pdp-v21__price-wrap">
+        <span class="pdp-v21__price">{{ current_variant.price | money | default: "â‚¹899" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v21__compare">{{ current_variant.compare_at_price | money }}</span>
+          <span class="pdp-v21__discount">-40%</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v21__urgency">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Hurry! Only {{ random_stock }} left in stock. {{ random_viewers }} people viewing.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v21__sizes">
+        <div class="pdp-v21__s-head">
+          <span>Select Age / Size</span>
+          <span style="color:var(--v21-accent); cursor:pointer; text-decoration: underline;">Size Chart</span>
+        </div>
+        <div class="pdp-v21__s-grid">
+          <div class="pdp-v21__s-item">0-3 M</div>
+          <div class="pdp-v21__s-item active">3-6 M</div>
+          <div class="pdp-v21__s-item">6-12 M</div>
+          <div class="pdp-v21__s-item">1-2 Y</div>
+          <div class="pdp-v21__s-item">2-3 Y</div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <!-- PINCODE CHECKER UI -->
+        <div class="pdp-v21__pincode">
+          <div class="pdp-v21__pin-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Check Delivery Speed
+          </div>
+          <div class="pdp-v21__pin-input-wrap">
+            <input type="text" class="pdp-v21__pin-input" id="v21-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v21__pin-btn" onclick="document.getElementById('v21-pin-msg').style.display='block'">CHECK</button>
+          </div>
+          <div class="pdp-v21__pin-msg" id="v21-pin-msg">âœ¨ Awesome! Free Delivery by Friday, Aug 12.</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v21__atc" id="v21-atc">ADD TO CART</button>
+
+      {% if section.settings.show_reels %}
+        <!-- PRODUCT REELS -->
+        <div class="pdp-v21__reels-wrap">
+          <div class="pdp-v21__reels-title">See It In Action ðŸŽ¥</div>
+          <div class="pdp-v21__reels">
+            <div class="pdp-v21__reel">
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+              <div class="pdp-v21__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v21__reel">
+              {{ 'lifestyle-2' | placeholder_svg_tag }}
+              <div class="pdp-v21__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v21__reel">
+              {{ 'image' | placeholder_svg_tag }}
+              <div class="pdp-v21__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v21__trust">
+          <div class="pdp-v21__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Skin Safe</span>
+          </div>
+          <div class="pdp-v21__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+            <span>Soft Cotton</span>
+          </div>
+          <div class="pdp-v21__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Easy Return</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div style="font-size: 15px; color: #555; margin-top: 16px;">
+        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: var(--v21-text);">Description</h3>
+        {{ product.description | strip_html | default: "Dress your little one in ultimate comfort. Made with 100% organic cotton, this outfit is gentle on delicate skin and features snap closures for easy diaper changes. Perfect for playdates and nap times!" }}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v21__lifestyle">
+      {{ 'collection-1' | placeholder_svg_tag }}
+      <div class="pdp-v21__life-overlay">
+        <h2 class="pdp-v21__life-title">Made for Play.</h2>
+        <p class="pdp-v21__life-desc">Breathable, stretchy, and durable. Clothes that move the way your kids do.</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- CROSS SELL -->
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v21__section">
+      <h2 class="pdp-v21__sec-title">Complete The Look</h2>
+      <div class="pdp-v21__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v21__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v21__card-title">Cute Beanie Cap</div>
+            <div class="pdp-v21__card-price">â‚¹299</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED -->
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v21__section" style="background: #FFF; padding-top: 40px; border-radius: 40px 40px 0 0;">
+      <h2 class="pdp-v21__sec-title">Recently Viewed</h2>
+      <div class="pdp-v21__grid">
+        {% for i in (4..6) %}
+          <div class="pdp-v21__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v21__card-title">Organic Cotton Bibs</div>
+            <div class="pdp-v21__card-price">â‚¹199</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+    z-index: 999;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-top: 2px solid var(--v21-border);
+    border-radius: 24px 24px 0 0;
+  }
+  .sticky-atc-{{ section.id }}.visible {
+    bottom: 0;
+  }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 12px; }
+  .sticky-atc-{{ section.id }}__img { width: 48px; height: 48px; object-fit: cover; border-radius: 12px; border: 1px solid var(--v21-border); }
+  .sticky-atc-{{ section.id }}__title { font-weight: 800; font-size: 14px; color: var(--v21-text); font-family: var(--v21-font); }
+  .sticky-atc-{{ section.id }}__price { font-weight: 900; color: var(--v21-primary); font-size: 14px; font-family: var(--v21-font); }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v21-primary); color: #FFF; border: none; padding: 14px 28px; font-weight: 900; cursor: pointer; border-radius: 12px; text-transform: uppercase; font-family: var(--v21-font); }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 16px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Premium Cotton Kids Romper" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹899" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v21-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V21 - Kids",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Urgency Banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Product Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Complete The Look'",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V21 - Kids"
+    }
+  ]
+}
+{% endschema %}

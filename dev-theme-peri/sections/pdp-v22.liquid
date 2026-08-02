@@ -1,0 +1,419 @@
+﻿{%- comment -%}
+  PDP V22: GYM & ACTIVEWEAR
+  Aesthetic: High energy, dark mode, neon accents, bold typography.
+  Features: Pincode Checker, Product Reels, Urgency, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 8 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
+
+  :root {
+    --v22-bg: #121212;
+    --v22-bg-alt: #1E1E1E;
+    --v22-text: #FFFFFF;
+    --v22-text-light: #AAAAAA;
+    --v22-primary: #CCFF00; /* Neon Volt Green */
+    --v22-border: #333333;
+    --v22-font: 'Oswald', sans-serif;
+  }
+
+  .pdp-v22 {
+    background-color: var(--v22-bg);
+    color: var(--v22-text);
+    font-family: var(--v22-font);
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .pdp-v22__container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    gap: 30px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v22__container { grid-template-columns: 1fr 1fr; gap: 50px; padding: 40px 20px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v22__gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 10px;
+  }
+  .pdp-v22__gallery::-webkit-scrollbar { height: 6px; }
+  .pdp-v22__gallery::-webkit-scrollbar-thumb { background: var(--v22-border); border-radius: 10px; }
+  @media (min-width: 992px) {
+    .pdp-v22__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+  }
+  .pdp-v22__img-wrap { min-width: 85%; scroll-snap-align: start; }
+  @media (min-width: 992px) { .pdp-v22__img-wrap { min-width: 100%; } }
+  .pdp-v22__gallery img, .pdp-v22__gallery svg {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover; background: #222; border-radius: 8px; filter: contrast(1.1);
+  }
+
+  /* --- INFO --- */
+  .pdp-v22__info { padding-top: 10px; }
+  .pdp-v22__title {
+    font-size: 32px; font-weight: 700; margin: 0 0 10px 0; color: var(--v22-text); letter-spacing: 1px; line-height: 1.1;
+  }
+  
+  .pdp-v22__price-wrap {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px;
+  }
+  .pdp-v22__price { font-size: 36px; font-weight: 700; color: var(--v22-primary); }
+  .pdp-v22__compare { font-size: 18px; color: var(--v22-text-light); text-decoration: line-through; }
+  .pdp-v22__discount { background: var(--v22-primary); color: #000; padding: 4px 10px; font-weight: 700; font-size: 14px; border-radius: 4px; }
+
+  /* --- URGENCY --- */
+  .pdp-v22__urgency {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,0,0,0.1); border-left: 4px solid #FF3333;
+    padding: 14px; font-size: 16px; font-weight: 600; color: #FFF; margin-bottom: 24px;
+  }
+  .pdp-v22__urgency span { color: #FF3333; font-weight: 700; font-size: 18px; }
+
+  /* --- SIZES --- */
+  .pdp-v22__sizes { margin-bottom: 30px; }
+  .pdp-v22__s-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 12px; font-size: 16px; letter-spacing: 1px; }
+  .pdp-v22__s-grid { display: flex; gap: 12px; }
+  .pdp-v22__s-item {
+    border: 2px solid var(--v22-border); width: 60px; height: 60px;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;
+    cursor: pointer; background: var(--v22-bg-alt); transition: all 0.2s;
+  }
+  .pdp-v22__s-item.active { border-color: var(--v22-primary); color: #000; background: var(--v22-primary); }
+  .pdp-v22__s-item:hover:not(.active) { border-color: #555; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v22__pincode {
+    background: var(--v22-bg-alt); padding: 20px; margin-bottom: 30px; border-radius: 8px; border: 1px solid var(--v22-border);
+  }
+  .pdp-v22__pin-title { font-weight: 700; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--v22-text); letter-spacing: 1px; }
+  .pdp-v22__pin-input-wrap { display: flex; gap: 10px; }
+  .pdp-v22__pin-input { flex: 1; background: #111; border: 2px solid var(--v22-border); padding: 14px; font-family: var(--v22-font); color: #FFF; font-size: 16px; outline: none; transition: border 0.3s; }
+  .pdp-v22__pin-input:focus { border-color: var(--v22-primary); }
+  .pdp-v22__pin-btn { background: var(--v22-primary); color: #000; border: none; padding: 0 24px; font-weight: 700; font-size: 16px; cursor: pointer; font-family: var(--v22-font); transition: opacity 0.2s; }
+  .pdp-v22__pin-btn:hover { opacity: 0.8; }
+  .pdp-v22__pin-msg { margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--v22-primary); display: none; letter-spacing: 0.5px; }
+
+  /* --- ATC --- */
+  .pdp-v22__atc {
+    width: 100%; background: var(--v22-text); color: #000; border: none; padding: 20px; font-size: 22px; font-weight: 700; cursor: pointer; margin-bottom: 24px; font-family: var(--v22-font); transition: all 0.3s;
+    box-shadow: 4px 4px 0 var(--v22-primary);
+  }
+  .pdp-v22__atc:active { transform: translate(4px, 4px); box-shadow: 0 0 0 transparent; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v22__reels-wrap { margin-bottom: 40px; }
+  .pdp-v22__reels-title { font-weight: 700; font-size: 20px; margin-bottom: 16px; letter-spacing: 1px; }
+  .pdp-v22__reels { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+  .pdp-v22__reels::-webkit-scrollbar { height: 6px; }
+  .pdp-v22__reels::-webkit-scrollbar-thumb { background: var(--v22-border); border-radius: 10px; }
+  .pdp-v22__reel { min-width: 160px; height: 280px; background: var(--v22-bg-alt); position: relative; scroll-snap-align: start; flex: 1; }
+  @media (min-width: 768px) { .pdp-v22__reel { min-width: 0; } }
+  .pdp-v22__reel img, .pdp-v22__reel svg { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.2); }
+  .pdp-v22__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(204,255,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; }
+
+  /* --- TRUST BADGES --- */
+  .pdp-v22__trust { display: flex; justify-content: space-between; border-top: 1px solid var(--v22-border); border-bottom: 1px solid var(--v22-border); padding: 24px 0; margin-bottom: 30px; }
+  .pdp-v22__t-item { text-align: center; width: 33%; }
+  .pdp-v22__t-item svg { width: 32px; height: 32px; color: var(--v22-text); margin-bottom: 10px; }
+  .pdp-v22__t-item span { display: block; font-size: 14px; font-weight: 600; color: var(--v22-text-light); }
+
+  /* --- FULL WIDTH LIFESTYLE --- */
+  .pdp-v22__lifestyle { width: 100%; position: relative; margin: 60px 0; border-top: 4px solid var(--v22-primary); border-bottom: 4px solid var(--v22-primary); }
+  .pdp-v22__lifestyle img, .pdp-v22__lifestyle svg { width: 100%; height: 70vh; object-fit: cover; display: block; filter: grayscale(100%) contrast(1.2); }
+  .pdp-v22__life-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.5); padding: 20px; }
+  .pdp-v22__life-title { font-size: 48px; font-weight: 700; color: var(--v22-primary); margin-bottom: 16px; letter-spacing: 2px; }
+  .pdp-v22__life-desc { font-size: 18px; font-weight: 400; max-width: 600px; color: #FFF; text-transform: none; }
+
+  /* --- GRIDS --- */
+  .pdp-v22__section { padding: 0 20px 60px 20px; max-width: 1300px; margin: 0 auto; }
+  .pdp-v22__sec-title { font-size: 32px; font-weight: 700; margin-bottom: 24px; color: var(--v22-text); border-left: 4px solid var(--v22-primary); padding-left: 12px; }
+  .pdp-v22__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (min-width: 768px) { .pdp-v22__grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+  .pdp-v22__card { background: var(--v22-bg-alt); padding: 12px; transition: transform 0.3s; border: 1px solid transparent; }
+  .pdp-v22__card:hover { transform: translateY(-5px); border-color: var(--v22-border); }
+  .pdp-v22__card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; margin-bottom: 16px; filter: contrast(1.1); }
+  .pdp-v22__card-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--v22-text-light); }
+  .pdp-v22__card-price { font-weight: 700; font-size: 18px; color: #FFF; }
+
+</style>
+
+<div class="pdp-v22" data-section="{{ section.id }}">
+  <div class="pdp-v22__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v22__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 4 %}
+          <div class="pdp-v22__img-wrap"><img src="{{ media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v22__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v22__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v22__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v22__info">
+      <h1 class="pdp-v22__title">{{ product.title | default: "Performance Compression Tee" }}</h1>
+      
+      <div class="pdp-v22__price-wrap">
+        <span class="pdp-v22__price">{{ current_variant.price | money | default: "â‚¹1,499" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v22__compare">{{ current_variant.compare_at_price | money }}</span>
+          <span class="pdp-v22__discount">-30%</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v22__urgency">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          FAST SELLING! ONLY <span>{{ random_stock }}</span> UNITS LEFT.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v22__sizes">
+        <div class="pdp-v22__s-head">
+          <span>Choose Size</span>
+          <span style="color:var(--v22-primary); cursor:pointer; text-decoration: underline;">Size Chart</span>
+        </div>
+        <div class="pdp-v22__s-grid">
+          <div class="pdp-v22__s-item">S</div>
+          <div class="pdp-v22__s-item active">M</div>
+          <div class="pdp-v22__s-item">L</div>
+          <div class="pdp-v22__s-item">XL</div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v22__pincode">
+          <div class="pdp-v22__pin-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Verify Delivery Speed
+          </div>
+          <div class="pdp-v22__pin-input-wrap">
+            <input type="text" class="pdp-v22__pin-input" id="v22-pin" placeholder="ENTER PINCODE" maxlength="6">
+            <button class="pdp-v22__pin-btn" onclick="document.getElementById('v22-pin-msg').style.display='block'">VERIFY</button>
+          </div>
+          <div class="pdp-v22__pin-msg" id="v22-pin-msg">DELIVERY BY FRIDAY GUARANTEED!</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v22__atc" id="v22-atc">ADD TO CART</button>
+
+      {% if section.settings.show_reels %}
+        <div class="pdp-v22__reels-wrap">
+          <div class="pdp-v22__reels-title">See It In Action</div>
+          <div class="pdp-v22__reels">
+            <div class="pdp-v22__reel">
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+              <div class="pdp-v22__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v22__reel">
+              {{ 'lifestyle-2' | placeholder_svg_tag }}
+              <div class="pdp-v22__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v22__reel">
+              {{ 'image' | placeholder_svg_tag }}
+              <div class="pdp-v22__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v22__trust">
+          <div class="pdp-v22__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <span>SWEAT PROOF</span>
+          </div>
+          <div class="pdp-v22__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <span>QUICK DRY</span>
+          </div>
+          <div class="pdp-v22__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>FREE RETURNS</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div style="font-size: 16px; color: var(--v22-text-light); text-transform: none; line-height: 1.6;">
+        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px; color: #FFF; text-transform: uppercase;">Engineered for Greatness</h3>
+        {{ product.description | strip_html | default: "Max out your reps in comfort. Made with our proprietary 4-way stretch fabric that wicks away moisture faster than you can sweat it. Zero restrictions, maximum gains." }}
+      </div>
+    </div>
+  </div>
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v22__lifestyle">
+      {{ 'collection-2' | placeholder_svg_tag }}
+      <div class="pdp-v22__life-overlay">
+        <h2 class="pdp-v22__life-title">PUSH YOUR LIMITS</h2>
+        <p class="pdp-v22__life-desc">Designed to withstand the toughest workouts. Don't compromise on your gear.</p>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v22__section">
+      <h2 class="pdp-v22__sec-title">UPGRADE YOUR GEAR</h2>
+      <div class="pdp-v22__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v22__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v22__card-title">ELITE TRAINING SHORTS</div>
+            <div class="pdp-v22__card-price">â‚¹1,299</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v22__section">
+      <h2 class="pdp-v22__sec-title">RECENTLY VIEWED</h2>
+      <div class="pdp-v22__grid">
+        {% for i in (4..6) %}
+          <div class="pdp-v22__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v22__card-title">MUSCLE FIT TANK</div>
+            <div class="pdp-v22__card-price">â‚¹899</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; bottom: -100px; left: 0; width: 100%;
+    background: #000; border-top: 2px solid var(--v22-primary);
+    z-index: 999; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease-in-out; font-family: var(--v22-font);
+  }
+  .sticky-atc-{{ section.id }}.visible { bottom: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 16px; }
+  .sticky-atc-{{ section.id }}__img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; filter: contrast(1.2); }
+  .sticky-atc-{{ section.id }}__title { font-weight: 700; font-size: 16px; color: #FFF; letter-spacing: 1px; text-transform: uppercase; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: var(--v22-primary); font-size: 16px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v22-text); color: #000; border: none; padding: 14px 30px; font-weight: 700; font-size: 18px; cursor: pointer; text-transform: uppercase; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 18px; font-size: 20px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Performance Compression Tee" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹1,499" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v22-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V22 - Gym Wear",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Urgency Banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Product Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Upgrade Your Gear'",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V22 - Gym Wear"
+    }
+  ]
+}
+{% endschema %}

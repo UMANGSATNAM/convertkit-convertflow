@@ -1,0 +1,468 @@
+﻿{%- comment -%}
+  PDP V6: BEYOUNG STYLE (Indian Fast Fashion)
+  Aesthetic: Clean, Trust-heavy, Combo offers, High structure.
+  Features: Full schema control for Upsells, Cross-sells, Badges.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 10 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
+
+  :root {
+    --v6-bg: #FFFFFF;
+    --v6-text: #212121;
+    --v6-text-light: #757575;
+    --v6-primary: #32439C; /* Beyoung Blue */
+    --v6-border: #E0E0E0;
+    --v6-accent: #E8F0FE;
+    --v6-urgency: #D32F2F;
+    --v6-font: 'Jost', sans-serif;
+  }
+
+  .pdp-v6 {
+    background-color: var(--v6-bg);
+    color: var(--v6-text);
+    font-family: var(--v6-font);
+    line-height: 1.5;
+  }
+
+  .pdp-v6__container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    gap: 30px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v6__container { grid-template-columns: 60% 40%; gap: 50px; padding: 40px 20px; }
+  }
+
+  /* --- GALLERY (Grid Style) --- */
+  .pdp-v6__gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .pdp-v6__gallery img, .pdp-v6__gallery svg {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    background: #F5F5F5;
+    border-radius: 8px;
+  }
+
+  /* --- INFO BOX --- */
+  .pdp-v6__title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: var(--v6-text);
+  }
+  
+  .pdp-v6__price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .pdp-v6__price { font-size: 28px; font-weight: 700; color: var(--v6-text); }
+  .pdp-v6__compare { font-size: 18px; color: var(--v6-text-light); text-decoration: line-through; }
+  .pdp-v6__discount { color: #388E3C; font-weight: 600; font-size: 16px; }
+
+  /* --- URGENCY --- */
+  .pdp-v6__urgency {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--v6-urgency);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 24px;
+    padding: 10px;
+    background: #FFEBEE;
+    border-radius: 6px;
+  }
+
+  /* --- SIZES --- */
+  .pdp-v6__sizes { margin-bottom: 24px; }
+  .pdp-v6__s-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 12px; }
+  .pdp-v6__s-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdp-v6__s-item {
+    border: 1px solid var(--v6-border);
+    border-radius: 50%;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pdp-v6__s-item.active { border-color: var(--v6-primary); background: var(--v6-primary); color: #FFF; }
+  .pdp-v6__s-item:hover:not(.active) { border-color: var(--v6-primary); }
+
+  /* --- COMBO UPSELL --- */
+  .pdp-v6__combo {
+    border: 1px solid var(--v6-primary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    background: var(--v6-accent);
+  }
+  .pdp-v6__c-title { font-weight: 700; color: var(--v6-primary); margin-bottom: 12px; font-size: 16px; }
+  .pdp-v6__c-options { display: flex; flex-direction: column; gap: 10px; }
+  .pdp-v6__c-option {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #FFF; padding: 12px; border-radius: 6px; border: 1px solid var(--v6-border);
+    cursor: pointer;
+  }
+  .pdp-v6__c-option:hover { border-color: var(--v6-primary); }
+  .pdp-v6__c-save { color: #388E3C; font-weight: 600; font-size: 13px; }
+
+  /* --- ATC --- */
+  .pdp-v6__atc {
+    width: 100%;
+    background: var(--v6-primary);
+    color: #FFF;
+    border: none;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+  }
+  .pdp-v6__atc:hover { background: #283583; }
+
+  /* --- TRUST BADGES --- */
+  .pdp-v6__trust {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+    border-top: 1px solid var(--v6-border);
+    border-bottom: 1px solid var(--v6-border);
+    padding: 20px 0;
+    margin-bottom: 30px;
+  }
+  .pdp-v6__t-item svg { width: 32px; height: 32px; color: var(--v6-primary); margin-bottom: 8px; }
+  .pdp-v6__t-item span { display: block; font-size: 12px; font-weight: 500; color: var(--v6-text-light); }
+
+  /* --- SECTION GRIDS (Cross Sell / Recents) --- */
+  .pdp-v6__section { margin-top: 60px; padding: 0 20px 60px 20px; max-width: 1300px; margin-left: auto; margin-right: auto; }
+  .pdp-v6__sec-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center; }
+  .pdp-v6__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdp-v6__grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+  .pdp-v6__card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
+  .pdp-v6__card-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .pdp-v6__card-price { font-weight: 700; }
+
+</style>
+
+<div class="pdp-v6" data-section="{{ section.id }}">
+  
+  <div class="pdp-v6__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v6__gallery">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+        {{ 'product-2' | placeholder_svg_tag }}
+        {{ 'product-3' | placeholder_svg_tag }}
+        {{ 'product-4' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v6__info">
+      
+      <h1 class="pdp-v6__title">{{ product.title }}</h1>
+      
+      <div class="pdp-v6__price-wrap">
+        <span class="pdp-v6__price">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v6__compare">{{ current_variant.compare_at_price | money }}</span>
+          <span class="pdp-v6__discount">(60% OFF)</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v6__urgency">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          {{ section.settings.urgency_text | replace: '[stock]', random_stock }}
+        </div>
+      {% endif %}
+
+      <div class="pdp-v6__sizes">
+        <div class="pdp-v6__s-head">
+          <span>Select Size</span>
+          <span style="color:var(--v6-primary); cursor:pointer;">Size Guide</span>
+        </div>
+        <div class="pdp-v6__s-grid">
+          <div class="pdp-v6__s-item active">S</div>
+          <div class="pdp-v6__s-item">M</div>
+          <div class="pdp-v6__s-item">L</div>
+          <div class="pdp-v6__s-item">XL</div>
+          <div class="pdp-v6__s-item">XXL</div>
+        </div>
+      </div>
+
+      {% if section.settings.show_combo_upsell %}
+        <div class="pdp-v6__combo">
+          <div class="pdp-v6__c-title">Buy More, Save More (BEYOUNG COMBO)</div>
+          <div style="display: flex; gap: 10px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px;">
+            <div style="background: var(--v6-primary); color: #FFF; padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 100px; cursor: pointer; border: 2px solid var(--v6-primary);">
+              <div style="font-size: 12px; font-weight: 500; text-transform: uppercase;">Pack of 2</div>
+              <div style="font-size: 16px; font-weight: 700;">â‚¹899</div>
+            </div>
+            <div style="background: #FFF; color: var(--v6-primary); padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 100px; cursor: pointer; border: 2px solid var(--v6-primary);">
+              <div style="font-size: 12px; font-weight: 500; text-transform: uppercase;">Pack of 3</div>
+              <div style="font-size: 16px; font-weight: 700;">â‚¹1299</div>
+            </div>
+            <div style="background: #FFF; color: var(--v6-primary); padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 100px; cursor: pointer; border: 2px solid var(--v6-primary);">
+              <div style="font-size: 12px; font-weight: 500; text-transform: uppercase;">Pack of 4</div>
+              <div style="font-size: 16px; font-weight: 700;">â‚¹1699</div>
+            </div>
+          </div>
+          <div style="font-size: 12px; color: #388E3C; font-weight: 600;">âš¡ You save up to 45% with combo packs!</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v6__atc" id="v6-atc">ADD TO CART</button>
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v6__trust">
+          <div class="pdp-v6__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Premium<br>Quality</span>
+          </div>
+          <div class="pdp-v6__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <span>Secure<br>Payments</span>
+          </div>
+          <div class="pdp-v6__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Easy<br>Returns</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div>
+        <h3 style="font-size: 16px; margin-bottom:10px;">Product Description</h3>
+        <div style="color:var(--v6-text-light); font-size:14px;">
+          {{ product.description | strip_html | default: "Upgrade your everyday style with our premium cotton blend t-shirt. Designed for ultimate comfort and a perfect fit, it's the versatile staple your wardrobe needs." }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 40px; margin-bottom: 20px;">
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'style="width: 100%; height: 50vh; object-fit: cover; display: block;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; color: #FFF; padding: 40px 20px;">
+        <h2 style="font-family: var(--v6-font); font-size: 32px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Everyday Essentials.</h2>
+        <p style="font-size: 16px; font-weight: 500; max-width: 600px; margin-bottom: 24px; color: #F5F5F5;">Upgrade your wardrobe with our premium cotton tees. Designed to keep you comfortable and stylish all day long.</p>
+        <button style="background: var(--v6-primary); color: #FFF; border: none; padding: 12px 36px; font-family: var(--v6-font); font-weight: 600; font-size: 14px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: background 0.3s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmouseover="this.style.background='#283583'" onmouseout="this.style.background='var(--v6-primary)'">Shop The Look</button>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v6__section">
+      <h2 class="pdp-v6__sec-title">Complete The Look</h2>
+      <div class="pdp-v6__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v6__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v6__card-title">Essential Joggers</div>
+            <div class="pdp-v6__card-price">â‚¹799</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_recently_viewed %}
+    <div class="pdp-v6__section" style="background: #F9F9F9; padding-top: 60px; max-width: 100%;">
+      <div style="max-width: 1300px; margin: 0 auto;">
+        <h2 class="pdp-v6__sec-title">Recently Viewed</h2>
+        <div class="pdp-v6__grid">
+          {% for i in (5..6) %}
+            <div class="pdp-v6__card">
+              {% capture ph %}product-{{ i }}{% endcapture %}
+              {{ ph | placeholder_svg_tag }}
+              <div class="pdp-v6__card-title">Classic Polo</div>
+              <div class="pdp-v6__card-price">â‚¹599</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s ease-in-out;
+    border-top: 1px solid #eee;
+  }
+  .sticky-atc-{{ section.id }}.visible {
+    bottom: 0;
+  }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 10px; }
+  .sticky-atc-{{ section.id }}__img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: #000; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: #D32F2F; font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: #000; color: #FFF; border: none; padding: 12px 24px; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+  .sticky-atc-{{ section.id }}__btn:hover { opacity: 0.8; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 14px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ product.selected_or_first_available_variant.price | money }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v6-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    } else if (stickyBar) {
+      // Fallback
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+
+{
+  "name": "PDP V6 - Beyoung Style",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Urgency Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "urgency_text",
+      "label": "Urgency Text",
+      "default": "Hurry! Only [stock] left in stock.",
+      "info": "Use [stock] to inject dynamic remaining stock number."
+    },
+    {
+      "type": "header",
+      "content": "Upsell Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_combo_upsell",
+      "label": "Show Combo Packs Upsell",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sell Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Complete The Look'",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Recently Viewed"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V6 - Beyoung Style"
+    }
+  ]
+}
+{% endschema %}

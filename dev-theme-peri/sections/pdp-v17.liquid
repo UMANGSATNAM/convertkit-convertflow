@@ -1,0 +1,377 @@
+﻿{%- comment -%}
+  PDP V17: PET CARE & NUTRITION
+  Aesthetic: Playful, Rounded, Vibrant, Trust-driven.
+  CRO: "Scissor Cut" coupons, FBT bundles, Subscription.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Quicksand:wght@500;700&display=swap');
+
+  :root {
+    --v17-bg: #FDF9F1;
+    --v17-surface: #FFFFFF;
+    --v17-text: #2D3748;
+    --v17-text-light: #718096;
+    --v17-primary: #FF7B54; /* Vibrant Orange */
+    --v17-secondary: #4A90E2; /* Friendly Blue */
+    --v17-border: #EDF2F7;
+    --v17-font-head: 'Nunito', sans-serif;
+    --v17-font-body: 'Quicksand', sans-serif;
+  }
+
+  .pdp-v17 {
+    background-color: var(--v17-bg);
+    color: var(--v17-text);
+    font-family: var(--v17-font-body);
+    line-height: 1.5;
+  }
+
+  .pdp-v17__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    padding: 20px;
+    gap: 30px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v17__container { grid-template-columns: 1fr 1fr; padding: 60px 40px; gap: 60px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v17__gallery { position: relative; }
+  .pdp-v17__gallery img, .pdp-v17__gallery svg {
+    width: 100%; border-radius: 30px; background: #FFF; box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  }
+  .pdp-v17__badge {
+    position: absolute; top: 20px; right: -10px; background: var(--v17-primary); color: #FFF;
+    padding: 10px 20px; border-radius: 30px; font-family: var(--v17-font-head); font-weight: 800;
+    transform: rotate(5deg); box-shadow: 0 5px 15px rgba(255,123,84,0.4);
+  }
+
+  /* --- INFO --- */
+  .pdp-v17__title { font-family: var(--v17-font-head); font-size: 38px; font-weight: 900; line-height: 1.1; margin: 0 0 16px 0; color: var(--v17-text); }
+  
+  .pdp-v17__reviews { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 24px; color: var(--v17-secondary); }
+  .pdp-v17__reviews svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* --- SCISSOR COUPON --- */
+  .pdp-v17__coupon {
+    background: #FFF; border: 2px dashed var(--v17-primary); border-radius: 12px; padding: 16px;
+    margin-bottom: 32px; display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden;
+  }
+  .pdp-v17__coupon::before, .pdp-v17__coupon::after {
+    content:''; position: absolute; width: 24px; height: 24px; background: var(--v17-bg); border-radius: 50%; top: 50%; transform: translateY(-50%); border: 2px dashed var(--v17-primary);
+  }
+  .pdp-v17__coupon::before { left: -14px; border-right-color: transparent; border-top-color: transparent; border-bottom-color: transparent; }
+  .pdp-v17__coupon::after { right: -14px; border-left-color: transparent; border-top-color: transparent; border-bottom-color: transparent; }
+  
+  .pdp-v17__c-icon { font-size: 24px; }
+  .pdp-v17__c-text { flex: 1; font-weight: 700; font-family: var(--v17-font-head); font-size: 16px; color: var(--v17-primary); }
+  .pdp-v17__c-code { background: var(--v17-bg); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-family: monospace; font-size: 14px; }
+
+  /* --- FLAVOR SELECTION --- */
+  .pdp-v17__flavors { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .pdp-v17__flavor {
+    padding: 10px 20px; border: 2px solid var(--v17-border); border-radius: 30px; font-weight: 700; cursor: pointer;
+    background: #FFF; transition: all 0.2s;
+  }
+  .pdp-v17__flavor.active { border-color: var(--v17-secondary); background: var(--v17-secondary); color: #FFF; }
+
+  /* --- PRICE & ATC --- */
+  .pdp-v17__price-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .pdp-v17__price { font-size: 32px; font-family: var(--v17-font-head); font-weight: 900; }
+  .pdp-v17__compare { font-size: 18px; color: var(--v17-text-light); text-decoration: line-through; font-weight: 700; }
+
+  .pdp-v17__atc {
+    width: 100%; background: var(--v17-primary); color: #FFF; border: none; padding: 20px;
+    font-family: var(--v17-font-head); font-size: 20px; font-weight: 900; text-transform: uppercase;
+    border-radius: 40px; cursor: pointer; margin-bottom: 32px; box-shadow: 0 10px 20px rgba(255,123,84,0.3);
+    transition: transform 0.2s;
+  }
+  .pdp-v17__atc:active { transform: scale(0.95); }
+
+  /* --- BOUGHT TOGETHER BUNDLE --- */
+  .pdp-v17__fbt {
+    background: #FFF; border-radius: 20px; padding: 24px; margin-bottom: 32px; box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+  }
+  .pdp-v17__fbt-title { font-family: var(--v17-font-head); font-size: 20px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .pdp-v17__fbt-item { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+  .pdp-v17__fbt-check { appearance: none; width: 24px; height: 24px; border: 2px solid var(--v17-text-light); border-radius: 6px; cursor: pointer; position: relative; }
+  .pdp-v17__fbt-check:checked { background: var(--v17-secondary); border-color: var(--v17-secondary); }
+  .pdp-v17__fbt-check:checked::after { content:'âœ“'; position: absolute; color:#FFF; font-weight:bold; top:50%; left:50%; transform:translate(-50%,-50%); }
+  .pdp-v17__fbt-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; background: var(--v17-bg); }
+  .pdp-v17__fbt-info { flex: 1; }
+  .pdp-v17__fbt-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .pdp-v17__fbt-price { font-weight: 800; color: var(--v17-secondary); }
+
+  /* --- ICONS ROW --- */
+  .pdp-v17__icons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; border-top: 2px dashed var(--v17-border); padding-top: 24px; }
+  .pdp-v17__icon { font-weight: 700; font-size: 13px; color: var(--v17-text-light); }
+  .pdp-v17__icon-circle { width: 50px; height: 50px; background: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--v17-primary); font-size: 24px; }
+
+  /* --- STICKY ATC --- */
+  .pdp-v17-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: #FFF; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+    z-index: 999; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 30px 30px 0 0;
+  }
+  .pdp-v17-sticky.visible { bottom: 0; }
+  .pdp-v17-sticky__title { font-family: var(--v17-font-head); font-size: 18px; font-weight: 800; }
+  .pdp-v17-sticky__btn {
+    background: var(--v17-primary); color: #FFF; border: none; padding: 12px 32px;
+    font-family: var(--v17-font-head); font-size: 16px; font-weight: 900; text-transform: uppercase; cursor: pointer; border-radius: 30px;
+  }
+
+</style>
+
+<div class="pdp-v17" data-section="{{ section.id }}">
+  
+  <div class="pdp-v17__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v17__gallery">
+      <div class="pdp-v17__badge">Vet Approved! ðŸ¾</div>
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <div class="pdp-v17__info">
+      
+      <div class="pdp-v17__reviews">
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <span>4.9 (450+ Happy Dogs)</span>
+      </div>
+
+      <h1 class="pdp-v17__title">{{ product.title | default: "Premium Grain-Free Kibble" }}</h1>
+
+      <!-- URGENCY SECTION -->
+      {% if section.settings.show_urgency %}
+        <div style="background: rgba(255, 123, 84, 0.1); border: 2px solid rgba(255, 123, 84, 0.3); padding: 12px 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+          <div style="font-size: 24px;">ðŸ”¥</div>
+          <div>
+            <div style="font-family: var(--v17-font-head); font-weight: 800; color: var(--v17-primary); font-size: 14px;">SELLING FAST!</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--v17-text);">Over 120 bags sold today. Grab yours before we sell out!</div>
+          </div>
+        </div>
+      {% endif %}
+
+      
+      {% if section.settings.show_coupon %}
+        <div class="pdp-v17__coupon">
+          <div class="pdp-v17__c-icon">âœ‚ï¸</div>
+          <div class="pdp-v17__c-text">Get 20% Off Your First Bag!</div>
+          <div class="pdp-v17__c-code">WOOF20</div>
+        </div>
+      {% endif %}
+
+      <div class="pdp-v17__flavors">
+        <div class="pdp-v17__flavor active">Beef & Sweet Potato</div>
+        <div class="pdp-v17__flavor">Salmon & Pea</div>
+        <div class="pdp-v17__flavor">Chicken & Rice</div>
+      </div>
+
+      <div class="pdp-v17__price-wrap">
+        <span class="pdp-v17__price">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v17__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      <button class="pdp-v17__atc" id="v17-atc">ADD TO BOWL ðŸ¦´</button>
+
+      <!-- BOUGHT TOGETHER BUNDLE -->
+      {% if section.settings.show_fbt %}
+        <div class="pdp-v17__fbt">
+          <div class="pdp-v17__fbt-title">ðŸ¾ Often Bought Together</div>
+          <div class="pdp-v17__fbt-item">
+            <input type="checkbox" class="pdp-v17__fbt-check" checked disabled>
+            {{ 'product-1' | placeholder_svg_tag: 'pdp-v17__fbt-img' }}
+            <div class="pdp-v17__fbt-info">
+              <div class="pdp-v17__fbt-name">This Item: {{ product.title | default: "Premium Kibble" }}</div>
+              <div class="pdp-v17__fbt-price">{{ current_variant.price | money }}</div>
+            </div>
+          </div>
+          <div class="pdp-v17__fbt-item">
+            <input type="checkbox" class="pdp-v17__fbt-check">
+            {{ 'product-2' | placeholder_svg_tag: 'pdp-v17__fbt-img' }}
+            <div class="pdp-v17__fbt-info">
+              <div class="pdp-v17__fbt-name">Dental Chew Sticks (30 Pack)</div>
+              <div class="pdp-v17__fbt-price">â‚¹499</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- TRUST ICONS -->
+      <div class="pdp-v17__icons">
+        <div class="pdp-v17__icon">
+          <div class="pdp-v17__icon-circle">ðŸŒ¾</div>
+          Grain Free
+        </div>
+        <div class="pdp-v17__icon">
+          <div class="pdp-v17__icon-circle">ðŸ’ª</div>
+          High Protein
+        </div>
+        <div class="pdp-v17__icon">
+          <div class="pdp-v17__icon-circle">â¤ï¸</div>
+          Heart Healthy
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 60px;">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'style="width: 100%; height: 60vh; object-fit: cover;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(45,55,72,0.8), rgba(45,55,72,0.3)); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; color: #FFF; padding: 60px 40px;">
+        <h2 style="font-family: var(--v17-font-head); font-size: 42px; font-weight: 900; margin-bottom: 16px; line-height: 1.1;">Healthy Pets, Happy Lives.</h2>
+        <p style="font-size: 18px; font-weight: 700; max-width: 600px; margin-bottom: 32px; font-family: var(--v17-font-body);">Made with real, whole-food ingredients. No fillers, no artificial preservatives. Just pure, tail-wagging nutrition.</p>
+        <button style="background: var(--v17-primary); color: #FFF; border: none; padding: 16px 40px; font-family: var(--v17-font-head); font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; border-radius: 40px; box-shadow: 0 10px 20px rgba(255,123,84,0.3); transition: transform 0.2s;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">Shop Nutrition</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- CROSS SELL / FEATURED -->
+  {% if section.settings.show_cross_sell %}
+    <div style="max-width: 1200px; margin: 80px auto; padding: 0 20px;">
+      <h2 style="font-family: var(--v17-font-head); font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 40px; color: var(--v17-text);">More Tail-Wagging Favorites</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+        <div style="background: #FFF; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          {{ 'product-3' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v17-font-head); font-size: 18px; font-weight: 800; margin-bottom: 8px;">Salmon Oil Supplement</h3>
+          <p style="color: var(--v17-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹899</p>
+          <button style="width: 100%; background: var(--v17-secondary); color: #FFF; border: none; padding: 12px; font-family: var(--v17-font-head); font-weight: 800; text-transform: uppercase; border-radius: 30px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: #FFF; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          {{ 'product-4' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v17-font-head); font-size: 18px; font-weight: 800; margin-bottom: 8px;">Soothing Oatmeal Shampoo</h3>
+          <p style="color: var(--v17-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹650</p>
+          <button style="width: 100%; background: var(--v17-secondary); color: #FFF; border: none; padding: 12px; font-family: var(--v17-font-head); font-weight: 800; text-transform: uppercase; border-radius: 30px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: #FFF; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+          {{ 'product-5' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v17-font-head); font-size: 18px; font-weight: 800; margin-bottom: 8px;">Durable Chew Toy</h3>
+          <p style="color: var(--v17-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹499</p>
+          <button style="width: 100%; background: var(--v17-secondary); color: #FFF; border: none; padding: 12px; font-family: var(--v17-font-head); font-weight: 800; text-transform: uppercase; border-radius: 30px; cursor: pointer;">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED SECTION -->
+  {% if section.settings.show_recently_viewed %}
+    <div style="max-width: 1200px; margin: 40px auto 80px auto; padding: 0 20px;">
+      <h2 style="font-family: var(--v17-font-head); font-size: 24px; font-weight: 900; margin-bottom: 24px; color: var(--v17-text);">Recently Viewed</h2>
+      <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px;">
+        {% for i in (1..4) %}
+          <div style="min-width: 200px; background: #FFF; padding: 16px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag: 'style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:12px; margin-bottom:12px;"' }}
+            <h4 style="font-family: var(--v17-font-head); font-size: 16px; font-weight: 800; margin: 0 0 4px 0; color: var(--v17-text);">Training Treats</h4>
+            <div style="font-size: 14px; font-weight: 700; color: var(--v17-primary);">â‚¹350</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v17-sticky" id="v17-sticky">
+    <div class="pdp-v17-sticky__title">{{ product.title | default: "Premium Kibble" }}</div>
+    <button class="pdp-v17-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO BOWL - {{ current_variant.price | money }}</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const stickyBar = document.getElementById('v17-sticky');
+      const mainAtc = document.getElementById('v17-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V17 - Pet Care",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Offers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_coupon",
+      "label": "Show Scissor Coupon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bundles"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fbt",
+      "label": "Show Bought Together Block",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Urgency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show 'Selling Fast' Urgency",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'More Favorites' Cross Sell",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V17 - Pet Care"
+    }
+  ]
+}
+{% endschema %}

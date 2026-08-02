@@ -1,0 +1,384 @@
+﻿{%- comment -%}
+  PDP V24: PLASTIC / UTILITY PRODUCTS
+  Aesthetic: Clean, functional, blue/white, highly structured.
+  Features: Pincode Checker, Product Reels, Multi-pack Upsell, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_sold = 'now' | date: '%s' | modulo: 100 | plus: 250 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
+  :root {
+    --v24-bg: #FFFFFF;
+    --v24-text: #212121;
+    --v24-text-light: #5F6368;
+    --v24-primary: #1A73E8; /* Utility Blue */
+    --v24-accent: #E8F0FE;
+    --v24-border: #DADCE0;
+    --v24-font: 'Roboto', sans-serif;
+  }
+
+  .pdp-v24 {
+    background-color: var(--v24-bg);
+    color: var(--v24-text);
+    font-family: var(--v24-font);
+    line-height: 1.5;
+  }
+
+  .pdp-v24__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px;
+    display: grid;
+    gap: 24px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v24__container { grid-template-columns: 1fr 1fr; gap: 48px; padding: 48px 24px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v24__gallery {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v24__gallery { display: grid; grid-template-columns: repeat(2, 1fr); overflow-x: visible; }
+    .pdp-v24__img-wrap:first-child { grid-column: 1 / -1; }
+  }
+  .pdp-v24__img-wrap { min-width: 90%; scroll-snap-align: start; }
+  @media (min-width: 992px) { .pdp-v24__img-wrap { min-width: 100%; } }
+  .pdp-v24__gallery img, .pdp-v24__gallery svg { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid var(--v24-border); background: #F8F9FA; }
+
+  /* --- INFO --- */
+  .pdp-v24__title { font-size: 24px; font-weight: 700; margin: 0 0 12px 0; color: var(--v24-text); line-height: 1.2; }
+  .pdp-v24__reviews { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--v24-text-light); margin-bottom: 16px; }
+  .pdp-v24__reviews svg { width: 16px; height: 16px; color: #FABB05; }
+  
+  .pdp-v24__price-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .pdp-v24__price { font-size: 32px; font-weight: 900; color: var(--v24-primary); }
+  .pdp-v24__compare { font-size: 16px; color: var(--v24-text-light); text-decoration: line-through; }
+  .pdp-v24__discount { background: var(--v24-accent); color: var(--v24-primary); font-size: 13px; font-weight: 700; padding: 4px 8px; border-radius: 4px; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v24__pincode { background: #F8F9FA; padding: 16px; border-radius: 8px; border: 1px solid var(--v24-border); margin-bottom: 24px; }
+  .pdp-v24__pin-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .pdp-v24__pin-input-wrap { display: flex; gap: 8px; }
+  .pdp-v24__pin-input { flex: 1; border: 1px solid var(--v24-border); border-radius: 4px; padding: 10px 12px; font-family: var(--v24-font); font-size: 14px; outline: none; }
+  .pdp-v24__pin-input:focus { border-color: var(--v24-primary); }
+  .pdp-v24__pin-btn { background: var(--v24-primary); color: #FFF; border: none; border-radius: 4px; padding: 0 16px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .pdp-v24__pin-msg { margin-top: 10px; font-size: 13px; font-weight: 500; color: #188038; display: none; }
+
+  /* --- VARIANTS / MULTIPACK --- */
+  .pdp-v24__pack-wrap { margin-bottom: 24px; }
+  .pdp-v24__pack-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .pdp-v24__pack-list { display: flex; flex-direction: column; gap: 8px; }
+  .pdp-v24__pack-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid var(--v24-border); border-radius: 4px; cursor: pointer; }
+  .pdp-v24__pack-item.active { border-color: var(--v24-primary); background: var(--v24-accent); }
+  .pdp-v24__pack-item:hover:not(.active) { border-color: #9AA0A6; }
+  .pdp-v24__pack-name { font-weight: 500; font-size: 14px; }
+  .pdp-v24__pack-price { font-weight: 700; font-size: 14px; }
+
+  /* --- BULLET POINTS --- */
+  .pdp-v24__bullets { margin-bottom: 24px; padding-left: 20px; color: var(--v24-text-light); font-size: 14px; }
+  .pdp-v24__bullets li { margin-bottom: 6px; }
+
+  /* --- ATC --- */
+  .pdp-v24__atc {
+    width: 100%; background: var(--v24-primary); color: #FFF; border: none; padding: 16px; font-size: 18px; font-weight: 700; border-radius: 4px; cursor: pointer; margin-bottom: 16px; transition: background 0.2s; box-shadow: 0 2px 4px rgba(26,115,232,0.3);
+  }
+  .pdp-v24__atc:hover { background: #1557B0; box-shadow: 0 4px 8px rgba(26,115,232,0.4); }
+  .pdp-v24__urgency-text { text-align: center; font-size: 13px; font-weight: 500; color: #D93025; margin-bottom: 32px; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v24__reels-wrap { margin-bottom: 32px; }
+  .pdp-v24__reels-title { font-weight: 700; font-size: 18px; margin-bottom: 16px; }
+  .pdp-v24__reels { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+  .pdp-v24__reel { min-width: 140px; height: 250px; background: #F8F9FA; position: relative; border-radius: 8px; overflow: hidden; scroll-snap-align: start; flex: 1; border: 1px solid var(--v24-border); }
+  @media (min-width: 768px) { .pdp-v24__reel { min-width: 0; } }
+  .pdp-v24__reel img, .pdp-v24__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v24__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: rgba(26,115,232,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; }
+
+  /* --- TRUST BADGES --- */
+  .pdp-v24__trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; margin-bottom: 32px; }
+  .pdp-v24__t-item { background: #F8F9FA; padding: 12px; border-radius: 8px; border: 1px solid var(--v24-border); }
+  .pdp-v24__t-item svg { width: 24px; height: 24px; color: var(--v24-primary); margin-bottom: 8px; }
+  .pdp-v24__t-item span { display: block; font-size: 12px; font-weight: 500; color: var(--v24-text-light); }
+
+  /* --- FULL WIDTH LIFESTYLE --- */
+  .pdp-v24__lifestyle { width: 100%; position: relative; margin: 40px 0; }
+  .pdp-v24__lifestyle img, .pdp-v24__lifestyle svg { width: 100%; height: 50vh; object-fit: cover; display: block; }
+  .pdp-v24__life-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.7), transparent); display: flex; flex-direction: column; justify-content: center; padding: 40px; color: #FFF; }
+  .pdp-v24__life-title { font-size: 32px; font-weight: 900; margin-bottom: 16px; }
+  .pdp-v24__life-desc { font-size: 16px; font-weight: 400; max-width: 400px; line-height: 1.5; }
+
+  /* --- GRIDS --- */
+  .pdp-v24__section { padding: 0 16px 40px 16px; max-width: 1280px; margin: 0 auto; }
+  .pdp-v24__sec-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--v24-text); border-bottom: 2px solid var(--v24-primary); display: inline-block; padding-bottom: 4px; }
+  .pdp-v24__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (min-width: 768px) { .pdp-v24__grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+  .pdp-v24__card { border: 1px solid var(--v24-border); border-radius: 8px; padding: 12px; transition: box-shadow 0.2s; }
+  .pdp-v24__card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .pdp-v24__card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; margin-bottom: 12px; background: #F8F9FA; }
+  .pdp-v24__card-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--v24-text); }
+  .pdp-v24__card-price { font-weight: 700; color: var(--v24-primary); }
+
+</style>
+
+<div class="pdp-v24" data-section="{{ section.id }}">
+  <div class="pdp-v24__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v24__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 4 %}
+          <div class="pdp-v24__img-wrap"><img src="{{ media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v24__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v24__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v24__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v24__info">
+      <h1 class="pdp-v24__title">{{ product.title | default: "Heavy Duty Multi-Purpose Storage Box (Set of 3)" }}</h1>
+      <div class="pdp-v24__reviews">
+        <svg fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        4.8 ({{ random_sold }} reviews)
+      </div>
+      
+      <div class="pdp-v24__price-wrap">
+        <span class="pdp-v24__price">{{ current_variant.price | money | default: "â‚¹699" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v24__compare">{{ current_variant.compare_at_price | money }}</span>
+          <span class="pdp-v24__discount">45% OFF</span>
+        {% endif %}
+      </div>
+
+      <ul class="pdp-v24__bullets">
+        <li>100% BPA Free Food Grade Material</li>
+        <li>Airtight & Leakproof Design</li>
+        <li>Microwave & Dishwasher Safe</li>
+        <li>Stackable to save space</li>
+      </ul>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v24__pincode">
+          <div class="pdp-v24__pin-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Check Delivery Availability
+          </div>
+          <div class="pdp-v24__pin-input-wrap">
+            <input type="text" class="pdp-v24__pin-input" id="v24-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v24__pin-btn" onclick="document.getElementById('v24-pin-msg').style.display='block'">Check</button>
+          </div>
+          <div class="pdp-v24__pin-msg" id="v24-pin-msg">âœ” Delivery available in 3-5 days.</div>
+        </div>
+      {% endif %}
+
+      <div class="pdp-v24__pack-wrap">
+        <div class="pdp-v24__pack-title">Select Pack Size</div>
+        <div class="pdp-v24__pack-list">
+          <div class="pdp-v24__pack-item active">
+            <div class="pdp-v24__pack-name">Set of 3 (Standard)</div>
+            <div class="pdp-v24__pack-price">â‚¹699</div>
+          </div>
+          <div class="pdp-v24__pack-item">
+            <div class="pdp-v24__pack-name">Set of 6 (Most Popular)</div>
+            <div class="pdp-v24__pack-price">â‚¹1,199</div>
+          </div>
+          <div class="pdp-v24__pack-item">
+            <div class="pdp-v24__pack-name">Set of 12 (Family Pack)</div>
+            <div class="pdp-v24__pack-price">â‚¹1,999</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="pdp-v24__atc" id="v24-atc">ADD TO CART</button>
+      
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v24__urgency-text">Only few sets left at this discounted price!</div>
+      {% endif %}
+
+      {% if section.settings.show_reels %}
+        <div class="pdp-v24__reels-wrap">
+          <div class="pdp-v24__reels-title">Product Utility Videos</div>
+          <div class="pdp-v24__reels">
+            <div class="pdp-v24__reel">
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+              <div class="pdp-v24__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v24__reel">
+              {{ 'lifestyle-2' | placeholder_svg_tag }}
+              <div class="pdp-v24__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+            <div class="pdp-v24__reel">
+              {{ 'image' | placeholder_svg_tag }}
+              <div class="pdp-v24__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v24__trust">
+          <div class="pdp-v24__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <span>Durable</span>
+          </div>
+          <div class="pdp-v24__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+            <span>Food Safe</span>
+          </div>
+          <div class="pdp-v24__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Returns</span>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v24__lifestyle">
+      {{ 'collection-4' | placeholder_svg_tag }}
+      <div class="pdp-v24__life-overlay">
+        <h2 class="pdp-v24__life-title">Organize Your Life.</h2>
+        <p class="pdp-v24__life-desc">Declutter your kitchen and save space with our premium utility containers.</p>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v24__section">
+      <h2 class="pdp-v24__sec-title">Frequently Bought Together</h2>
+      <div class="pdp-v24__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v24__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v24__card-title">Airtight Spice Jars (Set of 6)</div>
+            <div class="pdp-v24__card-price">â‚¹499</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; bottom: -100px; left: 0; width: 100%;
+    background: #FFF; box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 999; padding: 12px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease-in-out; font-family: var(--v24-font);
+  }
+  .sticky-atc-{{ section.id }}.visible { bottom: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 16px; }
+  .sticky-atc-{{ section.id }}__img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid var(--v24-border); }
+  .sticky-atc-{{ section.id }}__title { font-weight: 700; font-size: 14px; color: var(--v24-text); margin-bottom: 4px; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: var(--v24-primary); font-size: 16px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v24-primary); color: #FFF; border: none; padding: 14px 32px; font-weight: 700; font-size: 16px; cursor: pointer; border-radius: 4px; box-shadow: 0 2px 4px rgba(26,115,232,0.3); }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 16px; font-size: 18px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Heavy Duty Multi-Purpose Storage Box" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹699" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v24-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V24 - Utility",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Low Stock Text",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Product Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Frequently Bought Together'",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V24 - Utility"
+    }
+  ]
+}
+{% endschema %}

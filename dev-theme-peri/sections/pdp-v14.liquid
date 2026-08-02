@@ -1,0 +1,365 @@
+﻿{%- comment -%}
+  PDP V14: PREMIUM COFFEE / BEVERAGE
+  Aesthetic: Artisanal, Textured, Rich Browns.
+  CRO: Subscription toggle, Taste Profiles, Mug cross-sells.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;700&display=swap');
+
+  :root {
+    --v14-bg: #FDFBF7;
+    --v14-text: #3E2723; /* Dark Brown */
+    --v14-text-light: #795548;
+    --v14-primary: #D84315; /* Burnt Orange */
+    --v14-border: #D7CCC8;
+    --v14-surface: #F5F0E6;
+    --v14-font-head: 'Playfair Display', serif;
+    --v14-font-body: 'Lato', sans-serif;
+  }
+
+  .pdp-v14 {
+    background-color: var(--v14-bg);
+    color: var(--v14-text);
+    font-family: var(--v14-font-body);
+    line-height: 1.6;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.03"/></svg>');
+  }
+
+  .pdp-v14__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    padding: 20px;
+    gap: 40px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v14__container { grid-template-columns: 1fr 1fr; padding: 60px 40px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v14__gallery { position: relative; }
+  .pdp-v14__gallery img, .pdp-v14__gallery svg {
+    width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(62,39,35,0.08); background: var(--v14-surface);
+  }
+  .pdp-v14__badge {
+    position: absolute; top: 20px; left: 20px; background: var(--v14-primary); color: #FFF;
+    padding: 6px 16px; border-radius: 20px; font-family: var(--v14-font-head); font-style: italic; font-size: 14px;
+  }
+
+  /* --- INFO --- */
+  .pdp-v14__title { font-family: var(--v14-font-head); font-size: 42px; line-height: 1.1; margin: 0 0 16px 0; color: var(--v14-text); }
+  
+  /* --- TASTE PROFILE --- */
+  .pdp-v14__taste { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .pdp-v14__taste-tag {
+    border: 1px solid var(--v14-text); padding: 4px 12px; border-radius: 4px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  /* --- ROAST LEVEL --- */
+  .pdp-v14__roast { margin-bottom: 32px; }
+  .pdp-v14__roast-title { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+  .pdp-v14__roast-bar { height: 6px; background: var(--v14-border); border-radius: 3px; position: relative; margin-bottom: 8px; }
+  .pdp-v14__roast-fill { position: absolute; left: 0; top: 0; height: 100%; width: 75%; background: var(--v14-text); border-radius: 3px; }
+  .pdp-v14__roast-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--v14-text-light); text-transform: uppercase; }
+
+  /* --- SUBSCRIPTION WIDGET --- */
+  .pdp-v14__subs {
+    border: 2px solid var(--v14-border); border-radius: 8px; margin-bottom: 32px; overflow: hidden;
+  }
+  .pdp-v14__sub-opt {
+    padding: 16px; display: flex; gap: 12px; cursor: pointer; border-bottom: 1px solid var(--v14-border); transition: background 0.2s;
+  }
+  .pdp-v14__sub-opt:last-child { border-bottom: none; }
+  .pdp-v14__sub-opt.active { background: var(--v14-surface); border-color: var(--v14-text); }
+  .pdp-v14__sub-radio {
+    width: 20px; height: 20px; border: 2px solid var(--v14-text); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .pdp-v14__sub-opt.active .pdp-v14__sub-radio::after { content:''; width: 10px; height: 10px; background: var(--v14-text); border-radius: 50%; }
+  
+  .pdp-v14__sub-info { flex: 1; }
+  .pdp-v14__sub-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .pdp-v14__sub-desc { font-size: 13px; color: var(--v14-text-light); }
+  .pdp-v14__sub-save { color: var(--v14-primary); font-weight: 700; font-size: 12px; }
+
+  /* --- ATC --- */
+  .pdp-v14__atc {
+    width: 100%; background: var(--v14-text); color: #FFF; border: none; padding: 18px;
+    font-family: var(--v14-font-body); font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+    border-radius: 4px; cursor: pointer; margin-bottom: 32px; transition: background 0.3s;
+  }
+  .pdp-v14__atc:hover { background: #271815; }
+
+  /* --- PAIR WITH MUG (CROSS SELL) --- */
+  .pdp-v14__cross {
+    background: #FFF; border: 1px dashed var(--v14-border); padding: 20px; border-radius: 8px; margin-bottom: 32px;
+  }
+  .pdp-v14__c-title { font-family: var(--v14-font-head); font-size: 20px; margin-bottom: 16px; font-style: italic; }
+  .pdp-v14__c-item { display: flex; gap: 16px; align-items: center; }
+  .pdp-v14__c-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; background: var(--v14-surface); }
+  .pdp-v14__c-info { flex: 1; }
+  .pdp-v14__c-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .pdp-v14__c-price { font-size: 14px; color: var(--v14-text-light); margin-bottom: 8px; }
+  .pdp-v14__c-btn {
+    background: transparent; border: 1px solid var(--v14-text); color: var(--v14-text);
+    padding: 6px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer;
+  }
+
+  /* --- STICKY ATC --- */
+  .pdp-v14-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: var(--v14-bg); box-shadow: 0 -5px 20px rgba(62,39,35,0.1);
+    z-index: 999; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease; border-top: 1px solid var(--v14-border);
+  }
+  .pdp-v14-sticky.visible { bottom: 0; }
+  .pdp-v14-sticky__title { font-family: var(--v14-font-head); font-size: 20px; font-weight: 600; }
+  .pdp-v14-sticky__btn {
+    background: var(--v14-text); color: #FFF; border: none; padding: 12px 32px;
+    font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 4px;
+  }
+
+</style>
+
+<div class="pdp-v14" data-section="{{ section.id }}">
+  
+  <div class="pdp-v14__container">
+    
+    <div class="pdp-v14__gallery">
+      <div class="pdp-v14__badge">Single Origin</div>
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <div class="pdp-v14__info">
+      
+      <!-- URGENCY OFFER BANNER -->
+      {% if section.settings.show_urgency %}
+        <div style="background: rgba(216, 67, 21, 0.1); border-left: 3px solid var(--v14-primary); padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--v14-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <div style="font-size: 13px;">
+            <strong style="color: var(--v14-text);">Fresh Roast Alert:</strong> Only 14 bags left from this week's artisanal small-batch roast.
+          </div>
+        </div>
+      {% endif %}
+
+      <h1 class="pdp-v14__title">{{ product.title | default: "Ethiopia Yirgacheffe Whole Bean" }}</h1>
+      
+      <div class="pdp-v14__taste">
+        <div class="pdp-v14__taste-tag">Jasmine</div>
+        <div class="pdp-v14__taste-tag">Bergamot</div>
+        <div class="pdp-v14__taste-tag">Honey</div>
+      </div>
+
+      <div class="pdp-v14__roast">
+        <div class="pdp-v14__roast-title">Roast Level</div>
+        <div class="pdp-v14__roast-bar"><div class="pdp-v14__roast-fill" style="width: 30%;"></div></div>
+        <div class="pdp-v14__roast-labels">
+          <span>Light</span>
+          <span>Medium</span>
+          <span>Dark</span>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 32px;">
+        {{ product.description | strip_html | default: "Grown at 2,000 meters above sea level, this washed coffee delivers bright, tea-like florals with a sweet honey finish." }}
+      </p>
+
+      <!-- SUBSCRIPTION -->
+      {% if section.settings.show_subscription %}
+        <div class="pdp-v14__subs">
+          
+          <div class="pdp-v14__sub-opt" onclick="document.querySelectorAll('.pdp-v14__sub-opt').forEach(el=>el.classList.remove('active')); this.classList.add('active');">
+            <div class="pdp-v14__sub-radio"></div>
+            <div class="pdp-v14__sub-info">
+              <div class="pdp-v14__sub-title">
+                One-Time Purchase <span>{{ current_variant.price | money }}</span>
+              </div>
+              <div class="pdp-v14__sub-desc">Standard delivery in 3-5 days.</div>
+            </div>
+          </div>
+
+          <div class="pdp-v14__sub-opt active" onclick="document.querySelectorAll('.pdp-v14__sub-opt').forEach(el=>el.classList.remove('active')); this.classList.add('active');">
+            <div class="pdp-v14__sub-radio"></div>
+            <div class="pdp-v14__sub-info">
+              <div class="pdp-v14__sub-title">
+                Subscribe & Save 20% <span>â‚¹799</span>
+              </div>
+              <div class="pdp-v14__sub-desc">Fresh coffee delivered every 2 weeks. Cancel anytime. <span class="pdp-v14__sub-save">Save â‚¹200</span></div>
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+
+      <button class="pdp-v14__atc" id="v14-atc">ADD TO CART - â‚¹799</button>
+
+      <!-- CROSS SELL -->
+      {% if section.settings.show_cross_sell %}
+        <div class="pdp-v14__cross">
+          <div class="pdp-v14__c-title">The Perfect Pair</div>
+          <div class="pdp-v14__c-item">
+            {{ 'product-2' | placeholder_svg_tag: 'pdp-v14__c-img' }}
+            <div class="pdp-v14__c-info">
+              <div class="pdp-v14__c-name">Matte Black Ceramic Dripper</div>
+              <div class="pdp-v14__c-price">â‚¹1,499</div>
+              <button class="pdp-v14__c-btn">+ Add to order</button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 60px;">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'style="width: 100%; height: 60vh; object-fit: cover;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62,39,35,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #FFF; padding: 20px;">
+        <h2 style="font-family: var(--v14-font-head); font-size: 48px; font-weight: 700; margin-bottom: 16px; font-style: italic;">Savor Every Sip.</h2>
+        <p style="font-size: 18px; max-width: 600px; margin-bottom: 32px; font-family: var(--v14-font-body);">Responsibly sourced, meticulously roasted, and delivered at peak freshness.</p>
+        <button style="background: var(--v14-primary); color: #FFF; border: none; padding: 16px 40px; font-family: var(--v14-font-body); font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 4px;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Subscribe & Save</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- FEATURED PRODUCT SECTION -->
+  {% if section.settings.show_featured %}
+    <div style="max-width: 1200px; margin: 80px auto; padding: 20px;">
+      <h2 style="font-family: var(--v14-font-head); font-size: 32px; text-align: center; margin-bottom: 40px; color: var(--v14-text); font-style: italic;">Our Master Roaster's Picks</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+        <div style="background: var(--v14-surface); padding: 24px; border-radius: 12px; text-align: center;">
+          {{ 'product-3' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v14-font-head); font-size: 20px; font-weight: 600; margin-bottom: 8px;">Colombia Supremo</h3>
+          <p style="color: var(--v14-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹699</p>
+          <button style="width: 100%; background: transparent; color: var(--v14-text); border: 2px solid var(--v14-text); padding: 12px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: var(--v14-surface); padding: 24px; border-radius: 12px; text-align: center;">
+          {{ 'product-4' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v14-font-head); font-size: 20px; font-weight: 600; margin-bottom: 8px;">Sumatra Mandheling</h3>
+          <p style="color: var(--v14-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹849</p>
+          <button style="width: 100%; background: transparent; color: var(--v14-text); border: 2px solid var(--v14-text); padding: 12px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: var(--v14-surface); padding: 24px; border-radius: 12px; text-align: center;">
+          {{ 'product-5' | placeholder_svg_tag: 'style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:16px;"' }}
+          <h3 style="font-family: var(--v14-font-head); font-size: 20px; font-weight: 600; margin-bottom: 8px;">French Roast Blend</h3>
+          <p style="color: var(--v14-text-light); font-weight: 700; margin-bottom: 16px;">â‚¹599</p>
+          <button style="width: 100%; background: transparent; color: var(--v14-text); border: 2px solid var(--v14-text); padding: 12px; font-weight: 700; text-transform: uppercase; border-radius: 4px; cursor: pointer;">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED SECTION -->
+  {% if section.settings.show_recently_viewed %}
+    <div style="max-width: 1200px; margin: 40px auto 80px auto; padding: 20px; border-top: 1px solid var(--v14-border); padding-top: 60px;">
+      <h2 style="font-family: var(--v14-font-head); font-size: 24px; margin-bottom: 32px; color: var(--v14-text); font-style: italic;">You Recently Viewed</h2>
+      <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px;">
+        {% for i in (1..4) %}
+          <div style="min-width: 180px; background: #FFF; padding: 16px; border: 1px solid var(--v14-border); border-radius: 8px;">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag: 'style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:4px; margin-bottom:12px; background:var(--v14-surface);"' }}
+            <h4 style="font-size: 14px; font-weight: 700; margin: 0 0 4px 0; color: var(--v14-text);">Cold Brew Pitcher</h4>
+            <div style="font-size: 13px; color: var(--v14-primary); font-weight: 600;">â‚¹1,299</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v14-sticky" id="v14-sticky">
+    <div class="pdp-v14-sticky__title">{{ product.title | default: "Ethiopia Yirgacheffe" }}</div>
+    <button class="pdp-v14-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Subscribe - â‚¹799</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const stickyBar = document.getElementById('v14-sticky');
+      const mainAtc = document.getElementById('v14-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V14 - Coffee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Subscription"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subscription",
+      "label": "Show Subscription Widget",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sell"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'The Perfect Pair' Cross Sell",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Urgency & Offers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show 'Fresh Roast Alert' Urgency",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured",
+      "label": "Show Master Roaster's Picks",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V14 - Coffee"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,479 @@
+﻿{%- comment -%}
+  PDP V11: K-BEAUTY / CLINICAL SKINCARE
+  Aesthetic: Soft Pastels, Clinical, High-Trust.
+  CRO: Ticket-style offer banner, Routine Builder, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_bought = 'now' | date: '%s' | modulo: 500 | plus: 120 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --v11-bg: #FAFAFA;
+    --v11-surface: #FFFFFF;
+    --v11-text: #2C3539;
+    --v11-text-light: #838996;
+    --v11-primary: #A3C1AD; /* Soft Sage Green */
+    --v11-accent: #F4C2C2; /* Soft Pink */
+    --v11-border: #E8E9EB;
+    --v11-font: 'Outfit', sans-serif;
+  }
+
+  .pdp-v11 {
+    background-color: var(--v11-bg);
+    color: var(--v11-text);
+    font-family: var(--v11-font);
+    line-height: 1.6;
+  }
+
+  .pdp-v11__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+  }
+  @media (min-width: 992px) {
+    .pdp-v11__container { grid-template-columns: 1fr 480px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v11__gallery {
+    padding: 20px;
+    background: #F0F2F0;
+  }
+  @media (min-width: 992px) {
+    .pdp-v11__gallery { padding: 40px; height: calc(100vh - 40px); position: sticky; top: 0; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; scroll-snap-type: y mandatory; }
+  }
+  .pdp-v11__gallery img, .pdp-v11__gallery svg {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    background: #FFF;
+    scroll-snap-align: start;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  }
+
+  /* --- INFO BOX --- */
+  .pdp-v11__info {
+    padding: 32px 20px;
+    background: var(--v11-surface);
+  }
+  @media (min-width: 992px) {
+    .pdp-v11__info { padding: 60px 40px; min-height: 100vh; }
+  }
+
+  /* --- TICKET BANNER --- */
+  .pdp-v11__ticket {
+    background: var(--v11-accent);
+    color: #FFF;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(244, 194, 194, 0.4);
+  }
+  .pdp-v11__ticket::before, .pdp-v11__ticket::after {
+    content: ''; position: absolute; width: 16px; height: 16px; background: var(--v11-surface); border-radius: 50%; top: 50%; transform: translateY(-50%);
+  }
+  .pdp-v11__ticket::before { left: -8px; }
+  .pdp-v11__ticket::after { right: -8px; }
+  .pdp-v11__t-text { font-weight: 700; font-size: 14px; letter-spacing: 1px; }
+  .pdp-v11__t-code { border: 1px dashed #FFF; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 13px; }
+
+  /* --- PRODUCT HEAD --- */
+  .pdp-v11__badge { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--v11-primary); font-weight: 700; margin-bottom: 12px; }
+  .pdp-v11__title { font-size: 32px; font-weight: 600; line-height: 1.2; margin: 0 0 16px 0; }
+  .pdp-v11__reviews { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--v11-text-light); margin-bottom: 24px; }
+  .pdp-v11__stars { color: #FFC107; display: flex; }
+  .pdp-v11__stars svg { width: 16px; height: 16px; fill: currentColor; }
+  
+  .pdp-v11__price-wrap { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+  .pdp-v11__price { font-size: 28px; font-weight: 700; }
+  .pdp-v11__compare { font-size: 16px; color: var(--v11-text-light); text-decoration: line-through; }
+
+  /* --- CLINICAL TRUST --- */
+  .pdp-v11__trust-row {
+    display: flex; justify-content: space-between; border-top: 1px solid var(--v11-border); border-bottom: 1px solid var(--v11-border); padding: 16px 0; margin-bottom: 32px;
+  }
+  .pdp-v11__t-icon { text-align: center; font-size: 11px; font-weight: 600; color: var(--v11-text-light); }
+  .pdp-v11__t-icon svg { width: 24px; height: 24px; margin-bottom: 4px; color: var(--v11-primary); }
+
+  /* --- ROUTINE BUILDER (FBT) --- */
+  .pdp-v11__routine {
+    background: var(--v11-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 32px;
+  }
+  .pdp-v11__r-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v11__r-item {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  }
+  .pdp-v11__r-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #FFF; }
+  .pdp-v11__r-info { flex: 1; }
+  .pdp-v11__r-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .pdp-v11__r-price { font-size: 13px; font-weight: 700; color: var(--v11-primary); }
+  .pdp-v11__r-check {
+    appearance: none; width: 20px; height: 20px; border: 2px solid var(--v11-border); border-radius: 4px; cursor: pointer; position: relative;
+  }
+  .pdp-v11__r-check:checked { background: var(--v11-primary); border-color: var(--v11-primary); }
+  .pdp-v11__r-check:checked::after {
+    content: 'âœ“'; position: absolute; color: #FFF; font-size: 12px; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+
+  /* --- ATC --- */
+  .pdp-v11__atc {
+    width: 100%;
+    background: var(--v11-text);
+    color: #FFF;
+    border: none;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: opacity 0.3s;
+  }
+  .pdp-v11__atc:hover { opacity: 0.8; }
+  .pdp-v11__bought { text-align: center; font-size: 12px; color: var(--v11-primary); font-weight: 600; margin-bottom: 32px; }
+
+  /* --- ACCORDIONS --- */
+  .pdp-v11__acc { border-top: 1px solid var(--v11-border); }
+  .pdp-v11__acc:last-child { border-bottom: 1px solid var(--v11-border); }
+  .pdp-v11__acc-btn {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 20px 0; font-size: 15px; font-weight: 600;
+    display: flex; justify-content: space-between; cursor: pointer;
+  }
+  .pdp-v11__acc-content { padding-bottom: 20px; font-size: 14px; color: var(--v11-text-light); }
+  
+  /* --- STICKY ATC --- */
+  .pdp-v11-sticky {
+    position: fixed; bottom: -100px; left: 0; width: 100%; background: #FFF; box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+    z-index: 999; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px 20px 0 0;
+  }
+  .pdp-v11-sticky.visible { bottom: 0; }
+  .pdp-v11-sticky__info { display: flex; align-items: center; gap: 16px; }
+  .pdp-v11-sticky__img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+  .pdp-v11-sticky__title { font-weight: 600; font-size: 14px; color: var(--v11-text); }
+  .pdp-v11-sticky__price { font-weight: 700; color: var(--v11-primary); font-size: 14px; }
+  .pdp-v11-sticky__btn { background: var(--v11-text); color: #FFF; border: none; padding: 12px 32px; font-weight: 600; cursor: pointer; border-radius: 30px; }
+  @media (max-width: 768px) {
+    .pdp-v11-sticky__info { display: none; }
+    .pdp-v11-sticky__btn { width: 100%; padding: 16px; font-size: 16px; }
+  }
+
+</style>
+
+<div class="pdp-v11" data-section="{{ section.id }}">
+  
+  <div class="pdp-v11__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v11__gallery">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+        {{ 'product-2' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="pdp-v11__info">
+      
+      {% if section.settings.show_ticket %}
+        <div class="pdp-v11__ticket">
+          <div class="pdp-v11__t-text">15% OFF YOUR FIRST ROUTINE</div>
+          <div class="pdp-v11__t-code">GLOW15</div>
+        </div>
+      {% endif %}
+      
+      <div class="pdp-v11__badge">Clinically Tested</div>
+      <h1 class="pdp-v11__title">{{ product.title | default: "Advanced Hydration Serum" }}</h1>
+      
+      <div class="pdp-v11__reviews">
+        <div class="pdp-v11__stars">
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </div>
+        <span>(128 Reviews)</span>
+      </div>
+
+      <div class="pdp-v11__price-wrap">
+        <span class="pdp-v11__price">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v11__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      <!-- CLINICAL TRUST BADGES -->
+      {% if section.settings.show_badges %}
+        <div class="pdp-v11__trust-row">
+          <div class="pdp-v11__t-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg><br>Dermatologist<br>Tested
+          </div>
+          <div class="pdp-v11__t-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><br>Cruelty<br>Free
+          </div>
+          <div class="pdp-v11__t-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg><br>Clean<br>Ingredients
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- ROUTINE BUILDER (FBT) -->
+      {% if section.settings.show_routine %}
+        <div class="pdp-v11__routine">
+          <div class="pdp-v11__r-title">Frequently Bought Together</div>
+          
+          <div class="pdp-v11__r-item">
+            <input type="checkbox" class="pdp-v11__r-check" checked disabled>
+            <div class="pdp-v11__r-img">{{ 'product-1' | placeholder_svg_tag }}</div>
+            <div class="pdp-v11__r-info">
+              <div class="pdp-v11__r-name">This Item: {{ product.title | default: "Serum" }}</div>
+              <div class="pdp-v11__r-price">{{ current_variant.price | money }}</div>
+            </div>
+          </div>
+          
+          <div class="pdp-v11__r-item">
+            <input type="checkbox" class="pdp-v11__r-check">
+            <div class="pdp-v11__r-img">{{ 'product-2' | placeholder_svg_tag }}</div>
+            <div class="pdp-v11__r-info">
+              <div class="pdp-v11__r-name">Gentle Foaming Cleanser</div>
+              <div class="pdp-v11__r-price">â‚¹899</div>
+            </div>
+          </div>
+
+          <div class="pdp-v11__r-item">
+            <input type="checkbox" class="pdp-v11__r-check">
+            <div class="pdp-v11__r-img">{{ 'product-3' | placeholder_svg_tag }}</div>
+            <div class="pdp-v11__r-info">
+              <div class="pdp-v11__r-name">Ceramide Barrier Cream</div>
+              <div class="pdp-v11__r-price">â‚¹1299</div>
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+
+      <button class="pdp-v11__atc" id="v11-atc">ADD TO CART</button>
+      
+      <div class="pdp-v11__bought">ðŸ”¥ {{ random_bought }} people bought this in the last 24 hours</div>
+
+      <!-- ACCORDIONS -->
+      <div class="pdp-v11__acc">
+        <button class="pdp-v11__acc-btn">Why It Works <span>+</span></button>
+        <div class="pdp-v11__acc-content">
+          {{ product.description | strip_html | default: "Formulated with 5 types of Hyaluronic Acid and Ceramide NP to deeply hydrate and lock in moisture for 24 hours." }}
+        </div>
+      </div>
+      <div class="pdp-v11__acc">
+        <button class="pdp-v11__acc-btn">Key Ingredients <span>+</span></button>
+        <div class="pdp-v11__acc-content" style="display:none;">
+          Hyaluronic Acid (Hydration), Niacinamide (Brightening), Centella Asiatica (Soothing).
+        </div>
+      </div>
+      <div class="pdp-v11__acc">
+        <button class="pdp-v11__acc-btn">How To Use <span>+</span></button>
+        <div class="pdp-v11__acc-content" style="display:none;">
+          Apply 2-3 drops to damp skin after cleansing and toning. Gently pat into the skin until fully absorbed. Follow with moisturizer.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FULL WIDTH IMAGE / LIFESTYLE -->
+  {% if section.settings.show_full_image %}
+    <div style="width: 100%; position: relative; margin-top: 40px;">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'style="width: 100%; height: 60vh; object-fit: cover;"' }}
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #FFF; padding: 20px;">
+        <h2 style="font-family: var(--v11-font); font-size: 40px; font-weight: 700; margin-bottom: 16px; letter-spacing: 2px;">PURE. CLINICAL. PROVEN.</h2>
+        <p style="font-size: 18px; max-width: 600px; margin-bottom: 24px;">Experience the difference of dermatology-backed skincare that respects your barrier.</p>
+        <button style="background: var(--v11-primary); color: #FFF; border: none; padding: 14px 40px; border-radius: 30px; font-weight: 600; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Shop The Collection</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- FEATURED PRODUCT SECTION -->
+  {% if section.settings.show_featured %}
+    <div style="max-width: 1400px; margin: 40px auto; padding: 20px;">
+      <h2 style="font-family: var(--v11-font); font-size: 24px; font-weight: 600; margin-bottom: 20px; color: var(--v11-text);">Featured Favorites</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="background: var(--v11-surface); padding: 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          {{ 'product-4' | placeholder_svg_tag: 'style="width:100%; border-radius:8px; margin-bottom:12px;"' }}
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--v11-text);">Niacinamide Glow Serum</h3>
+          <p style="color: var(--v11-primary); font-weight: 700;">â‚¹1,199</p>
+          <button style="width: 100%; background: var(--v11-text); color: #FFF; border: none; padding: 10px; border-radius: 20px; font-weight: 600; margin-top: 12px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: var(--v11-surface); padding: 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          {{ 'product-5' | placeholder_svg_tag: 'style="width:100%; border-radius:8px; margin-bottom:12px;"' }}
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--v11-text);">Peptide Eye Cream</h3>
+          <p style="color: var(--v11-primary); font-weight: 700;">â‚¹899</p>
+          <button style="width: 100%; background: var(--v11-text); color: #FFF; border: none; padding: 10px; border-radius: 20px; font-weight: 600; margin-top: 12px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: var(--v11-surface); padding: 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          {{ 'product-6' | placeholder_svg_tag: 'style="width:100%; border-radius:8px; margin-bottom:12px;"' }}
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--v11-text);">Exfoliating Toner</h3>
+          <p style="color: var(--v11-primary); font-weight: 700;">â‚¹799</p>
+          <button style="width: 100%; background: var(--v11-text); color: #FFF; border: none; padding: 10px; border-radius: 20px; font-weight: 600; margin-top: 12px; cursor: pointer;">Add to Cart</button>
+        </div>
+        <div style="background: var(--v11-surface); padding: 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          {{ 'product-1' | placeholder_svg_tag: 'style="width:100%; border-radius:8px; margin-bottom:12px;"' }}
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--v11-text);">Snail Mucin Essence</h3>
+          <p style="color: var(--v11-primary); font-weight: 700;">â‚¹1,499</p>
+          <button style="width: 100%; background: var(--v11-text); color: #FFF; border: none; padding: 10px; border-radius: 20px; font-weight: 600; margin-top: 12px; cursor: pointer;">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- RECENTLY VIEWED SECTION -->
+  {% if section.settings.show_recent %}
+    <div style="max-width: 1400px; margin: 40px auto 80px auto; padding: 20px;">
+      <h2 style="font-family: var(--v11-font); font-size: 24px; font-weight: 600; margin-bottom: 20px; color: var(--v11-text);">Recently Viewed</h2>
+      <div style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px;">
+        <div style="min-width: 150px; background: var(--v11-surface); padding: 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+          {{ 'product-2' | placeholder_svg_tag: 'style="width:100%; border-radius:4px; margin-bottom:8px;"' }}
+          <h4 style="font-size: 13px; font-weight: 500; margin: 0; color: var(--v11-text);">Vitamin C Serum</h4>
+        </div>
+        <div style="min-width: 150px; background: var(--v11-surface); padding: 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+          {{ 'product-3' | placeholder_svg_tag: 'style="width:100%; border-radius:4px; margin-bottom:8px;"' }}
+          <h4 style="font-size: 13px; font-weight: 500; margin: 0; color: var(--v11-text);">Daily Sunscreen SPF 50</h4>
+        </div>
+        <div style="min-width: 150px; background: var(--v11-surface); padding: 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+          {{ 'product-4' | placeholder_svg_tag: 'style="width:100%; border-radius:4px; margin-bottom:8px;"' }}
+          <h4 style="font-size: 13px; font-weight: 500; margin: 0; color: var(--v11-text);">Night Repair Cream</h4>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- BUILT-IN STICKY ATC -->
+  <div class="pdp-v11-sticky" id="v11-sticky">
+    <div class="pdp-v11-sticky__info">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 100 }}" class="pdp-v11-sticky__img">
+      {% else %}
+        <div class="pdp-v11-sticky__img">{{ 'product-1' | placeholder_svg_tag }}</div>
+      {% endif %}
+      <div>
+        <div class="pdp-v11-sticky__title">{{ product.title | default: "Advanced Hydration Serum" }}</div>
+        <div class="pdp-v11-sticky__price">{{ current_variant.price | money }}</div>
+      </div>
+    </div>
+    <button class="pdp-v11-sticky__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Accordion
+      const accBtns = document.querySelectorAll('.pdp-v11__acc-btn');
+      accBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          if (content.style.display === "none" || content.style.display === "") {
+            content.style.display = "block";
+            this.querySelector('span').innerText = "-";
+          } else {
+            content.style.display = "none";
+            this.querySelector('span').innerText = "+";
+          }
+        });
+      });
+
+      // Sticky ATC
+      const stickyBar = document.getElementById('v11-sticky');
+      const mainAtc = document.getElementById('v11-atc');
+      if(stickyBar && mainAtc) {
+        window.addEventListener('scroll', function() {
+          const mainAtcRect = mainAtc.getBoundingClientRect();
+          if (mainAtcRect.top < 0) {
+            stickyBar.classList.add('visible');
+          } else {
+            stickyBar.classList.remove('visible');
+          }
+        });
+      }
+    });
+  </script>
+
+</div>
+
+{% schema %}
+{
+  "name": "PDP V11 - K-Beauty",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Offer Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ticket",
+      "label": "Show Ticket Offer Banner",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badges",
+      "label": "Show Clinical Trust Badges",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sell Settings (FBT)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_routine",
+      "label": "Show 'Frequently Bought Together'",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle Image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured",
+      "label": "Show Featured Products",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recent",
+      "label": "Show Recently Viewed",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V11 - K-Beauty"
+    }
+  ]
+}
+{% endschema %}

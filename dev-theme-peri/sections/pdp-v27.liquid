@@ -1,0 +1,414 @@
+﻿{%- comment -%}
+  PDP V27: BEAUTY & SKINCARE
+  Aesthetic: Clean, clinical but soft, pastel mint/peach, modern sans-serif.
+  Features: Pincode Checker, Product Reels (texture), Routine Upsell, Ingredients, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 5 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --v27-bg: #FAFAF9; /* Soft cream/white */
+    --v27-text: #2D3748;
+    --v27-text-light: #718096;
+    --v27-primary: #81E6D9; /* Mint green */
+    --v27-primary-dark: #319795; /* Teal for text */
+    --v27-accent: #FED7D7; /* Soft peach/pink */
+    --v27-border: #E2E8F0;
+    --v27-font: 'Poppins', sans-serif;
+  }
+
+  .pdp-v27 {
+    background-color: var(--v27-bg);
+    color: var(--v27-text);
+    font-family: var(--v27-font);
+    line-height: 1.6;
+  }
+
+  .pdp-v27__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    gap: 30px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v27__container { grid-template-columns: 1fr 1fr; gap: 60px; padding: 60px 20px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v27__gallery {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v27__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+    .pdp-v27__img-wrap:first-child { grid-column: 1 / -1; }
+  }
+  .pdp-v27__img-wrap { min-width: 90%; scroll-snap-align: start; }
+  @media (min-width: 992px) { .pdp-v27__img-wrap { min-width: 100%; } }
+  .pdp-v27__gallery img, .pdp-v27__gallery svg { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; background: #FFF; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+  /* --- INFO --- */
+  .pdp-v27__info { padding-top: 10px; }
+  .pdp-v27__badge { display: inline-block; background: var(--v27-accent); color: #C53030; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .pdp-v27__title { font-size: 32px; font-weight: 600; margin: 0 0 12px 0; color: var(--v27-text); line-height: 1.2; letter-spacing: -0.5px; }
+  .pdp-v27__subtitle { font-size: 16px; color: var(--v27-text-light); margin-bottom: 24px; font-weight: 300; }
+  
+  .pdp-v27__price-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+  .pdp-v27__price { font-size: 28px; font-weight: 700; color: var(--v27-text); }
+  .pdp-v27__compare { font-size: 16px; color: var(--v27-text-light); text-decoration: line-through; }
+
+  /* --- URGENCY --- */
+  .pdp-v27__urgency {
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: var(--v27-primary-dark); margin-bottom: 30px; background: #E6FFFA; padding: 12px; border-radius: 8px; border: 1px solid var(--v27-primary);
+  }
+  .pdp-v27__urgency svg { width: 18px; height: 18px; color: var(--v27-primary-dark); }
+
+  /* --- ROUTINE UPSELL --- */
+  .pdp-v27__routine { background: #FFF; border: 1px solid var(--v27-border); padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .pdp-v27__r-title { font-weight: 600; font-size: 14px; margin-bottom: 16px; color: var(--v27-primary-dark); text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v27__r-items { display: flex; flex-direction: column; gap: 12px; }
+  .pdp-v27__r-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid var(--v27-border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .pdp-v27__r-item.active { border-color: var(--v27-primary-dark); background: #F0FFF4; }
+  .pdp-v27__r-name { font-weight: 500; font-size: 14px; }
+  .pdp-v27__r-save { font-size: 12px; color: #C53030; font-weight: 600; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v27__pincode { margin-bottom: 30px; }
+  .pdp-v27__pin-title { font-size: 13px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--v27-text); }
+  .pdp-v27__pin-input-wrap { display: flex; gap: 8px; }
+  .pdp-v27__pin-input { flex: 1; border: 1px solid var(--v27-border); border-radius: 8px; padding: 12px; font-family: var(--v27-font); font-size: 14px; outline: none; transition: border 0.3s; }
+  .pdp-v27__pin-input:focus { border-color: var(--v27-primary-dark); }
+  .pdp-v27__pin-btn { background: var(--v27-text); color: #FFF; border: none; border-radius: 8px; padding: 0 20px; font-weight: 500; font-size: 14px; cursor: pointer; font-family: var(--v27-font); transition: opacity 0.2s; }
+  .pdp-v27__pin-btn:hover { opacity: 0.8; }
+  .pdp-v27__pin-msg { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--v27-primary-dark); display: none; }
+
+  /* --- ATC --- */
+  .pdp-v27__atc {
+    width: 100%; background: var(--v27-primary-dark); color: #FFF; border: none; padding: 18px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 20px; font-family: var(--v27-font); border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(49, 151, 149, 0.3);
+  }
+  .pdp-v27__atc:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(49, 151, 149, 0.4); }
+
+  /* --- TRUST ICONS --- */
+  .pdp-v27__trust { display: flex; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-top: 1px solid var(--v27-border); border-bottom: 1px solid var(--v27-border); }
+  .pdp-v27__t-item { text-align: center; width: 30%; }
+  .pdp-v27__t-item svg { width: 24px; height: 24px; color: var(--v27-text-light); margin-bottom: 8px; }
+  .pdp-v27__t-item span { display: block; font-size: 12px; font-weight: 500; color: var(--v27-text-light); }
+
+  /* --- ACCORDION --- */
+  .pdp-v27__acc-item { border-bottom: 1px solid var(--v27-border); }
+  .pdp-v27__acc-head { padding: 16px 0; display: flex; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--v27-text); }
+  .pdp-v27__acc-content { padding-bottom: 16px; font-size: 14px; color: var(--v27-text-light); line-height: 1.8; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v27__reels-wrap { margin: 60px 0; }
+  .pdp-v27__reels-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; }
+  .pdp-v27__reels { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; justify-content: center; }
+  .pdp-v27__reel { min-width: 220px; max-width: 280px; aspect-ratio: 9/16; background: #FFF; position: relative; scroll-snap-align: center; flex: 1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .pdp-v27__reel img, .pdp-v27__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v27__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--v27-primary-dark); cursor: pointer; }
+
+  /* --- FULL WIDTH INGREDIENTS --- */
+  .pdp-v27__lifestyle { width: 100%; position: relative; margin: 60px 0; background: var(--v27-primary); color: var(--v27-text); padding: 80px 20px; text-align: center; }
+  .pdp-v27__life-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+  .pdp-v27__life-desc { font-size: 16px; font-weight: 400; max-width: 600px; margin: 0 auto 40px auto; }
+  .pdp-v27__ingredients { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+  .pdp-v27__ing-item { background: #FFF; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .pdp-v27__ing-item span { font-size: 12px; font-weight: 600; margin-top: 8px; text-align: center; line-height: 1.2; }
+
+  /* --- GRIDS --- */
+  .pdp-v27__section { padding: 0 20px 80px 20px; max-width: 1200px; margin: 0 auto; }
+  .pdp-v27__sec-title { font-size: 24px; font-weight: 600; margin-bottom: 30px; text-align: center; }
+  .pdp-v27__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (min-width: 768px) { .pdp-v27__grid { grid-template-columns: repeat(4, 1fr); gap: 30px; } }
+  .pdp-v27__card { text-align: center; }
+  .pdp-v27__card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .pdp-v27__card-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--v27-text); }
+  .pdp-v27__card-price { font-weight: 600; color: var(--v27-primary-dark); }
+
+</style>
+
+<div class="pdp-v27" data-section="{{ section.id }}">
+  <div class="pdp-v27__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v27__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 4 %}
+          <div class="pdp-v27__img-wrap"><img src="{{ media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v27__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v27__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v27__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v27__info">
+      <div class="pdp-v27__badge">Bestseller</div>
+      <h1 class="pdp-v27__title">{{ product.title | default: "Hydration Barrier Cream" }}</h1>
+      <p class="pdp-v27__subtitle">Deeply nourishes and restores your skin's natural moisture barrier.</p>
+      
+      <div class="pdp-v27__price-wrap">
+        <span class="pdp-v27__price">{{ current_variant.price | money | default: "â‚¹1,299" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v27__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v27__urgency">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Restocked! Only {{ random_stock }} remaining for immediate dispatch.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v27__routine">
+        <div class="pdp-v27__r-title">Choose Your Routine</div>
+        <div class="pdp-v27__r-items">
+          <div class="pdp-v27__r-item">
+            <div>
+              <div class="pdp-v27__r-name">Single Jar</div>
+            </div>
+            <div>â‚¹1,299</div>
+          </div>
+          <div class="pdp-v27__r-item active">
+            <div>
+              <div class="pdp-v27__r-name">The Glow Trio (Cleanser + Serum + Cream)</div>
+              <div class="pdp-v27__r-save">Save 20%</div>
+            </div>
+            <div style="font-weight:600;">â‚¹2,999</div>
+          </div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v27__pincode">
+          <div class="pdp-v27__pin-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Check Delivery Status
+          </div>
+          <div class="pdp-v27__pin-input-wrap">
+            <input type="text" class="pdp-v27__pin-input" id="v27-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v27__pin-btn" onclick="document.getElementById('v27-pin-msg').style.display='block'">Check</button>
+          </div>
+          <div class="pdp-v27__pin-msg" id="v27-pin-msg">âœ” Eligible for FREE 2-Day Shipping.</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v27__atc" id="v27-atc">Add to Cart</button>
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v27__trust">
+          <div class="pdp-v27__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            <span>Cruelty<br>Free</span>
+          </div>
+          <div class="pdp-v27__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"></path></svg>
+            <span>Vegan<br>Formula</span>
+          </div>
+          <div class="pdp-v27__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span>Dermatologist<br>Tested</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div>
+        <div class="pdp-v27__acc-item">
+          <div class="pdp-v27__acc-head">How To Use <span>+</span></div>
+          <div class="pdp-v27__acc-content">
+            Apply a dime-sized amount to cleansed and toned skin. Massage gently in upward circular motions until fully absorbed. Use morning and night.
+          </div>
+        </div>
+        <div class="pdp-v27__acc-item">
+          <div class="pdp-v27__acc-head">Key Ingredients <span>+</span></div>
+        </div>
+        <div class="pdp-v27__acc-item">
+          <div class="pdp-v27__acc-head">Full Ingredients List <span>+</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if section.settings.show_reels %}
+    <div class="pdp-v27__section">
+      <div class="pdp-v27__reels-wrap">
+        <h2 class="pdp-v27__reels-title">Texture & Application</h2>
+        <div class="pdp-v27__reels">
+          <div class="pdp-v27__reel">
+            {{ 'lifestyle-1' | placeholder_svg_tag }}
+            <div class="pdp-v27__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v27__reel">
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
+            <div class="pdp-v27__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v27__reel">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="pdp-v27__reel-play"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v27__lifestyle">
+      <h2 class="pdp-v27__life-title">Powered by Nature</h2>
+      <p class="pdp-v27__life-desc">We use clinically proven, plant-derived ingredients that work in harmony with your skin's natural ecosystem.</p>
+      <div class="pdp-v27__ingredients">
+        <div class="pdp-v27__ing-item">
+          <svg width="32" height="32" fill="none" stroke="var(--v27-primary-dark)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+          <span>Hyaluronic<br>Acid</span>
+        </div>
+        <div class="pdp-v27__ing-item">
+          <svg width="32" height="32" fill="none" stroke="var(--v27-primary-dark)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          <span>Ceramides</span>
+        </div>
+        <div class="pdp-v27__ing-item">
+          <svg width="32" height="32" fill="none" stroke="var(--v27-primary-dark)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <span>Vitamin C</span>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v27__section">
+      <h2 class="pdp-v27__sec-title">Pairs Well With</h2>
+      <div class="pdp-v27__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v27__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v27__card-title">Gentle Foaming Cleanser</div>
+            <div class="pdp-v27__card-price">â‚¹899</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; bottom: -100px; left: 0; width: 100%;
+    background: #FFF; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    z-index: 999; padding: 12px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease; font-family: var(--v27-font);
+  }
+  .sticky-atc-{{ section.id }}.visible { bottom: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 16px; }
+  .sticky-atc-{{ section.id }}__img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid var(--v27-border); }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: var(--v27-text); }
+  .sticky-atc-{{ section.id }}__price { font-weight: 500; color: var(--v27-primary-dark); font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v27-primary-dark); color: #FFF; border: none; padding: 12px 32px; font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 8px; transition: opacity 0.2s; }
+  .sticky-atc-{{ section.id }}__btn:hover { opacity: 0.9; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 16px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Hydration Barrier Cream" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹1,299" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Add to Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v27-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V27 - Skincare",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Restock Urgency",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Texture Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Ingredient Features",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show 'Pairs Well With'",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V27 - Skincare"
+    }
+  ]
+}
+{% endschema %}

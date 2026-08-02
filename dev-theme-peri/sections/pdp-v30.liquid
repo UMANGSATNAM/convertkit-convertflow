@@ -1,0 +1,439 @@
+﻿{%- comment -%}
+  PDP V30: SUPPLEMENTS & HEALTH
+  Aesthetic: Clean, clinical, vibrant green accents, trust-oriented.
+  Features: Pincode Checker, Product Reels (mixing/usage), Subscription Upsell, Ingredients, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 10 | plus: 5 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --v30-bg: #FFFFFF;
+    --v30-text: #1E293B;
+    --v30-text-light: #64748B;
+    --v30-primary: #10B981; /* Emerald Green */
+    --v30-primary-dark: #059669;
+    --v30-accent: #FEF3C7; /* Soft yellow for highlights */
+    --v30-border: #E2E8F0;
+    --v30-font: 'Outfit', sans-serif;
+  }
+
+  .pdp-v30 {
+    background-color: var(--v30-bg);
+    color: var(--v30-text);
+    font-family: var(--v30-font);
+    line-height: 1.6;
+  }
+
+  .pdp-v30__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v30__container { grid-template-columns: 1fr 1fr; gap: 80px; padding: 60px 40px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v30__gallery {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v30__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+    .pdp-v30__img-wrap:first-child { grid-column: 1 / -1; }
+  }
+  .pdp-v30__img-wrap { min-width: 85%; scroll-snap-align: start; }
+  @media (min-width: 992px) { .pdp-v30__img-wrap { min-width: 100%; } }
+  .pdp-v30__gallery img, .pdp-v30__gallery svg { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; background: #F8FAFC; border: 1px solid var(--v30-border); }
+
+  /* --- INFO --- */
+  .pdp-v30__info { padding-top: 10px; }
+  .pdp-v30__reviews { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--v30-primary-dark); }
+  .pdp-v30__reviews svg { width: 16px; height: 16px; fill: var(--v30-primary); color: var(--v30-primary); }
+  
+  .pdp-v30__title { font-size: 40px; font-weight: 800; margin: 0 0 16px 0; color: var(--v30-text); line-height: 1.1; letter-spacing: -1px; }
+  .pdp-v30__subtitle { font-size: 18px; color: var(--v30-text-light); margin-bottom: 24px; font-weight: 400; }
+  
+  .pdp-v30__price-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+  .pdp-v30__price { font-size: 32px; font-weight: 800; color: var(--v30-text); }
+  .pdp-v30__compare { font-size: 18px; color: var(--v30-text-light); text-decoration: line-through; }
+
+  /* --- URGENCY --- */
+  .pdp-v30__urgency {
+    display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #B45309; background: var(--v30-accent); padding: 12px 16px; border-radius: 8px; margin-bottom: 30px;
+  }
+
+  /* --- SUBSCRIPTION UPSELL --- */
+  .pdp-v30__sub { background: #F8FAFC; border: 2px solid var(--v30-border); padding: 20px; border-radius: 16px; margin-bottom: 30px; }
+  .pdp-v30__s-opt { display: flex; align-items: flex-start; gap: 16px; padding: 16px; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #FFF; margin-bottom: 12px; }
+  .pdp-v30__s-opt:last-child { margin-bottom: 0; }
+  .pdp-v30__s-opt.active { border-color: var(--v30-primary); box-shadow: 0 4px 12px rgba(16,185,129,0.1); }
+  .pdp-v30__s-radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--v30-border); margin-top: 2px; flex-shrink: 0; }
+  .pdp-v30__s-opt.active .pdp-v30__s-radio { border-color: var(--v30-primary); background: var(--v30-primary); box-shadow: inset 0 0 0 4px #FFF; }
+  .pdp-v30__s-info { flex: 1; }
+  .pdp-v30__s-name { font-weight: 700; font-size: 16px; display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .pdp-v30__s-badge { background: var(--v30-primary); color: #FFF; font-size: 11px; padding: 2px 8px; border-radius: 100px; margin-left: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .pdp-v30__s-desc { font-size: 13px; color: var(--v30-text-light); }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v30__pincode { margin-bottom: 30px; }
+  .pdp-v30__pin-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--v30-text); }
+  .pdp-v30__pin-input-wrap { display: flex; gap: 8px; }
+  .pdp-v30__pin-input { flex: 1; background: #F8FAFC; border: 1px solid var(--v30-border); border-radius: 8px; padding: 14px; font-family: var(--v30-font); font-size: 15px; outline: none; transition: border 0.3s; }
+  .pdp-v30__pin-input:focus { border-color: var(--v30-primary); background: #FFF; }
+  .pdp-v30__pin-btn { background: var(--v30-text); color: #FFF; border: none; border-radius: 8px; padding: 0 24px; font-weight: 600; font-size: 15px; cursor: pointer; transition: opacity 0.2s; font-family: var(--v30-font); }
+  .pdp-v30__pin-btn:hover { opacity: 0.9; }
+  .pdp-v30__pin-msg { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--v30-primary-dark); display: none; }
+
+  /* --- ATC --- */
+  .pdp-v30__atc {
+    width: 100%; background: var(--v30-primary); color: #FFF; border: none; padding: 20px; font-size: 18px; font-weight: 700; cursor: pointer; margin-bottom: 24px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s; font-family: var(--v30-font);
+    box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+  }
+  .pdp-v30__atc:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.5); }
+
+  /* --- TRUST ICONS --- */
+  .pdp-v30__trust { display: flex; justify-content: space-between; margin-bottom: 40px; }
+  .pdp-v30__t-item { text-align: center; flex: 1; }
+  .pdp-v30__t-item svg { width: 32px; height: 32px; color: var(--v30-primary-dark); margin-bottom: 8px; background: #ECFDF5; padding: 6px; border-radius: 50%; }
+  .pdp-v30__t-item span { display: block; font-size: 12px; font-weight: 600; color: var(--v30-text); }
+
+  /* --- ACCORDION --- */
+  .pdp-v30__acc-item { border-bottom: 1px solid var(--v30-border); }
+  .pdp-v30__acc-item:first-child { border-top: 1px solid var(--v30-border); }
+  .pdp-v30__acc-head { padding: 20px 0; display: flex; justify-content: space-between; cursor: pointer; font-size: 16px; font-weight: 700; }
+  .pdp-v30__acc-content { padding-bottom: 20px; font-size: 15px; color: var(--v30-text-light); line-height: 1.8; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v30__reels-wrap { margin: 80px 0; }
+  .pdp-v30__reels-title { font-size: 32px; font-weight: 800; margin-bottom: 30px; text-align: center; }
+  .pdp-v30__reels { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; justify-content: center; }
+  .pdp-v30__reel { min-width: 240px; max-width: 300px; aspect-ratio: 9/16; background: #F8FAFC; position: relative; scroll-snap-align: center; flex: 1; border-radius: 16px; overflow: hidden; border: 1px solid var(--v30-border); }
+  .pdp-v30__reel img, .pdp-v30__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v30__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--v30-primary); cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+  /* --- FULL WIDTH LIFESTYLE / INGREDIENTS --- */
+  .pdp-v30__lifestyle { width: 100%; position: relative; margin: 80px 0; background: var(--v30-text); color: #FFF; padding: 80px 20px; text-align: center; border-radius: 0; }
+  .pdp-v30__life-title { font-size: 40px; font-weight: 800; margin-bottom: 16px; color: var(--v30-primary); }
+  .pdp-v30__life-desc { font-size: 18px; font-weight: 400; max-width: 700px; margin: 0 auto 40px auto; color: #CBD5E1; }
+  .pdp-v30__ingredients { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 800px; margin: 0 auto; }
+  @media (min-width: 768px) { .pdp-v30__ingredients { grid-template-columns: repeat(4, 1fr); } }
+  .pdp-v30__ing-item { background: rgba(255,255,255,0.1); padding: 24px 16px; border-radius: 12px; text-align: center; }
+  .pdp-v30__ing-item h4 { font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #FFF; }
+  .pdp-v30__ing-item p { font-size: 13px; color: #94A3B8; margin: 0; }
+
+  /* --- GRIDS --- */
+  .pdp-v30__section { padding: 0 24px 80px 24px; max-width: 1200px; margin: 0 auto; }
+  .pdp-v30__sec-title { font-size: 28px; font-weight: 800; margin-bottom: 30px; text-align: center; }
+  .pdp-v30__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (min-width: 768px) { .pdp-v30__grid { grid-template-columns: repeat(4, 1fr); gap: 30px; } }
+  .pdp-v30__card { text-align: center; }
+  .pdp-v30__card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; margin-bottom: 16px; background: #F8FAFC; border: 1px solid var(--v30-border); }
+  .pdp-v30__card-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--v30-text); }
+  .pdp-v30__card-price { font-weight: 700; color: var(--v30-primary-dark); }
+
+</style>
+
+<div class="pdp-v30" data-section="{{ section.id }}">
+  <div class="pdp-v30__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v30__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 4 %}
+          <div class="pdp-v30__img-wrap"><img src="{{ media | image_url: width: 800 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v30__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v30__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v30__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+        <div class="pdp-v30__img-wrap">{{ 'product-4' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v30__info">
+      
+      <div class="pdp-v30__reviews">
+        <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        4.9/5 (1,284 Reviews)
+      </div>
+
+      <h1 class="pdp-v30__title">{{ product.title | default: "Daily Greens & Superfoods" }}</h1>
+      <p class="pdp-v30__subtitle">Comprehensive nutrition in one scoop. Supports immunity, energy, and digestion.</p>
+      
+      <div class="pdp-v30__price-wrap">
+        <span class="pdp-v30__price" id="v30-price-display">{{ current_variant.price | money | default: "â‚¹2,499" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v30__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v30__urgency">
+          ðŸ”¥ Selling fast! Only {{ random_stock }} jars left at this price.
+        </div>
+      {% endif %}
+
+      <div class="pdp-v30__sub">
+        <div class="pdp-v30__s-opt" onclick="document.getElementById('v30-price-display').innerText='â‚¹2,499'; this.classList.remove('active'); this.nextElementSibling.classList.add('active');">
+          <div class="pdp-v30__s-radio"></div>
+          <div class="pdp-v30__s-info">
+            <div class="pdp-v30__s-name">One-Time Purchase <span>â‚¹2,499</span></div>
+            <div class="pdp-v30__s-desc">Standard delivery</div>
+          </div>
+        </div>
+        <div class="pdp-v30__s-opt active" onclick="document.getElementById('v30-price-display').innerText='â‚¹1,999'; this.classList.remove('active'); this.previousElementSibling.classList.add('active');">
+          <div class="pdp-v30__s-radio"></div>
+          <div class="pdp-v30__s-info">
+            <div class="pdp-v30__s-name">Subscribe & Save 20% <span class="pdp-v30__s-badge">Best Value</span> <span>â‚¹1,999</span></div>
+            <div class="pdp-v30__s-desc">Delivered every 30 days. Cancel anytime.</div>
+          </div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v30__pincode">
+          <div class="pdp-v30__pin-title">Fast Delivery Guarantee</div>
+          <div class="pdp-v30__pin-input-wrap">
+            <input type="text" class="pdp-v30__pin-input" id="v30-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v30__pin-btn" onclick="document.getElementById('v30-pin-msg').style.display='block'">Check</button>
+          </div>
+          <div class="pdp-v30__pin-msg" id="v30-pin-msg">âœ” Arrives in 1-2 days. Free Shipping applied!</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v30__atc" id="v30-atc">Add to Cart</button>
+
+      {% if section.settings.show_trust_badges %}
+        <div class="pdp-v30__trust">
+          <div class="pdp-v30__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            <span>100%<br>Natural</span>
+          </div>
+          <div class="pdp-v30__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Lab<br>Tested</span>
+          </div>
+          <div class="pdp-v30__t-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>No Added<br>Sugar</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div>
+        <div class="pdp-v30__acc-item">
+          <div class="pdp-v30__acc-head">Benefits <span>+</span></div>
+          <div class="pdp-v30__acc-content">
+            Formulated with 32 whole-food sourced nutrients. Boosts natural energy levels, promotes healthy digestion with probiotics, and provides comprehensive immune support.
+          </div>
+        </div>
+        <div class="pdp-v30__acc-item">
+          <div class="pdp-v30__acc-head">How to Use <span>+</span></div>
+        </div>
+        <div class="pdp-v30__acc-item">
+          <div class="pdp-v30__acc-head">Nutritional Info <span>+</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if section.settings.show_reels %}
+    <div class="pdp-v30__section">
+      <div class="pdp-v30__reels-wrap">
+        <h2 class="pdp-v30__reels-title">See It In Action</h2>
+        <div class="pdp-v30__reels">
+          <div class="pdp-v30__reel">
+            {{ 'lifestyle-1' | placeholder_svg_tag }}
+            <div class="pdp-v30__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v30__reel">
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
+            <div class="pdp-v30__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v30__reel">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="pdp-v30__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v30__lifestyle">
+      <h2 class="pdp-v30__life-title">What's Inside?</h2>
+      <p class="pdp-v30__life-desc">No fillers, no artificial sweeteners. Just pure, bioavailable nutrients sourced from the highest quality ingredients worldwide.</p>
+      <div class="pdp-v30__ingredients">
+        <div class="pdp-v30__ing-item">
+          <h4>Spirulina</h4>
+          <p>Potent antioxidant</p>
+        </div>
+        <div class="pdp-v30__ing-item">
+          <h4>Ashwagandha</h4>
+          <p>Stress management</p>
+        </div>
+        <div class="pdp-v30__ing-item">
+          <h4>Probiotics</h4>
+          <p>Gut health (10B CFU)</p>
+        </div>
+        <div class="pdp-v30__ing-item">
+          <h4>Maca Root</h4>
+          <p>Natural energy boost</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v30__section">
+      <h2 class="pdp-v30__sec-title">Complete Your Routine</h2>
+      <div class="pdp-v30__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v30__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v30__card-title">Vegan Protein Powder</div>
+            <div class="pdp-v30__card-price">â‚¹1,899</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; bottom: -100px; left: 0; width: 100%;
+    background: #FFF; box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 999; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.3s ease; font-family: var(--v30-font); border-top: 1px solid var(--v30-border);
+  }
+  .sticky-atc-{{ section.id }}.visible { bottom: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 16px; }
+  .sticky-atc-{{ section.id }}__img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid var(--v30-border); }
+  .sticky-atc-{{ section.id }}__title { font-weight: 700; font-size: 16px; color: var(--v30-text); margin-bottom: 2px; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 800; color: var(--v30-primary-dark); font-size: 15px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v30-primary); color: #FFF; border: none; padding: 14px 36px; font-weight: 700; font-size: 16px; cursor: pointer; border-radius: 8px; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  .sticky-atc-{{ section.id }}__btn:hover { transform: translateY(-2px); }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 18px; font-size: 18px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Daily Greens & Superfoods" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹2,499" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Add to Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v30-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+
+    const accHeads = document.querySelectorAll('.pdp-v30__acc-head');
+    accHeads.forEach(head => {
+      head.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        if(content) {
+          content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V30 - Health",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Low Stock Warning",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Usage Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Ingredients Highlight",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show Cross-sell Grids",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V30 - Health"
+    }
+  ]
+}
+{% endschema %}

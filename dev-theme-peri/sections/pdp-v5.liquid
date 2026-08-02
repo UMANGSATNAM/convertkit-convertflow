@@ -1,0 +1,332 @@
+﻿{%- comment -%}
+  PDP V5: Apparel / Fashion (Liquid Glass)
+  FULL PAGE ARCHITECTURE
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+
+  :root {
+    --v5-primary: #1E3A8A; /* Deep Blue */
+    --v5-accent: #EA580C; /* Burnt Orange */
+    --v5-bg: #F8FAFC;
+    --v5-surface: rgba(255, 255, 255, 0.7);
+    --v5-border: rgba(226, 232, 240, 0.8);
+    --v5-text: #0F172A;
+    --v5-text-muted: #64748B;
+    
+    --v5-font-heading: 'Cormorant', serif;
+    --v5-font-body: 'Montserrat', sans-serif;
+  }
+
+  .pdp-v5 {
+    background-color: var(--v5-bg);
+    color: var(--v5-text);
+    font-family: var(--v5-font-body);
+    overflow-x: hidden;
+  }
+
+  /* --- HERO --- */
+  .pdp-v5__hero {
+    display: grid;
+    gap: 0;
+  }
+  @media (min-width: 992px) {
+    .pdp-v5__hero { grid-template-columns: 1.5fr 1fr; }
+  }
+
+  .pdp-v5__gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .pdp-v5__gallery img, .pdp-v5__gallery svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 3/4;
+    background: #e2e8f0;
+  }
+
+  .pdp-v5__info-wrap {
+    padding: 40px 24px;
+    background: var(--v5-surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid var(--v5-border);
+  }
+  @media (min-width: 992px) {
+    .pdp-v5__info-wrap { position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  }
+
+  .pdp-v5__title {
+    font-family: var(--v5-font-heading);
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0 0 12px 0;
+  }
+
+  .pdp-v5__price {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+
+  /* Swatches */
+  .pdp-v5__label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .pdp-v5__swatches { display: flex; gap: 12px; margin-bottom: 24px; }
+  .pdp-v5__swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--v5-border);
+    cursor: pointer;
+    transition: transform 300ms;
+  }
+  .pdp-v5__swatch:hover { transform: scale(1.1); }
+  .pdp-v5__swatch.active { border: 2px solid var(--v5-text); }
+
+  /* Sizes */
+  .pdp-v5__sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 32px; }
+  .pdp-v5__size {
+    border: 1px solid var(--v5-border);
+    padding: 12px 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    transition: all 300ms;
+  }
+  .pdp-v5__size:hover { border-color: var(--v5-text); }
+  .pdp-v5__size.active { background: var(--v5-text); color: white; border-color: var(--v5-text); }
+
+  .pdp-v5__atc {
+    width: 100%;
+    background: var(--v5-text);
+    color: white;
+    border: none;
+    padding: 20px;
+    font-family: var(--v5-font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 300ms;
+    margin-bottom: 40px;
+  }
+  .pdp-v5__atc:hover { background: var(--v5-primary); }
+
+  /* Accordions */
+  .pdp-v5__accordion { border-top: 1px solid var(--v5-border); padding: 20px 0; cursor: pointer; }
+  .pdp-v5__accordion-header { display: flex; justify-content: space-between; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pdp-v5__accordion-body { padding-top: 12px; font-size: 14px; line-height: 1.6; color: var(--v5-text-muted); display: none; }
+  .pdp-v5__accordion.open .pdp-v5__accordion-body { display: block; }
+
+  /* --- LOOKBOOK SECTION --- */
+  .pdp-v5__lookbook { padding: 80px 24px; text-align: center; background: white; }
+  .pdp-v5__lookbook-title { font-family: var(--v5-font-heading); font-size: 40px; margin-bottom: 40px; }
+  .pdp-v5__lookbook-img { width: 100%; max-width: 800px; margin: 0 auto; display: block; aspect-ratio: 16/9; object-fit: cover; }
+
+  /* --- COMPLETE THE LOOK (Cross-Sell) --- */
+  .pdp-v5__ctl { padding: 80px 24px; background: var(--v5-bg); }
+  .pdp-v5__ctl-container { max-width: 1200px; margin: 0 auto; display: grid; gap: 40px; }
+  @media (min-width: 768px) { .pdp-v5__ctl-container { grid-template-columns: 1fr 2fr; align-items: center; } }
+  .pdp-v5__ctl-main-img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
+  .pdp-v5__ctl-items { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .pdp-v5__ctl-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; margin-bottom: 16px; }
+  .pdp-v5__ctl-name { font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .pdp-v5__ctl-add { text-decoration: underline; font-size: 12px; cursor: pointer; color: var(--v5-primary); }
+
+</style>
+
+<div class="pdp-v5" data-section="{{ section.id }}">
+  
+  <!-- HERO -->
+  <div class="pdp-v5__hero">
+    
+    <!-- Gallery Left -->
+    <div class="pdp-v5__gallery">
+      {% if product.featured_media %}
+        <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.title }}">
+        {{ 'product-2' | placeholder_svg_tag }}
+        {{ 'product-3' | placeholder_svg_tag }}
+        {{ 'product-4' | placeholder_svg_tag }}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+        {{ 'product-2' | placeholder_svg_tag }}
+        {{ 'product-3' | placeholder_svg_tag }}
+        {{ 'product-4' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+
+    <!-- Info Right (Sticky) -->
+    <div class="pdp-v5__info-wrap">
+      <h1 class="pdp-v5__title">{{ product.title }}</h1>
+      <div class="pdp-v5__price">{{ current_variant.price | money }}</div>
+
+      <span class="pdp-v5__label">Color: Midnight Blue</span>
+      <div class="pdp-v5__swatches">
+        <div class="pdp-v5__swatch active" style="background: #1E3A8A;"></div>
+        <div class="pdp-v5__swatch" style="background: #475569;"></div>
+        <div class="pdp-v5__swatch" style="background: #F8FAFC;"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <span class="pdp-v5__label">Size</span>
+        <span style="font-size:12px; text-decoration:underline; cursor:pointer;">Size Guide</span>
+      </div>
+      <div class="pdp-v5__sizes">
+        <div class="pdp-v5__size">XS</div>
+        <div class="pdp-v5__size active">S</div>
+        <div class="pdp-v5__size">M</div>
+        <div class="pdp-v5__size">L</div>
+        <div class="pdp-v5__size">XL</div>
+      </div>
+
+      <button class="pdp-v5__atc">ADD TO CART</button>
+
+      <!-- Accordions -->
+      <div class="pdp-v5__accordion open" onclick="this.classList.toggle('open')">
+        <div class="pdp-v5__accordion-header"><span>Details & Fit</span> <span>+</span></div>
+        <div class="pdp-v5__accordion-body">
+          {{ product.description | default: "Designed for a relaxed fit. True to size. Model is 5 ft 9 in and wears a size S." }}
+        </div>
+      </div>
+      <div class="pdp-v5__accordion" onclick="this.classList.toggle('open')">
+        <div class="pdp-v5__accordion-header"><span>Materials & Care</span> <span>+</span></div>
+        <div class="pdp-v5__accordion-body">
+          100% Organic Cotton. Machine wash cold, tumble dry low. Do not bleach.
+        </div>
+      </div>
+      <div class="pdp-v5__accordion" style="border-bottom: 1px solid var(--v5-border);" onclick="this.classList.toggle('open')">
+        <div class="pdp-v5__accordion-header"><span>Shipping & Returns</span> <span>+</span></div>
+        <div class="pdp-v5__accordion-body">
+          Free shipping on orders over $150. Free returns within 30 days of purchase.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LOOKBOOK / DESCRIPTION -->
+  <div class="pdp-v5__lookbook">
+    <h2 class="pdp-v5__lookbook-title">The Art of Layering</h2>
+    <p style="max-width: 600px; margin: 0 auto 40px auto; color: var(--v5-text-muted); line-height: 1.8;">
+      Elevate your everyday wardrobe with pieces designed to transition seamlessly from day to night. Crafted with meticulous attention to detail and sustainable fabrics.
+    </p>
+    <div class="pdp-v5__lookbook-img">
+      {{ 'lifestyle-1' | placeholder_svg_tag }}
+    </div>
+  </div>
+
+  <!-- COMPLETE THE LOOK -->
+  <div class="pdp-v5__ctl">
+    <h2 class="pdp-v5__lookbook-title" style="text-align: center; font-size: 32px;">Complete The Look</h2>
+    <div class="pdp-v5__ctl-container">
+      <div class="pdp-v5__ctl-main">
+        {{ 'collection-1' | placeholder_svg_tag: 'pdp-v5__ctl-main-img' }}
+      </div>
+      <div class="pdp-v5__ctl-items">
+        <div class="pdp-v5__ctl-item">
+          {{ 'product-5' | placeholder_svg_tag }}
+          <div class="pdp-v5__ctl-name">Ribbed Knit Beanie</div>
+          <div style="margin-bottom:8px;">$35.00</div>
+          <div class="pdp-v5__ctl-add">Quick Add</div>
+        </div>
+        <div class="pdp-v5__ctl-item">
+          {{ 'product-6' | placeholder_svg_tag }}
+          <div class="pdp-v5__ctl-name">Wide Leg Trousers</div>
+          <div style="margin-bottom:8px;">$120.00</div>
+          <div class="pdp-v5__ctl-add">Quick Add</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s ease-in-out;
+    border-top: 1px solid #eee;
+  }
+  .sticky-atc-{{ section.id }}.visible {
+    bottom: 0;
+  }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 10px; }
+  .sticky-atc-{{ section.id }}__img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: #000; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: #D32F2F; font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: #000; color: #FFF; border: none; padding: 12px 24px; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+  .sticky-atc-{{ section.id }}__btn:hover { opacity: 0.8; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 14px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ product.selected_or_first_available_variant.price | money }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    if(stickyBar) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+
+{
+  "name": "PDP V5 - Apparel Full",
+  "settings": [],
+  "presets": [
+    {
+      "name": "PDP V5 - Apparel Full"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,357 @@
+﻿{%- comment -%}
+  PDP V29: HOME DECOR
+  Aesthetic: Warm, earthy, terracotta, elegant serif typography.
+  Features: Pincode Checker, Product Reels (styling), Shop The Look Upsell, Dimensions, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 12 | plus: 3 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap');
+
+  :root {
+    --v29-bg: #FDFBF7; /* Warm off-white */
+    --v29-text: #3E3B35;
+    --v29-text-light: #7A766C;
+    --v29-primary: #C07C5F; /* Terracotta */
+    --v29-accent: #E8DCCB; /* Warm beige */
+    --v29-border: #DEDAD1;
+    --v29-font-serif: 'Playfair Display', serif;
+    --v29-font-sans: 'Lato', sans-serif;
+  }
+
+  .pdp-v29 {
+    background-color: var(--v29-bg);
+    color: var(--v29-text);
+    font-family: var(--v29-font-sans);
+    line-height: 1.6;
+  }
+
+  .pdp-v29__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v29__container { grid-template-columns: 1fr 400px; gap: 60px; padding: 60px 20px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v29__gallery {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .pdp-v29__img-main img, .pdp-v29__img-main svg { width: 100%; aspect-ratio: 4/5; object-fit: cover; background: #EFEFEF; }
+  .pdp-v29__thumbs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
+  .pdp-v29__thumb { width: 80px; height: 100px; flex-shrink: 0; object-fit: cover; cursor: pointer; border: 1px solid transparent; transition: border 0.2s; scroll-snap-align: start; }
+  .pdp-v29__thumb:hover { border-color: var(--v29-primary); }
+
+  /* --- INFO --- */
+  .pdp-v29__info { padding-top: 10px; }
+  .pdp-v29__breadcrumbs { font-size: 12px; color: var(--v29-text-light); margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
+  .pdp-v29__title { font-family: var(--v29-font-serif); font-size: 36px; font-weight: 400; margin: 0 0 16px 0; color: var(--v29-text); line-height: 1.2; }
+  
+  .pdp-v29__price-wrap { margin-bottom: 30px; }
+  .pdp-v29__price { font-size: 24px; font-weight: 700; color: var(--v29-text); }
+  .pdp-v29__compare { font-size: 16px; color: var(--v29-text-light); text-decoration: line-through; margin-left: 12px; }
+
+  /* --- URGENCY --- */
+  .pdp-v29__urgency {
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 400; color: var(--v29-text); margin-bottom: 30px; padding: 12px 0; border-top: 1px solid var(--v29-border); border-bottom: 1px solid var(--v29-border);
+  }
+  .pdp-v29__urgency svg { width: 18px; height: 18px; color: var(--v29-primary); }
+  .pdp-v29__urgency strong { font-weight: 700; color: var(--v29-primary); }
+
+  /* --- SHOP THE LOOK UPSELL --- */
+  .pdp-v29__bundle { background: var(--v29-accent); padding: 24px; margin-bottom: 30px; }
+  .pdp-v29__b-title { font-family: var(--v29-font-serif); font-size: 20px; margin-bottom: 16px; color: var(--v29-text); }
+  .pdp-v29__b-items { display: flex; flex-direction: column; gap: 16px; }
+  .pdp-v29__b-item { display: flex; gap: 16px; align-items: center; }
+  .pdp-v29__b-img { width: 60px; height: 80px; object-fit: cover; background: #FFF; }
+  .pdp-v29__b-info { flex: 1; }
+  .pdp-v29__b-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .pdp-v29__b-price { font-size: 14px; color: var(--v29-text-light); }
+  .pdp-v29__b-check { width: 20px; height: 20px; border: 1px solid var(--v29-text); border-radius: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--v29-text); color: #FFF; }
+  .pdp-v29__b-check svg { width: 14px; height: 14px; }
+  .pdp-v29__b-check.unchecked { background: transparent; }
+  .pdp-v29__b-check.unchecked svg { display: none; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v29__pincode { margin-bottom: 30px; }
+  .pdp-v29__pin-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; color: var(--v29-text); }
+  .pdp-v29__pin-input-wrap { display: flex; border-bottom: 1px solid var(--v29-border); }
+  .pdp-v29__pin-input { flex: 1; background: transparent; border: none; padding: 12px 0; font-family: var(--v29-font-sans); font-size: 16px; outline: none; color: var(--v29-text); }
+  .pdp-v29__pin-btn { background: transparent; color: var(--v29-primary); border: none; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding: 0 16px; }
+  .pdp-v29__pin-msg { margin-top: 10px; font-size: 13px; font-style: italic; color: var(--v29-text-light); display: none; }
+
+  /* --- ATC --- */
+  .pdp-v29__atc {
+    width: 100%; background: var(--v29-text); color: var(--v29-bg); border: none; padding: 18px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; margin-bottom: 30px; font-family: var(--v29-font-sans); transition: background 0.2s;
+  }
+  .pdp-v29__atc:hover { background: var(--v29-primary); color: #FFF; }
+
+  /* --- ACCORDION --- */
+  .pdp-v29__acc-item { border-bottom: 1px solid var(--v29-border); }
+  .pdp-v29__acc-head { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-family: var(--v29-font-serif); font-size: 18px; color: var(--v29-text); }
+  .pdp-v29__acc-content { padding-bottom: 20px; font-size: 14px; color: var(--v29-text-light); line-height: 1.8; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v29__reels-wrap { margin: 80px 0; }
+  .pdp-v29__reels-title { font-family: var(--v29-font-serif); font-size: 32px; font-weight: 400; margin-bottom: 40px; text-align: center; }
+  .pdp-v29__reels { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; justify-content: center; }
+  .pdp-v29__reel { min-width: 240px; max-width: 300px; aspect-ratio: 4/5; background: #EFEFEF; position: relative; scroll-snap-align: center; flex: 1; }
+  .pdp-v29__reel img, .pdp-v29__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v29__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 1px solid #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; cursor: pointer; transition: background 0.3s; }
+  .pdp-v29__reel:hover .pdp-v29__reel-play { background: rgba(255,255,255,0.2); }
+
+  /* --- FULL WIDTH LIFESTYLE --- */
+  .pdp-v29__lifestyle { width: 100%; margin: 80px 0; text-align: center; }
+  .pdp-v29__lifestyle img, .pdp-v29__lifestyle svg { width: 100%; height: 60vh; object-fit: cover; display: block; margin-bottom: 40px; }
+  .pdp-v29__life-title { font-family: var(--v29-font-serif); font-size: 36px; margin-bottom: 20px; color: var(--v29-text); }
+  .pdp-v29__life-desc { font-size: 16px; color: var(--v29-text-light); max-width: 600px; margin: 0 auto; }
+
+</style>
+
+<div class="pdp-v29" data-section="{{ section.id }}">
+  <div class="pdp-v29__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v29__gallery">
+      <div class="pdp-v29__img-main">
+        {% if product.featured_media %}
+          <img src="{{ product.featured_media | image_url: width: 1000 }}" alt="{{ product.title }}">
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag }}
+        {% endif %}
+      </div>
+      <div class="pdp-v29__thumbs">
+        {% if product.media.size > 0 %}
+          {% for media in product.media limit: 5 %}
+            <img src="{{ media | image_url: width: 200 }}" class="pdp-v29__thumb">
+          {% endfor %}
+        {% else %}
+          <div class="pdp-v29__thumb">{{ 'product-2' | placeholder_svg_tag }}</div>
+          <div class="pdp-v29__thumb">{{ 'product-3' | placeholder_svg_tag }}</div>
+          <div class="pdp-v29__thumb">{{ 'product-4' | placeholder_svg_tag }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v29__info">
+      <div class="pdp-v29__breadcrumbs">Home / Decor / Vases</div>
+      <h1 class="pdp-v29__title">{{ product.title | default: "Handcrafted Terracotta Vase" }}</h1>
+      
+      <div class="pdp-v29__price-wrap">
+        <span class="pdp-v29__price">{{ current_variant.price | money | default: "â‚¹2,499" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v29__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v29__urgency">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Handcrafted in small batches. <strong>{{ random_stock }} pieces left.</strong>
+        </div>
+      {% endif %}
+
+      <div class="pdp-v29__bundle">
+        <div class="pdp-v29__b-title">Shop The Look</div>
+        <div class="pdp-v29__b-items">
+          <div class="pdp-v29__b-item">
+            <div class="pdp-v29__b-check">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            {% if product.featured_media %}
+              <img src="{{ product.featured_media | image_url: width: 100 }}" class="pdp-v29__b-img">
+            {% else %}
+              <div class="pdp-v29__b-img">{{ 'product-1' | placeholder_svg_tag }}</div>
+            {% endif %}
+            <div class="pdp-v29__b-info">
+              <div class="pdp-v29__b-name">This Item: Terracotta Vase</div>
+              <div class="pdp-v29__b-price">â‚¹2,499</div>
+            </div>
+          </div>
+          <div class="pdp-v29__b-item">
+            <div class="pdp-v29__b-check unchecked" onclick="this.classList.toggle('unchecked')">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="pdp-v29__b-img">{{ 'product-2' | placeholder_svg_tag }}</div>
+            <div class="pdp-v29__b-info">
+              <div class="pdp-v29__b-name">Dried Pampas Grass (Set of 5)</div>
+              <div class="pdp-v29__b-price">â‚¹899</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v29__pincode">
+          <div class="pdp-v29__pin-title">Estimated Delivery</div>
+          <div class="pdp-v29__pin-input-wrap">
+            <input type="text" class="pdp-v29__pin-input" id="v29-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v29__pin-btn" onclick="document.getElementById('v29-pin-msg').style.display='block'">Check</button>
+          </div>
+          <div class="pdp-v29__pin-msg" id="v29-pin-msg">Ships securely within 3-5 business days.</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v29__atc" id="v29-atc">Add to Cart</button>
+
+      <div>
+        <div class="pdp-v29__acc-item">
+          <div class="pdp-v29__acc-head">Details <span>+</span></div>
+          <div class="pdp-v29__acc-content">
+            Individually handcrafted by artisans, this terracotta vase brings warmth and organic texture to any space. Each piece bears unique marks of its making process.
+          </div>
+        </div>
+        <div class="pdp-v29__acc-item">
+          <div class="pdp-v29__acc-head">Dimensions & Care <span>+</span></div>
+          <div class="pdp-v29__acc-content" style="display:none;">
+            Height: 12" | Diameter: 7"<br><br>
+            Wipe clean with a dry cloth. Not intended for holding water without a liner.
+          </div>
+        </div>
+        <div class="pdp-v29__acc-item">
+          <div class="pdp-v29__acc-head">Shipping & Returns <span>+</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if section.settings.show_reels %}
+    <div class="pdp-v29__reels-wrap">
+      <h2 class="pdp-v29__reels-title">Styled By You</h2>
+      <div class="pdp-v29__reels">
+        <div class="pdp-v29__reel">
+          {{ 'lifestyle-1' | placeholder_svg_tag }}
+          <div class="pdp-v29__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="pdp-v29__reel">
+          {{ 'lifestyle-2' | placeholder_svg_tag }}
+          <div class="pdp-v29__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="pdp-v29__reel">
+          {{ 'image' | placeholder_svg_tag }}
+          <div class="pdp-v29__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v29__lifestyle">
+      {{ 'collection-2' | placeholder_svg_tag }}
+      <h2 class="pdp-v29__life-title">Artisan Made. Earthy Tones.</h2>
+      <p class="pdp-v29__life-desc">Elevate your living space with pieces that tell a story of traditional craftsmanship and modern design.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; bottom: -100px; left: 0; width: 100%;
+    background: var(--v29-bg); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); border-top: 1px solid var(--v29-border);
+    z-index: 999; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1); font-family: var(--v29-font-sans);
+  }
+  .sticky-atc-{{ section.id }}.visible { bottom: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 20px; }
+  .sticky-atc-{{ section.id }}__title { font-family: var(--v29-font-serif); font-size: 18px; color: var(--v29-text); }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: var(--v29-text); font-size: 16px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v29-text); color: var(--v29-bg); border: none; padding: 14px 40px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 18px; font-size: 14px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Handcrafted Terracotta Vase" }}</div>
+    <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹2,499" }}</div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Add to Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Simple Accordion Toggle
+    const accHeads = document.querySelectorAll('.pdp-v29__acc-head');
+    accHeads.forEach(head => {
+      head.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        if(content) {
+          content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    });
+
+    // Sticky ATC
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v29-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V29 - Home Decor",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Low Stock Warning",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Styling Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Lifestyle",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V29 - Home Decor"
+    }
+  ]
+}
+{% endschema %}

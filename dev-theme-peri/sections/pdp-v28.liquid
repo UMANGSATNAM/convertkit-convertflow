@@ -1,0 +1,401 @@
+﻿{%- comment -%}
+  PDP V28: ELECTRONICS & GADGETS
+  Aesthetic: Tech, sleek, dark mode / high contrast tech, monospace accents.
+  Features: Pincode Checker, Product Reels (usage), Warranty Upsell, Sticky ATC.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign random_stock = 'now' | date: '%s' | modulo: 8 | plus: 2 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  :root {
+    --v28-bg: #0A0A0A; /* Deep black */
+    --v28-bg-panel: #141414;
+    --v28-text: #F5F5F5;
+    --v28-text-light: #A3A3A3;
+    --v28-primary: #0070F3; /* Tech Blue */
+    --v28-border: #262626;
+    --v28-font-main: 'Inter', -apple-system, sans-serif;
+    --v28-font-mono: 'JetBrains Mono', monospace;
+  }
+
+  .pdp-v28 {
+    background-color: var(--v28-bg);
+    color: var(--v28-text);
+    font-family: var(--v28-font-main);
+    line-height: 1.5;
+  }
+
+  .pdp-v28__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v28__container { grid-template-columns: 1.2fr 1fr; gap: 80px; padding: 60px 40px; }
+  }
+
+  /* --- GALLERY --- */
+  .pdp-v28__gallery {
+    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px;
+  }
+  @media (min-width: 992px) {
+    .pdp-v28__gallery { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; }
+    .pdp-v28__img-wrap:first-child { grid-column: 1 / -1; }
+  }
+  .pdp-v28__img-wrap { min-width: 90%; scroll-snap-align: start; }
+  @media (min-width: 992px) { .pdp-v28__img-wrap { min-width: 100%; } }
+  .pdp-v28__gallery img, .pdp-v28__gallery svg { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--v28-border); }
+  .pdp-v28__img-wrap:first-child img { aspect-ratio: 4/3; }
+
+  /* --- INFO --- */
+  .pdp-v28__info { padding-top: 10px; }
+  .pdp-v28__tag { display: inline-block; font-family: var(--v28-font-mono); font-size: 11px; color: var(--v28-primary); background: rgba(0,112,243,0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(0,112,243,0.2); margin-bottom: 16px; }
+  
+  .pdp-v28__title { font-size: 36px; font-weight: 700; margin: 0 0 16px 0; color: var(--v28-text); letter-spacing: -1px; line-height: 1.1; }
+  
+  .pdp-v28__price-wrap { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+  .pdp-v28__price { font-size: 32px; font-weight: 700; color: var(--v28-text); }
+  .pdp-v28__compare { font-size: 18px; color: var(--v28-text-light); text-decoration: line-through; }
+  .pdp-v28__taxes { font-size: 12px; color: var(--v28-text-light); margin-left: 4px; }
+
+  /* --- URGENCY --- */
+  .pdp-v28__urgency {
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: #FFF; background: #262626; padding: 12px 16px; border-radius: 8px; margin-bottom: 32px; border-left: 4px solid #E53E3E;
+  }
+  .pdp-v28__urgency span { color: #FC8181; font-weight: 700; }
+
+  /* --- WARRANTY UPSELL --- */
+  .pdp-v28__warranty { background: var(--v28-bg-panel); border: 1px solid var(--v28-border); padding: 20px; border-radius: 12px; margin-bottom: 32px; }
+  .pdp-v28__w-title { font-weight: 600; font-size: 14px; margin-bottom: 16px; }
+  .pdp-v28__w-options { display: flex; flex-direction: column; gap: 12px; }
+  .pdp-v28__w-opt { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--v28-border); border-radius: 8px; cursor: pointer; transition: border 0.2s; background: var(--v28-bg); }
+  .pdp-v28__w-opt.active { border-color: var(--v28-primary); box-shadow: 0 0 0 1px var(--v28-primary); }
+  .pdp-v28__w-opt-left { display: flex; align-items: center; gap: 12px; }
+  .pdp-v28__w-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--v28-text-light); }
+  .pdp-v28__w-opt.active .pdp-v28__w-radio { border-color: var(--v28-primary); background: var(--v28-primary); box-shadow: inset 0 0 0 3px var(--v28-bg); }
+  .pdp-v28__w-name { font-weight: 500; font-size: 14px; }
+  .pdp-v28__w-desc { font-size: 12px; color: var(--v28-text-light); }
+  .pdp-v28__w-price { font-weight: 600; font-size: 14px; }
+
+  /* --- PINCODE CHECKER --- */
+  .pdp-v28__pincode { margin-bottom: 32px; }
+  .pdp-v28__pin-title { font-size: 13px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--v28-text-light); }
+  .pdp-v28__pin-input-wrap { display: flex; gap: 8px; }
+  .pdp-v28__pin-input { flex: 1; background: var(--v28-bg-panel); border: 1px solid var(--v28-border); border-radius: 8px; padding: 14px; font-family: var(--v28-font-mono); font-size: 14px; outline: none; color: #FFF; transition: border 0.3s; }
+  .pdp-v28__pin-input:focus { border-color: var(--v28-primary); }
+  .pdp-v28__pin-btn { background: var(--v28-text); color: #000; border: none; border-radius: 8px; padding: 0 24px; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
+  .pdp-v28__pin-btn:hover { opacity: 0.8; }
+  .pdp-v28__pin-msg { margin-top: 10px; font-size: 13px; font-weight: 500; color: #48BB78; display: none; }
+
+  /* --- ATC --- */
+  .pdp-v28__atc {
+    width: 100%; background: var(--v28-primary); color: #FFF; border: none; padding: 20px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 24px; border-radius: 8px; transition: background 0.2s;
+  }
+  .pdp-v28__atc:hover { background: #0056B3; }
+
+  /* --- ACCORDION (SPECS) --- */
+  .pdp-v28__acc { border-top: 1px solid var(--v28-border); }
+  .pdp-v28__acc-item { border-bottom: 1px solid var(--v28-border); }
+  .pdp-v28__acc-head { padding: 20px 0; display: flex; justify-content: space-between; cursor: pointer; font-size: 15px; font-weight: 500; }
+  .pdp-v28__acc-content { padding-bottom: 20px; font-size: 14px; color: var(--v28-text-light); line-height: 1.8; }
+  .pdp-v28__spec-table { width: 100%; font-family: var(--v28-font-mono); font-size: 13px; }
+  .pdp-v28__spec-table td { padding: 8px 0; border-bottom: 1px solid var(--v28-border); }
+  .pdp-v28__spec-table td:first-child { color: var(--v28-text-light); width: 40%; }
+  .pdp-v28__spec-table td:last-child { color: var(--v28-text); }
+  .pdp-v28__spec-table tr:last-child td { border-bottom: none; }
+
+  /* --- PRODUCT REELS --- */
+  .pdp-v28__reels-wrap { margin: 80px 0; }
+  .pdp-v28__reels-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; letter-spacing: -0.5px; }
+  .pdp-v28__reels { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; }
+  .pdp-v28__reels::-webkit-scrollbar { height: 8px; }
+  .pdp-v28__reels::-webkit-scrollbar-thumb { background: var(--v28-border); border-radius: 4px; }
+  .pdp-v28__reel { min-width: 260px; aspect-ratio: 9/16; background: #141414; position: relative; scroll-snap-align: start; flex: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--v28-border); }
+  .pdp-v28__reel img, .pdp-v28__reel svg { width: 100%; height: 100%; object-fit: cover; }
+  .pdp-v28__reel-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; cursor: pointer; transition: transform 0.2s; }
+  .pdp-v28__reel:hover .pdp-v28__reel-play { transform: translate(-50%, -50%) scale(1.1); }
+
+  /* --- FULL WIDTH FEATURE --- */
+  .pdp-v28__lifestyle { width: 100%; position: relative; margin: 80px 0; background: #000; overflow: hidden; border-top: 1px solid var(--v28-border); border-bottom: 1px solid var(--v28-border); }
+  .pdp-v28__lifestyle img, .pdp-v28__lifestyle svg { width: 100%; height: 70vh; object-fit: cover; display: block; opacity: 0.6; }
+  .pdp-v28__life-overlay { position: absolute; top: 50%; left: 10%; transform: translateY(-50%); max-width: 500px; color: #FFF; }
+  .pdp-v28__life-title { font-size: 48px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.1; }
+  .pdp-v28__life-desc { font-size: 18px; font-weight: 400; color: #CCC; line-height: 1.6; }
+
+  /* --- GRIDS --- */
+  .pdp-v28__section { padding: 0 24px 80px 24px; max-width: 1440px; margin: 0 auto; }
+  .pdp-v28__sec-title { font-size: 24px; font-weight: 600; margin-bottom: 32px; }
+  .pdp-v28__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (min-width: 768px) { .pdp-v28__grid { grid-template-columns: repeat(4, 1fr); gap: 32px; } }
+  .pdp-v28__card { padding: 16px; background: var(--v28-bg-panel); border: 1px solid var(--v28-border); border-radius: 12px; transition: border-color 0.2s; }
+  .pdp-v28__card:hover { border-color: var(--v28-text-light); }
+  .pdp-v28__card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 20px; background: #1A1A1A; }
+  .pdp-v28__card-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: var(--v28-text); }
+  .pdp-v28__card-price { font-weight: 600; color: var(--v28-text-light); }
+
+</style>
+
+<div class="pdp-v28" data-section="{{ section.id }}">
+  <div class="pdp-v28__container">
+    
+    <!-- GALLERY -->
+    <div class="pdp-v28__gallery">
+      {% if product.featured_media %}
+        {% for media in product.media limit: 5 %}
+          <div class="pdp-v28__img-wrap"><img src="{{ media | image_url: width: 1000 }}" alt="{{ product.title }}"></div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-v28__img-wrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <div class="pdp-v28__img-wrap">{{ 'product-2' | placeholder_svg_tag }}</div>
+        <div class="pdp-v28__img-wrap">{{ 'product-3' | placeholder_svg_tag }}</div>
+        <div class="pdp-v28__img-wrap">{{ 'product-4' | placeholder_svg_tag }}</div>
+        <div class="pdp-v28__img-wrap">{{ 'product-5' | placeholder_svg_tag }}</div>
+      {% endif %}
+    </div>
+
+    <!-- INFO -->
+    <div class="pdp-v28__info">
+      <div class="pdp-v28__tag">v2.0 PRO</div>
+      <h1 class="pdp-v28__title">{{ product.title | default: "Quantum Noise-Cancelling Earbuds" }}</h1>
+      
+      <div class="pdp-v28__price-wrap">
+        <span class="pdp-v28__price">{{ current_variant.price | money | default: "â‚¹12,499" }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v28__compare">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+        <span class="pdp-v28__taxes">Incl. of all taxes</span>
+      </div>
+
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v28__urgency">
+          <svg width="20" height="20" fill="none" stroke="#FC8181" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          High Demand: <span>Only {{ random_stock }} units left in stock.</span>
+        </div>
+      {% endif %}
+
+      <div class="pdp-v28__warranty">
+        <div class="pdp-v28__w-title">Protection Plan</div>
+        <div class="pdp-v28__w-options">
+          <div class="pdp-v28__w-opt active">
+            <div class="pdp-v28__w-opt-left">
+              <div class="pdp-v28__w-radio"></div>
+              <div>
+                <div class="pdp-v28__w-name">1-Year Standard Warranty</div>
+                <div class="pdp-v28__w-desc">Included against manufacturing defects.</div>
+              </div>
+            </div>
+            <div class="pdp-v28__w-price">Included</div>
+          </div>
+          <div class="pdp-v28__w-opt">
+            <div class="pdp-v28__w-opt-left">
+              <div class="pdp-v28__w-radio"></div>
+              <div>
+                <div class="pdp-v28__w-name">QuantumCare+ (2 Years)</div>
+                <div class="pdp-v28__w-desc">Covers accidental damage & drops.</div>
+              </div>
+            </div>
+            <div class="pdp-v28__w-price">+ â‚¹1,499</div>
+          </div>
+        </div>
+      </div>
+
+      {% if section.settings.show_pincode %}
+        <div class="pdp-v28__pincode">
+          <div class="pdp-v28__pin-title">Check Delivery Date</div>
+          <div class="pdp-v28__pin-input-wrap">
+            <input type="text" class="pdp-v28__pin-input" id="v28-pin" placeholder="Enter Pincode" maxlength="6">
+            <button class="pdp-v28__pin-btn" onclick="document.getElementById('v28-pin-msg').style.display='block'">Calculate</button>
+          </div>
+          <div class="pdp-v28__pin-msg" id="v28-pin-msg">âœ” Delivery by Tomorrow if ordered within 2 hrs.</div>
+        </div>
+      {% endif %}
+
+      <button class="pdp-v28__atc" id="v28-atc">Add to Cart</button>
+
+      <div class="pdp-v28__acc">
+        <div class="pdp-v28__acc-item">
+          <div class="pdp-v28__acc-head">Tech Specs <span>+</span></div>
+          <div class="pdp-v28__acc-content">
+            <table class="pdp-v28__spec-table">
+              <tr><td>Bluetooth</td><td>v5.3 (aptX Lossless)</td></tr>
+              <tr><td>Battery Life</td><td>Up to 32 hours with case</td></tr>
+              <tr><td>Drivers</td><td>11mm Beryllium</td></tr>
+              <tr><td>Water Resistance</td><td>IPX4</td></tr>
+              <tr><td>Weight</td><td>4.5g per earbud</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="pdp-v28__acc-item">
+          <div class="pdp-v28__acc-head">In The Box <span>+</span></div>
+        </div>
+        <div class="pdp-v28__acc-item">
+          <div class="pdp-v28__acc-head">Compatibility <span>+</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if section.settings.show_reels %}
+    <div class="pdp-v28__section">
+      <div class="pdp-v28__reels-wrap">
+        <h2 class="pdp-v28__reels-title">Experience It</h2>
+        <div class="pdp-v28__reels">
+          <div class="pdp-v28__reel">
+            {{ 'lifestyle-1' | placeholder_svg_tag }}
+            <div class="pdp-v28__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v28__reel">
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
+            <div class="pdp-v28__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="pdp-v28__reel">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="pdp-v28__reel-play"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_full_image %}
+    <div class="pdp-v28__lifestyle">
+      {{ 'collection-3' | placeholder_svg_tag }}
+      <div class="pdp-v28__life-overlay">
+        <h2 class="pdp-v28__life-title">Silence The World.</h2>
+        <p class="pdp-v28__life-desc">Next-generation ANC technology blocks out 98% of ambient noise, leaving only pure, unadulterated sound.</p>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_cross_sell %}
+    <div class="pdp-v28__section">
+      <h2 class="pdp-v28__sec-title">Accessories</h2>
+      <div class="pdp-v28__grid">
+        {% for i in (1..4) %}
+          <div class="pdp-v28__card">
+            {% capture ph %}product-{{ i }}{% endcapture %}
+            {{ ph | placeholder_svg_tag }}
+            <div class="pdp-v28__card-title">Silicone Case Cover</div>
+            <div class="pdp-v28__card-price">â‚¹999</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed; top: -100px; left: 0; width: 100%;
+    background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--v28-border);
+    z-index: 999; padding: 12px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: top 0.3s ease; font-family: var(--v28-font-main);
+  }
+  .sticky-atc-{{ section.id }}.visible { top: 0; }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 16px; }
+  .sticky-atc-{{ section.id }}__img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: var(--v28-text); }
+  .sticky-atc-{{ section.id }}__price { font-weight: 500; color: var(--v28-text-light); font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: var(--v28-primary); color: #FFF; border: none; padding: 10px 24px; font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 6px; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }} { top: auto; bottom: -100px; border-bottom: none; border-top: 1px solid var(--v28-border); padding: 16px; }
+    .sticky-atc-{{ section.id }}.visible { top: auto; bottom: 0; }
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 16px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title | default: "Quantum Earbuds" }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ current_variant.price | money | default: "â‚¹12,499" }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Add to Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    const mainAtc = document.getElementById('v28-atc');
+    
+    if(stickyBar && mainAtc) {
+      window.addEventListener('scroll', function() {
+        const mainAtcRect = mainAtc.getBoundingClientRect();
+        if (mainAtcRect.top < 0) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP V28 - Tech",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Urgency & Pincode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show Stock Urgency",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pincode",
+      "label": "Show Pincode Checker",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media Blocks"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reels",
+      "label": "Show Product Reels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_full_image",
+      "label": "Show Full Width Feature Image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Cross Sells"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cross_sell",
+      "label": "Show Accessories Cross-sell",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP V28 - Tech"
+    }
+  ]
+}
+{% endschema %}

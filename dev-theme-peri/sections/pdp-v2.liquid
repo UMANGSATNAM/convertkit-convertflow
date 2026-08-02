@@ -1,0 +1,476 @@
+﻿{%- comment -%}
+  PDP V2: Electronics / Gadgets Edition
+  Features: Offer Boxes, Image Swatches, Upsell Checkboxes (Gift, Warranty), Cross-sells
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inventory = current_variant.inventory_quantity | default: 8 -%}
+
+{%- comment -%} Liquid Math for Urgency {%- endcomment -%}
+{%- assign stock_left = inventory -%}
+{%- if stock_left <= 0 %}{% assign stock_left = 3 %}{% endif %}
+{%- assign sold_1hr = inventory | times: 2 | modulo: 15 | plus: 3 -%}
+
+<style>
+  :root {
+    --v2-primary: {{ section.settings.primary_color }};
+    --v2-bg: {{ section.settings.bg_color }};
+    --v2-text: #0F172A;
+    --v2-text-light: #64748B;
+    --v2-border: #E2E8F0;
+    --v2-radius: 12px;
+    --v2-font: {{ section.settings.base_font.family }}, {{ section.settings.base_font.fallback_families }};
+  }
+  
+  .pdp-v2 {
+    font-family: var(--v2-font);
+    color: var(--v2-text);
+    background: var(--v2-bg);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+  
+  .pdp-v2-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  @media (min-width: 768px) {
+    .pdp-v2-grid {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+    }
+  }
+
+  /* Gallery */
+  .pdp-v2-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .pdp-v2-gallery__main {
+    border-radius: var(--v2-radius);
+    background: #F8FAFC;
+    overflow: hidden;
+  }
+  .pdp-v2-gallery__main img {
+    width: 100%;
+    height: auto;
+    display: block;
+    mix-blend-mode: multiply;
+  }
+
+  /* Header */
+  .pdp-v2-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+  .pdp-v2-subtitle {
+    font-size: 14px;
+    color: var(--v2-text-light);
+    margin-bottom: 15px;
+  }
+  
+  .pdp-v2-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--v2-text-light);
+    margin-bottom: 20px;
+  }
+  .pdp-v2-rating__star { color: #EAB308; }
+
+  /* Price */
+  .pdp-v2-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .pdp-v2-price {
+    font-size: 32px;
+    font-weight: 800;
+  }
+  .pdp-v2-compare {
+    font-size: 16px;
+    color: var(--v2-text-light);
+    text-decoration: line-through;
+  }
+  .pdp-v2-discount {
+    font-size: 16px;
+    color: #16A34A;
+    font-weight: 700;
+  }
+
+  /* Offer Boxes */
+  .pdp-v2-offers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  .pdp-v2-offer-card {
+    border-radius: var(--v2-radius);
+    padding: 16px;
+    border: 1px solid var(--v2-border);
+  }
+  .pdp-v2-offer-card--gold {
+    background: #FEF9C3;
+    border-color: #FEF08A;
+  }
+  .pdp-v2-offer-card--green {
+    background: #DCFCE7;
+    border-color: #BBF7D0;
+  }
+  .pdp-v2-offer-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .pdp-v2-offer-tag {
+    background: #FDE047;
+    color: #854D0E;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .pdp-v2-offer-link {
+    font-size: 13px;
+    color: var(--v2-text);
+    text-decoration: underline;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  /* Swatches */
+  .pdp-v2-swatches {
+    margin-bottom: 30px;
+  }
+  .pdp-v2-swatch-title {
+    font-size: 14px;
+    color: var(--v2-text-light);
+    margin-bottom: 12px;
+  }
+  .pdp-v2-swatch-list {
+    display: flex;
+    gap: 10px;
+  }
+  .pdp-v2-swatch {
+    width: 60px;
+    height: 60px;
+    border: 1px solid var(--v2-border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #F8FAFC;
+    transition: all 0.2s;
+  }
+  .pdp-v2-swatch.is-active {
+    border-color: var(--v2-primary);
+    border-width: 2px;
+  }
+  .pdp-v2-swatch img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  /* Add-ons */
+  .pdp-v2-addons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  .pdp-v2-addon-group {
+    border: 1px solid var(--v2-border);
+    border-radius: var(--v2-radius);
+    overflow: hidden;
+  }
+  .pdp-v2-addon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #F8FAFC;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .pdp-v2-addon-body {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+  }
+  .pdp-v2-addon-body--gold { background: #FEF3C7; }
+  .pdp-v2-addon-body--blue { background: #EFF6FF; }
+
+  /* Urgency */
+  .pdp-v2-urgency {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    padding: 12px;
+    background: #F1F5F9;
+    border-radius: 8px;
+  }
+  .pdp-v2-urgency span { color: #EF4444; font-weight: 700; }
+
+  /* CTAs */
+  .pdp-v2-ctas {
+    display: flex;
+    gap: 15px;
+  }
+  .pdp-v2-btn {
+    flex: 1;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: var(--v2-radius);
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+  }
+  .pdp-v2-btn--outline {
+    background: transparent;
+    border: 2px solid var(--v2-primary);
+    color: var(--v2-primary);
+  }
+  .pdp-v2-btn--solid {
+    background: var(--v2-primary);
+    border: 2px solid var(--v2-primary);
+    color: #fff;
+  }
+  .pdp-v2-btn:hover { opacity: 0.9; }
+
+</style>
+
+<div class="pdp-v2" data-section="{{ section.id }}">
+  <div class="pdp-v2-grid">
+    
+    <!-- Left: Gallery -->
+    <div class="pdp-v2-gallery">
+      <div class="pdp-v2-gallery__main">
+        {% if product.featured_media %}
+          <img src="{{ product.featured_media | image_url: width: 1000 }}" alt="{{ product.title }}">
+        {% else %}
+          {{ 'product-2' | placeholder_svg_tag }}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: Info -->
+    <div class="pdp-v2-info">
+      
+      <h1 class="pdp-v2-title">{{ product.title }}</h1>
+      <div class="pdp-v2-subtitle">{{ section.settings.subtitle }}</div>
+      
+      {% if section.settings.show_rating %}
+        <div class="pdp-v2-rating">
+          <span class="pdp-v2-rating__star">â˜…</span> {{ section.settings.rating_value }} ({{ section.settings.review_count }})
+        </div>
+      {% endif %}
+
+      <div class="pdp-v2-price-wrap">
+        <span class="pdp-v2-price">{{ current_variant.price | money }}</span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-v2-compare">{{ current_variant.compare_at_price | money }}</span>
+          {% assign save = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round %}
+          <span class="pdp-v2-discount">{{ save }}% off</span>
+        {% endif %}
+        <span style="font-size:12px;color:var(--v2-text-light);">(MRP Incl. of all taxes)</span>
+      </div>
+
+      <!-- Offers Box -->
+      {% if section.settings.show_offers %}
+        <div class="pdp-v2-offers">
+          <div class="pdp-v2-offer-card pdp-v2-offer-card--gold">
+            <div class="pdp-v2-offer-title">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span>ðŸ·ï¸</span> Get it for {{ current_variant.price | times: 0.95 | money }} at checkout
+              </div>
+              <span class="pdp-v2-offer-tag">Extra 5% off</span>
+            </div>
+            <a href="#" class="pdp-v2-offer-link">Use prepaid offer Details ></a>
+          </div>
+          
+          <div class="pdp-v2-offer-card pdp-v2-offer-card--green">
+            <div class="pdp-v2-offer-title">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span>âœ¨</span> Earn 139 Store Cash on this purchase
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Color Swatches -->
+      {% if product.variants.size > 1 and section.settings.show_swatches %}
+        <div class="pdp-v2-swatches">
+          <div class="pdp-v2-swatch-title">Colour <strong style="color:var(--v2-text);">Cosmic Black</strong></div>
+          <div class="pdp-v2-swatch-list">
+            {% for variant in product.variants limit: 3 %}
+              <div class="pdp-v2-swatch {% if forloop.first %}is-active{% endif %}">
+                {% if variant.featured_image %}
+                  <img src="{{ variant.featured_image | image_url: width: 100 }}">
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag }}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Add-ons -->
+      {% if section.settings.show_addons %}
+        <div class="pdp-v2-addons">
+          
+          <div class="pdp-v2-addon-group">
+            <div class="pdp-v2-addon-header">Personalisation <a href="#" style="text-decoration:underline;color:var(--v2-text-light);">Learn more</a></div>
+            <div class="pdp-v2-addon-body pdp-v2-addon-body--gold">
+              <input type="checkbox" id="gift-wrap">
+              <label for="gift-wrap" style="font-size:14px;font-weight:500;">Make it a gift order @ â‚¹99</label>
+            </div>
+          </div>
+
+          <div class="pdp-v2-addon-group">
+            <div class="pdp-v2-addon-header">Device Protection <a href="#" style="text-decoration:underline;color:var(--v2-text-light);">Learn more</a></div>
+            <div class="pdp-v2-addon-body pdp-v2-addon-body--blue">
+              <input type="checkbox" id="warranty">
+              <label for="warranty" style="font-size:14px;font-weight:500;">Add 1-Year Extended Warranty Coverage @ â‚¹199</label>
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+
+      <!-- Urgency -->
+      {% if section.settings.show_urgency %}
+        <div class="pdp-v2-urgency">
+          <div>ðŸ”¥ <span>{{ sold_1hr }} sold</span> in last hour</div>
+          <div>âš ï¸ Only <span>{{ stock_left }} pcs left</span> in stock</div>
+        </div>
+      {% endif %}
+
+      <!-- CTAs -->
+      <div class="pdp-v2-ctas">
+        <button class="pdp-v2-btn pdp-v2-btn--outline">ADD TO CART</button>
+        <button class="pdp-v2-btn pdp-v2-btn--solid">BUY NOW</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc-{{ section.id }} {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s ease-in-out;
+    border-top: 1px solid #eee;
+  }
+  .sticky-atc-{{ section.id }}.visible {
+    bottom: 0;
+  }
+  .sticky-atc-{{ section.id }}__info { display: flex; align-items: center; gap: 10px; }
+  .sticky-atc-{{ section.id }}__img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+  .sticky-atc-{{ section.id }}__title { font-weight: 600; font-size: 14px; color: #000; }
+  .sticky-atc-{{ section.id }}__price { font-weight: 700; color: #D32F2F; font-size: 14px; }
+  .sticky-atc-{{ section.id }}__btn { background: #000; color: #FFF; border: none; padding: 12px 24px; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+  .sticky-atc-{{ section.id }}__btn:hover { opacity: 0.8; }
+  @media (max-width: 768px) {
+    .sticky-atc-{{ section.id }}__info { display: none; }
+    .sticky-atc-{{ section.id }}__btn { width: 100%; padding: 14px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-{{ section.id }}" id="sticky-atc-{{ section.id }}">
+  <div class="sticky-atc-{{ section.id }}__info">
+    {% if product.featured_media %}
+      <img src="{{ product.featured_media | image_url: width: 100 }}" class="sticky-atc-{{ section.id }}__img">
+    {% endif %}
+    <div>
+      <div class="sticky-atc-{{ section.id }}__title">{{ product.title }}</div>
+      <div class="sticky-atc-{{ section.id }}__price">{{ product.selected_or_first_available_variant.price | money }}</div>
+    </div>
+  </div>
+  <button class="sticky-atc-{{ section.id }}__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-{{ section.id }}');
+    if(stickyBar) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+
+{
+  "name": "PDP V2 - Electronics",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Theme Styling"
+    },
+    { "type": "color", "id": "primary_color", "label": "Primary Button Color", "default": "#111827" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFFFFF" },
+    { "type": "font_picker", "id": "base_font", "label": "Base Font", "default": "inter_n4" },
+    
+    {
+      "type": "header",
+      "content": "Product Info"
+    },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Spatial Audio | 50 Hours Playtime | BT 6.0" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show Rating", "default": true },
+    { "type": "text", "id": "rating_value", "label": "Rating Value", "default": "4.7" },
+    { "type": "text", "id": "review_count", "label": "Review Count", "default": "76" },
+
+    {
+      "type": "header",
+      "content": "Features & Upsells"
+    },
+    { "type": "checkbox", "id": "show_offers", "label": "Show Offer Boxes", "default": true },
+    { "type": "checkbox", "id": "show_swatches", "label": "Show Image Swatches", "default": true },
+    { "type": "checkbox", "id": "show_addons", "label": "Show Checkbox Add-ons", "default": true },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show Dynamic Urgency", "default": true }
+  ],
+  "presets": [
+    {
+      "name": "PDP V2 - Electronics"
+    }
+  ]
+}
+{% endschema %}
