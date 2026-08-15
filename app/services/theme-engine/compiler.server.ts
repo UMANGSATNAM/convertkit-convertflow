@@ -502,7 +502,7 @@ export async function resolveComponentLiquidContent(component: any, customRegist
   const appDataRoot = path.resolve(process.cwd(), "app/data");
   let exactPath: string;
   if (liquidPath.startsWith("app/data/") || liquidPath.startsWith("..") || liquidPath.includes("_beauty") || liquidPath.includes("_luxury") || liquidPath.includes("_streetwear") || liquidPath.includes("_supplements") || liquidPath.includes("_electronics")) {
-    const rel = liquidPath.replace(/^(\/?app\/data\/)+/, "").replace(/^(\.\.\/)+/, "").replace(/^(components\/[^\/]+\/)+/, "");
+    const rel = liquidPath.replace(/^(\/?app\/data\/)+/, "").replace(/^(components\/[^\/]+\/)+/, "");
     exactPath = path.resolve(appDataRoot, rel);
   } else {
     const cleanRelPath = liquidPath.replace(/^(\/?app\/data\/templates\/theme-engine\/)+/, "");

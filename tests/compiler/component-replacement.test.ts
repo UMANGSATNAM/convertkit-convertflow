@@ -155,7 +155,7 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
     await fs.writeFile(path.join(baseThemeDir, 'chassis-manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
 
     // Write minimal registry.json for compile-time cache freshness check
-    const minimalRegistry = { version: '1.0.0', components: Array(57).fill({ status: 'approved', componentId: 'mock' }) };
+    const minimalRegistry = { version: '1.0.0', components: Array(57).fill({ status: 'production', componentId: 'mock', sectionType: 'mock' }) };
     await fs.writeFile(path.join(themeEngineDir, 'registry.json'), JSON.stringify(minimalRegistry, null, 2), 'utf-8');
 
     // Setup custom headers and footers mock directories under nested theme-engine path
@@ -378,11 +378,13 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
 
     const { default: db } = await import('../../app/db.server');
     vi.mocked(db.componentRegistry.findMany).mockResolvedValue(
-      realRegistry.components.map((comp: any) => ({
-        status: 'PUBLISHED',
-        componentId: comp.componentId,
-        sectionType: comp.sectionType || comp.componentId
-      }))
+      realRegistry.components
+        .filter((comp: any) => comp.status === 'production')
+        .map((comp: any) => ({
+          status: 'PUBLISHED',
+          componentId: comp.componentId,
+          sectionType: comp.sectionType || comp.componentId
+        }))
     );
 
     const blueprint = {

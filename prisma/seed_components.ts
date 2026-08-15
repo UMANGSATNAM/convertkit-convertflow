@@ -56,14 +56,10 @@ async function main() {
   await prisma.componentRegistry.deleteMany({});
   console.log("Cleared old ComponentRegistry.");
 
-  for (const comp of components) {
-    await prisma.componentRegistry.upsert({
-      where: { componentId: comp.componentId },
-      update: comp,
-      create: comp
-    });
-    console.log(`Seeded component: ${comp.componentId}`);
-  }
+  await prisma.componentRegistry.createMany({
+    data: components
+  });
+  console.log(`Seeded ${components.length} components.`);
 
   // Seed the RegistryMeta singleton table to store registry.json SHA-256 hash
   await prisma.registryMeta.upsert({

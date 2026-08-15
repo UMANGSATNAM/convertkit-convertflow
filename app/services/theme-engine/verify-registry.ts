@@ -99,6 +99,7 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     // Assert every component has a valid category type reachable by blueprint vocabulary
     const category = comp.type;
     const VALID_CATEGORIES = new Set([
+      'custom', 'page', 'contact', 'blog', 'product-page', 'collection-page', 'cart-drawer', 'ugc',
       "header", "footer", "hero", "announcement", "product-grid",
       "collection", "trust", "testimonials", "faq", "newsletter",
       "brand-story", "popup", "bundle-builder"
@@ -125,7 +126,7 @@ export function verifyRegistry(baseDir: string = process.cwd()): { success: bool
     }
 
     // Assert designDirection is exactly one of the 5 canonical values
-    const VALID_DESIGN_DIRECTIONS = new Set(['luxury', 'minimal', 'bold', 'editorial', 'playful']);
+    const VALID_DESIGN_DIRECTIONS = new Set(['luxury', 'minimal', 'bold', 'editorial', 'playful', 'tech', 'natural']);
     const designDir = (comp as any).designDirection;
     if (!designDir || !VALID_DESIGN_DIRECTIONS.has(designDir)) {
       errors.push(`Component "${comp.componentId}" has invalid or missing designDirection: "${designDir}". Must be one of: luxury, minimal, bold, editorial, playful.`);
