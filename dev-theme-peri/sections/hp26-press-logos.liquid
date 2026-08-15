@@ -1,0 +1,236 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-top: 1px solid rgba(44, 42, 40, 0.05);
+    border-bottom: 1px solid rgba(44, 42, 40, 0.05);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp26-press-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-press-wrapper {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp26-press__title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0;
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+
+  .hp26-press__logos {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    flex: 1;
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-press__logos {
+      justify-content: center;
+    }
+  }
+
+  .hp26-press__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    filter: grayscale(100%) contrast(120%); /* Ensures monochrome feel */
+  }
+
+  .hp26-press__logo:hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .hp26-press__logo img {
+    max-height: {{ section.settings.logo_height }}px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .hp26-press__logo svg {
+    height: {{ section.settings.logo_height }}px;
+    width: auto;
+    fill: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-press-wrapper" id="HP26Press-{{ section.id }}">
+  {%- if section.settings.title != blank -%}
+    <h2 class="hp26-press__title">{{ section.settings.title }}</h2>
+  {%- endif -%}
+
+  <div class="hp26-press__logos">
+    {%- for block in section.blocks -%}
+      <div class="hp26-press__logo" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: height: 100 }}" alt="Press Logo" loading="lazy">
+        {%- else -%}
+          <!-- Placeholder simple wordmark -->
+          <span style="font-family:var(--font-heading);font-size:{{ section.settings.logo_height }}px;font-weight:600;letter-spacing:0.05em;color:var(--text-color);">PUBLICATION</span>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Press",
+  "class": "section-hp26-press-logos",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "As seen in"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 15,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Max Logo Height",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Press",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

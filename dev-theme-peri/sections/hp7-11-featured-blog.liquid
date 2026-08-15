@@ -1,0 +1,308 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#F4F4F0'
+  assign padding_top = section.settings.padding_top | default: 120
+  assign padding_bottom = section.settings.padding_bottom | default: 120
+  assign blog = section.settings.blog
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --padding-top: {{ padding_top }}px;
+    --padding-bottom: {{ padding_bottom }}px;
+    
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .hp7-blog-{{ section_id }} {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 4vw;
+    display: flex;
+    align-items: flex-start;
+    gap: 4vw;
+  }
+  
+  .hp7-blog__header-col {
+    width: 35%;
+    position: sticky;
+    top: 6vw;
+  }
+  
+  .hp7-blog__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: block;
+    opacity: 0.7;
+  }
+  
+  .hp7-blog__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 5vw, 6rem);
+    font-weight: 400;
+    line-height: 0.9;
+    margin: 0 0 2rem 0;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+  
+  .hp7-blog__title em {
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .hp7-blog__btn {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--text-color);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    transition: opacity 0.3s;
+  }
+  
+  .hp7-blog__btn:hover {
+    opacity: 0.5;
+  }
+
+  .hp7-blog__list-col {
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+  }
+
+  .hp7-blog__article {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+
+  .hp7-blog__image-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background: #111;
+  }
+
+  .hp7-blog__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .hp7-blog__article:hover .hp7-blog__image {
+    transform: scale(1.05);
+  }
+  
+  .hp7-blog__meta {
+    font-family: 'Inter', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .hp7-blog__article-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0 0 1rem 0;
+  }
+  
+  .hp7-blog__article-excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.8;
+    max-width: 800px;
+  }
+
+  @media screen and (max-width: 990px) {
+    .hp7-blog-{{ section_id }} {
+      flex-direction: column;
+    }
+    
+    .hp7-blog__header-col {
+      width: 100%;
+      position: relative;
+      top: 0;
+      margin-bottom: 4rem;
+    }
+    
+    .hp7-blog__list-col {
+      width: 100%;
+      gap: 4rem;
+    }
+  }
+</style>
+
+<section class="hp7-blog-{{ section_id }}">
+  
+  <div class="hp7-blog__header-col">
+    <span class="hp7-blog__label">{{ section.settings.label | escape }}</span>
+    <h2 class="hp7-blog__title">{{ section.settings.title }}</h2>
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ blog.url | default: '#' }}" class="hp7-blog__btn">
+        {{ section.settings.btn_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp7-blog__list-col">
+    {%- if blog != blank and blog.articles.size > 0 -%}
+      {%- for article in blog.articles limit: section.settings.post_limit -%}
+        <a href="{{ article.url }}" class="hp7-blog__article">
+          <div class="hp7-blog__image-wrap">
+            {%- if article.image -%}
+              {{ article.image | image_url: width: 1400 | image_tag: 
+                 loading: 'lazy',
+                 class: 'hp7-blog__image',
+                 alt: article.title | escape
+              }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'hp7-blog__image placeholder-svg' }}
+            {%- endif -%}
+          </div>
+          <div class="hp7-blog__meta">
+            <span>{{ article.published_at | time_tag: format: 'date' }}</span>
+            <span>{{ article.author }}</span>
+          </div>
+          <h3 class="hp7-blog__article-title">{{ article.title }}</h3>
+          <div class="hp7-blog__article-excerpt">
+            {%- if article.excerpt.size > 0 -%}
+              {{ article.excerpt | strip_html | truncatewords: 30 }}
+            {%- else -%}
+              {{ article.content | strip_html | truncatewords: 30 }}
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..2) -%}
+        <a href="#" class="hp7-blog__article">
+          <div class="hp7-blog__image-wrap">
+            {{ 'lifestyle-' | append: i | placeholder_svg_tag: 'hp7-blog__image placeholder-svg' }}
+          </div>
+          <div class="hp7-blog__meta">
+            <span>NOV 14, 2026</span>
+            <span>EDITORIAL TEAM</span>
+          </div>
+          <h3 class="hp7-blog__article-title">THE ARCHITECTURE OF SILENCE</h3>
+          <div class="hp7-blog__article-excerpt">
+            An exploration of our latest brutalist-inspired capsule collection, shot on location at the Barbican Estate. We strip away the non-essential to reveal the core structural beauty.
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "HP7 Editorial Blog",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aesthetic: Editorial Brutalism"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "post_limit",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Maximum posts to show",
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Subheading Label",
+      "default": "DISPATCHES"
+    },
+    {
+      "type": "html",
+      "id": "title",
+      "label": "Title",
+      "default": "THE<br><em>JOURNAL</em>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "READ ALL ARCHIVES"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 120
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 Editorial Blog"
+    }
+  ]
+}
+{% endschema %}

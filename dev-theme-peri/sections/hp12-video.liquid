@@ -1,0 +1,117 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAFAFA'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid #E5E5E5;
+  }
+  
+  .hp12-video-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    padding-top: 45%; 
+    background: #E5E5E5;
+  }
+  
+  .hp12-video-element-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  
+  .hp12-video-overlay-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(250, 250, 250, 0.2);
+  }
+  
+  .hp12-video-play-btn-{{ section_id }} {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #FAFAFA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .hp12-video-play-btn-{{ section_id }} svg {
+    width: 20px;
+    height: 20px;
+    fill: #333;
+    margin-left: 4px;
+  }
+  
+  .hp12-video-play-btn-{{ section_id }}:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 40px 20px;
+    }
+    .hp12-video-container-{{ section_id }} {
+      padding-top: 100%;
+    }
+  }
+</style>
+
+<div class="hp12-video-container-{{ section_id }}">
+  {% if section.settings.video_url != blank %}
+    <!-- Placeholder for video integration -->
+    <div class="hp12-video-element-{{ section_id }}"></div>
+  {% else %}
+    {% if section.settings.cover_image != blank %}
+      <img src="{{ section.settings.cover_image | image_url: width: 2000 }}" class="hp12-video-element-{{ section_id }}" alt="Video Cover">
+    {% endif %}
+  {% endif %}
+  
+  <div class="hp12-video-overlay-{{ section_id }}">
+    <div class="hp12-video-play-btn-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP12 Video",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP12 Video"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,212 @@
+{%- comment -%}
+  Global wishlist drawer.
+
+  Reads from the shared store in assets/wishlist.js (key: cf_wishlist_items).
+  Because the store keeps title/price/image/url with each item, the drawer
+  renders instantly with no network request.
+
+  Open it from anywhere:
+    <button onclick="toggleWishlist()">Wishlist (<span data-wishlist-count>0</span>)</button>
+{%- endcomment -%}
+
+<div id="cf-wishlist-overlay" class="cf-wishlist-overlay" hidden></div>
+
+<aside
+  id="cf-wishlist-drawer"
+  class="cf-wishlist-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cf-wishlist-title"
+  aria-hidden="true">
+
+  <header class="cf-wishlist__head">
+    <h2 id="cf-wishlist-title" class="cf-wishlist__heading">
+      Your wishlist <span class="cf-wishlist__count" data-wishlist-count hidden>0</span>
+    </h2>
+    <button id="cf-wishlist-close" class="cf-wishlist__close" type="button" aria-label="Close wishlist">&times;</button>
+  </header>
+
+  <div id="cf-wishlist-content" class="cf-wishlist__content">
+    <p id="cf-wishlist-empty" class="cf-wishlist__empty">
+      Nothing saved yet. Tap the heart on any product to keep it here.
+    </p>
+    <div id="cf-wishlist-list" class="cf-wishlist__list"></div>
+  </div>
+
+  <footer class="cf-wishlist__foot" id="cf-wishlist-foot" hidden>
+    <button type="button" class="cf-wishlist__clear" id="cf-wishlist-clear">Clear all</button>
+    <a class="cf-wishlist__cta" href="{{ routes.all_products_collection_url }}">Continue shopping</a>
+  </footer>
+</aside>
+
+<style>
+  .cf-wishlist-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
+    z-index: 99998; opacity: 0; transition: opacity 0.3s ease;
+  }
+  .cf-wishlist-overlay[hidden] { display: none; }
+  .cf-wishlist-overlay.is-open { opacity: 1; }
+
+  .cf-wishlist-drawer {
+    position: fixed; top: 0; right: 0; height: 100%;
+    width: 400px; max-width: 100%;
+    background: #FFFFFF; color: #111111;
+    z-index: 99999;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+  }
+  .cf-wishlist-drawer[aria-hidden="false"] { transform: translateX(0); }
+
+  .cf-wishlist__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px; border-bottom: 1px solid #E5E5E5; flex: 0 0 auto;
+  }
+  .cf-wishlist__heading { margin: 0; font-size: 18px; font-weight: 700; }
+  .cf-wishlist__count {
+    display: inline-block; margin-left: 6px; padding: 1px 8px;
+    background: #111111; color: #FFFFFF; border-radius: 99px; font-size: 12px;
+  }
+  .cf-wishlist__count[hidden] { display: none; }
+  .cf-wishlist__close {
+    background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer;
+    min-width: 44px; min-height: 44px; color: inherit;
+  }
+
+  .cf-wishlist__content { flex: 1 1 auto; overflow-y: auto; padding: 16px 20px; }
+  .cf-wishlist__empty { text-align: center; color: #757575; font-size: 14px; margin: 40px 0; }
+  .cf-wishlist__empty[hidden] { display: none; }
+  .cf-wishlist__list { display: flex; flex-direction: column; gap: 14px; }
+
+  .cf-wl-item { display: flex; gap: 12px; align-items: flex-start; }
+  .cf-wl-item__media {
+    flex: 0 0 72px; width: 72px; height: 72px; border-radius: 8px;
+    overflow: hidden; background: #F4F4F4;
+  }
+  .cf-wl-item__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cf-wl-item__info { flex: 1 1 auto; min-width: 0; }
+  .cf-wl-item__title {
+    margin: 0 0 4px; font-size: 14px; font-weight: 600; color: inherit; text-decoration: none;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .cf-wl-item__price { margin: 0 0 8px; font-size: 13px; font-weight: 700; }
+  .cf-wl-item__remove {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-size: 12px; text-decoration: underline; color: #757575; min-height: 32px;
+  }
+
+  .cf-wishlist__foot {
+    flex: 0 0 auto; display: flex; gap: 10px; align-items: center;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+    border-top: 1px solid #E5E5E5;
+  }
+  .cf-wishlist__foot[hidden] { display: none; }
+  .cf-wishlist__clear {
+    background: none; border: 1px solid #D5D5D5; border-radius: 6px;
+    padding: 12px 14px; min-height: 44px; cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  .cf-wishlist__cta {
+    flex: 1 1 auto; text-align: center; background: #111111; color: #FFFFFF;
+    border-radius: 6px; padding: 13px 14px; min-height: 44px;
+    font-size: 14px; font-weight: 700; text-decoration: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .cf-wishlist-drawer { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cf-wishlist-drawer, .cf-wishlist-overlay { transition: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    var overlay = document.getElementById('cf-wishlist-overlay');
+    var drawer = document.getElementById('cf-wishlist-drawer');
+    var closeBtn = document.getElementById('cf-wishlist-close');
+    var list = document.getElementById('cf-wishlist-list');
+    var empty = document.getElementById('cf-wishlist-empty');
+    var foot = document.getElementById('cf-wishlist-foot');
+    var clearBtn = document.getElementById('cf-wishlist-clear');
+    var lastFocus = null;
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function render() {
+      var items = window.Wishlist ? window.Wishlist.items() : [];
+
+      if (!items.length) {
+        list.innerHTML = '';
+        empty.hidden = false;
+        foot.hidden = true;
+        return;
+      }
+
+      empty.hidden = true;
+      foot.hidden = false;
+
+      list.innerHTML = items.map(function (i) {
+        var url = esc(i.url || '/products/' + i.handle);
+        var img = i.image
+          ? '<img src="' + esc(i.image) + '" alt="' + esc(i.title) + '" width="72" height="72" loading="lazy">'
+          : '';
+        return '' +
+          '<div class="cf-wl-item">' +
+            '<a class="cf-wl-item__media" href="' + url + '" tabindex="-1" aria-hidden="true">' + img + '</a>' +
+            '<div class="cf-wl-item__info">' +
+              '<a class="cf-wl-item__title" href="' + url + '">' + esc(i.title || i.handle) + '</a>' +
+              (i.price ? '<p class="cf-wl-item__price">' + esc(i.price) + '</p>' : '') +
+              '<button type="button" class="cf-wl-item__remove" data-wl-remove="' + esc(i.handle) + '">Remove</button>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function open() {
+      lastFocus = document.activeElement;
+      render();
+      overlay.hidden = false;
+      requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+      drawer.setAttribute('aria-hidden', 'false');
+      closeBtn.focus();
+      document.addEventListener('keydown', onKey);
+    }
+
+    function close() {
+      overlay.classList.remove('is-open');
+      drawer.setAttribute('aria-hidden', 'true');
+      setTimeout(function () { overlay.hidden = true; }, 300);
+      document.removeEventListener('keydown', onKey);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    function onKey(e) { if (e.key === 'Escape') close(); }
+
+    window.toggleWishlist = function () {
+      drawer.getAttribute('aria-hidden') === 'false' ? close() : open();
+    };
+    window.openWishlist = open;
+    window.closeWishlist = close;
+
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', close);
+
+    list.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-wl-remove]');
+      if (!btn || !window.Wishlist) return;
+      window.Wishlist.remove(btn.getAttribute('data-wl-remove'));
+    });
+
+    clearBtn.addEventListener('click', function () {
+      if (window.Wishlist) window.Wishlist.clear();
+    });
+
+    document.addEventListener('wishlist:updated', render);
+    document.addEventListener('DOMContentLoaded', render);
+  })();
+</script>

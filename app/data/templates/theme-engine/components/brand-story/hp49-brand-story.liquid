@@ -1,0 +1,168 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp49-story-bg: {{ section.settings.bg_color | default: '#F5F3FF' }};
+    --hp49-accent: {{ section.settings.accent_color | default: '#7C3AED' }};
+    
+    background-color: var(--hp49-story-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp49-story__container {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 70px;
+    align-items: center;
+  }
+
+  .hp49-story__media-bubble {
+    border-radius: 40px;
+    overflow: hidden;
+    height: 480px;
+    background: #EDE9FE;
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.12);
+  }
+
+  .hp49-story__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hp49-story__subhead {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--hp49-accent);
+    margin: 0 0 12px;
+  }
+
+  .hp49-story__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #2E1065;
+    margin: 0 0 20px;
+  }
+
+  .hp49-story__desc {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #5B21B6;
+    margin: 0 0 32px;
+    opacity: 0.85;
+  }
+
+  .hp49-story__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    border-top: 1px solid rgba(124, 58, 237, 0.2);
+    padding-top: 24px;
+    margin-bottom: 36px;
+  }
+
+  .hp49-story__val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--hp49-accent);
+    margin: 0 0 4px;
+  }
+
+  .hp49-story__lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2E1065;
+    margin: 0;
+  }
+
+  .hp49-story__btn {
+    display: inline-flex;
+    padding: 16px 36px;
+    background: #7C3AED;
+    color: #FFFFFF;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+    transition: all 0.25s ease;
+  }
+
+  .hp49-story__btn:hover {
+    background: #6D28D9;
+    transform: translateY(-2px);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp49-story__container { grid-template-columns: 1fr; text-align: center; }
+    .hp49-story__media-bubble { height: 340px; }
+  }
+{%- endstyle -%}
+
+<div class="hp49-story__container">
+  <div class="hp49-story__media-bubble">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 1000 }}" class="hp49-story__img" alt="Lavender Dream Field" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp49-story__img' }}
+    {%- endif -%}
+  </div>
+
+  <div>
+    <p class="hp49-story__subhead">PROVENCE BOTANICAL LABORATORY</p>
+    <h2 class="hp49-story__title">{{ section.settings.heading | default: 'Pure High-Altitude Hydrosols & Cloud Peptides' }}</h2>
+    <p class="hp49-story__desc">
+      {{ section.settings.description | default: 'Harvested exclusively at sunrise in the high French Alps. Our steam micro-distillation preserves the natural linalool terpenes, creating an intensely soothing cloud blanket that quiets skin stress.' }}
+    </p>
+
+    <div class="hp49-story__stats">
+      <div>
+        <p class="hp49-story__val">1,200M</p>
+        <p class="hp49-story__lbl">ALPINE ALTITUDE</p>
+      </div>
+      <div>
+        <p class="hp49-story__val">99.4%</p>
+        <p class="hp49-story__lbl">NATURAL HYDROSOL</p>
+      </div>
+      <div>
+        <p class="hp49-story__val">0%</p>
+        <p class="hp49-story__lbl">ARTIFICIAL PERFUME</p>
+      </div>
+    </div>
+
+    <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="hp49-story__btn">
+      {{ section.settings.btn_text | default: 'Read Our Provence Journal &rarr;' }}
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP49 - Lavender Story",
+  "class": "section-hp49-story",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F3FF" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#7C3AED" },
+    { "type": "image_picker", "id": "image", "label": "Story Image" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Pure High-Altitude Hydrosols & Cloud Peptides" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Harvested exclusively at sunrise in the high French Alps." },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Read Our Provence Journal →" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "presets": [
+    { "name": "HP49 - Lavender Story" }
+  ]
+}
+{% endschema %}

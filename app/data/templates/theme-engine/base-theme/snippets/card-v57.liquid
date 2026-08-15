@@ -1,0 +1,200 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V57 — SUSTAINABLE HEMP & LINEN APPAREL D2C (JUNGMAVEN / MAGIC LINEN STYLE)
+  Usage: {% render 'card-v57', product: product %}
+  Design: Sage Hemp Green (#52796F), Parchment Cream (#F4F1DE), Cormorant Garamond & Plus Jakarta Sans fonts, 12px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  .cv57-card {
+    --cv57-bg: #FFFFFF;
+    --cv57-text: #2F3E46;
+    --cv57-muted: #52796F;
+    --cv57-sage: #52796F;
+    --cv57-cream: #F4F1DE;
+    --cv57-border: #CAD2C5;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cv57-bg);
+    border: 1px solid var(--cv57-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv57-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv57-sage);
+    box-shadow: 0 12px 24px -6px rgba(82, 121, 111, 0.22);
+  }
+
+  .cv57-card *, .cv57-card *::before, .cv57-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv57-card a { color: inherit; text-decoration: none; }
+  .cv57-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv57-card img { max-width: 100%; display: block; }
+
+  .cv57-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv57-cream);
+    overflow: hidden;
+  }
+  .cv57-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv57-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv57-card:hover .cv57-img-pri { opacity: 0; }
+  .cv57-card:hover .cv57-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Hemp Tag Top Left */
+  .cv57-badge-hemp {
+    position: absolute; top: 10px; left: 10px;
+    background: #2F3E46; color: #F4F1DE;
+    font-family: 'Cormorant Garamond', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv57-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv57-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv57-sage); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv57-wish:hover, .cv57-wish.active { background: var(--cv57-sage); color: #FFFFFF; border-color: var(--cv57-sage); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv57-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(47, 62, 70, 0.95); color: #F4F1DE;
+    font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 6px; border: 1px solid var(--cv57-sage);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv57-card:hover .cv57-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv57-qv-overlay:hover { background: #F4F1DE; color: #2F3E46; }
+
+  .cv57-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv57-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv57-muted); font-weight: 600; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
+  .cv57-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #2F3E46; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Fiber Specs Subtitle */
+  .cv57-specs { font-size: 11px; color: var(--cv57-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv57-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #52796F; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv57-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv57-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #2F3E46; }
+  .cv57-cmp { font-size: 13px; color: #A8A29E; text-decoration: line-through; }
+  .cv57-disc { font-size: 10px; font-weight: 700; color: #2F3E46; background: var(--cv57-cream); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv57-border); }
+
+  /* Natural Dye Color Swatches */
+  .cv57-swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .cv57-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cv57-border); cursor: pointer; }
+  .cv57-swatch.active { transform: scale(1.25); border-color: var(--cv57-sage); }
+
+  /* Bottom Button */
+  .cv57-action-box { padding: 0 14px 14px; }
+  .cv57-atc-btn {
+    width: 100%; padding: 11px;
+    background: #52796F; color: #FFFFFF;
+    font-family: 'Cormorant Garamond', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 6px; border: none; transition: all 0.2s ease;
+  }
+  .cv57-atc-btn:hover { background: #2F3E46; transform: scale(1.01); }
+  .cv57-atc-btn:disabled { background: #E7E5E4; color: #A8A29E; cursor: not-allowed; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv57-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv57-badge-hemp">100% ORGANIC HEMP 🌿</span>
+
+    <button type="button" class="cv57-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv57-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv57-img cv57-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv57-img cv57-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-6' | placeholder_svg_tag: 'cv57-img' }}
+      {% endif %}
+
+      <button type="button" class="cv57-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv57-content">
+      {% if card_prod.vendor != blank %}<span class="cv57-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv57-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv57-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv57-specs">Plastic-Free Microfibers | Breathable</span>
+
+      <div class="cv57-rating">
+        <span>★ 4.8</span> <span>(2,600 reviews)</span>
+      </div>
+
+      <div class="cv57-price-row">
+        <span class="cv57-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv57-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv57-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv57-swatches">
+          {% for variant in card_prod.variants limit: 3 %}
+            <span class="cv57-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#52796F', '#E07A5F', '#F4F1DE' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cv57-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv57-atc-btn" data-add-cart="{{ cur_var.id }}">EMBRACE SLOW FASHION</button>
+      {% else %}
+        <button type="button" class="cv57-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv57-card">
+    <div class="cv57-media">{{ 'product-6' | placeholder_svg_tag: 'cv57-img' }}</div>
+    <div class="cv57-content">
+      <span class="cv57-vendor">ORGANIC HEMP D2C</span>
+      <div class="cv57-title">Organic Hemp & Cotton Heavyweight Crew Tee</div>
+
+      {% if card_r_show != false %}
+      <div class="cv57-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv57-specs">Plastic-Free Microfibers | Breathable</span>
+      <div class="cv57-price-row"><span class="cv57-price">₹ 2,499</span><span class="cv57-cmp">₹ 2,999</span><span class="cv57-disc">17% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

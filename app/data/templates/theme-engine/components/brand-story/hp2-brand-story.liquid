@@ -1,0 +1,423 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign image_position = section.settings.image_position
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp2-brand-bg: {{ bg_color }};
+    --hp2-brand-text: {{ text_color }};
+    
+    --hp2-brand-pt-desk: {{ padding_top_desktop }}px;
+    --hp2-brand-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp2-brand-pt-mob: {{ padding_top_mobile }}px;
+    --hp2-brand-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp2-fashion-brand-{{ section.id }} {
+    padding-top: var(--hp2-brand-pt-desk);
+    padding-bottom: var(--hp2-brand-pb-desk);
+    background-color: var(--hp2-brand-bg);
+    color: var(--hp2-brand-text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .hp2-brand-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: stretch;
+    min-height: 70vh;
+  }
+
+  /* Structural Flex */
+  .hp2-brand-inner.image-left {
+    flex-direction: row;
+  }
+  .hp2-brand-inner.image-right {
+    flex-direction: row-reverse;
+  }
+
+  /* Image Column */
+  .hp2-brand-img-col {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hp2-brand-img-col.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hp2-brand-img-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    aspect-ratio: 4/5;
+  }
+
+  .hp2-brand-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .hp2-brand-img-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--hp2-brand-bg);
+    opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
+    pointer-events: none;
+  }
+
+  /* Text Column */
+  .hp2-brand-txt-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+  }
+  
+  .hp2-brand-inner.image-left .hp2-brand-txt-col {
+    padding-left: 100px;
+  }
+  .hp2-brand-inner.image-right .hp2-brand-txt-col {
+    padding-right: 100px;
+  }
+
+  .hp2-brand-tagline {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+  }
+
+  .hp2-brand-title {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    margin: 0 0 40px 0;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+  }
+
+  .hp2-brand-desc {
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+    max-width: 500px;
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+  }
+
+  /* Text Reveal Animations */
+  .hp2-brand-txt-col.is-visible .hp2-brand-tagline,
+  .hp2-brand-txt-col.is-visible .hp2-brand-title,
+  .hp2-brand-txt-col.is-visible .hp2-brand-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Button */
+  .hp2-brand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 14px;
+    background: transparent;
+    color: var(--hp2-brand-text);
+    border: 2px solid var(--hp2-brand-text);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    align-self: flex-start;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+  }
+  
+  .hp2-brand-txt-col.is-visible .hp2-brand-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hp2-brand-btn:hover {
+    background: var(--hp2-brand-text);
+    color: var(--hp2-brand-bg);
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 1024px) {
+    .hp2-brand-txt-col {
+      padding: 40px;
+    }
+    .hp2-brand-inner.image-left .hp2-brand-txt-col { padding-left: 40px; }
+    .hp2-brand-inner.image-right .hp2-brand-txt-col { padding-right: 40px; }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp2-fashion-brand-{{ section.id }} {
+      padding-top: var(--hp2-brand-pt-mob);
+      padding-bottom: var(--hp2-brand-pb-mob);
+    }
+    .hp2-brand-inner {
+      flex-direction: column !important;
+      padding: 0;
+    }
+    .hp2-brand-img-col {
+      width: 100%;
+    }
+    .hp2-brand-txt-col {
+      width: 100%;
+      padding: 40px 20px;
+    }
+    .hp2-brand-inner.image-left .hp2-brand-txt-col,
+    .hp2-brand-inner.image-right .hp2-brand-txt-col {
+      padding: 40px 20px;
+    }
+    .hp2-brand-title {
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+    .hp2-brand-desc {
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+    .hp2-brand-btn {
+      width: 100%;
+    }
+    
+    /* Disable animation delay on mobile to prevent empty spaces if scroll is fast */
+    .hp2-brand-img-col, .hp2-brand-tagline, .hp2-brand-title, .hp2-brand-desc, .hp2-brand-btn {
+      opacity: 1;
+      transform: translateY(0);
+      transition: none;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .hp2-brand-img-col, .hp2-brand-tagline, .hp2-brand-title, .hp2-brand-desc, .hp2-brand-btn {
+      opacity: 1;
+      transform: translateY(0);
+      transition: none;
+    }
+  }
+</style>
+
+<section class="hp2-fashion-brand-{{ section.id }}" aria-label="Brand Story">
+  <div class="hp2-brand-inner image-{{ image_position }}">
+    
+    <div class="hp2-brand-img-col js-hp2-animate">
+      <div class="hp2-brand-img-wrapper">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | image_url: width: 1000 }}" 
+               srcset="{{ section.settings.image | image_url: width: 600 }} 600w, 
+                       {{ section.settings.image | image_url: width: 1000 }} 1000w, 
+                       {{ section.settings.image | image_url: width: 1600 }} 1600w"
+               sizes="(max-width: 768px) 100vw, 50vw"
+               class="hp2-brand-img" 
+               loading="lazy" 
+               alt="{{ section.settings.image.alt | default: section.settings.title | escape }}">
+        {%- else -%}
+          {{ 'collection-2' | placeholder_svg_tag: 'hp2-brand-img placeholder-svg' }}
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="hp2-brand-txt-col js-hp2-animate">
+      {%- if section.settings.tagline != blank -%}
+        <p class="hp2-brand-tagline">{{ section.settings.tagline }}</p>
+      {%- endif -%}
+      
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp2-brand-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.description != blank -%}
+        <div class="hp2-brand-desc">{{ section.settings.description }}</div>
+      {%- endif -%}
+      
+      {%- if section.settings.btn_label != blank and section.settings.btn_link != blank -%}
+        <a href="{{ section.settings.btn_link }}" class="hp2-brand-btn">
+          {{ section.settings.btn_label }}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Intersection Observer for scroll animations
+    if ('IntersectionObserver' in window && window.matchMedia('(min-width: 769px)').matches) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        rootMargin: '0px 0px -100px 0px',
+        threshold: 0.1
+      });
+
+      const animatedElements = document.querySelectorAll('.hp2-fashion-brand-{{ section.id }} .js-hp2-animate');
+      animatedElements.forEach(el => observer.observe(el));
+    } else {
+      // Fallback for older browsers or mobile
+      const animatedElements = document.querySelectorAll('.hp2-fashion-brand-{{ section.id }} .js-hp2-animate');
+      animatedElements.forEach(el => el.classList.add('is-visible'));
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP2 Brand Story",
+  "tag": "section",
+  "class": "section-hp2-brand",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Image Left, Text Right" },
+        { "value": "right", "label": "Image Right, Text Left" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Story Image"
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0, "max": 100, "step": 5, "unit": "%",
+      "label": "Image Darken Overlay",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "EST. 2026"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "DEFINING\nMODERN\nCULTURE."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>We create garments that bridge the gap between architectural brutalism and fluid motion. Every stitch is considered. Every silhouette is intentional.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "READ OUR STORY"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP2 Brand Story (Advanced)",
+      "category": "Image with text"
+    }
+  ]
+}
+{% endschema %}

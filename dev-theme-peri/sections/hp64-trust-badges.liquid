@@ -1,0 +1,66 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#020617' }};
+    padding-top: {{ section.settings.padding_top | default: 50 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 50 }}px;
+    border-top: 1px solid rgba(6, 182, 212, 0.25);
+  }
+  .hp64-trust__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp64-trust__grid { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
+  .hp64-trust__item { display: flex; align-items: center; gap: 14px; }
+  .hp64-trust__icon {
+    width: 44px; height: 44px; background: linear-gradient(135deg, #083344, #06B6D4);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #FFFFFF; flex-shrink: 0;
+    border: 1px solid rgba(6, 182, 212, 0.4); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+  }
+  .hp64-trust__label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #FFFFFF; margin: 0; }
+  .hp64-trust__sub { font-size: 11px; color: #06B6D4; margin: 2px 0 0; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px; }
+  @media screen and (max-width: 768px) { .hp64-trust__grid { gap: 24px; } }
+  @media screen and (max-width: 480px) {
+    .hp64-trust__grid { flex-direction: column; align-items: center; text-align: center; }
+    .hp64-trust__item { flex-direction: column; }
+  }
+{%- endstyle -%}
+<div class="hp64-trust__container">
+  <div class="hp64-trust__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp64-trust__item" {{ block.shopify_attributes }}>
+        <div class="hp64-trust__icon">{{ block.settings.icon | default: '🧬' }}</div>
+        <div>
+          <p class="hp64-trust__label">{{ block.settings.title | default: 'Zero Ocean Harvesting' }}</p>
+          <p class="hp64-trust__sub">{{ block.settings.subtitle | default: 'Closed-loop bioreactor grown' }}</p>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP64 Trust",
+  "class": "section-hp64-trust",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#020617" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 100, "step": 10, "unit": "px", "label": "Padding Top", "default": 50 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 100, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 50 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{
+    "type": "badge", "name": "Badge",
+    "settings": [
+      { "type": "text", "id": "icon", "label": "Icon", "default": "🧬" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Zero Ocean Harvesting" },
+      { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Closed-loop bioreactor grown" }
+    ]
+  }],
+  "presets": [{
+    "name": "HP64 Trust",
+    "blocks": [
+      { "type": "badge", "settings": { "icon": "🧬", "title": "Zero Ocean Harvesting", "subtitle": "Closed-loop bioreactor grown" } },
+      { "type": "badge", "settings": { "icon": "⚡", "title": "400 Bar Pressure Tested", "subtitle": "Extreme molecular stability" } },
+      { "type": "badge", "settings": { "icon": "📦", "title": "Titanium Cryo Flask", "subtitle": "Photon-proof container" } },
+      { "type": "badge", "settings": { "icon": "🛡️", "title": "Clinical Efficacy Guarantee", "subtitle": "60-day satisfaction pledge" } }
+    ]
+  }]
+}
+{% endschema %}

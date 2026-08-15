@@ -1,0 +1,219 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign border_color = section.settings.border_color
+  assign border_width = section.settings.border_width
+  assign text_size = section.settings.text_size
+  assign speed = section.settings.speed
+  assign direction = section.settings.direction
+-%}
+
+<style>
+  .hp18-scroll-{{ sec_id }} {
+    background-color: {{ bg_color }};
+    border-top: {{ border_width }}px solid {{ border_color }};
+    border-bottom: {{ border_width }}px solid {{ border_color }};
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .hp18-scroll-{{ sec_id }}__track {
+    display: flex;
+    animation: hp18Scroll{{ sec_id }} {{ speed }}s linear infinite;
+    {% if direction == 'right' %}
+      animation-direction: reverse;
+    {% endif %}
+  }
+
+  .hp18-scroll-{{ sec_id }}__item {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: {{ text_size }}px;
+    color: {{ text_color }};
+    text-transform: uppercase;
+    padding: 0 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 40px;
+    letter-spacing: -2px;
+  }
+
+  /* Outline style support */
+  .hp18-scroll-{{ sec_id }}__item.is-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px {{ text_color }};
+  }
+
+  @keyframes hp18Scroll{{ sec_id }} {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp18-scroll-{{ sec_id }}__item {
+      font-size: {{ text_size | times: 0.6 }}px;
+      padding: 0 20px;
+      gap: 20px;
+    }
+  }
+</style>
+
+<section class="hp18-scroll-{{ sec_id }}">
+  <div class="hp18-scroll-{{ sec_id }}__track">
+    
+    <!-- Group 1 -->
+    <div class="hp18-scroll-{{ sec_id }}__group">
+      {% for block in section.blocks %}
+        <span class="hp18-scroll-{{ sec_id }}__item {% if block.settings.is_outline %}is-outline{% endif %}" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+          {% if block.settings.separator_icon != blank %}
+            <span style="font-size: 0.6em; -webkit-text-stroke: 0; color: {{ text_color }};">{{ block.settings.separator_icon }}</span>
+          {% endif %}
+        </span>
+      {% else %}
+        <span class="hp18-scroll-{{ sec_id }}__item">LIMITED EDITION</span>
+        <span class="hp18-scroll-{{ sec_id }}__item is-outline">WORLDWIDE</span>
+        <span class="hp18-scroll-{{ sec_id }}__item">NO RESTOCKS</span>
+      {% endfor %}
+    </div>
+
+    <!-- Group 2 (Clone for seamless loop) -->
+    <div class="hp18-scroll-{{ sec_id }}__group">
+      {% for block in section.blocks %}
+        <span class="hp18-scroll-{{ sec_id }}__item {% if block.settings.is_outline %}is-outline{% endif %}">
+          {{ block.settings.text }}
+          {% if block.settings.separator_icon != blank %}
+            <span style="font-size: 0.6em; -webkit-text-stroke: 0; color: {{ text_color }};">{{ block.settings.separator_icon }}</span>
+          {% endif %}
+        </span>
+      {% else %}
+        <span class="hp18-scroll-{{ sec_id }}__item">LIMITED EDITION</span>
+        <span class="hp18-scroll-{{ sec_id }}__item is-outline">WORLDWIDE</span>
+        <span class="hp18-scroll-{{ sec_id }}__item">NO RESTOCKS</span>
+      {% endfor %}
+    </div>
+
+    <!-- Group 3 (Clone for safety on ultra-wide screens) -->
+    <div class="hp18-scroll-{{ sec_id }}__group">
+      {% for block in section.blocks %}
+        <span class="hp18-scroll-{{ sec_id }}__item {% if block.settings.is_outline %}is-outline{% endif %}">
+          {{ block.settings.text }}
+          {% if block.settings.separator_icon != blank %}
+            <span style="font-size: 0.6em; -webkit-text-stroke: 0; color: {{ text_color }};">{{ block.settings.separator_icon }}</span>
+          {% endif %}
+        </span>
+      {% else %}
+        <span class="hp18-scroll-{{ sec_id }}__item">LIMITED EDITION</span>
+        <span class="hp18-scroll-{{ sec_id }}__item is-outline">WORLDWIDE</span>
+        <span class="hp18-scroll-{{ sec_id }}__item">NO RESTOCKS</span>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP18 Adv Scrolling Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text/Border Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Outer Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Width",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "unit": "s",
+      "label": "Animation Speed",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "STREETWEAR"
+        },
+        {
+          "type": "checkbox",
+          "id": "is_outline",
+          "label": "Outline Style",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "separator_icon",
+          "label": "Separator Icon",
+          "default": "★"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP18 Advanced Scrolling Text",
+      "blocks": [
+        { "type": "text", "settings": { "text": "NEW SEASON", "is_outline": false, "separator_icon": "✦" } },
+        { "type": "text", "settings": { "text": "LIMITED EDITION", "is_outline": true, "separator_icon": "✦" } },
+        { "type": "text", "settings": { "text": "NO RESTOCKS", "is_outline": false, "separator_icon": "✦" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

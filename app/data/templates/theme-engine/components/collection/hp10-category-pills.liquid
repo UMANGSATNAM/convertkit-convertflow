@@ -1,0 +1,127 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#F9F6F0'
+  assign text_color = section.settings.text_color | default: '#2A3B2C'
+  assign hover_bg = section.settings.hover_bg | default: '#8A9A86'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 60px 20px;
+  }
+  
+  .hp10-pills-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .hp10-pill-{{ section_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 35px;
+    background: transparent;
+    border: 1px solid rgba(42, 59, 44, 0.2);
+    border-radius: 40px;
+    color: {{ text_color }};
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .hp10-pill-{{ section_id }}:hover {
+    background-color: {{ hover_bg }};
+    border-color: {{ hover_bg }};
+    color: #F9F6F0;
+  }
+
+  @media (max-width: 768px) {
+    .hp10-pills-container-{{ section_id }} {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 10px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .hp10-pills-container-{{ section_id }}::-webkit-scrollbar {
+      display: none;
+    }
+    .hp10-pill-{{ section_id }} {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<div class="hp10-pills-container-{{ section_id }}">
+  {% for block in section.blocks %}
+    <a href="{{ block.settings.link | default: '#' }}" class="hp10-pill-{{ section_id }}" {{ block.shopify_attributes }}>
+      {{ block.settings.title | default: 'Category' }}
+    </a>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP10 Category Pills",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2A3B2C"
+    },
+    {
+      "type": "color",
+      "id": "hover_bg",
+      "label": "Hover Background Color",
+      "default": "#8A9A86"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP10 Category Pills",
+      "blocks": [
+        { "type": "pill", "settings": { "title": "Skincare" } },
+        { "type": "pill", "settings": { "title": "Body" } },
+        { "type": "pill", "settings": { "title": "Haircare" } },
+        { "type": "pill", "settings": { "title": "Wellness" } },
+        { "type": "pill", "settings": { "title": "Sets" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

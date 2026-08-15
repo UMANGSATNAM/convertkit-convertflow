@@ -1,33 +1,214 @@
-<div class="sf-product-section trust" id="product-14" style="padding: 60px 20px; background-color: {{ section.settings.bg_color }};">
-  <div style="text-align: center; margin-bottom: 40px;">
-    <h2 style="font-size: 2.2rem; color: {{ section.settings.heading_color }};">{{ section.settings.title }}</h2>
-  </div>
+{%- assign product = all_products[section.settings.product] | default: product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  .sf-pdp-{{ section.id }} {
+    --primary-color: {{ section.settings.primary_color }};
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --border-color: #e2e8f0;
+    --radius: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  .sf-pdp-{{ section.id }} * { box-sizing: inherit; }
+  .sf-pdp-container { max-width: 1200px; margin: 0 auto; }
   
-  {% if section.settings.product != blank %}
-    {% assign product = all_products[section.settings.product] %}
-    <div style="display: flex; gap: 40px; align-items: center; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 300px;">
-        <img src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
-      </div>
-      <div style="flex: 1; min-width: 300px; padding: 20px;">
-        <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: {{ section.settings.heading_color }};">{{ product.title }}</h3>
-        <p style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: {{ section.settings.primary_color }};">{{ product.price | money }}</p>
-        <div style="margin-bottom: 30px; line-height: 1.6; color: #666;">
-          {{ product.description | strip_html | truncatewords: 30 }}
+  .sf-pdp-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+  @media(min-width: 900px) {
+    .sf-pdp-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
+  }
+
+  /* Gallery */
+  .sf-media-wrapper { display: flex; flex-direction: column; gap: 16px; }
+  .sf-gallery-main { width: 100%; border-radius: var(--radius); overflow: hidden; background: #f8fafc; border: 1px solid var(--border-color); }
+  .sf-gallery-main img { width: 100%; height: auto; display: block; object-fit: cover; }
+  
+  /* Trust Badges - Under Image */
+  .sf-trust-banner { display: flex; justify-content: space-around; padding: 24px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-top: 16px; }
+  .sf-trust-item { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .sf-trust-icon { width: 32px; height: 32px; color: var(--primary-color); }
+  .sf-trust-text { font-size: 0.85rem; font-weight: 600; color: var(--heading-color); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Details */
+  .sf-pdp-vendor { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; }
+  .sf-pdp-title { font-size: 2.25rem; font-weight: 800; color: var(--heading-color); margin: 0 0 16px 0; line-height: 1.1; }
+  .sf-pdp-price-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .sf-pdp-price { font-size: 1.75rem; font-weight: 700; color: var(--primary-color); }
+  .sf-pdp-compare-price { font-size: 1.125rem; color: #94a3b8; text-decoration: line-through; }
+
+  /* Form */
+  .sf-variant-group { margin-bottom: 20px; }
+  .sf-variant-label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+  .sf-variant-options { display: flex; flex-wrap: wrap; gap: 10px; }
+  .sf-variant-option { padding: 10px 16px; border: 2px solid var(--border-color); border-radius: var(--radius); background: #fff; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: all 0.2s; }
+  .sf-variant-option.selected { border-color: var(--primary-color); background: #f8fafc; color: var(--primary-color); }
+  
+  .sf-action-group { display: flex; gap: 16px; margin-bottom: 24px; height: 56px; }
+  .sf-quantity-selector { display: flex; align-items: center; border: 2px solid var(--border-color); border-radius: var(--radius); width: 120px; }
+  .sf-qty-btn { width: 40px; height: 100%; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-color); }
+  .sf-qty-input { flex: 1; height: 100%; border: none; text-align: center; font-size: 1rem; font-weight: 600; appearance: textfield; padding: 0; }
+  .sf-qty-input::-webkit-inner-spin-button { display: none; }
+  
+  .sf-add-to-cart { flex: 1; background: var(--primary-color); color: #fff; border: none; border-radius: var(--radius); font-size: 1.125rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .sf-add-to-cart:hover { opacity: 0.9; }
+
+  /* Trust Box (Right Column) */
+  .sf-trust-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin-top: 32px; }
+  .sf-trust-box-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  .sf-trust-box-item { display: flex; align-items: flex-start; gap: 12px; }
+  .sf-tb-icon { color: #10b981; flex-shrink: 0; margin-top: 2px; }
+  .sf-tb-text strong { display: block; color: var(--heading-color); font-size: 0.95rem; margin-bottom: 2px; }
+  .sf-tb-text span { display: block; color: #64748b; font-size: 0.85rem; line-height: 1.4; }
+
+  /* Secure Checkout Images */
+  .sf-secure-checkout { margin-top: 24px; text-align: center; }
+  .sf-secure-checkout span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px; }
+  .sf-payment-icons { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .sf-payment-icon { width: 38px; height: 24px; background: #e2e8f0; border-radius: 4px; display: inline-block; } /* Placeholder for payment icons */
+
+</style>
+
+<div class="sf-pdp-{{ section.id }}">
+  <div class="sf-pdp-container">
+    {% if product != blank %}
+      <div class="sf-pdp-grid">
+        
+        <!-- Media Gallery -->
+        <div class="sf-media-wrapper">
+          <div class="sf-gallery-main" id="sf-main-image-{{ section.id }}">
+            <img src="{{ current_variant.featured_image | default: product.featured_image | img_url: '1000x' }}" alt="{{ product.title | escape }}" id="sf-image-el-{{ section.id }}">
+          </div>
+          
+          <div class="sf-trust-banner">
+            <div class="sf-trust-item">
+              <svg class="sf-trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span class="sf-trust-text">Secure</span>
+            </div>
+            <div class="sf-trust-item">
+              <svg class="sf-trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span class="sf-trust-text">Verified</span>
+            </div>
+            <div class="sf-trust-item">
+              <svg class="sf-trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              <span class="sf-trust-text">Support</span>
+            </div>
+          </div>
         </div>
-        <form action="/cart/add" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
-          <button type="submit" style="width: 100%; padding: 15px; background-color: {{ section.settings.primary_color }}; color: #fff; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">
-            Add to Cart
-          </button>
-        </form>
+
+        <!-- Product Details -->
+        <div class="sf-details-wrapper">
+          <div class="sf-pdp-vendor">{{ product.vendor }}</div>
+          <h1 class="sf-pdp-title">{{ product.title }}</h1>
+          
+          <div class="sf-pdp-price-wrapper">
+            <span class="sf-pdp-price" id="sf-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="sf-pdp-compare-price" id="sf-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+            {% endif %}
+          </div>
+
+          <div style="font-size: 1rem; color: #475569; line-height: 1.6; margin-bottom: 24px;">
+            {{ product.description }}
+          </div>
+
+          <form method="post" action="/cart/add" id="sf-form-{{ section.id }}" accept-charset="UTF-8" enctype="multipart/form-data">
+            <input type="hidden" name="form_type" value="product">
+            <input type="hidden" name="utf8" value="✓">
+            <input type="hidden" name="id" id="sf-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+
+            {% unless product.has_only_default_variant %}
+              <div class="sf-variants-container">
+                {% for option in product.options_with_values %}
+                  <div class="sf-variant-group">
+                    <span class="sf-variant-label">{{ option.name }}</span>
+                    <div class="sf-variant-options" data-option-index="option{{ forloop.index }}">
+                      {% for value in option.values %}
+                        <div class="sf-variant-option {% if option.selected_value == value %}selected{% endif %}" 
+                             data-value="{{ value | escape }}"
+                             onclick="sfSelectOption('{{ section.id }}', this)">
+                          {{ value }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endunless %}
+
+            <div class="sf-action-group">
+              <div class="sf-quantity-selector">
+                <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', -1)">−</button>
+                <input type="number" class="sf-qty-input" name="quantity" id="sf-qty-{{ section.id }}" value="1" min="1">
+                <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', 1)">+</button>
+              </div>
+              <button type="submit" class="sf-add-to-cart" id="sf-atc-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+                {% if current_variant.available %}Add to Cart{% else %}Out of Stock{% endif %}
+              </button>
+            </div>
+            
+            <div class="sf-secure-checkout">
+              <span>Guaranteed Safe Checkout</span>
+              <div class="sf-payment-icons">
+                <div class="sf-payment-icon" style="background: #1a1f71;" title="Visa"></div>
+                <div class="sf-payment-icon" style="background: #eb001b;" title="Mastercard"></div>
+                <div class="sf-payment-icon" style="background: #0079c1;" title="PayPal"></div>
+                <div class="sf-payment-icon" style="background: #000;" title="Apple Pay"></div>
+              </div>
+            </div>
+
+            <!-- Detailed Trust Box -->
+            <div class="sf-trust-box">
+              <ul class="sf-trust-box-list">
+                <li class="sf-trust-box-item">
+                  <svg class="sf-tb-icon" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <div class="sf-tb-text">
+                    <strong>30-Day Money-Back Guarantee</strong>
+                    <span>Not satisfied? Return it for a full refund, no questions asked.</span>
+                  </div>
+                </li>
+                <li class="sf-trust-box-item">
+                  <svg class="sf-tb-icon" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  <div class="sf-tb-text">
+                    <strong>24/7 Customer Support</strong>
+                    <span>Our dedicated team is here to help you anytime, day or night.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+          </form>
+        </div>
       </div>
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">
-      <p style="font-size: 1.2rem; color: #888;">Select a product in the theme editor to view.</p>
-    </div>
-  {% endif %}
+
+      <script>
+        window.sfVariants_{{ section.id | replace: '-', '_' }} = [
+          {% for variant in product.variants %}
+            {
+              id: {{ variant.id }},
+              title: {{ variant.title | json }},
+              option1: {{ variant.option1 | json }},
+              option2: {{ variant.option2 | json }},
+              option3: {{ variant.option3 | json }},
+              price: '{{ variant.price | money }}',
+              compare_at_price: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
+              available: {{ variant.available }},
+              featured_image: {% if variant.featured_image %}'{{ variant.featured_image | img_url: "1000x" }}'{% else %}null{% endif %}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ];
+      </script>
+
+    {% else %}
+      <div style="text-align: center; padding: 100px 20px; border: 1px dashed var(--border-color);">
+        <p style="font-size: 1.25rem; color: #64748b;">Select a product in the theme editor.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 {% schema %}
@@ -35,11 +216,16 @@
   "name": "Product Trust Focused",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Section Title", "default": "Product Trust Focused" },
     { "type": "product", "id": "product", "label": "Select Product" },
+    { "type": "header", "content": "Colors" },
     { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
-    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "color", "id": "primary_color", "label": "Primary Color", "default": "#000000" }
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#334155" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#0f172a" },
+    { "type": "color", "id": "primary_color", "label": "Primary Button Color", "default": "#2563eb" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Top", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Bottom", "default": 60 },
+    { "type": "range", "id": "padding_horizontal", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Horizontal", "default": 20 }
   ]
 }
 {% endschema %}

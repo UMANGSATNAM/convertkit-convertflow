@@ -1,0 +1,100 @@
+{% comment %} CL V38 — K-Pop / Idol Merch (Holographic/Lavender) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv38 { background: {{ section.settings.bg_color | default: '#F3E8FF' }}; color: {{ section.settings.text_color | default: '#6B21A8' }}; padding: 40px 15px; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+  .clv38-hero { text-align: center; margin-bottom: 50px; padding: 60px 20px; background: linear-gradient(135deg, #E9D5FF 0%, #D8B4FE 100%); border-radius: 30px; position: relative; z-index: 1; }
+  .clv38-hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 30px; background: linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.4) 75%, transparent 75%, transparent); background-size: 20px 20px; z-index: -1; opacity: 0.5; }
+  .clv38-hero h1 { font-size: 46px; font-weight: 800; color: #FFF; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(107,33,168,0.3); }
+  .clv38-hero p { font-size: 16px; font-weight: 600; color: #581C87; max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.6); padding: 5px 15px; border-radius: 20px; display: inline-block; }
+  .clv38-chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv38-chips a { padding: 10px 22px; background: #FFF; color: #9333EA; text-decoration: none; font-size: 14px; font-weight: 700; border-radius: 50px; transition: 0.3s; box-shadow: 0 4px 15px rgba(147,51,234,0.1); }
+  .clv38-chips a:hover, .clv38-chips a.active { background: #9333EA; color: #FFF; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(147,51,234,0.3); }
+  .clv38-toolbar { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px 25px; margin-bottom: 40px; border: 1px solid #FFF; box-shadow: 0 10px 30px rgba(147,51,234,0.05); }
+  .clv38-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv38-promo { grid-column: span 1; background: linear-gradient(135deg, #C084FC, #9333EA); color: #FFF; border-radius: 25px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+  .clv38-promo::after { content: '✨'; position: absolute; top: 10px; right: 15px; font-size: 24px; opacity: 0.5; }
+  .clv38-promo h3 { font-size: 26px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  .clv38-promo a { display: inline-block; padding: 12px 25px; background: #FFF; color: #9333EA; text-decoration: none; font-weight: 700; border-radius: 20px; font-size: 14px; transition: 0.2s; }
+  .clv38-promo a:hover { transform: scale(1.05); }
+  .clv38-seo { margin-top: 60px; background: #FFF; padding: 40px; border-radius: 30px; text-align: center; box-shadow: 0 10px 30px rgba(147,51,234,0.05); }
+  @media (max-width: 768px) { .clv38-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv38-hero h1 { font-size: 36px; } }
+</style>
+<div class="clv38" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv38-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}IDOL GOODS{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Show your love with official lightsticks, photocards, and more.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv38-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv38-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 15px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 700; color: #6B21A8;">{{ filter.label }} 💖</summary>
+              <div style="position: absolute; background: #FFF; padding: 20px; border-radius: 20px; border: 1px solid #E9D5FF; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 0 10px 25px rgba(107,33,168,0.1);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #581C87; font-weight: 500;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FFF; border: 2px solid #E9D5FF; color: #6B21A8; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv38-grid">
+      {% for product in collection.products %}
+        {% render 'card-v38', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv38-promo">
+            <h3>New<br>Lightsticks</h3>
+            <a href="/collections/lightsticks">Shop Now</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v38', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-weight: 800; font-size: 18px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv38-seo">
+      <h2 style="font-size: 24px; font-weight: 800; color: #6B21A8; margin-bottom: 10px;">{{ section.settings.seo_title | default: 'Complete Your Collection' }}</h2>
+      <p style="font-size: 14px; color: #7E22CE; max-width: 600px; margin: 0 auto; line-height: 1.6;">{{ section.settings.seo_text | default: '100% official merchandise directly sourced from Korea. Find the rarest photocards and limited edition albums right here.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V38 — K-Pop Merch", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F3E8FF"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#6B21A8"}
+  ], "presets": [{"name": "CL V38 — K-Pop Merch"}]
+}
+{% endschema %}

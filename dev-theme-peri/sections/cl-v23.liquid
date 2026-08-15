@@ -1,0 +1,98 @@
+{% comment %} CL V23 — Minimal Home Decor {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv23 { background: {{ section.settings.bg_color | default: '#F4F1ED' }}; color: {{ section.settings.text_color | default: '#3D3B38' }}; padding: 70px 20px; font-family: 'Playfair Display', serif; }
+  .clv23-hero { text-align: center; margin-bottom: 60px; }
+  .clv23-hero h1 { font-size: 46px; font-weight: 400; margin-bottom: 20px; color: #2C2A28; }
+  .clv23-hero p { font-size: 15px; font-family: 'Helvetica', sans-serif; color: #736F6A; max-width: 500px; margin: 0 auto; line-height: 1.7; letter-spacing: 0.5px; }
+  .clv23-chips { display: flex; gap: 20px; justify-content: center; margin-bottom: 50px; flex-wrap: wrap; border-bottom: 1px solid #D6D2CA; padding-bottom: 30px; }
+  .clv23-chips a { padding: 8px 0; color: #3D3B38; text-decoration: none; font-family: 'Helvetica', sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid transparent; transition: 0.3s; }
+  .clv23-chips a:hover, .clv23-chips a.active { border-bottom: 1px solid #3D3B38; }
+  .clv23-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; font-family: 'Helvetica', sans-serif; }
+  .clv23-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 3 }}, 1fr); gap: 40px; }
+  .clv23-promo { grid-column: span 1; background: #E8E4DD; padding: 50px 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .clv23-promo h3 { font-size: 26px; font-weight: 400; margin-bottom: 15px; color: #2C2A28; }
+  .clv23-promo a { display: inline-block; font-family: 'Helvetica', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #3D3B38; text-decoration: none; border-bottom: 1px solid #3D3B38; padding-bottom: 3px; align-self: center; }
+  .clv23-seo { margin-top: 80px; text-align: center; padding: 60px 20px; background: #FFFFFF; }
+  @media (max-width: 768px) { .clv23-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 20px; } .clv23-hero h1 { font-size: 36px; } }
+</style>
+<div class="clv23" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv23-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Curated Living{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Objects for the modern home. Simple, functional, beautiful.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv23-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv23-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 30px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #736F6A;">{{ filter.label }}</summary>
+              <div style="position: absolute; top: 100%; left: 0; background: #FFF; border: 1px solid #D6D2CA; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); z-index: 10; min-width: 200px; margin-top: 15px;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 13px; color: #3D3B38;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} <span style="color:#A4A09B;font-size:11px;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #736F6A; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 12 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv23-grid">
+      {% for product in collection.products %}
+        {% render 'card-v23', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv23-promo">
+            <span style="font-family: 'Helvetica', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #736F6A; margin-bottom: 15px;">Consultation</span>
+            <h3>Interior Styling</h3>
+            <a href="/pages/styling">Learn More</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v23', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 60px; text-align: center; font-family: 'Helvetica', sans-serif; font-size: 13px; letter-spacing: 1px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv23-seo">
+      <h2 style="font-size: 28px; font-weight: 400; margin-bottom: 15px; color: #2C2A28;">{{ section.settings.seo_title | default: 'Design with Purpose' }}</h2>
+      <p style="font-family: 'Helvetica', sans-serif; font-size: 14px; color: #736F6A; line-height: 1.8; max-width: 600px; margin: 0 auto;">{{ section.settings.seo_text | default: 'We believe your home should be a sanctuary. Every piece in our collection is chosen for its timeless design and ethical craftsmanship.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V23 — Home Decor", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 12},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "default": 3},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F4F1ED"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#3D3B38"}
+  ], "presets": [{"name": "CL V23 — Home Decor"}]
+}
+{% endschema %}

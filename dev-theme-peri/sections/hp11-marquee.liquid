@@ -1,0 +1,101 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FF00FF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 20px 0;
+    overflow: hidden;
+    border-bottom: 3px solid #000;
+  }
+  
+  .hp11-marquee-container-{{ section_id }} {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .hp11-marquee-content-{{ section_id }} {
+    display: flex;
+    animation: hp11-marquee-scroll-{{ section_id }} 10s linear infinite;
+    align-items: center;
+  }
+  
+  .hp11-marquee-item-{{ section_id }} {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 2rem;
+    color: {{ text_color }};
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    -webkit-text-stroke: 1px #000;
+    text-shadow: 2px 2px 0 #FFF;
+  }
+  
+  .hp11-marquee-star-{{ section_id }} {
+    font-size: 2rem;
+    color: #000;
+    margin: 0 10px;
+  }
+
+  @keyframes hp11-marquee-scroll-{{ section_id }} {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
+
+<div class="hp11-marquee-container-{{ section_id }}">
+  <div class="hp11-marquee-content-{{ section_id }}">
+    <!-- First set -->
+    {% for i in (1..6) %}
+      <div class="hp11-marquee-item-{{ section_id }}">
+        {{ section.settings.text | default: 'LIMITED EDITION' }}
+      </div>
+      <div class="hp11-marquee-star-{{ section_id }}">✦</div>
+    {% endfor %}
+    <!-- Duplicate for seamless loop -->
+    {% for i in (1..6) %}
+      <div class="hp11-marquee-item-{{ section_id }}">
+        {{ section.settings.text | default: 'LIMITED EDITION' }}
+      </div>
+      <div class="hp11-marquee-star-{{ section_id }}">✦</div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP11 Marquee",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FF00FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Marquee Text",
+      "default": "LIMITED EDITION"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP11 Marquee"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,446 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign border_color = section.settings.border_color
+  assign border_width = section.settings.border_width
+  assign shadow_color = section.settings.shadow_color
+  assign shadow_offset_x = section.settings.shadow_offset_x
+  assign shadow_offset_y = section.settings.shadow_offset_y
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign font_size = section.settings.font_size
+  assign text_transform = section.settings.text_transform
+  assign show_close = section.settings.show_close
+  assign auto_play = section.settings.auto_play
+  assign delay = section.settings.delay | times: 1000
+-%}
+
+<style>
+  .hp18-announcement-bar-{{ sec_id }} {
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    border-bottom: {{ border_width }}px solid {{ border_color }};
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    position: relative;
+    z-index: 1000;
+    overflow: hidden;
+    {% if shadow_offset_x > 0 or shadow_offset_y > 0 %}
+      box-shadow: {{ shadow_offset_x }}px {{ shadow_offset_y }}px 0px {{ shadow_color }};
+      margin-bottom: {{ shadow_offset_y }}px;
+    {% endif %}
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__container {
+    max-width: var(--page-width, 1440px);
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__slider {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__slide {
+    flex: 0 0 100%;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp18-announcement-bar-{{ sec_id }}__slide.is-active {
+    opacity: 1;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__content {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: {{ font_size }}px;
+    text-transform: {{ text_transform }};
+    letter-spacing: 1px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: {{ text_color }};
+    text-decoration: none;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__content:hover {
+    opacity: 0.8;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: {{ text_color }};
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__close:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__close svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__controls {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__btn {
+    background: transparent;
+    border: none;
+    color: {{ text_color }};
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__btn:hover {
+    opacity: 1;
+  }
+
+  .hp18-announcement-bar-{{ sec_id }}__btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp18-announcement-bar-{{ sec_id }}__content {
+      font-size: {{ font_size | times: 0.8 }}px;
+    }
+    .hp18-announcement-bar-{{ sec_id }}__controls {
+      display: none;
+    }
+    .hp18-announcement-bar-{{ sec_id }}__close {
+      right: 10px;
+    }
+  }
+</style>
+
+{% if section.blocks.size > 0 %}
+<div class="hp18-announcement-bar-{{ sec_id }}" id="AnnouncementBar-{{ sec_id }}" data-section-id="{{ sec_id }}">
+  <div class="hp18-announcement-bar-{{ sec_id }}__container">
+    
+    {% if section.blocks.size > 1 %}
+    <div class="hp18-announcement-bar-{{ sec_id }}__controls">
+      <button type="button" class="hp18-announcement-bar-{{ sec_id }}__btn prev-btn" aria-label="Previous announcement">
+        <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+      </button>
+      <button type="button" class="hp18-announcement-bar-{{ sec_id }}__btn next-btn" aria-label="Next announcement">
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </button>
+    </div>
+    {% endif %}
+
+    <div class="hp18-announcement-bar-{{ sec_id }}__slider-wrapper" style="width: 100%; overflow: hidden;">
+      <div class="hp18-announcement-bar-{{ sec_id }}__slider js-slider">
+        {% for block in section.blocks %}
+          <div class="hp18-announcement-bar-{{ sec_id }}__slide {% if forloop.first %}is-active{% endif %}" data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="hp18-announcement-bar-{{ sec_id }}__content">
+            {%- else -%}
+              <div class="hp18-announcement-bar-{{ sec_id }}__content">
+            {%- endif -%}
+              
+              {% if block.settings.icon != blank %}
+                <span class="hp18-announcement-bar-{{ sec_id }}__icon">{{ block.settings.icon }}</span>
+              {% endif %}
+              
+              <span class="hp18-announcement-bar-{{ sec_id }}__text">{{ block.settings.text }}</span>
+              
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if show_close %}
+    <button type="button" class="hp18-announcement-bar-{{ sec_id }}__close js-close-bar" aria-label="Close announcement">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const barId = 'AnnouncementBar-{{ sec_id }}';
+    const bar = document.getElementById(barId);
+    if (!bar) return;
+
+    // Check if dismissed
+    const isDismissed = sessionStorage.getItem(barId + '-dismissed');
+    if (isDismissed) {
+      bar.style.display = 'none';
+      return;
+    }
+
+    const closeBtn = bar.querySelector('.js-close-bar');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        bar.style.display = 'none';
+        sessionStorage.setItem(barId + '-dismissed', 'true');
+      });
+    }
+
+    const slider = bar.querySelector('.js-slider');
+    const slides = bar.querySelectorAll('.hp18-announcement-bar-{{ sec_id }}__slide');
+    const prevBtn = bar.querySelector('.prev-btn');
+    const nextBtn = bar.querySelector('.next-btn');
+    
+    if (slides.length <= 1) return;
+
+    let currentIndex = 0;
+    let autoPlayTimer;
+
+    function goToSlide(index) {
+      slides.forEach(s => s.classList.remove('is-active'));
+      currentIndex = index;
+      if (currentIndex < 0) currentIndex = slides.length - 1;
+      if (currentIndex >= slides.length) currentIndex = 0;
+      
+      slides[currentIndex].classList.add('is-active');
+      slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function prevSlide() { goToSlide(currentIndex - 1); }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      prevSlide();
+      resetTimer();
+    });
+    
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      nextSlide();
+      resetTimer();
+    });
+
+    {% if auto_play %}
+    function startTimer() {
+      autoPlayTimer = setInterval(nextSlide, {{ delay }});
+    }
+    function resetTimer() {
+      clearInterval(autoPlayTimer);
+      startTimer();
+    }
+    startTimer();
+    
+    bar.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
+    bar.addEventListener('mouseleave', startTimer);
+    {% endif %}
+  });
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "HP18 Announcement Bar",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Shadow Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Design & Layout"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Width",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset_x",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset X",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset_y",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset Y",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Transform",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "header",
+      "content": "Functionality"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close",
+      "label": "Show Close Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_play",
+      "label": "Auto-play slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "delay",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "sec",
+      "label": "Slide Duration",
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (Emoji)",
+          "default": "💥"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "FREE WORLDWIDE SHIPPING ON ORDERS OVER $100"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP18 Advanced Announcement",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

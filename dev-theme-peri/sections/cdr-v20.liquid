@@ -1,0 +1,322 @@
+{% comment %}
+  Cart Drawer Variant 20: Premium Vintage (Upgraded with CRO bundles)
+{% endcomment %}
+
+<div id="cf-cart-drawer" class="cf-drawer cdr-v20" aria-hidden="true">
+  <div class="cf-drawer__overlay" onclick="document.getElementById('cf-cart-drawer').setAttribute('aria-hidden', 'true')"></div>
+
+  <div class="cf-drawer__panel">
+    
+    <!-- Top Offer Banner -->
+    {% if section.settings.show_offer_banner %}
+    <div class="cf-drawer__offer-banner">
+      {{ section.settings.offer_banner_text }}
+    </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="cf-drawer__header">
+      <h3>Your Cart ({{ cart.item_count }})</h3>
+      <button type="button" class="cf-drawer__close" onclick="document.getElementById('cf-cart-drawer').setAttribute('aria-hidden', 'true')" aria-label="Close cart drawer">
+        {% render 'icon', icon: 'close' %}
+      </button>
+    </div>
+
+    <!-- Free Shipping Progress Bar -->
+    {% assign free_shipping_num = settings.free_shipping_threshold | default: '999' | plus: 0 %}
+    {% assign cart_total_num = cart.total_price | divided_by: 100 %}
+    <div class="cf-drawer__shipping">
+      {% if cart_total_num >= free_shipping_num %}
+        <div class="shipping-success">🎉 Congratulations! You unlocked FREE Shipping!</div>
+        <div class="shipping-bar-container">
+          <div class="shipping-bar-fill" style="width: 100%;"></div>
+        </div>
+      {% else %}
+        {% assign needed = free_shipping_num | minus: cart_total_num %}
+        {% assign percentage = cart_total_num | times: 100 | divided_by: free_shipping_num %}
+        <div class="shipping-pending">Add <b>{{ needed | times: 100 | money }}</b> more for FREE Shipping!</div>
+        <div class="shipping-bar-container">
+          <div class="shipping-bar-fill" style="width: {{ percentage }}%;"></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Cart Line Items Loop -->
+    <div class="cf-drawer__items">
+      {% if cart.item_count > 0 %}
+        {% for item in cart.items %}
+          {% render 'cart-drawer-item', item: item %}
+        {% endfor %}
+        
+        <!-- Frequently Bought Together (FBT) inline -->
+        {% if section.settings.show_fbt %}
+        <div class="cf-drawer__fbt">
+            <div class="fbt-header">
+                <strong>People also bought</strong>
+            </div>
+            {% assign fbt_prod = all_products[section.settings.fbt_product] %}
+            {% if fbt_prod == blank %}
+              {% assign fbt_prod = collections.all.products.last %}
+            {% endif %}
+            {% if fbt_prod != blank %}
+            <div class="fbt-item">
+                <img src="{{ fbt_prod.featured_image | image_url: width: 100 }}" alt="{{ fbt_prod.title }}">
+                <div class="fbt-info">
+                    <span class="fbt-title">{{ fbt_prod.title }}</span>
+                    <span class="fbt-price">{{ fbt_prod.price | money }}</span>
+                </div>
+                <form method="post" action="/cart/add">
+                    <input type="hidden" name="id" value="{{ fbt_prod.variants.first.id }}">
+                    <button type="submit" class="fbt-add">+ Add</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+      {% else %}
+        <div class="cf-drawer__empty">
+          <p>Your cart is currently empty</p>
+          <a href="/collections/all" class="cf-drawer__btn">Continue Shopping</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Footer Checkout CTA -->
+    {% if cart.item_count > 0 %}
+      <div class="cf-drawer__footer">
+        
+        <!-- Bundle Upsell Widget -->
+        {% if section.settings.show_bundle_widget %}
+        <div class="cf-drawer__bundle-widget">
+            <h4 class="bundle-title">Upgrade Your Order</h4>
+            <div class="bundle-options">
+                <div class="bundle-option">
+                    <input type="radio" name="bundle" id="bundle-1" checked>
+                    <label for="bundle-1">
+                        <span class="bundle-qty">Buy 1</span>
+                        <span class="bundle-save">Standard</span>
+                    </label>
+                </div>
+                <div class="bundle-option highlight">
+                    <input type="radio" name="bundle" id="bundle-2">
+                    <label for="bundle-2">
+                        <span class="bundle-qty">Buy 2</span>
+                        <span class="bundle-save">Save 10%</span>
+                    </label>
+                </div>
+                <div class="bundle-option">
+                    <input type="radio" name="bundle" id="bundle-3">
+                    <label for="bundle-3">
+                        <span class="bundle-qty">Buy 3</span>
+                        <span class="bundle-save">Save 20%</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Order Notes Toggle -->
+        {% if section.settings.show_order_notes %}
+        <div class="cf-drawer__notes">
+            <details>
+                <summary>Add a gift note or instructions</summary>
+                <textarea name="note" form="cart-form">{{ cart.note }}</textarea>
+            </details>
+        </div>
+        {% endif %}
+
+        <!-- Trust Badges -->
+        {% if section.settings.show_trust_badges %}
+        <div class="cf-drawer__trust">
+            {% render 'trust-badges', image: section.settings.trust_image, text: section.settings.trust_text %}
+        </div>
+        {% endif %}
+
+        <div class="cf-drawer__subtotal">
+          <span>Subtotal</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <form action="/cart" method="post" id="cart-form">
+          <button type="submit" name="checkout" class="cf-drawer__checkout">
+            Proceed to Checkout
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* Global Drawer Behaviors */
+  .cdr-v20[aria-hidden="false"] { visibility: visible !important; }
+  .cdr-v20[aria-hidden="false"] .cf-drawer__overlay { opacity: 1 !important; }
+  .cdr-v20[aria-hidden="false"] .cf-drawer__panel { transform: translateX(0) !important; }
+
+  .cdr-v20 {
+    position: fixed; inset: 0; z-index: 999999; visibility: hidden; transition: visibility 0.3s ease;
+    font-family: 'Times New Roman', serif;
+  }
+  .cdr-v20 .cf-drawer__overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s ease;
+  }
+  .cdr-v20 .cf-drawer__panel {
+    position: absolute; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; 
+    background: #fef3c7; color: #78350f; display: flex; flex-direction: column; 
+    transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    box-shadow: inset 0 0 50px rgba(120,53,15,0.1);
+    backdrop-filter: none;
+    border-left: 2px solid #d45b00;
+  }
+  
+  /* Offer Banner */
+  .cdr-v20 .cf-drawer__offer-banner {
+    background: #92400e; color: #ffffff; text-align: center; padding: 10px;
+    font-size: 13px; font-weight: 700; text-transform: none;
+  }
+
+  /* Header */
+  .cdr-v20 .cf-drawer__header {
+    display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; 
+    border-bottom: 2px solid #d45b00;
+  }
+  .cdr-v20 .cf-drawer__header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #78350f; text-transform: none; }
+  .cdr-v20 .cf-drawer__close { background: none; border: none; cursor: pointer; padding: 4px; color: #78350f; }
+
+  /* Shipping Bar */
+  .cdr-v20 .cf-drawer__shipping { padding: 12px 20px; border-bottom: 2px solid #d45b00; background: rgba(0,0,0,0.03); }
+  .cdr-v20 .shipping-success { font-size: 13px; font-weight: 700; color: #92400e; text-align: center; margin-bottom: 8px; }
+  .cdr-v20 .shipping-pending { font-size: 13px; font-weight: 600; color: #78350f; text-align: center; margin-bottom: 8px; }
+  .cdr-v20 .shipping-bar-container { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
+  .cdr-v20 .shipping-bar-fill { height: 100%; background: #92400e; transition: width 0.3s ease; }
+
+  /* Items */
+  .cdr-v20 .cf-drawer__items { flex-grow: 1; overflow-y: auto; padding: 0 20px; }
+  .cdr-v20 .cf-drawer__empty { text-align: center; padding: 48px 0; color: #78350f; opacity: 0.7; }
+  .cdr-v20 .cf-drawer__btn { display: inline-block; padding: 10px 20px; background: #92400e; color: #ffffff; border-radius: 2px; font-size: 14px; font-weight: 600; text-decoration: none; border: 2px solid #d45b00; }
+
+  /* FBT */
+  .cdr-v20 .cf-drawer__fbt {
+      margin-top: 20px; padding: 16px; border: 2px solid #d45b00; border-radius: 2px;
+      background: rgba(0,0,0,0.02);
+  }
+  .cdr-v20 .fbt-header { font-size: 13px; text-transform: uppercase; margin-bottom: 12px; color: #92400e; }
+  .cdr-v20 .fbt-item { display: flex; align-items: center; gap: 12px; }
+  .cdr-v20 .fbt-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 2px; }
+  .cdr-v20 .fbt-info { flex-grow: 1; display: flex; flex-direction: column; font-size: 13px; }
+  .cdr-v20 .fbt-price { font-weight: 700; color: #92400e; }
+  .cdr-v20 .fbt-add { background: #92400e; color: #ffffff; border: none; padding: 6px 12px; border-radius: 2px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid #d45b00; }
+
+  /* Bundle Widget */
+  .cdr-v20 .cf-drawer__bundle-widget {
+      margin-bottom: 16px;
+  }
+  .cdr-v20 .bundle-title { font-size: 14px; font-weight: 700; margin: 0 0 10px 0; }
+  .cdr-v20 .bundle-options { display: flex; gap: 8px; }
+  .cdr-v20 .bundle-option { flex: 1; position: relative; }
+  .cdr-v20 .bundle-option input { position: absolute; opacity: 0; }
+  .cdr-v20 .bundle-option label {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 4px; border: 1px solid rgba(0,0,0,0.1); border-radius: 2px;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .cdr-v20 .bundle-option.highlight label { border-color: #92400e; background: rgba(0,0,0,0.02); }
+  .cdr-v20 .bundle-option input:checked + label { border: 2px solid #92400e; background: rgba(0,0,0,0.05); }
+  .cdr-v20 .bundle-qty { font-size: 13px; font-weight: 700; color: #78350f; }
+  .cdr-v20 .bundle-save { font-size: 11px; color: #92400e; font-weight: 600; text-transform: uppercase; }
+
+  /* Notes */
+  .cdr-v20 .cf-drawer__notes { margin-bottom: 16px; }
+  .cdr-v20 .cf-drawer__notes summary { font-size: 13px; font-weight: 600; cursor: pointer; color: #78350f; margin-bottom: 8px; }
+  .cdr-v20 .cf-drawer__notes textarea { width: 100%; border: 2px solid #d45b00; border-radius: 2px; padding: 8px; font-family: inherit; font-size: 13px; background: transparent; color: #78350f; }
+
+  /* Footer */
+  .cdr-v20 .cf-drawer__footer { padding: 16px 20px; border-top: 2px solid #d45b00; background: #fef3c7; }
+  .cdr-v20 .cf-drawer__trust img { max-width: 100%; height: auto; margin-bottom: 12px; display: block; }
+  .cdr-v20 .cf-drawer__subtotal { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: #78350f; margin-bottom: 16px; }
+  .cdr-v20 .cf-drawer__checkout { width: 100%; padding: 14px; background: #92400e; color: #ffffff; border: none; border-radius: 2px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; border: 2px solid #d45b00; text-transform: none; box-shadow: inset 0 0 50px rgba(120,53,15,0.1); }
+  .cdr-v20 .cf-drawer__checkout:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* Mobile responsive */
+  @media screen and (max-width: 749px) {
+    .cdr-v20 .cf-drawer__panel { max-width: 100%; width: 100%; }
+    .cdr-v20 .cf-drawer__header { padding-left: 16px; padding-right: 16px; }
+    .cdr-v20 .cf-drawer__items { padding: 0 16px; }
+    .cdr-v20 .cf-drawer__shipping { padding: 10px 16px; }
+    .cdr-v20 .cf-drawer__footer { padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); }
+    .cdr-v20 .cf-drawer__close { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .cdr-v20 .cf-drawer__checkout { padding: 16px; font-size: 16px; min-height: 52px; }
+    .cdr-v20 .fbt-item img { width: 52px; height: 52px; }
+    .cdr-v20 .fbt-add { min-height: 40px; padding: 8px 14px; }
+    .cdr-v20 .cf-drawer__notes textarea { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cdr-v20 .cf-drawer__panel, .cdr-v20 .cf-drawer__overlay { transition: none !important; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cart Drawer (Variant 20)",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_offer_banner",
+      "label": "Show Offer Banner",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "offer_banner_text",
+      "label": "Offer Banner Text",
+      "default": "<p>⚡ Use code <strong>SAVE20</strong> for 20% off today!</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fbt",
+      "label": "Show Frequently Bought Together",
+      "default": true
+    },
+    {
+      "type": "product",
+      "id": "fbt_product",
+      "label": "FBT Product"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bundle_widget",
+      "label": "Show Bundle Widget",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_order_notes",
+      "label": "Show Order Notes",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "trust_image",
+      "label": "Trust badge strip",
+      "info": "Optional. Leave empty to use the built-in icon row."
+    },
+    {
+      "type": "text",
+      "id": "trust_text",
+      "label": "Trust badge text",
+      "default": "Secure checkout · Easy returns · COD available"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart Drawer (Variant 20)"
+    }
+  ]
+}
+{% endschema %}

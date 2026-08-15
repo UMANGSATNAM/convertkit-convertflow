@@ -1,0 +1,293 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp32-faq-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp32-faq-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp32-faq__header {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 4px solid var(--border-color);
+    padding-bottom: 10px;
+  }
+
+  .hp32-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+  }
+
+  .hp32-faq__count {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-color);
+    background: #000;
+    padding: 4px 10px;
+  }
+
+  .hp32-faq__item {
+    background: #fff;
+    border: 4px solid var(--border-color);
+    margin-bottom: 20px;
+    box-shadow: 8px 8px 0 var(--border-color);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .hp32-faq__item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 6px 6px 0 var(--border-color);
+  }
+
+  .hp32-faq__question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 20px 25px;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+  }
+
+  .hp32-faq__icon {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+    color: var(--accent-color);
+    background: #000;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .hp32-faq__item.is-open .hp32-faq__icon {
+    transform: rotate(45deg);
+    background: var(--border-color);
+    color: #fff;
+  }
+
+  .hp32-faq__answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #f9f9f9;
+  }
+
+  .hp32-faq__answer-inner {
+    padding: 0 25px 25px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: #000;
+    border-top: 2px dashed var(--border-color);
+    margin-top: 10px;
+    padding-top: 20px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp32-faq-wrapper" id="HP32Faq-{{ section.id }}">
+  <div class="hp32-faq__header">
+    <h2 class="hp32-faq__title">{{ section.settings.title }}</h2>
+    <span class="hp32-faq__count">ENTRIES: 0{{ section.blocks.size }}</span>
+  </div>
+
+  <div class="hp32-faq__accordion">
+    {%- for block in section.blocks -%}
+      <div class="hp32-faq__item" {{ block.shopify_attributes }}>
+        <button class="hp32-faq__question" aria-expanded="false">
+          <span>> {{ block.settings.question }}</span>
+          <span class="hp32-faq__icon">+</span>
+        </button>
+        <div class="hp32-faq__answer">
+          <div class="hp32-faq__answer-inner">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('HP32Faq-{{ section.id }}');
+    if(!wrapper) return;
+    
+    const items = wrapper.querySelectorAll('.hp32-faq__item');
+    
+    items.forEach(item => {
+      const btn = item.querySelector('.hp32-faq__question');
+      const answer = item.querySelector('.hp32-faq__answer');
+      
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('is-open');
+        
+        // Close all
+        items.forEach(i => {
+          i.classList.remove('is-open');
+          i.querySelector('.hp32-faq__question').setAttribute('aria-expanded', 'false');
+          i.querySelector('.hp32-faq__answer').style.maxHeight = null;
+        });
+        
+        // Open clicked if it wasn't open
+        if (!isOpen) {
+          item.classList.add('is-open');
+          btn.setAttribute('aria-expanded', 'true');
+          answer.style.maxHeight = answer.scrollHeight + "px";
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP32 - Brutalist FAQ",
+  "class": "section-hp32-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "KNOWLEDGE_BASE"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Light Grey)",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (e.g. Lime)",
+      "default": "#ccff00"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "SYSTEM COMPATIBILITY?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>ALL UNITS ARE FORWARD COMPATIBLE. NO SOFTWARE UPDATES REQUIRED.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP32 - Brutalist FAQ",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "SHIPPING PROTOCOLS?" } },
+        { "type": "faq", "settings": { "question": "RETURN DIRECTIVE?" } },
+        { "type": "faq", "settings": { "question": "WARRANTY COVERAGE?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

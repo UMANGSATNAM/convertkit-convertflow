@@ -1,0 +1,86 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp46-pills-bg: {{ section.settings.bg_color | default: '#0B0F19' }};
+    
+    background-color: var(--hp46-pills-bg);
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+
+  .hp46-pills__wrap {
+    max-width: {{ section.settings.container_width | default: 1100 }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hp46-pill {
+    padding: 10px 24px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 50px;
+    color: #FFFFFF;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+
+  .hp46-pill:hover, .hp46-pill--active {
+    background: linear-gradient(135deg, #38BDF8, #F472B6);
+    color: #0B0F19;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp46-pills__wrap { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+    .hp46-pill { flex-shrink: 0; }
+  }
+{%- endstyle -%}
+
+<div class="hp46-pills__wrap">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '/collections/all' }}" class="hp46-pill {% if forloop.first %}hp46-pill--active{% endif %}" {{ block.shopify_attributes }}>
+        {{ block.settings.title }}
+      </a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="/collections/all" class="hp46-pill hp46-pill--active">⚡ ALL BIO-DROPS</a>
+    <a href="/collections/luminescence" class="hp46-pill">✦ LUMINESCENT ENZYMES</a>
+    <a href="/collections/peptides" class="hp46-pill">⚡ NEON PEPTIDES</a>
+    <a href="/collections/mists" class="hp46-pill">✦ CYBER SHIELD MISTS</a>
+    <a href="/collections/masks" class="hp46-pill">⚡ CRYO JELLY MASKS</a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP46 - Cyber Pills",
+  "class": "section-hp46-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0B0F19" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 70, "step": 5, "unit": "px", "label": "Vertical Padding", "default": 35 },
+    { "type": "range", "id": "container_width", "min": 800, "max": 1400, "step": 20, "unit": "px", "label": "Container Width", "default": 1100 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "⚡ ALL BIO-DROPS" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP46 - Cyber Pills" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,138 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp8-usp-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp8-usp-item-{{ section_id }} {
+    text-align: center;
+    padding: 0 20px;
+  }
+  
+  .hp8-usp-icon-{{ section_id }} {
+    margin-bottom: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hp8-usp-icon-{{ section_id }} svg {
+    width: 45px;
+    height: 45px;
+    stroke: currentColor;
+    stroke-width: 1;
+    fill: none;
+  }
+  
+  .hp8-usp-title-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 15px 0;
+  }
+  
+  .hp8-usp-desc-{{ section_id }} {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin: 0;
+    color: {{ text_color | color_modify: 'alpha', 0.7 }};
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .hp8-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+  }
+</style>
+
+<div class="hp8-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp8-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <div class="hp8-usp-icon-{{ section_id }}">
+        <!-- Use a generic elegant icon placeholder if SVG isn't provided -->
+        {% if block.settings.icon_svg != blank %}
+          {{ block.settings.icon_svg }}
+        {% else %}
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        {% endif %}
+      </div>
+      <h3 class="hp8-usp-title-{{ section_id }}">{{ block.settings.title }}</h3>
+      <p class="hp8-usp-desc-{{ section_id }}">{{ block.settings.description }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP8 USPs",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon_svg",
+          "label": "Icon SVG"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "ARTISAN CRAFTED"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Meticulously constructed by master tailors in Italy."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 USPs",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "ARTISAN CRAFTED" } },
+        { "type": "usp", "settings": { "title": "SUSTAINABLE LUXURY" } },
+        { "type": "usp", "settings": { "title": "BESPOKE SERVICE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

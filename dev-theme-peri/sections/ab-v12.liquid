@@ -1,0 +1,83 @@
+{% comment %}
+  AB V12 — Jewelry Atelier
+{% endcomment %}
+{%- assign s = section.settings -%}
+<style>
+  .abv12 {
+    background: {{ s.bg_color }}; color: {{ s.text_color }};
+    font-family: 'Playfair Display', Georgia, serif; font-size: {{ s.font_size }}px; font-weight: 400;
+    letter-spacing: 1px;
+    min-height: {{ s.bar_height }}px; display: flex; align-items: center; justify-content: center;
+    gap: 14px; padding: 6px 40px; text-align: center; position: relative; z-index: 100;
+    border-bottom: 1px solid {{ s.accent_color }};
+  }
+  .abv12__msg { text-decoration: none; color: inherit; }
+  .abv12__code { background: {{ s.text_color }}; color: {{ s.bg_color }}; padding: 3px 10px; border-radius: 3px;
+    font-size: 0.9em; font-weight: 800; font-family: inherit; border: none; cursor: pointer; white-space: nowrap; }
+  .abv12__close { position: absolute; right: 8px; background: none; border: none; color: inherit;
+    cursor: pointer; opacity: 0.6; font-size: 18px; line-height: 1; padding: 8px; }
+  .abv12__close:hover { opacity: 1; }
+  @media screen and (max-width: 749px) {
+    .abv12 { font-size: {{ s.font_size | minus: 2 }}px; letter-spacing: 0.5px; padding: 8px 40px 8px 12px; flex-wrap: wrap; gap: 8px; }
+    .abv12__close { min-width: 44px; min-height: 44px; right: 0; }
+  }
+</style>
+
+{%- if s.enable -%}
+<div class="abv12" id="abv12-{{ section.id }}" role="region" aria-label="Announcement">
+  {%- if s.link != blank -%}
+    <a class="abv12__msg" href="{{ s.link }}">{{ s.message }}</a>
+  {%- else -%}
+    <span class="abv12__msg">{{ s.message }}</span>
+  {%- endif -%}
+  {%- if s.promo_code != blank -%}
+    <button class="abv12__code" type="button" data-code="{{ s.promo_code }}">{{ s.promo_code }}</button>
+  {%- endif -%}
+  {%- if s.dismissible -%}
+    <button class="abv12__close" type="button" aria-label="Close announcement">&times;</button>
+  {%- endif -%}
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('abv12-{{ section.id }}');
+    if (!bar) return;
+    var key = 'abv12-dismissed-{{ section.id }}';
+    {%- if s.dismissible -%}
+    try { if (localStorage.getItem(key) === '1') bar.style.display = 'none'; } catch (e) {}
+    var close = bar.querySelector('.abv12__close');
+    if (close) close.addEventListener('click', function () {
+      bar.style.display = 'none';
+      try { localStorage.setItem(key, '1'); } catch (e) {}
+    });
+    {%- endif -%}
+    var chip = bar.querySelector('.abv12__code');
+    if (chip && navigator.clipboard) chip.addEventListener('click', function () {
+      var original = chip.textContent;
+      navigator.clipboard.writeText(chip.getAttribute('data-code')).then(function () {
+        chip.textContent = 'Copied!';
+        setTimeout(function () { chip.textContent = original; }, 1500);
+      });
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AB V12 Jewelry Atelier",
+  "settings": [
+    { "type": "checkbox", "id": "enable", "label": "Show bar", "default": true },
+    { "type": "text", "id": "message", "label": "Message", "default": "✨ Complimentary Jewelry Cleaning Kit & Velvet Pouch with Every Order ✨" },
+    { "type": "url", "id": "link", "label": "Message link" },
+    { "type": "text", "id": "promo_code", "label": "Promo code chip (tap to copy)" },
+    { "type": "checkbox", "id": "dismissible", "label": "Allow visitors to close", "default": false },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#1E1B4B" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#EEF2FF" },
+    { "type": "color", "id": "accent_color", "label": "Border", "default": "#4338CA" },
+    { "type": "range", "id": "font_size", "min": 10, "max": 20, "step": 1, "unit": "px", "label": "Font size", "default": 13 },
+    { "type": "range", "id": "bar_height", "min": 30, "max": 70, "step": 2, "unit": "px", "label": "Bar height", "default": 42 }
+  ],
+  "presets": [{ "name": "AB V12 Jewelry Atelier" }]
+}
+{% endschema %}

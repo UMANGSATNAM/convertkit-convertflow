@@ -1,0 +1,218 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+  }
+
+  .hp40-news-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp40-news-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp40-news__info {
+    padding: 80px 60px;
+    border-right: 2px solid var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp40-news__info {
+      border-right: none;
+      border-bottom: 2px solid var(--text-color);
+      padding: 60px 40px;
+    }
+  }
+
+  .hp40-news__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+  }
+
+  .hp40-news__text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  .hp40-news__form-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp40-news__form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+  }
+
+  .hp40-news__input {
+    flex: 1;
+    width: 100%;
+    padding: 60px 40px;
+    border: none;
+    border-bottom: 2px solid var(--text-color);
+    background: var(--bg-color);
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--text-color);
+    outline: none;
+    text-transform: uppercase;
+  }
+  
+  .hp40-news__input::placeholder {
+    color: var(--text-color);
+    opacity: 0.3;
+  }
+
+  .hp40-news__btn {
+    width: 100%;
+    padding: 40px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: none;
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .hp40-news__btn:hover {
+    background: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp40-news-wrapper" id="HP40News-{{ section.id }}">
+  <div class="hp40-news__info">
+    <h2 class="hp40-news__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.text != blank -%}
+      <p class="hp40-news__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="hp40-news__form-col">
+    {%- form 'customer', class: 'hp40-news__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" 
+             name="contact[email]" 
+             class="hp40-news__input" 
+             placeholder="{{ section.settings.placeholder }}" 
+             required>
+      <button type="submit" class="hp40-news__btn">{{ section.settings.btn_label }}</button>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP40 - Swiss Newsletter",
+  "class": "section-hp40-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "COMMUNICATION\nCHANNEL"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Data transfer protocol. System updates."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "ENTER ADDRESS..."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "INITIALIZE"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Swiss Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Lines",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Button Hover Accent",
+      "default": "#0055FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP40 - Swiss Newsletter"
+    }
+  ]
+}
+{% endschema %}

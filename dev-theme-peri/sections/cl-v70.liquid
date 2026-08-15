@@ -1,0 +1,100 @@
+{% comment %} CL V70 — Ultimate Luxury / Bespoke (Matte Black/Rose Gold) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv70 { background: {{ section.settings.bg_color | default: '#0A0A0A' }}; color: {{ section.settings.text_color | default: '#F2F2F2' }}; padding: 60px 20px; font-family: 'Didot', 'Bodoni MT', serif; }
+  .clv70-hero { text-align: center; margin-bottom: 60px; padding: 40px 20px; border-bottom: 1px solid #B76E79; }
+  .clv70-hero h1 { font-size: 50px; font-weight: normal; color: #B76E79; margin-bottom: 15px; letter-spacing: 6px; text-transform: uppercase; }
+  .clv70-hero p { font-size: 14px; color: #888; max-width: 500px; margin: 0 auto; line-height: 2; font-family: 'Helvetica Neue', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+  .clv70-chips { display: flex; gap: 30px; justify-content: center; margin-bottom: 50px; flex-wrap: wrap; }
+  .clv70-chips a { padding: 5px 0; color: #888; text-decoration: none; font-size: 12px; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; letter-spacing: 3px; position: relative; transition: 0.4s; }
+  .clv70-chips a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 1px; background: #B76E79; transition: 0.4s; }
+  .clv70-chips a:hover, .clv70-chips a.active { color: #F2F2F2; }
+  .clv70-chips a:hover::after, .clv70-chips a.active::after { width: 100%; }
+  .clv70-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
+  .clv70-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 3 }}, 1fr); gap: 40px; }
+  .clv70-promo { grid-column: span 1; background: #111; border: 1px solid #222; padding: 50px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .clv70-promo h3 { font-size: 28px; font-weight: normal; margin-bottom: 25px; color: #B76E79; letter-spacing: 4px; line-height: 1.5; text-transform: uppercase; }
+  .clv70-promo a { display: inline-block; padding: 15px 40px; background: transparent; color: #F2F2F2; text-decoration: none; font-size: 11px; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; letter-spacing: 4px; border: 1px solid #B76E79; transition: 0.4s; }
+  .clv70-promo a:hover { background: #B76E79; color: #0A0A0A; }
+  .clv70-seo { margin-top: 80px; text-align: center; padding: 60px 20px; border-top: 1px solid #222; }
+  @media (max-width: 768px) { .clv70-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 1 }}, 1fr); gap: 30px; } .clv70-hero h1 { font-size: 34px; letter-spacing: 4px; } }
+</style>
+<div class="clv70" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv70-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}LA COLLECTION{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Uncompromising elegance. Masterfully crafted.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv70-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv70-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 40px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 11px; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; letter-spacing: 3px; color: #B76E79;">{{ filter.label }}</summary>
+              <div style="position: absolute; background: #0A0A0A; border: 1px solid #222; padding: 30px; z-index: 10; margin-top: 15px; min-width: 250px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 15px; cursor: pointer; font-size: 12px; color: #888; font-family: 'Helvetica Neue', sans-serif; letter-spacing: 1px;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #B76E79;">
+                    {{ value.label }} <span style="font-size: 10px; color: #444;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-family: 'Helvetica Neue', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #B76E79; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 12 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv70-grid">
+      {% for product in collection.products %}
+        {% render 'card-v70', product: product %}
+        {% if forloop.index == 5 and section.settings.show_promo_tile %}
+          <div class="clv70-promo">
+            <h3>PRIVATE<br>ATELIER</h3>
+            <a href="/pages/appointments">REQUEST APPOINTMENT</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v70', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 70px; text-align: center; font-size: 14px; font-family: 'Helvetica Neue', sans-serif; letter-spacing: 4px; color: #B76E79;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv70-seo">
+      <h2 style="font-size: 20px; font-weight: normal; color: #F2F2F2; margin-bottom: 20px; letter-spacing: 5px; text-transform: uppercase;">{{ section.settings.seo_title | default: 'The Standard of Excellence' }}</h2>
+      <p style="font-size: 12px; font-family: 'Helvetica Neue', sans-serif; color: #888; max-width: 600px; margin: 0 auto; line-height: 2.2; letter-spacing: 1px;">{{ section.settings.seo_text | default: 'Every piece is meticulously constructed by master artisans using only the finest ethically sourced materials. A true investment in timeless design.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V70 — Luxury", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 12},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "default": 3},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "1"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#0A0A0A"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#F2F2F2"}
+  ], "presets": [{"name": "CL V70 — Luxury"}]
+}
+{% endschema %}

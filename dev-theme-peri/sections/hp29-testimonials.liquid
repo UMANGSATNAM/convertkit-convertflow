@@ -1,0 +1,309 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-testi-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-testi-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  /* Huge decorative quote mark */
+  .hp29-testi-wrapper::before {
+    content: '“';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
+    font-size: 250px;
+    line-height: 1;
+    color: var(--text-color);
+    opacity: 0.05;
+    z-index: 0;
+  }
+
+  .hp29-testi__slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    position: relative;
+    z-index: 1;
+  }
+  .hp29-testi__slider::-webkit-scrollbar { display: none; }
+
+  .hp29-testi__item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 20px 0;
+  }
+
+  .hp29-testi__stars {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 30px;
+    color: var(--accent-color);
+  }
+  .hp29-testi__stars svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .hp29-testi__quote {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, {{ section.settings.quote_size }}px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-color);
+    line-height: 1.4;
+    margin: 0 0 40px;
+  }
+
+  .hp29-testi__author {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-color);
+    opacity: 0.9;
+  }
+
+  .hp29-testi__author span {
+    display: block;
+    font-size: 13px;
+    font-weight: 300;
+    text-transform: none;
+    letter-spacing: normal;
+    opacity: 0.7;
+    margin-top: 5px;
+  }
+
+  .hp29-testi__nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hp29-testi__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    opacity: 0.3;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .hp29-testi__dot.is-active,
+  .hp29-testi__dot:hover {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-testi-wrapper" id="HP29Testimonials-{{ section.id }}">
+  <div class="hp29-testi__slider" id="hp29-testi-slider-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="hp29-testi__item" {{ block.shopify_attributes }}>
+        <div class="hp29-testi__stars">
+          {%- for i in (1..5) -%}
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          {%- endfor -%}
+        </div>
+        <div class="hp29-testi__quote">
+          "{{ block.settings.quote }}"
+        </div>
+        <div class="hp29-testi__author">
+          {{ block.settings.author }}
+          {%- if block.settings.location != blank -%}
+            <span>{{ block.settings.location }}</span>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="hp29-testi__nav" id="hp29-testi-nav-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <button class="hp29-testi__dot {% if forloop.first %}is-active{% endif %}" aria-label="Go to slide {{ forloop.index }}"></button>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('hp29-testi-slider-{{ section.id }}');
+    const dots = document.querySelectorAll('#hp29-testi-nav-{{ section.id }} .hp29-testi__dot');
+    
+    if(slider && dots.length > 0) {
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          slider.scrollTo({
+            left: index * slider.offsetWidth,
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      slider.addEventListener('scroll', () => {
+        const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+        dots.forEach(d => d.classList.remove('is-active'));
+        if(dots[index]) dots[index].classList.add('is-active');
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP29 - Boho Testimonials",
+  "class": "section-hp29-testimonials",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Quote Size",
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Earthy Boho Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Sage Green)",
+      "default": "#81B29A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Beige)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Stars Accent (Terracotta)",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "The quality is unmatched. These pieces bring such a grounded, peaceful energy into my daily routine."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "ELENA R."
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location/Detail",
+          "default": "Verified Buyer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 - Boho Testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial", "settings": { "quote": "I've finally found a brand that aligns with my values without sacrificing beautiful design." } },
+        { "type": "testimonial", "settings": { "quote": "Incredibly comfortable and consciously made. My absolute favorite pieces for everyday living." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

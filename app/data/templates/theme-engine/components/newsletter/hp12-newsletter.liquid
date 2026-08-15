@@ -1,0 +1,141 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAFAFA'
+  assign text_color = section.settings.text_color | default: '#333333'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 40px;
+    border-bottom: 1px solid #E5E5E5;
+    text-align: center;
+    color: {{ text_color }};
+  }
+  
+  .hp12-newsletter-container-{{ section_id }} {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .hp12-newsletter-heading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 300;
+    margin: 0 0 20px 0;
+    letter-spacing: 1px;
+  }
+  
+  .hp12-newsletter-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    margin: 0 0 40px 0;
+    opacity: 0.7;
+  }
+  
+  .hp12-newsletter-form-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .hp12-newsletter-input-{{ section_id }} {
+    width: 100%;
+    padding: 15px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #CCC;
+    color: {{ text_color }};
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.3s ease;
+  }
+  
+  .hp12-newsletter-input-{{ section_id }}:focus {
+    border-color: {{ text_color }};
+  }
+  
+  .hp12-newsletter-input-{{ section_id }}::placeholder {
+    color: {{ text_color }};
+    opacity: 0.5;
+  }
+  
+  .hp12-newsletter-btn-{{ section_id }} {
+    background: transparent;
+    color: {{ text_color }};
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 15px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp12-newsletter-btn-{{ section_id }}:hover {
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 80px 20px;
+    }
+  }
+</style>
+
+<div class="hp12-newsletter-container-{{ section_id }}">
+  <h2 class="hp12-newsletter-heading-{{ section_id }}">{{ section.settings.heading | default: 'Join the journal.' }}</h2>
+  <div class="hp12-newsletter-text-{{ section_id }}">
+    {{ section.settings.text | default: 'A monthly dispatch on design, architecture, and mindful living.' }}
+  </div>
+  
+  {% form 'customer', class: 'hp12-newsletter-form-' | append: section_id %}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    <input type="email" name="contact[email]" class="hp12-newsletter-input-{{ section_id }}" placeholder="Enter your email" required>
+    <button type="submit" class="hp12-newsletter-btn-{{ section_id }}">Subscribe</button>
+  {% endform %}
+</div>
+
+{% schema %}
+{
+  "name": "HP12 Newsletter",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Join the journal."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "A monthly dispatch on design, architecture, and mindful living."
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP12 Newsletter"
+    }
+  ]
+}
+{% endschema %}

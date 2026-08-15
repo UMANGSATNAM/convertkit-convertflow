@@ -1,0 +1,99 @@
+{% comment %} CL V59 — Gaming / E-sports (Dark Mode/RGB) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv59 { background: {{ section.settings.bg_color | default: '#050510' }}; color: {{ section.settings.text_color | default: '#E0E0FF' }}; padding: 40px 20px; font-family: 'Rajdhani', 'Orbitron', sans-serif; text-transform: uppercase; }
+  .clv59-hero { text-align: center; margin-bottom: 40px; padding: 60px 20px; background: linear-gradient(45deg, #1A0033, #001A33); border: 1px solid #330066; border-radius: 8px; position: relative; box-shadow: 0 0 20px rgba(100, 0, 255, 0.2); overflow: hidden; }
+  .clv59-hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, #FF00FF, #00FFFF); }
+  .clv59-hero h1 { font-size: 48px; font-weight: 700; margin-bottom: 10px; color: #FFF; text-shadow: 0 0 10px #00FFFF, 0 0 20px #FF00FF; letter-spacing: 4px; }
+  .clv59-hero p { font-size: 16px; color: #AACCFF; max-width: 600px; margin: 0 auto; letter-spacing: 1px; }
+  .clv59-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv59-chips a { padding: 10px 20px; background: #0A0A15; color: #00FFFF; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid #00FFFF; border-radius: 4px; transition: 0.3s; box-shadow: inset 0 0 5px rgba(0,255,255,0.2); }
+  .clv59-chips a:hover, .clv59-chips a.active { background: #00FFFF; color: #000; box-shadow: 0 0 15px rgba(0,255,255,0.5); }
+  .clv59-toolbar { background: #0A0A15; border: 1px solid #330066; padding: 15px 25px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; }
+  .clv59-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv59-promo { grid-column: span 1; background: linear-gradient(135deg, #330066, #660099); color: #FFF; border-radius: 8px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #FF00FF; box-shadow: inset 0 0 20px rgba(255,0,255,0.3); }
+  .clv59-promo h3 { font-size: 28px; font-weight: 700; margin-bottom: 20px; letter-spacing: 2px; }
+  .clv59-promo a { display: inline-block; padding: 10px 25px; background: transparent; color: #FF00FF; border: 1px solid #FF00FF; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 4px; transition: 0.3s; }
+  .clv59-promo a:hover { background: #FF00FF; color: #000; box-shadow: 0 0 15px #FF00FF; }
+  .clv59-seo { margin-top: 50px; background: #0A0A15; padding: 40px; border-radius: 8px; border: 1px solid #00FFFF; text-align: center; }
+  @media (max-width: 768px) { .clv59-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv59-hero h1 { font-size: 36px; } }
+</style>
+<div class="clv59" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv59-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}NEXT LEVEL{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Equip yourself with the hardware needed to dominate the leaderboard.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv59-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv59-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 600; color: #FF00FF; letter-spacing: 1px;">{{ filter.label }} ></summary>
+              <div style="position: absolute; background: #0A0A15; border: 1px solid #FF00FF; padding: 20px; border-radius: 4px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 0 5px 20px rgba(255,0,255,0.2);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 13px; color: #E0E0FF;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #00FFFF;">
+                    {{ value.label }} <span style="color: #666;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #0A0A15; border: 1px solid #00FFFF; color: #00FFFF; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; outline: none; font-family: inherit;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv59-grid">
+      {% for product in collection.products %}
+        {% render 'card-v59', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv59-promo">
+            <h3>UNLOCK<br>PRO<br>GEAR</h3>
+            <a href="/pages/pro">UPGRADE</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v59', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 18px; font-weight: 700; color: #00FFFF; letter-spacing: 2px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv59-seo">
+      <h2 style="font-size: 24px; font-weight: 700; color: #FFF; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 0 10px #00FFFF;">{{ section.settings.seo_title | default: 'Zero Latency Guarantee' }}</h2>
+      <p style="font-size: 14px; color: #AACCFF; max-width: 700px; margin: 0 auto; line-height: 1.6; text-transform: none; font-family: 'Arial', sans-serif;">{{ section.settings.seo_text | default: 'Designed for esports professionals. High polling rates, responsive switches, and ergonomic designs to keep you at the top of your game.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V59 — Gaming", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#050510"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#E0E0FF"}
+  ], "presets": [{"name": "CL V59 — Gaming"}]
+}
+{% endschema %}

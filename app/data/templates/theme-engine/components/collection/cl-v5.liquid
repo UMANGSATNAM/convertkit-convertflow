@@ -1,0 +1,100 @@
+{% comment %} CL V5 — Outdoor / Adventure {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv5 { background: {{ section.settings.bg_color | default: '#F2F6F1' }}; color: {{ section.settings.text_color | default: '#2C3E2D' }}; padding: 50px 20px; font-family: 'Roboto', sans-serif; }
+  .clv5-hero { background: #2C3E2D; color: #FFF; padding: 60px 40px; border-radius: 16px; margin-bottom: 40px; text-align: center; }
+  .clv5-hero h1 { font-size: 40px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+  .clv5-hero p { font-size: 16px; color: #B3C6B5; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .clv5-chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+  .clv5-chips a { padding: 10px 20px; background: #FFF; color: #2C3E2D; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold; border: 1px solid #D1DED2; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .clv5-chips a:hover { background: #E2EBE3; }
+  .clv5-toolbar { background: #FFF; border: 1px solid #D1DED2; border-radius: 8px; padding: 15px 25px; margin-bottom: 40px; }
+  .clv5-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv5-promo { grid-column: span 1; background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px); position: relative; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; color: #FFF; }
+  .clv5-promo::before { content: ''; position: absolute; top:0;left:0;right:0;bottom:0; background: rgba(44,62,45,0.7); z-index: 0; }
+  .clv5-promo > * { position: relative; z-index: 1; }
+  .clv5-promo h3 { font-size: 24px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+  .clv5-promo a { display: inline-block; padding: 12px 24px; background: #E85D04; color: #FFF; text-decoration: none; font-weight: bold; font-size: 14px; border-radius: 6px; }
+  .clv5-seo { margin-top: 60px; padding: 40px; background: #FFF; border-radius: 16px; border: 1px solid #D1DED2; text-align: center; }
+  @media (max-width: 768px) { .clv5-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv5-hero h1 { font-size: 32px; } }
+</style>
+<div class="clv5" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv5-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Explore The Wild{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Durable, weather-resistant gear for your next great adventure.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv5-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv5-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: bold; color: #2C3E2D;">{{ filter.label }} ▼</summary>
+              <div style="position: absolute; background: #FFF; border: 1px solid #D1DED2; padding: 20px; border-radius: 8px; z-index: 10; margin-top: 10px; min-width: 220px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #555;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #F2F6F1; border: 1px solid #D1DED2; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold; color: #2C3E2D; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv5-grid">
+      {% for product in collection.products %}
+        {% render 'card-v5', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv5-promo">
+            <span style="font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;">Trail Ready</span>
+            <h3>Gear Up For Winter</h3>
+            <a href="/collections/winter">Shop Now</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v5', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv5-seo">
+      <h2 style="font-size: 24px; font-weight: 800; color: #2C3E2D; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Tested in the Elements' }}</h2>
+      <p style="font-size: 15px; color: #555; max-width: 800px; margin: 0 auto; line-height: 1.7;">{{ section.settings.seo_text | default: 'Built for those who demand performance and durability. Our equipment is rigorously tested in extreme conditions.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V5 — Outdoor", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F2F6F1"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#2C3E2D"}
+  ], "presets": [{"name": "CL V5 — Outdoor"}]
+}
+{% endschema %}

@@ -1,0 +1,620 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --btn-bg: {{ section.settings.btn_bg }};
+    --btn-text: {{ section.settings.btn_text }};
+    --font-heading: 'Lora', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  /* Organic grain texture overlay */
+  {% if section.settings.show_grain %}
+  #shopify-section-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+  {% endif %}
+
+  .hp22-bestsellers-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp22-bestsellers-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp22-bestsellers__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    position: relative;
+  }
+
+  .hp22-bestsellers__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  .hp22-bestsellers__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  .hp22-bestsellers__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp22-bestsellers__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+  }
+
+  .hp22-bestsellers__tab {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--text-color);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 5px 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .hp22-bestsellers__tab.active, .hp22-bestsellers__tab:hover {
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--accent-color);
+  }
+
+  .hp22-bestsellers__slider-container {
+    margin: 0 -20px;
+    padding: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .hp22-bestsellers__slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp22-bestsellers__grid {
+    display: flex;
+    gap: {{ section.settings.gap }}px;
+    min-width: min-content;
+  }
+
+  .hp22-bs-card {
+    width: {{ section.settings.card_width }}px;
+    flex: 0 0 auto;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 16px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+
+  .hp22-bs-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  }
+
+  .hp22-bs-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.image_ratio }};
+    overflow: hidden;
+    background-color: #F9F6F0;
+    margin-bottom: 24px;
+    {% if section.settings.card_shape == 'arch' %}
+      border-radius: 200px 200px 12px 12px;
+    {% elsif section.settings.card_shape == 'pill' %}
+      border-radius: 200px;
+    {% else %}
+      border-radius: 12px;
+    {% endif %}
+  }
+
+  .hp22-bs-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.5s ease;
+  }
+
+  .hp22-bs-card:hover .hp22-bs-card__image {
+    transform: scale(1.08);
+  }
+
+  .hp22-bs-card__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--accent-color);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 20px;
+    z-index: 2;
+  }
+
+  .hp22-bs-card__info {
+    text-align: {{ section.settings.text_alignment }};
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp22-bs-card__reviews {
+    display: flex;
+    justify-content: {{ section.settings.text_alignment | replace: 'left', 'flex-start' | replace: 'right', 'flex-end' }};
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+    color: #E2B254; /* warm yellow */
+  }
+
+  .hp22-bs-card__reviews svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  .hp22-bs-card__reviews span {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+
+  .hp22-bs-card__title {
+    font-family: var(--font-heading);
+    font-size: {{ section.settings.product_title_size }}px;
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 12px;
+    text-decoration: none;
+    display: block;
+  }
+
+  .hp22-bs-card__title:hover {
+    color: var(--accent-color);
+  }
+
+  .hp22-bs-card__price {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.product_price_size }}px;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    margin-top: auto;
+  }
+
+  .hp22-bs-card__price s {
+    color: #999;
+    font-size: 0.9em;
+    margin-right: 8px;
+  }
+
+  .hp22-bs-card__add-btn {
+    width: 100%;
+    padding: 14px 0;
+    background: transparent;
+    color: var(--btn-bg);
+    border: 1px solid var(--btn-bg);
+    border-radius: 40px; /* Pill shape */
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hp22-bs-card__add-btn:hover {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp22-bestsellers-wrapper" id="HP22Bestsellers-{{ section.id }}">
+  
+  <div class="hp22-bestsellers__header">
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp22-bestsellers__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp22-bestsellers__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.show_tabs -%}
+    <div class="hp22-bestsellers__tabs">
+      <button class="hp22-bestsellers__tab active">Skincare</button>
+      <button class="hp22-bestsellers__tab">Body</button>
+      <button class="hp22-bestsellers__tab">Wellness</button>
+    </div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp22-bestsellers__slider-container">
+    <div class="hp22-bestsellers__grid">
+      {%- assign collection = section.settings.collection -%}
+      {%- assign limit = section.settings.products_to_show -%}
+      
+      {%- if collection != blank and collection.products_count > 0 -%}
+        {%- for product in collection.products limit: limit -%}
+          <div class="hp22-bs-card">
+            <a href="{{ product.url }}" class="hp22-bs-card__image-wrapper">
+              {%- if product.compare_at_price > product.price -%}
+                <div class="hp22-bs-card__badge">Sale</div>
+              {%- endif -%}
+              
+              {%- if product.featured_image != blank -%}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" class="hp22-bs-card__image" loading="lazy">
+              {%- else -%}
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#eae3d9;color:#8A9A86;">IMAGE</div>
+              {%- endif -%}
+            </a>
+            
+            <div class="hp22-bs-card__info">
+              {%- if section.settings.show_reviews -%}
+                <div class="hp22-bs-card__reviews">
+                  {%- for i in (1..5) -%}
+                    <svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
+                  {%- endfor -%}
+                  <span>(124)</span>
+                </div>
+              {%- endif -%}
+              
+              <a href="{{ product.url }}" class="hp22-bs-card__title">{{ product.title }}</a>
+              
+              <p class="hp22-bs-card__price">
+                {%- if product.compare_at_price > product.price -%}
+                  <s>{{ product.compare_at_price | money }}</s>
+                {%- endif -%}
+                {{ product.price | money }}
+              </p>
+              
+              <button type="button" class="hp22-bs-card__add-btn">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..6) -%}
+          <div class="hp22-bs-card">
+            <div class="hp22-bs-card__image-wrapper">
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#eae3d9;color:#8A9A86;">Product {{ i }}</div>
+            </div>
+            <div class="hp22-bs-card__info">
+              {%- if section.settings.show_reviews -%}
+                <div class="hp22-bs-card__reviews">
+                  {%- for j in (1..5) -%}
+                    <svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
+                  {%- endfor -%}
+                  <span>(42)</span>
+                </div>
+              {%- endif -%}
+              <a href="#" class="hp22-bs-card__title">Organic Example Product {{ i }}</a>
+              <p class="hp22-bs-card__price">$38.00</p>
+              <button type="button" class="hp22-bs-card__add-btn">Add to Cart</button>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP22 - Organic Bestseller",
+  "class": "section-hp22-bestsellers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "COMMUNITY FAVORITES"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>Loved by <em>Nature</em></p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tabs",
+      "label": "Show category tabs (Visual Only)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Product Card Width",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between cards",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Card Styling"
+    },
+    {
+      "type": "select",
+      "id": "card_shape",
+      "label": "Image Shape",
+      "options": [
+        { "value": "arch", "label": "Arch (Top Rounded)" },
+        { "value": "pill", "label": "Pill (Fully Rounded)" },
+        { "value": "soft", "label": "Soft Corners" }
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Tall (4:5)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show Star Rating",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Section Heading Size",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Section Subtitle Size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "product_title_size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Product Title Size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "product_price_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Product Price Size",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Organic Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#3A3A3A"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8A9A86"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Color",
+      "default": "#8A9A86"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button Hover Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_grain",
+      "label": "Show subtle paper grain texture",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP22 - Organic Bestseller"
+    }
+  ]
+}
+{% endschema %}

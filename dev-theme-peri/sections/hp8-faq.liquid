@@ -1,0 +1,214 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp8-faq-container-{{ section_id }} {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .hp8-faq-header-{{ section_id }} {
+    margin-bottom: 60px;
+  }
+  
+  .hp8-faq-header-{{ section_id }} h2 {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 400;
+    margin: 0;
+  }
+  
+  .hp8-faq-list-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hp8-faq-item-{{ section_id }} {
+    border-bottom: 1px solid {{ text_color | color_modify: 'alpha', 0.2 }};
+  }
+  
+  .hp8-faq-item-{{ section_id }}:first-child {
+    border-top: 1px solid {{ text_color | color_modify: 'alpha', 0.2 }};
+  }
+  
+  .hp8-faq-question-{{ section_id }} {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 30px 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: {{ text_color }};
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .hp8-faq-icon-{{ section_id }} {
+    position: relative;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .hp8-faq-icon-{{ section_id }}::before,
+  .hp8-faq-icon-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: {{ text_color }};
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s ease;
+  }
+  
+  .hp8-faq-icon-{{ section_id }}::before {
+    width: 100%;
+    height: 1px;
+  }
+  
+  .hp8-faq-icon-{{ section_id }}::after {
+    width: 1px;
+    height: 100%;
+  }
+  
+  .hp8-faq-item-{{ section_id }}.active .hp8-faq-icon-{{ section_id }}::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  
+  .hp8-faq-answer-{{ section_id }} {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  
+  .hp8-faq-item-{{ section_id }}.active .hp8-faq-answer-{{ section_id }} {
+    max-height: 500px;
+  }
+  
+  .hp8-faq-answer-inner-{{ section_id }} {
+    padding: 0 0 40px 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 300;
+    color: {{ text_color | color_modify: 'alpha', 0.7 }};
+    max-width: 800px;
+  }
+
+  @media (max-width: 768px) {
+    .hp8-faq-question-{{ section_id }} {
+      font-size: 0.95rem;
+      padding: 25px 0;
+    }
+  }
+</style>
+
+<div class="hp8-faq-container-{{ section_id }}">
+  <div class="hp8-faq-header-{{ section_id }}">
+    <h2>CLIENT SERVICES</h2>
+  </div>
+  
+  <div class="hp8-faq-list-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp8-faq-item-{{ section_id }}" {{ block.shopify_attributes }}>
+        <button class="hp8-faq-question-{{ section_id }}" aria-expanded="false">
+          {{ block.settings.question }}
+          <span class="hp8-faq-icon-{{ section_id }}"></span>
+        </button>
+        <div class="hp8-faq-answer-{{ section_id }}">
+          <div class="hp8-faq-answer-inner-{{ section_id }}">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqItems = document.querySelectorAll('.hp8-faq-item-{{ section_id }}');
+    
+    faqItems.forEach(item => {
+      const button = item.querySelector('.hp8-faq-question-{{ section_id }}');
+      
+      button.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        
+        faqItems.forEach(otherItem => {
+          otherItem.classList.remove('active');
+          otherItem.querySelector('.hp8-faq-question-{{ section_id }}').setAttribute('aria-expanded', 'false');
+        });
+        
+        if (!isActive) {
+          item.classList.add('active');
+          button.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP8 FAQ",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "DELIVERY & RETURNS"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Complimentary express shipping is available on all orders. Returns are accepted within 14 days of receipt for items in their original condition.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 FAQ",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "DELIVERY & RETURNS" } },
+        { "type": "faq", "settings": { "question": "CARE INSTRUCTIONS" } },
+        { "type": "faq", "settings": { "question": "BESPOKE SERVICES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

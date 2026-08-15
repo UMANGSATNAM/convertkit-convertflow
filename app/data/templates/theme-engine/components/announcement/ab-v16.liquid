@@ -1,0 +1,82 @@
+{% comment %}
+  AB V16 — K-Beauty Dewy
+{% endcomment %}
+{%- assign s = section.settings -%}
+<style>
+  .abv16 {
+    background: {{ s.bg_color }}; color: {{ s.text_color }};
+    font-family: 'Inter', sans-serif; font-size: {{ s.font_size }}px; font-weight: 700;
+    min-height: {{ s.bar_height }}px; display: flex; align-items: center; justify-content: center;
+    gap: 14px; padding: 6px 40px; text-align: center; position: relative; z-index: 100;
+    border-bottom: 1px solid {{ s.accent_color }};
+  }
+  .abv16__msg { text-decoration: none; color: inherit; }
+  .abv16__code { background: {{ s.text_color }}; color: {{ s.bg_color }}; padding: 3px 10px; border-radius: 99px;
+    font-size: 0.9em; font-weight: 800; font-family: inherit; border: none; cursor: pointer; white-space: nowrap; }
+  .abv16__close { position: absolute; right: 8px; background: none; border: none; color: inherit;
+    cursor: pointer; opacity: 0.6; font-size: 18px; line-height: 1; padding: 8px; }
+  .abv16__close:hover { opacity: 1; }
+  @media screen and (max-width: 749px) {
+    .abv16 { font-size: {{ s.font_size | minus: 1 }}px; padding: 8px 40px 8px 12px; flex-wrap: wrap; gap: 8px; }
+    .abv16__close { min-width: 44px; min-height: 44px; right: 0; }
+  }
+</style>
+
+{%- if s.enable -%}
+<div class="abv16" id="abv16-{{ section.id }}" role="region" aria-label="Announcement">
+  {%- if s.link != blank -%}
+    <a class="abv16__msg" href="{{ s.link }}">{{ s.message }}</a>
+  {%- else -%}
+    <span class="abv16__msg">{{ s.message }}</span>
+  {%- endif -%}
+  {%- if s.promo_code != blank -%}
+    <button class="abv16__code" type="button" data-code="{{ s.promo_code }}">{{ s.promo_code }}</button>
+  {%- endif -%}
+  {%- if s.dismissible -%}
+    <button class="abv16__close" type="button" aria-label="Close announcement">&times;</button>
+  {%- endif -%}
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('abv16-{{ section.id }}');
+    if (!bar) return;
+    var key = 'abv16-dismissed-{{ section.id }}';
+    {%- if s.dismissible -%}
+    try { if (localStorage.getItem(key) === '1') bar.style.display = 'none'; } catch (e) {}
+    var close = bar.querySelector('.abv16__close');
+    if (close) close.addEventListener('click', function () {
+      bar.style.display = 'none';
+      try { localStorage.setItem(key, '1'); } catch (e) {}
+    });
+    {%- endif -%}
+    var chip = bar.querySelector('.abv16__code');
+    if (chip && navigator.clipboard) chip.addEventListener('click', function () {
+      var original = chip.textContent;
+      navigator.clipboard.writeText(chip.getAttribute('data-code')).then(function () {
+        chip.textContent = 'Copied!';
+        setTimeout(function () { chip.textContent = original; }, 1500);
+      });
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AB V16 K-Beauty Dewy",
+  "settings": [
+    { "type": "checkbox", "id": "enable", "label": "Show bar", "default": true },
+    { "type": "text", "id": "message", "label": "Message", "default": "✨ Dewy Hydration Sets — Free Essence Spray on Orders Over ₹1,499 ✨" },
+    { "type": "url", "id": "link", "label": "Message link" },
+    { "type": "text", "id": "promo_code", "label": "Promo code chip (tap to copy)" },
+    { "type": "checkbox", "id": "dismissible", "label": "Allow visitors to close", "default": false },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FDF2F8" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#DB2777" },
+    { "type": "color", "id": "accent_color", "label": "Border", "default": "#F472B6" },
+    { "type": "range", "id": "font_size", "min": 10, "max": 20, "step": 1, "unit": "px", "label": "Font size", "default": 13 },
+    { "type": "range", "id": "bar_height", "min": 30, "max": 70, "step": 2, "unit": "px", "label": "Bar height", "default": 40 }
+  ],
+  "presets": [{ "name": "AB V16 K-Beauty Dewy" }]
+}
+{% endschema %}

@@ -1,0 +1,56 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background: radial-gradient(circle at 50% 50%, #FEFCE8 0%, #FEF08A 100%);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+    border-top: 1px solid rgba(63, 98, 18, 0.2);
+  }
+  .hp60-news__container { max-width: {{ section.settings.container_width | default: 700 }}px; margin: 0 auto; padding: 0 24px; text-align: center; }
+  .hp60-news__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #3F6212; margin: 0 0 16px; }
+  .hp60-news__heading { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #1E293B; margin: 0 0 16px; }
+  .hp60-news__desc { font-size: 15px; line-height: 1.7; color: #475569; margin: 0 0 32px; }
+  .hp60-news__form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; }
+  .hp60-news__input {
+    flex: 1; padding: 15px 22px; background: #FFFFFF; border: 1px solid rgba(63, 98, 18, 0.3);
+    border-radius: 4px; color: #1E293B; font-family: 'Outfit', sans-serif; font-size: 14px;
+  }
+  .hp60-news__input::placeholder { color: rgba(71, 85, 105, 0.6); }
+  .hp60-news__btn {
+    padding: 15px 32px; background: {{ section.settings.btn_bg | default: '#3F6212' }};
+    color: #FFFFFF; border: none; border-radius: 4px; font-family: 'Outfit', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(63, 98, 18, 0.25);
+  }
+  .hp60-news__btn:hover { box-shadow: 0 10px 30px rgba(63, 98, 18, 0.45); transform: translateY(-2px); }
+  @media screen and (max-width: 480px) { .hp60-news__form { flex-direction: column; } }
+{%- endstyle -%}
+<div class="hp60-news__container">
+  {%- if section.settings.eyebrow != blank -%}<p class="hp60-news__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+  <h2 class="hp60-news__heading">{{ section.settings.heading | default: 'The Tuscan Harvest Dispatch' }}</h2>
+  <p class="hp60-news__desc">{{ section.settings.description | default: 'Receive seasonal grove harvest calendars, cold-press extraction logs, and private estate tasting invitations.' }}</p>
+  {%- form 'customer', id: 'hp60-newsletter' -%}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    <div class="hp60-news__form">
+      <input type="email" name="contact[email]" class="hp60-news__input" placeholder="{{ section.settings.placeholder | default: 'Your email address' }}" required>
+      <button type="submit" class="hp60-news__btn">{{ section.settings.btn_label | default: 'Join Estate' }}</button>
+    </div>
+  {%- endform -%}
+</div>
+{% schema %}
+{
+  "name": "HP60 Newsletter",
+  "class": "section-hp60-news",
+  "settings": [
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#3F6212" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🏛️ ESTATE DISPATCH" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Tuscan Harvest Dispatch" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Receive seasonal grove harvest calendars and cold-press extraction logs." },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Your email address" },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Join Estate" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 500, "max": 900, "step": 20, "unit": "px", "label": "Container Width", "default": 700 }
+  ],
+  "presets": [{ "name": "HP60 Newsletter" }]
+}
+{% endschema %}

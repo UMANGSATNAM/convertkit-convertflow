@@ -1,0 +1,177 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#e8e0d5'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+-%}
+
+<section class="hp1-beauty-newsletter" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-newsletter-{{ section.id }}">
+  <div class="hp1-news-inner">
+    
+    <div class="hp1-news-content">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hp1-news-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <p class="hp1-news-text">{{ section.settings.text }}</p>
+      {%- endif -%}
+      
+      {% form 'customer', class: 'hp1-news-form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        
+        <div class="hp1-news-input-group">
+          <input type="email"
+                 name="contact[email]"
+                 class="hp1-news-input"
+                 value="{{ form.email }}"
+                 placeholder="{{ section.settings.placeholder }}"
+                 required
+          >
+          <button type="submit" class="hp1-news-submit" name="commit">
+            {{ section.settings.btn_label }}
+          </button>
+        </div>
+        
+        {%- if form.posted_successfully? -%}
+          <div class="hp1-news-success">
+            Thank you for subscribing!
+          </div>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <div class="hp1-news-error">
+            {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+          </div>
+        {%- endif -%}
+      {% endform %}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-newsletter {
+    padding: 100px 0;
+    font-family: 'Inter', sans-serif;
+  }
+  .hp1-news-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+  .hp1-news-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 42px);
+    font-weight: 400;
+    margin: 0 0 15px;
+  }
+  .hp1-news-text {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 40px;
+  }
+  
+  .hp1-news-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hp1-news-input-group {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid {{ text_color }};
+  }
+  .hp1-news-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 15px 0;
+    font-size: 16px;
+    color: {{ text_color }};
+    font-family: inherit;
+    outline: none;
+  }
+  .hp1-news-input::placeholder {
+    color: {{ text_color }};
+    opacity: 0.6;
+  }
+  .hp1-news-submit {
+    background: transparent;
+    border: none;
+    padding: 15px 20px;
+    color: {{ text_color }};
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .hp1-news-submit:hover {
+    opacity: 0.7;
+  }
+  
+  .hp1-news-success {
+    margin-top: 15px;
+    color: #2e7d32;
+    font-size: 14px;
+  }
+  .hp1-news-error {
+    margin-top: 15px;
+    color: #d32f2f;
+    font-size: 14px;
+  }
+
+  @media (max-width: 767px) {
+    .hp1-beauty-newsletter { padding: 60px 0; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Newsletter",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Join the Inner Circle"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Sign up for exclusive offers, early access to new launches, and skincare tips."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#e8e0d5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Newsletter"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,99 @@
+{% comment %} CL V18 — Yoga / Mindfulness (Soft, whitespace) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv18 { background: {{ section.settings.bg_color | default: '#F8F9FA' }}; color: {{ section.settings.text_color | default: '#495057' }}; padding: 80px 20px; font-family: 'Inter', sans-serif; }
+  .clv18-hero { text-align: center; margin-bottom: 70px; }
+  .clv18-hero h1 { font-size: 38px; font-weight: 300; color: #8C9EFF; margin-bottom: 20px; letter-spacing: 1px; }
+  .clv18-hero p { font-size: 15px; color: #ADB5BD; max-width: 550px; margin: 0 auto; line-height: 1.8; }
+  .clv18-chips { display: flex; gap: 20px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap; }
+  .clv18-chips a { padding: 8px 24px; color: #8C9EFF; text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 20px; background: #FFF; box-shadow: 0 2px 10px rgba(140,158,255,0.1); transition: 0.3s; }
+  .clv18-chips a:hover, .clv18-chips a.active { background: #8C9EFF; color: #FFF; box-shadow: 0 4px 15px rgba(140,158,255,0.2); }
+  .clv18-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px; }
+  .clv18-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 3 }}, 1fr); gap: 40px; }
+  .clv18-promo { grid-column: span 1; background: #FFF; border-radius: 12px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+  .clv18-promo h3 { font-size: 24px; font-weight: 300; color: #495057; margin-bottom: 20px; }
+  .clv18-promo a { display: inline-block; padding: 12px 30px; background: #F8F9FA; color: #8C9EFF; text-decoration: none; font-size: 13px; font-weight: 600; border-radius: 30px; transition: 0.3s; }
+  .clv18-promo a:hover { background: #8C9EFF; color: #FFF; }
+  .clv18-seo { margin-top: 100px; text-align: center; }
+  @media (max-width: 768px) { .clv18-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 1 }}, 1fr); gap: 30px; } }
+</style>
+<div class="clv18" style="max-width: 1100px; margin: 0 auto;">
+  <div class="clv18-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Flow Collection{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Move with intention in apparel designed to support your every breath.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv18-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv18-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 30px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 13px; font-weight: 500; color: #8C9EFF;">{{ filter.label }}</summary>
+              <div style="position: absolute; top: 100%; left: 0; background: #FFF; padding: 25px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); z-index: 10; min-width: 250px; margin-top: 20px;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 15px; cursor: pointer; font-size: 14px; color: #6C757D;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} <span style="font-size:12px;color:#CED4DA;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-size: 13px; color: #8C9EFF; font-weight: 500; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 12 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv18-grid">
+      {% for product in collection.products %}
+        {% render 'card-v18', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv18-promo">
+            <span style="font-size: 11px; letter-spacing: 2px; color: #ADB5BD; text-transform: uppercase; margin-bottom: 15px;">Community</span>
+            <h3>Join our Studio</h3>
+            <a href="/pages/classes">View Schedule</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v18', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 70px; text-align: center;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv18-seo">
+      <h2 style="font-size: 24px; font-weight: 300; color: #8C9EFF; margin-bottom: 20px;">{{ section.settings.seo_title | default: 'Find Your Center' }}</h2>
+      <p style="color: #ADB5BD; line-height: 1.9; max-width: 650px; margin: 0 auto; font-size: 14px;">{{ section.settings.seo_text | default: 'Our yoga collection is crafted from ultra-soft, breathable fabrics that move with you, bringing peace and comfort to your practice.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V18 — Yoga", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 12},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "default": 3},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "1"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F8F9FA"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#495057"}
+  ], "presets": [{"name": "CL V18 — Yoga"}]
+}
+{% endschema %}

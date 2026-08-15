@@ -1,0 +1,336 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --grid-color: rgba(255, 255, 255, 0.1);
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--grid-color);
+    overflow: hidden;
+  }
+
+  .hp34-ugc-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp34-ugc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--grid-color);
+    padding-bottom: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-ugc__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+  }
+
+  .hp34-ugc__subtitle {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .hp34-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp34-ugc__status {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--text-color);
+    opacity: 0.5;
+  }
+
+  .hp34-ugc__slider {
+    display: flex;
+    gap: 1px; /* grid line gap */
+    background: var(--grid-color);
+    border: 1px solid var(--grid-color);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .hp34-ugc__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp34-ugc__item {
+    flex: 0 0 calc(100% / {{ section.settings.columns_desktop }});
+    scroll-snap-align: start;
+    background: var(--bg-color);
+    position: relative;
+    cursor: pointer;
+    group: card;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp34-ugc__item {
+      flex: 0 0 calc(50% - 0.5px);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp34-ugc__item {
+      flex: 0 0 85%;
+    }
+  }
+
+  .hp34-ugc__video-wrap {
+    position: relative;
+    aspect-ratio: 9/16;
+    background: #111;
+    overflow: hidden;
+  }
+
+  .hp34-ugc__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .hp34-ugc__item:hover .hp34-ugc__video {
+    filter: grayscale(0%);
+    opacity: 1;
+  }
+
+  .hp34-ugc__data-overlay {
+    position: absolute;
+    top: 15px; left: 15px; right: 15px; bottom: 15px;
+    border: 1px solid transparent;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+  }
+
+  .hp34-ugc__item:hover .hp34-ugc__data-overlay {
+    border-color: var(--accent-color);
+  }
+
+  .hp34-ugc__handle {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #fff;
+    background: #000;
+    display: inline-block;
+    padding: 3px 8px;
+    align-self: flex-start;
+  }
+
+  .hp34-ugc__play {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--accent-color);
+    background: #000;
+    padding: 3px 8px;
+    align-self: flex-end;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-ugc-wrapper" id="HP34Ugc-{{ section.id }}">
+  <div class="hp34-ugc__header">
+    <div>
+      {%- if section.settings.subtitle != blank -%}
+        <div class="hp34-ugc__subtitle">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+      <h2 class="hp34-ugc__title">{{ section.settings.title }}</h2>
+    </div>
+    <div class="hp34-ugc__status">LIVE FEED_</div>
+  </div>
+
+  <div class="hp34-ugc__slider">
+    {%- for block in section.blocks -%}
+      <div class="hp34-ugc__item" {{ block.shopify_attributes }}>
+        <div class="hp34-ugc__video-wrap">
+          {%- if block.settings.video_url != blank -%}
+            <video class="hp34-ugc__video" autoplay loop muted playsinline>
+              <source src="{{ block.settings.video_url }}" type="video/mp4">
+            </video>
+          {%- else -%}
+            {%- assign placeholder = 'collection-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp34-ugc__video' }}
+          {%- endif -%}
+          
+          <div class="hp34-ugc__data-overlay">
+            <div class="hp34-ugc__handle">USR: {{ block.settings.handle }}</div>
+            <div class="hp34-ugc__play">[VIEW]</div>
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP34 - Tech UGC",
+  "class": "section-hp34-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "NETWORK.NODES"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Field Reports"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "UGC Video",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "MP4 Video URL"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "User Handle",
+          "default": "@operator_01"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech UGC",
+      "blocks": [
+        { "type": "video" },
+        { "type": "video" },
+        { "type": "video" },
+        { "type": "video" }
+      ]
+    }
+  ]
+}
+{% endschema %}

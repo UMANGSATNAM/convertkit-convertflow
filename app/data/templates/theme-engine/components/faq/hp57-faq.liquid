@@ -1,0 +1,76 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0F291E' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp57-faq__container { max-width: {{ section.settings.container_width | default: 800 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp57-faq__header { text-align: center; margin-bottom: 50px; }
+  .hp57-faq__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#D97706' }}; margin: 0 0 12px; }
+  .hp57-faq__heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #FFFFFF; margin: 0; }
+  .hp57-faq__item {
+    background: {{ section.settings.card_bg | default: '#1B4332' }};
+    border: 1px solid rgba(167, 243, 208, 0.15);
+    border-radius: 12px; margin-bottom: 14px; overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .hp57-faq__item.active { border-color: rgba(217, 119, 6, 0.5); }
+  .hp57-faq__question {
+    width: 100%; background: none; border: none; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #FFFFFF; text-align: left;
+  }
+  .hp57-faq__icon { font-size: 20px; color: {{ section.settings.accent_color | default: '#D97706' }}; transition: transform 0.3s ease; flex-shrink: 0; margin-left: 16px; }
+  .hp57-faq__item.active .hp57-faq__icon { transform: rotate(45deg); }
+  .hp57-faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .hp57-faq__item.active .hp57-faq__answer { max-height: 300px; }
+  .hp57-faq__answer-inner { padding: 0 24px 20px; font-size: 14px; line-height: 1.7; color: #CBD5E1; }
+{%- endstyle -%}
+<div class="hp57-faq__container">
+  <div class="hp57-faq__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp57-faq__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp57-faq__heading">{{ section.settings.heading | default: 'Herbalist Inquiries' }}</h2>
+  </div>
+  {%- for block in section.blocks -%}
+    <div class="hp57-faq__item" {{ block.shopify_attributes }}>
+      <button class="hp57-faq__question" onclick="this.parentElement.classList.toggle('active')">
+        <span>{{ block.settings.question | default: 'What is cold-maceration?' }}</span>
+        <span class="hp57-faq__icon">+</span>
+      </button>
+      <div class="hp57-faq__answer">
+        <div class="hp57-faq__answer-inner">{{ block.settings.answer | default: 'Cold maceration steeps raw botanicals in organic cold-pressed jojoba and squalane for 6 weeks with zero heat, preserving living phytochemical bonds.' }}</div>
+      </div>
+    </div>
+  {%- endfor -%}
+</div>
+{% schema %}
+{
+  "name": "HP57 FAQ",
+  "class": "section-hp57-faq",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0F291E" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#1B4332" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#D97706" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🌿 FAQ" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Herbalist Inquiries" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 600, "max": 1000, "step": 20, "unit": "px", "label": "Container Width", "default": 800 }
+  ],
+  "blocks": [{
+    "type": "faq", "name": "Question",
+    "settings": [
+      { "type": "text", "id": "question", "label": "Question", "default": "What is cold-maceration?" },
+      { "type": "textarea", "id": "answer", "label": "Answer", "default": "Cold maceration steeps raw botanicals in cold-pressed oil for 6 weeks with zero heat." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP57 FAQ",
+    "blocks": [
+      { "type": "faq" },
+      { "type": "faq", "settings": { "question": "Are the amber bottles UV protected?", "answer": "Yes, our genuine pharmaceutical-grade amber glass blocks 99% of damaging UV rays to protect live plant enzymes." } },
+      { "type": "faq", "settings": { "question": "Can this be combined with retinol?", "answer": "Our Forest Fern lipid oil is ideal to buffer retinol application and eliminate flaking." } }
+    ]
+  }]
+}
+{% endschema %}

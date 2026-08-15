@@ -1,33 +1,159 @@
-<div class="sf-product-section quickadd" id="product-10" style="padding: 60px 20px; background-color: {{ section.settings.bg_color }};">
-  <div style="text-align: center; margin-bottom: 40px;">
-    <h2 style="font-size: 2.2rem; color: {{ section.settings.heading_color }};">{{ section.settings.title }}</h2>
-  </div>
+{%- assign product = all_products[section.settings.product] | default: product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  .sf-pdp-{{ section.id }} {
+    --primary-color: {{ section.settings.primary_color }};
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --border-color: #e5e7eb;
+    --radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  .sf-pdp-{{ section.id }} * { box-sizing: inherit; }
   
-  {% if section.settings.product != blank %}
-    {% assign product = all_products[section.settings.product] %}
-    <div style="display: flex; gap: 40px; align-items: center; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 300px;">
-        <img src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
-      </div>
-      <div style="flex: 1; min-width: 300px; padding: 20px;">
-        <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: {{ section.settings.heading_color }};">{{ product.title }}</h3>
-        <p style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: {{ section.settings.primary_color }};">{{ product.price | money }}</p>
-        <div style="margin-bottom: 30px; line-height: 1.6; color: #666;">
-          {{ product.description | strip_html | truncatewords: 30 }}
+  .sf-quickadd-modal {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  .sf-pdp-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  @media(min-width: 768px) {
+    .sf-pdp-grid { flex-direction: row; }
+    .sf-media-wrapper { flex: 1; border-right: 1px solid var(--border-color); }
+    .sf-details-wrapper { flex: 1.2; padding: 40px; }
+  }
+
+  /* Gallery */
+  .sf-gallery-main { width: 100%; height: 100%; min-height: 400px; background: #f3f4f6; }
+  .sf-gallery-main img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  
+  /* Details */
+  .sf-details-wrapper { padding: 30px 20px; }
+  .sf-pdp-vendor { font-size: 0.8rem; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; }
+  .sf-pdp-title { font-size: 1.75rem; font-weight: 700; color: var(--heading-color); margin: 0 0 12px 0; }
+  .sf-pdp-price-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .sf-pdp-price { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+  .sf-pdp-compare-price { font-size: 1rem; color: #9ca3af; text-decoration: line-through; }
+  .sf-badge { background: #ef4444; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+
+  /* Form */
+  .sf-variant-group { margin-bottom: 20px; }
+  .sf-variant-label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+  .sf-variant-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sf-variant-option { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+  .sf-variant-option.selected { border-color: var(--primary-color); background: var(--primary-color); color: #fff; }
+  
+  .sf-action-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .sf-add-to-cart { width: 100%; background: var(--primary-color); color: #fff; border: none; border-radius: 6px; font-size: 1.125rem; font-weight: 600; cursor: pointer; height: 50px; transition: opacity 0.2s; }
+  .sf-add-to-cart:hover { opacity: 0.9; }
+
+  .sf-view-details { text-align: center; display: block; margin-top: 16px; font-size: 0.95rem; color: var(--primary-color); text-decoration: underline; }
+</style>
+
+<div class="sf-pdp-{{ section.id }}">
+  <div class="sf-quickadd-modal">
+    {% if product != blank %}
+      <div class="sf-pdp-grid">
+        
+        <!-- Media Gallery -->
+        <div class="sf-media-wrapper">
+          <div class="sf-gallery-main" id="sf-main-image-{{ section.id }}">
+            <img src="{{ current_variant.featured_image | default: product.featured_image | img_url: '800x' }}" alt="{{ product.title | escape }}" id="sf-image-el-{{ section.id }}">
+          </div>
         </div>
-        <form action="/cart/add" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
-          <button type="submit" style="width: 100%; padding: 15px; background-color: {{ section.settings.primary_color }}; color: #fff; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">
-            Add to Cart
-          </button>
-        </form>
+
+        <!-- Product Details -->
+        <div class="sf-details-wrapper">
+          <div class="sf-pdp-vendor">{{ product.vendor }}</div>
+          <h1 class="sf-pdp-title">{{ product.title }}</h1>
+          
+          <div class="sf-pdp-price-wrapper">
+            <span class="sf-pdp-price" id="sf-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="sf-pdp-compare-price" id="sf-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+              <span class="sf-badge" id="sf-sale-badge-{{ section.id }}">Sale</span>
+            {% endif %}
+          </div>
+
+          <div style="font-size:0.95rem; line-height:1.5; color:#4b5563; margin-bottom: 24px;">
+            {{ product.description | strip_html | truncatewords: 25 }}
+          </div>
+
+          <form method="post" action="/cart/add" id="sf-form-{{ section.id }}" accept-charset="UTF-8" enctype="multipart/form-data">
+            <input type="hidden" name="form_type" value="product">
+            <input type="hidden" name="utf8" value="✓">
+            <input type="hidden" name="id" id="sf-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" value="1"> <!-- Quick Add defaults to 1 qty -->
+
+            {% unless product.has_only_default_variant %}
+              <div class="sf-variants-container">
+                {% for option in product.options_with_values %}
+                  <div class="sf-variant-group">
+                    <span class="sf-variant-label">{{ option.name }}</span>
+                    <div class="sf-variant-options" data-option-index="option{{ forloop.index }}">
+                      {% for value in option.values %}
+                        <div class="sf-variant-option {% if option.selected_value == value %}selected{% endif %}" 
+                             data-value="{{ value | escape }}"
+                             onclick="sfSelectOption('{{ section.id }}', this)">
+                          {{ value }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endunless %}
+
+            <div class="sf-action-group">
+              <button type="submit" class="sf-add-to-cart" id="sf-atc-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+                {% if current_variant.available %}Quick Add to Cart{% else %}Sold Out{% endif %}
+              </button>
+            </div>
+            
+            <a href="{{ product.url }}" class="sf-view-details">View Full Details</a>
+          </form>
+          
+        </div>
       </div>
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">
-      <p style="font-size: 1.2rem; color: #888;">Select a product in the theme editor to view.</p>
-    </div>
-  {% endif %}
+      
+      <script>
+        window.sfVariants_{{ section.id | replace: '-', '_' }} = [
+          {% for variant in product.variants %}
+            {
+              id: {{ variant.id }},
+              title: {{ variant.title | json }},
+              option1: {{ variant.option1 | json }},
+              option2: {{ variant.option2 | json }},
+              option3: {{ variant.option3 | json }},
+              price: '{{ variant.price | money }}',
+              compare_at_price: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
+              available: {{ variant.available }},
+              featured_image: {% if variant.featured_image %}'{{ variant.featured_image | img_url: "800x" }}'{% else %}null{% endif %}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ];
+      </script>
+
+    {% else %}
+      <div style="text-align: center; padding: 60px 20px;">
+        <p style="font-size: 1.1rem; color: #6b7280;">Select a product in the theme editor.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 {% schema %}
@@ -35,11 +161,16 @@
   "name": "Product Quick Add Grid",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Section Title", "default": "Product Quick Add Grid" },
     { "type": "product", "id": "product", "label": "Select Product" },
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
-    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "color", "id": "primary_color", "label": "Primary Color", "default": "#000000" }
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#f9fafb" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#374151" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#111827" },
+    { "type": "color", "id": "primary_color", "label": "Primary Color", "default": "#2563eb" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Top", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Bottom", "default": 40 },
+    { "type": "range", "id": "padding_horizontal", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Horizontal", "default": 20 }
   ]
 }
 {% endschema %}

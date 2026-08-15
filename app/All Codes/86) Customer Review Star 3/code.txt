@@ -1,0 +1,52 @@
+{% assign userRating = product.metafields.custom.rating | default: 4.5 %}
+{% assign userRatingRounded = userRating | times: 2 | round | divided_by: 2.0 %}
+
+<div class="rating-container">
+  <span class="star-group">
+    {% for starIndex in (1..5) %}
+      {% assign starFloat = starIndex | times: 1.0 %}
+      {% assign halfPoint = userRatingRounded | plus: 0.5 %}
+      {% if starFloat <= userRatingRounded %}
+        <span class="icon-star full">★</span>
+      {% elsif starFloat == halfPoint %}
+        <span class="icon-star half">★</span>
+      {% else %}
+        <span class="icon-star empty">★</span>
+      {% endif %}
+    {% endfor %}
+  </span>
+  <span>{{ userRatingRounded }}/5 stars</span>
+</div>
+
+<style>
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Arial, sans-serif;
+  margin-bottom: 10px;
+}
+
+.star-group {
+  display: inline-flex;
+}
+
+.icon-star {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.icon-star.full {
+  color: #333;
+}
+
+.icon-star.half {
+  color: #333;
+  opacity: 0.5;
+}
+
+.icon-star.empty {
+  color: #333;
+  opacity: 0.2;
+}
+</style>

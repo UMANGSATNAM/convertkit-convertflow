@@ -1,0 +1,195 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00FFA3'
+  assign image_position = section.settings.image_position | default: 'left'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .hp13-iwt-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    flex-direction: {% if image_position == 'right' %}row-reverse{% else %}row{% endif %};
+  }
+  
+  .hp13-iwt-image-wrap-{{ section_id }} {
+    flex: 1;
+    position: relative;
+    padding-top: 60%;
+    border: 1px solid {{ text_color }};
+  }
+  
+  .hp13-iwt-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: contrast(110%) grayscale(50%);
+  }
+  
+  .hp13-iwt-content-{{ section_id }} {
+    flex: 1;
+    color: #FFF;
+    position: relative;
+  }
+  
+  .hp13-iwt-content-{{ section_id }}::before {
+    content: '[DATA_BLOCK]';
+    position: absolute;
+    top: -30px; left: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    color: #666;
+  }
+  
+  .hp13-iwt-heading-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 900;
+    margin: 0 0 20px 0;
+    line-height: 1;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px #FFF;
+  }
+  
+  .hp13-iwt-text-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 30px 0;
+    color: #CCC;
+  }
+  
+  .hp13-iwt-btn-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: {{ bg_color }};
+    background-color: {{ text_color }};
+    padding: 12px 25px;
+    display: inline-block;
+    box-shadow: 4px 4px 0 rgba(255,255,255,0.2);
+    transition: all 0.2s ease;
+  }
+  
+  .hp13-iwt-btn-{{ section_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(255,255,255,0.2);
+  }
+
+  @media (max-width: 992px) {
+    .hp13-iwt-container-{{ section_id }} {
+      flex-direction: column;
+    }
+    .hp13-iwt-image-wrap-{{ section_id }},
+    .hp13-iwt-content-{{ section_id }} {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp13-iwt-container-{{ section_id }}">
+  <div class="hp13-iwt-image-wrap-{{ section_id }}">
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | image_url: width: 1000 }}" alt="Image" class="hp13-iwt-image-{{ section_id }}" loading="lazy">
+    {% else %}
+      <div class="hp13-iwt-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+    {% endif %}
+  </div>
+  
+  <div class="hp13-iwt-content-{{ section_id }}">
+    <h2 class="hp13-iwt-heading-{{ section_id }}">{{ section.settings.heading | default: 'CORE_SYSTEMS' }}</h2>
+    <div class="hp13-iwt-text-{{ section_id }}">
+      {% if section.settings.text != blank %}
+        {{ section.settings.text }}
+      {% else %}
+        <p>Engineered for the demands of the hyper-connected era. Each piece is designed to provide utility, protection, and unparalleled aesthetics in the urban sprawl.</p>
+      {% endif %}
+    </div>
+    {% if section.settings.button_label != blank %}
+      <a href="{{ section.settings.button_link | default: '#' }}" class="hp13-iwt-btn-{{ section_id }}">
+        {{ section.settings.button_label }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP13 Image with Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Highlight Color",
+      "default": "#00FFA3"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "CORE_SYSTEMS"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Engineered for the demands of the hyper-connected era. Each piece is designed to provide utility, protection, and unparalleled aesthetics in the urban sprawl.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "READ_LOGS"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 Image with Text"
+    }
+  ]
+}
+{% endschema %}

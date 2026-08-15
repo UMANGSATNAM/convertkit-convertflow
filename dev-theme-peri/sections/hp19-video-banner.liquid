@@ -1,0 +1,409 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --btn-bg: {{ section.settings.btn_bg }};
+    --btn-text: {{ section.settings.btn_text_color }};
+    --play-btn-color: {{ section.settings.play_btn_color }};
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp19-video-container {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    position: relative;
+    {% if section.settings.full_width %}
+      max-width: 100%;
+      padding: 0;
+    {% else %}
+      padding: 0 24px;
+    {% endif %}
+  }
+  
+  .hp19-video-wrapper {
+    position: relative;
+    border-radius: {% if section.settings.full_width %}0{% else %}{{ section.settings.video_radius }}px{% endif %};
+    overflow: hidden;
+    background: #000;
+    {% if section.settings.aspect_ratio != 'auto' %}
+      aspect-ratio: {{ section.settings.aspect_ratio }};
+    {% else %}
+      aspect-ratio: 16/9;
+    {% endif %}
+  }
+
+  .hp19-video-element {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    pointer-events: none; /* Let overlay handle clicks */
+  }
+
+  .hp19-video-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+      to bottom, 
+      rgba(0,0,0,{{ section.settings.overlay_opacity | divided_by: 100.0 }}) 0%, 
+      rgba(0,0,0,{{ section.settings.overlay_opacity | plus: 20 | divided_by: 100.0 | at_most: 1.0 }}) 100%
+    );
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: {{ section.settings.content_alignment }};
+    text-align: {{ section.settings.content_alignment }};
+    padding: 40px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp19-video-overlay {
+      padding: 24px;
+    }
+  }
+
+  .hp19-video__tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.tagline_size }}px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .hp19-video__title {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    margin: 0 0 24px;
+    font-style: italic;
+    max-width: 800px;
+    line-height: 1.1;
+  }
+
+  .hp19-video__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    border-radius: {{ section.settings.btn_radius }}px;
+    transition: all 0.3s ease;
+    margin-top: 24px;
+  }
+
+  .hp19-video__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  .hp19-video__play {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--play-btn-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 24px;
+    z-index: 3;
+  }
+  
+  .hp19-video__play:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.1);
+  }
+  
+  .hp19-video__play svg {
+    width: 32px; height: 32px;
+    margin-left: 4px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp19-video-container" id="HP19Video-{{ section.id }}">
+  <div class="hp19-video-wrapper">
+    {%- if section.settings.video != blank -%}
+      <video class="hp19-video-element" 
+             autoplay 
+             loop 
+             muted 
+             playsinline 
+             poster="{{ section.settings.poster | image_url: width: 1600 }}">
+        <source src="{{ section.settings.video }}" type="video/mp4">
+      </video>
+    {%- elsif section.settings.poster != blank -%}
+      <img class="hp19-video-element" src="{{ section.settings.poster | image_url: width: 1600 }}" alt="" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp19-video-element placeholder-svg' }}
+    {%- endif -%}
+    
+    <div class="hp19-video-overlay">
+      {%- if section.settings.show_play_btn -%}
+        <div class="hp19-video__play">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      {%- endif -%}
+      
+      {%- if section.settings.tagline != blank -%}
+        <div class="hp19-video__tagline">{{ section.settings.tagline | escape }}</div>
+      {%- endif -%}
+      
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp19-video__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+        <a href="{{ section.settings.btn_link }}" class="hp19-video__btn">
+          {{ section.settings.btn_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP19 - Video Banner Pro",
+  "class": "section-hp19-video",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video Settings"
+    },
+    {
+      "type": "text",
+      "id": "video",
+      "label": "MP4 Video URL",
+      "info": "Paste a direct link to an .mp4 file (e.g. from Shopify Files)"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Poster Image",
+      "info": "Shows while video loads or as fallback"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 100,
+      "unit": "px",
+      "label": "Max Width (if not full width)",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Video Aspect Ratio",
+      "options": [
+        { "value": "16/9", "label": "Widescreen (16:9)" },
+        { "value": "21/9", "label": "Cinematic (21:9)" },
+        { "value": "4/3", "label": "Standard (4:3)" },
+        { "value": "1/1", "label": "Square (1:1)" }
+      ],
+      "default": "21/9"
+    },
+    {
+      "type": "range",
+      "id": "video_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Border Radius (if not full width)",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Behind the Scenes"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The Art of Baking"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "Discover Our Process"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_btn",
+      "label": "Show Decorative Play Button",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "tagline_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tagline Size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Background",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "play_btn_color",
+      "label": "Play Button Color",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "label": "Overlay Opacity (%)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - Video Banner Pro",
+      "category": "Video"
+    }
+  ]
+}
+{% endschema %}

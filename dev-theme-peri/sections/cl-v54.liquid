@@ -1,0 +1,98 @@
+{% comment %} CL V54 — Medical / Pharmacy (Clean White/Blue) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv54 { background: {{ section.settings.bg_color | default: '#F8FAFC' }}; color: {{ section.settings.text_color | default: '#0F172A' }}; padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  .clv54-hero { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 40px; padding: 40px; background: #FFF; border-radius: 12px; border-left: 6px solid #0284C7; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  .clv54-hero h1 { font-size: 32px; font-weight: 700; color: #0F172A; margin-bottom: 10px; }
+  .clv54-hero p { font-size: 16px; color: #64748B; margin: 0; max-width: 600px; line-height: 1.5; }
+  .clv54-chips { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+  .clv54-chips a { padding: 8px 16px; background: #F1F5F9; color: #334155; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 6px; transition: 0.2s; border: 1px solid #E2E8F0; }
+  .clv54-chips a:hover, .clv54-chips a.active { background: #0284C7; color: #FFF; border-color: #0284C7; }
+  .clv54-toolbar { display: flex; justify-content: space-between; align-items: center; background: #FFF; padding: 15px 20px; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .clv54-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv54-promo { grid-column: span 1; background: #0284C7; color: #FFF; border-radius: 12px; padding: 30px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+  .clv54-promo::after { content: '+'; position: absolute; right: 10px; top: -10px; font-size: 100px; font-weight: 200; opacity: 0.1; line-height: 1; }
+  .clv54-promo h3 { font-size: 22px; font-weight: 600; margin-bottom: 15px; z-index: 1; }
+  .clv54-promo a { display: inline-block; padding: 10px 20px; background: #FFF; color: #0284C7; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px; z-index: 1; width: fit-content; }
+  .clv54-seo { margin-top: 50px; background: #FFF; padding: 30px; border-radius: 12px; border: 1px solid #E2E8F0; }
+  @media (max-width: 768px) { .clv54-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv54-hero { padding: 25px; } .clv54-hero h1 { font-size: 28px; } }
+</style>
+<div class="clv54" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv54-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Healthcare Supplies{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Clinical-grade essentials for professionals and home care.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv54-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv54-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 600; color: #334155;">{{ filter.label }} <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:5px;"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+              <div style="position: absolute; background: #FFF; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; z-index: 10; margin-top: 10px; min-width: 200px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 10px; cursor: pointer; font-size: 14px; color: #475569;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} <span style="color: #94A3B8; font-size: 12px;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #F8FAFC; border: 1px solid #CBD5E1; color: #334155; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv54-grid">
+      {% for product in collection.products %}
+        {% render 'card-v54', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv54-promo">
+            <h3>First Aid<br>Kits</h3>
+            <a href="/collections/first-aid">Shop Now</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v54', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 14px; font-weight: 600; color: #64748B;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv54-seo">
+      <h2 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 10px;">{{ section.settings.seo_title | default: 'Certified & Regulated' }}</h2>
+      <p style="font-size: 14px; color: #64748B; line-height: 1.6; margin: 0;">{{ section.settings.seo_text | default: 'All our products meet stringent medical standards. From PPE to advanced diagnostics, trust us for reliable health solutions.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V54 — Pharmacy", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F8FAFC"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#0F172A"}
+  ], "presets": [{"name": "CL V54 — Pharmacy"}]
+}
+{% endschema %}

@@ -1,0 +1,439 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#f4f4f4'
+  assign text_color = section.settings.text_color | default: '#000000'
+  assign card_border = section.settings.card_border | default: '#e0e0e0'
+  assign card_bg = section.settings.card_bg | default: '#ffffff'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+  
+  assign heading = section.settings.heading
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.limit
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp2-best-bg: {{ bg_color }};
+    --hp2-best-text: {{ text_color }};
+    --hp2-best-card-border: {{ card_border }};
+    --hp2-best-card-bg: {{ card_bg }};
+    
+    --hp2-best-pt-desk: {{ padding_top_desktop }}px;
+    --hp2-best-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp2-best-pt-mob: {{ padding_top_mobile }}px;
+    --hp2-best-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp2-fashion-bestsellers-{{ section.id }} {
+    padding-top: var(--hp2-best-pt-desk);
+    padding-bottom: var(--hp2-best-pb-desk);
+    background-color: var(--hp2-best-bg);
+    color: var(--hp2-best-text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    overflow: hidden; /* Prevent horizontal scrollbar on body */
+  }
+
+  .hp2-best-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    /* Only left padding so carousel bleeds off right edge */
+    padding-left: 40px; 
+  }
+
+  .hp2-best-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    padding-right: 40px; /* Balance right padding for header */
+  }
+
+  .hp2-best-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  /* Carousel Controls */
+  .hp2-best-controls {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .hp2-btn-ctrl {
+    background: transparent;
+    border: 2px solid var(--hp2-best-text);
+    color: var(--hp2-best-text);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .hp2-btn-ctrl:hover {
+    background: var(--hp2-best-text);
+    color: var(--hp2-best-bg);
+  }
+  .hp2-btn-ctrl svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+
+  /* Carousel Track */
+  .hp2-best-carousel {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 40px;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hp2-best-carousel::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Trailing space so last item isn't glued to right edge */
+  .hp2-best-carousel::after {
+    content: '';
+    flex: 0 0 16px;
+  }
+
+  /* Item */
+  .hp2-best-item {
+    flex: 0 0 calc(25% - 18px); /* 4 visible on large desktop */
+    min-width: 280px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    group;
+    text-decoration: none;
+    color: var(--hp2-best-text);
+  }
+
+  .hp2-best-img-wrap {
+    position: relative;
+    aspect-ratio: 3/4;
+    background-color: var(--hp2-best-card-bg);
+    border: 1px solid var(--hp2-best-card-border);
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+
+  .hp2-best-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .hp2-best-item:hover .hp2-best-img {
+    transform: scale(1.04);
+  }
+
+  /* Secondary Image Hover */
+  .hp2-best-img-hover {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .hp2-best-item:hover .hp2-best-img-hover {
+    opacity: 1;
+  }
+
+  .hp2-best-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .hp2-best-name {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .hp2-best-price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hp2-best-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .hp2-best-compare {
+    font-size: 12px;
+    text-decoration: line-through;
+    color: #999;
+  }
+
+  /* Responsive styling */
+  @media screen and (max-width: 1200px) {
+    .hp2-best-item { flex: 0 0 calc(33.333% - 16px); } /* 3 visible */
+  }
+
+  @media screen and (max-width: 991px) {
+    .hp2-best-item { flex: 0 0 calc(50% - 12px); min-width: 250px; } /* 2 visible */
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp2-fashion-bestsellers-{{ section.id }} {
+      padding-top: var(--hp2-best-pt-mob);
+      padding-bottom: var(--hp2-best-pb-mob);
+    }
+    .hp2-best-inner {
+      padding-left: 20px;
+    }
+    .hp2-best-header {
+      padding-right: 20px;
+      margin-bottom: 30px;
+    }
+    .hp2-btn-ctrl {
+      width: 40px; height: 40px;
+    }
+    .hp2-best-carousel {
+      gap: 15px;
+      padding-bottom: 20px;
+    }
+    .hp2-best-item {
+      flex: 0 0 calc(70% - 15px); /* Peek at next item */
+      min-width: 200px;
+    }
+  }
+</style>
+
+<section class="hp2-fashion-bestsellers-{{ section.id }}" aria-label="Bestselling Products">
+  <div class="hp2-best-inner">
+    
+    <div class="hp2-best-header">
+      {%- if heading != blank -%}
+        <h2 class="hp2-best-title">{{ heading }}</h2>
+      {%- endif -%}
+      
+      <div class="hp2-best-controls" aria-label="Carousel Controls">
+        <button class="hp2-btn-ctrl hp2-prev" id="hp2-prev-{{ section.id }}" aria-label="Previous Products">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="hp2-btn-ctrl hp2-next" id="hp2-next-{{ section.id }}" aria-label="Next Products">
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="hp2-best-carousel" id="hp2-carousel-{{ section.id }}">
+      {%- if collection != blank and collection.products_count > 0 -%}
+        
+        {%- for product in collection.products limit: product_limit -%}
+          <a href="{{ product.url }}" class="hp2-best-item" aria-label="{{ product.title | escape }}">
+            
+            <div class="hp2-best-img-wrap">
+              {%- if product.featured_image != blank -%}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" 
+                     srcset="{{ product.featured_image | image_url: width: 400 }} 400w, 
+                             {{ product.featured_image | image_url: width: 600 }} 600w, 
+                             {{ product.featured_image | image_url: width: 800 }} 800w"
+                     sizes="(max-width: 768px) 70vw, (max-width: 991px) 50vw, 25vw"
+                     class="hp2-best-img" 
+                     loading="lazy" 
+                     alt="{{ product.featured_image.alt | default: product.title | escape }}">
+                
+                {%- if product.images[1] != blank and section.settings.show_secondary_image -%}
+                  <img src="{{ product.images[1] | image_url: width: 600 }}" 
+                       class="hp2-best-img-hover" 
+                       loading="lazy" 
+                       alt="">
+                {%- endif -%}
+              {%- else -%}
+                {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'hp2-best-img placeholder-svg' }}
+              {%- endif -%}
+            </div>
+
+            <div class="hp2-best-info">
+              <h3 class="hp2-best-name">{{ product.title }}</h3>
+              
+              <div class="hp2-best-price-wrap">
+                <span class="hp2-best-price">{{ product.price | money }}</span>
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="hp2-best-compare">{{ product.compare_at_price | money }}</span>
+                {%- endif -%}
+              </div>
+            </div>
+
+          </a>
+        {%- endfor -%}
+
+      {%- else -%}
+        
+        {%- comment -%} Placeholder state {%- endcomment -%}
+        {%- for i in (1..product_limit) -%}
+          <div class="hp2-best-item">
+            <div class="hp2-best-img-wrap">
+              {%- capture current -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
+              {{ 'product-' | append: current | placeholder_svg_tag: 'hp2-best-img placeholder-svg' }}
+            </div>
+            <div class="hp2-best-info">
+              <h3 class="hp2-best-name">Heavyweight Hoodie</h3>
+              <div class="hp2-best-price-wrap">
+                <span class="hp2-best-price">$85.00</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('hp2-carousel-{{ section.id }}');
+    const btnPrev = document.getElementById('hp2-prev-{{ section.id }}');
+    const btnNext = document.getElementById('hp2-next-{{ section.id }}');
+    
+    if(!carousel || !btnPrev || !btnNext) return;
+
+    const scrollAmount = () => {
+      // Scroll by one item width + gap
+      const firstItem = carousel.querySelector('.hp2-best-item');
+      if(firstItem) {
+        return firstItem.offsetWidth + 24; // 24 is grid gap
+      }
+      return 300;
+    };
+
+    btnNext.addEventListener('click', () => {
+      carousel.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+    });
+
+    btnPrev.addEventListener('click', () => {
+      carousel.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP2 Bestsellers",
+  "tag": "section",
+  "class": "section-hp2-bestsellers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "TRENDING NOW"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Maximum Products to Show",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Product Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border",
+      "label": "Product Card Border",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP2 Bestsellers (Advanced)",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

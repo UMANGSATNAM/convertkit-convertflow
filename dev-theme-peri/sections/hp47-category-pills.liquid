@@ -1,0 +1,86 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp47-pills-bg: {{ section.settings.bg_color | default: '#F5F0EB' }};
+    
+    background-color: var(--hp47-pills-bg);
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+
+  .hp47-pills__wrap {
+    max-width: {{ section.settings.container_width | default: 1100 }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hp47-pill {
+    padding: 11px 26px;
+    background: #FAF7F2;
+    border: 1px solid #EAE3DA;
+    border-radius: 50px;
+    color: #382E2B;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(56, 46, 43, 0.03);
+  }
+
+  .hp47-pill:hover, .hp47-pill--active {
+    background: #382E2B;
+    color: #FAF7F2;
+    border-color: #382E2B;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(56, 46, 43, 0.15);
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp47-pills__wrap { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+    .hp47-pill { flex-shrink: 0; }
+  }
+{%- endstyle -%}
+
+<div class="hp47-pills__wrap">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '/collections/all' }}" class="hp47-pill {% if forloop.first %}hp47-pill--active{% endif %}" {{ block.shopify_attributes }}>
+        {{ block.settings.title }}
+      </a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="/collections/all" class="hp47-pill hp47-pill--active">🌾 All Linen &amp; Oat Care</a>
+    <a href="/collections/oat" class="hp47-pill">🌾 Bio-Fermented Oat Balms</a>
+    <a href="/collections/birch" class="hp47-pill">💧 Birch Sap Essences</a>
+    <a href="/collections/creams" class="hp47-pill">✨ Velvet Cashmere Creams</a>
+    <a href="/collections/masks" class="hp47-pill">🌿 Soothing Linen Masks</a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP47 - Taupe Pills",
+  "class": "section-hp47-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F0EB" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 70, "step": 5, "unit": "px", "label": "Vertical Padding", "default": 35 },
+    { "type": "range", "id": "container_width", "min": 800, "max": 1400, "step": 20, "unit": "px", "label": "Container Width", "default": 1100 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "🌾 All Linen & Oat Care" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP47 - Taupe Pills" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,396 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Syncopate', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+  }
+
+  .hp27-hero {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.hero_height }}vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-hero {
+      height: {{ section.settings.hero_height_mobile }}vh;
+      min-height: 500px;
+    }
+  }
+
+  .hp27-hero__bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+  }
+
+  .hp27-hero__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: {{ section.settings.image_opacity | divided_by: 100.0 }};
+    /* Slight cool/dark filter */
+    filter: contrast(1.1) brightness(0.8) grayscale(20%);
+    transform: scale(1.02);
+  }
+
+  /* Grid lines overlay for engineered look */
+  .hp27-hero__grid-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 2;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
+
+  .hp27-hero__content {
+    position: relative;
+    z-index: 3;
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 40px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-hero__content {
+      padding: 0 20px;
+      text-align: center;
+    }
+  }
+
+  .hp27-hero__badge {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    border: 1px solid var(--accent-color);
+    padding: 6px 12px;
+    background: rgba(255, 42, 42, 0.05); /* very faint red */
+  }
+
+  .hp27-hero__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp27-hero__text {
+    font-family: var(--font-body);
+    font-size: clamp(14px, 1.5vw, {{ section.settings.text_size }}px);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 {% if section.settings.text_alignment == 'center' %}auto{% else %}0{% endif %} 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-hero__text {
+      margin: 0 auto 30px;
+    }
+  }
+
+  .hp27-hero__actions {
+    display: flex;
+    gap: 20px;
+    justify-content: {% if section.settings.text_alignment == 'center' %}center{% else %}flex-start{% endif %};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-hero__actions {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .hp27-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0; /* Sharp corners */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp27-hero__btn--primary {
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: 1px solid var(--text-color);
+  }
+
+  .hp27-hero__btn--primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,42,42,0.8), transparent);
+    transition: left 0.5s ease;
+    z-index: 0;
+  }
+
+  .hp27-hero__btn--primary span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hp27-hero__btn--primary:hover {
+    color: #fff;
+    border-color: var(--accent-color);
+    background: var(--bg-color);
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.4);
+  }
+
+  .hp27-hero__btn--primary:hover::before {
+    left: 100%;
+  }
+
+  .hp27-hero__btn--secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid rgba(226, 226, 226, 0.3);
+  }
+
+  .hp27-hero__btn--secondary:hover {
+    border-color: var(--text-color);
+    background: rgba(226, 226, 226, 0.05);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp27-hero" id="HP27Hero-{{ section.id }}">
+  <div class="hp27-hero__bg">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="eager">
+    {%- else -%}
+      <div style="width:100%;height:100%;background:#1A1A1A;"></div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp27-hero__grid-overlay"></div>
+
+  <div class="hp27-hero__content">
+    {%- if section.settings.badge != blank -%}
+      <div class="hp27-hero__badge">{{ section.settings.badge }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.title != blank -%}
+      <h1 class="hp27-hero__title">{{ section.settings.title }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <p class="hp27-hero__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+
+    <div class="hp27-hero__actions">
+      {%- if section.settings.btn_1_text != blank -%}
+        <a href="{{ section.settings.btn_1_link | default: '#' }}" class="hp27-hero__btn hp27-hero__btn--primary">
+          <span>{{ section.settings.btn_1_text }}</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.btn_2_text != blank -%}
+        <a href="{{ section.settings.btn_2_link | default: '#' }}" class="hp27-hero__btn hp27-hero__btn--secondary">
+          <span>{{ section.settings.btn_2_text }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP27 - Eng Hero",
+  "class": "section-hp27-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge Text",
+      "default": "SYSTEM V.27"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "PRECISION\nENGINEERED."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Performance meets high-contrast design. Discover the latest advancements in our core collection."
+    },
+    {
+      "type": "text",
+      "id": "btn_1_text",
+      "label": "Primary Button Text",
+      "default": "EXPLORE SERIES"
+    },
+    {
+      "type": "url",
+      "id": "btn_1_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "btn_2_text",
+      "label": "Secondary Button Text",
+      "default": "TECHNICAL SPECS"
+    },
+    {
+      "type": "url",
+      "id": "btn_2_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "image_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "label": "Image Opacity (%)",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Desktop Height",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "hero_height_mobile",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Mobile Height",
+      "default": 80
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Dark Engineered Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2E2E2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Red)",
+      "default": "#FF2A2A"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP27 - Eng Hero"
+    }
+  ]
+}
+{% endschema %}

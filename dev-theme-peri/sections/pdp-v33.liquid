@@ -1,0 +1,493 @@
+{%- comment -%}
+  PDP V33 — HIGH-PERFORMANCE TACTICAL CARBON
+  Design: Aggressive tactical athletic carbon aesthetic, Teko condensed display + Rajdhani body
+  Carbon Fiber Charcoal (#1E293B), Crimson Red (#E11D48), High-Viz Yellow (#FACC15), Matte Black (#0F172A)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inv_qty = current_variant.inventory_quantity | default: 15 -%}
+{%- if inv_qty <= 0 -%}{%- assign inv_qty = 8 -%}{%- endif -%}
+{%- assign viewer_count = inv_qty | times: 8 | modulo: 50 | plus: 35 -%}
+{%- assign sold_count = inv_qty | times: 16 | modulo: 480 | plus: 260 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Teko:wght@600;700&display=swap');
+
+  .pdpv33 {
+    --bg: #0F172A; --surface: #1E293B; --border: #334155; --border-dark: #E11D48;
+    --text: #F8FAFC; --muted: #94A3B8; --accent: #E11D48; --accent-hover: #BE123C;
+    --yellow: #FACC15; --danger: #EF4444;
+    --f-head: 'Teko', sans-serif; --f-body: 'Rajdhani', sans-serif;
+    --r: 4px; --r-pill: 9999px; --ease: all 0.2s ease;
+    background: var(--bg); color: var(--text); font-family: var(--f-body); font-size: 16px; line-height: 1.4; -webkit-font-smoothing: antialiased;
+  }
+  .pdpv33 *, .pdpv33 *::before, .pdpv33 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pdpv33 img { max-width: 100%; display: block; }
+  .pdpv33 button { font-family: inherit; cursor: pointer; }
+  .pdpv33__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* OFFER BAR */
+  .pdpv33__offer { background: var(--accent); color: #FFF; padding: 10px; text-align: center; font-family: var(--f-head); font-size: 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid var(--yellow); }
+
+  /* GRID */
+  .pdpv33__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding: 36px 0; }
+  @media (min-width: 992px) { .pdpv33__grid { grid-template-columns: 1.1fr 1fr; gap: 48px; padding: 48px 0; } }
+
+  /* GALLERY */
+  .pdpv33__gal { display: flex; flex-direction: column; gap: 12px; }
+  .pdpv33__hero { width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4); position: relative; }
+  .pdpv33__hero img { width: 100%; height: 100%; object-fit: contain; }
+  .pdpv33__tac-tag { position: absolute; top: 14px; left: 14px; background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 14px; font-weight: 700; padding: 2px 12px; border-radius: var(--r); text-transform: uppercase; letter-spacing: 1px; }
+
+  .pdpv33__thumbs { display: flex; gap: 10px; overflow-x: auto; }
+  .pdpv33__th { width: 64px; height: 64px; flex-shrink: 0; border: 2px solid var(--border); border-radius: 4px; overflow: hidden; cursor: pointer; background: var(--surface); transition: var(--ease); }
+  .pdpv33__th:hover, .pdpv33__th.on { border-color: var(--accent); }
+  .pdpv33__th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .pdpv33__info { display: flex; flex-direction: column; gap: 18px; }
+  .pdpv33__crumb { font-family: var(--f-head); font-size: 16px; letter-spacing: 2px; color: var(--yellow); font-weight: 700; text-transform: uppercase; }
+  .pdpv33__title { font-family: var(--f-head); font-size: 42px; font-weight: 700; line-height: 1.0; color: var(--text); letter-spacing: 1px; text-transform: uppercase; }
+  @media (min-width: 992px) { .pdpv33__title { font-size: 52px; } }
+
+  .pdpv33__rating { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--muted); font-weight: 700; }
+  .pdpv33__stars { color: var(--yellow); }
+
+  /* PRICE CARD */
+  .pdpv33__price-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--r); padding: 16px 20px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .pdpv33__price { font-family: var(--f-head); font-size: 42px; font-weight: 700; color: var(--accent); }
+  .pdpv33__cmp { font-size: 22px; color: var(--muted); text-decoration: line-through; }
+  .pdpv33__badge { background: var(--yellow); color: #000; font-family: var(--f-head); font-weight: 700; font-size: 16px; padding: 2px 10px; border-radius: 2px; text-transform: uppercase; }
+
+  /* VARIANTS */
+  .pdpv33__vlabel { font-family: var(--f-head); font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--yellow); margin-bottom: 6px; }
+  .pdpv33__vopts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdpv33__vr { display: none; }
+  .pdpv33__vbtn { padding: 8px 22px; border: 2px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--text); font-family: var(--f-head); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: var(--ease); cursor: pointer; }
+  .pdpv33__vbtn:hover { border-color: var(--accent); }
+  .pdpv33__vr:checked + .pdpv33__vbtn { border-color: var(--accent); background: var(--accent); color: #FFF; }
+
+  /* PROMO */
+  .pdpv33__promo { background: var(--surface); border: 2px dashed var(--accent); border-radius: var(--r); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; font-family: var(--f-head); font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+  .pdpv33__promo-code { background: var(--accent); color: #FFF; padding: 2px 12px; border-radius: 2px; }
+
+  /* URGENCY */
+  .pdpv33__urg { background: var(--surface); border-left: 4px solid var(--yellow); border-radius: 0 var(--r) var(--r) 0; padding: 16px; display: flex; flex-direction: column; gap: 6px; font-family: var(--f-head); font-size: 16px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .pdpv33__pulse { display: inline-block; width: 10px; height: 10px; background: var(--yellow); border-radius: 50%; margin-right: 6px; animation: pdpv33p 1.5s infinite; }
+  @keyframes pdpv33p { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pdpv33__bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .pdpv33__fill { height: 100%; background: var(--accent); border-radius: 4px; }
+
+  /* QTY & CTA */
+  .pdpv33__qty-row { display: flex; align-items: center; gap: 14px; }
+  .pdpv33__qty { display: flex; border: 2px solid var(--border); border-radius: var(--r); overflow: hidden; background: var(--surface); }
+  .pdpv33__qty button { width: 44px; height: 48px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: var(--text); }
+  .pdpv33__qty input { width: 44px; height: 48px; border: none; border-left: 2px solid var(--border); border-right: 2px solid var(--border); text-align: center; font-size: 18px; font-weight: 700; background: transparent; color: var(--text); }
+
+  .pdpv33__atc { width: 100%; padding: 16px; border: none; border-radius: var(--r); background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--ease); box-shadow: 0 4px 16px rgba(225,29,72,0.4); }
+  .pdpv33__atc:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .pdpv33__atc:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .pdpv33__buynow .shopify-payment-button__button { border-radius: var(--r) !important; }
+
+  /* TRUST */
+  .pdpv33__trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; padding: 16px 0; border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
+  .pdpv33__trust-item { font-family: var(--f-head); font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+  .pdpv33__trust-icon { font-size: 20px; margin-bottom: 2px; color: var(--yellow); }
+  @media (max-width: 480px) { .pdpv33__trust { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ACCORDION */
+  .pdpv33__acc { border-top: 2px solid var(--border); margin-top: 48px; }
+  .pdpv33__acc-item { border-bottom: 2px solid var(--border); }
+  .pdpv33__acc-btn { width: 100%; padding: 18px 0; border: none; background: transparent; display: flex; justify-content: space-between; align-items: center; font-family: var(--f-head); font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text); }
+  .pdpv33__acc-btn::after { content: '+'; font-size: 22px; color: var(--yellow); }
+  .pdpv33__acc-item.open .pdpv33__acc-btn::after { content: '−'; }
+  .pdpv33__acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pdpv33__acc-item.open .pdpv33__acc-body { max-height: 500px; }
+  .pdpv33__acc-inner { padding: 0 0 18px; font-size: 15px; line-height: 1.6; color: var(--muted); }
+
+  /* SECTION TITLE */
+  .pdpv33__sh { font-family: var(--f-head); font-size: 32px; font-weight: 700; text-transform: uppercase; text-align: center; margin: 48px 0 20px; color: var(--text); letter-spacing: 2px; }
+
+  /* REELS */
+  .pdpv33__reels { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .pdpv33__reel { min-width: 180px; width: 180px; aspect-ratio: 9/16; background: #000; border: 2px solid var(--accent); border-radius: var(--r); overflow: hidden; flex-shrink: 0; position: relative; }
+  .pdpv33__reel video { width: 100%; height: 100%; object-fit: cover; }
+  .pdpv33__reel-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: rgba(15,23,42,0.9); color: var(--yellow); font-family: var(--f-head); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+  .pdpv33__reel-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--yellow); font-size: 36px; }
+
+  /* CARDS */
+  .pdpv33__pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdpv33__pgrid { grid-template-columns: repeat(4, 1fr); } }
+  .pdpv33__pcard { background: var(--surface); border-radius: var(--r); border: 2px solid var(--border); overflow: hidden; transition: var(--ease); text-decoration: none; color: inherit; display: block; }
+  .pdpv33__pcard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .pdpv33__pcard img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .pdpv33__pcard-info { padding: 14px; }
+  .pdpv33__pcard-title { font-family: var(--f-head); font-size: 17px; font-weight: 700; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-transform: uppercase; }
+  .pdpv33__pcard-price { font-family: var(--f-head); font-size: 18px; font-weight: 700; color: var(--accent); }
+
+  /* REVIEWS */
+  .pdpv33__revgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .pdpv33__revgrid { grid-template-columns: repeat(3, 1fr); } }
+  .pdpv33__revcard { background: var(--surface); border-radius: var(--r); border: 2px solid var(--border); padding: 20px; }
+  .pdpv33__rev-stars { color: var(--yellow); font-size: 14px; margin-bottom: 8px; }
+  .pdpv33__rev-txt { font-size: 14px; line-height: 1.6; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+  .pdpv33__rev-auth { font-family: var(--f-head); font-size: 16px; font-weight: 700; text-transform: uppercase; color: var(--text); }
+  .pdpv33__rev-vf { font-family: var(--f-head); font-size: 12px; color: var(--accent); font-weight: 700; }
+
+  /* RECENTLY VIEWED */
+  #pdpv33-rv { display: none; }
+  #pdpv33-rv.has { display: block; }
+
+  /* STICKY ATC */
+  .pdpv33__sticky { position: fixed; bottom: -80px; left: 0; width: 100%; background: var(--surface); border-top: 3px solid var(--accent); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; transition: bottom 0.3s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+  .pdpv33__sticky.show { bottom: 0; }
+  .pdpv33__sticky-l { display: flex; align-items: center; gap: 14px; }
+  .pdpv33__sticky-img { width: 42px; height: 42px; border-radius: 4px; border: 1px solid var(--border); object-fit: cover; }
+  .pdpv33__sticky-t { font-family: var(--f-head); font-size: 16px; font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
+  .pdpv33__sticky-p { font-family: var(--f-head); font-size: 18px; font-weight: 700; color: var(--accent); }
+  .pdpv33__sticky-btn { background: var(--accent); color: #FFF; border: none; padding: 12px 26px; border-radius: var(--r); font-family: var(--f-head); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; transition: var(--ease); }
+  .pdpv33__sticky-btn:hover { background: var(--accent-hover); }
+  @media (max-width: 600px) { .pdpv33__sticky-l { display: none; } .pdpv33__sticky-btn { width: 100%; padding: 15px; } }
+
+  .pdpv33__toast { position: fixed; top: 20px; right: 20px; background: var(--accent); color: #FFF; border-radius: var(--r); padding: 12px 24px; font-family: var(--f-head); font-size: 16px; font-weight: 700; z-index: 10000; transform: translateX(130%); transition: transform 0.3s ease; box-shadow: 0 4px 16px rgba(225,29,72,0.4); }
+  .pdpv33__toast.show { transform: translateX(0); }
+</style>
+
+<div class="pdpv33">
+  {% if section.settings.show_offer %}<div class="pdpv33__offer">{{ section.settings.offer_text }}</div>{% endif %}
+
+  <div class="pdpv33__wrap">
+    <div class="pdpv33__grid">
+
+      <!-- GALLERY -->
+      <div class="pdpv33__gal">
+        <div class="pdpv33__hero" id="pdpv33-hero">
+          <span class="pdpv33__tac-tag">⚡ TACTICAL CARBON</span>
+          {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.title | escape }}" id="pdpv33-himg">{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
+        </div>
+        <div class="pdpv33__thumbs">
+          {% for media in product.media limit: 6 %}
+            <div class="pdpv33__th {% if forloop.first %}on{% endif %}">
+              <img src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" loading="lazy">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pdpv33__info">
+        <div class="pdpv33__crumb">⚡ {% if product.collections.size > 0 %}{{ product.collections.first.title }}{% else %}Tactical Gear{% endif %}</div>
+        <h1 class="pdpv33__title">{{ product.title }}</h1>
+
+        {% if section.settings.show_rating %}
+          <div class="pdpv33__rating">
+            <span class="pdpv33__stars">★★★★★</span>
+            <span>{{ section.settings.rating_val }} · {{ section.settings.rev_count }} Tactical Reviews</span>
+          </div>
+        {% endif %}
+
+        <div class="pdpv33__price-card">
+          <span class="pdpv33__price" id="pdpv33-price">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="pdpv33__cmp">{{ current_variant.compare_at_price | money }}</span>
+            {%- assign sv = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+            <span class="pdpv33__badge">SAVE {{ sv }}%</span>
+          {% endif %}
+        </div>
+
+        {% if product.variants.size > 1 %}
+          {% for option in product.options_with_values %}
+            <div>
+              <div class="pdpv33__vlabel">Select {{ option.name }}</div>
+              <div class="pdpv33__vopts">
+                {% for value in option.values %}
+                  <label>
+                    <input type="radio" name="pdpv33-o-{{ option.position }}" value="{{ value | escape }}" class="pdpv33__vr" data-pos="{{ option.position }}" {% if option.selected_value == value %}checked{% endif %}>
+                    <span class="pdpv33__vbtn">{{ value }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if section.settings.show_promo %}
+          <div class="pdpv33__promo">
+            <span>⚡ Tactical Pass: Apply {{ section.settings.promo_code }}</span>
+            <span class="pdpv33__promo-code">Save {{ section.settings.promo_disc }}</span>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_urgency %}
+          <div class="pdpv33__urg">
+            <div><span class="pdpv33__pulse"></span><strong>{{ viewer_count }}</strong> tactical athletes active</div>
+            <div>⚡ <strong>{{ sold_count }}</strong> heavy orders completed today</div>
+            <div>Stock Status: Only <strong>{{ inv_qty }}</strong> remaining
+              <div class="pdpv33__bar">
+                {%- assign sp = inv_qty | times: 100 | divided_by: 45 -%}
+                {%- if sp > 100 -%}{%- assign sp = 100 -%}{%- endif -%}
+                <div class="pdpv33__fill" style="width:{{ sp }}%"></div>
+              </div>
+            </div>
+            {% if section.settings.show_countdown %}
+              <div>⏳ Drop Ends In: <strong id="pdpv33-cd" style="color:var(--yellow)">{{ section.settings.cd_hrs }}h 00m 00s</strong></div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="pdpv33__qty-row">
+          <div class="pdpv33__qty">
+            <button type="button" id="pdpv33-qm">−</button>
+            <input type="number" id="pdpv33-qi" value="1" min="1" max="10" readonly>
+            <button type="button" id="pdpv33-qp">+</button>
+          </div>
+          {% form 'product', product, id: 'pdpv33-form', style: 'flex:1' %}
+            <input type="hidden" name="id" id="pdpv33-vid" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" id="pdpv33-fq" value="1">
+            <button type="submit" name="add" class="pdpv33__atc" id="pdpv33-atc" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}Add to Cart — {{ current_variant.price | money }}{% else %}Sold Out{% endif %}
+            </button>
+            <div class="pdpv33__buynow" style="margin-top:10px">{{ form | payment_button }}</div>
+          {% endform %}
+        </div>
+
+        <div class="pdpv33__trust">
+          <div class="pdpv33__trust-item"><div class="pdpv33__trust-icon">🔒</div>Secure</div>
+          <div class="pdpv33__trust-item"><div class="pdpv33__trust-icon">⚡</div>Express Dispatch</div>
+          <div class="pdpv33__trust-item"><div class="pdpv33__trust-icon">↩️</div>Easy Returns</div>
+          <div class="pdpv33__trust-item"><div class="pdpv33__trust-icon">🛡️</div>Military Grade</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION -->
+    <div class="pdpv33__acc">
+      <div class="pdpv33__acc-item open">
+        <button class="pdpv33__acc-btn" type="button">Tactical Specifications & Materials</button>
+        <div class="pdpv33__acc-body"><div class="pdpv33__acc-inner">{{ product.description }}</div></div>
+      </div>
+      {% if section.settings.tac_specs != blank %}
+        <div class="pdpv33__acc-item">
+          <button class="pdpv33__acc-btn" type="button">Carbon Fiber Engineering</button>
+          <div class="pdpv33__acc-body"><div class="pdpv33__acc-inner">{{ section.settings.tac_specs }}</div></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FBT -->
+    {% if section.settings.fbt_coll != blank %}
+      {%- assign fbt = collections[section.settings.fbt_coll] -%}
+      {% if fbt.products.size > 0 %}
+        <div class="pdpv33__sh">Tactical Gear Pairings</div>
+        <div class="pdpv33__pgrid">
+          {% for item in fbt.products limit: 4 %}
+            <a href="{{ item.url }}" class="pdpv33__pcard">
+              <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+              <div class="pdpv33__pcard-info">
+                <div class="pdpv33__pcard-title">{{ item.title }}</div>
+                <div class="pdpv33__pcard-price">{{ item.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- REELS -->
+    {% if section.settings.show_reels %}
+      <div class="pdpv33__sh">Field Footage</div>
+      <div class="pdpv33__reels">
+        {% if section.settings.r1 != blank %}<div class="pdpv33__reel"><video src="{{ section.settings.r1 }}" muted playsinline loop></video><div class="pdpv33__reel-cap">⚡ Carbon Test</div></div>{% else %}<div class="pdpv33__reel"><div class="pdpv33__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r2 != blank %}<div class="pdpv33__reel"><video src="{{ section.settings.r2 }}" muted playsinline loop></video><div class="pdpv33__reel-cap">⚡ High Impact</div></div>{% else %}<div class="pdpv33__reel"><div class="pdpv33__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r3 != blank %}<div class="pdpv33__reel"><video src="{{ section.settings.r3 }}" muted playsinline loop></video><div class="pdpv33__reel-cap">⚡ Extreme Stress</div></div>{% else %}<div class="pdpv33__reel"><div class="pdpv33__reel-ph">▶</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- REVIEWS -->
+    {% if section.settings.show_reviews %}
+      <div class="pdpv33__sh" id="reviews">Athlete Reviews</div>
+      <div class="pdpv33__revgrid">
+        {% if section.settings.rv1 != blank %}<div class="pdpv33__revcard"><div class="pdpv33__rev-stars">★★★★★</div><div class="pdpv33__rev-txt">"{{ section.settings.rv1 }}"</div><div class="pdpv33__rev-auth">{{ section.settings.rv1n }}</div><div class="pdpv33__rev-vf">✓ Verified Athlete</div></div>{% endif %}
+        {% if section.settings.rv2 != blank %}<div class="pdpv33__revcard"><div class="pdpv33__rev-stars">★★★★★</div><div class="pdpv33__rev-txt">"{{ section.settings.rv2 }}"</div><div class="pdpv33__rev-auth">{{ section.settings.rv2n }}</div><div class="pdpv33__rev-vf">✓ Verified Athlete</div></div>{% endif %}
+        {% if section.settings.rv3 != blank %}<div class="pdpv33__revcard"><div class="pdpv33__rev-stars">★★★★★</div><div class="pdpv33__rev-txt">"{{ section.settings.rv3 }}"</div><div class="pdpv33__rev-auth">{{ section.settings.rv3n }}</div><div class="pdpv33__rev-vf">✓ Verified Athlete</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURED -->
+    {% if section.settings.feat_coll != blank %}
+      {%- assign fc = collections[section.settings.feat_coll] -%}
+      {% if fc.products.size > 0 %}
+        <div class="pdpv33__sh">Recommended Gear</div>
+        <div class="pdpv33__pgrid">
+          {% for item in fc.products limit: 4 %}
+            {% if item.handle != product.handle %}
+              <a href="{{ item.url }}" class="pdpv33__pcard">
+                <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+                <div class="pdpv33__pcard-info">
+                  <div class="pdpv33__pcard-title">{{ item.title }}</div>
+                  <div class="pdpv33__pcard-price">{{ item.price | money }}</div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- RECENTLY VIEWED -->
+    <div id="pdpv33-rv">
+      <div class="pdpv33__sh">Recently Viewed</div>
+      <div class="pdpv33__pgrid" id="pdpv33-rvg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY ATC -->
+<div class="pdpv33__sticky" id="pdpv33-sticky">
+  <div class="pdpv33__sticky-l">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 80 }}" class="pdpv33__sticky-img" alt="{{ product.title | escape }}">{% endif %}
+    <div>
+      <div class="pdpv33__sticky-t">{{ product.title }}</div>
+      <div class="pdpv33__sticky-p" id="pdpv33-sp">{{ current_variant.price | money }}</div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      {% if product.available %}
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b>{% render 'countdown-timer', product: product %}</b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% render 'back-in-stock', product: product %}
+
+      {% if product.available %}
+      <button type="button" class="pdpv33__sticky-btn" id="pdpv33-sbtn">Add to Cart</button>
+      {% else %}
+      <button class="pdpv33__sticky-btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      {% endif %}
+</div>
+
+<div class="pdpv33__toast" id="pdpv33-toast">⚡ Added to cart!</div>
+
+<script>
+(function(){
+  var PJ={{ product | json }}, cid={{ current_variant.id }};
+  function getO(){ var o=[]; document.querySelectorAll('.pdpv33__vr:checked').forEach(function(r){ o.push({p:parseInt(r.dataset.pos),v:r.value}); }); o.sort(function(a,b){return a.p-b.p}); return o.map(function(x){return x.v}); }
+  function findV(o){ for(var i=0;i<PJ.variants.length;i++){ var v=PJ.variants[i],ok=true; for(var j=0;j<o.length;j++){ if(v.options[j]!==o[j]){ ok=false; break; } } if(ok) return v; } return null; }
+  function upd(){
+    var o=getO(); if(!o.length) return; var v=findV(o); if(!v) return; cid=v.id;
+    document.getElementById('pdpv33-vid').value=v.id;
+    var pf=(v.price/100).toLocaleString('en-US',{style:'currency',currency:PJ.currency||'USD'});
+    var pe=document.getElementById('pdpv33-price'); if(pe) pe.textContent=pf;
+    var sp=document.getElementById('pdpv33-sp'); if(sp) sp.textContent=pf;
+    var ab=document.getElementById('pdpv33-atc');
+    if(ab){ ab.disabled=!v.available; ab.textContent=v.available?'Add to Cart — '+pf:'Sold Out'; }
+    var u=new URL(window.location); u.searchParams.set('variant',v.id); history.replaceState({},'',u);
+  }
+  document.querySelectorAll('.pdpv33__vr').forEach(function(r){ r.addEventListener('change',upd); });
+
+  var fm=document.getElementById('pdpv33-form');
+  if(fm) fm.addEventListener('submit',function(e){
+    e.preventDefault(); var b=document.getElementById('pdpv33-atc'), ot=b.textContent;
+    b.disabled=true; b.textContent='Adding...';
+    var q=parseInt(document.getElementById('pdpv33-qi').value)||1;
+    document.getElementById('pdpv33-fq').value=q;
+    fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cid,quantity:q})})
+    .then(function(r){return r.json();})
+    .then(function(){ b.textContent='✓ Added!'; toast33(); setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); })
+    .catch(function(){ b.textContent='Error'; setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); });
+  });
+
+  function toast33(){ var t=document.getElementById('pdpv33-toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+  var qi=document.getElementById('pdpv33-qi');
+  document.getElementById('pdpv33-qm').addEventListener('click',function(){ var v=parseInt(qi.value); if(v>1) qi.value=v-1; });
+  document.getElementById('pdpv33-qp').addEventListener('click',function(){ var v=parseInt(qi.value); if(v<10) qi.value=v+1; });
+
+  document.querySelectorAll('.pdpv33__th').forEach(function(th){
+    th.addEventListener('click',function(){
+      document.querySelectorAll('.pdpv33__th').forEach(function(t){ t.classList.remove('on'); });
+      th.classList.add('on');
+      var hi=document.getElementById('pdpv33-himg'), ti=th.querySelector('img');
+      if(hi&&ti) hi.src=ti.src.replace(/width=\d+/,'width=900');
+    });
+  });
+
+  var sb=document.getElementById('pdpv33-sticky'), ab=document.getElementById('pdpv33-atc');
+  if(sb&&ab) window.addEventListener('scroll',function(){ sb.classList.toggle('show', ab.getBoundingClientRect().top<-50); });
+  var sbn=document.getElementById('pdpv33-sbtn');
+  if(sbn) sbn.addEventListener('click',function(){ document.getElementById('pdpv33-atc').click(); });
+
+  document.querySelectorAll('.pdpv33__acc-btn').forEach(function(b){ b.addEventListener('click',function(){ b.closest('.pdpv33__acc-item').classList.toggle('open'); }); });
+
+  var ce=document.getElementById('pdpv33-cd');
+  if(ce){
+    var hrs=parseInt('{{ section.settings.cd_hrs | default: 6 }}')||6, ts=hrs*3600;
+    var sk=sessionStorage.getItem('pdpv33_cd'); if(sk) ts=parseInt(sk);
+    setInterval(function(){ ts--; if(ts<=0){ ce.textContent='EXPIRED'; return; } var h=Math.floor(ts/3600), m=Math.floor((ts%3600)/60), s=ts%60; ce.textContent=h+'h '+(m<10?'0':'')+m+'m '+(s<10?'0':'')+s+'s'; sessionStorage.setItem('pdpv33_cd',ts); },1000);
+  }
+
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target.querySelector('video'); if(v){ e.isIntersecting?v.play():v.pause(); } }); },{threshold:0.5});
+    document.querySelectorAll('.pdpv33__reel').forEach(function(r){ ro.observe(r); });
+  }
+
+  var RK='pdpv33_rv', cp={handle:'{{ product.handle }}',title:'{{ product.title | escape }}',price:'{{ product.price | money }}',image:'{{ product.featured_image | image_url: width: 400 }}',url:'{{ product.url }}'};
+  try{ var its=JSON.parse(localStorage.getItem(RK)||'[]'); its=its.filter(function(i){ return i.handle!==cp.handle; }); its.unshift(cp); if(its.length>8) its=its.slice(0,8); localStorage.setItem(RK,JSON.stringify(its)); }catch(e){}
+  try{
+    var its2=JSON.parse(localStorage.getItem(RK)||'[]').filter(function(i){ return i.handle!==cp.handle; });
+    var c=document.getElementById('pdpv33-rv'), g=document.getElementById('pdpv33-rvg');
+    if(g&&its2.length>0){ c.classList.add('has'); var h=''; its2.slice(0,4).forEach(function(i){ h+='<a href="'+i.url+'" class="pdpv33__pcard"><img src="'+i.image+'" alt="'+i.title+'" loading="lazy"><div class="pdpv33__pcard-info"><div class="pdpv33__pcard-title">'+i.title+'</div><div class="pdpv33__pcard-price">'+i.price+'</div></div></a>'; }); g.innerHTML=h; }
+  }catch(e){}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PDP V33 — Tactical Carbon",
+  "tag": "section",
+  "class": "pdpv33-section",
+  "settings": [
+    { "type": "header", "content": "Rating" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "text", "id": "rating_val", "label": "Rating score", "default": "4.98" },
+    { "type": "text", "id": "rev_count", "label": "Total reviews", "default": "2,180" },
+    { "type": "header", "content": "Offer Banner" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show offer", "default": true },
+    { "type": "text", "id": "offer_text", "label": "Offer text", "default": "⚡ TACTICAL CARBON: ENJOY 20% DISCOUNT WITH CODE 'CARBON20'" },
+    { "type": "header", "content": "Promo" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show promo", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Code", "default": "CARBON20" },
+    { "type": "text", "id": "promo_disc", "label": "Discount", "default": "20%" },
+    { "type": "header", "content": "Urgency" },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show urgency", "default": true },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "range", "id": "cd_hrs", "label": "Countdown hours", "min": 1, "max": 48, "default": 6 },
+    { "type": "header", "content": "Accordion" },
+    { "type": "richtext", "id": "tac_specs", "label": "Carbon fiber engineering" },
+    { "type": "header", "content": "FBT" },
+    { "type": "collection", "id": "fbt_coll", "label": "FBT collection" },
+    { "type": "header", "content": "Reels" },
+    { "type": "checkbox", "id": "show_reels", "label": "Show reels", "default": true },
+    { "type": "url", "id": "r1", "label": "Reel 1 URL" },
+    { "type": "url", "id": "r2", "label": "Reel 2 URL" },
+    { "type": "url", "id": "r3", "label": "Reel 3 URL" },
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews", "default": true },
+    { "type": "text", "id": "rv1", "label": "Review 1", "default": "Built for extreme performance. Heavy duty!" },
+    { "type": "text", "id": "rv1n", "label": "Author 1", "default": "Marcus B." },
+    { "type": "text", "id": "rv2", "label": "Review 2", "default": "Carbon fiber finish looks insanely clean." },
+    { "type": "text", "id": "rv2n", "label": "Author 2", "default": "Drake V." },
+    { "type": "text", "id": "rv3", "label": "Review 3", "default": "Top tier tactical build quality." },
+    { "type": "text", "id": "rv3n", "label": "Author 3", "default": "Jaxson M." },
+    { "type": "header", "content": "Featured" },
+    { "type": "collection", "id": "feat_coll", "label": "Featured collection" }
+  ],
+  "presets": [{ "name": "PDP V33 — Tactical Carbon" }]
+}
+{% endschema %}

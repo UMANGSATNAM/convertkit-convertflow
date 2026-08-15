@@ -1,0 +1,170 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp40-offer-wrapper {
+    padding: 100px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 60vh;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp40-offer-wrapper {
+      padding: 60px 20px;
+      min-height: 50vh;
+    }
+  }
+
+  .hp40-offer__title {
+    font-family: var(--font-heading);
+    font-size: clamp(60px, 15vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    line-height: 0.8;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 40px;
+    letter-spacing: -4px;
+    max-width: 100vw;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp40-offer__title {
+      letter-spacing: -2px;
+    }
+  }
+
+  .hp40-offer__btn {
+    display: inline-block;
+    padding: 20px 40px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: -1px;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+
+  .hp40-offer__btn:hover {
+    transform: scale(1.05);
+  }
+
+  /* Decorative diagonal lines classic to Swiss design */
+  .hp40-offer__lines {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+    pointer-events: none;
+  }
+  
+  /* Invert lines if bg is dark */
+  .hp40-offer-wrapper.is-dark .hp40-offer__lines {
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+{%- assign is_dark = false -%}
+{%- if section.settings.bg_color == '#111111' or section.settings.bg_color == '#000000' -%}
+  {%- assign is_dark = true -%}
+{%- endif -%}
+
+<div class="hp40-offer-wrapper {% if is_dark %}is-dark{% endif %}" id="HP40Offer-{{ section.id }}">
+  <div class="hp40-offer__lines"></div>
+  
+  <h2 class="hp40-offer__title">{{ section.settings.title }}</h2>
+  
+  {%- if section.settings.btn_label != blank -%}
+    <a href="{{ section.settings.btn_link | default: '#' }}" class="hp40-offer__btn">
+      {{ section.settings.btn_label }}
+    </a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP40 - Swiss Offer",
+  "class": "section-hp40-offer-banner",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "SALE\nIS ON"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "ACCESS NOW"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 60,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 180
+    },
+    {
+      "type": "header",
+      "content": "Swiss Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Primary block)",
+      "default": "#0055FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP40 - Swiss Offer"
+    }
+  ]
+}
+{% endschema %}

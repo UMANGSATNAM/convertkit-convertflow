@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V7 — SUSTAINABLE FOOTWEAR & SNEAKERS D2C (NEEMAN'S / ALLBIRDS STYLE)
+  Usage: {% render 'card-v7', product: product %}
+  Design: Eco Soft Cream (#F5F5F0), Deep Forest Green (#2E4F4F), Bricolage Grotesque & Outfit fonts, 14px leaf-rounded corners
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Outfit:wght@400;500;600;700&display=swap');
+
+  .cv7-card {
+    --cv7-bg: #FFFFFF;
+    --cv7-text: #2E4F4F;
+    --cv7-muted: #0E8388;
+    --cv7-green: #2E4F4F;
+    --cv7-light-green: #CBE4DE;
+    --cv7-border: #E5E7EB;
+    font-family: 'Outfit', sans-serif;
+    background: var(--cv7-bg);
+    border: 1px solid var(--cv7-border);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv7-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv7-green);
+    box-shadow: 0 12px 24px -6px rgba(46, 79, 79, 0.15);
+  }
+
+  .cv7-card *, .cv7-card *::before, .cv7-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv7-card a { color: inherit; text-decoration: none; }
+  .cv7-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv7-card img { max-width: 100%; display: block; }
+
+  .cv7-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #F5F5F0;
+    overflow: hidden;
+  }
+  .cv7-img { width: 100%; height: 100%; object-fit: contain; padding: 16px; transition: transform 0.5s ease; }
+  .cv7-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv7-card:hover .cv7-img-pri { opacity: 0; }
+  .cv7-card:hover .cv7-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Eco Tag Top Left */
+  .cv7-badge-eco {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv7-light-green); color: var(--cv7-green);
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 20px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv7-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid #E5E7EB;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv7-green); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv7-wish:hover, .cv7-wish.active { background: var(--cv7-green); color: #FFFFFF; transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv7-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(255, 255, 255, 0.95); color: var(--cv7-green);
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 8px; border: 1px solid var(--cv7-green);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv7-card:hover .cv7-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv7-qv-overlay:hover { background: var(--cv7-green); color: #FFFFFF; }
+
+  .cv7-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+  .cv7-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv7-muted); font-weight: 700; font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: 0.08em; }
+  .cv7-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #2E4F4F; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Eco Subtitle */
+  .cv7-eco-line { font-size: 11px; color: #0E8388; font-weight: 500; }
+
+  /* Rating Row */
+  .cv7-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cv7-green); font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv7-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv7-price { font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800; color: #2E4F4F; }
+  .cv7-cmp { font-size: 13px; color: #9CA3AF; text-decoration: line-through; }
+  .cv7-disc { font-size: 11px; font-weight: 800; color: #2E4F4F; background: var(--cv7-light-green); padding: 2px 6px; border-radius: 4px; }
+
+  /* Shoe Size Selector */
+  .cv7-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv7-size-btn {
+    font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid #D1D5DB; background: #FFFFFF; color: #2E4F4F; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv7-size-btn.active, .cv7-size-btn:hover { background: #2E4F4F; color: #FFFFFF; border-color: #2E4F4F; }
+
+  /* Bottom Button */
+  .cv7-action-box { padding: 0 14px 14px; }
+  .cv7-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv7-green); color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 8px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(46, 79, 79, 0.25);
+  }
+  .cv7-atc-btn:hover { background: #1F3737; transform: scale(1.01); }
+  .cv7-atc-btn:disabled { background: #CBD5E1; color: #64748B; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv7-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv7-badge-eco">100% RECYCLED WOOL</span>
+
+    <button type="button" class="cv7-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv7-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv7-img cv7-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv7-img cv7-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv7-img' }}
+      {% endif %}
+
+      <button type="button" class="cv7-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv7-content">
+      {% if card_prod.vendor != blank %}<span class="cv7-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv7-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv7-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv7-eco-line">Ultra Lightweight | Machine Washable</span>
+
+      <div class="cv7-rating">
+        <span>★ 4.8</span> <span>(850 reviews)</span>
+      </div>
+
+      <div class="cv7-price-row">
+        <span class="cv7-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv7-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv7-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Shoe Size Selector -->
+      <div class="cv7-sizes">
+        {% for variant in card_prod.variants limit: 5 %}
+          <button type="button" class="cv7-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">UK {{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv7-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv7-atc-btn" data-add-cart="{{ cur_var.id }}">STEP INTO COMFORT</button>
+      {% else %}
+        <button type="button" class="cv7-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv7-card">
+    <div class="cv7-media">{{ 'product-1' | placeholder_svg_tag: 'cv7-img' }}</div>
+    <div class="cv7-content">
+      <span class="cv7-vendor">ECO FOOTWEAR</span>
+      <div class="cv7-title">Merino Wool Eco Slip-On Sneakers</div>
+
+      {% if card_r_show != false %}
+      <div class="cv7-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv7-eco-line">Ultra Lightweight | Machine Washable</span>
+      <div class="cv7-price-row"><span class="cv7-price">₹ 3,499</span><span class="cv7-cmp">₹ 4,299</span><span class="cv7-disc">20% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

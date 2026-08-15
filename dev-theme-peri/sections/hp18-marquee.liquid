@@ -1,0 +1,266 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign outline_color = section.settings.outline_color
+  assign border_color = section.settings.border_color
+  assign border_width = section.settings.border_width
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign font_size = section.settings.font_size
+  assign speed = section.settings.speed
+  assign direction = section.settings.direction
+-%}
+
+<style>
+  .hp18-marquee-{{ sec_id }} {
+    background-color: {{ bg_color }};
+    border-bottom: {{ border_width }}px solid {{ border_color }};
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+  }
+
+  .hp18-marquee-{{ sec_id }}__inner {
+    display: flex;
+    {% if direction == 'right' %}
+      animation: hp18-marquee-scroll-{{ sec_id }} {{ speed }}s linear infinite reverse;
+    {% else %}
+      animation: hp18-marquee-scroll-{{ sec_id }} {{ speed }}s linear infinite;
+    {% endif %}
+  }
+
+  /* Duplicate for seamless loop */
+  .hp18-marquee-{{ sec_id }}__inner:hover {
+    animation-play-state: paused;
+  }
+
+  .hp18-marquee-{{ sec_id }}__item {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: {{ font_size }}px;
+    text-transform: uppercase;
+    padding: 0 40px;
+    margin: 0;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px {{ outline_color }};
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    transition: color 0.3s ease, -webkit-text-stroke 0.3s ease;
+    cursor: default;
+  }
+
+  .hp18-marquee-{{ sec_id }}__item--solid,
+  .hp18-marquee-{{ sec_id }}__item:hover {
+    color: {{ text_color }};
+    -webkit-text-stroke: 0px transparent;
+    text-shadow: 4px 4px 0px {{ outline_color }};
+  }
+
+  .hp18-marquee-{{ sec_id }}__separator {
+    display: inline-block;
+    color: {{ text_color }};
+    -webkit-text-stroke: 0px transparent;
+  }
+
+  @keyframes hp18-marquee-scroll-{{ sec_id }} {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp18-marquee-{{ sec_id }}__item {
+      font-size: {{ font_size | times: 0.6 }}px;
+      padding: 0 20px;
+      gap: 20px;
+    }
+  }
+</style>
+
+<div class="hp18-marquee-{{ sec_id }}">
+  <div class="hp18-marquee-{{ sec_id }}__inner">
+    {%- capture marquee_content -%}
+      {% for block in section.blocks %}
+        <span class="hp18-marquee-{{ sec_id }}__item {% if block.settings.is_solid %}hp18-marquee-{{ sec_id }}__item--solid{% endif %}" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+          {% if block.settings.icon != blank %}
+            <span class="hp18-marquee-{{ sec_id }}__separator">{{ block.settings.icon }}</span>
+          {% endif %}
+        </span>
+      {% else %}
+        <span class="hp18-marquee-{{ sec_id }}__item">LIMITED EDITION <span class="hp18-marquee-{{ sec_id }}__separator">🔥</span></span>
+        <span class="hp18-marquee-{{ sec_id }}__item hp18-marquee-{{ sec_id }}__item--solid">FAST SELLING <span class="hp18-marquee-{{ sec_id }}__separator">🔥</span></span>
+        <span class="hp18-marquee-{{ sec_id }}__item">NO RESTOCKS <span class="hp18-marquee-{{ sec_id }}__separator">🔥</span></span>
+      {% endfor %}
+    {%- endcapture -%}
+
+    <!-- Render content multiple times to ensure continuous flow across large screens -->
+    {{ marquee_content }}
+    {{ marquee_content }}
+    {{ marquee_content }}
+    {{ marquee_content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP18 Advanced Marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Solid Text Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color",
+      "id": "outline_color",
+      "label": "Outline Text Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Design & Layout"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Width",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop Font Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 40,
+      "step": 1,
+      "unit": "sec",
+      "label": "Scroll Speed (Lower is faster)",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "left", "label": "Right to Left" },
+        { "value": "right", "label": "Left to Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_block",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "LIMITED EDITION"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Separator Icon/Emoji",
+          "default": "🔥"
+        },
+        {
+          "type": "checkbox",
+          "id": "is_solid",
+          "label": "Make Text Solid",
+          "default": false,
+          "info": "If unchecked, text will be an outline."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP18 Advanced Marquee",
+      "blocks": [
+        {
+          "type": "text_block",
+          "settings": {
+            "text": "LIMITED EDITION",
+            "is_solid": false
+          }
+        },
+        {
+          "type": "text_block",
+          "settings": {
+            "text": "FAST SELLING",
+            "is_solid": true
+          }
+        },
+        {
+          "type": "text_block",
+          "settings": {
+            "text": "NO RESTOCKS",
+            "is_solid": false
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

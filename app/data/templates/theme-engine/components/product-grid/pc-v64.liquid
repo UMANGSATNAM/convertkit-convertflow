@@ -1,0 +1,542 @@
+{%- comment -%}
+  PC V64 — CYBERPUNK NEON DJ GEAR & ELECTRONIC MUSIC PRODUCT GRID
+  Design: Void Dark (#05050A), Neon Magenta (#FF007F) & Electric Blue (#00F0FF) accents, Orbitron & Space Grotesk typography
+  Card Shape: 8px corners, 1px magenta borders, cyberpunk DJ club electronic music aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  .pcv64 {
+    --bg: {{ section.settings.bg_color | default: '#05050A' }};
+    --card-bg: {{ section.settings.card_bg | default: '#0E0E18' }};
+    --text: {{ section.settings.text_color | default: '#FFFFFF' }};
+    --muted: {{ section.settings.muted_color | default: '#F472B6' }};
+    --accent: {{ section.settings.accent_color | default: '#FF007F' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#D9006C' }};
+    --border: {{ section.settings.border_color | default: '#FF007F' }};
+    --badge-sale-bg: #FF007F;
+    --badge-sale-text: #FFFFFF;
+    --f-heading: 'Orbitron', sans-serif;
+    --f-body: 'Space Grotesk', sans-serif;
+    --r-card: 8px;
+    --ease: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv64 *, .pcv64 *::before, .pcv64 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv64 a { color: inherit; text-decoration: none; }
+  .pcv64 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv64 img { max-width: 100%; display: block; }
+
+  .pcv64__wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv64__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv64__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv64__title { font-family: var(--f-heading); font-size: 28px; font-weight: 800; color: #FFFFFF; text-shadow: 0 0 12px #FF007F; letter-spacing: 0.05em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv64__title { font-size: 38px; } }
+  .pcv64__sub { font-size: 15px; color: var(--muted); }
+  .pcv64__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; font-family: var(--f-heading); text-transform: uppercase; letter-spacing: 0.1em; color: #00F0FF; background: rgba(0, 240, 255, 0.1); border: 1px solid #00F0FF; padding: 8px 20px; border-radius: 20px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); transition: var(--ease); }
+  .pcv64__viewall:hover { background: #00F0FF; color: #05050A; box-shadow: 0 0 25px rgba(0, 240, 255, 0.7); }
+
+  /* GRID */
+  .pcv64__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv64__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv64__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv64__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+    transition: var(--ease);
+  }
+  .pcv64__card:hover {
+    transform: translateY(-5px);
+    border-color: #00F0FF;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv64__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #030306;
+    overflow: hidden;
+  }
+  .pcv64__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv64__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv64__card:hover .pcv64__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.06);
+    {% endif %}
+  }
+  .pcv64__card:hover .pcv64__img--sec { opacity: 1; transform: scale(1.06); }
+
+  /* BADGES */
+  .pcv64__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv64__badge { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.05em; font-family: var(--f-heading); }
+  .pcv64__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv64__badge--tag { background: #00F0FF; color: #05050A; }
+  .pcv64__badge--sold { background: #1F1E2E; color: #F472B6; }
+
+  /* WISHLIST BUTTON */
+  .pcv64__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(5, 5, 10, 0.85);
+    border: 1px solid rgba(255, 0, 127, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    color: #FF007F;
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv64__wish:hover { background: #FF007F; color: #FFFFFF; box-shadow: 0 0 15px #FF007F; transform: scale(1.1); }
+  .pcv64__wish.active { color: #FFFFFF; background: #FF007F; box-shadow: 0 0 15px #FF007F; }
+
+  /* QUICK ADD HOVER */
+  .pcv64__quick-box {
+    position: absolute;
+    bottom: 12px; left: 12px; right: 12px;
+    z-index: 3;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: var(--ease);
+  }
+  .pcv64__card:hover .pcv64__quick-box { transform: translateY(0); opacity: 1; }
+  @media (max-width: 767px) {
+    .pcv64__quick-box { transform: translateY(0); opacity: 1; position: relative; bottom: auto; left: auto; right: auto; padding: 0 14px 14px; }
+  }
+
+  .pcv64__quick-btn {
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: var(--f-heading);
+    border-radius: 20px;
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+  }
+  .pcv64__quick-btn:hover { background: var(--accent-hover); box-shadow: 0 0 25px rgba(255, 0, 127, 0.7); transform: scale(1.02); }
+  .pcv64__quick-btn:disabled { background: #1F1E2E; color: #F472B6; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv64__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv64__vendor { font-size: 10px; text-transform: uppercase; color: #00F0FF; font-weight: 700; font-family: var(--f-heading); letter-spacing: 0.1em; }
+  .pcv64__item-title { font-family: var(--f-body); font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv64__rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: #00F0FF; font-weight: 700; }
+  .pcv64__stars { letter-spacing: 1px; text-shadow: 0 0 8px #00F0FF; }
+  .pcv64__rev-cnt { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  /* PRICE */
+  .pcv64__price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv64__price { font-size: 17px; font-weight: 800; color: #FFFFFF; font-family: var(--f-heading); text-shadow: 0 0 8px rgba(255, 0, 127, 0.4); }
+  .pcv64__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv64__swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv64__swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv64__swatch:hover, .pcv64__swatch.active { transform: scale(1.25); border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv64__urgency { font-size: 11px; color: #FF007F; font-weight: 800; font-family: var(--f-heading); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; text-shadow: 0 0 8px #FF007F; }
+
+  /* TOAST */
+  .pcv64__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #FFFFFF;
+    padding: 12px 22px; border-radius: 20px;
+    font-size: 12px; font-weight: 800; font-family: var(--f-heading); text-transform: uppercase;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 25px rgba(255, 0, 127, 0.6);
+  }
+  .pcv64__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv64">
+  <div class="pcv64__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv64__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv64__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv64__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv64__viewall">
+            {{ section.settings.view_all_label | default: 'Explore DJ Gear' }} 🎧 &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv64__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v64', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v64', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv64__toast" id="pcv64-toast">DJ DECK ADDED</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv64-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv64Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'MIXING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ ADDED';
+        showT('DJ DECK ADDED');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv64-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V64 — Cyberpunk DJ Gea",
+  "tag": "section",
+  "class": "pcv64-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "DJ PRO 🎧"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "CYBERPUNK NEON DJ GEAR"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Standalone DJ controllers, club monitors, and electronic music gear."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore DJ Gear"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#05050A"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#0E0E18"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#F472B6"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#FF007F"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#FF007F"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V64 — Cyberpunk DJ Gea"
+    }
+  ]
+}
+{% endschema %}

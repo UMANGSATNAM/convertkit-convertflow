@@ -1,0 +1,112 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  
+  .hp15-usp-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+  }
+  
+  .hp15-usp-item-{{ section_id }} {
+    text-align: center;
+    color: {{ text_color }};
+  }
+  
+  .hp15-usp-title-{{ section_id }} {
+    font-family: 'Didot', 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0 0 15px 0;
+  }
+  
+  .hp15-usp-text-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp15-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+</style>
+
+<div class="hp15-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp15-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <h3 class="hp15-usp-title-{{ section_id }}">{{ block.settings.title }}</h3>
+      <p class="hp15-usp-text-{{ section_id }}">{{ block.settings.text }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP15 USP",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "THE ATELIER"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Each piece is meticulously crafted in our Parisian atelier."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP15 USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "THE ATELIER", "text": "Each piece is meticulously crafted in our Parisian atelier." } },
+        { "type": "usp", "settings": { "title": "SUSTAINABILITY", "text": "Committed to zero waste and ethically sourced materials." } },
+        { "type": "usp", "settings": { "title": "COMPLIMENTARY", "text": "Global express shipping on all orders over $200." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

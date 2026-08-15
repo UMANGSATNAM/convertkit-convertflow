@@ -49,3 +49,7 @@
 - [ ] Component Analytics
 - [ ] Recommendation Engine
 - [ ] Version Management & Partial Updates
+
+## Phase A — Section Variant Library (The Visual Engine)
+- [x] Kickoff Phase A: Codebase Inventory
+- [ ] Evaluate legacy sections for reuse vs rewriting (45 target variations)

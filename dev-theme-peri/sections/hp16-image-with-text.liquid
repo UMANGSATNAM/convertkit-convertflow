@@ -1,0 +1,206 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FF00FF'
+  assign text_color = section.settings.text_color | default: '#000000'
+  assign layout = section.settings.layout | default: 'image_left'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    border-bottom: 4px solid #000;
+  }
+  
+  .hp16-iwt-container-{{ section_id }} {
+    display: flex;
+    {% if layout == 'image_right' %}
+      flex-direction: row-reverse;
+    {% endif %}
+  }
+  
+  .hp16-iwt-image-wrap-{{ section_id }} {
+    flex: 1;
+    position: relative;
+    border-right: {% if layout == 'image_left' %}4px solid #000{% else %}none{% endif %};
+    border-left: {% if layout == 'image_right' %}4px solid #000{% else %}none{% endif %};
+    background: #FFFF00;
+  }
+  
+  .hp16-iwt-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  
+  .hp16-iwt-content-{{ section_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    color: {{ text_color }};
+    position: relative;
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+  }
+  
+  .hp16-iwt-subtitle-{{ section_id }} {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: #000;
+    color: #FFF;
+    display: inline-block;
+    padding: 5px 15px;
+    align-self: flex-start;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    transform: rotate(-3deg);
+  }
+  
+  .hp16-iwt-title-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    text-transform: uppercase;
+    color: #FFF;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 4px 4px 0 #00FFFF;
+    margin: 0 0 30px 0;
+    line-height: 1;
+  }
+  
+  .hp16-iwt-text-{{ section_id }} {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.6;
+    margin: 0 0 40px 0;
+    background: #FFF;
+    border: 3px solid #000;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 6px 6px 0 #000;
+  }
+  
+  .hp16-iwt-btn-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: #000;
+    background: #FFFF00;
+    text-decoration: none;
+    padding: 15px 30px;
+    border: 4px solid #000;
+    border-radius: 40px;
+    align-self: flex-start;
+    box-shadow: 5px 5px 0 #000;
+    transition: all 0.2s ease;
+  }
+  
+  .hp16-iwt-btn-{{ section_id }}:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 #000;
+    background: #FFF;
+  }
+
+  @media (max-width: 992px) {
+    .hp16-iwt-container-{{ section_id }} {
+      flex-direction: column;
+    }
+    .hp16-iwt-image-wrap-{{ section_id }} {
+      min-height: 50vh;
+      border-right: none;
+      border-left: none;
+      border-bottom: 4px solid #000;
+    }
+    .hp16-iwt-content-{{ section_id }} {
+      padding: 40px 20px;
+    }
+  }
+</style>
+
+<div class="hp16-iwt-container-{{ section_id }}">
+  <div class="hp16-iwt-image-wrap-{{ section_id }}">
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | image_url: width: 1200 }}" class="hp16-iwt-image-{{ section_id }}" loading="lazy" alt="Image">
+    {% else %}
+      <div class="hp16-iwt-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+    {% endif %}
+  </div>
+  
+  <div class="hp16-iwt-content-{{ section_id }}">
+    <div class="hp16-iwt-subtitle-{{ section_id }}">{{ section.settings.subtitle | default: 'Y2K FOREVER' }}</div>
+    <h2 class="hp16-iwt-title-{{ section_id }}">{{ section.settings.title | default: 'THAT CLIP LIFE' }}</h2>
+    <div class="hp16-iwt-text-{{ section_id }}">{{ section.settings.text | default: '<p>Butterfly clips, tinted shades, and low rise everything. We are bringing back the best era of fashion and giving it a modern twist. Get in loser, we are going shopping.</p>' }}</div>
+    <a href="{{ section.settings.btn_link | default: '#' }}" class="hp16-iwt-btn-{{ section_id }}">{{ section.settings.btn_text | default: 'SHOP THE VIBE' }}</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP16 Image with Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FF00FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Image Alignment",
+      "options": [
+        { "value": "image_left", "label": "Left" },
+        { "value": "image_right", "label": "Right" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Y2K FOREVER"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "THAT CLIP LIFE"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Butterfly clips, tinted shades, and low rise everything. We are bringing back the best era of fashion and giving it a modern twist. Get in loser, we are going shopping.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "SHOP THE VIBE"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP16 Image with Text"
+    }
+  ]
+}
+{% endschema %}

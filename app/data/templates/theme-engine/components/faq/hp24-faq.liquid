@@ -1,0 +1,341 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-faq-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-faq-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp24-faq__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp24-faq__sys-text {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--accent-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp24-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  }
+
+  .hp24-faq__list {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hp24-faq__item {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    overflow: hidden;
+  }
+
+  .hp24-faq__question {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 20px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+  }
+
+  .hp24-faq__question:hover,
+  .hp24-faq__item.is-active .hp24-faq__question {
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--accent-primary);
+  }
+
+  .hp24-faq__icon {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--accent-secondary);
+    transition: transform 0.3s ease;
+  }
+
+  .hp24-faq__item.is-active .hp24-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .hp24-faq__answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    background: rgba(0,0,0,0.8);
+    border-top: 1px dashed rgba(0, 243, 255, 0.2);
+  }
+
+  .hp24-faq__answer-inner {
+    padding: 20px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--text-color);
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+  
+  .hp24-faq__answer-inner::before {
+    content: '>>';
+    color: var(--accent-secondary);
+    margin-right: 10px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-faq-wrapper" id="HP24FAQ-{{ section.id }}">
+  <div class="hp24-faq__header">
+    <div class="hp24-faq__sys-text">DATA.QUERY: KNOWLEDGE_BASE</div>
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp24-faq__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp24-faq__list">
+    {%- for block in section.blocks -%}
+      <div class="hp24-faq__item" {{ block.shopify_attributes }}>
+        <button class="hp24-faq__question" aria-expanded="false">
+          <span>Q: {{ block.settings.question | escape }}</span>
+          <span class="hp24-faq__icon">+</span>
+        </button>
+        <div class="hp24-faq__answer">
+          <div class="hp24-faq__answer-inner">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var faqItems = document.querySelectorAll('#HP24FAQ-{{ section.id }} .hp24-faq__item');
+    
+    faqItems.forEach(function(item) {
+      var btn = item.querySelector('.hp24-faq__question');
+      var content = item.querySelector('.hp24-faq__answer');
+      
+      btn.addEventListener('click', function() {
+        var isActive = item.classList.contains('is-active');
+        
+        // Close all
+        faqItems.forEach(function(i) {
+          i.classList.remove('is-active');
+          i.querySelector('.hp24-faq__question').setAttribute('aria-expanded', 'false');
+          i.querySelector('.hp24-faq__answer').style.maxHeight = null;
+        });
+        
+        // Open clicked if it wasn't active
+        if (!isActive) {
+          item.classList.add('is-active');
+          btn.setAttribute('aria-expanded', 'true');
+          content.style.maxHeight = content.scrollHeight + 'px';
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber FAQ",
+  "class": "section-hp24-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "KNOWLEDGE BASE"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1000
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "SYSTEM COMPATIBILITY REQUIREMENTS?"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Our hardware interfaces with all standard neural ports produced after 2045. For older models, an adapter is required."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

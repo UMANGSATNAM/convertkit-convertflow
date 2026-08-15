@@ -1,0 +1,67 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FFFBEB' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp59-story__container {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 70px; align-items: center;
+  }
+  .hp59-story__img-wrap {
+    border-radius: 24px; overflow: hidden; height: 480px;
+    border: 1px solid rgba(249, 115, 22, 0.25); box-shadow: 0 20px 50px rgba(249, 115, 22, 0.12);
+  }
+  .hp59-story__img { width: 100%; height: 100%; object-fit: cover; }
+  .hp59-story__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#F97316' }}; margin: 0 0 16px; }
+  .hp59-story__heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #042F2E; margin: 0 0 22px; line-height: 1.15; }
+  .hp59-story__text { font-size: 15px; line-height: 1.8; color: #334155; margin: 0 0 32px; }
+  .hp59-story__btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 34px;
+    background: {{ section.settings.btn_bg | default: '#F97316' }}; color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700;
+    text-decoration: none; border-radius: 50px; transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+  }
+  .hp59-story__btn:hover { box-shadow: 0 10px 30px rgba(249, 115, 22, 0.55); transform: translateY(-2px); }
+  @media screen and (max-width: 992px) { .hp59-story__container { grid-template-columns: 1fr; text-align: center; gap: 40px; } .hp59-story__img-wrap { height: 350px; } }
+{%- endstyle -%}
+<div class="hp59-story__container">
+  <div class="hp59-story__img-wrap">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 800 }}" class="hp59-story__img" alt="{{ section.settings.heading }}" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp59-story__img' }}
+    {%- endif -%}
+  </div>
+  <div>
+    <p class="hp59-story__eyebrow">{{ section.settings.eyebrow | default: '🪸 MARINE REEF HERITAGE' }}</p>
+    <h2 class="hp59-story__heading">{{ section.settings.heading | default: 'The Living Ocean Apothecary' }}</h2>
+    <p class="hp59-story__text">{{ section.settings.text | default: 'Harvested from protected micro-algal sanctuaries along the sun-drenched Pacific reefs, our red astaxanthin carotenoids provide cellular photoprotection mimicking marine life defenses against solar radiation.' }}</p>
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="hp59-story__btn">{{ section.settings.btn_label }} &rarr;</a>
+    {%- endif -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP59 Story",
+  "class": "section-hp59-story",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFFBEB" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#F97316" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#F97316" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🪸 MARINE REEF HERITAGE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Living Ocean Apothecary" },
+    { "type": "textarea", "id": "text", "label": "Story Text", "default": "Harvested from protected micro-algal sanctuaries along Pacific reefs." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Discover Marine Science" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "presets": [{ "name": "HP59 Story" }]
+}
+{% endschema %}

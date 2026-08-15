@@ -1,0 +1,200 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V36 — LUXURY FRENCH LINEN & ORGANIC BEDDING D2C (BED THREADS / CULTIVER STYLE)
+  Usage: {% render 'card-v36', product: product %}
+  Design: French Sand (#D6C7B2), Terracotta Olive (#6B705C), Cormorant Garamond & Inter fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
+
+  .cv36-card {
+    --cv36-bg: #FFFFFF;
+    --cv36-text: #4A4E3D;
+    --cv36-muted: #6B705C;
+    --cv36-olive: #6B705C;
+    --cv36-sand: #F7F4EF;
+    --cv36-border: #E5DDD0;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv36-bg);
+    border: 1px solid var(--cv36-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv36-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv36-olive);
+    box-shadow: 0 12px 24px -6px rgba(107, 112, 92, 0.2);
+  }
+
+  .cv36-card *, .cv36-card *::before, .cv36-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv36-card a { color: inherit; text-decoration: none; }
+  .cv36-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv36-card img { max-width: 100%; display: block; }
+
+  .cv36-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv36-sand);
+    overflow: hidden;
+  }
+  .cv36-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv36-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv36-card:hover .cv36-img-pri { opacity: 0; }
+  .cv36-card:hover .cv36-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Linen Tag Top Left */
+  .cv36-badge-linen {
+    position: absolute; top: 10px; left: 10px;
+    background: #4A4E3D; color: #F7F4EF;
+    font-family: 'Cormorant Garamond', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv36-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv36-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv36-olive); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv36-wish:hover, .cv36-wish.active { background: var(--cv36-olive); color: #FFFFFF; border-color: var(--cv36-olive); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv36-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(74, 78, 61, 0.95); color: #F7F4EF;
+    font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv36-olive);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv36-card:hover .cv36-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv36-qv-overlay:hover { background: #F7F4EF; color: #4A4E3D; }
+
+  .cv36-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv36-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv36-muted); font-weight: 600; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
+  .cv36-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #4A4E3D; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Linen Specs Subtitle */
+  .cv36-specs { font-size: 11px; color: var(--cv36-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv36-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #4A4E3D; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv36-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv36-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #4A4E3D; }
+  .cv36-cmp { font-size: 13px; color: #A8A29E; text-decoration: line-through; }
+  .cv36-disc { font-size: 10px; font-weight: 700; color: #4A4E3D; background: var(--cv36-sand); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv36-border); }
+
+  /* Color Swatches */
+  .cv36-swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .cv36-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cv36-border); cursor: pointer; }
+  .cv36-swatch.active { transform: scale(1.25); border-color: var(--cv36-olive); }
+
+  /* Bottom Button */
+  .cv36-action-box { padding: 0 14px 14px; }
+  .cv36-atc-btn {
+    width: 100%; padding: 11px;
+    background: #4A4E3D; color: #F7F4EF;
+    font-family: 'Cormorant Garamond', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+  }
+  .cv36-atc-btn:hover { background: #6B705C; color: #FFFFFF; transform: scale(1.01); }
+  .cv36-atc-btn:disabled { background: #E7E5E4; color: #A8A29E; cursor: not-allowed; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv36-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv36-badge-linen">100% FRENCH FLAX LINEN 🛏️</span>
+
+    <button type="button" class="cv36-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv36-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv36-img cv36-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv36-img cv36-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv36-img' }}
+      {% endif %}
+
+      <button type="button" class="cv36-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv36-content">
+      {% if card_prod.vendor != blank %}<span class="cv36-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv36-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv36-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv36-specs">Thermoregulating | Pre-Softened & Breathable</span>
+
+      <div class="cv36-rating">
+        <span>★ 4.9</span> <span>(2,100 reviews)</span>
+      </div>
+
+      <div class="cv36-price-row">
+        <span class="cv36-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv36-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv36-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv36-swatches">
+          {% for variant in card_prod.variants limit: 3 %}
+            <span class="cv36-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#B35438', '#6B705C', '#D6C7B2' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cv36-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv36-atc-btn" data-add-cart="{{ cur_var.id }}">SLIP INTO HEAVEN</button>
+      {% else %}
+        <button type="button" class="cv36-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv36-card">
+    <div class="cv36-media">{{ 'product-1' | placeholder_svg_tag: 'cv36-img' }}</div>
+    <div class="cv36-content">
+      <span class="cv36-vendor">FRENCH LINEN D2C</span>
+      <div class="cv36-title">Pre-Washed 100% French Flax Linen Duvet Set</div>
+
+      {% if card_r_show != false %}
+      <div class="cv36-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv36-specs">Thermoregulating | Pre-Softened & Breathable</span>
+      <div class="cv36-price-row"><span class="cv36-price">₹ 6,999</span><span class="cv36-cmp">₹ 8,999</span><span class="cv36-disc">22% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,237 @@
+{% if section.settings.image != blank %}
+  <div class="sf-hero-fullbleed js-motion-enabled sf-hero-{{ section.id }}">
+    <div class="sf-hero-fullbleed__media sf-reveal">
+      <img src="{{ section.settings.image | img_url: 'master' }}" alt="{{ section.settings.title }}" loading="lazy" fetchpriority="high">
+      <div class="sf-hero-fullbleed__overlay"></div>
+    </div>
+    
+    <div class="sf-hero-fullbleed__content">
+      <div class="sf-hero-fullbleed__inner {% if section.settings.content_alignment == 'center' %}text-center{% else %}text-left{% endif %}">
+        {% if section.settings.eyebrow != blank %}
+          <span class="sf-reveal eyebrow sf-hero-fullbleed__eyebrow">{{ section.settings.eyebrow }}</span>
+        {% endif %}
+        <h2 class="sf-reveal display-heading sf-hero-fullbleed__title">{{ section.settings.title }}</h2>
+        {% if section.settings.subtitle != blank %}
+          <p class="sf-reveal sf-hero-fullbleed__subtitle">{{ section.settings.subtitle }}</p>
+        {% endif %}
+        
+        <div class="sf-hero-fullbleed__actions sf-reveal {% if section.settings.content_alignment == 'center' %}justify-center{% endif %}">
+          {% if section.settings.button_link != blank and section.settings.button_text != blank %}
+            <a href="{{ section.settings.button_link }}" class="button button--primary">
+              {{ section.settings.button_text }}
+            </a>
+          {% endif %}
+          {% if section.settings.button_link_2 != blank and section.settings.button_text_2 != blank %}
+            <a href="{{ section.settings.button_link_2 }}" class="button button--secondary">
+              {{ section.settings.button_text_2 }}
+            </a>
+          {% endif %}
+        </div>
+        
+        {% if section.settings.trust_text != blank %}
+          <div class="sf-hero-fullbleed__trust sf-reveal">
+            {{ section.settings.trust_text }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .sf-hero-{{ section.id }} {
+      position: relative;
+      width: 100%;
+      min-height: 80vh;
+      display: flex;
+      color: {% if section.settings.text_color == 'light' %}var(--color-background){% else %}var(--color-text){% endif %};
+      align-items: {% if section.settings.content_alignment == 'center' %}center{% else %}flex-end{% endif %};
+      justify-content: {% if section.settings.content_alignment == 'center' %}center{% else %}flex-start{% endif %};
+    }
+    .sf-hero-fullbleed__media {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+      background-color: var(--color-surface);
+    }
+    .sf-hero-fullbleed__media img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .sf-hero-fullbleed__overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, color-mix(in srgb, var(--color-overlay) 40%, transparent), color-mix(in srgb, var(--color-overlay) 80%, transparent));
+    }
+    .sf-hero-fullbleed__content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: var(--spacing-section-y) var(--space-20);
+    }
+    .sf-hero-fullbleed__inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .sf-hero-fullbleed__inner.text-left {
+      margin: 0;
+      max-width: 600px;
+    }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    
+    .sf-hero-fullbleed__eyebrow {
+      display: block;
+      margin-bottom: var(--space-12);
+      color: inherit;
+      opacity: 0.8;
+    }
+    .sf-hero-fullbleed__title {
+      font-weight: var(--weight-display);
+      margin-bottom: var(--space-16);
+      color: inherit;
+    }
+    .sf-hero-fullbleed__subtitle {
+      margin-bottom: var(--space-24);
+      opacity: 0.9;
+    }
+    .sf-hero-fullbleed__actions {
+      display: flex;
+      gap: var(--space-16);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-24);
+    }
+    .justify-center {
+      justify-content: center;
+    }
+    .sf-hero-fullbleed__trust {
+      font-size: var(--font-small);
+      opacity: 0.7;
+    }
+    .button {
+      display: inline-block;
+      padding: var(--space-12) var(--space-24);
+      font-weight: var(--weight-heading);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      border-radius: var(--button-radius);
+      transition: transform var(--transition-fast) ease, background-color var(--transition-fast) ease;
+    }
+    .button--primary {
+      background-color: var(--color-accent);
+      color: var(--color-background);
+      border: 1px solid var(--color-accent);
+    }
+    .button--secondary {
+      background-color: transparent;
+      color: inherit;
+      border: 1px solid currentColor;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Stagger animation overrides */
+    .sf-hero-fullbleed__inner > .sf-reveal:nth-child(1) { transition-delay: calc(var(--motion-stagger) * 1); }
+    .sf-hero-fullbleed__inner > .sf-reveal:nth-child(2) { transition-delay: calc(var(--motion-stagger) * 2); }
+    .sf-hero-fullbleed__inner > .sf-reveal:nth-child(3) { transition-delay: calc(var(--motion-stagger) * 3); }
+    .sf-hero-fullbleed__inner > .sf-reveal:nth-child(4) { transition-delay: calc(var(--motion-stagger) * 4); }
+    .sf-hero-fullbleed__inner > .sf-reveal:nth-child(5) { transition-delay: calc(var(--motion-stagger) * 5); }
+
+    @media (min-width: 768px) {
+      .sf-hero-{{ section.id }} {
+        min-height: 90vh;
+      }
+      .sf-hero-fullbleed__content {
+        padding: var(--spacing-section-y) 5%;
+      }
+    }
+  </style>
+
+{% else %}
+  {% render 'hero-centered-v4-fallback', section: section %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Hero Full-bleed",
+  "settings": [
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left", "label": "Bottom Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_color",
+      "label": "Text Color over Image",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "New Collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Section heading"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Add a descriptive subheading to guide the user."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Primary Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "button_text_2",
+      "label": "Secondary Button Text"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "trust_text",
+      "label": "Trust Strip (Optional)",
+      "info": "E.g., Free shipping on orders over $50"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image",
+      "info": "If left blank, section will gracefully fall back to a centered minimal layout."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Full-bleed",
+      "category": "Hero"
+    }
+  ]
+}
+{% endschema %}

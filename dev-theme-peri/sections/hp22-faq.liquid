@@ -1,0 +1,513 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --item-bg: {{ section.settings.item_bg }};
+    --font-heading: 'Lora', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  /* Organic grain texture overlay */
+  {% if section.settings.show_grain %}
+  #shopify-section-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+  {% endif %}
+
+  .hp22-faq-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp22-faq-wrapper {
+      flex-direction: column;
+      gap: 40px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp22-faq-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp22-faq__header {
+    flex: 0 0 40%;
+    position: sticky;
+    top: 100px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp22-faq__header {
+      flex: none;
+      width: 100%;
+      position: static;
+      text-align: center;
+    }
+  }
+
+  .hp22-faq__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  .hp22-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 24px;
+    line-height: 1.2;
+  }
+  
+  .hp22-faq__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp22-faq__text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-color);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin: 0 0 32px;
+    max-width: 400px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp22-faq__text {
+      margin: 0 auto 32px;
+    }
+  }
+
+  .hp22-faq__link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 4px;
+    transition: color 0.3s ease;
+  }
+
+  .hp22-faq__link:hover {
+    color: var(--accent-color);
+  }
+
+  /* Accordion Column */
+  .hp22-faq__accordion {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hp22-faq__item {
+    background: var(--item-bg);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: background 0.3s ease;
+  }
+
+  .hp22-faq__item:hover {
+    background: #ffffff; /* Subtle hover lift */
+  }
+
+  .hp22-faq__question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+  }
+  
+  .hp22-faq__question:hover {
+    color: var(--accent-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp22-faq__question {
+      padding: 20px 24px;
+      font-size: 16px;
+    }
+  }
+
+  .hp22-faq__icon {
+    width: 24px;
+    height: 24px;
+    position: relative;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+
+  .hp22-faq__icon::before,
+  .hp22-faq__icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: var(--accent-color);
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hp22-faq__icon::before {
+    width: 14px;
+    height: 1.5px;
+  }
+
+  .hp22-faq__icon::after {
+    width: 1.5px;
+    height: 14px;
+  }
+
+  .hp22-faq__item.is-active .hp22-faq__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  
+  .hp22-faq__item.is-active .hp22-faq__question {
+    color: var(--accent-color);
+  }
+
+  .hp22-faq__answer-wrapper {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hp22-faq__answer {
+    padding: 0 32px 24px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp22-faq__answer {
+      padding: 0 24px 20px;
+    }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp22-faq-wrapper" id="HP22Faq-{{ section.id }}">
+  
+  <div class="hp22-faq__header">
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp22-faq__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp22-faq__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <p class="hp22-faq__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.link_text != blank -%}
+      <a href="{{ section.settings.link_url | default: '#' }}" class="hp22-faq__link">{{ section.settings.link_text | escape }}</a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp22-faq__accordion">
+    {%- for block in section.blocks -%}
+      <div class="hp22-faq__item" {{ block.shopify_attributes }}>
+        <button class="hp22-faq__question" aria-expanded="false">
+          {{ block.settings.question | escape }}
+          <span class="hp22-faq__icon"></span>
+        </button>
+        <div class="hp22-faq__answer-wrapper">
+          <div class="hp22-faq__answer">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqContainer = document.querySelector('#HP22Faq-{{ section.id }}');
+    if (!faqContainer) return;
+
+    const items = faqContainer.querySelectorAll('.hp22-faq__item');
+
+    items.forEach(item => {
+      const question = item.querySelector('.hp22-faq__question');
+      const answerWrapper = item.querySelector('.hp22-faq__answer-wrapper');
+      const answer = item.querySelector('.hp22-faq__answer');
+
+      question.addEventListener('click', () => {
+        const isActive = item.classList.contains('is-active');
+
+        // Close all other items (optional accordion behavior)
+        {% if section.settings.close_others %}
+        items.forEach(otherItem => {
+          if (otherItem !== item && otherItem.classList.contains('is-active')) {
+            otherItem.classList.remove('is-active');
+            otherItem.querySelector('.hp22-faq__question').setAttribute('aria-expanded', 'false');
+            otherItem.querySelector('.hp22-faq__answer-wrapper').style.height = '0px';
+          }
+        });
+        {% endif %}
+
+        if (isActive) {
+          item.classList.remove('is-active');
+          question.setAttribute('aria-expanded', 'false');
+          answerWrapper.style.height = '0px';
+        } else {
+          item.classList.add('is-active');
+          question.setAttribute('aria-expanded', 'true');
+          answerWrapper.style.height = answer.offsetHeight + 'px';
+        }
+      });
+    });
+    
+    // Recalculate heights on resize
+    window.addEventListener('resize', () => {
+      items.forEach(item => {
+        if (item.classList.contains('is-active')) {
+          const answerWrapper = item.querySelector('.hp22-faq__answer-wrapper');
+          const answer = item.querySelector('.hp22-faq__answer');
+          answerWrapper.style.height = 'auto'; // Reset temporarily
+          const newHeight = answer.offsetHeight;
+          answerWrapper.style.height = newHeight + 'px';
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP22 - Organic FAQ",
+  "class": "section-hp22-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "checkbox",
+      "id": "close_others",
+      "label": "Close other items when one is opened",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "KNOWLEDGE"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>Common <em>Questions</em></p>"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Body Text",
+      "default": "Learn more about our botanical formulations, sourcing, and how to use our products for maximum efficacy."
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link Text",
+      "default": "VIEW FULL FAQ"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Organic Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "item_bg",
+      "label": "Accordion Item Background",
+      "default": "#EAE3D9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#3A3A3A"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8A9A86"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_grain",
+      "label": "Show subtle paper grain texture",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Are your products safe for sensitive skin?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes, our formulations are specifically designed with sensitive skin in mind. We use gentle, plant-derived ingredients and avoid harsh synthetics.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP22 - Organic FAQ",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "Are your products 100% natural?" } },
+        { "type": "faq", "settings": { "question": "Are your products vegan and cruelty-free?" } },
+        { "type": "faq", "settings": { "question": "How should I store my botanical products?" } },
+        { "type": "faq", "settings": { "question": "Do you offer international shipping?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

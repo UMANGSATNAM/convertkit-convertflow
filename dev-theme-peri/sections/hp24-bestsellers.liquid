@@ -1,0 +1,457 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-best-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-best-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp24-best__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp24-best__sys-text {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--accent-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp24-best__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  }
+
+  .hp24-best__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp24-best__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp24-best__grid {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hp24-best__grid::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Product Card (Inventory Slot style) */
+  .hp24-best-card {
+    position: relative;
+    background: #000;
+    border: 1px solid var(--accent-primary);
+    padding: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    /* Give it that cut corner look on the bottom right */
+    clip-path: polygon(
+      0 0, 
+      100% 0, 
+      100% calc(100% - 20px), 
+      calc(100% - 20px) 100%, 
+      0 100%
+    );
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp24-best-card {
+      flex: 0 0 80%;
+      scroll-snap-align: start;
+    }
+  }
+
+  /* Glowing frame on hover */
+  .hp24-best-card:hover {
+    box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.4);
+    background: rgba(0, 243, 255, 0.05);
+  }
+
+  .hp24-best-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.image_aspect_ratio }};
+    overflow: hidden;
+    background: #111;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .hp24-best-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(1) hue-rotate(180deg) saturate(1.5) contrast(1.2);
+    transition: filter 0.3s ease, transform 0.5s ease;
+  }
+
+  .hp24-best-card:hover .hp24-best-card__image {
+    filter: none;
+    transform: scale(1.05);
+  }
+
+  .hp24-best-card__hud-text {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--accent-primary);
+    background: rgba(0,0,0,0.7);
+    padding: 2px 5px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  .hp24-best-card__badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--bg-color);
+    background: var(--accent-secondary);
+    padding: 2px 5px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .hp24-best-card__info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .hp24-best-card__title {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 0 0 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hp24-best-card__price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .hp24-best-card__price {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--accent-primary);
+    font-weight: 700;
+  }
+
+  .hp24-best-card__price--compare {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: line-through;
+  }
+  
+  .hp24-best-card__action {
+    margin-top: 15px;
+    padding: 8px;
+    background: var(--accent-primary);
+    color: var(--bg-color);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hp24-best-card:hover .hp24-best-card__action {
+    background: var(--accent-secondary);
+    box-shadow: 0 0 10px var(--accent-secondary);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-best-wrapper" id="HP24Bestsellers-{{ section.id }}">
+  <div class="hp24-best__header">
+    <div class="hp24-best__sys-text">DATA.QUERY: TOP_TIER_MODULES</div>
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp24-best__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp24-best__grid">
+    {%- assign collection = section.settings.collection -%}
+    {%- assign limit = section.settings.limit -%}
+    
+    {%- if collection != blank and collection.products_count > 0 -%}
+      {%- for product in collection.products limit: limit -%}
+        <a href="{{ product.url }}" class="hp24-best-card" {{ block.shopify_attributes }}>
+          
+          <div class="hp24-best-card__image-wrapper">
+            <div class="hp24-best-card__hud-text">ID: {{ product.id | slice: 0, 6 }}</div>
+            {%- if product.compare_at_price > product.price -%}
+              <div class="hp24-best-card__badge">DISCOUNT_APPLIED</div>
+            {%- endif -%}
+
+            <img 
+              src="{{ product.featured_image | image_url: width: 600 }}" 
+              alt="{{ product.title | escape }}"
+              class="hp24-best-card__image"
+              loading="lazy"
+            >
+          </div>
+
+          <div class="hp24-best-card__info">
+            <h3 class="hp24-best-card__title">{{ product.title }}</h3>
+            
+            <div class="hp24-best-card__price-wrapper">
+              <span class="hp24-best-card__price">{{ product.price | money }}</span>
+              {%- if product.compare_at_price > product.price -%}
+                <span class="hp24-best-card__price--compare">{{ product.compare_at_price | money }}</span>
+              {%- endif -%}
+            </div>
+            
+            <button class="hp24-best-card__action">ACQUIRE MODULE</button>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..limit) -%}
+        <a href="#" class="hp24-best-card">
+          <div class="hp24-best-card__image-wrapper">
+            <div class="hp24-best-card__hud-text">ID: 000{{ i }}</div>
+            <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;color:#444;font-family:'Share Tech Mono';">IMG.ERROR</div>
+          </div>
+          <div class="hp24-best-card__info">
+            <h3 class="hp24-best-card__title">OPTICAL ENHANCER V{{ i }}</h3>
+            <div class="hp24-best-card__price-wrapper">
+              <span class="hp24-best-card__price">$129.00</span>
+            </div>
+            <button class="hp24-best-card__action">ACQUIRE MODULE</button>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber Bestsellers",
+  "class": "section-hp24-bestsellers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "TOP TIER HARDWARE"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Products to Show",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Portrait (4:5)" },
+        { "value": "16/9", "label": "Landscape (16:9)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber Bestsellers"
+    }
+  ]
+}
+{% endschema %}

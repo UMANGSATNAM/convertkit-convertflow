@@ -1,0 +1,204 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V37 — NEO-INDUSTRIAL HARDWARE & MODULAR TOOLS D2C (TITAN TOOL / LEATHERMAN STYLE)
+  Usage: {% render 'card-v37', product: product %}
+  Design: Black Steel (#18181B), Industrial Yellow (#EAB308), Space Grotesk & Orbitron fonts, 4px chamfered card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+  .cv37-card {
+    --cv37-bg: #18181B;
+    --cv37-card-bg: #27272A;
+    --cv37-text: #F4F4F5;
+    --cv37-muted: #A1A1AA;
+    --cv37-yellow: #EAB308;
+    --cv37-border: #3F3F46;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--cv37-card-bg);
+    border: 1px solid var(--cv37-border);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv37-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv37-yellow);
+    box-shadow: 0 12px 24px -6px rgba(234, 179, 8, 0.25);
+  }
+
+  .cv37-card *, .cv37-card *::before, .cv37-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv37-card a { color: inherit; text-decoration: none; }
+  .cv37-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv37-card img { max-width: 100%; display: block; }
+
+  .cv37-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #09090B;
+    overflow: hidden;
+    border-bottom: 1px solid var(--cv37-border);
+  }
+  .cv37-img { width: 100%; height: 100%; object-fit: contain; padding: 16px; transition: transform 0.5s ease; }
+  .cv37-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv37-card:hover .cv37-img-pri { opacity: 0; }
+  .cv37-card:hover .cv37-img-sec { opacity: 1; transform: scale(1.06); }
+
+  /* Industrial Tag Top Left */
+  .cv37-badge-tool {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv37-yellow); color: #18181B;
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 2px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv37-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #18181B; border: 1px solid var(--cv37-yellow);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv37-yellow); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv37-wish:hover, .cv37-wish.active { background: var(--cv37-yellow); color: #18181B; transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv37-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(24, 24, 27, 0.95); color: var(--cv37-yellow);
+    font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 2px; border: 1px solid var(--cv37-yellow);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv37-card:hover .cv37-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv37-qv-overlay:hover { background: var(--cv37-yellow); color: #18181B; }
+
+  .cv37-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: left; }
+  .cv37-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv37-yellow); font-weight: 800; font-family: 'Orbitron', sans-serif; letter-spacing: 0.1em; }
+  .cv37-title { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #FFFFFF; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-transform: uppercase; }
+
+  /* Hardware Specs Subtitle */
+  .cv37-specs { font-size: 11px; color: var(--cv37-muted); font-weight: 500; }
+
+  /* Rating Row */
+  .cv37-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cv37-yellow); font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv37-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv37-price { font-family: 'Orbitron', sans-serif; font-size: 17px; font-weight: 800; color: #FFFFFF; }
+  .cv37-cmp { font-size: 13px; color: var(--cv37-muted); text-decoration: line-through; }
+  .cv37-disc { font-size: 10px; font-weight: 800; color: #18181B; background: var(--cv37-yellow); padding: 2px 6px; border-radius: 2px; }
+
+  /* Finish Variant Selector */
+  .cv37-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv37-size-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 2px;
+    border: 1px solid #3F3F46; background: #18181B; color: #FFFFFF; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv37-size-btn.active, .cv37-size-btn:hover { background: var(--cv37-yellow); color: #18181B; border-color: var(--cv37-yellow); }
+
+  /* Bottom Button */
+  .cv37-action-box { padding: 0 14px 14px; }
+  .cv37-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv37-yellow); color: #18181B;
+    font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 2px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+  }
+  .cv37-atc-btn:hover { background: #FFFFFF; color: #18181B; transform: scale(1.01); }
+  .cv37-atc-btn:disabled { background: #3F3F46; color: #71717A; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv37-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv37-badge-tool">MIL-SPEC GRADE 🛠️</span>
+
+    <button type="button" class="cv37-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv37-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv37-img cv37-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv37-img cv37-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-6' | placeholder_svg_tag: 'cv37-img' }}
+      {% endif %}
+
+      <button type="button" class="cv37-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv37-content">
+      {% if card_prod.vendor != blank %}<span class="cv37-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv37-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv37-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv37-specs">420HC High-Carbon Steel | Nylon Sheath</span>
+
+      <div class="cv37-rating">
+        <span>★ 4.9</span> <span>(3,800 reviews)</span>
+      </div>
+
+      <div class="cv37-price-row">
+        <span class="cv37-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv37-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv37-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Finish Selector -->
+      <div class="cv37-sizes">
+        {% for variant in card_prod.variants limit: 2 %}
+          <button type="button" class="cv37-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv37-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv37-atc-btn" data-add-cart="{{ cur_var.id }}">EQUIP HEAVY DUTY</button>
+      {% else %}
+        <button type="button" class="cv37-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv37-card">
+    <div class="cv37-media">{{ 'product-6' | placeholder_svg_tag: 'cv37-img' }}</div>
+    <div class="cv37-content">
+      <span class="cv37-vendor">INDUSTRIAL HARDWARE D2C</span>
+      <div class="cv37-title">18-in-1 Stainless Steel Precision Multitool</div>
+
+      {% if card_r_show != false %}
+      <div class="cv37-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv37-specs">420HC High-Carbon Steel | Nylon Sheath</span>
+      <div class="cv37-price-row"><span class="cv37-price">₹ 3,999</span><span class="cv37-cmp">₹ 4,999</span><span class="cv37-disc">20% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

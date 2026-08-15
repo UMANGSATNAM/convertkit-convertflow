@@ -1,0 +1,239 @@
+{%- liquid
+  assign sec_id = section.id
+-%}
+
+<style>
+  .hp20-video-{{ sec_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.desktop_height }}vh;
+    min-height: 500px;
+    overflow: hidden;
+    background-color: #000;
+  }
+
+  .hp20-video-{{ sec_id }}__media {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+  }
+
+  .hp20-video-{{ sec_id }}__media iframe,
+  .hp20-video-{{ sec_id }}__media video {
+    width: 100vw;
+    height: 56.25vw; /* 16:9 aspect ratio */
+    min-height: 100vh;
+    min-width: 177.77vh; /* 16:9 aspect ratio */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .hp20-video-{{ sec_id }}__overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: {{ section.settings.overlay_color }};
+    opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  .hp20-video-{{ sec_id }}__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .hp20-video-{{ sec_id }}__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: {{ section.settings.text_color }};
+  }
+
+  .hp20-video-{{ sec_id }}__icon svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    margin-left: 4px; /* optical alignment for play icon */
+  }
+
+  .hp20-video-{{ sec_id }}__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 300;
+    color: {{ section.settings.text_color }};
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+    max-width: 800px;
+  }
+
+  .hp20-video-{{ sec_id }}__btn {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    padding-bottom: 8px;
+    border-bottom: 1px solid {{ section.settings.text_color }};
+    transition: opacity 0.3s ease;
+  }
+  .hp20-video-{{ sec_id }}__btn:hover {
+    opacity: 0.7;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-video-{{ sec_id }} {
+      height: {{ section.settings.mobile_height }}vh;
+      min-height: 400px;
+    }
+  }
+</style>
+
+<section class="hp20-video-{{ sec_id }}">
+  <div class="hp20-video-{{ sec_id }}__media">
+    {% if section.settings.video_url != blank %}
+      {% if section.settings.video_url contains 'youtube' or section.settings.video_url contains 'youtu.be' %}
+        {% assign video_id = section.settings.video_url | split: 'v=' | last | split: '&' | first %}
+        <iframe src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&loop=1&playlist={{ video_id }}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      {% elsif section.settings.video_url contains 'vimeo' %}
+        {% assign video_id = section.settings.video_url | split: '/' | last %}
+        <iframe src="https://player.vimeo.com/video/{{ video_id }}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      {% else %}
+        <video src="{{ section.settings.video_url }}" autoplay loop muted playsinline></video>
+      {% endif %}
+    {% else %}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hp20-video-sec_id__placeholder' | replace: 'hp20-video-sec_id__placeholder', 'hp20-video-placeholder' }}
+      <style>
+        .hp20-video-placeholder { width: 100%; height: 100%; object-fit: cover; }
+      </style>
+    {% endif %}
+  </div>
+
+  <div class="hp20-video-{{ sec_id }}__overlay"></div>
+
+  <div class="hp20-video-{{ sec_id }}__content">
+    {% if section.settings.show_play_icon %}
+      <div class="hp20-video-{{ sec_id }}__icon">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    {% endif %}
+
+    {% if section.settings.title != blank %}
+      <h2 class="hp20-video-{{ sec_id }}__title">{{ section.settings.title }}</h2>
+    {% endif %}
+
+    {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="hp20-video-{{ sec_id }}__btn">{{ section.settings.btn_label }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP20 Video Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL",
+      "info": "YouTube, Vimeo, or MP4 URL"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 40,
+      "max": 100,
+      "step": 10,
+      "unit": "vh",
+      "label": "Desktop Height",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 40,
+      "max": 100,
+      "step": 10,
+      "unit": "vh",
+      "label": "Mobile Height",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Overlay & Colors"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_icon",
+      "label": "Show Play Icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Immersive Experience"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Watch Full Film"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 Video Banner"
+    }
+  ]
+}
+{% endschema %}

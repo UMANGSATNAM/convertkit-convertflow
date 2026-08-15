@@ -1,0 +1,282 @@
+{%- liquid
+  assign sec_id = section.id
+  assign text_align = section.settings.text_alignment
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign btn_bg = section.settings.btn_bg_color
+  assign btn_text = section.settings.btn_text_color
+  assign image_position = section.settings.image_position
+-%}
+
+<style>
+  #shopify-section-{{ sec_id }} {
+    background-color: {{ bg_color }};
+  }
+
+  .hp20-hero-{{ sec_id }} {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hp20-hero-{{ sec_id }}__content-pane,
+  .hp20-hero-{{ sec_id }}__media-pane {
+    flex: 1;
+    display: flex;
+  }
+
+  .hp20-hero-{{ sec_id }}__content-pane {
+    padding: 60px 24px;
+    justify-content: center;
+    align-items: {% if text_align == 'left' %}flex-start{% elsif text_align == 'right' %}flex-end{% else %}center{% endif %};
+    text-align: {{ text_align }};
+  }
+
+  .hp20-hero-{{ sec_id }}__media-pane {
+    position: relative;
+    min-height: 400px;
+  }
+
+  .hp20-hero-{{ sec_id }}__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .hp20-hero-{{ sec_id }}__inner {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .hp20-hero-{{ sec_id }}__label {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: {{ text_color }};
+    opacity: 0.6;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .hp20-hero-{{ sec_id }}__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: {{ text_color }};
+    margin: 0 0 32px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hp20-hero-{{ sec_id }}__text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: {{ text_color }};
+    opacity: 0.8;
+    margin: 0 0 40px 0;
+    max-width: 480px;
+  }
+  
+  {% if text_align == 'center' %}
+  .hp20-hero-{{ sec_id }}__text { margin-left: auto; margin-right: auto; }
+  {% elsif text_align == 'right' %}
+  .hp20-hero-{{ sec_id }}__text { margin-left: auto; }
+  {% endif %}
+
+  .hp20-hero-{{ sec_id }}__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background-color: {{ btn_bg }};
+    color: {{ btn_text }};
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .hp20-hero-{{ sec_id }}__btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+
+  @media screen and (min-width: 990px) {
+    .hp20-hero-{{ sec_id }} {
+      flex-direction: {% if image_position == 'left' %}row-reverse{% else %}row{% endif %};
+      height: 100vh;
+      min-height: 700px;
+    }
+    .hp20-hero-{{ sec_id }}__content-pane {
+      padding: 100px 8%;
+    }
+    .hp20-hero-{{ sec_id }}__media-pane {
+      min-height: auto;
+    }
+  }
+
+  /* Entrance Animation */
+  .hp20-hero-{{ sec_id }}__inner > * {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: hp20FadeInUp 0.8s ease forwards;
+  }
+  
+  .hp20-hero-{{ sec_id }}__inner > *:nth-child(1) { animation-delay: 0.1s; }
+  .hp20-hero-{{ sec_id }}__inner > *:nth-child(2) { animation-delay: 0.2s; }
+  .hp20-hero-{{ sec_id }}__inner > *:nth-child(3) { animation-delay: 0.3s; }
+  .hp20-hero-{{ sec_id }}__inner > *:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes hp20FadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<section class="hp20-hero-{{ sec_id }}">
+  <div class="hp20-hero-{{ sec_id }}__content-pane">
+    <div class="hp20-hero-{{ sec_id }}__inner">
+      {% if section.settings.label != blank %}
+        <span class="hp20-hero-{{ sec_id }}__label">{{ section.settings.label }}</span>
+      {% endif %}
+      
+      {% if section.settings.title != blank %}
+        <h1 class="hp20-hero-{{ sec_id }}__title">{{ section.settings.title }}</h1>
+      {% endif %}
+      
+      {% if section.settings.text != blank %}
+        <div class="hp20-hero-{{ sec_id }}__text">{{ section.settings.text }}</div>
+      {% endif %}
+      
+      {% if section.settings.btn_label != blank and section.settings.btn_link != blank %}
+        <a href="{{ section.settings.btn_link }}" class="hp20-hero-{{ sec_id }}__btn">
+          {{ section.settings.btn_label }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="hp20-hero-{{ sec_id }}__media-pane">
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" class="hp20-hero-{{ sec_id }}__img" loading="eager">
+    {% else %}
+      {{ 'collection-1' | placeholder_svg_tag: 'hp20-hero-sec_id__img' | replace: 'hp20-hero-sec_id__img', 'hp20-hero-' | append: sec_id | append: '__img' }}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP20 Split Hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Eyebrow Label",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The Art of Less"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Description",
+      "default": "Discover our new collection of minimalist essentials designed for the modern lifestyle. Stripped of excess, crafted for endurance."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 Split Hero"
+    }
+  ]
+}
+{% endschema %}

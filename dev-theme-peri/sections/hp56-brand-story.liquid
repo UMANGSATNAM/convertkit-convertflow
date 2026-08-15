@@ -1,0 +1,67 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#F0F9FF' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp56-story__container {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 70px; align-items: center;
+  }
+  .hp56-story__img-wrap {
+    border-radius: 20px; overflow: hidden; height: 480px;
+    border: 1px solid rgba(2, 132, 199, 0.2); box-shadow: 0 20px 50px rgba(2, 132, 199, 0.1);
+  }
+  .hp56-story__img { width: 100%; height: 100%; object-fit: cover; }
+  .hp56-story__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#0284C7' }}; margin: 0 0 16px; }
+  .hp56-story__heading { font-family: 'Syne', sans-serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; color: #082F49; margin: 0 0 22px; line-height: 1.15; }
+  .hp56-story__text { font-size: 15px; line-height: 1.8; color: #334155; margin: 0 0 32px; }
+  .hp56-story__btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 34px;
+    background: {{ section.settings.btn_bg | default: '#082F49' }}; color: #FFFFFF;
+    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700;
+    text-decoration: none; border-radius: 8px; transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(8, 47, 73, 0.2);
+  }
+  .hp56-story__btn:hover { background: #0284C7; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.35); transform: translateY(-2px); }
+  @media screen and (max-width: 992px) { .hp56-story__container { grid-template-columns: 1fr; text-align: center; gap: 40px; } .hp56-story__img-wrap { height: 350px; } }
+{%- endstyle -%}
+<div class="hp56-story__container">
+  <div class="hp56-story__img-wrap">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 800 }}" class="hp56-story__img" alt="{{ section.settings.heading }}" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp56-story__img' }}
+    {%- endif -%}
+  </div>
+  <div>
+    <p class="hp56-story__eyebrow">{{ section.settings.eyebrow | default: '❄️ ARCTIC PROVENANCE' }}</p>
+    <h2 class="hp56-story__heading">{{ section.settings.heading | default: 'Surviving 60° Below Zero' }}</h2>
+    <p class="hp56-story__text">{{ section.settings.text | default: 'Arctic flora survives months of perpetual darkness and sub-zero blizzards by synthesizing super-dense concentrations of protective polyphenols, bio-flavonoids, and vitamin C.' }}</p>
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="hp56-story__btn">{{ section.settings.btn_label }} &rarr;</a>
+    {%- endif -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP56 Story",
+  "class": "section-hp56-story",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F0F9FF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#0284C7" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#082F49" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "❄️ ARCTIC PROVENANCE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Surviving 60° Below Zero" },
+    { "type": "textarea", "id": "text", "label": "Story Text", "default": "Arctic flora survives months of perpetual darkness by synthesizing super-dense polyphenols." },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Discover Provenance" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "presets": [{ "name": "HP56 Story" }]
+}
+{% endschema %}

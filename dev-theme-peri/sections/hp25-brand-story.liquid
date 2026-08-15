@@ -1,0 +1,373 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-orange: {{ section.settings.accent_orange }};
+    --accent-yellow: {{ section.settings.accent_yellow }};
+    --font-heading: 'Fraunces', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative Wavy Lines Top */
+  #shopify-section-{{ section.id }}::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z' fill='%233E2723' opacity='0.1'/%3E%3C/svg%3E");
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(180deg);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp25-story-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp25-story-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp25-story__grid {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp25-story__grid {
+      flex-direction: column;
+      gap: 50px;
+    }
+  }
+
+  .hp25-story__image-col {
+    flex: 1;
+    position: relative;
+  }
+
+  .hp25-story__content-col {
+    flex: 1;
+  }
+
+  {%- if section.settings.image_position == 'right' -%}
+    .hp25-story__image-col { order: 2; }
+    .hp25-story__content-col { order: 1; }
+    @media screen and (max-width: 992px) {
+      .hp25-story__image-col { order: 1; }
+      .hp25-story__content-col { order: 2; }
+    }
+  {%- endif -%}
+
+  /* Funky Image Wrapper */
+  .hp25-story__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    background-color: var(--accent-yellow);
+    /* Flower/Blob shape */
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    border: 4px solid var(--text-color);
+    box-shadow: 12px 12px 0 var(--accent-orange);
+    overflow: hidden;
+    animation: blobMorph 10s infinite alternate ease-in-out;
+  }
+
+  @keyframes blobMorph {
+    0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  }
+
+  .hp25-story__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.3) contrast(1.1);
+    transform: scale(1.1); /* To cover the blob edges during animation */
+  }
+
+  .hp25-story__badge {
+    display: inline-block;
+    padding: 8px 24px;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    font-family: var(--font-body);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+    transform: rotate(-2deg);
+  }
+
+  .hp25-story__title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0 0 24px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .hp25-story__text {
+    font-family: var(--font-body);
+    font-size: clamp(16px, 2vw, {{ section.settings.text_size }}px);
+    color: var(--text-color);
+    margin: 0 0 40px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .hp25-story__btn {
+    display: inline-block;
+    padding: 16px 40px;
+    background-color: var(--accent-orange);
+    color: var(--bg-color);
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 50px;
+    border: 2px solid var(--text-color);
+    box-shadow: 4px 4px 0 var(--text-color);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .hp25-story__btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--text-color);
+    background-color: var(--accent-yellow);
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp25-story-wrapper" id="HP25Story-{{ section.id }}">
+  <div class="hp25-story__grid">
+    
+    <div class="hp25-story__image-col">
+      <div class="hp25-story__image-wrapper">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | image_url: width: 1000 }}" alt="{{ section.settings.title | escape }}" class="hp25-story__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--accent-yellow);color:var(--text-color);font-family:var(--font-heading);font-style:italic;font-size:24px;">IMAGE</div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="hp25-story__content-col">
+      {%- if section.settings.badge_text != blank -%}
+        <div class="hp25-story__badge">{{ section.settings.badge_text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp25-story__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="hp25-story__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.btn_text != blank -%}
+        <a href="{{ section.settings.btn_link | default: '#' }}" class="hp25-story__btn">
+          {{ section.settings.btn_text }}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP25 - Retro Story",
+  "class": "section-hp25-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "OUR ROOTS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Born in the Era of Love"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We started in a garage with nothing but good vibes, a sewing machine, and a dream to bring color back to the world. Decades later, we're still keeping it groovy.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "READ OUR STORY"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Retro 70s Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#E2B144"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Border (Dark Brown)",
+      "default": "#3E2723"
+    },
+    {
+      "type": "color",
+      "id": "accent_orange",
+      "label": "Accent (Burnt Orange)",
+      "default": "#D15F3C"
+    },
+    {
+      "type": "color",
+      "id": "accent_yellow",
+      "label": "Accent (Mustard)",
+      "default": "#F5E6D3"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP25 - Retro Story"
+    }
+  ]
+}
+{% endschema %}

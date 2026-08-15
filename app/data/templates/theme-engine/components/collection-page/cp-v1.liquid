@@ -1,0 +1,553 @@
+{% comment %}
+  CP V1 — Glossier Clean Beauty D2C Collection Page Section
+  Includes: Hero Header, Sub-collection chips (from menu), Shopify Standard Filter + Sort, 
+  Product Grid (pc-v1) with Quick Add, In-Grid Promo Tile every 8 products, 
+  Bottom SEO Text Block, and Pagination
+{% endcomment %}
+
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+
+<style>
+  .cpv1 {
+    background-color: {{ section.settings.bg_color | default: '#FFF5F5' }};
+    color: {{ section.settings.text_color | default: '#3D9A98' }};
+    padding: {{ section.settings.padding_top | default: 40 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px;
+    font-family: var(--font-body);
+  }
+  .cpv1__wrap {
+    max-width: var(--page-width, 1280px);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Collection Hero Header */
+  .cpv1__hero {
+    background: {{ section.settings.hero_bg | default: '#FFFFFF' }};
+    border-radius: var(--radius-card, 16px);
+    padding: 36px 32px;
+    margin-bottom: 24px;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    text-align: {{ section.settings.hero_align | default: 'left' }};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+  .cpv1__hero-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: {{ section.settings.text_color | default: '#3D9A98' }};
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+  }
+  .cpv1__hero-sub {
+    font-size: 15px;
+    color: {{ section.settings.sub_color | default: '#6B7280' }};
+    margin: 0;
+    max-width: 720px;
+    line-height: 1.6;
+    display: inline-block;
+  }
+
+  /* Sub-collection Category Chips */
+  .cpv1__chips-box {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .cpv1__chips-box::-webkit-scrollbar { display: none; }
+  .cpv1__chip {
+    padding: 8px 18px;
+    background: #FFFFFF;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    color: {{ section.settings.text_color | default: '#3D9A98' }};
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .cpv1__chip.active, .cpv1__chip:hover {
+    background: #E11D48;
+    color: #FFFFFF;
+    border-color: #E11D48;
+  }
+
+  /* Filter & Sort Bar (Shopify Native Styles override) */
+  .cpv1__toolbar {
+    background: #FFFFFF;
+    border-radius: var(--radius-button, 10px);
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    margin-bottom: 28px;
+    padding: 14px 20px;
+  }
+  
+  .facets__form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .facets__wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .facets__summary {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #D1D5DB;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    background: #FFFFFF;
+    cursor: pointer;
+    list-style: none;
+  }
+  .facet-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    cursor: pointer;
+  }
+
+  /* Product Grid */
+  .cpv1__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr);
+    gap: {{ section.settings.grid_gap | default: 24 }}px;
+  }
+  @media (max-width: 1024px) {
+    .cpv1__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .cpv1__grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 16px; }
+  }
+
+  /* In-Grid Promo Banner Tile (Inserts every 8 products) */
+  .cpv1__promo-tile {
+    grid-column: span 1;
+    background: linear-gradient(135deg, #3D9A98 0%, #E11D48 100%);
+    border-radius: var(--radius-card, 16px);
+    padding: 24px;
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .cpv1__promo-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    align-self: flex-start;
+    margin-bottom: 12px;
+  }
+  .cpv1__promo-title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 0 0 10px;
+  }
+  .cpv1__promo-code-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cpv1__promo-btn {
+    width: 100%;
+    padding: 10px;
+    background: #FFFFFF;
+    color: #3D9A98;
+    border-radius: var(--radius-button, 8px);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
+  /* Bottom SEO Text Block */
+  .cpv1__seo-block {
+    margin-top: 50px;
+    background: #FFFFFF;
+    border-radius: var(--radius-card, 12px);
+    padding: 32px;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+  }
+  .cpv1__seo-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: {{ section.settings.text_color | default: '#3D9A98' }};
+    margin: 0 0 12px;
+  }
+  .cpv1__seo-content {
+    font-size: 14px;
+    color: #4B5563;
+    line-height: 1.7;
+    max-height: 90px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .cpv1__seo-block.expanded .cpv1__seo-content {
+    max-height: 1000px;
+  }
+  .cpv1__seo-toggle {
+    margin-top: 12px;
+    background: none;
+    border: none;
+    color: #E11D48;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* Pagination */
+  .cpv1__pagination {
+    margin-top: 40px;
+    text-align: center;
+  }
+  .cpv1__pagination nav {
+    display: inline-flex;
+    gap: 8px;
+  }
+  .cpv1__pagination a, .cpv1__pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #FFF;
+    border: 1px solid #E5E7EB;
+    color: #374151;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .cpv1__pagination .current {
+    background: #3D9A98;
+    color: #FFF;
+    border-color: #3D9A98;
+  }
+</style>
+
+<div class="cpv1">
+  <div class="cpv1__wrap">
+    
+    <!-- 1. Collection Hero Banner Header -->
+    <div class="cpv1__hero">
+      <h1 class="cpv1__hero-title">
+        {% if collection.title != blank %}{{ collection.title | escape }}{% else %}{{ section.settings.title | default: 'Glossier Clean Beauty' }}{% endif %}
+      </h1>
+      <div class="cpv1__hero-sub">
+        {% if collection.description != blank %}{{ collection.description }}{% else %}{{ section.settings.subheading | default: 'Discover our premium handcrafted collection designed for modern living.' }}{% endif %}
+      </div>
+    </div>
+
+    <!-- 2. Sub-Collection Chips / Quick Category Tabs -->
+    {% if section.settings.sub_collections != blank %}
+      <div class="cpv1__chips-box">
+        {% for link in section.settings.sub_collections.links %}
+          <a href="{{ link.url }}" class="cpv1__chip {% if link.active %}active{% endif %}">
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </div>
+    {% elsif section.settings.show_chips %}
+      <div class="cpv1__chips-box">
+        <a href="#" class="cpv1__chip active">All Products</a>
+        <a href="#" class="cpv1__chip">Best Sellers</a>
+        <a href="#" class="cpv1__chip">New Arrivals</a>
+      </div>
+    {% endif %}
+
+    <!-- 3. Filter + Sort Controls Bar (Shopify Native) -->
+    <div class="cpv1__toolbar" id="main-collection-filters" data-id="{{ section.id }}">
+      <facet-filters-form class="facets">
+        <form id="FacetFiltersForm" class="facets__form">
+          {%- if collection.terms -%}
+            <input type="hidden" name="q" value="{{ collection.terms | escape }}">
+            <input name="options[prefix]" type="hidden" value="last">
+          {%- endif -%}
+
+          <!-- Active Filters -->
+          <div class="facets__wrapper">
+            <span style="font-size: 13px; font-weight: 700; color: #374151;">Filters:</span>
+            {%- for filter in collection.filters -%}
+              <details class="facets__disclosure">
+                <summary class="facets__summary">
+                  <span>{{ filter.label | escape }}</span>
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="margin-left: 6px;"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </summary>
+                <div class="facets__display" style="position: absolute; background: #fff; border: 1px solid #E5E7EB; padding: 16px; border-radius: 8px; margin-top: 8px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                  <ul class="facets__list list-unstyled" role="list">
+                    {%- for value in filter.values -%}
+                      <li class="list-menu__item facets__item">
+                        <label for="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}" class="facet-checkbox{% if value.count == 0 and value.active == false %} facet-checkbox--disabled{% endif %}">
+                          <input type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            id="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                          >
+                          <span aria-hidden="true">{{ value.label | escape }} ({{ value.count }})</span>
+                        </label>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              </details>
+            {%- endfor -%}
+          </div>
+
+          <!-- Sorting -->
+          <div class="facet-filters__sort">
+            <span style="font-size: 13px; font-weight: 700; color: #374151; margin-right: 8px;">Sort By:</span>
+            <select name="sort_by" class="facets__summary" id="SortBy" aria-describedby="a11y-refresh-page-message">
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected="selected"{% endif %}>{{ option.name | escape }}</option>
+              {%- endfor -%}
+            </select>
+          </div>
+        </form>
+      </facet-filters-form>
+    </div>
+
+    <!-- 4. Product Grid & Pagination -->
+    {% assign limit_num = section.settings.products_per_page | default: 16 %}
+    {% paginate collection.products by limit_num %}
+      <div class="cpv1__grid" id="ProductGridContainer">
+        {% if collection.products.size > 0 %}
+          {% for product in collection.products %}
+            
+            {% comment %} Render proper pc-v1 series card {% endcomment %}
+            {% render 'card-v1', product: product %}
+
+            {% comment %} 5. In-Grid Promo Banner Card exactly after 8th product {% endcomment %}
+            {% if forloop.index == 8 and section.settings.show_promo_tile %}
+              <div class="cpv1__promo-tile">
+                <div>
+                  <span class="cpv1__promo-badge">SPECIAL OFFER</span>
+                  <h3 class="cpv1__promo-title">GET 20% OFF CLEAN BEAUTY SETS</h3>
+                </div>
+                <div>
+                  <div class="cpv1__promo-code-box">
+                    <span>USE CODE:</span>
+                    <span style="letter-spacing: 1px;">GLOW20</span>
+                  </div>
+                  <a href="/discount/GLOW20" class="cpv1__promo-btn">CLAIM DISCOUNT</a>
+                </div>
+              </div>
+            {% endif %}
+
+          {% endfor %}
+        {% else %}
+          {% comment %} Fallback Demo Mode {% endcomment %}
+          {% for i in (1..limit_num) %}
+            {% render 'card-v1', product: nil %}
+            {% if forloop.index == 8 and section.settings.show_promo_tile %}
+              <div class="cpv1__promo-tile">
+                <div>
+                  <span class="cpv1__promo-badge">SPECIAL OFFER</span>
+                  <h3 class="cpv1__promo-title">GET 20% OFF CLEAN BEAUTY SETS</h3>
+                </div>
+                <div>
+                  <div class="cpv1__promo-code-box">
+                    <span>USE CODE:</span>
+                    <span style="letter-spacing: 1px;">GLOW20</span>
+                  </div>
+                  <a href="/discount/GLOW20" class="cpv1__promo-btn">CLAIM DISCOUNT</a>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if paginate.pages > 1 %}
+        <div class="cpv1__pagination">
+          {{ paginate | default_pagination: next: 'Next →', previous: '← Prev' }}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+
+    <!-- 6. Bottom Expandable SEO Text Block -->
+    {% if section.settings.show_seo_block %}
+      <div class="cpv1__seo-block" id="cpv1-seo-block">
+        <h2 class="cpv1__seo-title">{{ section.settings.seo_title | default: 'About Our Collection' }}</h2>
+        <div class="cpv1__seo-content">
+          <p>{{ section.settings.seo_text | default: 'Explore our complete range of high-performance products crafted with sustainable materials and cutting-edge design. Designed to deliver exceptional durability, comfort, and style for daily use.' }}</p>
+          <p>Our commitment to quality ensures every item meets rigorous international standards. Shop with confidence backed by fast express delivery and easy 30-day hassle-free returns.</p>
+        </div>
+        <button type="button" class="cpv1__seo-toggle" onclick="document.getElementById('cpv1-seo-block').classList.toggle('expanded'); this.textContent = document.getElementById('cpv1-seo-block').classList.contains('expanded') ? 'Read Less ↑' : 'Read More ↓';">
+          Read More ↓
+        </button>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  // Simple listener for sorting dropdown
+  document.getElementById('SortBy')?.addEventListener('change', function(e) {
+    document.getElementById('FacetFiltersForm').submit();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "CP V1 — Glossier Clean",
+  "tag": "section",
+  "class": "cpv1-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Mobile Columns",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Hero Banner"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Override Title (optional)"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Override Subheading"
+    },
+    {
+      "type": "select",
+      "id": "hero_align",
+      "label": "Hero Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Features & In-Grid Promo"
+    },
+    {
+      "type": "link_list",
+      "id": "sub_collections",
+      "label": "Sub-Collection Chips Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_tile",
+      "label": "Show Promo Card (after 8th product)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "SEO Text Block"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_seo_block",
+      "label": "Show Bottom SEO Text Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "seo_title",
+      "label": "SEO Section Title",
+      "default": "About Our Collection"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Spacing"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FFF5F5"
+    },
+    {
+      "type": "color",
+      "id": "hero_bg",
+      "label": "Hero Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#3D9A98"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#E5E7EB"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CP V1 — Glossier Clean"
+    }
+  ]
+}
+{% endschema %}

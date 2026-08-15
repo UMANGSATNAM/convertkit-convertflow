@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Slider</title>
+    <style>
+        #v3-slider-container {
+            overflow: hidden;
+            position: relative;
+            padding: 20px 5px;
+            max-width: 1500px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        @media only screen and (min-width: 768px) {
+            #v3-slider-container {
+                width: max-content;
+            }
+        }
+
+        #v3-slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            padding: 5px;
+        }
+
+        .v3-slider-card {
+            flex: 0 0 80%;
+            max-width: 300px;
+            height: max-content;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            gap: 10px;
+            transition: transform 0.3s ease;
+            justify-content: space-around;
+            margin-right: 10px;
+        }
+
+        #v3-pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .v3-pagination-dot {
+            width: 18px;
+            height: 6px;
+            background-color: #0d437d29;
+            cursor: pointer;
+        }
+
+        .v3-pagination-dot.active {
+            background-color: #f05454;
+            width: 22px;
+            border-radius: 5px;
+        }
+
+        .content-container {
+            padding: 10px;
+        }
+
+        .feature-title {
+            margin: 0px;
+            font-weight: 700;
+            color: #203E5C;
+        }
+
+        .feature-image {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+        .feature-description {
+            font-size: 15px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="v3-slider-container">
+        <div id="v3-slider">
+            <div class="v3-slider-card">
+
+                <img src="//www.moonpod.co/cdn/shop/files/1_16.jpg?v=1720630615" class="feature-image">
+                <div class="content-container">
+                    <h3 class="feature-title"><span>Relaxing Comfort</span></h3>
+                    <p class="feature-description"><span>Thousands of high density beads conform to every inch of your body, mimicking floatation therapy, a known treatment for reducing stress and anxiety.</span></p>
+                </div>
+
+            </div>
+            <div class="v3-slider-card">
+
+                <img src="//www.moonpod.co/cdn/shop/files/2_13.jpg?v=1720630634" class="feature-image">
+                <div class="content-container">
+                    <h3 class="feature-title"><span>Upgraded Leisure</span></h3>
+                    <p class="feature-description"><span>People love to Moon Pod together. Our beads do the work, so it's easier to with loved ones. Reading, napping and gaming are all better on a Moon Pod.</span></p>
+                </div>
+
+
+            </div>
+            <div class="v3-slider-card">
+
+                <img src="//www.moonpod.co/cdn/shop/files/3_14.jpg?v=1720630634" class="feature-image">
+                <div class="content-container">
+                    <h3 class="feature-title"><span class="metafield-single_line_text_field">Elevated Relaxation</span></h3>
+                    <p class="feature-description"><span class="metafield-multi_line_text_field">Unparalleled support meets adaptive flexibility, relieving tension and joint pain while you relax. the perfect amount of structure for all shapes and sizes.</span></p>
+                </div>
+
+
+            </div>
+        </div>
+        <div id="v3-pagination"></div>
+    </div>
+
+    <script>
+        let sliderInitialized = false;
+
+        class ResponsiveSlider {
+            constructor(containerId, sliderId, paginationId) {
+                this.container = document.getElementById(containerId);
+                this.slider = document.getElementById(sliderId);
+                this.pagination = document.getElementById(paginationId);
+                this.cards = Array.from(this.slider.children);
+                this.cardWidth = this.cards[0].offsetWidth + 10; // Includes margin
+                this.totalWidth = this.cardWidth * this.cards.length - 10; // Adjust total width
+                this.containerWidth = this.slider.parentElement.offsetWidth;
+                this.currentIndex = 0;
+                this.isDragging = false;
+                this.startX = 0;
+                this.currentTranslate = 0;
+                this.prevTranslate = 0;
+                this.animationID = null;
+
+                this.init();
+            }
+
+            init() {
+                this.createPagination();
+                this.addEventListeners();
+                this.startAutoplay();
+            }
+
+            updatePagination() {
+                this.pagination.querySelectorAll('.v3-pagination-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+
+            goToSlide(index) {
+                this.currentIndex = index;
+                const maxOffset = Math.max(this.totalWidth - this.containerWidth, 0); // Prevent gaps
+                const offset = Math.min(this.currentIndex * this.cardWidth, maxOffset);
+                this.slider.style.transition = 'transform 0.5s ease';
+                this.slider.style.transform = `translateX(-${offset}px)`;
+                this.currentTranslate = -offset;
+                this.prevTranslate = this.currentTranslate;
+                this.updatePagination();
+            }
+
+            createPagination() {
+                const totalSlides = this.cards.length;
+                this.pagination.innerHTML = '';
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('v3-pagination-dot');
+                    dot.innerHTML = '&#8203;'; // Add zero-width space to prevent being treated as empty
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.pagination.appendChild(dot);
+                }
+            }
+
+            autoplay() {
+                this.currentIndex = (this.currentIndex + 1) % this.cards.length;
+                this.goToSlide(this.currentIndex);
+            }
+
+            startAutoplay() {
+                setInterval(() => this.autoplay(), 3000);
+            }
+
+            startDrag(event) {
+                this.isDragging = true;
+                this.startX = this.getPositionX(event);
+                this.slider.style.transition = 'none';
+                cancelAnimationFrame(this.animationID);
+            }
+
+            endDrag() {
+                this.isDragging = false;
+                const movedBy = this.currentTranslate - this.prevTranslate;
+                if (movedBy < -50 && this.currentIndex < this.cards.length - 1) {
+                    this.currentIndex++;
+                }
+                if (movedBy > 50 && this.currentIndex > 0) {
+                    this.currentIndex--;
+                }
+                this.goToSlide(this.currentIndex);
+            }
+
+            drag(event) {
+                if (this.isDragging) {
+                    const currentPosition = this.getPositionX(event);
+                    this.currentTranslate = this.prevTranslate + currentPosition - this.startX;
+                    this.slider.style.transform = `translateX(${this.currentTranslate}px)`;
+                }
+            }
+
+            getPositionX(event) {
+                return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+            }
+
+            addEventListeners() {
+                this.slider.addEventListener('mousedown', (e) => this.startDrag(e));
+                this.slider.addEventListener('touchstart', (e) => this.startDrag(e));
+                this.slider.addEventListener('mouseup', () => this.endDrag());
+                this.slider.addEventListener('touchend', () => this.endDrag());
+                this.slider.addEventListener('mousemove', (e) => this.drag(e));
+                this.slider.addEventListener('touchmove', (e) => this.drag(e));
+                window.addEventListener('resize', () => {
+                    this.slider.style.transform = 'translateX(0)';
+                    this.currentIndex = 0;
+                    this.updatePagination();
+                });
+            }
+        }
+
+        function initializeSlider() {
+            if (!sliderInitialized && window.innerWidth < 768) {
+                new ResponsiveSlider('v3-slider-container', 'v3-slider', 'v3-pagination');
+                sliderInitialized = true;
+            } else if (sliderInitialized && window.innerWidth >= 768) {
+                sliderInitialized = false;
+                document.getElementById('v3-slider').style.transform = 'translateX(0)';
+                document.getElementById('v3-pagination').innerHTML = '';
+            }
+        }
+
+        initializeSlider();
+
+        window.addEventListener('resize', initializeSlider);
+    </script>
+
+</body>
+
+</html>

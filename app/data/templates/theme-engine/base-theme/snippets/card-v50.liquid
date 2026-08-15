@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V50 — ZERO-WASTE ECO CLEANING & REFILLABLE HOMECARE D2C (BLUELAND / CLEANCULT STYLE)
+  Usage: {% render 'card-v50', product: product %}
+  Design: Eco Sky Blue (#0284C7), Fresh Mint (#E0F2FE), Plus Jakarta Sans & Bricolage Grotesque fonts, 14px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  .cv50-card {
+    --cv50-bg: #FFFFFF;
+    --cv50-text: #075985;
+    --cv50-muted: #0284C7;
+    --cv50-blue: #0284C7;
+    --cv50-mint: #E0F2FE;
+    --cv50-border: #BAE6FD;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cv50-bg);
+    border: 1px solid var(--cv50-border);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv50-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv50-blue);
+    box-shadow: 0 12px 24px -6px rgba(2, 132, 199, 0.25);
+  }
+
+  .cv50-card *, .cv50-card *::before, .cv50-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv50-card a { color: inherit; text-decoration: none; }
+  .cv50-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv50-card img { max-width: 100%; display: block; }
+
+  .cv50-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #F0F9FF;
+    overflow: hidden;
+  }
+  .cv50-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv50-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv50-card:hover .cv50-img-pri { opacity: 0; }
+  .cv50-card:hover .cv50-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Eco Tag Top Left */
+  .cv50-badge-eco {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv50-blue); color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 20px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv50-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv50-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv50-blue); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv50-wish:hover, .cv50-wish.active { background: var(--cv50-blue); color: #FFFFFF; border-color: var(--cv50-blue); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv50-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(2, 132, 199, 0.95); color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 8px; border: 1px solid var(--cv50-blue);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv50-card:hover .cv50-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv50-qv-overlay:hover { background: #FFFFFF; color: #0284C7; }
+
+  .cv50-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv50-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv50-blue); font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: 0.08em; }
+  .cv50-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 800; color: #075985; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Eco Specs Subtitle */
+  .cv50-specs { font-size: 11px; color: var(--cv50-muted); font-weight: 600; }
+
+  /* Rating Row */
+  .cv50-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #0284C7; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv50-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv50-price { font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800; color: #075985; }
+  .cv50-cmp { font-size: 13px; color: #9CA3AF; text-decoration: line-through; }
+  .cv50-disc { font-size: 10px; font-weight: 800; color: #075985; background: var(--cv50-mint); padding: 2px 6px; border-radius: 4px; }
+
+  /* Scent Variant Selector */
+  .cv50-sizes { display: flex; gap: 6px; overflow-x: auto; justify-content: center; margin-top: 4px; }
+  .cv50-size-btn {
+    font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+    border: 1px solid var(--cv50-border); background: #FFFFFF; color: #075985; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv50-size-btn.active, .cv50-size-btn:hover { background: #0284C7; color: #FFFFFF; border-color: #0284C7; }
+
+  /* Bottom Button */
+  .cv50-action-box { padding: 0 14px 14px; }
+  .cv50-atc-btn {
+    width: 100%; padding: 11px;
+    background: #0284C7; color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 8px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  }
+  .cv50-atc-btn:hover { background: #075985; transform: scale(1.01); }
+  .cv50-atc-btn:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv50-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv50-badge-eco">100% PLASTIC-FREE REFILL ♻️</span>
+
+    <button type="button" class="cv50-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv50-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv50-img cv50-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv50-img cv50-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-3' | placeholder_svg_tag: 'cv50-img' }}
+      {% endif %}
+
+      <button type="button" class="cv50-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv50-content">
+      {% if card_prod.vendor != blank %}<span class="cv50-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv50-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv50-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv50-specs">Zero Single-Use Plastic | Plant-Based</span>
+
+      <div class="cv50-rating">
+        <span>★ 4.9</span> <span>(4,100 reviews)</span>
+      </div>
+
+      <div class="cv50-price-row">
+        <span class="cv50-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv50-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv50-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Scent Selector -->
+      <div class="cv50-sizes">
+        {% for variant in card_prod.variants limit: 3 %}
+          <button type="button" class="cv50-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv50-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv50-atc-btn" data-add-cart="{{ cur_var.id }}">START REFILL JOURNEY</button>
+      {% else %}
+        <button type="button" class="cv50-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv50-card">
+    <div class="cv50-media">{{ 'product-3' | placeholder_svg_tag: 'cv50-img' }}</div>
+    <div class="cv50-content">
+      <span class="cv50-vendor">REFILLABLE ECO D2C</span>
+      <div class="cv50-title">Forever Glass Bottle & Hand Wash Tablet Set</div>
+
+      {% if card_r_show != false %}
+      <div class="cv50-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv50-specs">Zero Single-Use Plastic | Plant-Based</span>
+      <div class="cv50-price-row"><span class="cv50-price">₹ 999</span><span class="cv50-cmp">₹ 1,299</span><span class="cv50-disc">23% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

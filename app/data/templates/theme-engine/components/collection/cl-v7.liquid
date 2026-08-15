@@ -1,0 +1,98 @@
+{% comment %} CL V7 — Playful Kids & Toys {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv7 { background: {{ section.settings.bg_color | default: '#FFFBEB' }}; color: {{ section.settings.text_color | default: '#92400E' }}; padding: 60px 20px; font-family: 'Quicksand', sans-serif; }
+  .clv7-hero { text-align: center; margin-bottom: 50px; position: relative; }
+  .clv7-hero h1 { font-size: 46px; font-weight: 800; color: #D97706; margin-bottom: 15px; letter-spacing: -1px; }
+  .clv7-hero p { font-size: 18px; color: #92400E; max-width: 500px; margin: 0 auto; font-weight: 500; }
+  .clv7-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv7-chips a { padding: 12px 24px; background: #FEF3C7; color: #D97706; text-decoration: none; border-radius: 30px; font-size: 15px; font-weight: 700; transition: 0.3s; border: 2px solid transparent; }
+  .clv7-chips a:hover { border: 2px solid #D97706; background: #FFF; }
+  .clv7-toolbar { background: #FFF; border-radius: 20px; padding: 20px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(217,119,6,0.1); border: 2px dashed #FCD34D; }
+  .clv7-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 25px; }
+  .clv7-promo { grid-column: span 1; background: #FDE68A; border-radius: 20px; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 3px solid #F59E0B; position: relative; overflow: hidden; }
+  .clv7-promo h3 { font-size: 26px; font-weight: 800; color: #92400E; margin-bottom: 20px; line-height: 1.2; z-index: 1; }
+  .clv7-promo a { display: inline-block; padding: 14px 28px; background: #F59E0B; color: #FFF; text-decoration: none; border-radius: 30px; font-size: 16px; font-weight: 800; z-index: 1; box-shadow: 0 4px 0 #D97706; transition: 0.1s; }
+  .clv7-promo a:active { transform: translateY(4px); box-shadow: none; }
+  .clv7-seo { margin-top: 60px; padding: 40px; background: #FFF; border-radius: 20px; text-align: center; border: 2px solid #FEF3C7; }
+  @media (max-width: 768px) { .clv7-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv7-hero h1 { font-size: 36px; } }
+</style>
+<div class="clv7" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv7-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Kids & Play{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Safe, fun, and educational toys for all ages!{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv7-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv7-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; font-weight: 700; color: #D97706;">{{ filter.label }} 🧸</summary>
+              <div style="position: absolute; background: #FFF; border: 2px solid #FCD34D; padding: 20px; border-radius: 16px; z-index: 10; margin-top: 10px; min-width: 220px; box-shadow: 0 10px 25px rgba(217,119,6,0.15);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 15px; color: #92400E; font-weight: 600;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FEF3C7; border: 2px solid #FCD34D; color: #D97706; padding: 10px 20px; border-radius: 20px; font-size: 15px; font-weight: 700; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv7-grid">
+      {% for product in collection.products %}
+        {% render 'card-v7', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv7-promo">
+            <h3>🎁 Mystery Gift Included!</h3>
+            <a href="/collections/all">Shop Now</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v7', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv7-seo">
+      <h2 style="font-size: 24px; font-weight: 800; color: #D97706; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Spark Their Imagination' }}</h2>
+      <p style="font-size: 16px; font-weight: 500; line-height: 1.6; max-width: 700px; margin: 0 auto;">{{ section.settings.seo_text | default: 'Every toy is designed to inspire creativity and joy in children.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V7 — Kids", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFFBEB"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#92400E"}
+  ], "presets": [{"name": "CL V7 — Kids"}]
+}
+{% endschema %}

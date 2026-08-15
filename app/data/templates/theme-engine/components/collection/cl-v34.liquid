@@ -1,0 +1,97 @@
+{% comment %} CL V34 — Stationery / Pastels {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv34 { background: {{ section.settings.bg_color | default: '#FDFBF7' }}; color: {{ section.settings.text_color | default: '#4A5568' }}; padding: 50px 20px; font-family: 'Quicksand', sans-serif; }
+  .clv34-hero { text-align: center; margin-bottom: 40px; padding: 40px; background: linear-gradient(135deg, #FFE4E1, #E6E6FA); border-radius: 24px; }
+  .clv34-hero h1 { font-size: 42px; font-weight: 700; color: #4A5568; margin-bottom: 10px; }
+  .clv34-hero p { font-size: 15px; color: #718096; max-width: 500px; margin: 0 auto; font-weight: 500; }
+  .clv34-chips { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv34-chips a { padding: 10px 20px; background: #FFF; color: #4A5568; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.2s; border: 1px solid #EDF2F7; }
+  .clv34-chips a:hover, .clv34-chips a.active { background: #4A5568; color: #FFF; }
+  .clv34-toolbar { background: #FFF; padding: 15px 20px; border-radius: 12px; margin-bottom: 40px; border: 1px solid #EDF2F7; }
+  .clv34-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv34-promo { grid-column: span 1; background: #E6E6FA; color: #4A5568; border-radius: 20px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .clv34-promo h3 { font-size: 24px; font-weight: 700; margin-bottom: 15px; }
+  .clv34-promo a { display: inline-block; padding: 12px 25px; background: #FFF; color: #4A5568; text-decoration: none; font-weight: 700; border-radius: 12px; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  .clv34-seo { margin-top: 50px; background: #FFF; padding: 40px; border-radius: 24px; text-align: center; border: 1px solid #EDF2F7; }
+  @media (max-width: 768px) { .clv34-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } }
+</style>
+<div class="clv34" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv34-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Paper & Pens{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Beautiful stationery for your daily thoughts and grand plans.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv34-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv34-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 15px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 600; color: #4A5568;">{{ filter.label }} 🖍️</summary>
+              <div style="position: absolute; background: #FFF; padding: 20px; border-radius: 12px; border: 1px solid #EDF2F7; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #718096; font-weight: 500;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FDFBF7; border: 1px solid #EDF2F7; color: #4A5568; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv34-grid">
+      {% for product in collection.products %}
+        {% render 'card-v34', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv34-promo">
+            <h3>Mystery<br>Boxes</h3>
+            <a href="/products/mystery-box">Unbox Joy</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v34', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-weight: 700;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv34-seo">
+      <h2 style="font-size: 24px; font-weight: 700; color: #4A5568; margin-bottom: 10px;">{{ section.settings.seo_title | default: 'The Joy of Writing' }}</h2>
+      <p style="font-size: 14px; color: #718096; max-width: 600px; margin: 0 auto; line-height: 1.6; font-weight: 500;">{{ section.settings.seo_text | default: 'Explore our collection of imported Japanese pens, luxury notebooks, and creative art supplies designed to inspire.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V34 — Stationery", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FDFBF7"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#4A5568"}
+  ], "presets": [{"name": "CL V34 — Stationery"}]
+}
+{% endschema %}

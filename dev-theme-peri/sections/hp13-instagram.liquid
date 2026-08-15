@@ -1,0 +1,193 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00FFA3'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .hp13-ig-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp13-ig-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+  
+  .hp13-ig-heading-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+    color: #FFF;
+    letter-spacing: 2px;
+  }
+  
+  .hp13-ig-heading-{{ section_id }} span {
+    color: {{ text_color }};
+  }
+  
+  .hp13-ig-handle-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: {{ text_color }};
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  
+  .hp13-ig-handle-{{ section_id }}:hover {
+    text-decoration: underline;
+  }
+  
+  .hp13-ig-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+  
+  .hp13-ig-item-{{ section_id }} {
+    position: relative;
+    padding-top: 100%;
+    background: #111;
+    border: 1px solid #333;
+    overflow: hidden;
+    display: block;
+  }
+  
+  .hp13-ig-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease, transform 0.6s ease;
+  }
+  
+  .hp13-ig-item-{{ section_id }}:hover .hp13-ig-image-{{ section_id }} {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+  }
+  
+  .hp13-ig-overlay-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 255, 163, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .hp13-ig-item-{{ section_id }}:hover .hp13-ig-overlay-{{ section_id }} {
+    opacity: 1;
+  }
+
+  @media (max-width: 992px) {
+    .hp13-ig-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp13-ig-header-{{ section_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .hp13-ig-grid-{{ section_id }} {
+      gap: 10px;
+    }
+  }
+</style>
+
+<div class="hp13-ig-container-{{ section_id }}">
+  <div class="hp13-ig-header-{{ section_id }}">
+    <h2 class="hp13-ig-heading-{{ section_id }}">GRID_<span>VISUALS</span></h2>
+    <a href="{{ section.settings.link | default: '#' }}" class="hp13-ig-handle-{{ section_id }}">[@{{ section.settings.handle | default: 'cybersys' }}]</a>
+  </div>
+  
+  <div class="hp13-ig-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 4 %}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp13-ig-item-{{ section_id }}" {{ block.shopify_attributes }}>
+        {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | image_url: width: 600, height: 600, crop: 'center' }}" class="hp13-ig-image-{{ section_id }}" alt="Instagram" loading="lazy">
+        {% else %}
+          <div class="hp13-ig-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+        {% endif %}
+        <div class="hp13-ig-overlay-{{ section_id }}"></div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP13 Instagram",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Highlight Color",
+      "default": "#00FFA3"
+    },
+    {
+      "type": "text",
+      "id": "handle",
+      "label": "Instagram Handle",
+      "default": "cybersys"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Profile Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Instagram Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 Instagram",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,234 @@
+{%- comment -%}
+  Social proof toast.
+
+  Three modes, set in Settings → Social Proof & Urgency:
+
+    aggregate  Honest. Shows a real, verifiable stat you enter once
+               ("1,240 orders shipped this month"). No invented names.
+    manual     You enter real recent purchases as a list. Nothing is invented.
+    simulated  Randomised names + cities over real product titles. Common in
+               D2C but the purchases are illustrative, not real orders.
+
+  Never covers the sticky add-to-cart bar on mobile, dismissible for the
+  session, and pauses while the cart drawer or a popup is open.
+{%- endcomment -%}
+
+{%- if settings.enable_social_proof -%}
+  {%- liquid
+    assign sp_mode = settings.social_proof_mode | default: 'simulated'
+    assign sp_position = settings.social_proof_position | default: 'bottom-left'
+    assign sp_first = settings.social_proof_first_delay | default: 6
+    assign sp_interval = settings.social_proof_delay | default: 8
+    assign sp_visible = settings.social_proof_visible | default: 5
+    assign sp_max = settings.social_proof_max | default: 6
+  -%}
+
+  <div
+    id="cf-social-proof"
+    class="cf-sp cf-sp--{{ sp_position }}"
+    role="status"
+    aria-live="polite"
+    hidden>
+    <div class="cf-sp__media" aria-hidden="true">
+      <img class="cf-sp__img" src="" alt="" width="44" height="44" hidden>
+      <span class="cf-sp__emoji">🛍️</span>
+    </div>
+    <div class="cf-sp__body">
+      <p class="cf-sp__name" id="CFProofName"></p>
+      <p class="cf-sp__action" id="CFProofAction"></p>
+      <p class="cf-sp__time" id="CFProofTime"></p>
+    </div>
+    <button class="cf-sp__close" type="button" aria-label="Dismiss notification">&times;</button>
+  </div>
+
+  <style>
+    .cf-sp {
+      position: fixed;
+      z-index: 9990;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 330px;
+      padding: 12px 34px 12px 14px;
+      background: #FFFFFF;
+      color: #111827;
+      border: 1px solid #F0F0F0;
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+      opacity: 0;
+      transform: translateY(120%);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      pointer-events: auto;
+    }
+    .cf-sp[hidden] { display: none; }
+    .cf-sp.is-visible { opacity: 1; transform: translateY(0); }
+
+    .cf-sp--bottom-left  { bottom: 20px; left: 20px; }
+    .cf-sp--bottom-right { bottom: 20px; right: 20px; }
+    .cf-sp--top-left     { top: 20px; left: 20px; transform: translateY(-120%); }
+    .cf-sp--top-right    { top: 20px; right: 20px; transform: translateY(-120%); }
+
+    .cf-sp__media {
+      flex: 0 0 44px; width: 44px; height: 44px;
+      border-radius: 8px; overflow: hidden; background: #F3F4F6;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .cf-sp__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cf-sp__img[hidden] { display: none; }
+    .cf-sp__body { min-width: 0; }
+    .cf-sp__name   { margin: 0; font-size: 12px; font-weight: 700; }
+    .cf-sp__action { margin: 0; font-size: 12px; color: #4B5563; }
+    .cf-sp__time   { margin: 2px 0 0; font-size: 10px; color: #9CA3AF; }
+    .cf-sp__close {
+      position: absolute; top: 4px; right: 4px;
+      background: none; border: none; cursor: pointer;
+      font-size: 18px; line-height: 1; color: #9CA3AF;
+      min-width: 30px; min-height: 30px;
+    }
+    .cf-sp__close:hover { color: #111827; }
+
+    @media screen and (max-width: 749px) {
+      .cf-sp {
+        left: 12px; right: 12px; max-width: none;
+        /* clear of any sticky add-to-cart bar */
+        bottom: calc(84px + env(safe-area-inset-bottom));
+      }
+      .cf-sp--top-left, .cf-sp--top-right { top: 12px; bottom: auto; }
+      .cf-sp__close { min-width: 44px; min-height: 44px; top: 0; right: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cf-sp { transition: opacity 0.2s ease; transform: none; }
+      .cf-sp.is-visible { transform: none; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var el = document.getElementById('cf-social-proof');
+      if (!el) return;
+
+      var DISMISS = 'cf_sp_dismissed';
+      try { if (sessionStorage.getItem(DISMISS) === '1') return; } catch (e) {}
+
+      var mode = {{ sp_mode | json }};
+      var maxShows = {{ sp_max | json }};
+      var firstDelay = {{ sp_first | json }} * 1000;
+      var interval = {{ sp_interval | json }} * 1000;
+      var visibleFor = {{ sp_visible | json }} * 1000;
+
+      var nameEl = document.getElementById('CFProofName');
+      var actionEl = document.getElementById('CFProofAction');
+      var timeEl = document.getElementById('CFProofTime');
+      var imgEl = el.querySelector('.cf-sp__img');
+      var emojiEl = el.querySelector('.cf-sp__emoji');
+
+      {%- if sp_mode == 'aggregate' -%}
+      var aggregate = {
+        headline: {{ settings.social_proof_aggregate_headline | default: 'Trusted by our community' | json }},
+        line: {{ settings.social_proof_aggregate_line | default: '1,240 orders shipped this month' | json }},
+        note: {{ settings.social_proof_aggregate_note | default: 'Updated weekly' | json }}
+      };
+      {%- endif -%}
+
+      {%- if sp_mode == 'manual' -%}
+      var manual = ({{ settings.social_proof_manual | default: '' | json }} || '')
+        .split('\n')
+        .map(function (l) { return l.trim(); })
+        .filter(Boolean)
+        .map(function (l) {
+          var p = l.split('|').map(function (x) { return x.trim(); });
+          return { who: p[0] || '', what: p[1] || '', when: p[2] || '' };
+        });
+      {%- endif -%}
+
+      {%- if sp_mode == 'simulated' -%}
+      var names = ({{ settings.social_proof_names | default: 'Ananya from Delhi, Rohan from Bangalore, Sneha from Mumbai, Vikram from Pune, Kavya from Hyderabad, Riya from Delhi, Rahul from Mumbai, Amit from Chennai' | json }})
+        .split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+
+      var products = [
+        {%- assign sp_collection = collections[settings.social_proof_collection] | default: collections.all -%}
+        {%- for p in sp_collection.products limit: 12 -%}
+          { title: {{ p.title | json }}, url: {{ p.url | json }}, img: {{ p.featured_image | image_url: width: 120 | json }} }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ];
+
+      var times = ['just now', '2 minutes ago', '5 minutes ago', '12 minutes ago', 'an hour ago'];
+      function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+      {%- endif -%}
+
+      var shown = 0;
+      var hideTimer = null;
+
+      function blocked() {
+        // don't stack on top of an open drawer or modal
+        var drawer = document.getElementById('cf-cart-drawer');
+        if (drawer && drawer.getAttribute('aria-hidden') === 'false') return true;
+        var wl = document.getElementById('cf-wishlist-drawer');
+        if (wl && wl.getAttribute('aria-hidden') === 'false') return true;
+        return document.hidden;
+      }
+
+      function hide() {
+        el.classList.remove('is-visible');
+        setTimeout(function () { el.hidden = true; }, 400);
+      }
+
+      function show(data) {
+        nameEl.textContent = data.who;
+        actionEl.innerHTML = data.what;
+        timeEl.textContent = data.when;
+
+        if (data.img) {
+          imgEl.src = data.img;
+          imgEl.hidden = false;
+          emojiEl.style.display = 'none';
+        } else {
+          imgEl.hidden = true;
+          emojiEl.style.display = '';
+        }
+
+        el.hidden = false;
+        requestAnimationFrame(function () { el.classList.add('is-visible'); });
+
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(hide, visibleFor);
+      }
+
+      function next() {
+        if (shown >= maxShows) return;
+        if (blocked()) return;
+
+        {%- if sp_mode == 'aggregate' -%}
+        show({ who: aggregate.headline, what: aggregate.line, when: aggregate.note });
+        {%- elsif sp_mode == 'manual' -%}
+        if (!manual.length) return;
+        var m = manual[shown % manual.length];
+        show({ who: m.who, what: m.what, when: m.when });
+        {%- else -%}
+        if (!products.length) return;
+        var p = pick(products);
+        show({
+          who: pick(names),
+          what: 'just bought <b>' + p.title.replace(/</g, '&lt;') + '</b>',
+          when: pick(times),
+          img: p.img
+        });
+        {%- endif -%}
+
+        shown++;
+      }
+
+      el.querySelector('.cf-sp__close').addEventListener('click', function () {
+        hide();
+        clearInterval(loop);
+        try { sessionStorage.setItem(DISMISS, '1'); } catch (e) {}
+      });
+
+      var loop;
+      setTimeout(function () {
+        next();
+        loop = setInterval(next, interval);
+      }, firstDelay);
+    })();
+  </script>
+{%- endif -%}

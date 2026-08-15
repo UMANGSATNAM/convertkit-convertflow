@@ -1,0 +1,242 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=JetBrains+Mono:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.accent_color }}; /* Intentionally swapped */
+    --text-color: #000000;
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  .hp34-offer-wrapper {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .hp34-offer__warning {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color);
+    background: #fff;
+    padding: 5px 15px;
+    display: inline-block;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: flash 2s infinite;
+  }
+
+  @keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .hp34-offer__title {
+    font-family: var(--font-heading);
+    font-size: clamp(60px, 12vw, {{ section.settings.title_size }}px);
+    line-height: 0.85;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    word-break: break-word;
+  }
+
+  .hp34-offer__code {
+    font-family: var(--font-body);
+    font-size: clamp(24px, 4vw, 40px);
+    color: var(--text-color);
+    margin: 0 0 40px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    border: 2px solid var(--text-color);
+    display: inline-block;
+    padding: 10px 30px;
+  }
+
+  .hp34-offer__btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 20px 50px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    transition: all 0.3s ease;
+  }
+
+  .hp34-offer__btn:hover {
+    background-color: #fff;
+    color: #000;
+  }
+
+  /* Background text ticker */
+  .hp34-offer__bg-ticker {
+    position: absolute;
+    top: 50%; left: 0;
+    transform: translateY(-50%);
+    width: 200%;
+    font-family: var(--font-heading);
+    font-size: 300px;
+    line-height: 1;
+    font-weight: 900;
+    color: rgba(0,0,0,0.05);
+    z-index: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    animation: bgScroll 30s linear infinite;
+  }
+
+  @keyframes bgScroll {
+    0% { transform: translate(0, -50%); }
+    100% { transform: translate(-50%, -50%); }
+  }
+
+  .hp34-offer__content {
+    position: relative;
+    z-index: 2;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-offer-wrapper" id="HP34Offer-{{ section.id }}">
+  <div class="hp34-offer__bg-ticker">{{ section.settings.bg_text }} // {{ section.settings.bg_text }}</div>
+  
+  <div class="hp34-offer__content">
+    {%- if section.settings.warning != blank -%}
+      <div class="hp34-offer__warning">{{ section.settings.warning }}</div>
+    {%- endif -%}
+    
+    <h2 class="hp34-offer__title">{{ section.settings.title }}</h2>
+    
+    {%- if section.settings.code != blank -%}
+      <div class="hp34-offer__code">USE_CODE: {{ section.settings.code }}</div><br>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp34-offer__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP34 - Tech Offer",
+  "class": "section-hp34-offer-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "warning",
+      "label": "Warning Tag",
+      "default": "SYSTEM ALERT"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "GLOBAL\nCLEARANCE"
+    },
+    {
+      "type": "text",
+      "id": "code",
+      "label": "Discount Code",
+      "default": "SYS_OVERRIDE_20"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "[ INITIATE TRANSFER ]"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "text",
+      "id": "bg_text",
+      "label": "Background Text",
+      "default": "FLASH SALE"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 140
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Background Color (e.g. Neon Orange)",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech Offer"
+    }
+  ]
+}
+{% endschema %}

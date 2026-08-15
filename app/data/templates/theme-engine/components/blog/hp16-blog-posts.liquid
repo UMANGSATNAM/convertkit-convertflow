@@ -1,0 +1,193 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#00FFFF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 4px solid #000;
+  }
+  
+  .hp16-blog-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp16-blog-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+  }
+  
+  .hp16-blog-title-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    text-transform: uppercase;
+    color: #FFF;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 5px 5px 0 #FF00FF;
+    margin: 0;
+    line-height: 1;
+    transform: rotate(2deg);
+  }
+  
+  .hp16-blog-link-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: #FFF;
+    background: #000;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 4px 4px 0 #FFFF00;
+    transition: all 0.2s ease;
+  }
+  
+  .hp16-blog-link-{{ section_id }}:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #FFFF00;
+  }
+  
+  .hp16-blog-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp16-blog-card-{{ section_id }} {
+    background: #FFF;
+    border: 4px solid #000;
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    color: {{ text_color }};
+    box-shadow: 10px 10px 0 #000;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hp16-blog-card-{{ section_id }}:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 15px 15px 0 #FF00FF;
+  }
+  
+  .hp16-blog-image-wrap-{{ section_id }} {
+    position: relative;
+    padding-top: 70%;
+    border-bottom: 4px solid #000;
+  }
+  
+  .hp16-blog-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  
+  .hp16-blog-content-{{ section_id }} {
+    padding: 25px;
+  }
+  
+  .hp16-blog-date-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #FF00FF;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .hp16-blog-post-title-{{ section_id }} {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  @media (max-width: 992px) {
+    .hp16-blog-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp16-blog-header-{{ section_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+</style>
+
+<div class="hp16-blog-container-{{ section_id }}">
+  <div class="hp16-blog-header-{{ section_id }}">
+    <h2 class="hp16-blog-title-{{ section_id }}">{{ section.settings.title | default: 'THE GOSSIP' }}</h2>
+    <a href="{{ blogs[section.settings.blog].url | default: '#' }}" class="hp16-blog-link-{{ section_id }}">READ MORE</a>
+  </div>
+  
+  <div class="hp16-blog-grid-{{ section_id }}">
+    {% assign blog = blogs[section.settings.blog] %}
+    {% if blog != blank and blog.articles_count > 0 %}
+      {% for article in blog.articles limit: 3 %}
+        <a href="{{ article.url }}" class="hp16-blog-card-{{ section_id }}">
+          <div class="hp16-blog-image-wrap-{{ section_id }}">
+            <img src="{{ article.image | image_url: width: 600 }}" class="hp16-blog-image-{{ section_id }}" loading="lazy" alt="{{ article.title }}">
+          </div>
+          <div class="hp16-blog-content-{{ section_id }}">
+            <span class="hp16-blog-date-{{ section_id }}">{{ article.published_at | date: "%b %d, %Y" }}</span>
+            <h3 class="hp16-blog-post-title-{{ section_id }}">{{ article.title }}</h3>
+          </div>
+        </a>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..3) %}
+        <a href="#" class="hp16-blog-card-{{ section_id }}">
+          <div class="hp16-blog-image-wrap-{{ section_id }}">
+            <div class="hp16-blog-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+          </div>
+          <div class="hp16-blog-content-{{ section_id }}">
+            <span class="hp16-blog-date-{{ section_id }}">JUL 10, 2026</span>
+            <h3 class="hp16-blog-post-title-{{ section_id }}">HOW TO STYLE LOW RISE DENIM</h3>
+          </div>
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP16 Blog Posts",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#00FFFF"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "THE GOSSIP"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP16 Blog Posts"
+    }
+  ]
+}
+{% endschema %}

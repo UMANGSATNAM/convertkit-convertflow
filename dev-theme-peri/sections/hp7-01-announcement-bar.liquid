@@ -1,0 +1,216 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#FFFFFF'
+  assign font_size = section.settings.font_size | default: 12
+  assign letter_spacing = section.settings.letter_spacing | default: 4
+  assign padding_y = section.settings.padding_y | default: 12
+  assign speed = section.settings.speed | default: 20
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --font-size: {{ font_size }}px;
+    --letter-spacing: {{ letter_spacing }}px;
+    --padding-y: {{ padding_y }}px;
+    --speed: {{ speed }}s;
+    
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    position: relative;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .hp7-announcement-{{ section_id }} {
+    display: flex;
+    white-space: nowrap;
+    padding: var(--padding-y) 0;
+    font-family: 'Inter', sans-serif; /* Clean sans for contrast with later serifs */
+    font-size: var(--font-size);
+    font-weight: 600;
+    letter-spacing: var(--letter-spacing);
+    text-transform: uppercase;
+  }
+
+  .hp7-announcement__content {
+    display: flex;
+    animation: hp7-ticker var(--speed) linear infinite;
+  }
+
+  /* Pause on hover for accessibility */
+  .hp7-announcement-{{ section_id }}:hover .hp7-announcement__content {
+    animation-play-state: paused;
+  }
+
+  .hp7-announcement__item {
+    padding: 0 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .hp7-announcement__link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp7-announcement__link:hover {
+    opacity: 0.6;
+  }
+  
+  .hp7-announcement__separator {
+    margin-left: 40px;
+    opacity: 0.5;
+  }
+
+  @keyframes hp7-ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      --font-size: {{ font_size | times: 0.8 }}px;
+      --padding-y: {{ padding_y | times: 0.8 }}px;
+    }
+  }
+</style>
+
+<div class="hp7-announcement-{{ section_id }}" role="region" aria-label="Announcement">
+  {%- if section.blocks.size > 0 -%}
+    <div class="hp7-announcement__content">
+      
+      {%- capture ticker_items -%}
+        {%- for block in section.blocks -%}
+          <div class="hp7-announcement__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="hp7-announcement__link">
+                {{ block.settings.text | escape }}
+              </a>
+            {%- else -%}
+              <span>{{ block.settings.text | escape }}</span>
+            {%- endif -%}
+            
+            {%- unless forloop.last -%}
+              <span class="hp7-announcement__separator">///</span>
+            {%- endunless -%}
+          </div>
+        {%- endfor -%}
+        <span class="hp7-announcement__separator">///</span>
+      {%- endcapture -%}
+
+      <!-- Render items multiple times to create seamless loop -->
+      {{ ticker_items }}
+      {{ ticker_items }}
+      {{ ticker_items }}
+      {{ ticker_items }}
+      {{ ticker_items }}
+      {{ ticker_items }}
+      
+    </div>
+  {%- else -%}
+    <div class="hp7-announcement__item" style="margin:0 auto;">
+      <span>THE FALL/WINTER COLLECTION HAS ARRIVED. COMPLIMENTARY GLOBAL SHIPPING ON ALL ORDERS.</span>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP7 Announcement Ticker",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aesthetic: Editorial Brutalism"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Letter Spacing",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 60,
+      "step": 1,
+      "unit": "sec",
+      "label": "Scroll Speed",
+      "default": 25,
+      "info": "Lower is faster."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "COMPLIMENTARY GLOBAL SHIPPING"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 Announcement Ticker",
+      "blocks": [
+        { "type": "announcement", "settings": { "text": "THE FW26 COLLECTION IS LIVE" } },
+        { "type": "announcement", "settings": { "text": "COMPLIMENTARY GLOBAL SHIPPING" } },
+        { "type": "announcement", "settings": { "text": "LIMITED EDITION ARCHIVE PIECES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,76 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0A1628' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp54-faq__container { max-width: {{ section.settings.container_width | default: 800 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp54-faq__header { text-align: center; margin-bottom: 50px; }
+  .hp54-faq__eyebrow { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#60A5FA' }}; margin: 0 0 12px; }
+  .hp54-faq__heading { font-family: 'Tenor Sans', serif; font-size: clamp(28px, 3.5vw, 42px); color: #FFFFFF; margin: 0; }
+  .hp54-faq__item {
+    background: {{ section.settings.card_bg | default: '#111D33' }};
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 10px; margin-bottom: 14px; overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .hp54-faq__item.active { border-color: rgba(59, 130, 246, 0.5); }
+  .hp54-faq__question {
+    width: 100%; background: none; border: none; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    font-family: 'Tenor Sans', serif; font-size: 17px; color: #FFFFFF; text-align: left;
+  }
+  .hp54-faq__icon { font-size: 20px; color: {{ section.settings.accent_color | default: '#60A5FA' }}; transition: transform 0.3s ease; flex-shrink: 0; margin-left: 16px; }
+  .hp54-faq__item.active .hp54-faq__icon { transform: rotate(45deg); }
+  .hp54-faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .hp54-faq__item.active .hp54-faq__answer { max-height: 300px; }
+  .hp54-faq__answer-inner { padding: 0 24px 20px; font-size: 14px; line-height: 1.7; color: #94A3B8; }
+{%- endstyle -%}
+<div class="hp54-faq__container">
+  <div class="hp54-faq__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp54-faq__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp54-faq__heading">{{ section.settings.heading | default: 'Nightly Inquiries' }}</h2>
+  </div>
+  {%- for block in section.blocks -%}
+    <div class="hp54-faq__item" {{ block.shopify_attributes }}>
+      <button class="hp54-faq__question" onclick="this.parentElement.classList.toggle('active')">
+        <span>{{ block.settings.question | default: 'How does sapphire peptide technology work?' }}</span>
+        <span class="hp54-faq__icon">+</span>
+      </button>
+      <div class="hp54-faq__answer">
+        <div class="hp54-faq__answer-inner">{{ block.settings.answer | default: 'Our sapphire-encapsulated peptides penetrate the deep epidermal layers during nocturnal cellular regeneration.' }}</div>
+      </div>
+    </div>
+  {%- endfor -%}
+</div>
+{% schema %}
+{
+  "name": "HP54 - Sapphire FAQ",
+  "class": "section-hp54-faq",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0A1628" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#111D33" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#60A5FA" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "◆ FAQ" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Nightly Inquiries" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 600, "max": 1000, "step": 20, "unit": "px", "label": "Container Width", "default": 800 }
+  ],
+  "blocks": [{
+    "type": "faq", "name": "Question",
+    "settings": [
+      { "type": "text", "id": "question", "label": "Question", "default": "How does sapphire peptide technology work?" },
+      { "type": "textarea", "id": "answer", "label": "Answer", "default": "Our sapphire-encapsulated peptides penetrate deep epidermal layers during night repair." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP54 - Sapphire FAQ",
+    "blocks": [
+      { "type": "faq" },
+      { "type": "faq", "settings": { "question": "Can this be used on sensitive skin?", "answer": "Yes, blue tansy naturally soothes irritation and redness." } },
+      { "type": "faq", "settings": { "question": "What is the recommended nightly ritual?", "answer": "Apply 3-4 drops of sapphire elixir followed by our night recovery cream." } }
+    ]
+  }]
+}
+{% endschema %}

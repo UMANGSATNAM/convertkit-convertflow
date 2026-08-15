@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V52 — ERGONOMIC MECHANICAL KEYBOARDS D2C (KEYCHRON / NUPHY STYLE)
+  Usage: {% render 'card-v52', product: product %}
+  Design: Steel Blue (#3B82F6), Mechanical Gray (#F1F5F9), JetBrains Mono & Inter fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap');
+
+  .cv52-card {
+    --cv52-bg: #FFFFFF;
+    --cv52-text: #1E293B;
+    --cv52-muted: #3B82F6;
+    --cv52-blue: #3B82F6;
+    --cv52-slate: #F1F5F9;
+    --cv52-border: #CBD5E1;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv52-bg);
+    border: 1px solid var(--cv52-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv52-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv52-blue);
+    box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.25);
+  }
+
+  .cv52-card *, .cv52-card *::before, .cv52-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv52-card a { color: inherit; text-decoration: none; }
+  .cv52-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv52-card img { max-width: 100%; display: block; }
+
+  .cv52-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv52-slate);
+    overflow: hidden;
+  }
+  .cv52-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv52-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv52-card:hover .cv52-img-pri { opacity: 0; }
+  .cv52-card:hover .cv52-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Mechanical Tag Top Left */
+  .cv52-badge-mech {
+    position: absolute; top: 10px; left: 10px;
+    background: #1E293B; color: #F8FAFC;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv52-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv52-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv52-blue); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv52-wish:hover, .cv52-wish.active { background: var(--cv52-blue); color: #FFFFFF; border-color: var(--cv52-blue); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv52-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(30, 41, 59, 0.95); color: #F8FAFC;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv52-blue);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv52-card:hover .cv52-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv52-qv-overlay:hover { background: var(--cv52-blue); color: #FFFFFF; }
+
+  .cv52-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: left; }
+  .cv52-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv52-blue); font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; }
+  .cv52-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: #1E293B; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Mechanical Specs Subtitle */
+  .cv52-specs { font-size: 11px; color: #64748B; font-weight: 500; }
+
+  /* Rating Row */
+  .cv52-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #3B82F6; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv52-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv52-price { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 800; color: #1E293B; }
+  .cv52-cmp { font-size: 13px; color: #94A3B8; text-decoration: line-through; }
+  .cv52-disc { font-size: 10px; font-weight: 700; color: #1E293B; background: var(--cv52-slate); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv52-border); }
+
+  /* Switch Variant Selector */
+  .cv52-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv52-size-btn {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--cv52-border); background: #FFFFFF; color: #1E293B; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv52-size-btn.active, .cv52-size-btn:hover { background: #3B82F6; color: #FFFFFF; border-color: #3B82F6; }
+
+  /* Bottom Button */
+  .cv52-action-box { padding: 0 14px 14px; }
+  .cv52-atc-btn {
+    width: 100%; padding: 11px;
+    background: #3B82F6; color: #FFFFFF;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  .cv52-atc-btn:hover { background: #1E293B; transform: scale(1.01); }
+  .cv52-atc-btn:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv52-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv52-badge-mech">HOT-SWAPPABLE ⌨️</span>
+
+    <button type="button" class="cv52-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv52-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv52-img cv52-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv52-img cv52-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv52-img' }}
+      {% endif %}
+
+      <button type="button" class="cv52-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv52-content">
+      {% if card_prod.vendor != blank %}<span class="cv52-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv52-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv52-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv52-specs">Gateron G-Pro | Tri-Mode Connectivity</span>
+
+      <div class="cv52-rating">
+        <span>★ 4.9</span> <span>(3,800 reviews)</span>
+      </div>
+
+      <div class="cv52-price-row">
+        <span class="cv52-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv52-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv52-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Switch Selector -->
+      <div class="cv52-sizes">
+        {% for variant in card_prod.variants limit: 3 %}
+          <button type="button" class="cv52-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv52-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv52-atc-btn" data-add-cart="{{ cur_var.id }}">UPGRADE DESK SETUP</button>
+      {% else %}
+        <button type="button" class="cv52-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv52-card">
+    <div class="cv52-media">{{ 'product-1' | placeholder_svg_tag: 'cv52-img' }}</div>
+    <div class="cv52-content">
+      <span class="cv52-vendor">MECHANICAL KEYBOARDS D2C</span>
+      <div class="cv52-title">75% Wireless Custom Mechanical Keyboard w/ RGB</div>
+
+      {% if card_r_show != false %}
+      <div class="cv52-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv52-specs">Gateron G-Pro | Tri-Mode Connectivity</span>
+      <div class="cv52-price-row"><span class="cv52-price">₹ 8,999</span><span class="cv52-cmp">₹ 11,499</span><span class="cv52-disc">21% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

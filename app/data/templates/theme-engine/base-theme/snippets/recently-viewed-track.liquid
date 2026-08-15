@@ -1,0 +1,26 @@
+{%- comment -%}
+  Records the current product into the shared recently-viewed store.
+
+  Rendered once from layout/theme.liquid on product templates, so EVERY pdp-v
+  variant contributes — no per-section code needed.
+{%- endcomment -%}
+
+{%- if template.name == 'product' and product != blank -%}
+  <script>
+    (function () {
+      function track() {
+        if (!window.RecentlyViewed) return;
+        window.RecentlyViewed.track({
+          handle: {{ product.handle | json }},
+          id: {{ product.id | json }},
+          title: {{ product.title | json }},
+          price: {{ product.price | money | strip_html | json }},
+          image: {{ product.featured_image | image_url: width: 300 | json }},
+          url: {{ product.url | json }}
+        });
+      }
+      if (window.RecentlyViewed) track();
+      else document.addEventListener('DOMContentLoaded', track);
+    })();
+  </script>
+{%- endif -%}

@@ -1,0 +1,401 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-orange: {{ section.settings.accent_orange }};
+    --accent-yellow: {{ section.settings.accent_yellow }};
+    --accent-green: {{ section.settings.accent_green }};
+    --font-heading: 'Fraunces', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    /* Subtle grainy texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp25-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp25-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp25-tiles__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp25-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-shadow: 3px 3px 0 var(--accent-yellow);
+  }
+
+  .hp25-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+    gap: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp25-tiles__grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  .hp25-tiles__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-decoration: none;
+    border: 4px solid var(--text-color);
+    border-radius: 30px;
+    overflow: hidden;
+    min-height: 300px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 8px 8px 0 var(--accent-orange);
+    padding: 30px;
+    z-index: 1;
+  }
+
+  .hp25-tiles__item:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0 var(--text-color);
+    z-index: 2;
+  }
+
+  /* Different block sizes based on index */
+  .hp25-tiles__item:nth-child(1) { grid-column: span 8; grid-row: span 2; background-color: var(--accent-yellow); }
+  .hp25-tiles__item:nth-child(2) { grid-column: span 4; grid-row: span 1; background-color: var(--accent-green); }
+  .hp25-tiles__item:nth-child(3) { grid-column: span 4; grid-row: span 2; background-color: var(--accent-orange); }
+  .hp25-tiles__item:nth-child(4) { grid-column: span 4; grid-row: span 1; background-color: var(--bg-color); }
+  .hp25-tiles__item:nth-child(5) { grid-column: span 4; grid-row: span 1; background-color: var(--text-color); }
+
+  @media screen and (max-width: 992px) and (min-width: 769px) {
+    .hp25-tiles__item:nth-child(1) { grid-column: span 12; grid-row: span 2; }
+    .hp25-tiles__item:nth-child(2) { grid-column: span 6; grid-row: span 1; }
+    .hp25-tiles__item:nth-child(3) { grid-column: span 6; grid-row: span 1; }
+    .hp25-tiles__item:nth-child(4) { grid-column: span 6; grid-row: span 1; }
+    .hp25-tiles__item:nth-child(5) { grid-column: span 6; grid-row: span 1; }
+  }
+
+  .hp25-tiles__image {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    filter: sepia(0.2) contrast(1.1);
+    transition: transform 0.6s ease;
+  }
+
+  .hp25-tiles__item:hover .hp25-tiles__image {
+    transform: scale(1.05);
+  }
+
+  /* Overlay for items with images */
+  .hp25-tiles__item--has-image::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(62,39,35,0.8) 0%, rgba(62,39,35,0) 50%);
+    z-index: -1;
+  }
+
+  .hp25-tiles__content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hp25-tiles__badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--text-color);
+    color: var(--bg-color);
+    border-radius: 50%;
+    transform: rotate(15deg);
+  }
+
+  .hp25-tiles__item--has-image .hp25-tiles__badge {
+    background: var(--accent-yellow);
+    color: var(--text-color);
+  }
+  
+  .hp25-tiles__item:nth-child(5) .hp25-tiles__badge {
+    background: var(--accent-orange);
+    color: var(--bg-color);
+  }
+
+  .hp25-tiles__badge svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  .hp25-tiles__item-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0 0 10px;
+    line-height: 1.1;
+  }
+
+  .hp25-tiles__item--has-image .hp25-tiles__item-title,
+  .hp25-tiles__item:nth-child(5) .hp25-tiles__item-title {
+    color: var(--bg-color);
+  }
+
+  .hp25-tiles__item-btn {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-color);
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .hp25-tiles__item--has-image .hp25-tiles__item-btn,
+  .hp25-tiles__item:nth-child(5) .hp25-tiles__item-btn {
+    color: var(--bg-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp25-tiles-wrapper" id="HP25Tiles-{{ section.id }}">
+  <div class="hp25-tiles__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp25-tiles__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp25-tiles__grid">
+    {%- for block in section.blocks limit: 5 -%}
+      {%- assign has_image = false -%}
+      {%- if block.settings.image != blank -%}
+        {%- assign has_image = true -%}
+      {%- endif -%}
+
+      <a href="{{ block.settings.link | default: '#' }}" class="hp25-tiles__item {% if has_image %}hp25-tiles__item--has-image{% endif %}" {{ block.shopify_attributes }}>
+        
+        {%- if has_image -%}
+          <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.title | escape }}" class="hp25-tiles__image" loading="lazy">
+        {%- endif -%}
+        
+        <div class="hp25-tiles__badge">
+          <svg viewBox="0 0 24 24"><path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/></svg>
+        </div>
+
+        <div class="hp25-tiles__content">
+          <h3 class="hp25-tiles__item-title">{{ block.settings.title }}</h3>
+          <span class="hp25-tiles__item-btn">{{ block.settings.btn_text | default: 'Shop Now' }}</span>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP25 - Retro Tiles",
+  "class": "section-hp25-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop The Grooves"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Retro 70s Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5E6D3"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Border (Dark Brown)",
+      "default": "#3E2723"
+    },
+    {
+      "type": "color",
+      "id": "accent_orange",
+      "label": "Accent (Burnt Orange)",
+      "default": "#D15F3C"
+    },
+    {
+      "type": "color",
+      "id": "accent_yellow",
+      "label": "Accent (Mustard)",
+      "default": "#E2B144"
+    },
+    {
+      "type": "color",
+      "id": "accent_green",
+      "label": "Accent (Avocado Green)",
+      "default": "#76834F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile (Max 5)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP25 - Retro Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "New Arrivals" } },
+        { "type": "tile", "settings": { "title": "Dresses" } },
+        { "type": "tile", "settings": { "title": "Tops" } },
+        { "type": "tile", "settings": { "title": "Bottoms" } },
+        { "type": "tile", "settings": { "title": "Sale" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

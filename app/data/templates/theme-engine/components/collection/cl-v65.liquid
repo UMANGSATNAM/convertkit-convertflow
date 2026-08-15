@@ -1,0 +1,98 @@
+{% comment %} CL V65 — Fast Food / Diner (Red/Yellow/Bold) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv65 { background: {{ section.settings.bg_color | default: '#FFFBF0' }}; color: {{ section.settings.text_color | default: '#D92525' }}; padding: 30px 15px; font-family: 'Fredoka One', 'Arial Black', sans-serif; text-transform: uppercase; }
+  .clv65-hero { text-align: center; margin-bottom: 40px; padding: 60px 20px; background: #D92525; color: #FFCC00; border: 8px solid #FFCC00; border-radius: 20px; box-shadow: 10px 10px 0 #333; position: relative; }
+  .clv65-hero h1 { font-size: 60px; font-weight: normal; margin-bottom: 10px; line-height: 1; text-shadow: 4px 4px 0 #333; }
+  .clv65-hero p { font-size: 18px; color: #FFF; max-width: 600px; margin: 0 auto; text-shadow: 2px 2px 0 #333; font-family: 'Arial', sans-serif; font-weight: 900; }
+  .clv65-chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv65-chips a { padding: 12px 25px; background: #FFF; color: #D92525; text-decoration: none; font-size: 16px; border-radius: 50px; border: 4px solid #D92525; transition: 0.1s; box-shadow: 4px 4px 0 #333; }
+  .clv65-chips a:hover, .clv65-chips a.active { background: #FFCC00; color: #333; border-color: #333; transform: translate(2px, 2px); box-shadow: 2px 2px 0 #333; }
+  .clv65-toolbar { background: #FFCC00; border: 4px solid #333; padding: 15px 20px; margin-bottom: 30px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0 #333; }
+  .clv65-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv65-promo { grid-column: span 1; background: #333; color: #FFF; border-radius: 20px; border: 4px solid #FFCC00; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 8px 8px 0 #D92525; }
+  .clv65-promo h3 { font-size: 32px; font-weight: normal; margin-bottom: 15px; color: #FFCC00; line-height: 1.1; }
+  .clv65-promo a { display: inline-block; padding: 12px 25px; background: #D92525; color: #FFF; text-decoration: none; font-size: 16px; border: 4px solid #FFF; border-radius: 50px; transition: 0.1s; }
+  .clv65-promo a:hover { background: #FFF; color: #D92525; border-color: #D92525; }
+  .clv65-seo { margin-top: 50px; background: #FFF; padding: 40px; border-radius: 20px; border: 5px dashed #D92525; text-align: center; }
+  @media (max-width: 768px) { .clv65-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv65-hero h1 { font-size: 42px; } }
+</style>
+<div class="clv65" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv65-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}THE MENU{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Hot, fresh, and ready to go!{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv65-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv65-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 15px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; color: #333; background: #FFF; padding: 5px 15px; border: 3px solid #333; border-radius: 30px;">{{ filter.label }} +</summary>
+              <div style="position: absolute; background: #FFF; border: 4px solid #D92525; padding: 20px; border-radius: 15px; z-index: 10; margin-top: 10px; min-width: 220px; box-shadow: 6px 6px 0 #333;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #333; font-family: 'Arial', sans-serif; font-weight: bold;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #D92525;">
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FFF; border: 3px solid #333; color: #333; padding: 8px 15px; border-radius: 30px; font-size: 14px; font-family: 'Fredoka One', sans-serif; cursor: pointer; outline: none; text-transform: uppercase;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv65-grid">
+      {% for product in collection.products %}
+        {% render 'card-v65', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv65-promo">
+            <h3>SUPER<br>COMBO<br>MEAL</h3>
+            <a href="/collections/combos">ORDER NOW</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v65', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 24px; color: #D92525;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv65-seo">
+      <h2 style="font-size: 28px; color: #D92525; margin-bottom: 15px;">{{ section.settings.seo_title | default: '100% REAL INGREDIENTS' }}</h2>
+      <p style="font-size: 16px; font-family: 'Arial', sans-serif; font-weight: bold; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.5; text-transform: none;">{{ section.settings.seo_text | default: "We don't cut corners. Fast service doesn't mean compromising on quality." }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V65 — Diner", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFFBF0"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#D92525"}
+  ], "presets": [{"name": "CL V65 — Diner"}]
+}
+{% endschema %}

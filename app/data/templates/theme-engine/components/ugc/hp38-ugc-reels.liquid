@@ -1,0 +1,215 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+    overflow: hidden;
+  }
+
+  .hp38-ugc-wrapper {
+    /* Full bleed film strip look */
+  }
+
+  .hp38-ugc__header {
+    padding: 40px 40px 20px;
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-ugc__header {
+      padding: 30px 20px 15px;
+    }
+  }
+
+  .hp38-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .hp38-ugc__track {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Grid gap as border trick */
+    background: var(--text-color);
+    gap: 2px;
+  }
+
+  .hp38-ugc__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp38-ugc__card {
+    flex: 0 0 350px;
+    background: var(--bg-color);
+    position: relative;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-ugc__card {
+      flex: 0 0 280px;
+    }
+  }
+
+  .hp38-ugc__card:hover .hp38-ugc__image {
+    filter: grayscale(0%);
+  }
+  .hp38-ugc__card:hover .hp38-ugc__handle {
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hp38-ugc__image-wrap {
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: #f4f4f4;
+    overflow: hidden;
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-ugc__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+  }
+
+  .hp38-ugc__handle {
+    padding: 15px 20px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-ugc-wrapper" id="HP38UGC-{{ section.id }}">
+  <div class="hp38-ugc__header">
+    <h2 class="hp38-ugc__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp38-ugc__track">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp38-ugc__card" {{ block.shopify_attributes }}>
+        <div class="hp38-ugc__image-wrap">
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp38-ugc__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'collection-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp38-ugc__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp38-ugc__handle">{{ block.settings.handle }}</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist UGC",
+  "class": "section-hp38-ugc-reels",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYS.CAPTURE // COMM"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Grid Lines",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ugc",
+      "name": "UGC Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "USR_001"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist UGC",
+      "blocks": [
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" }
+      ]
+    }
+  ]
+}
+{% endschema %}

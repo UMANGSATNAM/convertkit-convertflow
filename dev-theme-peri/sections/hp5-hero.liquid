@@ -1,0 +1,448 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#f4f7f9'
+  assign text_color = section.settings.text_color | default: '#1a2a3a'
+  assign accent_color = section.settings.accent_color | default: '#0066cc'
+  assign button_bg = section.settings.button_bg | default: '#0066cc'
+  assign button_text = section.settings.button_text | default: '#ffffff'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp5-hero-bg: {{ bg_color }};
+    --hp5-hero-text: {{ text_color }};
+    --hp5-hero-accent: {{ accent_color }};
+    --hp5-hero-btn-bg: {{ button_bg }};
+    --hp5-hero-btn-text: {{ button_text }};
+    
+    --hp5-hero-pt-desk: {{ padding_top_desktop }}px;
+    --hp5-hero-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp5-hero-pt-mob: {{ padding_top_mobile }}px;
+    --hp5-hero-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp5-health-hero-{{ section.id }} {
+    padding-top: var(--hp5-hero-pt-desk);
+    padding-bottom: var(--hp5-hero-pb-desk);
+    background-color: var(--hp5-hero-bg);
+    color: var(--hp5-hero-text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp5-hero-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hp5-hero-content {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .hp5-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--hp5-hero-accent);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+  }
+  .hp5-hero-badge svg {
+    width: 16px; height: 16px;
+  }
+
+  .hp5-hero-title {
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 20px 0;
+    letter-spacing: -1px;
+  }
+  .hp5-hero-title span {
+    color: var(--hp5-hero-accent);
+  }
+
+  .hp5-hero-desc {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(26, 42, 58, 0.7);
+    margin: 0 0 40px 0;
+    font-weight: 400;
+  }
+
+  .hp5-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .hp5-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hp5-hero-btn-bg);
+    color: var(--hp5-hero-btn-text);
+    padding: 18px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  .hp5-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 102, 204, 0.2);
+  }
+
+  .hp5-hero-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--hp5-hero-text);
+    padding: 18px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(26, 42, 58, 0.1);
+  }
+  .hp5-hero-btn-secondary:hover {
+    border-color: var(--hp5-hero-text);
+  }
+
+  .hp5-hero-trust {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    border-top: 1px solid rgba(26, 42, 58, 0.1);
+    padding-top: 30px;
+  }
+  .hp5-hero-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(26, 42, 58, 0.8);
+  }
+  .hp5-hero-trust-icon {
+    width: 24px; height: 24px;
+    color: var(--hp5-hero-accent);
+  }
+
+  .hp5-hero-visual {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .hp5-hero-img-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+  }
+  .hp5-hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+  .hp5-hero-floating-card {
+    position: absolute;
+    bottom: -20px;
+    left: -40px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 3;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+  .hp5-hero-floating-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--hp5-hero-accent);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hp5-hero-floating-text {
+    font-size: 14px; font-weight: 700;
+  }
+  .hp5-hero-floating-sub {
+    font-size: 12px; color: rgba(26,42,58,0.6);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp5-hero-inner {
+      flex-direction: column;
+      text-align: center;
+      gap: 50px;
+    }
+    .hp5-hero-content {
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hp5-hero-actions {
+      justify-content: center;
+    }
+    .hp5-hero-trust {
+      justify-content: center;
+    }
+    .hp5-hero-floating-card {
+      left: 20px;
+      bottom: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp5-health-hero-{{ section.id }} {
+      padding-top: var(--hp5-hero-pt-mob);
+      padding-bottom: var(--hp5-hero-pb-mob);
+    }
+    .hp5-hero-inner {
+      padding: 0 20px;
+    }
+    .hp5-hero-trust {
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+    .hp5-hero-floating-card {
+      display: none; /* Hide on small mobile to save space */
+    }
+  }
+</style>
+
+<section class="hp5-health-hero-{{ section.id }}" aria-label="Hero">
+  <div class="hp5-hero-inner">
+    
+    <div class="hp5-hero-content">
+      {%- if section.settings.badge_text != blank -%}
+        <div class="hp5-hero-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          {{ section.settings.badge_text }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h1 class="hp5-hero-title">{{ section.settings.title }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.description != blank -%}
+        <p class="hp5-hero-desc">{{ section.settings.description }}</p>
+      {%- endif -%}
+
+      <div class="hp5-hero-actions">
+        {%- if section.settings.btn1_label != blank -%}
+          <a href="{{ section.settings.btn1_link }}" class="hp5-hero-btn">{{ section.settings.btn1_label }}</a>
+        {%- endif -%}
+        {%- if section.settings.btn2_label != blank -%}
+          <a href="{{ section.settings.btn2_link }}" class="hp5-hero-btn-secondary">{{ section.settings.btn2_label }}</a>
+        {%- endif -%}
+      </div>
+
+      <div class="hp5-hero-trust">
+        <div class="hp5-hero-trust-item">
+          <svg class="hp5-hero-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <span>Clinically Proven</span>
+        </div>
+        <div class="hp5-hero-trust-item">
+          <svg class="hp5-hero-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+          <span>Fast Absorption</span>
+        </div>
+        <div class="hp5-hero-trust-item">
+          <svg class="hp5-hero-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+          <span>Doctor Formulated</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hp5-hero-visual">
+      <div class="hp5-hero-img-wrap">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | image_url: width: 1200 }}" class="hp5-hero-img" alt="Hero Image" loading="eager" fetchpriority="high">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'hp5-hero-img placeholder-svg' }}
+        {%- endif -%}
+      </div>
+      
+      {%- if section.settings.show_floating_card -%}
+      <div class="hp5-hero-floating-card">
+        <div class="hp5-hero-floating-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+          <div class="hp5-hero-floating-text">Science-Backed</div>
+          <div class="hp5-hero-floating-sub">100% Transparent Label</div>
+        </div>
+      </div>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP5 Health Hero",
+  "tag": "section",
+  "class": "section-hp5-hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "TRUSTED BY 1M+ CUSTOMERS"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Advanced Nutrition for <span>Peak Performance.</span>"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Doctor-formulated supplements made with clinically proven ingredients to support your daily wellness journey."
+    },
+    {
+      "type": "text",
+      "id": "btn1_label",
+      "label": "Primary Button Label",
+      "default": "Shop All Formulas"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "btn2_label",
+      "label": "Secondary Button Label",
+      "default": "Take the Quiz"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_floating_card",
+      "label": "Show Floating Trust Card",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f7f9"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a2a3a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP5 Health Hero",
+      "category": "Hero"
+    }
+  ]
+}
+{% endschema %}

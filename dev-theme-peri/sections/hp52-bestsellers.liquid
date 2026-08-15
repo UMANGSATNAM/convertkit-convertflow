@@ -1,0 +1,175 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp52-bs-bg: {{ section.settings.bg_color | default: '#F7EFE6' }};
+    --hp52-terra: {{ section.settings.accent_terra | default: '#C2593F' }};
+    
+    background-color: var(--hp52-bs-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp52-bs__wrap {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp52-bs__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px;
+  }
+
+  .hp52-bs__heading {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(32px, 4.5vw, 44px);
+    font-weight: 700;
+    color: #2D3B2D;
+    margin: 0 0 8px;
+  }
+
+  .hp52-bs__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp52-bs__card {
+    background: #FFFDF9;
+    border: 1px solid rgba(194, 89, 63, 0.15);
+    border-radius: 36px 36px 12px 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(45, 59, 45, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp52-bs__card:hover {
+    border-color: var(--hp52-terra);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(194, 89, 63, 0.12);
+  }
+
+  .hp52-bs__img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 20px 20px 8px 8px;
+    margin-bottom: 20px;
+  }
+
+  .hp52-bs__title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2D3B2D;
+    margin: 0 0 8px;
+  }
+
+  .hp52-bs__price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hp52-terra);
+    margin-bottom: 18px;
+  }
+
+  .hp52-bs__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 13px;
+    background: #2D3B2D;
+    color: #FFFDF9;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .hp52-bs__btn:hover { background: var(--hp52-terra); }
+
+  @media screen and (max-width: 992px) {
+    .hp52-bs__grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  }
+{%- endstyle -%}
+
+<div class="hp52-bs__wrap">
+  <div class="hp52-bs__header">
+    <h2 class="hp52-bs__heading">{{ section.settings.heading | default: 'Our Coveted Mediterranean Classics' }}</h2>
+    <p style="font-size:14px; color:#5C675B;">{{ section.settings.subheading | default: 'Revered for reviving dry, stressed complexions with golden lipid nourishment.' }}</p>
+  </div>
+
+  <div class="hp52-bs__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp52-bs__card" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" class="hp52-bs__img" alt="{{ block.settings.title }}" loading="lazy">
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'hp52-bs__img' }}
+          {%- endif -%}
+          <h3 class="hp52-bs__title">{{ block.settings.title }}</h3>
+          <div class="hp52-bs__price">{{ block.settings.price | default: '$64.00 USD' }}</div>
+          <button class="hp52-bs__btn">{{ block.settings.btn_text | default: 'Acquire Formulation' }}</button>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp52-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp52-bs__img' }}
+        <h3 class="hp52-bs__title">Tuscan Olive Squalane Face Nectar</h3>
+        <div class="hp52-bs__price">$64.00 USD</div>
+        <button class="hp52-bs__btn">Acquire Formulation</button>
+      </div>
+      <div class="hp52-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp52-bs__img' }}
+        <h3 class="hp52-bs__title">Sicilian Terracotta Purifying Mask</h3>
+        <div class="hp52-bs__price">$52.00 USD</div>
+        <button class="hp52-bs__btn">Acquire Formulation</button>
+      </div>
+      <div class="hp52-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp52-bs__img' }}
+        <h3 class="hp52-bs__title">Amalfi Wild Honey Barrier Crème</h3>
+        <div class="hp52-bs__price">$72.00 USD</div>
+        <button class="hp52-bs__btn">Acquire Formulation</button>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP52 - Terra Best",
+  "class": "section-hp52-bestsellers",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F7EFE6" },
+    { "type": "color", "id": "accent_terra", "label": "Terracotta Accent", "default": "#C2593F" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Coveted Mediterranean Classics" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Revered for reviving dry, stressed complexions." },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Tuscan Olive Squalane Face Nectar" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$64.00 USD" },
+        { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Acquire Formulation" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP52 - Terra Best" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,267 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp47-fc-bg: {{ section.settings.bg_color | default: '#F5F0EB' }};
+    --hp47-fc-card: {{ section.settings.card_bg | default: '#FAF7F2' }};
+    --hp47-fc-border: {{ section.settings.border_color | default: '#EAE3DA' }};
+    --hp47-fc-title: {{ section.settings.title_color | default: '#382E2B' }};
+    --hp47-fc-accent: {{ section.settings.accent_color | default: '#8C6D58' }};
+    
+    background-color: var(--hp47-fc-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp47-fc__wrapper {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp47-fc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+
+  .hp47-fc__heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4.5vw, 44px);
+    font-weight: 600;
+    color: var(--hp47-fc-title);
+    margin: 0;
+  }
+
+  .hp47-fc__view-all {
+    color: var(--hp47-fc-title);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hp47-fc__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp47-card {
+    background: var(--hp47-fc-card);
+    border: 1px solid var(--hp47-fc-border);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(56, 46, 43, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp47-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(56, 46, 43, 0.09);
+  }
+
+  .hp47-card__media {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+    background: #EAE3DA;
+  }
+
+  .hp47-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .hp47-card:hover .hp47-card__img { transform: scale(1.04); }
+
+  .hp47-card__badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: #382E2B;
+    color: #FAF7F2;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 50px;
+  }
+
+  .hp47-card__body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .hp47-card__tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hp47-fc-accent);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .hp47-card__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--hp47-fc-title);
+    margin: 0 0 8px;
+  }
+
+  .hp47-card__price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hp47-fc-accent);
+    margin-bottom: 16px;
+  }
+
+  .hp47-card__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 13px;
+    background: #382E2B;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .hp47-card__btn:hover { background: var(--hp47-fc-accent); }
+
+  @media screen and (max-width: 992px) {
+    .hp47-fc__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  }
+{%- endstyle -%}
+
+<div class="hp47-fc__wrapper">
+  <div class="hp47-fc__header">
+    <h2 class="hp47-fc__heading">{{ section.settings.heading | default: 'The Warm Linen & Oat Collection' }}</h2>
+    <a href="{{ section.settings.view_all_url | default: '/collections/all' }}" class="hp47-fc__view-all">
+      {{ section.settings.view_all_text | default: 'View All Formulations &rarr;' }}
+    </a>
+  </div>
+
+  <div class="hp47-fc__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp47-card" {{ block.shopify_attributes }}>
+          <div class="hp47-card__media">
+            {%- if block.settings.badge != blank -%}
+              <span class="hp47-card__badge">{{ block.settings.badge }}</span>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              <img src="{{ block.settings.image | image_url: width: 600 }}" class="hp47-card__img" alt="{{ block.settings.title }}" loading="lazy">
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'hp47-card__img' }}
+            {%- endif -%}
+          </div>
+          <div class="hp47-card__body">
+            <span class="hp47-card__tag">{{ block.settings.tag | default: 'BARRIER CARE' }}</span>
+            <h3 class="hp47-card__title">{{ block.settings.title }}</h3>
+            <div class="hp47-card__price">{{ block.settings.price | default: '$58.00 USD' }}</div>
+            <button class="hp47-card__btn">{{ block.settings.btn_text | default: 'Add to Bag' }}</button>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp47-card">
+        <div class="hp47-card__media">
+          <span class="hp47-card__badge">Bestseller</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp47-card__img' }}
+        </div>
+        <div class="hp47-card__body">
+          <span class="hp47-card__tag">BARRIER HEALING</span>
+          <h3 class="hp47-card__title">Nordic Oat &amp; Flax Barrier Balm</h3>
+          <div class="hp47-card__price">$58.00 USD</div>
+          <button class="hp47-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp47-card">
+        <div class="hp47-card__media">
+          <span class="hp47-card__badge">New Harvest</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp47-card__img' }}
+        </div>
+        <div class="hp47-card__body">
+          <span class="hp47-card__tag">DEEP HYDRATION</span>
+          <h3 class="hp47-card__title">Pristine Birch Sap Essence</h3>
+          <div class="hp47-card__price">$48.00 USD</div>
+          <button class="hp47-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp47-card">
+        <div class="hp47-card__media">
+          {{ 'product-1' | placeholder_svg_tag: 'hp47-card__img' }}
+        </div>
+        <div class="hp47-card__body">
+          <span class="hp47-card__tag">VELVET RESTORE</span>
+          <h3 class="hp47-card__title">Warm Taupe Cashmere Cream</h3>
+          <div class="hp47-card__price">$64.00 USD</div>
+          <button class="hp47-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp47-card">
+        <div class="hp47-card__media">
+          <span class="hp47-card__badge">Award Winner</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp47-card__img' }}
+        </div>
+        <div class="hp47-card__body">
+          <span class="hp47-card__tag">SOOTHING RITUAL</span>
+          <h3 class="hp47-card__title">Organic Linen Comfort Mask</h3>
+          <div class="hp47-card__price">$52.00 USD</div>
+          <button class="hp47-card__btn">Add to Bag</button>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP47 - Taupe Grid",
+  "class": "section-hp47-grid",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F0EB" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FAF7F2" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#EAE3DA" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#382E2B" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#8C6D58" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Warm Linen & Oat Collection" },
+    { "type": "text", "id": "view_all_text", "label": "View All Text", "default": "View All Formulations →" },
+    { "type": "url", "id": "view_all_url", "label": "View All URL" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Bestseller" },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "BARRIER CARE" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Nordic Oat & Flax Barrier Balm" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$58.00 USD" },
+        { "type": "text", "id": "btn_text", "label": "Button Label", "default": "Add to Bag" },
+        { "type": "url", "id": "url", "label": "Product Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP47 - Taupe Grid" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,285 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+  assign transparent_header = section.settings.transparent_header | default: false
+-%}
+
+<style>
+  :root {
+    --hp8-header-height: 80px;
+  }
+
+  #shopify-section-{{ section_id }} {
+    {% if transparent_header %}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: transparent;
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    {% else %}
+      position: relative;
+      background-color: {{ bg_color }};
+      color: {{ text_color }};
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    {% endif %}
+    z-index: 99;
+    height: var(--hp8-header-height);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  #shopify-section-{{ section_id }}.is-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-bottom: none;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  #shopify-section-{{ section_id }}.is-sticky.scrolled-down {
+    transform: translateY(0);
+  }
+  
+  .hp8-header-container-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 40px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .hp8-header-nav-{{ section_id }} {
+    flex: 1;
+    display: flex;
+    gap: 30px;
+  }
+  
+  .hp8-header-nav-link-{{ section_id }} {
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+  }
+  
+  .hp8-header-nav-link-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  
+  .hp8-header-nav-link-{{ section_id }}:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  
+  .hp8-header-logo-{{ section_id }} {
+    flex: 0 0 auto;
+    text-align: center;
+  }
+  
+  .hp8-header-logo-link-{{ section_id }} {
+    color: inherit;
+    text-decoration: none;
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  
+  .hp8-header-icons-{{ section_id }} {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 25px;
+  }
+  
+  .hp8-header-icon-{{ section_id }} {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .hp8-header-icon-{{ section_id }}:hover {
+    transform: scale(1.1);
+  }
+  
+  .hp8-header-icon-{{ section_id }} svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  .hp8-header-mobile-toggle-{{ section_id }} {
+    display: none;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .hp8-header-mobile-toggle-{{ section_id }} svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  @media (max-width: 992px) {
+    .hp8-header-container-{{ section_id }} {
+      padding: 0 20px;
+    }
+    .hp8-header-nav-{{ section_id }} {
+      display: none;
+    }
+    .hp8-header-mobile-toggle-{{ section_id }} {
+      display: block;
+      flex: 1;
+      text-align: left;
+    }
+    .hp8-header-icons-{{ section_id }} .hp8-hide-mobile {
+      display: none;
+    }
+  }
+</style>
+
+<div class="hp8-header-container-{{ section_id }}">
+  <!-- Mobile Toggle -->
+  <button class="hp8-header-mobile-toggle-{{ section_id }}" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+
+  <!-- Desktop Nav -->
+  <nav class="hp8-header-nav-{{ section_id }}">
+    {% if section.settings.menu != blank %}
+      {% for link in linklists[section.settings.menu].links %}
+        <a href="{{ link.url }}" class="hp8-header-nav-link-{{ section_id }}">{{ link.title }}</a>
+      {% endfor %}
+    {% else %}
+      <a href="#" class="hp8-header-nav-link-{{ section_id }}">New In</a>
+      <a href="#" class="hp8-header-nav-link-{{ section_id }}">Designers</a>
+      <a href="#" class="hp8-header-nav-link-{{ section_id }}">Clothing</a>
+      <a href="#" class="hp8-header-nav-link-{{ section_id }}">Accessories</a>
+    {% endif %}
+  </nav>
+
+  <!-- Logo -->
+  <div class="hp8-header-logo-{{ section_id }}">
+    <a href="/" class="hp8-header-logo-link-{{ section_id }}">
+      {% if section.settings.logo_text != blank %}
+        {{ section.settings.logo_text }}
+      {% else %}
+        {{ shop.name }}
+      {% endif %}
+    </a>
+  </div>
+
+  <!-- Icons -->
+  <div class="hp8-header-icons-{{ section_id }}">
+    <a href="/search" class="hp8-header-icon-{{ section_id }} hp8-hide-mobile" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </a>
+    <a href="/account" class="hp8-header-icon-{{ section_id }} hp8-hide-mobile" aria-label="Account">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </a>
+    {% render 'search-bar', compact: true %}
+    {% render 'wishlist-icon' %}
+    <a href="/cart" data-cart-open class="hp8-header-icon-{{ section_id }}" aria-label="Cart">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('shopify-section-{{ section_id }}');
+    const scrollThreshold = 150;
+    
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > scrollThreshold) {
+        header.classList.add('is-sticky');
+        // Small delay to allow transform to work smoothly
+        setTimeout(() => {
+          header.classList.add('scrolled-down');
+        }, 10);
+      } else {
+        header.classList.remove('scrolled-down');
+        header.classList.remove('is-sticky');
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP8 Header",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_header",
+      "label": "Transparent on Desktop (Overlaps Hero)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "default": "LUXURIA"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main Menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 Header"
+    }
+  ]
+}
+{% endschema %}

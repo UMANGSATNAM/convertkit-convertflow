@@ -1,0 +1,384 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    --shadow-offset: 8px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp23-cat-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-cat-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp23-cat-tiles__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    padding-bottom: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-cat-tiles__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp23-cat-tiles__title {
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+  
+  .hp23-cat-tiles__title em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text-color);
+  }
+
+  .hp23-cat-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(300px, auto);
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp23-cat-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(250px, auto);
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp23-cat-tiles__grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: minmax(300px, auto);
+    }
+  }
+
+  .hp23-cat-tile {
+    position: relative;
+    background: #ffffff;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hp23-cat-tile:hover {
+    transform: translate(2px, 2px);
+    box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+  }
+
+  .hp23-cat-tile:nth-child(1) { grid-column: span 8; }
+  .hp23-cat-tile:nth-child(2) { grid-column: span 4; }
+  .hp23-cat-tile:nth-child(3) { grid-column: span 4; }
+  .hp23-cat-tile:nth-child(4) { grid-column: span 8; }
+
+  @media screen and (max-width: 992px) {
+    .hp23-cat-tile:nth-child(1),
+    .hp23-cat-tile:nth-child(2),
+    .hp23-cat-tile:nth-child(3),
+    .hp23-cat-tile:nth-child(4) {
+      grid-column: span 1;
+    }
+    .hp23-cat-tile:nth-child(1) { grid-column: span 2; } /* Keep first one full width on tablet */
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp23-cat-tile:nth-child(n) {
+      grid-column: span 1;
+    }
+  }
+
+  .hp23-cat-tile__image {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(1.1) grayscale(0.1);
+    transition: transform 0.4s ease;
+  }
+  
+  .hp23-cat-tile:hover .hp23-cat-tile__image {
+    transform: scale(1.03);
+  }
+
+  .hp23-cat-tile__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.2);
+    transition: background 0.4s ease;
+  }
+  
+  .hp23-cat-tile:hover .hp23-cat-tile__overlay {
+    background: rgba(0,0,0,0.4);
+  }
+
+  .hp23-cat-tile__content {
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+
+  .hp23-cat-tile__label {
+    background: var(--text-color);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 2px solid var(--border-color);
+    box-shadow: 3px 3px 0 var(--border-color);
+    margin-bottom: 12px;
+  }
+
+  /* Specific color overrides for tile labels if chosen */
+  .hp23-cat-tile:nth-child(odd) .hp23-cat-tile__label {
+    background: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .hp23-cat-tile__title {
+    background: #ffffff;
+    color: var(--text-color);
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: 900;
+    margin: 0;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    border: 2px solid var(--border-color);
+    box-shadow: 4px 4px 0 var(--border-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp23-cat-tiles-wrapper" id="HP23CatTiles-{{ section.id }}">
+  
+  {%- if section.settings.title != blank -%}
+    <div class="hp23-cat-tiles__header">
+      <h2 class="hp23-cat-tiles__title">{{ section.settings.title }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hp23-cat-tiles__grid">
+    {%- for block in section.blocks limit: 4 -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp23-cat-tile" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.title | escape }}" class="hp23-cat-tile__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;position:absolute;">IMG</div>
+        {%- endif -%}
+        
+        <div class="hp23-cat-tile__overlay"></div>
+        
+        <div class="hp23-cat-tile__content">
+          <div class="hp23-cat-tile__label">EXPLORE</div>
+          <h3 class="hp23-cat-tile__title">{{ block.settings.title | escape }}</h3>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist CatTiles",
+  "class": "section-hp23-category-tiles",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>SHOP BY <em>CATEGORY</em></p>"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Section Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#39FF14"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "CATEGORY NAME"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist CatTiles",
+      "blocks": [
+        { "type": "category", "settings": { "title": "CLEANSERS" } },
+        { "type": "category", "settings": { "title": "SERUMS" } },
+        { "type": "category", "settings": { "title": "MASKS" } },
+        { "type": "category", "settings": { "title": "MOISTURIZERS" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,308 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#0f0f13'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ff88'
+-%}
+
+<style>
+  :root {
+    --hp9-header-height: 90px;
+  }
+
+  #shopify-section-{{ section_id }} {
+    position: relative;
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    z-index: 99;
+    height: var(--hp9-header-height);
+    font-family: 'Inter', sans-serif;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  #shopify-section-{{ section_id }}.is-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(15, 15, 19, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  #shopify-section-{{ section_id }}.is-sticky.scrolled-down {
+    transform: translateY(0);
+  }
+  
+  .hp9-header-container-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .hp9-header-logo-{{ section_id }} {
+    flex: 0 0 auto;
+  }
+  
+  .hp9-header-logo-link-{{ section_id }} {
+    color: {{ text_color }};
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .hp9-header-logo-link-{{ section_id }} span {
+    color: {{ accent_color }};
+  }
+  
+  .hp9-header-nav-{{ section_id }} {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+  }
+  
+  .hp9-header-nav-link-{{ section_id }} {
+    color: {{ text_color | color_modify: 'alpha', 0.8 }};
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    position: relative;
+    padding: 10px 0;
+  }
+  
+  .hp9-header-nav-link-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: {{ accent_color }};
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 10px {{ accent_color }};
+  }
+  
+  .hp9-header-nav-link-{{ section_id }}:hover {
+    color: {{ text_color }};
+  }
+  
+  .hp9-header-nav-link-{{ section_id }}:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  
+  .hp9-header-icons-{{ section_id }} {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+  
+  .hp9-header-icon-{{ section_id }} {
+    color: {{ text_color }};
+    text-decoration: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: color 0.3s ease;
+  }
+  
+  .hp9-header-icon-{{ section_id }}:hover {
+    color: {{ accent_color }};
+  }
+  
+  .hp9-header-icon-{{ section_id }} svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  
+  .hp9-header-cart-count-{{ section_id }} {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: {{ accent_color }};
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px; /* Techy squircle instead of perfect circle */
+  }
+
+  .hp9-header-mobile-toggle-{{ section_id }} {
+    display: none;
+    background: none;
+    border: none;
+    color: {{ text_color }};
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 24px;
+    position: relative;
+  }
+  
+  .hp9-header-mobile-toggle-{{ section_id }} span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    position: absolute;
+    transition: all 0.3s ease;
+  }
+  
+  .hp9-header-mobile-toggle-{{ section_id }} span:nth-child(1) { top: 0; }
+  .hp9-header-mobile-toggle-{{ section_id }} span:nth-child(2) { top: 11px; }
+  .hp9-header-mobile-toggle-{{ section_id }} span:nth-child(3) { bottom: 0; }
+
+  @media (max-width: 992px) {
+    .hp9-header-container-{{ section_id }} {
+      padding: 0 20px;
+    }
+    .hp9-header-nav-{{ section_id }} {
+      display: none;
+    }
+    .hp9-header-mobile-toggle-{{ section_id }} {
+      display: block;
+    }
+    .hp9-header-icons-{{ section_id }} .hp9-hide-mobile {
+      display: none;
+    }
+  }
+</style>
+
+<div class="hp9-header-container-{{ section_id }}">
+  <!-- Mobile Toggle -->
+  <button class="hp9-header-mobile-toggle-{{ section_id }}" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Logo -->
+  <div class="hp9-header-logo-{{ section_id }}">
+    <a href="/" class="hp9-header-logo-link-{{ section_id }}">
+      {% if section.settings.logo_text != blank %}
+        {{ section.settings.logo_text }}<span>.SYS</span>
+      {% else %}
+        {{ shop.name }}<span>.SYS</span>
+      {% endif %}
+    </a>
+  </div>
+
+  <!-- Desktop Nav -->
+  <nav class="hp9-header-nav-{{ section_id }}">
+    {% if section.settings.menu != blank %}
+      {% for link in linklists[section.settings.menu].links %}
+        <a href="{{ link.url }}" class="hp9-header-nav-link-{{ section_id }}">{{ link.title }}</a>
+      {% endfor %}
+    {% else %}
+      <a href="#" class="hp9-header-nav-link-{{ section_id }}">Hardware</a>
+      <a href="#" class="hp9-header-nav-link-{{ section_id }}">Accessories</a>
+      <a href="#" class="hp9-header-nav-link-{{ section_id }}">Software</a>
+      <a href="#" class="hp9-header-nav-link-{{ section_id }}">Support</a>
+    {% endif %}
+  </nav>
+
+  <!-- Icons -->
+  <div class="hp9-header-icons-{{ section_id }}">
+    <a href="/search" class="hp9-header-icon-{{ section_id }} hp9-hide-mobile" aria-label="Search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </a>
+    <a href="/account" class="hp9-header-icon-{{ section_id }} hp9-hide-mobile" aria-label="Account">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    </a>
+    {% render 'search-bar', compact: true %}
+    {% render 'wishlist-icon' %}
+    <a href="/cart" data-cart-open class="hp9-header-icon-{{ section_id }}" aria-label="Cart">
+      <svg viewBox="0 0 24 24"><path d="M19 8h-3V6c0-2.21-1.79-4-4-4S8 3.79 8 6v2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM10 6c0-1.1.9-2 2-2s2 .9 2 2v2h-4V6zm9 14H5V10h14v10z"/></svg>
+      <span class="hp9-header-cart-count-{{ section_id }}">0</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('shopify-section-{{ section_id }}');
+    const scrollThreshold = 100;
+    
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > scrollThreshold) {
+        header.classList.add('is-sticky');
+        setTimeout(() => {
+          header.classList.add('scrolled-down');
+        }, 10);
+      } else {
+        header.classList.remove('scrolled-down');
+        header.classList.remove('is-sticky');
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP9 Header",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0f0f13"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ff88"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "default": "NEON"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main Menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Header"
+    }
+  ]
+}
+{% endschema %}

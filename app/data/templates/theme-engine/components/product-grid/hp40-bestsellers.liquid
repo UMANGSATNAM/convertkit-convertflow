@@ -1,0 +1,256 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp40-bs-wrapper {
+    /* Full width, grid structures */
+  }
+
+  .hp40-bs__header {
+    padding: 60px 40px;
+    border-bottom: 2px solid var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp40-bs__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 40px 20px;
+    }
+  }
+
+  .hp40-bs__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  
+  .hp40-bs__meta {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  /* List approach instead of cards */
+  .hp40-bs__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp40-bs__item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto auto;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 2px solid var(--text-color);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: background 0.3s ease, color 0.3s ease;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp40-bs__item {
+      grid-template-columns: 40px 1fr auto;
+      padding: 20px;
+      gap: 15px;
+    }
+    .hp40-bs__item-image-wrap {
+      display: none !important;
+    }
+  }
+
+  .hp40-bs__item:last-child {
+    border-bottom: none;
+  }
+
+  .hp40-bs__item:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hp40-bs__index {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .hp40-bs__item-title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .hp40-bs__item-price {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    padding-right: 40px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp40-bs__item-price {
+      padding-right: 0;
+    }
+  }
+
+  .hp40-bs__item-image-wrap {
+    width: 60px;
+    height: 60px;
+    background: var(--accent-color);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.3s ease;
+  }
+
+  .hp40-bs__item:hover .hp40-bs__item-image-wrap {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .hp40-bs__item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    filter: grayscale(100%);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp40-bs-wrapper" id="HP40Bestsellers-{{ section.id }}">
+  <div class="hp40-bs__header">
+    <h2 class="hp40-bs__title">{{ section.settings.title }}</h2>
+    <div class="hp40-bs__meta">INDEX: TOP TIER</div>
+  </div>
+
+  <div class="hp40-bs__list">
+    {%- assign collection = collections[section.settings.collection] -%}
+    {%- if collection != blank and collection.products_count > 0 -%}
+      {%- for product in collection.products limit: section.settings.limit -%}
+        <a href="{{ product.url }}" class="hp40-bs__item">
+          <div class="hp40-bs__index">0{{ forloop.index }}</div>
+          <h3 class="hp40-bs__item-title">{{ product.title }}</h3>
+          <div class="hp40-bs__item-price">{{ product.price | money }}</div>
+          <div class="hp40-bs__item-image-wrap">
+            <img src="{{ product.featured_image | image_url: width: 200 }}" alt="{{ product.title | escape }}" class="hp40-bs__item-image" loading="lazy">
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..section.settings.limit) -%}
+        <a href="#" class="hp40-bs__item">
+          <div class="hp40-bs__index">0{{ i }}</div>
+          <h3 class="hp40-bs__item-title">STANDARD ITEM NO. {{ i }}</h3>
+          <div class="hp40-bs__item-price">$100.00</div>
+          <div class="hp40-bs__item-image-wrap">
+            {{ 'product-' | append: i | placeholder_svg_tag: 'hp40-bs__item-image' }}
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP40 - Swiss Bestsellers",
+  "class": "section-hp40-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "PRIMARY SELECTION"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "Product Limit",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Swiss Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Lines",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Hover Image Background",
+      "default": "#E21833"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP40 - Swiss Bestsellers"
+    }
+  ]
+}
+{% endschema %}

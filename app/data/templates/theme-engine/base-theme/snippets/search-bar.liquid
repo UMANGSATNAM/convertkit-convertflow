@@ -1,0 +1,92 @@
+{%- comment -%}
+  Search field with live product suggestions (assets/predictive-search.js).
+
+  Usage:
+    {% render 'search-bar' %}
+    {% render 'search-bar', class: 'hp7-search', placeholder: 'Search skincare…' %}
+    {% render 'search-bar', compact: true %}   {# icon-width field that expands on focus #}
+
+  Params (all optional):
+    class        extra class so each header keeps its own styling
+    placeholder  field placeholder
+    limit        max suggestions, default 6
+
+  Falls back to a normal /search submit if JS is unavailable.
+{%- endcomment -%}
+
+{%- liquid
+  assign sb_class = class | default: ''
+  assign sb_placeholder = placeholder | default: 'Search products'
+  assign sb_limit = limit | default: 6
+-%}
+
+<form class="cf-search {{ sb_class }}{% if compact %} cf-search--compact{% endif %}"
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search">
+  <label class="cf-search__label" for="cf-search-{{ section.id }}">{{ sb_placeholder }}</label>
+  <svg class="cf-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+    <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+  </svg>
+  <input
+    class="cf-search__input"
+    id="cf-search-{{ section.id }}"
+    type="search"
+    name="q"
+    value="{{ search.terms | escape }}"
+    placeholder="{{ sb_placeholder }}"
+    data-predictive-search
+    data-predictive-limit="{{ sb_limit }}">
+</form>
+
+{%- unless search_bar_styles -%}
+  {%- assign search_bar_styles = true -%}
+  <style>
+    .cf-search {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 auto;
+      max-width: 460px;
+      color: inherit;
+    }
+    .cf-search__label {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .cf-search__icon {
+      position: absolute;
+      left: 12px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .cf-search__input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 14px 10px 38px;
+      font: inherit;
+      font-size: 14px;
+      color: inherit;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 99px;
+      outline: none;
+    }
+    .cf-search__input::placeholder { opacity: 0.6; color: inherit; }
+    .cf-search__input:focus { border-color: currentColor; background: rgba(0, 0, 0, 0.02); }
+    .cf-search__input::-webkit-search-cancel-button { cursor: pointer; }
+
+    .cf-search--compact { max-width: 44px; transition: max-width 0.25s ease; }
+    .cf-search--compact:focus-within { max-width: 320px; }
+
+    @media screen and (max-width: 749px) {
+      .cf-search { max-width: 100%; }
+      .cf-search__input { font-size: 16px; }
+      .cf-search--compact, .cf-search--compact:focus-within { max-width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cf-search--compact { transition: none; }
+    }
+  </style>
+{%- endunless -%}

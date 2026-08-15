@@ -1,0 +1,227 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --font-heading: 'Cormorant Garamond', serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .hp26-marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+
+  .hp26-marquee__track {
+    display: flex;
+    align-items: center;
+    animation: hp26Marquee {{ section.settings.speed }}s linear infinite;
+  }
+
+  .hp26-marquee__track.reverse {
+    animation-direction: reverse;
+  }
+
+  .hp26-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-marquee__item {
+      padding: 0 20px;
+    }
+  }
+
+  .hp26-marquee__text {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, {{ section.settings.text_size }}px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-color);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  /* Elegant separator dot */
+  .hp26-marquee__separator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    opacity: 0.3;
+  }
+
+  @keyframes hp26Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* Accessibility pause */
+  @media (prefers-reduced-motion: reduce) {
+    .hp26-marquee__track {
+      animation: none;
+    }
+  }
+  
+  .hp26-marquee-wrapper:hover .hp26-marquee__track {
+    animation-play-state: paused;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-marquee-wrapper" id="HP26Marquee-{{ section.id }}">
+  <!-- Duplicate tracks for seamless looping -->
+  {%- for i in (1..3) -%}
+    <div class="hp26-marquee__track {% if section.settings.direction == 'right' %}reverse{% endif %}" aria-hidden="{% if forloop.index > 1 %}true{% else %}false{% endif %}">
+      {%- for block in section.blocks -%}
+        <div class="hp26-marquee__item" {{ block.shopify_attributes }}>
+          <span class="hp26-marquee__text">{{ block.settings.text }}</span>
+        </div>
+        <div class="hp26-marquee__item">
+          <div class="hp26-marquee__separator"></div>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Marquee",
+  "class": "section-hp26-marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Settings"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 16,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#E0D5C1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Mindfully Crafted"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Mindfully Crafted" } },
+        { "type": "text", "settings": { "text": "Sustainable Materials" } },
+        { "type": "text", "settings": { "text": "Ethically Sourced" } },
+        { "type": "text", "settings": { "text": "Timeless Design" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

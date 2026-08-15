@@ -1,0 +1,193 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#0A0A0A'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+  }
+  
+  .hp17-cl-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp17-cl-header-{{ section_id }} {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hp17-cl-heading-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    text-transform: uppercase;
+    color: #FFF;
+    margin: 0;
+    letter-spacing: 2px;
+  }
+  
+  .hp17-cl-heading-{{ section_id }} span {
+    color: #B800FF;
+  }
+  
+  .hp17-cl-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .hp17-cl-card-{{ section_id }} {
+    position: relative;
+    text-decoration: none;
+    display: block;
+    background: #000;
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .hp17-cl-card-{{ section_id }}::before {
+    content: '';
+    position: absolute;
+    top: 5px; left: 5px; right: 5px; bottom: 5px;
+    border: 1px dashed rgba(0, 255, 65, 0.3);
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .hp17-cl-card-{{ section_id }}:hover {
+    border-color: #00FF41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+  }
+  
+  .hp17-cl-image-wrap-{{ section_id }} {
+    position: relative;
+    padding-top: 120%;
+  }
+  
+  .hp17-cl-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    filter: sepia(50%) hue-rotate(180deg) contrast(120%);
+    transition: all 0.5s ease;
+  }
+  
+  .hp17-cl-card-{{ section_id }}:hover .hp17-cl-image-{{ section_id }} {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.05);
+  }
+  
+  .hp17-cl-content-{{ section_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #00FF41;
+    padding: 15px;
+    z-index: 3;
+    text-align: center;
+    backdrop-filter: blur(5px);
+  }
+  
+  .hp17-cl-title-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #00FF41;
+    margin: 0;
+    letter-spacing: 2px;
+  }
+
+  @media (max-width: 992px) {
+    .hp17-cl-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp17-cl-container-{{ section_id }}">
+  <div class="hp17-cl-header-{{ section_id }}">
+    <h2 class="hp17-cl-heading-{{ section_id }}">SECTOR <span>DATA</span></h2>
+  </div>
+  
+  <div class="hp17-cl-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 3 %}
+      {% assign collection = collections[block.settings.collection] %}
+      <a href="{{ collection.url | default: '#' }}" class="hp17-cl-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp17-cl-image-wrap-{{ section_id }}">
+          {% if block.settings.image != blank %}
+            <img src="{{ block.settings.image | image_url: width: 800 }}" class="hp17-cl-image-{{ section_id }}" loading="lazy" alt="Collection">
+          {% elsif collection.image != blank %}
+            <img src="{{ collection.image | image_url: width: 800 }}" class="hp17-cl-image-{{ section_id }}" loading="lazy" alt="{{ collection.title }}">
+          {% else %}
+            <div class="hp17-cl-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+          {% endif %}
+        </div>
+        <div class="hp17-cl-content-{{ section_id }}">
+          <h3 class="hp17-cl-title-{{ section_id }}">{{ block.settings.title | default: collection.title | default: 'SECTOR' }}</h3>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP17 Collection List",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0A0A0A"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP17 Collection List",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

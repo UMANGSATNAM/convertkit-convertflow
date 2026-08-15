@@ -1,0 +1,53 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0A1628' }};
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+  .hp54-pills__container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .hp54-pills__scroll { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; justify-content: center; flex-wrap: wrap; }
+  .hp54-pills__scroll::-webkit-scrollbar { display: none; }
+  .hp54-pills__pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px;
+    background: {{ section.settings.pill_bg | default: '#111D33' }};
+    border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px;
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    color: {{ section.settings.pill_text | default: '#E0E7FF' }};
+    text-decoration: none; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .hp54-pills__pill:hover { background: #3B82F6; color: #FFFFFF; border-color: #3B82F6; }
+  @media screen and (max-width: 768px) { .hp54-pills__scroll { justify-content: flex-start; flex-wrap: nowrap; } }
+{%- endstyle -%}
+<div class="hp54-pills__container">
+  <div class="hp54-pills__scroll">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '#' }}" class="hp54-pills__pill" {{ block.shopify_attributes }}>
+        {%- if block.settings.icon != blank -%}<span>{{ block.settings.icon }}</span>{%- endif -%}
+        <span>{{ block.settings.label | default: 'Category' }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP54 Categories",
+  "class": "section-hp54-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0A1628" },
+    { "type": "color", "id": "pill_bg", "label": "Pill BG", "default": "#111D33" },
+    { "type": "color", "id": "pill_text", "label": "Pill Text", "default": "#E0E7FF" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Padding", "default": 35 }
+  ],
+  "blocks": [{ "type": "pill", "name": "Category", "settings": [
+    { "type": "text", "id": "icon", "label": "Icon", "default": "◆" },
+    { "type": "text", "id": "label", "label": "Label", "default": "Serums" },
+    { "type": "url", "id": "url", "label": "URL" }
+  ]}],
+  "presets": [{ "name": "HP54 - Sapphire Categories", "blocks": [
+    { "type": "pill", "settings": { "icon": "💎", "label": "Serums" } },
+    { "type": "pill", "settings": { "icon": "🌊", "label": "Hydrators" } },
+    { "type": "pill", "settings": { "icon": "🌙", "label": "Night Care" } },
+    { "type": "pill", "settings": { "icon": "❄️", "label": "Cryo" } },
+    { "type": "pill", "settings": { "icon": "◆", "label": "Eye Care" } }
+  ]}]
+}
+{% endschema %}

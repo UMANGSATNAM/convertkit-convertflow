@@ -1,33 +1,303 @@
-<div class="sf-product-section bundle" id="product-12" style="padding: 60px 20px; background-color: {{ section.settings.bg_color }};">
-  <div style="text-align: center; margin-bottom: 40px;">
-    <h2 style="font-size: 2.2rem; color: {{ section.settings.heading_color }};">{{ section.settings.title }}</h2>
-  </div>
+{%- assign product = all_products[section.settings.product] | default: product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  .sf-pdp-{{ section.id }} {
+    --primary-color: {{ section.settings.primary_color }};
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --border-color: #cbd5e1;
+    --radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  .sf-pdp-{{ section.id }} * { box-sizing: inherit; }
+  .sf-pdp-container { max-width: 1200px; margin: 0 auto; }
   
-  {% if section.settings.product != blank %}
-    {% assign product = all_products[section.settings.product] %}
-    <div style="display: flex; gap: 40px; align-items: center; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 300px;">
-        <img src="{{ product.featured_image | img_url: '800x' }}" alt="{{ product.title }}" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
-      </div>
-      <div style="flex: 1; min-width: 300px; padding: 20px;">
-        <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: {{ section.settings.heading_color }};">{{ product.title }}</h3>
-        <p style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: {{ section.settings.primary_color }};">{{ product.price | money }}</p>
-        <div style="margin-bottom: 30px; line-height: 1.6; color: #666;">
-          {{ product.description | strip_html | truncatewords: 30 }}
+  .sf-pdp-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+  @media(min-width: 900px) {
+    .sf-pdp-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
+  }
+
+  /* Gallery */
+  .sf-gallery-main { position: relative; border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; background: #f8fafc; border: 1px solid var(--border-color); }
+  .sf-gallery-main img { width: 100%; height: auto; display: block; object-fit: cover; }
+  .sf-gallery-thumbs { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+  .sf-gallery-thumbs::-webkit-scrollbar { display: none; }
+  .sf-thumb-item { flex: 0 0 calc(20% - 10px); border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: all 0.2s ease; }
+  .sf-thumb-item.active, .sf-thumb-item:hover { opacity: 1; border-color: var(--primary-color); }
+  .sf-thumb-item img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1/1; }
+
+  /* Details */
+  .sf-pdp-title { font-size: 2rem; line-height: 1.2; color: var(--heading-color); margin: 0 0 8px 0; font-weight: 800; }
+  .sf-pdp-price-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .sf-pdp-price { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+  .sf-pdp-compare-price { font-size: 1.125rem; color: #94a3b8; text-decoration: line-through; }
+
+  /* Bundle UI */
+  .sf-bundle-container {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .sf-bundle-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: var(--heading-color);
+  }
+  .sf-bundle-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sf-bundle-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sf-bundle-option.selected {
+    border-color: var(--primary-color);
+    background: #eff6ff;
+  }
+  .sf-bundle-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sf-bundle-radio {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sf-bundle-option.selected .sf-bundle-radio {
+    border-color: var(--primary-color);
+  }
+  .sf-bundle-option.selected .sf-bundle-radio::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--primary-color);
+    border-radius: 50%;
+  }
+  .sf-bundle-name { font-weight: 600; color: var(--heading-color); font-size: 1rem; }
+  .sf-bundle-discount { background: #ef4444; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-left: 8px; }
+  .sf-bundle-price { font-weight: 700; color: var(--heading-color); font-size: 1.125rem; }
+
+  /* Form & CTA */
+  .sf-variant-group { margin-bottom: 24px; }
+  .sf-variant-label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+  .sf-variant-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sf-variant-option { padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.95rem; }
+  .sf-variant-option.selected { border-color: var(--primary-color); background: var(--primary-color); color: #fff; }
+
+  .sf-action-group { margin-bottom: 32px; }
+  .sf-add-to-cart { width: 100%; background: var(--primary-color); color: #fff; border: none; border-radius: 8px; font-size: 1.125rem; font-weight: 700; cursor: pointer; height: 60px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+  .sf-add-to-cart:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(0,0,0,0.2); }
+  .sf-add-to-cart:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+</style>
+
+<div class="sf-pdp-{{ section.id }}">
+  <div class="sf-pdp-container">
+    {% if product != blank %}
+      <div class="sf-pdp-grid">
+        
+        <!-- Media Gallery -->
+        <div class="sf-media-wrapper">
+          <div class="sf-gallery-main" id="sf-main-image-{{ section.id }}">
+            <img src="{{ current_variant.featured_image | default: product.featured_image | img_url: '1000x' }}" alt="{{ product.title | escape }}" id="sf-image-el-{{ section.id }}">
+          </div>
+          {% if product.images.size > 1 %}
+            <div class="sf-gallery-thumbs">
+              {% for image in product.images %}
+                <div class="sf-thumb-item {% if forloop.first %}active{% endif %}" data-img-url="{{ image | img_url: '1000x' }}" onclick="sfSwitchImage('{{ section.id }}', this)">
+                  <img src="{{ image | img_url: '150x150', crop: 'center' }}" alt="{{ image.alt | escape }}">
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
-        <form action="/cart/add" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
-          <button type="submit" style="width: 100%; padding: 15px; background-color: {{ section.settings.primary_color }}; color: #fff; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">
-            Add to Cart
-          </button>
-        </form>
+
+        <!-- Product Details -->
+        <div class="sf-details-wrapper">
+          <h1 class="sf-pdp-title">{{ product.title }}</h1>
+          
+          <div class="sf-pdp-price-wrapper">
+            <span class="sf-pdp-price" id="sf-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="sf-pdp-compare-price" id="sf-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+            {% endif %}
+          </div>
+
+          <form method="post" action="/cart/add" id="sf-form-{{ section.id }}" accept-charset="UTF-8" enctype="multipart/form-data">
+            <input type="hidden" name="form_type" value="product">
+            <input type="hidden" name="utf8" value="✓">
+            <input type="hidden" name="id" id="sf-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+            <!-- Custom quantity field controlled by bundle UI -->
+            <input type="hidden" name="quantity" id="sf-qty-{{ section.id }}" value="1">
+
+            {% unless product.has_only_default_variant %}
+              <div class="sf-variants-container">
+                {% for option in product.options_with_values %}
+                  <div class="sf-variant-group">
+                    <span class="sf-variant-label">{{ option.name }}</span>
+                    <div class="sf-variant-options" data-option-index="option{{ forloop.index }}">
+                      {% for value in option.values %}
+                        <div class="sf-variant-option {% if option.selected_value == value %}selected{% endif %}" 
+                             data-value="{{ value | escape }}"
+                             onclick="sfSelectOption('{{ section.id }}', this)">
+                          {{ value }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endunless %}
+
+            <!-- Bundle Offer UI -->
+            <div class="sf-bundle-container">
+              <h3 class="sf-bundle-title">Select Quantity & Save</h3>
+              <div class="sf-bundle-options">
+                <div class="sf-bundle-option selected" onclick="sfSelectBundle('{{ section.id }}', 1, this)">
+                  <div class="sf-bundle-left">
+                    <div class="sf-bundle-radio"></div>
+                    <span class="sf-bundle-name">Buy 1</span>
+                  </div>
+                  <span class="sf-bundle-price" id="sf-bundle-price-1-{{ section.id }}"></span>
+                </div>
+                <div class="sf-bundle-option" onclick="sfSelectBundle('{{ section.id }}', 2, this)">
+                  <div class="sf-bundle-left">
+                    <div class="sf-bundle-radio"></div>
+                    <span class="sf-bundle-name">Buy 2 <span class="sf-bundle-discount">10% OFF</span></span>
+                  </div>
+                  <span class="sf-bundle-price" id="sf-bundle-price-2-{{ section.id }}"></span>
+                </div>
+                <div class="sf-bundle-option" onclick="sfSelectBundle('{{ section.id }}', 3, this)">
+                  <div class="sf-bundle-left">
+                    <div class="sf-bundle-radio"></div>
+                    <span class="sf-bundle-name">Buy 3 <span class="sf-bundle-discount">20% OFF</span></span>
+                  </div>
+                  <span class="sf-bundle-price" id="sf-bundle-price-3-{{ section.id }}"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sf-action-group">
+              <button type="submit" class="sf-add-to-cart" id="sf-atc-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+                {% if current_variant.available %}Add to Cart - <span id="sf-atc-price-{{ section.id }}">{{ current_variant.price | money }}</span>{% else %}Sold Out{% endif %}
+              </button>
+            </div>
+          </form>
+          
+          <div style="font-size: 1rem; color: #475569; line-height: 1.6; margin-bottom: 24px;">
+            {{ product.description }}
+          </div>
+        </div>
       </div>
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">
-      <p style="font-size: 1.2rem; color: #888;">Select a product in the theme editor to view.</p>
-    </div>
-  {% endif %}
+
+      <script>
+        // Custom JS for Bundle Offer logic
+        window.sfVariants_{{ section.id | replace: '-', '_' }} = [
+          {% for variant in product.variants %}
+            {
+              id: {{ variant.id }},
+              title: {{ variant.title | json }},
+              option1: {{ variant.option1 | json }},
+              option2: {{ variant.option2 | json }},
+              option3: {{ variant.option3 | json }},
+              price: {{ variant.price }},
+              price_formatted: '{{ variant.price | money }}',
+              compare_at_price: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
+              available: {{ variant.available }},
+              featured_image: {% if variant.featured_image %}'{{ variant.featured_image | img_url: "1000x" }}'{% else %}null{% endif %}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ];
+
+        function sfSelectBundle(sectionId, qty, element) {
+          // Update visual selection
+          var options = element.parentNode.children;
+          for (var i=0; i<options.length; i++) {
+            options[i].classList.remove('selected');
+          }
+          element.classList.add('selected');
+          
+          // Update hidden quantity input
+          document.getElementById('sf-qty-' + sectionId).value = qty;
+          
+          // Update ATC button price display based on current variant and bundle qty
+          sfUpdateBundlePrices(sectionId);
+        }
+
+        function sfUpdateBundlePrices(sectionId) {
+          var variantId = parseInt(document.getElementById('sf-variant-id-' + sectionId).value);
+          var variants = window['sfVariants_' + sectionId.replace(/-/g, '_')];
+          var currentVariant = variants.find(function(v) { return v.id === variantId; });
+          if(currentVariant) {
+            var basePrice = currentVariant.price;
+            
+            // Shopify money formatting is tricky client-side without a library, 
+            // so we'll do a simple heuristic for display or just use the base string
+            // For a robust app, we should use Shopify.formatMoney, but here's a fallback:
+            var symbol = '{{ cart.currency.symbol }}';
+            var price1 = (basePrice / 100).toFixed(2);
+            var price2 = ((basePrice * 2 * 0.9) / 100).toFixed(2);
+            var price3 = ((basePrice * 3 * 0.8) / 100).toFixed(2);
+
+            var p1El = document.getElementById('sf-bundle-price-1-' + sectionId);
+            var p2El = document.getElementById('sf-bundle-price-2-' + sectionId);
+            var p3El = document.getElementById('sf-bundle-price-3-' + sectionId);
+            
+            if(p1El) p1El.innerHTML = symbol + price1;
+            if(p2El) p2El.innerHTML = symbol + price2;
+            if(p3El) p3El.innerHTML = symbol + price3;
+
+            // Update ATC button
+            var qty = parseInt(document.getElementById('sf-qty-' + sectionId).value) || 1;
+            var atcPrice = qty === 1 ? price1 : qty === 2 ? price2 : price3;
+            var atcEl = document.getElementById('sf-atc-price-' + sectionId);
+            if(atcEl) atcEl.innerHTML = symbol + atcPrice;
+          }
+        }
+        
+        // Initialize prices on load
+        document.addEventListener('DOMContentLoaded', function() {
+          sfUpdateBundlePrices('{{ section.id }}');
+        });
+        
+        // Override the global sfUpdateVariantUI to also update bundle prices
+        var originalSfUpdateVariantUI = window.sfUpdateVariantUI;
+        window.sfUpdateVariantUI = function(sectionId, variant) {
+          if (originalSfUpdateVariantUI) {
+            originalSfUpdateVariantUI(sectionId, variant);
+          }
+          sfUpdateBundlePrices(sectionId);
+        };
+      </script>
+
+    {% else %}
+      <div style="text-align: center; padding: 100px 20px; border: 1px dashed var(--border-color); border-radius: var(--radius);">
+        <p style="font-size: 1.25rem; color: #64748b;">Select a product in the theme editor.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 {% schema %}
@@ -35,11 +305,16 @@
   "name": "Product Bundle Offer",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Section Title", "default": "Product Bundle Offer" },
     { "type": "product", "id": "product", "label": "Select Product" },
+    { "type": "header", "content": "Colors" },
     { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
-    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "color", "id": "primary_color", "label": "Primary Color", "default": "#000000" }
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#334155" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#0f172a" },
+    { "type": "color", "id": "primary_color", "label": "Primary Button Color", "default": "#2563eb" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Top", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Bottom", "default": 60 },
+    { "type": "range", "id": "padding_horizontal", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Horizontal", "default": 20 }
   ]
 }
 {% endschema %}

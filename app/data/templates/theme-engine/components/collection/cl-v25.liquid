@@ -1,0 +1,97 @@
+{% comment %} CL V25 — Summer Swimwear (Aqua/Orange) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv25 { background: {{ section.settings.bg_color | default: '#E0F7FA' }}; color: {{ section.settings.text_color | default: '#006064' }}; padding: 60px 20px; font-family: 'Poppins', sans-serif; }
+  .clv25-hero { text-align: center; margin-bottom: 50px; background: url('https://cdn.shopify.com/s/files/1/0000/0000/0000/files/wave-bg.png') repeat-x bottom; background-size: contain; padding-bottom: 60px; }
+  .clv25-hero h1 { font-size: 50px; font-weight: 800; color: #FF6F00; margin-bottom: 10px; text-transform: uppercase; }
+  .clv25-hero p { font-size: 18px; font-weight: 500; color: #00838F; max-width: 500px; margin: 0 auto; }
+  .clv25-chips { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv25-chips a { padding: 10px 22px; background: #FFF; color: #FF6F00; font-weight: 700; text-decoration: none; border-radius: 50px; text-transform: uppercase; font-size: 13px; box-shadow: 0 4px 10px rgba(0,96,100,0.1); transition: 0.3s; border: 2px solid transparent; }
+  .clv25-chips a:hover, .clv25-chips a.active { background: #FF6F00; color: #FFF; box-shadow: 0 6px 15px rgba(255,111,0,0.3); border-color: #FFF; }
+  .clv25-toolbar { display: flex; justify-content: space-between; align-items: center; background: #FFF; padding: 20px 30px; border-radius: 50px; margin-bottom: 40px; box-shadow: 0 5px 20px rgba(0,96,100,0.05); }
+  .clv25-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 30px; }
+  .clv25-promo { grid-column: span 1; background: #FF6F00; color: #FFF; border-radius: 20px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(255,111,0,0.2); }
+  .clv25-promo h3 { font-size: 28px; font-weight: 800; margin-bottom: 15px; line-height: 1.1; }
+  .clv25-promo a { display: inline-block; padding: 12px 25px; background: #FFF; color: #FF6F00; text-decoration: none; font-weight: 800; border-radius: 50px; font-size: 14px; text-transform: uppercase; }
+  .clv25-seo { margin-top: 60px; background: #FFF; padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,96,100,0.05); }
+  @media (max-width: 768px) { .clv25-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 20px; } .clv25-toolbar { border-radius: 20px; padding: 15px; } }
+</style>
+<div class="clv25" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv25-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}SUN CHASER{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Dive into our brightest summer styles yet.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv25-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv25-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 700; color: #00838F; text-transform: uppercase;">{{ filter.label }} +</summary>
+              <div style="position: absolute; background: #FFF; padding: 25px; border-radius: 20px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 0 10px 40px rgba(0,96,100,0.15); border: 1px solid #E0F7FA;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #006064; font-weight: 500;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #E0F7FA; border: none; padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 700; color: #00838F; text-transform: uppercase; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv25-grid">
+      {% for product in collection.products %}
+        {% render 'card-v25', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv25-promo">
+            <h3>Beach<br>Essentials</h3>
+            <a href="/collections/accessories">Shop Towels</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v25', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv25-seo">
+      <h2 style="font-size: 28px; font-weight: 800; color: #00838F; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Make a Splash' }}</h2>
+      <p style="font-size: 15px; color: #006064; max-width: 700px; margin: 0 auto; line-height: 1.7; font-weight: 500;">{{ section.settings.seo_text | default: 'Our swimwear is crafted from recycled ocean plastics, offering UPF 50+ protection and a fit that stays put in the waves.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V25 — Swimwear", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#E0F7FA"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#006064"}
+  ], "presets": [{"name": "CL V25 — Swimwear"}]
+}
+{% endschema %}

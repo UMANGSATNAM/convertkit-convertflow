@@ -1,0 +1,463 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-ugc-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp24-ugc__header {
+    text-align: left;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--accent-primary);
+    padding-bottom: 10px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp24-ugc__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+  }
+
+  .hp24-ugc__sys-text {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--accent-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp24-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 rgba(0, 243, 255, 0.3);
+  }
+
+  .hp24-ugc__network-status {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hp24-ugc__network-status::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    animation: alertBlink 1s infinite;
+  }
+
+  @keyframes alertBlink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .hp24-ugc__grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-primary) rgba(255,255,255,0.1);
+  }
+
+  .hp24-ugc__grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .hp24-ugc__grid::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+  }
+  
+  .hp24-ugc__grid::-webkit-scrollbar-thumb {
+    background: var(--accent-primary);
+  }
+
+  .hp24-ugc__item {
+    flex: 0 0 calc(25% - 15px);
+    scroll-snap-align: start;
+    position: relative;
+    background: #000;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp24-ugc__item {
+      flex: 0 0 calc(33.333% - 14px);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-ugc__item {
+      flex: 0 0 calc(50% - 10px);
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp24-ugc__item {
+      flex: 0 0 85%;
+    }
+  }
+
+  .hp24-ugc__item:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+  }
+
+  /* Scanlines for the thumbnail */
+  .hp24-ugc__item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.4) 3px,
+      rgba(0,0,0,0.4) 4px
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hp24-ugc__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+  }
+
+  .hp24-ugc__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(1) hue-rotate(180deg) saturate(1.2);
+    transition: filter 0.3s ease, transform 0.5s ease;
+  }
+
+  .hp24-ugc__item:hover .hp24-ugc__image {
+    filter: none;
+    transform: scale(1.05);
+  }
+
+  /* Glitch text overlay */
+  .hp24-ugc__hud-text {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 3;
+    background: rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+  }
+
+  .hp24-ugc__handle {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 2px;
+  }
+
+  .hp24-ugc__likes {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .hp24-ugc__likes svg {
+    width: 10px;
+    height: 10px;
+    fill: var(--accent-secondary);
+  }
+  
+  .hp24-ugc__play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    width: 50px;
+    height: 50px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--accent-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+  
+  .hp24-ugc__item:hover .hp24-ugc__play-icon {
+    opacity: 1;
+    background: var(--accent-primary);
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--accent-primary);
+  }
+  
+  .hp24-ugc__play-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    margin-left: 3px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-ugc-wrapper" id="HP24UGC-{{ section.id }}">
+  <div class="hp24-ugc__header">
+    <div>
+      <div class="hp24-ugc__sys-text">DATA_STREAM: USER_UPLOADS</div>
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp24-ugc__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+    </div>
+    <div class="hp24-ugc__network-status">NETWORK ONLINE</div>
+  </div>
+
+  <div class="hp24-ugc__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp24-ugc__item" {{ block.shopify_attributes }}>
+        <div class="hp24-ugc__image-wrapper">
+          
+          <div class="hp24-ugc__play-icon">
+            <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+          </div>
+          
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp24-ugc__image" loading="lazy">
+          {%- else -%}
+            <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;color:#444;font-family:'Share Tech Mono';">VIDEO_FEED</div>
+          {%- endif -%}
+          
+          <div class="hp24-ugc__hud-text">
+            <span class="hp24-ugc__handle">@{{ block.settings.handle | default: 'user_unknown' }}</span>
+            <span class="hp24-ugc__likes">
+              <svg viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
+              {{ block.settings.likes | default: '10K' }}
+            </span>
+          </div>
+
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber UGC Reels",
+  "class": "section-hp24-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "NETWORK FEEDS"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "User Handle",
+          "default": "cyber_punk01"
+        },
+        {
+          "type": "text",
+          "id": "likes",
+          "label": "Likes/Views Count",
+          "default": "10.4K"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Video Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber UGC Reels",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

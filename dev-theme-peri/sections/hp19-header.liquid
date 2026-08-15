@@ -1,0 +1,324 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color_initial = section.settings.bg_color_initial
+  assign text_color_initial = section.settings.text_color_initial
+  assign bg_color_scrolled = section.settings.bg_color_scrolled
+  assign text_color_scrolled = section.settings.text_color_scrolled
+-%}
+
+<style>
+  .hp19-header-{{ sec_id }} {
+    position: fixed;
+    top: 40px; /* Below announcement bar */
+    left: 0;
+    width: 100%;
+    z-index: 99;
+    background-color: {{ bg_color_initial }};
+    transition: background-color 0.4s ease, top 0.4s ease, border-bottom 0.4s ease;
+    border-bottom: 1px solid transparent;
+  }
+
+  .hp19-header-{{ sec_id }}.is-scrolled {
+    top: 0;
+    background-color: {{ bg_color_scrolled }};
+    border-bottom: 1px solid {{ text_color_scrolled | color_modify: 'alpha', 0.1 }};
+  }
+
+  .hp19-header-{{ sec_id }}__container {
+    max-width: var(--page-width, 1600px);
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Hamburger */
+  .hp19-header-{{ sec_id }}__menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+
+  .hp19-header-{{ sec_id }}__menu-line {
+    width: 100%;
+    height: 1px;
+    background-color: {{ text_color_initial }};
+    transition: background-color 0.4s ease, width 0.3s ease;
+  }
+
+  .hp19-header-{{ sec_id }}.is-scrolled .hp19-header-{{ sec_id }}__menu-line {
+    background-color: {{ text_color_scrolled }};
+  }
+
+  .hp19-header-{{ sec_id }}__menu-btn:hover .hp19-header-{{ sec_id }}__menu-line:nth-child(2) {
+    width: 60%;
+  }
+
+  /* Logo */
+  .hp19-header-{{ sec_id }}__logo-wrap {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .hp19-header-{{ sec_id }}__logo-text {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: {{ text_color_initial }};
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: normal;
+    transition: color 0.4s ease;
+  }
+
+  .hp19-header-{{ sec_id }}.is-scrolled .hp19-header-{{ sec_id }}__logo-text {
+    color: {{ text_color_scrolled }};
+  }
+
+  /* Icons */
+  .hp19-header-{{ sec_id }}__icons {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+  }
+
+  .hp19-header-{{ sec_id }}__icon-link {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-decoration: none;
+    color: {{ text_color_initial }};
+    transition: color 0.4s ease, opacity 0.2s ease;
+  }
+
+  .hp19-header-{{ sec_id }}.is-scrolled .hp19-header-{{ sec_id }}__icon-link {
+    color: {{ text_color_scrolled }};
+  }
+
+  .hp19-header-{{ sec_id }}__icon-link:hover {
+    opacity: 0.5;
+  }
+
+  /* Drawer */
+  .hp19-drawer-{{ sec_id }} {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100vh;
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 60px;
+  }
+
+  .hp19-drawer-{{ sec_id }}.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .hp19-drawer-{{ sec_id }}__close {
+    position: absolute;
+    top: 40px; right: 40px;
+    background: none; border: none;
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #000;
+  }
+
+  .hp19-drawer-{{ sec_id }}__nav {
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .hp19-drawer-{{ sec_id }}__link {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 4vw;
+    color: #000;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.4s ease, padding-left 0.4s ease;
+    display: block;
+  }
+
+  .hp19-drawer-{{ sec_id }}__link:hover {
+    opacity: 1;
+    padding-left: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-header-{{ sec_id }}__container { padding: 0 20px; height: 60px; }
+    .hp19-header-{{ sec_id }}__logo-text { font-size: 20px; letter-spacing: 2px; }
+    .hp19-header-{{ sec_id }}__icon-text { display: none; }
+    .hp19-drawer-{{ sec_id }} { padding: 40px 20px; }
+    .hp19-drawer-{{ sec_id }}__link { font-size: 32px; }
+    .hp19-drawer-{{ sec_id }}__close { top: 25px; right: 20px; }
+  }
+</style>
+
+<header class="hp19-header-{{ sec_id }} js-hp19-header-{{ sec_id }}">
+  <div class="hp19-header-{{ sec_id }}__container">
+    
+    <button class="hp19-header-{{ sec_id }}__menu-btn js-hp19-menu-trigger">
+      <div class="hp19-header-{{ sec_id }}__menu-line"></div>
+      <div class="hp19-header-{{ sec_id }}__menu-line"></div>
+      <div class="hp19-header-{{ sec_id }}__menu-line"></div>
+    </button>
+
+    <a href="/" class="hp19-header-{{ sec_id }}__logo-wrap">
+      {% if section.settings.logo != blank %}
+        <img src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name }}" style="height: {{ section.settings.logo_height }}px;">
+      {% else %}
+        <h1 class="hp19-header-{{ sec_id }}__logo-text">{{ shop.name }}</h1>
+      {% endif %}
+    </a>
+
+    <div class="hp19-header-{{ sec_id }}__icons">
+      <a href="/search" class="hp19-header-{{ sec_id }}__icon-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="vertical-align: middle; margin-right: 5px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span class="hp19-header-{{ sec_id }}__icon-text">Search</span>
+      </a>
+      {% render 'search-bar', compact: true %}
+      {% render 'wishlist-icon' %}
+      <a href="/cart" data-cart-open class="hp19-header-{{ sec_id }}__icon-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="vertical-align: middle; margin-right: 5px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="hp19-header-{{ sec_id }}__icon-text">Cart</span>
+      </a>
+    </div>
+
+  </div>
+</header>
+
+<!-- Minimalist Drawer -->
+<div class="hp19-drawer-{{ sec_id }} js-hp19-drawer">
+  <button class="hp19-drawer-{{ sec_id }}__close js-hp19-close">CLOSE</button>
+  <nav class="hp19-drawer-{{ sec_id }}__nav">
+    {% if section.settings.menu != blank %}
+      {% for link in linklists[section.settings.menu].links %}
+        <a href="{{ link.url }}" class="hp19-drawer-{{ sec_id }}__link">{{ link.title }}</a>
+      {% endfor %}
+    {% else %}
+      <a href="#" class="hp19-drawer-{{ sec_id }}__link">New In</a>
+      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Ready-to-Wear</a>
+      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Accessories</a>
+      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Maison</a>
+    {% endif %}
+  </nav>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.querySelector('.js-hp19-header-{{ sec_id }}');
+    const trigger = document.querySelector('.js-hp19-menu-trigger');
+    const closeBtn = document.querySelector('.js-hp19-close');
+    const drawer = document.querySelector('.js-hp19-drawer');
+
+    // Scroll Logic
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        header.classList.add('is-scrolled');
+      } else {
+        header.classList.remove('is-scrolled');
+      }
+    });
+
+    // Drawer Logic
+    if (trigger && closeBtn && drawer) {
+      trigger.addEventListener('click', () => {
+        drawer.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      });
+      closeBtn.addEventListener('click', () => {
+        drawer.classList.remove('is-open');
+        document.body.style.overflow = '';
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP19 Luxury Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Initial State (Top of page)"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_initial",
+      "label": "Background Color",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "text_color_initial",
+      "label": "Text/Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Scrolled State"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_scrolled",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color_scrolled",
+      "label": "Text/Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Logo Height",
+      "default": 30
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Drawer Menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 Luxury Header"
+    }
+  ]
+}
+{% endschema %}

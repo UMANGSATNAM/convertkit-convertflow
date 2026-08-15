@@ -1,0 +1,211 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#8c7b66'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp4-offer-bg: {{ bg_color }};
+    --hp4-offer-text: {{ text_color }};
+    
+    --hp4-offer-pt-desk: {{ padding_top_desktop }}px;
+    --hp4-offer-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp4-offer-pt-mob: {{ padding_top_mobile }}px;
+    --hp4-offer-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp4-decor-offer-{{ section.id }} {
+    padding-top: var(--hp4-offer-pt-desk);
+    padding-bottom: var(--hp4-offer-pb-desk);
+    background-color: var(--hp4-offer-bg);
+    color: var(--hp4-offer-text);
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+  }
+
+  .hp4-offer-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hp4-offer-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .hp4-offer-title {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 30px 0;
+  }
+  .hp4-offer-title em {
+    font-style: italic;
+  }
+
+  .hp4-offer-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .hp4-offer-btn {
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    padding: 16px 40px;
+    background: #fff;
+    color: var(--hp4-offer-bg);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.4s ease;
+  }
+  .hp4-offer-btn:hover {
+    background: transparent;
+    color: #fff;
+    box-shadow: inset 0 0 0 1px #fff;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp4-decor-offer-{{ section.id }} {
+      padding-top: var(--hp4-offer-pt-mob);
+      padding-bottom: var(--hp4-offer-pb-mob);
+    }
+    .hp4-offer-inner {
+      padding: 0 20px;
+    }
+    .hp4-offer-title {
+      font-size: 32px;
+    }
+  }
+</style>
+
+<section class="hp4-decor-offer-{{ section.id }}" aria-label="Offer Banner">
+  <div class="hp4-offer-inner">
+    
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp4-offer-sub">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.heading != blank -%}
+      <h2 class="hp4-offer-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.description != blank -%}
+      <p class="hp4-offer-desc">{{ section.settings.description }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+      <a href="{{ section.settings.btn_link }}" class="hp4-offer-btn">{{ section.settings.btn_text }}</a>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP4 Decor Offer Banner",
+  "tag": "section",
+  "class": "section-hp4-offer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "SEASONAL EVENT"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Enjoy 20% off <em>everything</em>."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Elevate your space with our curated collection of artisanal home decor. Offer valid for a limited time."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "SHOP THE EVENT"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#8c7b66"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP4 Decor Offer Banner",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

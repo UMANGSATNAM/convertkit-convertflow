@@ -1,0 +1,319 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: {{ section.settings.border_color }};
+    --pill-bg: {{ section.settings.pill_bg }};
+    --font-body: 'Jost', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp21-pills-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: {{ section.settings.alignment }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-pills-wrapper {
+      padding: 0 20px;
+      justify-content: flex-start;
+    }
+  }
+
+  .hp21-pills__container {
+    display: flex;
+    gap: {{ section.settings.gap }}px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 20px; /* Space for hover glow */
+    margin-bottom: -20px;
+  }
+  
+  .hp21-pills__container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp21-pills__item {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .hp21-pills__link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 32px;
+    background: var(--pill-bg);
+    border: 1px solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hp21-pills__link::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .hp21-pills__link:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transform: translateY(-2px);
+  }
+  
+  .hp21-pills__link:hover::before {
+    opacity: 1;
+  }
+
+  .hp21-pills__image {
+    width: {{ section.settings.image_size }}px;
+    height: {{ section.settings.image_size }}px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .hp21-pills__text {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 300;
+    color: var(--text-color);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+    transition: color 0.4s;
+  }
+
+  .hp21-pills__link:hover .hp21-pills__text {
+    color: var(--accent-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-pills-wrapper" id="HP21CategoryPills-{{ section.id }}">
+  <div class="hp21-pills__container">
+    
+    {%- for block in section.blocks -%}
+      <div class="hp21-pills__item" {{ block.shopify_attributes }}>
+        <a href="{{ block.settings.link | default: '#' }}" class="hp21-pills__link">
+          {%- if block.settings.image != blank and section.settings.show_images -%}
+            <img src="{{ block.settings.image | image_url: width: 100 }}" alt="{{ block.settings.title | escape }}" class="hp21-pills__image" loading="lazy">
+          {%- endif -%}
+          <span class="hp21-pills__text">{{ block.settings.title | escape }}</span>
+        </a>
+      </div>
+    {%- endfor -%}
+    
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Pills",
+  "class": "section-hp21-category-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between pills",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Pill Styling"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Border Radius",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Show Thumbnail Images",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "image_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Thumbnail Size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Luxury Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "pill_bg",
+      "label": "Pill Background",
+      "default": "rgba(255, 255, 255, 0.03)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Hover Accent Color",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "rgba(255, 255, 255, 0.15)"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Pills",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

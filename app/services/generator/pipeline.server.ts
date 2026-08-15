@@ -227,9 +227,36 @@ export function initGeneratorWorker() {
           })
         };
 
+        // Resolve the product and collection page templates the same way as the
+        // homepage. Without this the PDP and collection layouts in the registry
+        // are never picked and every generated store falls back to the base theme.
+        const resolvePage = async (sectionTypes: string[], label: string) => {
+          const out: Array<{ sectionType: string; componentId: string; settings?: any }> = [];
+          for (const sectionType of sectionTypes) {
+            const matched = await retrieveBestComponent({
+              sectionType,
+              brandArchetype: brandContext.brand_archetype,
+              catalogIndustry: catalogContext.industry,
+              catalogStyle: catalogContext.style,
+              catalogVisualComplexity: catalogContext.visual_complexity,
+              exclude: out.map(s => s.componentId)
+            });
+            if (matched?.componentId) {
+              out.push({ sectionType, componentId: matched.componentId, settings: {} });
+              console.log(`[Phase 5] Resolved ${label} ${sectionType} -> ${matched.componentId}`);
+            } else {
+              console.warn(`[Phase 5] No component found for ${label} sectionType=${sectionType}`);
+            }
+          }
+          return out;
+        };
+
+        const productSections = await resolvePage(generatedBlueprint.pages.product ?? [], "PRODUCT");
+        const collectionSections = await resolvePage(generatedBlueprint.pages.collection ?? [], "COLLECTION");
+
         const globalComponents: string[] = [];
-        const globalSectionTypes = ["announcement", "header", "footer"];
-        
+        const globalSectionTypes = generatedBlueprint.globals ?? ["announcement", "header", "footer"];
+
         for (const sectionType of globalSectionTypes) {
           const matchedComponent = await retrieveBestComponent({
             sectionType,
@@ -241,6 +268,8 @@ export function initGeneratorWorker() {
           if (matchedComponent && matchedComponent.componentId) {
              globalComponents.push(matchedComponent.componentId);
              console.log(`[Phase 5] Resolved GLOBAL ${sectionType} -> ${matchedComponent.componentId}`);
+          } else {
+             console.warn(`[Phase 5] No component found for GLOBAL sectionType=${sectionType}`);
           }
         }
         // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
@@ -282,7 +311,9 @@ export function initGeneratorWorker() {
 
         const storeBlueprintAi = {
           pages: {
-            "index": { sections: resolvedSections }
+            "index": { sections: resolvedSections },
+            ...(productSections.length ? { "product": { sections: productSections } } : {}),
+            ...(collectionSections.length ? { "collection": { sections: collectionSections } } : {})
           },
           settings: baseSettings,
           globalComponents

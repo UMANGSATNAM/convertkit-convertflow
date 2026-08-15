@@ -1,0 +1,276 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#F9F6F0'
+  assign text_color = section.settings.text_color | default: '#2A3B2C'
+  assign card_bg = section.settings.card_bg | default: '#FFFFFF'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp10-bestsellers-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp10-bestsellers-header-{{ section_id }} {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hp10-bestsellers-subheading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0 0 15px 0;
+    color: rgba(42, 59, 44, 0.6);
+  }
+  
+  .hp10-bestsellers-heading-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 400;
+    margin: 0;
+  }
+  
+  .hp10-bestsellers-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  
+  .hp10-product-card-{{ section_id }} {
+    background: {{ card_bg }};
+    border-radius: 24px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  }
+  
+  .hp10-product-card-{{ section_id }}:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  }
+  
+  .hp10-product-image-wrap-{{ section_id }} {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    padding-top: 120%; /* Taller aspect ratio for elegance */
+    background: #f4f0e6;
+    margin-bottom: 20px;
+  }
+  
+  .hp10-product-image-{{ section_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+  
+  .hp10-product-card-{{ section_id }}:hover .hp10-product-image-{{ section_id }} {
+    transform: scale(1.05);
+  }
+  
+  .hp10-product-info-{{ section_id }} {
+    text-align: center;
+    padding: 0 10px 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hp10-product-title-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+    color: {{ text_color }};
+  }
+  
+  .hp10-product-price-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(42, 59, 44, 0.7);
+    margin-bottom: 20px;
+  }
+  
+  .hp10-product-add-{{ section_id }} {
+    margin-top: auto;
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: transparent;
+    border: 1px solid {{ text_color }};
+    border-radius: 40px;
+    color: {{ text_color }};
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .hp10-product-add-{{ section_id }}:hover {
+    background: {{ text_color }};
+    color: #F9F6F0;
+  }
+  
+  .hp10-view-all-wrap-{{ section_id }} {
+    text-align: center;
+    margin-top: 60px;
+  }
+  
+  .hp10-view-all-btn-{{ section_id }} {
+    display: inline-block;
+    padding: 16px 40px;
+    background: #D4A373; /* Earthy Terracotta */
+    color: #fff;
+    border-radius: 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: background 0.3s ease;
+  }
+  
+  .hp10-view-all-btn-{{ section_id }}:hover {
+    background: #ba8c60;
+  }
+
+  @media (max-width: 1024px) {
+    .hp10-bestsellers-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp10-bestsellers-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+</style>
+
+<div class="hp10-bestsellers-container-{{ section_id }}">
+  <div class="hp10-bestsellers-header-{{ section_id }}">
+    <p class="hp10-bestsellers-subheading-{{ section_id }}">{{ section.settings.subheading | default: 'Our Signatures' }}</p>
+    <h2 class="hp10-bestsellers-heading-{{ section_id }}">{{ section.settings.heading | default: 'Community Favorites' }}</h2>
+  </div>
+  
+  <div class="hp10-bestsellers-grid-{{ section_id }}">
+    {% assign collection = collections[section.settings.collection] %}
+    {% if collection != blank %}
+      {% for product in collection.products limit: section.settings.product_limit %}
+        <div class="hp10-product-card-{{ section_id }}">
+          <a href="{{ product.url }}" class="hp10-product-image-wrap-{{ section_id }}">
+            <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" class="hp10-product-image-{{ section_id }}" loading="lazy">
+          </a>
+          <div class="hp10-product-info-{{ section_id }}">
+            <h3 class="hp10-product-title-{{ section_id }}">{{ product.title }}</h3>
+            <div class="hp10-product-price-{{ section_id }}">{{ product.price | money }}</div>
+            <a href="{{ product.url }}" class="hp10-product-add-{{ section_id }}">Quick Add</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..4) %}
+        <div class="hp10-product-card-{{ section_id }}">
+          <div class="hp10-product-image-wrap-{{ section_id }}">
+            <div class="hp10-product-image-{{ section_id }}" style="background: #e8e3d5;"></div>
+          </div>
+          <div class="hp10-product-info-{{ section_id }}">
+            <h3 class="hp10-product-title-{{ section_id }}">Botanical Serum</h3>
+            <div class="hp10-product-price-{{ section_id }}">$48.00</div>
+            <a href="#" class="hp10-product-add-{{ section_id }}">Quick Add</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  
+  {% if section.settings.show_view_all %}
+    <div class="hp10-view-all-wrap-{{ section_id }}">
+      <a href="{{ collection.url | default: '#' }}" class="hp10-view-all-btn-{{ section_id }}">Shop All Essentials</a>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "HP10 Bestsellers",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2A3B2C"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Our Signatures"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Community Favorites"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Product Limit",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All Button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP10 Bestsellers"
+    }
+  ]
+}
+{% endschema %}

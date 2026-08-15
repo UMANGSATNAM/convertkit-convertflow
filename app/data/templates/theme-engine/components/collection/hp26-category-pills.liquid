@@ -1,0 +1,298 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --pill-bg: {{ section.settings.pill_bg }};
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp26-cat-pills-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-cat-pills-wrapper {
+      padding: 0; /* Let pills touch edges on mobile */
+    }
+  }
+
+  .hp26-cat-pills__header {
+    margin-bottom: {{ section.settings.header_margin }}px;
+    padding: 0 20px;
+  }
+
+  .hp26-cat-pills__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .hp26-cat-pills__title em {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .hp26-cat-pills__scroll {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 0 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-cat-pills__scroll {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 10px 20px 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hp26-cat-pills__scroll::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .hp26-cat-pills__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--pill-bg);
+    border: 1px solid rgba(44, 42, 40, 0.05);
+    padding: 12px 24px;
+    border-radius: 4px; /* Soft square instead of full pill for Japandi */
+    text-decoration: none;
+    transition: all 0.4s ease;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-cat-pills__item {
+      scroll-snap-align: center;
+      flex-shrink: 0;
+    }
+  }
+
+  .hp26-cat-pills__item:hover {
+    background-color: var(--text-color);
+    border-color: var(--text-color);
+    transform: translateY(-2px);
+  }
+
+  .hp26-cat-pills__item-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .hp26-cat-pills__item-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text-color);
+    transition: color 0.4s ease;
+  }
+
+  .hp26-cat-pills__item:hover .hp26-cat-pills__item-text {
+    color: var(--bg-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-cat-pills-wrapper" id="HP26CatPills-{{ section.id }}">
+  <div class="hp26-cat-pills__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp26-cat-pills__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp26-cat-pills__scroll">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp26-cat-pills__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 50 }}" alt="{{ block.settings.title | escape }}" class="hp26-cat-pills__item-img" loading="lazy">
+        {%- endif -%}
+        <span class="hp26-cat-pills__item-text">{{ block.settings.title | default: 'Category' }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Cat Pills",
+  "class": "section-hp26-category-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by <em>Category</em>"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "pill_bg",
+      "label": "Pill Background",
+      "default": "#EAE6DF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8B9582"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Small Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Name",
+          "default": "Ceramics"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Cat Pills",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Ceramics" } },
+        { "type": "category", "settings": { "title": "Linens" } },
+        { "type": "category", "settings": { "title": "Woodwork" } },
+        { "type": "category", "settings": { "title": "Decor" } },
+        { "type": "category", "settings": { "title": "Lighting" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

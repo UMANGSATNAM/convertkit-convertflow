@@ -9,3 +9,6 @@
 ### Fixed
 - Stale server build execution resolved via fresh compilation.
 - Relaxed settings patch validator to prevent false-positive schema errors on dynamic design tokens.
+
+### Phase A
+- **In Progress**: Codebase inventory of 45 legacy sections for reuse vs rewriting.

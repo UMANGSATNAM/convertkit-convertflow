@@ -1,0 +1,408 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-founder-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-founder-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp24-founder__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp24-founder__grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  .hp24-founder__image-col {
+    position: relative;
+    order: {{ section.settings.image_position }};
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp24-founder__image-col {
+      order: 1;
+    }
+    .hp24-founder__text-col {
+      order: 2;
+    }
+  }
+
+  /* Glitchy image container */
+  .hp24-founder__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: #000;
+    border: 2px solid var(--accent-secondary);
+    box-shadow: 10px 10px 0 var(--accent-primary);
+    overflow: hidden;
+  }
+
+  .hp24-founder__image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.4) 4px,
+      rgba(0,0,0,0.4) 6px
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hp24-founder__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8);
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 1;
+  }
+  
+  /* Create a fake glitch effect using a pseudo element copy */
+  .hp24-founder__image-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: inherit;
+    z-index: 1;
+    mix-blend-mode: color-dodge;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .hp24-founder__image-wrapper:hover .hp24-founder__image {
+    animation: imageGlitch 0.3s linear infinite;
+  }
+
+  @keyframes imageGlitch {
+    0% { transform: translate(0); filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8) drop-shadow(2px 0 0 red); }
+    25% { transform: translate(-5px, 2px); filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8) drop-shadow(-2px 0 0 blue); }
+    50% { transform: translate(5px, -2px); filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8) drop-shadow(2px 0 0 red); }
+    75% { transform: translate(-2px, -5px); filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8) drop-shadow(-2px 0 0 blue); }
+    100% { transform: translate(0); filter: sepia(0.8) hue-rotate(250deg) saturate(2) brightness(0.8) drop-shadow(2px 0 0 red); }
+  }
+
+  .hp24-founder__hud {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 3;
+    background: rgba(0,0,0,0.8);
+    padding: 10px;
+    border: 1px solid var(--accent-primary);
+  }
+
+  .hp24-founder__signature {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--accent-primary);
+    margin: 0;
+  }
+  
+  .hp24-founder__role {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--text-color);
+    margin: 5px 0 0;
+    text-transform: uppercase;
+  }
+
+  /* Text column */
+  .hp24-founder__text-col {
+    position: relative;
+    padding: 20px;
+  }
+
+  .hp24-founder__text-col::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--accent-secondary), transparent);
+  }
+
+  .hp24-founder__sys-text {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--accent-secondary);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hp24-founder__sys-text::before {
+    content: '>';
+    animation: alertBlink 1s infinite;
+  }
+
+  .hp24-founder__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 25px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-shadow: 2px 2px 0 rgba(0, 243, 255, 0.2);
+  }
+
+  .hp24-founder__text {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.text_size }}px;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  
+  .hp24-founder__text p {
+    margin-bottom: 15px;
+  }
+
+  .hp24-founder__text strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-founder-wrapper" id="HP24Founder-{{ section.id }}">
+  <div class="hp24-founder__grid">
+    
+    <div class="hp24-founder__image-col">
+      <div class="hp24-founder__image-wrapper">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | image_url: width: 800 }}" alt="Founder" class="hp24-founder__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;background:#111;position:absolute;top:0;left:0;display:flex;align-items:center;justify-content:center;color:#444;font-family:'Share Tech Mono';">ARCHITECT_FEED</div>
+        {%- endif -%}
+        
+        <div class="hp24-founder__hud">
+          <p class="hp24-founder__signature">{{ section.settings.founder_name | default: 'UNKNOWN' }}</p>
+          <p class="hp24-founder__role">{{ section.settings.founder_role | default: 'SYSTEM ARCHITECT' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hp24-founder__text-col">
+      <div class="hp24-founder__sys-text">SECURE TRANSMISSION // INCOMING</div>
+      
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp24-founder__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="hp24-founder__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber Founder",
+  "class": "section-hp24-founder-note",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "THE MANIFESTO"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Body Text",
+      "default": "<p>When the system failed us, we didn't beg for a patch. We wrote our own code. We engineered hardware that defied the established limits.</p><p>This isn't just a product line. It's a <strong>rebellion</strong> against mediocrity. We are giving you the tools to rewrite your reality.</p>"
+    },
+    {
+      "type": "text",
+      "id": "founder_name",
+      "label": "Founder Name",
+      "default": "N30"
+    },
+    {
+      "type": "text",
+      "id": "founder_role",
+      "label": "Founder Role",
+      "default": "LEAD ARCHITECT"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Founder Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position (Desktop)",
+      "options": [
+        { "value": "1", "label": "Left" },
+        { "value": "2", "label": "Right" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber Founder"
+    }
+  ]
+}
+{% endschema %}

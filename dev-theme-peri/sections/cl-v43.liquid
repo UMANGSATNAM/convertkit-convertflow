@@ -1,0 +1,98 @@
+{% comment %} CL V43 — Fitness / Gym (Black & Neon Yellow) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv43 { background: {{ section.settings.bg_color | default: '#000000' }}; color: {{ section.settings.text_color | default: '#FFFFFF' }}; padding: 50px 20px; font-family: 'Teko', sans-serif; text-transform: uppercase; }
+  .clv43-hero { text-align: left; margin-bottom: 40px; border-left: 8px solid #EAB308; padding-left: 30px; }
+  .clv43-hero h1 { font-size: 70px; font-weight: 700; color: #FFFFFF; margin-bottom: -10px; line-height: 1; letter-spacing: 2px; }
+  .clv43-hero p { font-size: 20px; color: #9CA3AF; max-width: 600px; margin: 0; letter-spacing: 1px; }
+  .clv43-chips { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv43-chips a { padding: 8px 25px; background: #111827; color: #FFFFFF; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: 1px; border: 1px solid #374151; transition: 0.2s; }
+  .clv43-chips a:hover, .clv43-chips a.active { background: #EAB308; color: #000; border-color: #EAB308; }
+  .clv43-toolbar { background: #111827; padding: 15px 25px; margin-bottom: 40px; border: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; }
+  .clv43-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv43-promo { grid-column: span 1; background: #EAB308; color: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+  .clv43-promo h3 { font-size: 40px; font-weight: 700; margin-bottom: 10px; line-height: 1; }
+  .clv43-promo a { display: inline-block; padding: 10px 20px; background: #000; color: #EAB308; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: 1px; }
+  .clv43-promo a:hover { background: #FFFFFF; color: #000; }
+  .clv43-seo { margin-top: 60px; padding: 40px; background: #111827; border-left: 8px solid #EAB308; }
+  @media (max-width: 768px) { .clv43-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv43-hero h1 { font-size: 50px; } }
+</style>
+<div class="clv43" style="max-width: 1400px; margin: 0 auto;">
+  <div class="clv43-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}PERFORMANCE GEAR{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Push your limits. Zero excuses.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv43-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv43-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 20px; font-weight: 600; color: #EAB308; letter-spacing: 1px;">{{ filter.label }} +</summary>
+              <div style="position: absolute; background: #000; border: 1px solid #374151; padding: 20px; z-index: 10; margin-top: 10px; min-width: 250px;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 18px; color: #FFFFFF; letter-spacing: 1px;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: 1px solid #374151; color: #FFFFFF; padding: 5px 15px; font-size: 18px; font-family: inherit; text-transform: uppercase; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}" style="background: #000;"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv43-grid">
+      {% for product in collection.products %}
+        {% render 'card-v43', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv43-promo">
+            <h3>HEAVY<br>DUTY</h3>
+            <a href="/collections/heavy">SHOP NOW</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v43', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-size: 24px; color: #EAB308; letter-spacing: 2px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv43-seo">
+      <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 10px; color: #EAB308;">{{ section.settings.seo_title | default: 'ENGINEERED FOR STRENGTH' }}</h2>
+      <p style="font-size: 18px; color: #9CA3AF; max-width: 800px; line-height: 1.4;">{{ section.settings.seo_text | default: 'Our athletic wear is built with moisture-wicking technology and reinforced stitching to withstand the most grueling workouts.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V43 — Fitness", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#000000"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#FFFFFF"}
+  ], "presets": [{"name": "CL V43 — Fitness"}]
+}
+{% endschema %}

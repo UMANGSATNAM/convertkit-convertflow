@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V24 — SMART TECH ACCESSORIES & EDC D2C (DAILYOBJECTS / MOKOBARA STYLE)
+  Usage: {% render 'card-v24', product: product %}
+  Design: Graphite Slate (#1E293B), Mustard Gold (#F59E0B), Space Grotesk & Inter fonts, 10px technical rounded card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
+  .cv24-card {
+    --cv24-bg: #FFFFFF;
+    --cv24-text: #1E293B;
+    --cv24-muted: #64748B;
+    --cv24-amber: #F59E0B;
+    --cv24-slate: #1E293B;
+    --cv24-border: #E2E8F0;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv24-bg);
+    border: 1px solid var(--cv24-border);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv24-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv24-amber);
+    box-shadow: 0 12px 24px -6px rgba(245, 158, 11, 0.25);
+  }
+
+  .cv24-card *, .cv24-card *::before, .cv24-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv24-card a { color: inherit; text-decoration: none; }
+  .cv24-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv24-card img { max-width: 100%; display: block; }
+
+  .cv24-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #F8FAFC;
+    overflow: hidden;
+  }
+  .cv24-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv24-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv24-card:hover .cv24-img-pri { opacity: 0; }
+  .cv24-card:hover .cv24-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Tech Tag Top Left */
+  .cv24-badge-tech {
+    position: absolute; top: 10px; left: 10px;
+    background: #1E293B; color: var(--cv24-amber);
+    font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 4px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv24-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv24-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv24-slate); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv24-wish:hover, .cv24-wish.active { background: var(--cv24-amber); color: #1E293B; border-color: var(--cv24-amber); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv24-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(30, 41, 59, 0.95); color: var(--cv24-amber);
+    font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 6px; border: 1px solid var(--cv24-amber);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv24-card:hover .cv24-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv24-qv-overlay:hover { background: var(--cv24-amber); color: #1E293B; }
+
+  .cv24-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+  .cv24-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv24-amber); font-weight: 700; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
+  .cv24-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: #1E293B; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* EDC Specs Subtitle */
+  .cv24-specs { font-size: 11px; color: var(--cv24-muted); font-weight: 500; }
+
+  /* Rating Row */
+  .cv24-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #D97706; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv24-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv24-price { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 800; color: #1E293B; }
+  .cv24-cmp { font-size: 13px; color: #94A3B8; text-decoration: line-through; }
+  .cv24-disc { font-size: 10px; font-weight: 800; color: #1E293B; background: #FEF3C7; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv24-amber); }
+
+  /* Laptop Size Selector */
+  .cv24-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv24-size-btn {
+    font-size: 10px; font-weight: 600; padding: 4px 9px; border-radius: 4px;
+    border: 1px solid var(--cv24-border); background: #FFFFFF; color: #1E293B; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv24-size-btn.active, .cv24-size-btn:hover { background: #1E293B; color: #FFFFFF; border-color: #1E293B; }
+
+  /* Bottom Button */
+  .cv24-action-box { padding: 0 14px 14px; }
+  .cv24-atc-btn {
+    width: 100%; padding: 11px;
+    background: #1E293B; color: #FFFFFF;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 6px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
+  }
+  .cv24-atc-btn:hover { background: var(--cv24-amber); color: #1E293B; transform: scale(1.01); }
+  .cv24-atc-btn:disabled { background: #CBD5E1; color: #64748B; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv24-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv24-badge-tech">MAGNETIC MAGSAFE ⚡</span>
+
+    <button type="button" class="cv24-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv24-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv24-img cv24-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv24-img cv24-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv24-img' }}
+      {% endif %}
+
+      <button type="button" class="cv24-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv24-content">
+      {% if card_prod.vendor != blank %}<span class="cv24-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv24-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv24-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv24-specs">Water-Resistant Vegan Leather | YKK Zippers</span>
+
+      <div class="cv24-rating">
+        <span>★ 4.9</span> <span>(1,890 reviews)</span>
+      </div>
+
+      <div class="cv24-price-row">
+        <span class="cv24-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv24-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv24-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Laptop Size Selector -->
+      <div class="cv24-sizes">
+        {% for variant in card_prod.variants limit: 2 %}
+          <button type="button" class="cv24-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv24-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv24-atc-btn" data-add-cart="{{ cur_var.id }}">UPGRADE YOUR DESK</button>
+      {% else %}
+        <button type="button" class="cv24-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv24-card">
+    <div class="cv24-media">{{ 'product-1' | placeholder_svg_tag: 'cv24-img' }}</div>
+    <div class="cv24-content">
+      <span class="cv24-vendor">SMART ACCESSORIES D2C</span>
+      <div class="cv24-title">Tech Folio Leather Laptop Sleeve w/ MagSafe Stand</div>
+
+      {% if card_r_show != false %}
+      <div class="cv24-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv24-specs">Water-Resistant Vegan Leather | YKK Zippers</span>
+      <div class="cv24-price-row"><span class="cv24-price">₹ 2,499</span><span class="cv24-cmp">₹ 3,499</span><span class="cv24-disc">28% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

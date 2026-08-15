@@ -109,7 +109,31 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     "press-mentions": "trust",
     "press": "trust",
     "testimonials_marquee": "testimonials",
-    "featured": "product-grid"
+    "featured": "product-grid",
+
+    // page-level layouts synced from dev-theme-peri
+    "product-page": "product-page",
+    "product_page": "product-page",
+    "pdp": "product-page",
+    "collection-page": "collection-page",
+    "collection_page": "collection-page",
+
+    // overlays and chrome
+    "cart-drawer": "cart-drawer",
+    "cart_drawer": "cart-drawer",
+    "popup": "popup",
+
+    // social proof / media
+    "ugc": "ugc",
+    "ugc-reels": "ugc",
+    "instagram": "ugc",
+    "gallery": "ugc",
+
+    // commerce extras
+    "bundle": "bundle-builder",
+    "bundle-builder": "bundle-builder",
+    "blog": "blog",
+    "contact": "contact"
   };
 
   const registryType = typeMapping[params.sectionType] || params.sectionType;

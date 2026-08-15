@@ -1,0 +1,76 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#09090B' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp61-faq__container { max-width: {{ section.settings.container_width | default: 800 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp61-faq__header { text-align: center; margin-bottom: 50px; }
+  .hp61-faq__eyebrow { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#EF4444' }}; margin: 0 0 12px; }
+  .hp61-faq__heading { font-family: 'Syne', sans-serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; color: #FFFFFF; margin: 0; }
+  .hp61-faq__item {
+    background: {{ section.settings.card_bg | default: '#18181B' }};
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 6px; margin-bottom: 14px; overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .hp61-faq__item.active { border-color: #EF4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.25); }
+  .hp61-faq__question {
+    width: 100%; background: none; border: none; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: #FFFFFF; text-align: left;
+  }
+  .hp61-faq__icon { font-size: 20px; color: {{ section.settings.accent_color | default: '#EF4444' }}; transition: transform 0.3s ease; flex-shrink: 0; margin-left: 16px; }
+  .hp61-faq__item.active .hp61-faq__icon { transform: rotate(45deg); }
+  .hp61-faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .hp61-faq__item.active .hp61-faq__answer { max-height: 300px; }
+  .hp61-faq__answer-inner { padding: 0 24px 20px; font-size: 14px; line-height: 1.7; color: #A1A1AA; font-family: 'Space Grotesk', sans-serif; }
+{%- endstyle -%}
+<div class="hp61-faq__container">
+  <div class="hp61-faq__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp61-faq__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp61-faq__heading">{{ section.settings.heading | default: 'Thermal Inquiries' }}</h2>
+  </div>
+  {%- for block in section.blocks -%}
+    <div class="hp61-faq__item" {{ block.shopify_attributes }}>
+      <button class="hp61-faq__question" onclick="this.parentElement.classList.toggle('active')">
+        <span>{{ block.settings.question | default: 'How does volcanic basalt ash purify pores?' }}</span>
+        <span class="hp61-faq__icon">+</span>
+      </button>
+      <div class="hp61-faq__answer">
+        <div class="hp61-faq__answer-inner">{{ block.settings.answer | default: 'Micronized basalt particles act like magnetic ionic sponges, absorbing trapped oxidized sebum and urban particulate without stripping skin lipids.' }}</div>
+      </div>
+    </div>
+  {%- endfor -%}
+</div>
+{% schema %}
+{
+  "name": "HP61 FAQ",
+  "class": "section-hp61-faq",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#09090B" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#18181B" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#EF4444" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🌋 FAQ" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Thermal Inquiries" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 600, "max": 1000, "step": 20, "unit": "px", "label": "Container Width", "default": 800 }
+  ],
+  "blocks": [{
+    "type": "faq", "name": "Question",
+    "settings": [
+      { "type": "text", "id": "question", "label": "Question", "default": "How does volcanic basalt ash purify pores?" },
+      { "type": "textarea", "id": "answer", "label": "Answer", "default": "Micronized basalt particles act like magnetic ionic sponges." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP61 FAQ",
+    "blocks": [
+      { "type": "faq" },
+      { "type": "faq", "settings": { "question": "Can this be used on sensitive or reactive skin?", "answer": "Yes. Our volcanic ash is micronized to 5 microns and blended in thermal spring water and squalane to prevent micro-abrasions." } },
+      { "type": "faq", "settings": { "question": "How often should I use the Magma Masque?", "answer": "For optimal pore refining and cellular detoxification, apply 1-2 times per week for 10-15 minutes." } }
+    ]
+  }]
+}
+{% endschema %}

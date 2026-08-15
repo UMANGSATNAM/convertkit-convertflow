@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="{{ settings.color_accent }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_accent | default: '#2563EB' }}">
     <link rel="canonical" href="{{ canonical_url }}">
     
     {%- if settings.favicon != blank -%}
@@ -22,82 +22,175 @@
       <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
 
-    {% render 'meta-tags' %}
+    <!-- OpenGraph & Twitter Meta Tags -->
+    <meta property="og:site_name" content="{{ shop.name }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{{ page_title | escape }}">
+    <meta property="og:type" content="website">
+    {% if page_description %}
+      <meta property="og:description" content="{{ page_description | escape }}">
+    {% endif %}
 
-    <!-- Schema.org Organization Markup -->
+    <!-- Schema.org Organization JSON-LD -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": {{ shop.name | json }},
-        {% if settings.social_logo_link != blank %}
-          "logo": {{ settings.social_logo_link | json }},
-        {% endif %}
-        "sameAs": [
-          {{ settings.social_twitter_link | json }},
-          {{ settings.social_facebook_link | json }},
-          {{ settings.social_instagram_link | json }},
-          {{ settings.social_tiktok_link | json }},
-          {{ settings.social_pinterest_link | json }},
-          {{ settings.social_youtube_link | json }}
-        ],
         "url": {{ request.origin | append: page.url | json }}
       }
     </script>
 
+    <!-- Global CSS Design Tokens & Theme Variables -->
+    <style>
+      :root {
+        --color-primary: {{ settings.color_primary | default: '#111827' }};
+        --color-secondary: {{ settings.color_secondary | default: '#4B5563' }};
+        --color-accent: {{ settings.color_accent | default: '#2563EB' }};
+        --color-bg: {{ settings.color_bg | default: '#FFFFFF' }};
+        --color-bg-secondary: {{ settings.color_bg_secondary | default: '#F9FAFB' }};
+        --color-surface: {{ settings.color_surface | default: '#FFFFFF' }};
+        --color-text: {{ settings.color_text | default: '#111827' }};
+        --color-text-muted: {{ settings.color_text_muted | default: '#6B7280' }};
+        --color-border: {{ settings.color_border | default: '#E5E7EB' }};
+        --color-sale: {{ settings.color_sale | default: '#DC2626' }};
+        --color-star: {{ settings.color_star | default: '#F59E0B' }};
+
+        --font-heading: {{ settings.font_heading.family | default: 'Inter' }}, sans-serif;
+        --font-body: {{ settings.font_body.family | default: 'Inter' }}, sans-serif;
+        --font-base-size: {{ settings.font_base_size | default: 15 }}px;
+
+        --page-width: {{ settings.page_width | default: 1280 }}px;
+        --radius-button: {{ settings.radius_button | default: 8 }}px;
+        --radius-card: {{ settings.radius_card | default: 12 }}px;
+        --radius-badge: {{ settings.radius_badge | default: 99 }}px;
+      }
+    </style>
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
-    <!-- Structural and Niche Styling Files -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;700&display=swap">
+
+    <!-- Structural Layout Styling -->
     {{ 'base-tokens.css' | asset_url | stylesheet_tag }}
     {{ 'responsive.css' | asset_url | stylesheet_tag }}
-    {{ 'animations.css' | asset_url | stylesheet_tag }}
-    {{ 'design-language-fresh.css' | asset_url | stylesheet_tag }}
-    {{ 'motion.css' | asset_url | stylesheet_tag }}
+    {{ 'predictive-search.css' | asset_url | stylesheet_tag }}
 
-    <!-- Deferred Framework-Agnostic JavaScript Operations -->
-    <script src="{{ 'utils.js' | asset_url }}" defer></script>
-    <script src="{{ 'cart.js' | asset_url }}" defer></script>
-    <script src="{{ 'variant-swap.js' | asset_url }}" defer></script>
-    <script src="{{ 'search.js' | asset_url }}" defer></script>
-    <script src="{{ 'wishlist.js' | asset_url }}" defer></script>
-    <script src="{{ 'countdown.js' | asset_url }}" defer></script>
-    <script src="{{ 'sticky-atc.js' | asset_url }}" defer></script>
-    <script src="{{ 'motion.js' | asset_url }}" defer></script>
-    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    <!-- Global JavaScript Engine & Utilities -->
+    <script>
+      window.ConvertFlow = window.ConvertFlow || {};
+      window.ConvertFlow.shop = {{ shop.permanent_domain | json }};
+      window.ConvertFlow.activePromo = {{ settings.active_promo_code | default: 'FIRST10' | json }};
+      window.ConvertFlow.freeShippingThreshold = {{ settings.free_shipping_threshold | default: '999' | json }};
+    </script>
+
+    <!-- Shared behaviour modules. Deferred: they never block first paint. -->
+    <script src="{{ 'utils.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'wishlist.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'recently-viewed.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'countdown.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
   </head>
 
   <body class="theme-layout-body">
-    <!-- Accessibility Skip link -->
-    <a href="#MainContent" class="skip-to-content-link button visually-hidden">
-      {{ 'accessibility.skip_to_content' | t }}
-    </a>
+    <a href="#MainContent" class="skip-to-content-link visually-hidden">Skip to content</a>
 
-    <!-- Global Layout Header Groups -->
+    <!-- Header Section Group -->
     {% sections 'header-group' %}
 
     <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
       {{ content_for_layout }}
     </main>
 
-    <!-- Global Layout Footer Groups -->
+    <!-- Footer Section Group -->
     {% sections 'footer-group' %}
 
-    <!-- Cart Drawer Container -->
-    {% render 'cart-drawer' %}
+    <!-- Global Cart Drawer System (Dynamic Preview enabled) -->
+    {% case template.suffix %}
+      {% when 'cdr-v1' %}{% section 'cdr-v1' %}
+      {% when 'cdr-v2' %}{% section 'cdr-v2' %}
+      {% when 'cdr-v3' %}{% section 'cdr-v3' %}
+      {% when 'cdr-v4' %}{% section 'cdr-v4' %}
+      {% when 'cdr-v5' %}{% section 'cdr-v5' %}
+      {% when 'cdr-v6' %}{% section 'cdr-v6' %}
+      {% when 'cdr-v7' %}{% section 'cdr-v7' %}
+      {% when 'cdr-v8' %}{% section 'cdr-v8' %}
+      {% when 'cdr-v9' %}{% section 'cdr-v9' %}
+      {% when 'cdr-v10' %}{% section 'cdr-v10' %}
+      {% when 'cdr-v11' %}{% section 'cdr-v11' %}
+      {% when 'cdr-v12' %}{% section 'cdr-v12' %}
+      {% when 'cdr-v13' %}{% section 'cdr-v13' %}
+      {% when 'cdr-v14' %}{% section 'cdr-v14' %}
+      {% when 'cdr-v15' %}{% section 'cdr-v15' %}
+      {% when 'cdr-v16' %}{% section 'cdr-v16' %}
+      {% when 'cdr-v17' %}{% section 'cdr-v17' %}
+      {% when 'cdr-v18' %}{% section 'cdr-v18' %}
+      {% when 'cdr-v19' %}{% section 'cdr-v19' %}
+      {% when 'cdr-v20' %}{% section 'cdr-v20' %}
+      {% else %}{% section 'cdr-v1' %}
+    {% endcase %}
 
-    <!-- Predictive Search Drawer Placeholder -->
-    <div id="predictive-search-drawer" class="predictive-search-drawer-wrapper" aria-hidden="true" role="dialog">
-      <div class="search-drawer-inner">
-        <button type="button" class="search-drawer-close-btn" aria-label="{{ 'general.search.close' | t }}">
-          {% render 'icon-close' %}
-        </button>
-        <div class="search-drawer-search-box">
-          <input type="search" id="SearchDrawerInput" class="search-drawer-input" placeholder="{{ 'general.search.placeholder' | t }}" autocomplete="off">
-          <div id="predictive-search-results" class="predictive-search-results-container"></div>
-        </div>
-      </div>
-    </div>
+    <!-- Global Social Proof Popup -->
+    {% render 'social-proof-popup' %}
+
+    <!-- Global Marketing Popups (Dynamic Preview enabled) -->
+    {% case template.suffix %}
+      {% when 'popup-v1' %}{% section 'popup-v1' %}
+      {% when 'popup-v2' %}{% section 'popup-v2' %}
+      {% when 'popup-v3' %}{% section 'popup-v3' %}
+      {% when 'popup-v4' %}{% section 'popup-v4' %}
+      {% when 'popup-v5' %}{% section 'popup-v5' %}
+      {% when 'popup-v6' %}{% section 'popup-v6' %}
+      {% when 'popup-v7' %}{% section 'popup-v7' %}
+      {% when 'popup-v8' %}{% section 'popup-v8' %}
+      {% when 'popup-v9' %}{% section 'popup-v9' %}
+      {% when 'popup-v10' %}{% section 'popup-v10' %}
+      {% when 'popup-v11' %}{% section 'popup-v11' %}
+      {% when 'popup-v12' %}{% section 'popup-v12' %}
+      {% when 'popup-v13' %}{% section 'popup-v13' %}
+      {% when 'popup-v14' %}{% section 'popup-v14' %}
+      {% when 'popup-v15' %}{% section 'popup-v15' %}
+      {% when 'popup-v16' %}{% section 'popup-v16' %}
+      {% when 'popup-v17' %}{% section 'popup-v17' %}
+      {% when 'popup-v18' %}{% section 'popup-v18' %}
+      {% when 'popup-v19' %}{% section 'popup-v19' %}
+      {% when 'popup-v20' %}{% section 'popup-v20' %}
+    {% endcase %}
+
+    <!-- Global WhatsApp Chat Widget (India D2C specific) -->
+    {% section 'whatsapp-widget' %}
+
+    <!-- Global Wishlist Drawer -->
+    {% render 'wishlist-drawer' %}
+
+    <!-- Records the current product into the shared recently-viewed store -->
+    {% render 'recently-viewed-track' %}
+
+    <!-- Global Toast Notification Container -->
+    <div id="cf-toast" class="cf-toast-notification" aria-live="polite"></div>
+
+    <style>
+      .cf-toast-notification {
+        position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+        background: var(--color-primary, #111827); color: #FFFFFF;
+        padding: 12px 20px; border-radius: var(--radius-button, 8px);
+        font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        transform: translateY(100px); opacity: 0; transition: all 0.3s ease;
+      }
+      .cf-toast-notification.active { transform: translateY(0); opacity: 1; }
+    </style>
+
+    <script>
+      // Global Event Bus & Toast System
+      document.addEventListener('toast:show', function(e) {
+        var toast = document.getElementById('cf-toast');
+        if (!toast) return;
+        toast.textContent = e.detail && e.detail.message ? e.detail.message : 'Action completed!';
+        toast.classList.add('active');
+        setTimeout(function() { toast.classList.remove('active'); }, 3000);
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,428 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-brand-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp20-brand__container {
+    display: flex;
+    flex-direction: {% if section.settings.image_position == 'right' %}row{% else %}row-reverse{% endif %};
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    background: {{ section.settings.content_bg }};
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-brand__container {
+      flex-direction: column-reverse;
+    }
+  }
+
+  .hp20-brand__content {
+    flex: 1;
+    padding: {{ section.settings.content_padding }}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: {% if section.settings.image_position == 'right' %}var(--border-thickness) solid var(--border-color){% else %}none{% endif %};
+    border-left: {% if section.settings.image_position == 'left' %}var(--border-thickness) solid var(--border-color){% else %}none{% endif %};
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-brand__content {
+      border-right: none;
+      border-left: none;
+      border-top: var(--border-thickness) solid var(--border-color);
+      padding: 32px 24px;
+    }
+  }
+
+  .hp20-brand__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    letter-spacing: -1px;
+  }
+
+  .hp20-brand__text {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-color);
+    margin: 0 0 32px;
+  }
+
+  .hp20-brand__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+    padding-top: 24px;
+    border-top: var(--border-thickness) dashed var(--border-color);
+  }
+  
+  .hp20-brand__stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hp20-brand__stat-number {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    color: var(--text-color);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  
+  .hp20-brand__stat-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-color);
+    letter-spacing: 1px;
+  }
+
+  .hp20-brand__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    padding: 16px 32px;
+    background: var(--text-color);
+    color: var(--bg-color); /* assuming outer bg is contrasting */
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0px var(--shadow-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp20-brand__btn:hover {
+    background: {{ section.settings.accent_color }};
+    color: var(--text-color);
+    transform: translate(2px, 2px);
+    box-shadow: calc(calc(var(--shadow-offset) / 2) - 2px) calc(calc(var(--shadow-offset) / 2) - 2px) 0px var(--shadow-color);
+  }
+
+  .hp20-brand__image {
+    flex: 1;
+    position: relative;
+    min-height: 100%;
+    background: {{ section.settings.accent_color }};
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-brand__image {
+      min-height: 350px;
+    }
+  }
+
+  .hp20-brand__image img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: {% if section.settings.image_grayscale %}grayscale(100%) contrast(120%){% else %}none{% endif %};
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-brand-wrapper" id="HP20BrandStory-{{ section.id }}">
+  <div class="hp20-brand__container">
+    
+    <div class="hp20-brand__content">
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp20-brand__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.text != blank -%}
+        <div class="hp20-brand__text">{{ section.settings.text | escape }}</div>
+      {%- endif -%}
+      
+      {%- if section.blocks.size > 0 -%}
+        <div class="hp20-brand__stats">
+          {%- for block in section.blocks -%}
+            <div class="hp20-brand__stat" {{ block.shopify_attributes }}>
+              <span class="hp20-brand__stat-number">{{ block.settings.number | escape }}</span>
+              <span class="hp20-brand__stat-label">{{ block.settings.label | escape }}</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      
+      {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+        <a href="{{ section.settings.btn_link }}" class="hp20-brand__btn">{{ section.settings.btn_text | escape }}</a>
+      {%- endif -%}
+    </div>
+
+    <div class="hp20-brand__image">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 1000 }}" alt="{{ section.settings.title | escape }}" loading="lazy">
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Brand",
+  "class": "section-hp20-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Desktop Content Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "BUILT FOR THE BOLD."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "We don't follow trends. We make them. Every piece is engineered for maximum impact."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "OUR STORY"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_grayscale",
+      "label": "Enable High-Contrast Grayscale",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Outer Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "content_bg",
+      "label": "Content Box Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Global Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Hard Shadow Offset",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number/Value",
+          "default": "100%"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "GUARANTEED"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Brand",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "1M+", "label": "CUSTOMERS" } },
+        { "type": "stat", "settings": { "number": "5★", "label": "RATING" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

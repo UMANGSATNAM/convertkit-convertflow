@@ -1,0 +1,223 @@
+{%- style -%}
+  .deals-v2 {
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--surface) 100%);
+    padding: var(--space-48) 0;
+    position: relative;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  @media (min-width: 768px) {
+    .deals-v2 {
+      padding: var(--space-64) 0;
+    }
+  }
+
+  .deals-v2__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+  }
+
+  .deals-v2__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .deals-v2__header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .deals-v2__badge {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-size: var(--text-12);
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: var(--space-8);
+  }
+  .deals-v2__badge-pulse {
+    width: 8px;
+    height: 8px;
+    background-color: #4ade80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+    100% { transform: scale(0.95); opacity: 1; }
+  }
+
+  .deals-v2__title {
+    font-size: var(--text-32);
+    font-weight: 400;
+    color: var(--text-main);
+    margin: 0;
+  }
+  @media (min-width: 768px) {
+    .deals-v2__title {
+      font-size: var(--text-40);
+    }
+  }
+
+  .deals-v2__timer-box {
+    background-color: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-button);
+    padding: var(--space-12) var(--space-20);
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    box-shadow: var(--shadow-sm);
+  }
+  .deals-v2__timer-label {
+    font-size: var(--text-12);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .deals-v2__timer-digits {
+    font-size: var(--text-18);
+    font-weight: 700;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .deals-v2__grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: var(--space-24);
+  }
+  @media (min-width: 640px) {
+    .deals-v2__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .deals-v2__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+{%- endstyle -%}
+
+<div class="deals-v2">
+  <div class="fresh-container">
+    <div class="deals-v2__inner">
+      <div class="deals-v2__header">
+        <div>
+          <div class="deals-v2__badge">
+            <span class="deals-v2__badge-pulse"></span>
+            {{ section.settings.badge_text | default: "⚡ Limited Drop · High Potency Actives" }}
+          </div>
+          <h2 class="deals-v2__title">{{ section.settings.title | default: "Award-Winning Bestsellers" }}</h2>
+        </div>
+        
+        {%- if section.settings.show_countdown -%}
+          <div class="deals-v2__timer-box">
+            <span class="deals-v2__timer-label">{{ section.settings.countdown_label | default: "Offer Ends In:" }}</span>
+            <span class="deals-v2__timer-digits" id="deals-timer-{{ section.id }}">14h : 38m : 22s</span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="deals-v2__grid">
+        {%- assign collection = collections[section.settings.collection] -%}
+        {%- if collection != blank and collection.products_count > 0 -%}
+          {%- for product in collection.products limit: section.settings.products_to_show -%}
+            {% render 'product-card', product: product, show_rating: true %}
+          {%- endfor -%}
+        {%- else -%}
+          {%- comment -%} Fallback rendering when no collection assigned or store collection empty {%- endcomment -%}
+          {%- for i in (1..4) -%}
+            {%- assign dummy_product = collections.all.products[forloop.index0] -%}
+            {%- if dummy_product != blank -%}
+              {% render 'product-card', product: dummy_product, show_rating: true %}
+            {%- else -%}
+              {%- comment -%} Create dummy product object to render via product-card {%- endcomment -%}
+              {% render 'product-card', product: nil, show_rating: true %}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const timerElem = document.getElementById('deals-timer-{{ section.id }}');
+    if (!timerElem) return;
+    let totalSeconds = 14 * 3600 + 38 * 60 + 22;
+    setInterval(() => {
+      if (totalSeconds <= 0) totalSeconds = 24 * 3600;
+      totalSeconds--;
+      const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+      const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+      const secs = (totalSeconds % 60).toString().padStart(2, '0');
+      timerElem.textContent = `${hrs}h : ${mins}m : ${secs}s`;
+    }, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Deals & Bestsellers V2",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "⚡ Limited Drop · High Potency Actives"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Award-Winning Bestsellers"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Featured Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "label": "Number of products to show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "Show Countdown Timer",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "countdown_label",
+      "label": "Countdown Label",
+      "default": "Offer Ends In:"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Deals & Bestsellers V2"
+    }
+  ]
+}
+{% endschema %}

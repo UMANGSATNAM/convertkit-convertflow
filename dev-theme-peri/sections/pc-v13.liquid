@@ -1,0 +1,539 @@
+{%- comment -%}
+  PC V13 — ORGANIC BIO-BOTANICAL SKINCARE PRODUCT GRID
+  Design: Leaf Sage (#F0FDF4), Deep Emerald (#15803D) accents, Outfit & Bricolage Grotesque typography
+  Card Shape: Organic asymmetrical corners (24px 8px), soft mint borders, botanical aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Outfit:wght@400;500;600;700&display=swap');
+
+  .pcv13 {
+    --bg: {{ section.settings.bg_color | default: '#F0FDF4' }};
+    --card-bg: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    --text: {{ section.settings.text_color | default: '#14532D' }};
+    --muted: {{ section.settings.muted_color | default: '#4ADE80' }};
+    --accent: {{ section.settings.accent_color | default: '#15803D' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#166534' }};
+    --border: {{ section.settings.border_color | default: '#DCFCE7' }};
+    --badge-sale-bg: #15803D;
+    --badge-sale-text: #FFFFFF;
+    --f-heading: 'Bricolage Grotesque', sans-serif;
+    --f-body: 'Outfit', sans-serif;
+    --ease: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding: {{ section.settings.padding_top | default: 56 }}px 0 {{ section.settings.padding_bottom | default: 56 }}px 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv13 *, .pcv13 *::before, .pcv13 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv13 a { color: inherit; text-decoration: none; }
+  .pcv13 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv13 img { max-width: 100%; display: block; }
+
+  .pcv13__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv13__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'center' }}; }
+  @media (min-width: 768px) {
+    .pcv13__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv13__title { font-family: var(--f-heading); font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  @media (min-width: 768px) { .pcv13__title { font-size: 36px; } }
+  .pcv13__sub { font-size: 15px; color: #365314; }
+  .pcv13__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--accent); background: #DCFCE7; padding: 8px 18px; border-radius: 30px; transition: var(--ease); }
+  .pcv13__viewall:hover { background: var(--accent); color: #FFFFFF; }
+
+  /* GRID */
+  .pcv13__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv13__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv13__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv13__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px 8px 24px 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--ease);
+  }
+  .pcv13__card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px -10px rgba(21, 128, 61, 0.16);
+    border-color: #86EFAC;
+  }
+
+  /* IMAGE BOX */
+  .pcv13__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #E8F5E9;
+    overflow: hidden;
+    border-radius: 24px 8px 0 0;
+  }
+  .pcv13__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv13__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv13__card:hover .pcv13__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv13__card:hover .pcv13__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv13__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv13__badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+  .pcv13__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv13__badge--tag { background: #065F46; color: #FFFFFF; }
+  .pcv13__badge--sold { background: #64748B; color: #FFFFFF; }
+
+  /* WISHLIST BUTTON */
+  .pcv13__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    color: #166534;
+    z-index: 3;
+    transition: var(--ease);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  .pcv13__wish:hover { background: #FFFFFF; color: var(--accent); transform: scale(1.1); }
+  .pcv13__wish.active { color: var(--accent); background: #FFFFFF; }
+
+  /* QUICK ADD HOVER */
+  .pcv13__quick-box {
+    position: absolute;
+    bottom: 12px; left: 12px; right: 12px;
+    z-index: 3;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: var(--ease);
+  }
+  .pcv13__card:hover .pcv13__quick-box { transform: translateY(0); opacity: 1; }
+  @media (max-width: 767px) {
+    .pcv13__quick-box { transform: translateY(0); opacity: 1; position: relative; bottom: auto; left: auto; right: auto; padding: 0 14px 14px; }
+  }
+
+  .pcv13__quick-btn {
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 12px; font-weight: 700;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.25);
+  }
+  .pcv13__quick-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
+  .pcv13__quick-btn:disabled { background: #CBD5E1; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv13__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv13__vendor { font-size: 10px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.08em; }
+  .pcv13__item-title { font-family: var(--f-heading); font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv13__rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .pcv13__stars { letter-spacing: 1px; }
+  .pcv13__rev-cnt { color: #365314; font-size: 11px; font-weight: 400; }
+
+  /* PRICE */
+  .pcv13__price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv13__price { font-size: 16px; font-weight: 700; color: var(--text); }
+  .pcv13__cmp-price { font-size: 13px; color: #64748B; text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv13__swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv13__swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv13__swatch:hover, .pcv13__swatch.active { transform: scale(1.25); border-color: var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv13__urgency { font-size: 11px; color: var(--accent); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv13__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #FFFFFF;
+    padding: 12px 22px; border-radius: 25px;
+    font-size: 13px; font-weight: 700;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 25px rgba(21, 128, 61, 0.3);
+  }
+  .pcv13__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv13">
+  <div class="pcv13__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv13__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv13__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv13__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv13__viewall">
+            {{ section.settings.view_all_label | default: 'Explore Botanical Range' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv13__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v13', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v13', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv13__toast" id="pcv13-toast">Added to Routine!</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv13-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv13Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ Added';
+        showT('Added to Routine!');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'Error';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv13-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V13 — Organic Botanica",
+  "tag": "section",
+  "class": "pcv13-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "100% ORGANIC"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Botanical Formulas"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Bio-active plant nutrients crafted to restore natural vitality."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore Botanical Range"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F0FDF4"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#14532D"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#4ADE80"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#15803D"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#DCFCE7"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V13 — Organic Botanica"
+    }
+  ]
+}
+{% endschema %}

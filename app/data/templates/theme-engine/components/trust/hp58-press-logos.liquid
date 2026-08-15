@@ -1,0 +1,47 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0B0F19' }};
+    padding: {{ section.settings.padding_vertical | default: 30 }}px 0;
+    border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  }
+  .hp58-press__container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .hp58-press__label {
+    text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: {{ section.settings.label_color | default: '#06B6D4' }}; margin: 0 0 24px;
+  }
+  .hp58-press__logos { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; }
+  .hp58-press__logo {
+    height: {{ section.settings.logo_height | default: 26 }}px;
+    opacity: 0.4; filter: grayscale(100%) brightness(3);
+    transition: all 0.3s ease;
+  }
+  .hp58-press__logo:hover { opacity: 0.85; filter: grayscale(0%); }
+  @media screen and (max-width: 768px) { .hp58-press__logos { gap: 30px; } .hp58-press__logo { height: 20px; } }
+{%- endstyle -%}
+<div class="hp58-press__container">
+  {%- if section.settings.label != blank -%}<p class="hp58-press__label">{{ section.settings.label }}</p>{%- endif -%}
+  <div class="hp58-press__logos">
+    {%- for block in section.blocks -%}
+      {%- if block.settings.logo != blank -%}<img src="{{ block.settings.logo | image_url: height: 60 }}" class="hp58-press__logo" alt="{{ block.settings.alt | default: 'Press' }}" loading="lazy">{%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP58 Press",
+  "class": "section-hp58-press",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0B0F19" },
+    { "type": "color", "id": "label_color", "label": "Label", "default": "#06B6D4" },
+    { "type": "text", "id": "label", "label": "Label", "default": "AS FEATURED IN" },
+    { "type": "range", "id": "logo_height", "min": 16, "max": 50, "step": 2, "unit": "px", "label": "Logo Height", "default": 26 },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Padding", "default": 30 }
+  ],
+  "blocks": [{ "type": "logo", "name": "Logo", "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "text", "id": "alt", "label": "Alt Text" }
+  ]}],
+  "presets": [{ "name": "HP58 Press" }]
+}
+{% endschema %}

@@ -1,0 +1,492 @@
+{%- comment -%}
+  PDP V41 — ELECTRIC SUNSET NEON POP
+  Design: Vibrant high-contrast electric sunset pop aesthetic, Outfit display + Inter body font
+  Deep Violet background (#4C1D95), Electric Sunset (#F97316), Neon Pink (#EC4899), Bright Amber (#F59E0B)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inv_qty = current_variant.inventory_quantity | default: 15 -%}
+{%- if inv_qty <= 0 -%}{%- assign inv_qty = 9 -%}{%- endif -%}
+{%- assign viewer_count = inv_qty | times: 7 | modulo: 50 | plus: 28 -%}
+{%- assign sold_count = inv_qty | times: 16 | modulo: 410 | plus: 190 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+
+  .pdpv41 {
+    --bg: #4C1D95; --surface: #2E1065; --border: #5B21B6; --border-dark: #F97316;
+    --text: #F3E8FF; --muted: #C084FC; --accent: #F97316; --accent-hover: #EA580C;
+    --pink: #EC4899; --amber: #F59E0B; --danger: #EF4444;
+    --f-head: 'Outfit', sans-serif; --f-body: 'Inter', sans-serif;
+    --r: 16px; --r-pill: 9999px; --ease: all 0.25s ease;
+    background: var(--bg); color: var(--text); font-family: var(--f-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .pdpv41 *, .pdpv41 *::before, .pdpv41 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pdpv41 img { max-width: 100%; display: block; }
+  .pdpv41 button { font-family: inherit; cursor: pointer; }
+  .pdpv41__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* OFFER BAR */
+  .pdpv41__offer { background: linear-gradient(90deg, #F97316, #EC4899, #F59E0B); color: #FFF; padding: 12px; text-align: center; font-family: var(--f-head); font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* GRID */
+  .pdpv41__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding: 36px 0; }
+  @media (min-width: 992px) { .pdpv41__grid { grid-template-columns: 1.1fr 1fr; gap: 48px; padding: 48px 0; } }
+
+  /* GALLERY */
+  .pdpv41__gal { display: flex; flex-direction: column; gap: 12px; }
+  .pdpv41__hero { width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--surface); border: 2px solid var(--border-dark); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(249,115,22,0.3); position: relative; }
+  .pdpv41__hero img { width: 100%; height: 100%; object-fit: contain; }
+  .pdpv41__neon-tag { position: absolute; top: 14px; left: 14px; background: var(--pink); color: #FFF; font-family: var(--f-head); font-size: 12px; font-weight: 800; padding: 4px 14px; border-radius: var(--r-pill); box-shadow: 0 0 12px rgba(236,72,153,0.5); }
+
+  .pdpv41__thumbs { display: flex; gap: 10px; overflow-x: auto; }
+  .pdpv41__th { width: 64px; height: 64px; flex-shrink: 0; border: 2px solid transparent; border-radius: 12px; overflow: hidden; cursor: pointer; background: var(--surface); transition: var(--ease); }
+  .pdpv41__th:hover, .pdpv41__th.on { border-color: var(--accent); box-shadow: 0 0 12px rgba(249,115,22,0.5); }
+  .pdpv41__th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .pdpv41__info { display: flex; flex-direction: column; gap: 18px; }
+  .pdpv41__crumb { font-family: var(--f-head); font-size: 13px; letter-spacing: 2px; color: var(--amber); font-weight: 800; text-transform: uppercase; }
+  .pdpv41__title { font-family: var(--f-head); font-size: 36px; font-weight: 800; line-height: 1.15; color: var(--text); }
+  @media (min-width: 992px) { .pdpv41__title { font-size: 44px; } }
+
+  .pdpv41__rating { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .pdpv41__stars { color: var(--amber); }
+
+  /* PRICE CARD */
+  .pdpv41__price-card { background: var(--surface); border: 2px solid var(--border-dark); border-radius: var(--r); padding: 16px 20px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 0 0 20px rgba(249,115,22,0.2); }
+  .pdpv41__price { font-family: var(--f-head); font-size: 38px; font-weight: 800; color: var(--accent); }
+  .pdpv41__cmp { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+  .pdpv41__badge { background: var(--pink); color: #FFF; font-family: var(--f-head); font-weight: 800; font-size: 13px; padding: 4px 12px; border-radius: var(--r-pill); }
+
+  /* VARIANTS */
+  .pdpv41__vlabel { font-family: var(--f-head); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); margin-bottom: 8px; }
+  .pdpv41__vopts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdpv41__vr { display: none; }
+  .pdpv41__vbtn { padding: 10px 22px; border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface); color: var(--text); font-weight: 700; font-size: 14px; transition: var(--ease); cursor: pointer; }
+  .pdpv41__vbtn:hover { border-color: var(--accent); }
+  .pdpv41__vr:checked + .pdpv41__vbtn { border-color: var(--accent); background: var(--accent); color: #FFF; box-shadow: 0 0 12px rgba(249,115,22,0.4); }
+
+  /* PROMO */
+  .pdpv41__promo { background: var(--surface); border: 1px dashed var(--accent); border-radius: var(--r); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--text); }
+  .pdpv41__promo-code { background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 13px; font-weight: 800; padding: 4px 12px; border-radius: 6px; }
+
+  /* URGENCY */
+  .pdpv41__urg { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
+  .pdpv41__pulse { display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-right: 6px; animation: pdpv41p 1.5s infinite; }
+  @keyframes pdpv41p { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pdpv41__bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .pdpv41__fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* QTY & CTA */
+  .pdpv41__qty-row { display: flex; align-items: center; gap: 14px; }
+  .pdpv41__qty { display: flex; border: 1px solid var(--border); border-radius: var(--r-pill); overflow: hidden; background: var(--surface); }
+  .pdpv41__qty button { width: 42px; height: 46px; border: none; background: transparent; font-size: 18px; color: var(--text); }
+  .pdpv41__qty input { width: 44px; height: 46px; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; font-size: 15px; font-weight: 700; background: transparent; color: var(--text); }
+
+  .pdpv41__atc { width: 100%; padding: 16px; border: none; border-radius: var(--r-pill); background: linear-gradient(90deg, #F97316, #EC4899); color: #FFF; font-family: var(--f-head); font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: var(--ease); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
+  .pdpv41__atc:hover { opacity: 0.95; transform: translateY(-1px); }
+  .pdpv41__atc:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .pdpv41__buynow .shopify-payment-button__button { border-radius: var(--r-pill) !important; }
+
+  /* TRUST */
+  .pdpv41__trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .pdpv41__trust-item { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .pdpv41__trust-icon { font-size: 20px; margin-bottom: 3px; color: var(--amber); }
+  @media (max-width: 480px) { .pdpv41__trust { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ACCORDION */
+  .pdpv41__acc { border-top: 1px solid var(--border); margin-top: 48px; }
+  .pdpv41__acc-item { border-bottom: 1px solid var(--border); }
+  .pdpv41__acc-btn { width: 100%; padding: 18px 0; border: none; background: transparent; display: flex; justify-content: space-between; align-items: center; font-family: var(--f-head); font-size: 19px; font-weight: 800; color: var(--text); }
+  .pdpv41__acc-btn::after { content: '⚡'; font-size: 18px; color: var(--amber); }
+  .pdpv41__acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pdpv41__acc-item.open .pdpv41__acc-body { max-height: 500px; }
+  .pdpv41__acc-inner { padding: 0 0 18px; font-size: 15px; line-height: 1.7; color: var(--muted); }
+
+  /* SECTION TITLE */
+  .pdpv41__sh { font-family: var(--f-head); font-size: 30px; font-weight: 800; text-align: center; margin: 48px 0 20px; color: var(--text); }
+
+  /* REELS */
+  .pdpv41__reels { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .pdpv41__reel { min-width: 180px; width: 180px; aspect-ratio: 9/16; background: #2E1065; border-radius: var(--r); overflow: hidden; flex-shrink: 0; position: relative; border: 1px solid var(--border-dark); }
+  .pdpv41__reel video { width: 100%; height: 100%; object-fit: cover; }
+  .pdpv41__reel-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #FFF; font-size: 12px; font-weight: 600; }
+  .pdpv41__reel-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--amber); font-size: 36px; }
+
+  /* CARDS */
+  .pdpv41__pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdpv41__pgrid { grid-template-columns: repeat(4, 1fr); } }
+  .pdpv41__pcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; transition: var(--ease); text-decoration: none; color: inherit; display: block; }
+  .pdpv41__pcard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(249,115,22,0.2); }
+  .pdpv41__pcard img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .pdpv41__pcard-info { padding: 14px; }
+  .pdpv41__pcard-title { font-family: var(--f-head); font-size: 16px; font-weight: 800; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pdpv41__pcard-price { font-size: 15px; font-weight: 700; color: var(--accent); }
+
+  /* REVIEWS */
+  .pdpv41__revgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .pdpv41__revgrid { grid-template-columns: repeat(3, 1fr); } }
+  .pdpv41__revcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); padding: 20px; }
+  .pdpv41__rev-stars { color: var(--amber); font-size: 14px; margin-bottom: 8px; }
+  .pdpv41__rev-txt { font-size: 14px; line-height: 1.6; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+  .pdpv41__rev-auth { font-family: var(--f-head); font-size: 15px; font-weight: 800; }
+  .pdpv41__rev-vf { font-size: 11px; color: var(--amber); font-weight: 700; }
+
+  /* RECENTLY VIEWED */
+  #pdpv41-rv { display: none; }
+  #pdpv41-rv.has { display: block; }
+
+  /* STICKY ATC */
+  .pdpv41__sticky { position: fixed; bottom: -80px; left: 0; width: 100%; background: var(--surface); border-top: 3px solid var(--accent); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; transition: bottom 0.3s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+  .pdpv41__sticky.show { bottom: 0; }
+  .pdpv41__sticky-l { display: flex; align-items: center; gap: 14px; }
+  .pdpv41__sticky-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+  .pdpv41__sticky-t { font-family: var(--f-head); font-size: 15px; font-weight: 800; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdpv41__sticky-p { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .pdpv41__sticky-btn { background: linear-gradient(90deg, #F97316, #EC4899); color: #FFF; border: none; padding: 12px 26px; border-radius: var(--r-pill); font-family: var(--f-head); font-weight: 800; font-size: 15px; transition: var(--ease); }
+  .pdpv41__sticky-btn:hover { opacity: 0.95; }
+  @media (max-width: 600px) { .pdpv41__sticky-l { display: none; } .pdpv41__sticky-btn { width: 100%; padding: 15px; } }
+
+  .pdpv41__toast { position: fixed; top: 20px; right: 20px; background: var(--accent); color: #FFF; padding: 12px 24px; border-radius: var(--r-pill); font-family: var(--f-head); font-size: 15px; font-weight: 800; z-index: 10000; transform: translateX(130%); transition: transform 0.3s ease; box-shadow: 0 4px 16px rgba(249,115,22,0.4); }
+  .pdpv41__toast.show { transform: translateX(0); }
+</style>
+
+<div class="pdpv41">
+  {% if section.settings.show_offer %}<div class="pdpv41__offer">{{ section.settings.offer_text }}</div>{% endif %}
+
+  <div class="pdpv41__wrap">
+    <div class="pdpv41__grid">
+
+      <!-- GALLERY -->
+      <div class="pdpv41__gal">
+        <div class="pdpv41__hero" id="pdpv41-hero">
+          <span class="pdpv41__neon-tag">⚡ ELECTRIC SUNSET</span>
+          {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.title | escape }}" id="pdpv41-himg">{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
+        </div>
+        <div class="pdpv41__thumbs">
+          {% for media in product.media limit: 6 %}
+            <div class="pdpv41__th {% if forloop.first %}on{% endif %}">
+              <img src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" loading="lazy">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pdpv41__info">
+        <div class="pdpv41__crumb">⚡ {% if product.collections.size > 0 %}{{ product.collections.first.title }}{% else %}Electric Sunset{% endif %}</div>
+        <h1 class="pdpv41__title">{{ product.title }}</h1>
+
+        {% if section.settings.show_rating %}
+          <div class="pdpv41__rating">
+            <span class="pdpv41__stars">★★★★★</span>
+            <span>{{ section.settings.rating_val }} · {{ section.settings.rev_count }} Electric Reviews</span>
+          </div>
+        {% endif %}
+
+        <div class="pdpv41__price-card">
+          <span class="pdpv41__price" id="pdpv41-price">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="pdpv41__cmp">{{ current_variant.compare_at_price | money }}</span>
+            {%- assign sv = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+            <span class="pdpv41__badge">SAVE {{ sv }}%</span>
+          {% endif %}
+        </div>
+
+        {% if product.variants.size > 1 %}
+          {% for option in product.options_with_values %}
+            <div>
+              <div class="pdpv41__vlabel">Select {{ option.name }}</div>
+              <div class="pdpv41__vopts">
+                {% for value in option.values %}
+                  <label>
+                    <input type="radio" name="pdpv41-o-{{ option.position }}" value="{{ value | escape }}" class="pdpv41__vr" data-pos="{{ option.position }}" {% if option.selected_value == value %}checked{% endif %}>
+                    <span class="pdpv41__vbtn">{{ value }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if section.settings.show_promo %}
+          <div class="pdpv41__promo">
+            <span>⚡ Sunset Pass: Apply {{ section.settings.promo_code }}</span>
+            <span class="pdpv41__promo-code">Save {{ section.settings.promo_disc }}</span>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_urgency %}
+          <div class="pdpv41__urg">
+            <div><span class="pdpv41__pulse"></span><strong>{{ viewer_count }}</strong> electric buyers active</div>
+            <div>⚡ <strong>{{ sold_count }}</strong> sunset orders completed today</div>
+            <div>Availability: Only <strong>{{ inv_qty }}</strong> remaining
+              <div class="pdpv41__bar">
+                {%- assign sp = inv_qty | times: 100 | divided_by: 45 -%}
+                {%- if sp > 100 -%}{%- assign sp = 100 -%}{%- endif -%}
+                <div class="pdpv41__fill" style="width:{{ sp }}%"></div>
+              </div>
+            </div>
+            {% if section.settings.show_countdown %}
+              <div>⏳ Sunset Drop Ends In: <strong id="pdpv41-cd" style="color:var(--amber)">{{ section.settings.cd_hrs }}h 00m 00s</strong></div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="pdpv41__qty-row">
+          <div class="pdpv41__qty">
+            <button type="button" id="pdpv41-qm">−</button>
+            <input type="number" id="pdpv41-qi" value="1" min="1" max="10" readonly>
+            <button type="button" id="pdpv41-qp">+</button>
+          </div>
+          {% form 'product', product, id: 'pdpv41-form', style: 'flex:1' %}
+            <input type="hidden" name="id" id="pdpv41-vid" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" id="pdpv41-fq" value="1">
+            <button type="submit" name="add" class="pdpv41__atc" id="pdpv41-atc" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}Add to Cart — {{ current_variant.price | money }}{% else %}Sold Out{% endif %}
+            </button>
+            <div class="pdpv41__buynow" style="margin-top:10px">{{ form | payment_button }}</div>
+          {% endform %}
+        </div>
+
+        <div class="pdpv41__trust">
+          <div class="pdpv41__trust-item"><div class="pdpv41__trust-icon">🔒</div>Secure</div>
+          <div class="pdpv41__trust-item"><div class="pdpv41__trust-icon">⚡</div>Express Dispatch</div>
+          <div class="pdpv41__trust-item"><div class="pdpv41__trust-icon">↩️</div>Easy Returns</div>
+          <div class="pdpv41__trust-item"><div class="pdpv41__trust-icon">✨</div>Neon Glow</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION -->
+    <div class="pdpv41__acc">
+      <div class="pdpv41__acc-item open">
+        <button class="pdpv41__acc-btn" type="button">Electric Sunset Specifications</button>
+        <div class="pdpv41__acc-body"><div class="pdpv41__acc-inner">{{ product.description }}</div></div>
+      </div>
+      {% if section.settings.sunset_specs != blank %}
+        <div class="pdpv41__acc-item">
+          <button class="pdpv41__acc-btn" type="button">Neon Engineering & Care</button>
+          <div class="pdpv41__acc-body"><div class="pdpv41__acc-inner">{{ section.settings.sunset_specs }}</div></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FBT -->
+    {% if section.settings.fbt_coll != blank %}
+      {%- assign fbt = collections[section.settings.fbt_coll] -%}
+      {% if fbt.products.size > 0 %}
+        <div class="pdpv41__sh">Electric Sunset Pairings</div>
+        <div class="pdpv41__pgrid">
+          {% for item in fbt.products limit: 4 %}
+            <a href="{{ item.url }}" class="pdpv41__pcard">
+              <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+              <div class="pdpv41__pcard-info">
+                <div class="pdpv41__pcard-title">{{ item.title }}</div>
+                <div class="pdpv41__pcard-price">{{ item.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- REELS -->
+    {% if section.settings.show_reels %}
+      <div class="pdpv41__sh">Neon Stream</div>
+      <div class="pdpv41__reels">
+        {% if section.settings.r1 != blank %}<div class="pdpv41__reel"><video src="{{ section.settings.r1 }}" muted playsinline loop></video><div class="pdpv41__reel-cap">⚡ Sunset Glow</div></div>{% else %}<div class="pdpv41__reel"><div class="pdpv41__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r2 != blank %}<div class="pdpv41__reel"><video src="{{ section.settings.r2 }}" muted playsinline loop></video><div class="pdpv41__reel-cap">⚡ Neon Pink</div></div>{% else %}<div class="pdpv41__reel"><div class="pdpv41__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r3 != blank %}<div class="pdpv41__reel"><video src="{{ section.settings.r3 }}" muted playsinline loop></video><div class="pdpv41__reel-cap">✨ Electric Unboxing</div></div>{% else %}<div class="pdpv41__reel"><div class="pdpv41__reel-ph">▶</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- REVIEWS -->
+    {% if section.settings.show_reviews %}
+      <div class="pdpv41__sh" id="reviews">Customer Reviews</div>
+      <div class="pdpv41__revgrid">
+        {% if section.settings.rv1 != blank %}<div class="pdpv41__revcard"><div class="pdpv41__rev-stars">★★★★★</div><div class="pdpv41__rev-txt">"{{ section.settings.rv1 }}"</div><div class="pdpv41__rev-auth">{{ section.settings.rv1n }}</div><div class="pdpv41__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv2 != blank %}<div class="pdpv41__revcard"><div class="pdpv41__rev-stars">★★★★★</div><div class="pdpv41__rev-txt">"{{ section.settings.rv2 }}"</div><div class="pdpv41__rev-auth">{{ section.settings.rv2n }}</div><div class="pdpv41__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv3 != blank %}<div class="pdpv41__revcard"><div class="pdpv41__rev-stars">★★★★★</div><div class="pdpv41__rev-txt">"{{ section.settings.rv3 }}"</div><div class="pdpv41__rev-auth">{{ section.settings.rv3n }}</div><div class="pdpv41__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURED -->
+    {% if section.settings.feat_coll != blank %}
+      {%- assign fc = collections[section.settings.feat_coll] -%}
+      {% if fc.products.size > 0 %}
+        <div class="pdpv41__sh">Recommended Neon Products</div>
+        <div class="pdpv41__pgrid">
+          {% for item in fc.products limit: 4 %}
+            {% if item.handle != product.handle %}
+              <a href="{{ item.url }}" class="pdpv41__pcard">
+                <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+                <div class="pdpv41__pcard-info">
+                  <div class="pdpv41__pcard-title">{{ item.title }}</div>
+                  <div class="pdpv41__pcard-price">{{ item.price | money }}</div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- RECENTLY VIEWED -->
+    <div id="pdpv41-rv">
+      <div class="pdpv41__sh">Recently Viewed</div>
+      <div class="pdpv41__pgrid" id="pdpv41-rvg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY ATC -->
+<div class="pdpv41__sticky" id="pdpv41-sticky">
+  <div class="pdpv41__sticky-l">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 80 }}" class="pdpv41__sticky-img" alt="{{ product.title | escape }}">{% endif %}
+    <div>
+      <div class="pdpv41__sticky-t">{{ product.title }}</div>
+      <div class="pdpv41__sticky-p" id="pdpv41-sp">{{ current_variant.price | money }}</div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      {% if product.available %}
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b>{% render 'countdown-timer', product: product %}</b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% render 'back-in-stock', product: product %}
+
+      {% if product.available %}
+      <button type="button" class="pdpv41__sticky-btn" id="pdpv41-sbtn">Add to Cart</button>
+      {% else %}
+      <button class="pdpv41__sticky-btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      {% endif %}
+</div>
+
+<div class="pdpv41__toast" id="pdpv41-toast">⚡ Added to cart!</div>
+
+<script>
+(function(){
+  var PJ={{ product | json }}, cid={{ current_variant.id }};
+  function getO(){ var o=[]; document.querySelectorAll('.pdpv41__vr:checked').forEach(function(r){ o.push({p:parseInt(r.dataset.pos),v:r.value}); }); o.sort(function(a,b){return a.p-b.p}); return o.map(function(x){return x.v}); }
+  function findV(o){ for(var i=0;i<PJ.variants.length;i++){ var v=PJ.variants[i],ok=true; for(var j=0;j<o.length;j++){ if(v.options[j]!==o[j]){ ok=false; break; } } if(ok) return v; } return null; }
+  function upd(){
+    var o=getO(); if(!o.length) return; var v=findV(o); if(!v) return; cid=v.id;
+    document.getElementById('pdpv41-vid').value=v.id;
+    var pf=(v.price/100).toLocaleString('en-US',{style:'currency',currency:PJ.currency||'USD'});
+    var pe=document.getElementById('pdpv41-price'); if(pe) pe.textContent=pf;
+    var sp=document.getElementById('pdpv41-sp'); if(sp) sp.textContent=pf;
+    var ab=document.getElementById('pdpv41-atc');
+    if(ab){ ab.disabled=!v.available; ab.textContent=v.available?'Add to Cart — '+pf:'Sold Out'; }
+    var u=new URL(window.location); u.searchParams.set('variant',v.id); history.replaceState({},'',u);
+  }
+  document.querySelectorAll('.pdpv41__vr').forEach(function(r){ r.addEventListener('change',upd); });
+
+  var fm=document.getElementById('pdpv41-form');
+  if(fm) fm.addEventListener('submit',function(e){
+    e.preventDefault(); var b=document.getElementById('pdpv41-atc'), ot=b.textContent;
+    b.disabled=true; b.textContent='Adding...';
+    var q=parseInt(document.getElementById('pdpv41-qi').value)||1;
+    document.getElementById('pdpv41-fq').value=q;
+    fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cid,quantity:q})})
+    .then(function(r){return r.json();})
+    .then(function(){ b.textContent='✓ Added!'; toast41(); setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); })
+    .catch(function(){ b.textContent='Error'; setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); });
+  });
+
+  function toast41(){ var t=document.getElementById('pdpv41-toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+  var qi=document.getElementById('pdpv41-qi');
+  document.getElementById('pdpv41-qm').addEventListener('click',function(){ var v=parseInt(qi.value); if(v>1) qi.value=v-1; });
+  document.getElementById('pdpv41-qp').addEventListener('click',function(){ var v=parseInt(qi.value); if(v<10) qi.value=v+1; });
+
+  document.querySelectorAll('.pdpv41__th').forEach(function(th){
+    th.addEventListener('click',function(){
+      document.querySelectorAll('.pdpv41__th').forEach(function(t){ t.classList.remove('on'); });
+      th.classList.add('on');
+      var hi=document.getElementById('pdpv41-himg'), ti=th.querySelector('img');
+      if(hi&&ti) hi.src=ti.src.replace(/width=\d+/,'width=900');
+    });
+  });
+
+  var sb=document.getElementById('pdpv41-sticky'), ab=document.getElementById('pdpv41-atc');
+  if(sb&&ab) window.addEventListener('scroll',function(){ sb.classList.toggle('show', ab.getBoundingClientRect().top<-50); });
+  var sbn=document.getElementById('pdpv41-sbtn');
+  if(sbn) sbn.addEventListener('click',function(){ document.getElementById('pdpv41-atc').click(); });
+
+  document.querySelectorAll('.pdpv41__acc-btn').forEach(function(b){ b.addEventListener('click',function(){ b.closest('.pdpv41__acc-item').classList.toggle('open'); }); });
+
+  var ce=document.getElementById('pdpv41-cd');
+  if(ce){
+    var hrs=parseInt('{{ section.settings.cd_hrs | default: 6 }}')||6, ts=hrs*3600;
+    var sk=sessionStorage.getItem('pdpv41_cd'); if(sk) ts=parseInt(sk);
+    setInterval(function(){ ts--; if(ts<=0){ ce.textContent='EXPIRED'; return; } var h=Math.floor(ts/3600), m=Math.floor((ts%3600)/60), s=ts%60; ce.textContent=h+'h '+(m<10?'0':'')+m+'m '+(s<10?'0':'')+s+'s'; sessionStorage.setItem('pdpv41_cd',ts); },1000);
+  }
+
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target.querySelector('video'); if(v){ e.isIntersecting?v.play():v.pause(); } }); },{threshold:0.5});
+    document.querySelectorAll('.pdpv41__reel').forEach(function(r){ ro.observe(r); });
+  }
+
+  var RK='pdpv41_rv', cp={handle:'{{ product.handle }}',title:'{{ product.title | escape }}',price:'{{ product.price | money }}',image:'{{ product.featured_image | image_url: width: 400 }}',url:'{{ product.url }}'};
+  try{ var its=JSON.parse(localStorage.getItem(RK)||'[]'); its=its.filter(function(i){ return i.handle!==cp.handle; }); its.unshift(cp); if(its.length>8) its=its.slice(0,8); localStorage.setItem(RK,JSON.stringify(its)); }catch(e){}
+  try{
+    var its2=JSON.parse(localStorage.getItem(RK)||'[]').filter(function(i){ return i.handle!==cp.handle; });
+    var c=document.getElementById('pdpv41-rv'), g=document.getElementById('pdpv41-rvg');
+    if(g&&its2.length>0){ c.classList.add('has'); var h=''; its2.slice(0,4).forEach(function(i){ h+='<a href="'+i.url+'" class="pdpv41__pcard"><img src="'+i.image+'" alt="'+i.title+'" loading="lazy"><div class="pdpv41__pcard-info"><div class="pdpv41__pcard-title">'+i.title+'</div><div class="pdpv41__pcard-price">'+i.price+'</div></div></a>'; }); g.innerHTML=h; }
+  }catch(e){}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PDP V41 — Electric Sunset",
+  "tag": "section",
+  "class": "pdpv41-section",
+  "settings": [
+    { "type": "header", "content": "Rating" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "text", "id": "rating_val", "label": "Rating score", "default": "4.98" },
+    { "type": "text", "id": "rev_count", "label": "Total reviews", "default": "2,050" },
+    { "type": "header", "content": "Offer Banner" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show offer", "default": true },
+    { "type": "text", "id": "offer_text", "label": "Offer text", "default": "⚡ ELECTRIC SUNSET: ENJOY 20% DISCOUNT WITH CODE 'SUNSET20'" },
+    { "type": "header", "content": "Promo" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show promo", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Code", "default": "SUNSET20" },
+    { "type": "text", "id": "promo_disc", "label": "Discount", "default": "20%" },
+    { "type": "header", "content": "Urgency" },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show urgency", "default": true },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "range", "id": "cd_hrs", "label": "Countdown hours", "min": 1, "max": 48, "default": 6 },
+    { "type": "header", "content": "Accordion" },
+    { "type": "richtext", "id": "sunset_specs", "label": "Neon engineering & care" },
+    { "type": "header", "content": "FBT" },
+    { "type": "collection", "id": "fbt_coll", "label": "FBT collection" },
+    { "type": "header", "content": "Reels" },
+    { "type": "checkbox", "id": "show_reels", "label": "Show reels", "default": true },
+    { "type": "url", "id": "r1", "label": "Reel 1 URL" },
+    { "type": "url", "id": "r2", "label": "Reel 2 URL" },
+    { "type": "url", "id": "r3", "label": "Reel 3 URL" },
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews", "default": true },
+    { "type": "text", "id": "rv1", "label": "Review 1", "default": "Vibrant colors and electric energy!" },
+    { "type": "text", "id": "rv1n", "label": "Author 1", "default": "Skyler V." },
+    { "type": "text", "id": "rv2", "label": "Review 2", "default": "High contrast design is incredible." },
+    { "type": "text", "id": "rv2n", "label": "Author 2", "default": "Kai N." },
+    { "type": "text", "id": "rv3", "label": "Review 3", "default": "100% electric quality." },
+    { "type": "text", "id": "rv3n", "label": "Author 3", "default": "Zion R." },
+    { "type": "header", "content": "Featured" },
+    { "type": "collection", "id": "feat_coll", "label": "Featured collection" }
+  ],
+  "presets": [{ "name": "PDP V41 — Electric Sunset" }]
+}
+{% endschema %}

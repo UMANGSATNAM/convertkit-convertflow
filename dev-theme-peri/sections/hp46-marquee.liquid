@@ -1,0 +1,80 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp46-marq-bg: {{ section.settings.bg_color | default: '#0F172A' }};
+    
+    background: var(--hp46-marq-bg);
+    border-top: 1px solid rgba(56, 189, 248, 0.2);
+    border-bottom: 1px solid rgba(244, 114, 182, 0.2);
+    padding: {{ section.settings.padding_vertical | default: 16 }}px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .hp46-marquee__track {
+    display: inline-flex;
+    gap: 40px;
+    animation: hp46-scroll {{ section.settings.speed | default: 20 }}s linear infinite;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .hp46-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #38BDF8 0%, #F472B6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @keyframes hp46-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+{%- endstyle -%}
+
+<div class="hp46-marquee__track">
+  {%- if section.blocks.size > 0 -%}
+    {%- for i in (1..2) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp46-marquee__item" {{ block.shopify_attributes }}>
+          <span>⚡ {{ block.settings.text }}</span>
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for i in (1..2) -%}
+      <div class="hp46-marquee__item"><span>⚡ HOLOGRAPHIC BIO-LUMINESCENCE</span></div>
+      <div class="hp46-marquee__item"><span>✦ 24-HOUR CYBER DEFENSE</span></div>
+      <div class="hp46-marquee__item"><span>⚡ GLOBAL DDP AIR COURIER</span></div>
+      <div class="hp46-marquee__item"><span>✦ BIO-SYNTHESIZED PEPTIDES</span></div>
+    {%- endfor -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP46 - Cyber Marquee",
+  "class": "section-hp46-marquee",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0F172A" },
+    { "type": "range", "id": "speed", "min": 10, "max": 60, "step": 2, "unit": "s", "label": "Scroll Speed", "default": 20 },
+    { "type": "range", "id": "padding_vertical", "min": 8, "max": 40, "step": 2, "unit": "px", "label": "Padding Vertical", "default": 16 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Ticker Item",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "HOLOGRAPHIC BIO-LUMINESCENCE" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP46 - Cyber Marquee" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,101 @@
+{% comment %} CL V40 — Anime / Manga (Halftone dots) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv40 { background: {{ section.settings.bg_color | default: '#FFFFFF' }}; color: {{ section.settings.text_color | default: '#000000' }}; padding: 40px 15px; font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; border-left: 10px solid #000; border-right: 10px solid #000; }
+  .clv40-hero { text-align: left; margin-bottom: 40px; padding: 40px; border: 4px solid #000; position: relative; background: url('https://cdn.shopify.com/s/files/1/0000/0000/0000/files/manga-bg.png') repeat; background-size: 15px 15px; box-shadow: 10px 10px 0 #000; }
+  .clv40-hero h1 { font-size: 50px; font-weight: 900; margin-bottom: 10px; background: #FFF; display: inline-block; padding: 0 10px; border: 2px solid #000; text-transform: uppercase; font-style: italic; }
+  .clv40-hero p { font-size: 18px; font-weight: bold; background: #FFF; display: inline-block; padding: 5px 10px; border: 2px solid #000; margin-top: 10px; }
+  .clv40-chips { display: flex; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; justify-content: center; }
+  .clv40-chips a { padding: 10px 20px; background: #FFF; color: #000; text-decoration: none; font-size: 16px; font-weight: bold; border: 3px solid #000; transform: skew(-10deg); box-shadow: 4px 4px 0 #000; transition: 0.1s; }
+  .clv40-chips a:hover, .clv40-chips a.active { background: #000; color: #FFF; transform: skew(-10deg) translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+  .clv40-chips a span { display: inline-block; transform: skew(10deg); }
+  .clv40-toolbar { background: #FFF; border: 3px solid #000; padding: 15px 20px; margin-bottom: 40px; box-shadow: 6px 6px 0 #000; }
+  .clv40-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 25px; }
+  .clv40-promo { grid-column: span 1; background: #FFF; border: 4px solid #000; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 8px 8px 0 #000; background-image: radial-gradient(#000 15%, transparent 16%); background-size: 10px 10px; position: relative; z-index: 1; }
+  .clv40-promo::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; background: #FFF; z-index: -1; border: 2px solid #000; }
+  .clv40-promo h3 { font-size: 28px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; line-height: 1.1; font-style: italic; }
+  .clv40-promo a { display: inline-block; padding: 10px 20px; background: #000; color: #FFF; text-decoration: none; font-weight: bold; font-size: 14px; text-transform: uppercase; border: 2px solid #000; }
+  .clv40-promo a:hover { background: #FFF; color: #000; }
+  .clv40-seo { margin-top: 50px; background: #FFF; border: 4px solid #000; padding: 40px; box-shadow: 10px 10px 0 #000; }
+  @media (max-width: 768px) { .clv40-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv40-hero h1 { font-size: 35px; } }
+</style>
+<div class="clv40" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv40-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}MANGA STORE{% endif %}</h1>
+    <br>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Volumes 1 to 100. Catch up on your favorite series.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv40-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}"><span>{{ link.title }}</span></a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv40-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; font-weight: bold; text-transform: uppercase; color: #000;">{{ filter.label }} 💥</summary>
+              <div style="position: absolute; background: #FFF; border: 3px solid #000; padding: 20px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 5px 5px 0 #000;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FFF; border: 2px solid #000; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: inherit; text-transform: uppercase;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv40-grid">
+      {% for product in collection.products %}
+        {% render 'card-v40', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv40-promo">
+            <h3>Pre-Order<br>Vol. 42</h3>
+            <a href="/products/vol42">Reserve</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v40', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-size: 24px; font-weight: 900;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv40-seo">
+      <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; font-style: italic;">{{ section.settings.seo_title | default: 'READ. EVERY. CHAPTER.' }}</h2>
+      <p style="font-size: 16px; font-weight: bold; max-width: 700px; line-height: 1.5;">{{ section.settings.seo_text | default: 'Dive into new worlds. We stock the latest releases directly translated and published, alongside classic series box sets.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V40 — Manga", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFFFFF"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#000000"}
+  ], "presets": [{"name": "CL V40 — Manga"}]
+}
+{% endschema %}

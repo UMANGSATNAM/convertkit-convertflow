@@ -1,0 +1,355 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    --pill-bg: {{ section.settings.pill_bg }};
+    --pill-active-bg: {{ section.settings.pill_active_bg }};
+    --pill-active-text: {{ section.settings.pill_active_text }};
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-top: var(--border-thickness) solid var(--border-color);
+    border-bottom: var(--border-thickness) solid var(--border-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-cat-pills {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: {{ section.settings.gap }}px;
+    justify-content: {{ section.settings.alignment }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-cat-pills {
+      {% if section.settings.mobile_swipe %}
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 16px;
+      margin-left: -24px;
+      margin-right: -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Firefox */
+      justify-content: flex-start;
+      {% else %}
+      justify-content: center;
+      {% endif %}
+    }
+    {% if section.settings.mobile_swipe %}
+    .hp20-cat-pills::-webkit-scrollbar {
+      display: none;
+    }
+    {% endif %}
+  }
+
+  .hp20-cat-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pill-bg);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: {{ section.settings.text_size }}px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    padding: {{ section.settings.pill_padding_y }}px {{ section.settings.pill_padding_x }}px;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    transition: all 0.15s ease-out;
+    white-space: nowrap;
+    
+    {% if section.settings.mobile_swipe %}
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    {% endif %}
+  }
+
+  .hp20-cat-pill:hover {
+    transform: translate(2px, 2px);
+    box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0px var(--shadow-color);
+    background: var(--pill-active-bg);
+    color: var(--pill-active-text);
+  }
+
+  .hp20-cat-pill:active, .hp20-cat-pill.is-active {
+    transform: translate(var(--shadow-offset), var(--shadow-offset));
+    box-shadow: 0px 0px 0px var(--shadow-color);
+    background: var(--pill-active-bg);
+    color: var(--pill-active-text);
+  }
+
+  .hp20-cat-pill img {
+    width: {{ section.settings.icon_size }}px;
+    height: {{ section.settings.icon_size }}px;
+    object-fit: contain;
+    margin-right: 12px;
+    mix-blend-mode: multiply; /* Helps icon blend into colored background */
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-cat-pills" id="HP20CategoryPills-{{ section.id }}">
+  {%- for block in section.blocks -%}
+    {%- assign link_url = block.settings.link | default: '#' -%}
+    <a href="{{ link_url }}" class="hp20-cat-pill {% if forloop.first and section.settings.make_first_active %}is-active{% endif %}" {{ block.shopify_attributes }}>
+      {%- if block.settings.icon != blank -%}
+        <img src="{{ block.settings.icon | image_url: width: 100 }}" alt="{{ block.settings.title | escape }}" loading="lazy">
+      {%- endif -%}
+      {{ block.settings.title | escape }}
+    </a>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Pills",
+  "class": "section-hp20-cat-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment (Desktop)",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between pills",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_swipe",
+      "label": "Enable horizontal swipe on mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Pill Styling"
+    },
+    {
+      "type": "range",
+      "id": "pill_padding_x",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Horizontal Padding",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "pill_padding_y",
+      "min": 5,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "make_first_active",
+      "label": "Force first pill as 'Active'",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "pill_bg",
+      "label": "Pill Background (Default)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "pill_active_bg",
+      "label": "Pill Background (Hover/Active)",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "pill_active_text",
+      "label": "Text Color (Hover/Active)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Optional Icon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Pills",
+      "blocks": [
+        { "type": "category", "settings": { "title": "NEW ARRIVALS" } },
+        { "type": "category", "settings": { "title": "BEST SELLERS" } },
+        { "type": "category", "settings": { "title": "SALE" } },
+        { "type": "category", "settings": { "title": "ACCESSORIES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

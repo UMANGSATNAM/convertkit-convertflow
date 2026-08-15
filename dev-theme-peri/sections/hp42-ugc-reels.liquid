@@ -1,0 +1,101 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Inter:wght@300&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg: {{ section.settings.bg_color }};
+    --text: {{ section.settings.text_color }};
+    --sans: 'Inter', sans-serif;
+    background: var(--bg);
+    padding: 80px 0;
+    overflow: hidden;
+  }
+
+  .hp42-ugc__track {
+    display: flex;
+    gap: 3px;
+    padding: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hp42-ugc__track::-webkit-scrollbar { display: none; }
+
+  .hp42-ugc__item {
+    flex: 0 0 25vw;
+    scroll-snap-align: start;
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    display: block;
+  }
+  @media (max-width: 768px) { .hp42-ugc__item { flex: 0 0 60vw; } }
+
+  .hp42-ugc__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.5) saturate(0.6);
+    transition: filter 0.6s ease, transform 0.6s ease;
+  }
+
+  .hp42-ugc__item:hover .hp42-ugc__img {
+    filter: brightness(0.8) saturate(1);
+    transform: scale(1.05);
+  }
+
+  .hp42-ugc__handle {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+  }
+
+  .hp42-ugc__item:hover .hp42-ugc__handle {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div id="HP42UGC-{{ section.id }}">
+  <div class="hp42-ugc__track">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp42-ugc__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp42-ugc__img" loading="lazy">
+        {%- else -%}
+          {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'hp42-ugc__img' }}
+        {%- endif -%}
+        <div class="hp42-ugc__handle">{{ block.settings.handle }}</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP42 - Noir UGC",
+  "class": "section-hp42-ugc-reels",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0A0A0A" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#F5F0EB" },
+    { "type": "html", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "blocks": [{ "type": "ugc", "name": "Post", "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "handle", "label": "Handle", "default": "@darkelegance" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ]}],
+  "presets": [{ "name": "HP42 - Noir UGC", "blocks": [
+    { "type": "ugc" }, { "type": "ugc" }, { "type": "ugc" }, { "type": "ugc" }
+  ]}]
+}
+{% endschema %}

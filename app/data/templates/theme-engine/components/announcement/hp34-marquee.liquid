@@ -1,0 +1,193 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  .hp34-marquee-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Fixed terminal prompt symbol on the left */
+  .hp34-marquee__prompt {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-body);
+    font-size: {{ section.settings.font_size }}px;
+    color: var(--accent-color);
+    z-index: 10;
+    background: var(--bg-color);
+    padding-right: 15px;
+  }
+
+  .hp34-marquee__track {
+    display: flex;
+    white-space: nowrap;
+    animation: hp34Marquee var(--speed, 15s) linear infinite;
+    padding-left: 80px; /* space for prompt */
+  }
+
+  .hp34-marquee__track:hover {
+    animation-play-state: paused;
+  }
+
+  .hp34-marquee__item {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.font_size }}px;
+    color: var(--text-color);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0 40px;
+    display: inline-block;
+    letter-spacing: 1px;
+  }
+
+  .hp34-marquee__separator {
+    color: var(--accent-color);
+    opacity: 0.5;
+  }
+
+  @keyframes hp34Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-marquee-wrapper" id="HP34Marquee-{{ section.id }}" style="--speed: {{ section.settings.speed }}s;">
+  <div class="hp34-marquee__prompt">>&_</div>
+  <div class="hp34-marquee__track">
+    {%- for i in (1..2) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp34-marquee__item" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+          <span class="hp34-marquee__separator">//</span>
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP34 - Tech Marquee",
+  "class": "section-hp34-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "s",
+      "label": "Animation Speed",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Marquee Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "SYSTEM RUNNING"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "GLOBAL SHIPPING ACTIVE" } },
+        { "type": "text", "settings": { "text": "ENCRYPTED CHECKOUT" } },
+        { "type": "text", "settings": { "text": "RETURN POLICY ENABLED" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,184 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#00FFFF'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 4px solid #000;
+  }
+  
+  .hp16-table-container-{{ section_id }} {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .hp16-table-title-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    text-transform: uppercase;
+    color: #FFF;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 4px 4px 0 #FF00FF;
+    text-align: center;
+    margin: 0 0 50px 0;
+  }
+  
+  .hp16-table-wrap-{{ section_id }} {
+    background: #FFF;
+    border: 4px solid #000;
+    border-radius: 20px;
+    box-shadow: 15px 15px 0 #FF00FF;
+    overflow: hidden;
+  }
+  
+  .hp16-table-{{ section_id }} {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .hp16-table-{{ section_id }} th {
+    background: #000;
+    color: #FFF;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.2rem;
+    padding: 20px;
+    text-transform: uppercase;
+  }
+  
+  .hp16-table-{{ section_id }} th:first-child {
+    background: #FFF;
+    border-right: 4px solid #000;
+  }
+  
+  .hp16-table-{{ section_id }} th:last-child {
+    background: #FF00FF;
+    border-left: 4px solid #000;
+    color: #FFF;
+  }
+  
+  .hp16-table-{{ section_id }} td {
+    padding: 20px;
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+    border-top: 4px solid #000;
+  }
+  
+  .hp16-table-{{ section_id }} td:first-child {
+    text-align: left;
+    border-right: 4px solid #000;
+  }
+  
+  .hp16-table-{{ section_id }} td:last-child {
+    border-left: 4px solid #000;
+    background: rgba(255,0,255,0.1);
+  }
+  
+  .hp16-check-{{ section_id }} {
+    color: #FF00FF;
+    font-size: 1.5rem;
+  }
+  
+  .hp16-cross-{{ section_id }} {
+    color: #000;
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp16-table-{{ section_id }} th, .hp16-table-{{ section_id }} td {
+      padding: 15px 10px;
+      font-size: 0.9rem;
+    }
+    .hp16-table-wrap-{{ section_id }} {
+      box-shadow: 8px 8px 0 #FF00FF;
+    }
+  }
+</style>
+
+<div class="hp16-table-container-{{ section_id }}">
+  <h2 class="hp16-table-title-{{ section_id }}">{{ section.settings.title | default: 'US VS THEM' }}</h2>
+  
+  <div class="hp16-table-wrap-{{ section_id }}">
+    <table class="hp16-table-{{ section_id }}">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Others</th>
+          <th>{{ shop.name | default: 'US' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for block in section.blocks %}
+          <tr {{ block.shopify_attributes }}>
+            <td>{{ block.settings.title }}</td>
+            <td>{% if block.settings.others %}<span class="hp16-check-{{ section_id }}">✔</span>{% else %}<span class="hp16-cross-{{ section_id }}">✘</span>{% endif %}</td>
+            <td>{% if block.settings.us %}<span class="hp16-check-{{ section_id }}">✔</span>{% else %}<span class="hp16-cross-{{ section_id }}">✘</span>{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP16 Comparison Table",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#00FFFF"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "US VS THEM"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Feature Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Name"
+        },
+        {
+          "type": "checkbox",
+          "id": "others",
+          "label": "Others have this",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "us",
+          "label": "We have this",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP16 Comparison Table",
+      "blocks": [
+        { "type": "row", "settings": { "title": "Boring Designs", "others": true, "us": false } },
+        { "type": "row", "settings": { "title": "Y2K Aesthetic", "others": false, "us": true } },
+        { "type": "row", "settings": { "title": "Fast Shipping", "others": false, "us": true } },
+        { "type": "row", "settings": { "title": "Cuteness Overload", "others": false, "us": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

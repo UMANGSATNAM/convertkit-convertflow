@@ -1,0 +1,98 @@
+{% comment %} CL V16 — Coffee / Warm Tones {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv16 { background: {{ section.settings.bg_color | default: '#FDFBF7' }}; color: {{ section.settings.text_color | default: '#4A3728' }}; padding: 60px 20px; font-family: 'Merriweather', serif; }
+  .clv16-hero { text-align: center; margin-bottom: 50px; }
+  .clv16-hero h1 { font-size: 42px; font-weight: 700; color: #3E2723; margin-bottom: 15px; }
+  .clv16-hero p { font-size: 16px; font-family: 'Open Sans', sans-serif; color: #6D4C41; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .clv16-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv16-chips a { padding: 10px 24px; background: #EFEBE9; color: #4A3728; border: 1px solid #D7CCC8; border-radius: 8px; text-decoration: none; font-family: 'Open Sans', sans-serif; font-size: 13px; font-weight: 600; transition: 0.3s; }
+  .clv16-chips a:hover, .clv16-chips a.active { background: #4A3728; color: #FFF; border-color: #4A3728; }
+  .clv16-toolbar { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #D7CCC8; border-bottom: 1px solid #D7CCC8; padding: 20px 0; margin-bottom: 40px; font-family: 'Open Sans', sans-serif; }
+  .clv16-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 30px; }
+  .clv16-promo { grid-column: span 1; background: #3E2723; color: #FFF; border-radius: 8px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .clv16-promo h3 { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: #D7CCC8; }
+  .clv16-promo a { display: inline-block; padding: 12px 25px; background: #D7CCC8; color: #3E2723; font-family: 'Open Sans', sans-serif; font-size: 13px; font-weight: bold; text-decoration: none; border-radius: 4px; }
+  .clv16-seo { margin-top: 60px; text-align: center; background: #EFEBE9; padding: 50px; border-radius: 8px; }
+  @media (max-width: 768px) { .clv16-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } }
+</style>
+<div class="clv16" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv16-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}The Roaster's Choice{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Discover our carefully selected single-origin beans and blends.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv16-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv16-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 13px; font-weight: 600; color: #4A3728; text-transform: uppercase;">{{ filter.label }} ▾</summary>
+              <div style="position: absolute; background: #FFF; border: 1px solid #D7CCC8; border-radius: 8px; padding: 20px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 10px; cursor: pointer; font-size: 14px; color: #6D4C41;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-size: 13px; font-weight: 600; color: #4A3728; text-transform: uppercase; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv16-grid">
+      {% for product in collection.products %}
+        {% render 'card-v16', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv16-promo">
+            <span style="font-family: 'Open Sans', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #A1887F; margin-bottom: 10px;">Subscription</span>
+            <h3>Never Run Out</h3>
+            <a href="/pages/subscribe">Subscribe & Save</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v16', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-family: 'Open Sans', sans-serif;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv16-seo">
+      <h2 style="font-size: 26px; font-weight: 700; color: #3E2723; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Brewed with Passion' }}</h2>
+      <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; color: #6D4C41; max-width: 700px; margin: 0 auto; line-height: 1.7;">{{ section.settings.seo_text | default: 'We source our beans directly from sustainable farms to ensure the highest quality cup, every single time.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V16 — Coffee", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FDFBF7"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#4A3728"}
+  ], "presets": [{"name": "CL V16 — Coffee"}]
+}
+{% endschema %}

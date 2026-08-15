@@ -1,0 +1,88 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp45-pills-bg: {{ section.settings.bg_color | default: '#F5F5F0' }};
+    --hp45-border: {{ section.settings.border_color | default: '#0A0A0A' }};
+    
+    background-color: var(--hp45-pills-bg);
+    padding: {{ section.settings.padding_vertical | default: 30 }}px 0;
+    border-bottom: 2px solid var(--hp45-border);
+  }
+
+  .hp45-pills__wrap {
+    max-width: {{ section.settings.container_width | default: 1300 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .hp45-tab-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0A0A0A;
+    background: #FFFFFF;
+    border: 2px solid var(--hp45-border);
+    box-shadow: 3px 3px 0 var(--hp45-border);
+    padding: 10px 22px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .hp45-tab-pill:hover, .hp45-tab-pill--active {
+    background: #0A0A0A;
+    color: #FFFFFF;
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--hp45-border);
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp45-pills__wrap { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+    .hp45-tab-pill { flex-shrink: 0; }
+  }
+{%- endstyle -%}
+
+<div class="hp45-pills__wrap">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '/collections/all' }}" class="hp45-tab-pill {% if forloop.first %}hp45-tab-pill--active{% endif %}" {{ block.shopify_attributes }}>
+        {{ block.settings.title }}
+      </a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="/collections/all" class="hp45-tab-pill hp45-tab-pill--active">[01] ALL DOSAGES</a>
+    <a href="/collections/peptides" class="hp45-tab-pill">[02] PEPTIDE MATRICES</a>
+    <a href="/collections/ectoin" class="hp45-tab-pill">[03] ECTOIN SHIELDS</a>
+    <a href="/collections/lipids" class="hp45-tab-pill">[04] BIO-LIPID BALMS</a>
+    <a href="/collections/infusions" class="hp45-tab-pill">[05] OSMOTIC FLUIDS</a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP45 - Brutal Pills",
+  "class": "section-hp45-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F5F0" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#0A0A0A" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Vertical Padding", "default": 30 },
+    { "type": "range", "id": "container_width", "min": 800, "max": 1400, "step": 20, "unit": "px", "label": "Container Width", "default": 1300 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Tab Block",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab Label", "default": "[01] ALL DOSAGES" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP45 - Brutal Pills" }
+  ]
+}
+{% endschema %}

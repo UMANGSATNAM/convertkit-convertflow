@@ -1,0 +1,152 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#F9F6F0'
+  assign text_color = section.settings.text_color | default: '#2A3B2C'
+  assign accent_color = section.settings.accent_color | default: '#8A9A86'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 60px 20px 100px;
+    color: {{ text_color }};
+  }
+  
+  .hp10-usp-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .hp10-usp-item-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hp10-usp-icon-{{ section_id }} {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: {{ accent_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #F9F6F0;
+    margin-bottom: 20px;
+  }
+  
+  .hp10-usp-icon-{{ section_id }} svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  
+  .hp10-usp-title-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0 0 10px 0;
+  }
+  
+  .hp10-usp-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(42, 59, 44, 0.7);
+    margin: 0;
+    max-width: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .hp10-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+    .hp10-usp-text-{{ section_id }} {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="hp10-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp10-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <div class="hp10-usp-icon-{{ section_id }}">
+        {% if block.settings.icon_svg != blank %}
+          {{ block.settings.icon_svg }}
+        {% else %}
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        {% endif %}
+      </div>
+      <h3 class="hp10-usp-title-{{ section_id }}">{{ block.settings.title | default: 'Cruelty Free' }}</h3>
+      <p class="hp10-usp-text-{{ section_id }}">{{ block.settings.text | default: 'Never tested on animals. We believe in ethical beauty.' }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP10 USP",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2A3B2C"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8A9A86"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon_svg",
+          "label": "Icon SVG"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Cruelty Free"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Never tested on animals. We believe in ethical beauty."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP10 USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "Cruelty Free" } },
+        { "type": "usp", "settings": { "title": "100% Organic" } },
+        { "type": "usp", "settings": { "title": "Eco-Packaging" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

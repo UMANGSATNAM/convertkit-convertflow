@@ -1,0 +1,539 @@
+{%- comment -%}
+  PC V41 — ARTISAN LEATHER & HERITAGE BOOTS PRODUCT GRID
+  Design: Espresso Dark (#2B1E17), Warm Tan (#D4A373) accents, Playfair Display & Plus Jakarta Sans typography
+  Card Shape: 8px corners, stitched dashed border details, heritage leather aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+
+  .pcv41 {
+    --bg: {{ section.settings.bg_color | default: '#2B1E17' }};
+    --card-bg: {{ section.settings.card_bg | default: '#3D2B22' }};
+    --text: {{ section.settings.text_color | default: '#F4EAE1' }};
+    --muted: {{ section.settings.muted_color | default: '#C5A898' }};
+    --accent: {{ section.settings.accent_color | default: '#D4A373' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#BC8A5F' }};
+    --border: {{ section.settings.border_color | default: '#5C4436' }};
+    --badge-sale-bg: #D4A373;
+    --badge-sale-text: #2B1E17;
+    --f-serif: 'Playfair Display', serif;
+    --f-sans: 'Plus Jakarta Sans', sans-serif;
+    --r-card: 8px;
+    --ease: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-sans);
+    padding: {{ section.settings.padding_top | default: 56 }}px 0 {{ section.settings.padding_bottom | default: 56 }}px 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv41 *, .pcv41 *::before, .pcv41 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv41 a { color: inherit; text-decoration: none; }
+  .pcv41 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv41 img { max-width: 100%; display: block; }
+
+  .pcv41__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv41__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'center' }}; }
+  @media (min-width: 768px) {
+    .pcv41__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv41__title { font-family: var(--f-serif); font-size: 30px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+  @media (min-width: 768px) { .pcv41__title { font-size: 38px; } }
+  .pcv41__sub { font-size: 15px; color: var(--muted); font-style: italic; }
+  .pcv41__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--accent); border: 1px dashed var(--accent); padding: 8px 20px; border-radius: 4px; transition: var(--ease); }
+  .pcv41__viewall:hover { background: var(--accent); color: #2B1E17; }
+
+  /* GRID */
+  .pcv41__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv41__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv41__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv41__card {
+    background: var(--card-bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 8px 20px -5px rgba(43, 30, 23, 0.3);
+    transition: var(--ease);
+  }
+  .pcv41__card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 14px 28px -6px rgba(212, 163, 115, 0.2);
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv41__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #231711;
+    overflow: hidden;
+  }
+  .pcv41__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv41__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv41__card:hover .pcv41__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv41__card:hover .pcv41__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv41__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv41__badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; letter-spacing: 0.05em; font-family: var(--f-sans); }
+  .pcv41__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv41__badge--tag { background: #2B1E17; color: #F4EAE1; border: 1px solid var(--border); }
+  .pcv41__badge--sold { background: #5C4436; color: #C5A898; }
+
+  /* WISHLIST BUTTON */
+  .pcv41__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(43, 30, 23, 0.85);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv41__wish:hover { background: var(--accent); color: #2B1E17; border-color: var(--accent); transform: scale(1.1); }
+  .pcv41__wish.active { color: #2B1E17; background: var(--accent); border-color: var(--accent); }
+
+  /* QUICK ADD HOVER */
+  .pcv41__quick-box {
+    position: absolute;
+    bottom: 12px; left: 12px; right: 12px;
+    z-index: 3;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: var(--ease);
+  }
+  .pcv41__card:hover .pcv41__quick-box { transform: translateY(0); opacity: 1; }
+  @media (max-width: 767px) {
+    .pcv41__quick-box { transform: translateY(0); opacity: 1; position: relative; bottom: auto; left: auto; right: auto; padding: 0 14px 14px; }
+  }
+
+  .pcv41__quick-btn {
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #2B1E17;
+    font-size: 12px; font-weight: 700;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 4px 12px rgba(212, 163, 115, 0.3);
+  }
+  .pcv41__quick-btn:hover { background: var(--accent-hover); color: #FFFFFF; }
+  .pcv41__quick-btn:disabled { background: #5C4436; color: #C5A898; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv41__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv41__vendor { font-size: 10px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.08em; }
+  .pcv41__item-title { font-family: var(--f-serif); font-size: 17px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv41__rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--accent); font-weight: 700; }
+  .pcv41__stars { letter-spacing: 1px; }
+  .pcv41__rev-cnt { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  /* PRICE */
+  .pcv41__price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv41__price { font-size: 16px; font-weight: 700; color: var(--text); font-family: var(--f-sans); }
+  .pcv41__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv41__swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv41__swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv41__swatch:hover, .pcv41__swatch.active { transform: scale(1.25); border-color: var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv41__urgency { font-size: 11px; color: var(--accent); font-style: italic; font-family: var(--f-serif); display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv41__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #2B1E17;
+    padding: 12px 22px; border-radius: 4px;
+    font-size: 13px; font-weight: 700;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pcv41__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv41">
+  <div class="pcv41__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv41__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv41__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv41__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv41__viewall">
+            {{ section.settings.view_all_label | default: 'Explore Leathercraft' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv41__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v41', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v41', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv41__toast" id="pcv41-toast">Leather Boots Added!</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv41-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv41Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Crafting...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ Added';
+        showT('Leather Boots Added!');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'Error';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv41-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V41 — Artisan Leather",
+  "tag": "section",
+  "class": "pcv41-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "HANDCRAFTED LEATHER"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "HERITAGE LEATHERCRAFT"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Handcrafted full-grain leather boots and artisan footwear."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore Leathercraft"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#2B1E17"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#3D2B22"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F4EAE1"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#C5A898"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#D4A373"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#5C4436"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V41 — Artisan Leather"
+    }
+  ]
+}
+{% endschema %}

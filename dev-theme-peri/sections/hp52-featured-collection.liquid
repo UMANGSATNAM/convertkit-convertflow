@@ -1,0 +1,274 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp52-fc-bg: {{ section.settings.bg_color | default: '#F7EFE6' }};
+    --hp52-fc-card: {{ section.settings.card_bg | default: '#FFFDF9' }};
+    --hp52-fc-title: {{ section.settings.title_color | default: '#2D3B2D' }};
+    --hp52-terra: {{ section.settings.accent_terra | default: '#C2593F' }};
+    
+    background-color: var(--hp52-fc-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp52-fc__wrapper {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp52-fc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 45px;
+  }
+
+  .hp52-fc__heading {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(32px, 4.5vw, 44px);
+    font-weight: 700;
+    color: var(--hp52-fc-title);
+    margin: 0;
+  }
+
+  .hp52-fc__view-all {
+    color: var(--hp52-terra);
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hp52-fc__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp52-card {
+    background: var(--hp52-fc-card);
+    border: 1px solid rgba(194, 89, 63, 0.15);
+    border-radius: 40px 40px 12px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(45, 59, 45, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp52-card:hover {
+    border-color: var(--hp52-terra);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(194, 89, 63, 0.12);
+  }
+
+  .hp52-card__media {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+    background: #EFE4D6;
+  }
+
+  .hp52-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .hp52-card:hover .hp52-card__img { transform: scale(1.04); }
+
+  .hp52-card__badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: #C2593F;
+    color: #FFFDF9;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 50px;
+  }
+
+  .hp52-card__body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .hp52-card__tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--hp52-terra);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .hp52-card__title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--hp52-fc-title);
+    margin: 0 0 8px;
+  }
+
+  .hp52-card__price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hp52-terra);
+    margin-bottom: 16px;
+  }
+
+  .hp52-card__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 13px;
+    background: #2D3B2D;
+    color: #FFFDF9;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .hp52-card__btn:hover { background: var(--hp52-terra); }
+
+  @media screen and (max-width: 992px) {
+    .hp52-fc__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  }
+{%- endstyle -%}
+
+<div class="hp52-fc__wrapper">
+  <div class="hp52-fc__header">
+    <h2 class="hp52-fc__heading">{{ section.settings.heading | default: 'The Mediterranean Botanical Reserve' }}</h2>
+    <a href="{{ section.settings.view_all_url | default: '/collections/all' }}" class="hp52-fc__view-all">
+      {{ section.settings.view_all_text | default: 'Explore Terracotta Edit →' }}
+    </a>
+  </div>
+
+  <div class="hp52-fc__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp52-card" {{ block.shopify_attributes }}>
+          <div class="hp52-card__media">
+            {%- if block.settings.badge != blank -%}
+              <span class="hp52-card__badge">{{ block.settings.badge }}</span>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              <img src="{{ block.settings.image | image_url: width: 600 }}" class="hp52-card__img" alt="{{ block.settings.title }}" loading="lazy">
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'hp52-card__img' }}
+            {%- endif -%}
+          </div>
+          <div class="hp52-card__body">
+            <span class="hp52-card__tag">{{ block.settings.tag | default: 'TUSCAN HARVEST' }}</span>
+            <h3 class="hp52-card__title">{{ block.settings.title }}</h3>
+            <div class="hp52-card__price">{{ block.settings.price | default: '$58.00 USD' }}</div>
+            <button class="hp52-card__btn">{{ block.settings.btn_text | default: 'Add to Bag' }}</button>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp52-card">
+        <div class="hp52-card__media">
+          <span class="hp52-card__badge">Tuscan Sun</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp52-card__img' }}
+        </div>
+        <div class="hp52-card__body">
+          <span class="hp52-card__tag">COLD-PRESSED OLIVE</span>
+          <h3 class="hp52-card__title">Tuscan Olive Squalane Face Nectar</h3>
+          <div class="hp52-card__price">$64.00 USD</div>
+          <button class="hp52-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp52-card">
+        <div class="hp52-card__media">
+          <span class="hp52-card__badge">Sicilian Clay</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp52-card__img' }}
+        </div>
+        <div class="hp52-card__body">
+          <span class="hp52-card__tag">TERRACOTTA MINERAL</span>
+          <h3 class="hp52-card__title">Sicilian Terracotta Purifying Mask</h3>
+          <div class="hp52-card__price">$52.00 USD</div>
+          <button class="hp52-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp52-card">
+        <div class="hp52-card__media">
+          {{ 'product-1' | placeholder_svg_tag: 'hp52-card__img' }}
+        </div>
+        <div class="hp52-card__body">
+          <span class="hp52-card__tag">CALABRIAN BERGAMOT</span>
+          <h3 class="hp52-card__title">Calabrian Sun Balm Cleanser</h3>
+          <div class="hp52-card__price">$46.00 USD</div>
+          <button class="hp52-card__btn">Add to Bag</button>
+        </div>
+      </div>
+      <div class="hp52-card">
+        <div class="hp52-card__media">
+          <span class="hp52-card__badge">Artisanal Honey</span>
+          {{ 'product-1' | placeholder_svg_tag: 'hp52-card__img' }}
+        </div>
+        <div class="hp52-card__body">
+          <span class="hp52-card__tag">WILD THYME HONEY</span>
+          <h3 class="hp52-card__title">Amalfi Wild Honey Barrier Crème</h3>
+          <div class="hp52-card__price">$72.00 USD</div>
+          <button class="hp52-card__btn">Add to Bag</button>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP52 - Terra Grid",
+  "class": "section-hp52-grid",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F7EFE6" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FFFDF9" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#2D3B2D" },
+    { "type": "color", "id": "accent_terra", "label": "Terracotta Accent", "default": "#C2593F" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Mediterranean Botanical Reserve" },
+    { "type": "text", "id": "view_all_text", "label": "View All Text", "default": "Explore Terracotta Edit →" },
+    { "type": "url", "id": "view_all_url", "label": "View All URL" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Tuscan Sun" },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "COLD-PRESSED OLIVE" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Tuscan Olive Squalane Face Nectar" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$64.00 USD" },
+        { "type": "text", "id": "btn_text", "label": "Button Label", "default": "Add to Bag" },
+        { "type": "url", "id": "url", "label": "Product Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP52 - Terra Grid" }
+  ]
+}
+{% endschema %}

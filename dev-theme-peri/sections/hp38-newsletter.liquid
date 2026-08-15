@@ -1,0 +1,274 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-news-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp38-news-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp38-news__col {
+    background: var(--bg-color);
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-news__col {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-news__meta {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hp38-news__meta::before {
+    content: '';
+    display: block;
+    width: 10px; height: 10px;
+    background: var(--accent-color);
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .hp38-news__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 20px;
+  }
+
+  .hp38-news__text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--text-color);
+    margin-bottom: 0;
+  }
+
+  /* Form Column */
+  .hp38-news__form-col {
+    background: var(--bg-color);
+    padding: 80px 60px;
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-news__form-col {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-news__form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hp38-news__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hp38-news__label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+  }
+
+  .hp38-news__input-wrapper {
+    display: flex;
+    border: 2px solid var(--text-color);
+  }
+
+  .hp38-news__prefix {
+    padding: 20px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: var(--text-color);
+    background: rgba(0,0,0,0.05);
+    border-right: 2px solid var(--text-color);
+  }
+
+  .hp38-news__input {
+    flex: 1;
+    padding: 20px;
+    border: none;
+    background: transparent;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: var(--text-color);
+    outline: none;
+  }
+
+  .hp38-news__btn {
+    padding: 20px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: 2px solid var(--text-color);
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .hp38-news__btn:hover {
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-news-wrapper" id="HP38News-{{ section.id }}">
+  <div class="hp38-news__col">
+    <div class="hp38-news__meta">AWAITING INPUT</div>
+    <h2 class="hp38-news__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.text != blank -%}
+      <p class="hp38-news__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="hp38-news__form-col">
+    {%- form 'customer', class: 'hp38-news__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      
+      <div class="hp38-news__input-group">
+        <label class="hp38-news__label" for="hp38-email">DATA ENTRY // EMAIL</label>
+        <div class="hp38-news__input-wrapper">
+          <span class="hp38-news__prefix">></span>
+          <input type="email" 
+                 id="hp38-email"
+                 name="contact[email]" 
+                 class="hp38-news__input" 
+                 placeholder="{{ section.settings.placeholder }}" 
+                 required>
+        </div>
+      </div>
+      
+      <button type="submit" class="hp38-news__btn">{{ section.settings.btn_label }}</button>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist News",
+  "class": "section-hp38-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "INITIALIZE CONNECTION"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Transmit coordinates to receive secure system updates."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Enter data string..."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "EXECUTE [ENTER]"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist News"
+    }
+  ]
+}
+{% endschema %}

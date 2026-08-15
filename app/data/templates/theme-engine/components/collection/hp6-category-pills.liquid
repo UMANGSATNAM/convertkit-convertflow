@@ -1,0 +1,230 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#ff4500'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp6-pills-bg: {{ bg_color }};
+    --hp6-pills-text: {{ text_color }};
+    --hp6-pills-accent: {{ accent_color }};
+    
+    --hp6-pills-pt-desk: {{ padding_top_desktop }}px;
+    --hp6-pills-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp6-pills-pt-mob: {{ padding_top_mobile }}px;
+    --hp6-pills-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp6-sports-pills-{{ section.id }} {
+    padding-top: var(--hp6-pills-pt-desk);
+    padding-bottom: var(--hp6-pills-pb-desk);
+    background-color: var(--hp6-pills-bg);
+  }
+
+  .hp6-pills-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .hp6-pills-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Scroller */
+  .hp6-pills-scroller {
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    display: flex;
+    gap: 15px;
+    scroll-behavior: smooth;
+    padding-bottom: 5px; /* for focus rings */
+  }
+  .hp6-pills-scroller::-webkit-scrollbar { display: none; }
+
+  .hp6-pill-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 30px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--hp6-pills-text);
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+  }
+
+  .hp6-pill-item:hover {
+    background: var(--hp6-pills-accent);
+    border-color: var(--hp6-pills-accent);
+    color: #fff;
+    transform: skewX(-5deg);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp6-sports-pills-{{ section.id }} {
+      padding-top: var(--hp6-pills-pt-mob);
+      padding-bottom: var(--hp6-pills-pb-mob);
+    }
+    .hp6-pills-inner {
+      padding: 0 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .hp6-pills-scroller {
+      width: 100%;
+      padding-right: 20px;
+    }
+    .hp6-pill-item {
+      padding: 10px 25px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<section class="hp6-sports-pills-{{ section.id }}" aria-label="Quick Categories">
+  <div class="hp6-pills-inner">
+    
+    {%- if section.settings.label != blank -%}
+      <div class="hp6-pills-label">{{ section.settings.label }}</div>
+    {%- endif -%}
+
+    <div class="hp6-pills-scroller" role="list">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.link }}" class="hp6-pill-item" role="listitem" {{ block.shopify_attributes }}>
+          {{ block.settings.title }}
+        </a>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        <a href="#" class="hp6-pill-item">RUNNING</a>
+        <a href="#" class="hp6-pill-item">TRAINING</a>
+        <a href="#" class="hp6-pill-item">BASKETBALL</a>
+        <a href="#" class="hp6-pill-item">WEIGHTLIFTING</a>
+        <a href="#" class="hp6-pill-item">YOGA</a>
+        <a href="#" class="hp6-pill-item">OUTDOOR</a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP6 Sports Categories Bar",
+  "tag": "section",
+  "class": "section-hp6-category-pills",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Leading Label",
+      "default": "SHOP BY SPORT:"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent/Hover Color",
+      "default": "#ff4500"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP6 Sports Categories Bar",
+      "category": "Navigation",
+      "blocks": [
+        { "type": "category", "settings": { "title": "RUNNING" } },
+        { "type": "category", "settings": { "title": "TRAINING" } },
+        { "type": "category", "settings": { "title": "BASKETBALL" } },
+        { "type": "category", "settings": { "title": "WEIGHTLIFTING" } },
+        { "type": "category", "settings": { "title": "YOGA" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

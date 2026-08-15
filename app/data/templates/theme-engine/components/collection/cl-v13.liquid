@@ -1,0 +1,97 @@
+{% comment %} CL V13 — Dark Mode Fitness {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv13 { background: {{ section.settings.bg_color | default: '#050505' }}; color: {{ section.settings.text_color | default: '#00FF66' }}; padding: 60px 20px; font-family: 'Teko', sans-serif; }
+  .clv13-hero { text-align: left; margin-bottom: 50px; background: #111; padding: 50px; border-left: 10px solid #00FF66; }
+  .clv13-hero h1 { font-size: 60px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; line-height: 1; letter-spacing: 2px; }
+  .clv13-hero p { font-size: 22px; color: #AAA; max-width: 600px; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+  .clv13-chips { display: flex; gap: 10px; margin-bottom: 40px; overflow-x: auto; }
+  .clv13-chips a { padding: 12px 25px; background: #111; text-decoration: none; color: #FFF; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #333; transition: 0.2s; }
+  .clv13-chips a:hover, .clv13-chips a.active { background: #00FF66; color: #000; border-color: #00FF66; }
+  .clv13-toolbar { background: #111; padding: 20px; margin-bottom: 40px; font-family: 'Roboto', sans-serif; border: 1px solid #333; }
+  .clv13-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv13-promo { grid-column: span 1; background: #00FF66; color: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+  .clv13-promo h3 { font-size: 40px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
+  .clv13-promo a { display: inline-block; padding: 12px 24px; background: #000; color: #00FF66; text-decoration: none; font-weight: 700; font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px; align-self: flex-start; }
+  .clv13-seo { margin-top: 60px; padding: 50px; background: #111; border-top: 5px solid #00FF66; }
+  @media (max-width: 768px) { .clv13-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv13-hero h1 { font-size: 45px; } }
+</style>
+<div class="clv13" style="max-width: 1400px; margin: 0 auto;">
+  <div class="clv13-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}POWER SERIES{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}DOMINATE EVERY WORKOUT.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv13-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv13-toolbar">
+    <facet-filters-form>
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 700; text-transform: uppercase; color: #00FF66; letter-spacing: 1px;">{{ filter.label }} +</summary>
+              <div style="position: absolute; background: #111; border: 1px solid #00FF66; padding: 20px; z-index: 10; margin-top: 15px; min-width: 200px;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #FFF;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; color: #00FF66; border: 1px solid #00FF66; padding: 10px 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 1px;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv13-grid">
+      {% for product in collection.products %}
+        {% render 'card-v13', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv13-promo">
+            <h3>MAXIMUM<br>INTENSITY</h3>
+            <a href="/collections/pro">SHOP PRO GEAR</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v13', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-size: 24px; color: #FFF;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv13-seo">
+      <h2 style="font-size: 40px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; line-height: 1;">{{ section.settings.seo_title | default: 'NO EXCUSES' }}</h2>
+      <p style="color: #AAA; line-height: 1.6; font-size: 16px; font-family: 'Roboto', sans-serif;">{{ section.settings.seo_text | default: 'Engineered for athletes who push beyond limits. Sweat-wicking, ultra-durable, and built to perform.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V13 — Fitness", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#050505"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#00FF66"}
+  ], "presets": [{"name": "CL V13 — Fitness"}]
+}
+{% endschema %}

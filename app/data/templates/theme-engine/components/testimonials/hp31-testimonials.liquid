@@ -1,0 +1,282 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp31-testi-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp31-testi-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp31-testi__title {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    opacity: 0.6;
+  }
+
+  .hp31-testi__slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+
+  .hp31-testi__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp31-testi__item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 0 20px;
+    opacity: 0.4;
+    transition: opacity 0.5s ease;
+  }
+
+  .hp31-testi__item.is-active {
+    opacity: 1;
+  }
+
+  .hp31-testi__quote {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, 40px);
+    line-height: 1.4;
+    color: var(--text-color);
+    margin: 0 0 30px;
+    font-weight: 400;
+  }
+
+  .hp31-testi__author {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+  }
+  
+  .hp31-testi__author span {
+    font-weight: 300;
+    opacity: 0.6;
+    margin-left: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .hp31-testi__dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 40px;
+  }
+
+  .hp31-testi__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-color);
+    opacity: 0.2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .hp31-testi__dot.is-active,
+  .hp31-testi__dot:hover {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+
+  /* Decorative background */
+  .hp31-testi__bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(0,0,0,0.02) 0%, transparent 70%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp31-testi-wrapper" id="HP31Testi-{{ section.id }}">
+  <div class="hp31-testi__bg"></div>
+  
+  <h2 class="hp31-testi__title">{{ section.settings.title }}</h2>
+
+  <div class="hp31-testi__slider" id="hp31-t-slider-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="hp31-testi__item {% if forloop.first %}is-active{% endif %}" {{ block.shopify_attributes }}>
+        <p class="hp31-testi__quote">"{{ block.settings.quote }}"</p>
+        <p class="hp31-testi__author">{{ block.settings.author }} <span>{{ block.settings.detail }}</span></p>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="hp31-testi__dots" id="hp31-t-dots-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <button class="hp31-testi__dot {% if forloop.first %}is-active{% endif %}" aria-label="Go to slide {{ forloop.index }}"></button>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('hp31-t-slider-{{ section.id }}');
+    const dots = document.querySelectorAll('#hp31-t-dots-{{ section.id }} .hp31-testi__dot');
+    const items = slider.querySelectorAll('.hp31-testi__item');
+    
+    if(slider && dots.length > 0) {
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          const itemWidth = slider.offsetWidth;
+          slider.scrollTo({ left: itemWidth * index, behavior: 'smooth' });
+        });
+      });
+
+      slider.addEventListener('scroll', () => {
+        const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+        dots.forEach(d => d.classList.remove('is-active'));
+        items.forEach(i => i.classList.remove('is-active'));
+        
+        if(dots[index]) dots[index].classList.add('is-active');
+        if(items[index]) items[index].classList.add('is-active');
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP31 - Zen Testimonials",
+  "class": "section-hp31-testimonials",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Kind Words"
+    },
+    {
+      "type": "header",
+      "content": "Zen Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "There is a profound sense of calm that comes with bringing these pieces into my home."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "E. Richards"
+        },
+        {
+          "type": "text",
+          "id": "detail",
+          "label": "Detail (e.g. location)",
+          "default": "Verified Buyer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP31 - Zen Testimonials",
+      "blocks": [
+        { "type": "quote" },
+        { "type": "quote", "settings": { "quote": "The craftsmanship is unparalleled. It completely changed the energy of our living room.", "author": "M. Jenkins" } },
+        { "type": "quote", "settings": { "quote": "Simple, elegant, and perfectly understated. Exactly what I was looking for.", "author": "S. Lee" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

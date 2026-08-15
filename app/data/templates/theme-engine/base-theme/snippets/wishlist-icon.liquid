@@ -1,0 +1,77 @@
+{%- comment -%}
+  Header wishlist icon + live count.
+
+  Opens the global drawer (snippets/wishlist-drawer.liquid) and the count is
+  painted by assets/wishlist.js via [data-wishlist-count] — no per-header JS.
+
+  Usage:
+    {% render 'wishlist-icon' %}
+    {% render 'wishlist-icon', class: 'hp7-icon-btn-abc123', size: 22 %}
+
+  Params (optional):
+    class  - extra class so the icon inherits each header's own styling
+    size   - icon px, default 22
+    label  - visible text next to the icon (omit for icon-only)
+{%- endcomment -%}
+
+{%- liquid
+  assign wi_class = class | default: ''
+  assign wi_size = size | default: 22
+-%}
+
+<button
+  type="button"
+  class="cf-wish-icon {{ wi_class }}"
+  onclick="if(window.toggleWishlist)window.toggleWishlist()"
+  aria-label="Open wishlist"
+  aria-haspopup="dialog">
+  <svg width="{{ wi_size }}" height="{{ wi_size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+  {%- if label != blank -%}
+    <span class="cf-wish-icon__label">{{ label }}</span>
+  {%- endif -%}
+  <span class="cf-wish-icon__count" data-wishlist-count hidden>0</span>
+</button>
+
+{%- unless wishlist_icon_styles -%}
+  {%- assign wishlist_icon_styles = true -%}
+  <style>
+    .cf-wish-icon {
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0 6px;
+      cursor: pointer;
+      color: inherit;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 44px;
+      min-height: 44px;
+      justify-content: center;
+    }
+    .cf-wish-icon:hover { opacity: 0.75; }
+    .cf-wish-icon:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 6px; }
+    /* Fixed red-on-white badge so it stays readable on light and dark headers */
+    .cf-wish-icon__count {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 99px;
+      background: #E11D48;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 18px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .cf-wish-icon__count[hidden] { display: none; }
+    .cf-wish-icon__label { font-size: 12px; }
+  </style>
+{%- endunless -%}

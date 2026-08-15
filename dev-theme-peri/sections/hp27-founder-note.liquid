@@ -1,0 +1,350 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Syncopate', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp27-founder-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp27-founder-wrapper {
+      flex-direction: column;
+      gap: 50px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-founder-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp27-founder__image-col {
+    flex: 1;
+    position: relative;
+  }
+
+  .hp27-founder__image-wrapper {
+    aspect-ratio: 3/4;
+    background: #111;
+    position: relative;
+    border: 1px solid rgba(226, 226, 226, 0.1);
+    padding: 10px; /* frame effect */
+  }
+
+  /* Inner technical line */
+  .hp27-founder__image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px solid var(--accent-color);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .hp27-founder__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.2);
+  }
+
+  .hp27-founder__text-col {
+    flex: 1.2;
+    max-width: 600px;
+    position: relative;
+  }
+
+  /* Vertical scanning line behind text */
+  .hp27-founder__text-col::before {
+    content: '';
+    position: absolute;
+    left: -40px; top: 0;
+    width: 1px; height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+    opacity: 0.3;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp27-founder__text-col::before {
+      display: none;
+    }
+  }
+
+  .hp27-founder__label {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bg-color);
+    background: var(--accent-color);
+    padding: 4px 8px;
+    margin-bottom: 30px;
+  }
+
+  .hp27-founder__title {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 3vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 30px;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp27-founder__text {
+    font-family: var(--font-body);
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0 0 40px;
+  }
+
+  .hp27-founder__text p {
+    margin: 0 0 20px;
+  }
+
+  .hp27-founder__text p:last-child {
+    margin: 0;
+  }
+
+  .hp27-founder__sign-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-top: 1px solid rgba(226, 226, 226, 0.1);
+    padding-top: 30px;
+  }
+
+  .hp27-founder__signature {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .hp27-founder__role {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-color);
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp27-founder-wrapper" id="HP27Founder-{{ section.id }}">
+  
+  <div class="hp27-founder__image-col">
+    <div class="hp27-founder__image-wrapper">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" class="hp27-founder__image" loading="lazy">
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'hp27-founder__image' }}
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="hp27-founder__text-col">
+    {%- if section.settings.label != blank -%}
+      <div class="hp27-founder__label">{{ section.settings.label }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp27-founder__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="hp27-founder__text">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    <div class="hp27-founder__sign-area">
+      {%- if section.settings.signature_image != blank -%}
+        <img src="{{ section.settings.signature_image | image_url: width: 200 }}" alt="Signature" style="max-height: 50px; filter: invert(1);">
+      {%- else -%}
+        <div class="hp27-founder__signature">{{ section.settings.name }}</div>
+      {%- endif -%}
+      
+      <div class="hp27-founder__role">{{ section.settings.role }}</div>
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP27 - Eng Founder Note",
+  "class": "section-hp27-founder-note",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Founder Image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small Label",
+      "default": "SYSTEM ARCHITECT"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "ENGINEERING THE FUTURE"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>When we started this project, the goal was simple: eliminate all unnecessary components. What remains is pure function. Every angle, every material choice serves a distinct purpose.</p><p>We don't design for the present. We build systems designed to outlast us.</p>"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "default": "J. D. FOUNDER"
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "Role",
+      "default": "LEAD ENGINEER"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature_image",
+      "label": "Signature Image (Optional)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Dark Engineered Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2E2E2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF2A2A"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP27 - Eng Founder Note"
+    }
+  ]
+}
+{% endschema %}

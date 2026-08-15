@@ -1,0 +1,359 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp26-offer-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-offer-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp26-offer__container {
+    background-color: var(--accent-color);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    min-height: 400px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-offer__container {
+      flex-direction: column;
+      text-align: center;
+      min-height: auto;
+    }
+  }
+
+  /* Abstract graphic element in background */
+  .hp26-offer__graphic {
+    position: absolute;
+    top: -20%;
+    left: 10%;
+    width: 60vh;
+    height: 60vh;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hp26-offer__graphic:nth-child(2) {
+    top: 50%;
+    left: 60%;
+    width: 40vh;
+    height: 40vh;
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+
+  .hp26-offer__content {
+    flex: 1;
+    padding: 60px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-offer__content {
+      padding: 60px 30px;
+      order: 2;
+    }
+  }
+
+  .hp26-offer__subtitle {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+
+  .hp26-offer__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0 0 20px;
+  }
+
+  .hp26-offer__title em {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .hp26-offer__text {
+    font-family: var(--font-body);
+    font-size: clamp(14px, 1.5vw, {{ section.settings.text_size }}px);
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0 0 40px;
+    max-width: 400px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-offer__text {
+      max-width: 100%;
+    }
+  }
+
+  .hp26-offer__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 40px;
+    background-color: var(--text-color);
+    color: var(--bg-color); /* contrast */
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.4s ease;
+    border: 1px solid var(--text-color);
+  }
+
+  .hp26-offer__btn:hover {
+    background-color: transparent;
+    color: var(--text-color);
+  }
+
+  .hp26-offer__image-col {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-offer__image-col {
+      width: 100%;
+      min-height: 300px;
+      order: 1;
+    }
+  }
+
+  .hp26-offer__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    /* Soft blend into background if it's a cutout */
+    mix-blend-mode: multiply;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-offer-wrapper" id="HP26Offer-{{ section.id }}">
+  <div class="hp26-offer__container">
+    <div class="hp26-offer__graphic"></div>
+    <div class="hp26-offer__graphic"></div>
+
+    <div class="hp26-offer__content">
+      {%- if section.settings.subtitle != blank -%}
+        <div class="hp26-offer__subtitle">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp26-offer__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="hp26-offer__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.btn_text != blank -%}
+        <a href="{{ section.settings.btn_link | default: '#' }}" class="hp26-offer__btn">
+          {{ section.settings.btn_text }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="hp26-offer__image-col">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" class="hp26-offer__image" loading="lazy">
+      {%- else -%}
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;color:var(--text-color);font-family:var(--font-heading);font-style:italic;opacity:0.5;">IMAGE (Ideally transparent PNG)</div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Offer",
+  "class": "section-hp26-offer-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "LIMITED TIME"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Enjoy 15% off your <em>first ritual</em>."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Embrace a slower pace with our curated selection. Use code MINDFUL15 at checkout.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "SHOP THE EDIT"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Offer Image (Transparent PNG recommended)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Banner Background (Accent)",
+      "default": "#EAE6DF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Offer"
+    }
+  ]
+}
+{% endschema %}

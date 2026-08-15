@@ -1,0 +1,97 @@
+{% comment %} CL V37 — Outdoor Camping (Utilitarian) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv37 { background: {{ section.settings.bg_color | default: '#EAE6D7' }}; color: {{ section.settings.text_color | default: '#2E3523' }}; padding: 40px 20px; font-family: 'Courier New', Courier, monospace; }
+  .clv37-hero { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 30px; border: 2px solid #2E3523; background: #D5D0C0; }
+  .clv37-hero h1 { font-size: 32px; font-weight: 700; margin: 0; text-transform: uppercase; }
+  .clv37-hero p { font-size: 14px; margin: 0; max-width: 400px; }
+  .clv37-chips { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+  .clv37-chips a { padding: 8px 15px; background: transparent; color: #2E3523; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #2E3523; text-transform: uppercase; }
+  .clv37-chips a:hover, .clv37-chips a.active { background: #2E3523; color: #EAE6D7; }
+  .clv37-toolbar { border-top: 2px solid #2E3523; border-bottom: 2px solid #2E3523; padding: 15px 0; margin-bottom: 40px; }
+  .clv37-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv37-promo { grid-column: span 1; background: #4A5320; color: #EAE6D7; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; border: 2px solid #2E3523; }
+  .clv37-promo h3 { font-size: 20px; margin-bottom: 15px; text-transform: uppercase; }
+  .clv37-promo a { display: inline-block; padding: 10px; background: #EAE6D7; color: #4A5320; text-decoration: none; font-weight: bold; font-size: 12px; text-transform: uppercase; text-align: center; }
+  .clv37-seo { margin-top: 50px; padding: 30px; border: 1px dashed #2E3523; }
+  @media (max-width: 768px) { .clv37-hero { flex-direction: column; text-align: left; gap: 15px; } .clv37-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } }
+</style>
+<div class="clv37" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv37-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}BASECAMP{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Field-tested equipment for the uncompromising outdoorsman.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv37-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv37-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 30px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: bold; text-transform: uppercase; color: #2E3523;">[{{ filter.label }}]</summary>
+              <div style="position: absolute; background: #EAE6D7; border: 2px solid #2E3523; padding: 20px; z-index: 10; margin-top: 10px; min-width: 200px;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 10px; cursor: pointer; font-size: 13px;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: 1px solid #2E3523; padding: 5px 10px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; text-transform: uppercase;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>SORT: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv37-grid">
+      {% for product in collection.products %}
+        {% render 'card-v37', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv37-promo">
+            <h3>SURVIVAL<br>KITS</h3>
+            <a href="/products/kit">VIEW LOADOUT</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v37', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: left; font-weight: bold;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv37-seo">
+      <h2 style="font-size: 20px; margin-bottom: 10px; text-transform: uppercase;">{{ section.settings.seo_title | default: 'SPECIFICATIONS:' }}</h2>
+      <p style="font-size: 13px; max-width: 800px;">{{ section.settings.seo_text | default: 'All gear is rigorously tested in alpine conditions. Built with mil-spec materials to ensure durability when it matters most.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V37 — Outdoor", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#EAE6D7"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#2E3523"}
+  ], "presets": [{"name": "CL V37 — Outdoor"}]
+}
+{% endschema %}

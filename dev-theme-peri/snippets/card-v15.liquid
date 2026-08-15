@@ -1,0 +1,201 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V15 — MODERN MINIMALIST HOME DECOR & CERAMICS D2C (NESTASIA / CHUMBAK STYLE)
+  Usage: {% render 'card-v15', product: product %}
+  Design: Terracotta Warmth (#C87D55), Oat Cream (#F7F4EF), Playfair Display & Plus Jakarta Sans, 12px soft arch corners
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  .cv15-card {
+    --cv15-bg: #FFFFFF;
+    --cv15-text: #4A352B;
+    --cv15-muted: #9E7B6C;
+    --cv15-terra: #C87D55;
+    --cv15-oat: #F7F4EF;
+    --cv15-border: #E8DFD8;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cv15-bg);
+    border: 1px solid var(--cv15-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv15-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv15-terra);
+    box-shadow: 0 12px 24px -6px rgba(200, 125, 85, 0.2);
+  }
+
+  .cv15-card *, .cv15-card *::before, .cv15-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv15-card a { color: inherit; text-decoration: none; }
+  .cv15-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv15-card img { max-width: 100%; display: block; }
+
+  .cv15-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv15-oat);
+    overflow: hidden;
+  }
+  .cv15-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv15-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv15-card:hover .cv15-img-pri { opacity: 0; }
+  .cv15-card:hover .cv15-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Craft Tag Top Left */
+  .cv15-badge-home {
+    position: absolute; top: 10px; left: 10px;
+    background: #4A352B; color: var(--cv15-terra);
+    font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 4px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv15-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv15-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv15-terra); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv15-wish:hover, .cv15-wish.active { background: var(--cv15-terra); color: #FFFFFF; border-color: var(--cv15-terra); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv15-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(74, 53, 43, 0.95); color: var(--cv15-terra);
+    font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 6px; border: 1px solid var(--cv15-terra);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv15-card:hover .cv15-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv15-qv-overlay:hover { background: var(--cv15-terra); color: #FFFFFF; }
+
+  .cv15-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv15-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv15-terra); font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 0.1em; }
+  .cv15-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: #4A352B; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Subtitle / Craft Specs */
+  .cv15-specs { font-size: 11px; color: var(--cv15-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv15-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: var(--cv15-terra); font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv15-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv15-price { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #4A352B; }
+  .cv15-cmp { font-size: 13px; color: #9E7B6C; text-decoration: line-through; }
+  .cv15-disc { font-size: 10px; font-weight: 700; color: #FFFFFF; background: var(--cv15-terra); padding: 2px 6px; border-radius: 4px; }
+
+  /* Color Glaze Swatches */
+  .cv15-swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .cv15-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cv15-border); cursor: pointer; }
+  .cv15-swatch.active { transform: scale(1.25); border-color: var(--cv15-terra); }
+
+  /* Bottom Button */
+  .cv15-action-box { padding: 0 14px 14px; }
+  .cv15-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv15-terra); color: #FFFFFF;
+    font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 6px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(200, 125, 85, 0.3);
+  }
+  .cv15-atc-btn:hover { background: #4A352B; color: var(--cv15-terra); transform: scale(1.01); }
+  .cv15-atc-btn:disabled { background: #E8DFD8; color: #9E7B6C; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv15-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv15-badge-home">HAND-PAINTED CERAMIC 🏺</span>
+
+    <button type="button" class="cv15-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv15-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv15-img cv15-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv15-img cv15-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-2' | placeholder_svg_tag: 'cv15-img' }}
+      {% endif %}
+
+      <button type="button" class="cv15-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv15-content">
+      {% if card_prod.vendor != blank %}<span class="cv15-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv15-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv15-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv15-specs">Dishwasher & Microwave Safe</span>
+
+      <div class="cv15-rating">
+        <span>★ 4.8</span> <span>(620 reviews)</span>
+      </div>
+
+      <div class="cv15-price-row">
+        <span class="cv15-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv15-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv15-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv15-swatches">
+          {% for variant in card_prod.variants limit: 4 %}
+            <span class="cv15-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#F7F4EF', '#8A9A86', '#C87D55', '#7090B0' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cv15-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv15-atc-btn" data-add-cart="{{ cur_var.id }}">ELEVATE YOUR HOME</button>
+      {% else %}
+        <button type="button" class="cv15-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv15-card">
+    <div class="cv15-media">{{ 'product-2' | placeholder_svg_tag: 'cv15-img' }}</div>
+    <div class="cv15-content">
+      <span class="cv15-vendor">HOME DECOR D2C</span>
+      <div class="cv15-title">Speckled Oat Hand-Glazed Ceramic Dinnerware Set</div>
+
+      {% if card_r_show != false %}
+      <div class="cv15-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv15-specs">Dishwasher & Microwave Safe</span>
+      <div class="cv15-price-row"><span class="cv15-price">₹ 1,899</span><span class="cv15-cmp">₹ 2,499</span><span class="cv15-disc">24% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

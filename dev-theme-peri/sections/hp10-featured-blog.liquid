@@ -1,0 +1,158 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#F9F6F0'
+  assign text_color = section.settings.text_color | default: '#2A3B2C'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+  }
+  
+  .hp10-blog-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp10-blog-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+  }
+  
+  .hp10-blog-heading-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-weight: 400;
+    color: {{ text_color }};
+    margin: 0;
+  }
+  
+  .hp10-blog-view-all-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: {{ text_color }};
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: 500;
+  }
+  
+  .hp10-blog-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp10-blog-card-{{ section_id }} {
+    text-decoration: none;
+    color: {{ text_color }};
+  }
+  
+  .hp10-blog-img-wrap-{{ section_id }} {
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    padding-top: 70%;
+    position: relative;
+  }
+  
+  .hp10-blog-img-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  
+  .hp10-blog-card-{{ section_id }}:hover .hp10-blog-img-{{ section_id }} {
+    transform: scale(1.05);
+  }
+  
+  .hp10-blog-meta-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(42, 59, 44, 0.6);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .hp10-blog-title-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+  }
+  
+  .hp10-blog-excerpt-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(42, 59, 44, 0.8);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 992px) {
+    .hp10-blog-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hp10-blog-header-{{ section_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .hp10-blog-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="hp10-blog-container-{{ section_id }}">
+  <div class="hp10-blog-header-{{ section_id }}">
+    <h2 class="hp10-blog-heading-{{ section_id }}">{{ section.settings.heading | default: 'The Journal' }}</h2>
+    <a href="{{ section.settings.blog_url | default: '#' }}" class="hp10-blog-view-all-{{ section_id }}">Read All Articles</a>
+  </div>
+  
+  <div class="hp10-blog-grid-{{ section_id }}">
+    {% for i in (1..3) %}
+      <a href="#" class="hp10-blog-card-{{ section_id }}">
+        <div class="hp10-blog-img-wrap-{{ section_id }}">
+          <div class="hp10-blog-img-{{ section_id }}" style="background: #e8e3d5;"></div>
+        </div>
+        <div class="hp10-blog-meta-{{ section_id }}">Wellness • Oct 12, 2023</div>
+        <h3 class="hp10-blog-title-{{ section_id }}">The Benefits of Cold Pressed Oils</h3>
+        <p class="hp10-blog-excerpt-{{ section_id }}">Discover why we choose cold pressed extraction for our botanical oils and how it preserves nutrients.</p>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP10 Featured Blog",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Journal"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP10 Featured Blog"
+    }
+  ]
+}
+{% endschema %}

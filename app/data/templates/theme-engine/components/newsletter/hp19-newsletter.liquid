@@ -1,0 +1,439 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --input-bg: {{ section.settings.input_bg }};
+    --input-text: {{ section.settings.input_text }};
+    --btn-bg: {{ section.settings.btn_bg }};
+    --btn-text: {{ section.settings.btn_text_color }};
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp19-news-wrapper {
+    position: relative;
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: {{ section.settings.box_padding }}px;
+    text-align: {{ section.settings.text_alignment }};
+    background: {{ section.settings.box_bg }};
+    border-radius: {{ section.settings.box_radius }}px;
+    overflow: hidden;
+    z-index: 2;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp19-news-wrapper {
+      padding: {{ section.settings.box_padding | times: 0.75 | round }}px 24px;
+    }
+  }
+  
+  {% if section.settings.bg_image != blank %}
+  .hp19-news-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+  }
+  .hp19-news-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .hp19-news-bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: {{ section.settings.overlay_color | color_modify: 'alpha', section.settings.overlay_opacity | divided_by: 100.0 }};
+  }
+  {% endif %}
+
+  .hp19-news__title {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    margin: 0 0 16px;
+    font-style: italic;
+    line-height: 1.1;
+  }
+
+  .hp19-news__text {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.text_size }}px;
+    color: var(--text-color);
+    margin: 0 auto 32px;
+    max-width: 600px;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+
+  .hp19-news__form {
+    max-width: {{ section.settings.form_width }}px;
+    margin: 0 {% if section.settings.text_alignment == 'center' %}auto{% elsif section.settings.text_alignment == 'right' %}0 0 0 auto{% else %}0{% endif %};
+    display: flex;
+    flex-direction: {% if section.settings.form_layout == 'stacked' %}column{% else %}row{% endif %};
+    gap: 12px;
+  }
+  
+  @media screen and (max-width: 576px) {
+    .hp19-news__form {
+      flex-direction: column;
+    }
+  }
+
+  .hp19-news__input {
+    flex: 1;
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 16px 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    border-radius: {{ section.settings.input_radius }}px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .hp19-news__input::placeholder {
+    color: var(--input-text);
+    opacity: 0.6;
+  }
+  
+  .hp19-news__input:focus {
+    border-color: var(--text-color);
+  }
+
+  .hp19-news__btn {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: 1px solid var(--btn-bg);
+    padding: 16px 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: {{ section.settings.input_radius }}px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .hp19-news__btn:hover {
+    background: transparent;
+    color: var(--btn-bg);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div style="position:relative;" id="HP19Newsletter-{{ section.id }}">
+  <div class="hp19-news-wrapper">
+    {% if section.settings.bg_image != blank %}
+    <div class="hp19-news-bg">
+      <img src="{{ section.settings.bg_image | image_url: width: 1400 }}" alt="" loading="lazy">
+    </div>
+    {% endif %}
+    
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp19-news__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.text != blank -%}
+      <p class="hp19-news__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+    
+    {%- assign formId = 'HP19NewsletterForm-' | append: section.id -%}
+    {% form 'customer', id: formId, class: 'hp19-news__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      
+      <input type="email"
+        name="contact[email]"
+        id="{{ formId }}-email"
+        class="hp19-news__input"
+        value="{% if customer %}{{ customer.email }}{% endif %}"
+        placeholder="{{ section.settings.placeholder | escape }}"
+        aria-label="Email address"
+        autocorrect="off"
+        autocapitalize="off"
+        required>
+        
+      <button type="submit" class="hp19-news__btn">
+        {{ section.settings.btn_text | escape }}
+      </button>
+      
+      {%- if form.posted_successfully? -%}
+        <p class="hp19-news__success" style="width:100%;margin-top:16px;font-family:'Inter',sans-serif;color:green;font-size:14px;">
+          Thank you for subscribing!
+        </p>
+      {%- endif -%}
+    {% endform %}
+    
+    {% if section.settings.disclaimer != blank %}
+    <p style="font-family:'Inter',sans-serif;font-size:11px;opacity:0.6;margin-top:16px;color:var(--text-color);">
+      {{ section.settings.disclaimer | escape }}
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP19 - Newsletter Pro",
+  "class": "section-hp19-newsletter",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join The Club"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Sign up for exclusive offers, original stories, events and more."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Enter your email address"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Disclaimer Text",
+      "default": "By subscribing you agree to our Terms & Conditions and Privacy Policy."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Box Max Width",
+      "default": 1000
+    },
+    {
+      "type": "range",
+      "id": "form_width",
+      "min": 400,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Form Max Width",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "form_layout",
+      "label": "Form Layout (Desktop)",
+      "options": [
+        { "value": "inline", "label": "Inline" },
+        { "value": "stacked", "label": "Stacked" }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "range",
+      "id": "box_padding",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Box Inner Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "box_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Box Border Radius",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "input_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Input & Button Radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Outer Section Background",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "color",
+      "id": "box_bg",
+      "label": "Inner Box Background",
+      "default": "#FEF3C7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "input_bg",
+      "label": "Input Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "input_text",
+      "label": "Input Text Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Background",
+      "default": "#D97706"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "header",
+      "content": "Background Image (Optional)"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Box Background Image"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - Newsletter Pro",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,242 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp32-usp-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp32-usp-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp32-usp__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp32-usp__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp32-usp__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp32-usp__item {
+    border: 4px solid var(--border-color);
+    background: #ffffff;
+    padding: 30px;
+    box-shadow: 8px 8px 0 var(--border-color);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.3s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp32-usp__item:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0 var(--border-color);
+    background: {{ section.settings.hover_color }};
+  }
+
+  /* Serial number detail */
+  .hp32-usp__serial {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .hp32-usp__icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 20px;
+    color: #000;
+    border: 2px solid #000;
+    padding: 8px;
+    box-shadow: 4px 4px 0 #000;
+    background: #fff;
+  }
+
+  .hp32-usp__title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .hp32-usp__text {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    color: #000;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp32-usp-wrapper" id="HP32USP-{{ section.id }}">
+  <div class="hp32-usp__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp32-usp__item" {{ block.shopify_attributes }}>
+        <div class="hp32-usp__serial">SYS.{{ forloop.index | prepend: '0' }}</div>
+        
+        <svg class="hp32-usp__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+          {%- if block.settings.icon == 'shield' -%}
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          {%- elsif block.settings.icon == 'zap' -%}
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          {%- elsif block.settings.icon == 'globe' -%}
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          {%- else -%}
+            <rect x="3" y="3" width="18" height="18"/>
+            <circle cx="12" cy="12" r="4"/>
+          {%- endif -%}
+        </svg>
+
+        <h3 class="hp32-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp32-usp__text">{{ block.settings.text }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP32 - Brutalist USPs",
+  "class": "section-hp32-usp",
+  "settings": [
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Light Grey)",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "hover_color",
+      "label": "Hover Accent (e.g. Electric Blue)",
+      "default": "#00ffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shield", "label": "Shield" },
+            { "value": "zap", "label": "Zap" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "box", "label": "Box" }
+          ],
+          "default": "zap"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "SYSTEM SPEED"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "NEXT-DAY DELIVERY GUARANTEED ON ALL PREMIUM TIER HARDWARE."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP32 - Brutalist USPs",
+      "blocks": [
+        { "type": "usp", "settings": { "icon": "zap", "title": "HYPER SPEED", "text": "DELIVERY SO FAST IT DEFIES PHYSICS." } },
+        { "type": "usp", "settings": { "icon": "shield", "title": "IRONCLAD", "text": "LIFETIME WARRANTY AGAINST STRUCTURAL FAILURE." } },
+        { "type": "usp", "settings": { "icon": "globe", "title": "GLOBAL COMM", "text": "WE SHIP TO ANY GRID ON THE PLANET." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

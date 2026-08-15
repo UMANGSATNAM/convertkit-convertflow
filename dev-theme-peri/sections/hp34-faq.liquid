@@ -1,0 +1,292 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --grid-color: rgba(255, 255, 255, 0.1);
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--grid-color);
+  }
+
+  .hp34-faq-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-faq-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp34-faq__header {
+    text-align: left;
+    margin-bottom: 50px;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 20px;
+  }
+
+  .hp34-faq__subtitle {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .hp34-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp34-faq__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp34-faq__item {
+    border-bottom: 1px solid var(--grid-color);
+  }
+
+  .hp34-faq__question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 25px 0;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-color);
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.3s ease;
+  }
+
+  .hp34-faq__question::before {
+    content: '> QUERY_' attr(data-index) ': ';
+    color: var(--accent-color);
+    margin-right: 15px;
+  }
+
+  .hp34-faq__question:hover {
+    color: var(--accent-color);
+  }
+
+  .hp34-faq__icon {
+    font-size: 18px;
+    color: var(--accent-color);
+    transition: transform 0.3s ease;
+  }
+
+  .hp34-faq__item.is-open .hp34-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .hp34-faq__answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .hp34-faq__answer-inner {
+    padding: 0 0 30px 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-faq-wrapper" id="HP34Faq-{{ section.id }}">
+  <div class="hp34-faq__header">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp34-faq__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    <h2 class="hp34-faq__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp34-faq__list">
+    {%- for block in section.blocks -%}
+      <div class="hp34-faq__item" {{ block.shopify_attributes }}>
+        <button class="hp34-faq__question" data-index="0{{ forloop.index }}">
+          <span>{{ block.settings.question }}</span>
+          <span class="hp34-faq__icon">+</span>
+        </button>
+        <div class="hp34-faq__answer">
+          <div class="hp34-faq__answer-inner">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = document.querySelectorAll('#HP34Faq-{{ section.id }} .hp34-faq__item');
+    items.forEach(item => {
+      const btn = item.querySelector('.hp34-faq__question');
+      const answer = item.querySelector('.hp34-faq__answer');
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('is-open');
+        // Close all
+        items.forEach(i => {
+          i.classList.remove('is-open');
+          i.querySelector('.hp34-faq__answer').style.maxHeight = null;
+        });
+        if(!isOpen) {
+          item.classList.add('is-open');
+          answer.style.maxHeight = answer.scrollHeight + "px";
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP34 - Tech FAQ",
+  "class": "section-hp34-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "KNOWLEDGE_BASE"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "System Diagnostics"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "WHAT IS THE DEPLOYMENT TIMEFRAME?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Standard deployment takes 2-4 cycles. Expedited routing available upon request.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

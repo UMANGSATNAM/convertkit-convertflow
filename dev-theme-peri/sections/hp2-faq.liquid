@@ -1,0 +1,340 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+  assign border_color = section.settings.border_color | default: '#000000'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp2-faq-bg: {{ bg_color }};
+    --hp2-faq-text: {{ text_color }};
+    --hp2-faq-border: {{ border_color }};
+    
+    --hp2-faq-pt-desk: {{ padding_top_desktop }}px;
+    --hp2-faq-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp2-faq-pt-mob: {{ padding_top_mobile }}px;
+    --hp2-faq-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp2-fashion-faq-{{ section.id }} {
+    padding-top: var(--hp2-faq-pt-desk);
+    padding-bottom: var(--hp2-faq-pb-desk);
+    background-color: var(--hp2-faq-bg);
+    color: var(--hp2-faq-text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  .hp2-faq-inner {
+    max-width: 1000px; /* Narrower for reading */
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp2-faq-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .hp2-faq-title {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+  }
+
+  /* Accordion Styles */
+  .hp2-faq-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid var(--hp2-faq-border);
+  }
+
+  .hp2-faq-item {
+    border-bottom: 2px solid var(--hp2-faq-border);
+  }
+
+  .hp2-faq-question {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--hp2-faq-text);
+    padding: 30px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .hp2-faq-question:hover {
+    color: rgba(var(--hp2-faq-text-rgb), 0.7); /* Assuming color needs opacity, fallback below */
+    opacity: 0.7;
+  }
+
+  .hp2-faq-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: 20px;
+  }
+  .hp2-faq-icon::before,
+  .hp2-faq-icon::after {
+    content: '';
+    position: absolute;
+    background-color: currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hp2-faq-icon::before {
+    width: 100%;
+    height: 2px;
+  }
+  .hp2-faq-icon::after {
+    width: 2px;
+    height: 100%;
+  }
+  
+  /* Open State */
+  .hp2-faq-item.is-open .hp2-faq-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .hp2-faq-item.is-open .hp2-faq-icon::before {
+    transform: translate(-50%, -50%) rotate(180deg);
+  }
+
+  .hp2-faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .hp2-faq-item.is-open .hp2-faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .hp2-faq-answer-inner {
+    overflow: hidden;
+  }
+  
+  .hp2-faq-answer-content {
+    padding-bottom: 30px;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+  .hp2-faq-answer-content p:first-child { margin-top: 0; }
+  .hp2-faq-answer-content p:last-child { margin-bottom: 0; }
+
+  @media screen and (max-width: 768px) {
+    .hp2-fashion-faq-{{ section.id }} {
+      padding-top: var(--hp2-faq-pt-mob);
+      padding-bottom: var(--hp2-faq-pb-mob);
+    }
+    .hp2-faq-inner {
+      padding: 0 20px;
+    }
+    .hp2-faq-question {
+      font-size: 15px;
+      padding: 20px 0;
+    }
+    .hp2-faq-answer-content {
+      font-size: 14px;
+      padding-bottom: 20px;
+    }
+  }
+</style>
+
+<section class="hp2-fashion-faq-{{ section.id }}" aria-label="Frequently Asked Questions">
+  <div class="hp2-faq-inner">
+    
+    {%- if section.settings.heading != blank -%}
+      <div class="hp2-faq-header">
+        <h2 class="hp2-faq-title">{{ section.settings.heading }}</h2>
+      </div>
+    {%- endif -%}
+
+    <div class="hp2-faq-list">
+      {%- for block in section.blocks -%}
+        <div class="hp2-faq-item" {{ block.shopify_attributes }}>
+          <button class="hp2-faq-question" aria-expanded="false" aria-controls="faq-answer-{{ section.id }}-{{ forloop.index }}">
+            {{ block.settings.question }}
+            <span class="hp2-faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="hp2-faq-answer" id="faq-answer-{{ section.id }}-{{ forloop.index }}" role="region">
+            <div class="hp2-faq-answer-inner">
+              <div class="hp2-faq-answer-content">
+                {{ block.settings.answer }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+      
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..3) -%}
+          <div class="hp2-faq-item">
+            <button class="hp2-faq-question" aria-expanded="false">
+              EXAMPLE QUESTION {{ i }}
+              <span class="hp2-faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="hp2-faq-answer">
+              <div class="hp2-faq-answer-inner">
+                <div class="hp2-faq-answer-content">
+                  <p>This is a placeholder answer. You can add real questions and answers in the theme editor.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.querySelector('.hp2-fashion-faq-{{ section.id }}');
+    if (!section) return;
+
+    const questions = section.querySelectorAll('.hp2-faq-question');
+    
+    questions.forEach(question => {
+      question.addEventListener('click', function() {
+        const item = this.closest('.hp2-faq-item');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        {% if section.settings.close_others %}
+          // Close all others
+          questions.forEach(q => {
+            if(q !== this) {
+              q.setAttribute('aria-expanded', 'false');
+              q.closest('.hp2-faq-item').classList.remove('is-open');
+            }
+          });
+        {% endif %}
+        
+        // Toggle current
+        this.setAttribute('aria-expanded', !isExpanded);
+        item.classList.toggle('is-open');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP2 FAQ Accordion",
+  "tag": "section",
+  "class": "section-hp2-faq",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "FAQS"
+    },
+    {
+      "type": "checkbox",
+      "id": "close_others",
+      "label": "Close other items when one is opened",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Line Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "DO YOU SHIP INTERNATIONALLY?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes, we ship worldwide. Shipping costs will apply, and will be added at checkout.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP2 FAQ Accordion (Advanced)",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "WHAT IS YOUR RETURN POLICY?" } },
+        { "type": "faq", "settings": { "question": "HOW LONG DOES SHIPPING TAKE?" } },
+        { "type": "faq", "settings": { "question": "DO YOUR ITEMS FIT TRUE TO SIZE?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

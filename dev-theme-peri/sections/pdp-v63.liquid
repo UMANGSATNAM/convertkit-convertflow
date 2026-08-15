@@ -1,0 +1,492 @@
+{%- comment -%}
+  PDP V63 — SCANDINAVIAN GLACIER FROST MINIMAL
+  Design: Ultra-clean Nordic glacier frost aesthetic, DM Sans header + Inter body font
+  Glacier Frost background (#F0F9FF), Ice Cyan (#06B6D4), Deep Navy (#0F172A), Slate Muted (#64748B)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inv_qty = current_variant.inventory_quantity | default: 15 -%}
+{%- if inv_qty <= 0 -%}{%- assign inv_qty = 9 -%}{%- endif -%}
+{%- assign viewer_count = inv_qty | times: 6 | modulo: 45 | plus: 25 -%}
+{%- assign sold_count = inv_qty | times: 15 | modulo: 380 | plus: 190 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  .pdpv63 {
+    --bg: #F0F9FF; --surface: #FFFFFF; --border: #E0F2FE; --border-dark: #06B6D4;
+    --text: #0F172A; --muted: #0284C7; --accent: #06B6D4; --accent-hover: #0891B2;
+    --cyan: #06B6D4; --danger: #EF4444;
+    --f-head: 'DM Sans', sans-serif; --f-body: 'Inter', sans-serif;
+    --r: 8px; --r-pill: 9999px; --ease: all 0.2s ease;
+    background: var(--bg); color: var(--text); font-family: var(--f-body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .pdpv63 *, .pdpv63 *::before, .pdpv63 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pdpv63 img { max-width: 100%; display: block; }
+  .pdpv63 button { font-family: inherit; cursor: pointer; }
+  .pdpv63__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* OFFER BAR */
+  .pdpv63__offer { background: var(--accent); color: #FFF; padding: 12px; text-align: center; font-family: var(--f-head); font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+
+  /* GRID */
+  .pdpv63__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding: 36px 0; }
+  @media (min-width: 992px) { .pdpv63__grid { grid-template-columns: 1.1fr 1fr; gap: 48px; padding: 48px 0; } }
+
+  /* GALLERY */
+  .pdpv63__gal { display: flex; flex-direction: column; gap: 12px; }
+  .pdpv63__hero { width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--surface); border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(6,182,212,0.12); position: relative; }
+  .pdpv63__hero img { width: 100%; height: 100%; object-fit: contain; }
+  .pdpv63__glc-tag { position: absolute; top: 14px; left: 14px; background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: var(--r); text-transform: uppercase; }
+
+  .pdpv63__thumbs { display: flex; gap: 10px; overflow-x: auto; }
+  .pdpv63__th { width: 64px; height: 64px; flex-shrink: 0; border: 2px solid transparent; border-radius: 6px; overflow: hidden; cursor: pointer; background: var(--surface); transition: var(--ease); }
+  .pdpv63__th:hover, .pdpv63__th.on { border-color: var(--accent); }
+  .pdpv63__th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .pdpv63__info { display: flex; flex-direction: column; gap: 18px; }
+  .pdpv63__crumb { font-family: var(--f-head); font-size: 12px; letter-spacing: 2px; color: var(--accent); font-weight: 700; text-transform: uppercase; }
+  .pdpv63__title { font-family: var(--f-head); font-size: 32px; font-weight: 700; line-height: 1.2; color: var(--text); }
+  @media (min-width: 992px) { .pdpv63__title { font-size: 40px; } }
+
+  .pdpv63__rating { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .pdpv63__stars { color: var(--accent); }
+
+  /* PRICE */
+  .pdpv63__price-row { display: flex; align-items: baseline; gap: 12px; }
+  .pdpv63__price { font-family: var(--f-head); font-size: 36px; font-weight: 700; color: var(--accent); }
+  .pdpv63__cmp { font-size: 18px; color: var(--muted); text-decoration: line-through; }
+  .pdpv63__badge { background: var(--accent); color: #FFF; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 4px; }
+
+  /* VARIANTS */
+  .pdpv63__vlabel { font-family: var(--f-head); font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
+  .pdpv63__vopts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdpv63__vr { display: none; }
+  .pdpv63__vbtn { padding: 10px 22px; border: 1px solid var(--border-dark); border-radius: var(--r); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; transition: var(--ease); cursor: pointer; }
+  .pdpv63__vbtn:hover { border-color: var(--accent); }
+  .pdpv63__vr:checked + .pdpv63__vbtn { border-color: var(--accent); background: var(--accent); color: #FFF; }
+
+  /* PROMO */
+  .pdpv63__promo { background: var(--surface); border: 1px dashed var(--accent); border-radius: var(--r); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--accent); }
+  .pdpv63__promo-code { background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 4px; }
+
+  /* URGENCY */
+  .pdpv63__urg { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+  .pdpv63__pulse { display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-right: 6px; animation: pdpv63p 1.5s infinite; }
+  @keyframes pdpv63p { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pdpv63__bar { height: 6px; background: #E0F2FE; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .pdpv63__fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* QTY & CTA */
+  .pdpv63__qty-row { display: flex; align-items: center; gap: 14px; }
+  .pdpv63__qty { display: flex; border: 1px solid var(--border-dark); border-radius: var(--r); overflow: hidden; background: var(--surface); }
+  .pdpv63__qty button { width: 42px; height: 46px; border: none; background: transparent; font-size: 18px; color: var(--text); }
+  .pdpv63__qty input { width: 44px; height: 46px; border: none; border-left: 1px solid var(--border-dark); border-right: 1px solid var(--border-dark); text-align: center; font-size: 15px; font-weight: 700; background: transparent; }
+
+  .pdpv63__atc { width: 100%; padding: 16px; border: none; border-radius: var(--r); background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 16px; font-weight: 700; letter-spacing: 1px; transition: var(--ease); box-shadow: 0 6px 18px rgba(6,182,212,0.3); }
+  .pdpv63__atc:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .pdpv63__atc:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .pdpv63__buynow .shopify-payment-button__button { border-radius: var(--r) !important; }
+
+  /* TRUST */
+  .pdpv63__trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; padding: 18px 0; border-top: 1px solid var(--border-dark); border-bottom: 1px solid var(--border-dark); }
+  .pdpv63__trust-item { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .pdpv63__trust-icon { font-size: 20px; margin-bottom: 3px; color: var(--accent); }
+  @media (max-width: 480px) { .pdpv63__trust { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ACCORDION */
+  .pdpv63__acc { border-top: 1px solid var(--border-dark); margin-top: 48px; }
+  .pdpv63__acc-item { border-bottom: 1px solid var(--border-dark); }
+  .pdpv63__acc-btn { width: 100%; padding: 18px 0; border: none; background: transparent; display: flex; justify-content: space-between; align-items: center; font-family: var(--f-head); font-size: 17px; font-weight: 700; color: var(--text); }
+  .pdpv63__acc-btn::after { content: '❄️'; font-size: 18px; }
+  .pdpv63__acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pdpv63__acc-item.open .pdpv63__acc-body { max-height: 500px; }
+  .pdpv63__acc-inner { padding: 0 0 18px; font-size: 15px; line-height: 1.7; color: var(--muted); }
+
+  /* SECTION TITLE */
+  .pdpv63__sh { font-family: var(--f-head); font-size: 26px; font-weight: 700; text-align: center; margin: 48px 0 20px; color: var(--text); }
+
+  /* REELS */
+  .pdpv63__reels { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .pdpv63__reel { min-width: 180px; width: 180px; aspect-ratio: 9/16; background: #0284C7; border-radius: var(--r); overflow: hidden; flex-shrink: 0; position: relative; }
+  .pdpv63__reel video { width: 100%; height: 100%; object-fit: cover; }
+  .pdpv63__reel-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #FFF; font-size: 12px; font-weight: 600; }
+  .pdpv63__reel-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--bg); font-size: 36px; }
+
+  /* CARDS */
+  .pdpv63__pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdpv63__pgrid { grid-template-columns: repeat(4, 1fr); } }
+  .pdpv63__pcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; transition: var(--ease); text-decoration: none; color: inherit; display: block; }
+  .pdpv63__pcard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,182,212,0.15); }
+  .pdpv63__pcard img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .pdpv63__pcard-info { padding: 14px; }
+  .pdpv63__pcard-title { font-family: var(--f-head); font-size: 15px; font-weight: 700; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pdpv63__pcard-price { font-size: 15px; font-weight: 700; color: var(--accent); }
+
+  /* REVIEWS */
+  .pdpv63__revgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .pdpv63__revgrid { grid-template-columns: repeat(3, 1fr); } }
+  .pdpv63__revcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); padding: 20px; }
+  .pdpv63__rev-stars { color: var(--accent); font-size: 14px; margin-bottom: 8px; }
+  .pdpv63__rev-txt { font-size: 14px; line-height: 1.6; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+  .pdpv63__rev-auth { font-family: var(--f-head); font-size: 14px; font-weight: 700; }
+  .pdpv63__rev-vf { font-size: 11px; color: var(--accent); font-weight: 700; }
+
+  /* RECENTLY VIEWED */
+  #pdpv63-rv { display: none; }
+  #pdpv63-rv.has { display: block; }
+
+  /* STICKY ATC */
+  .pdpv63__sticky { position: fixed; bottom: -80px; left: 0; width: 100%; background: var(--surface); border-top: 3px solid var(--accent); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; transition: bottom 0.3s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
+  .pdpv63__sticky.show { bottom: 0; }
+  .pdpv63__sticky-l { display: flex; align-items: center; gap: 14px; }
+  .pdpv63__sticky-img { width: 42px; height: 42px; border-radius: 6px; object-fit: cover; }
+  .pdpv63__sticky-t { font-family: var(--f-head); font-size: 14px; font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdpv63__sticky-p { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .pdpv63__sticky-btn { background: var(--accent); color: #FFF; border: none; padding: 12px 26px; border-radius: var(--r); font-family: var(--f-head); font-weight: 700; font-size: 14px; transition: var(--ease); }
+  .pdpv63__sticky-btn:hover { background: var(--accent-hover); }
+  @media (max-width: 600px) { .pdpv63__sticky-l { display: none; } .pdpv63__sticky-btn { width: 100%; padding: 15px; } }
+
+  .pdpv63__toast { position: fixed; top: 20px; right: 20px; background: var(--accent); color: #FFF; padding: 12px 24px; border-radius: var(--r); font-family: var(--f-head); font-size: 14px; font-weight: 700; z-index: 10000; transform: translateX(130%); transition: transform 0.3s ease; box-shadow: 0 4px 16px rgba(6,182,212,0.3); }
+  .pdpv63__toast.show { transform: translateX(0); }
+</style>
+
+<div class="pdpv63">
+  {% if section.settings.show_offer %}<div class="pdpv63__offer">{{ section.settings.offer_text }}</div>{% endif %}
+
+  <div class="pdpv63__wrap">
+    <div class="pdpv63__grid">
+
+      <!-- GALLERY -->
+      <div class="pdpv63__gal">
+        <div class="pdpv63__hero" id="pdpv63-hero">
+          <span class="pdpv63__glc-tag">❄️ GLACIER FROST</span>
+          {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.title | escape }}" id="pdpv63-himg">{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
+        </div>
+        <div class="pdpv63__thumbs">
+          {% for media in product.media limit: 6 %}
+            <div class="pdpv63__th {% if forloop.first %}on{% endif %}">
+              <img src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" loading="lazy">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pdpv63__info">
+        <div class="pdpv63__crumb">❄️ {% if product.collections.size > 0 %}{{ product.collections.first.title }}{% else %}Glacier Frost{% endif %}</div>
+        <h1 class="pdpv63__title">{{ product.title }}</h1>
+
+        {% if section.settings.show_rating %}
+          <div class="pdpv63__rating">
+            <span class="pdpv63__stars">★★★★★</span>
+            <span>{{ section.settings.rating_val }} · {{ section.settings.rev_count }} Glacier Reviews</span>
+          </div>
+        {% endif %}
+
+        <div class="pdpv63__price-row">
+          <span class="pdpv63__price" id="pdpv63-price">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="pdpv63__cmp">{{ current_variant.compare_at_price | money }}</span>
+            {%- assign sv = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+            <span class="pdpv63__badge">SAVE {{ sv }}%</span>
+          {% endif %}
+        </div>
+
+        {% if product.variants.size > 1 %}
+          {% for option in product.options_with_values %}
+            <div>
+              <div class="pdpv63__vlabel">Select {{ option.name }}</div>
+              <div class="pdpv63__vopts">
+                {% for value in option.values %}
+                  <label>
+                    <input type="radio" name="pdpv63-o-{{ option.position }}" value="{{ value | escape }}" class="pdpv63__vr" data-pos="{{ option.position }}" {% if option.selected_value == value %}checked{% endif %}>
+                    <span class="pdpv63__vbtn">{{ value }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if section.settings.show_promo %}
+          <div class="pdpv63__promo">
+            <span>❄️ Glacier Pass: Apply {{ section.settings.promo_code }}</span>
+            <span class="pdpv63__promo-code">Save {{ section.settings.promo_disc }}</span>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_urgency %}
+          <div class="pdpv63__urg">
+            <div><span class="pdpv63__pulse"></span><strong>{{ viewer_count }}</strong> nordic shoppers online</div>
+            <div>❄️ <strong>{{ sold_count }}</strong> glacier orders completed today</div>
+            <div>Availability: Only <strong>{{ inv_qty }}</strong> remaining
+              <div class="pdpv63__bar">
+                {%- assign sp = inv_qty | times: 100 | divided_by: 45 -%}
+                {%- if sp > 100 -%}{%- assign sp = 100 -%}{%- endif -%}
+                <div class="pdpv63__fill" style="width:{{ sp }}%"></div>
+              </div>
+            </div>
+            {% if section.settings.show_countdown %}
+              <div>⏳ Glacier Offer Ends In: <strong id="pdpv63-cd" style="color:var(--accent)">{{ section.settings.cd_hrs }}h 00m 00s</strong></div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="pdpv63__qty-row">
+          <div class="pdpv63__qty">
+            <button type="button" id="pdpv63-qm">−</button>
+            <input type="number" id="pdpv63-qi" value="1" min="1" max="10" readonly>
+            <button type="button" id="pdpv63-qp">+</button>
+          </div>
+          {% form 'product', product, id: 'pdpv63-form', style: 'flex:1' %}
+            <input type="hidden" name="id" id="pdpv63-vid" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" id="pdpv63-fq" value="1">
+            <button type="submit" name="add" class="pdpv63__atc" id="pdpv63-atc" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}Add to Cart — {{ current_variant.price | money }}{% else %}Sold Out{% endif %}
+            </button>
+            <div class="pdpv63__buynow" style="margin-top:10px">{{ form | payment_button }}</div>
+          {% endform %}
+        </div>
+
+        <div class="pdpv63__trust">
+          <div class="pdpv63__trust-item"><div class="pdpv63__trust-icon">🔒</div>Secure</div>
+          <div class="pdpv63__trust-item"><div class="pdpv63__trust-icon">❄️</div>Glacier Pure</div>
+          <div class="pdpv63__trust-item"><div class="pdpv63__trust-icon">↩️</div>Easy Returns</div>
+          <div class="pdpv63__trust-item"><div class="pdpv63__trust-icon">✨</div>Nordic Design</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION -->
+    <div class="pdpv63__acc">
+      <div class="pdpv63__acc-item open">
+        <button class="pdpv63__acc-btn" type="button">Glacier Details & Nordic Craft</button>
+        <div class="pdpv63__acc-body"><div class="pdpv63__acc-inner">{{ product.description }}</div></div>
+      </div>
+      {% if section.settings.glc_specs != blank %}
+        <div class="pdpv63__acc-item">
+          <button class="pdpv63__acc-btn" type="button">Arctic Craftsmanship & Materials</button>
+          <div class="pdpv63__acc-body"><div class="pdpv63__acc-inner">{{ section.settings.glc_specs }}</div></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FBT -->
+    {% if section.settings.fbt_coll != blank %}
+      {%- assign fbt = collections[section.settings.fbt_coll] -%}
+      {% if fbt.products.size > 0 %}
+        <div class="pdpv63__sh">Glacier Frost Pairings</div>
+        <div class="pdpv63__pgrid">
+          {% for item in fbt.products limit: 4 %}
+            <a href="{{ item.url }}" class="pdpv63__pcard">
+              <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+              <div class="pdpv63__pcard-info">
+                <div class="pdpv63__pcard-title">{{ item.title }}</div>
+                <div class="pdpv63__pcard-price">{{ item.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- REELS -->
+    {% if section.settings.show_reels %}
+      <div class="pdpv63__sh">Arctic Stream</div>
+      <div class="pdpv63__reels">
+        {% if section.settings.r1 != blank %}<div class="pdpv63__reel"><video src="{{ section.settings.r1 }}" muted playsinline loop></video><div class="pdpv63__reel-cap">❄️ Glacier Breeze</div></div>{% else %}<div class="pdpv63__reel"><div class="pdpv63__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r2 != blank %}<div class="pdpv63__reel"><video src="{{ section.settings.r2 }}" muted playsinline loop></video><div class="pdpv63__reel-cap">✨ Nordic Frost</div></div>{% else %}<div class="pdpv63__reel"><div class="pdpv63__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r3 != blank %}<div class="pdpv63__reel"><video src="{{ section.settings.r3 }}" muted playsinline loop></video><div class="pdpv63__reel-cap">❄️ Arctic Unboxing</div></div>{% else %}<div class="pdpv63__reel"><div class="pdpv63__reel-ph">▶</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- REVIEWS -->
+    {% if section.settings.show_reviews %}
+      <div class="pdpv63__sh" id="reviews">Customer Reviews</div>
+      <div class="pdpv63__revgrid">
+        {% if section.settings.rv1 != blank %}<div class="pdpv63__revcard"><div class="pdpv63__rev-stars">★★★★★</div><div class="pdpv63__rev-txt">"{{ section.settings.rv1 }}"</div><div class="pdpv63__rev-auth">{{ section.settings.rv1n }}</div><div class="pdpv63__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv2 != blank %}<div class="pdpv63__revcard"><div class="pdpv63__rev-stars">★★★★★</div><div class="pdpv63__rev-txt">"{{ section.settings.rv2 }}"</div><div class="pdpv63__rev-auth">{{ section.settings.rv2n }}</div><div class="pdpv63__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv3 != blank %}<div class="pdpv63__revcard"><div class="pdpv63__rev-stars">★★★★★</div><div class="pdpv63__rev-txt">"{{ section.settings.rv3 }}"</div><div class="pdpv63__rev-auth">{{ section.settings.rv3n }}</div><div class="pdpv63__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURED -->
+    {% if section.settings.feat_coll != blank %}
+      {%- assign fc = collections[section.settings.feat_coll] -%}
+      {% if fc.products.size > 0 %}
+        <div class="pdpv63__sh">Recommended Glacier Items</div>
+        <div class="pdpv63__pgrid">
+          {% for item in fc.products limit: 4 %}
+            {% if item.handle != product.handle %}
+              <a href="{{ item.url }}" class="pdpv63__pcard">
+                <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+                <div class="pdpv63__pcard-info">
+                  <div class="pdpv63__pcard-title">{{ item.title }}</div>
+                  <div class="pdpv63__pcard-price">{{ item.price | money }}</div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- RECENTLY VIEWED -->
+    <div id="pdpv63-rv">
+      <div class="pdpv63__sh">Recently Viewed</div>
+      <div class="pdpv63__pgrid" id="pdpv63-rvg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY ATC -->
+<div class="pdpv63__sticky" id="pdpv63-sticky">
+  <div class="pdpv63__sticky-l">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 80 }}" class="pdpv63__sticky-img" alt="{{ product.title | escape }}">{% endif %}
+    <div>
+      <div class="pdpv63__sticky-t">{{ product.title }}</div>
+      <div class="pdpv63__sticky-p" id="pdpv63-sp">{{ current_variant.price | money }}</div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      {% if product.available %}
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b>{% render 'countdown-timer', product: product %}</b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% render 'back-in-stock', product: product %}
+
+      {% if product.available %}
+      <button type="button" class="pdpv63__sticky-btn" id="pdpv63-sbtn">Add to Cart</button>
+      {% else %}
+      <button class="pdpv63__sticky-btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      {% endif %}
+</div>
+
+<div class="pdpv63__toast" id="pdpv63-toast">❄️ Added to cart!</div>
+
+<script>
+(function(){
+  var PJ={{ product | json }}, cid={{ current_variant.id }};
+  function getO(){ var o=[]; document.querySelectorAll('.pdpv63__vr:checked').forEach(function(r){ o.push({p:parseInt(r.dataset.pos),v:r.value}); }); o.sort(function(a,b){return a.p-b.p}); return o.map(function(x){return x.v}); }
+  function findV(o){ for(var i=0;i<PJ.variants.length;i++){ var v=PJ.variants[i],ok=true; for(var j=0;j<o.length;j++){ if(v.options[j]!==o[j]){ ok=false; break; } } if(ok) return v; } return null; }
+  function upd(){
+    var o=getO(); if(!o.length) return; var v=findV(o); if(!v) return; cid=v.id;
+    document.getElementById('pdpv63-vid').value=v.id;
+    var pf=(v.price/100).toLocaleString('en-US',{style:'currency',currency:PJ.currency||'USD'});
+    var pe=document.getElementById('pdpv63-price'); if(pe) pe.textContent=pf;
+    var sp=document.getElementById('pdpv63-sp'); if(sp) sp.textContent=pf;
+    var ab=document.getElementById('pdpv63-atc');
+    if(ab){ ab.disabled=!v.available; ab.textContent=v.available?'Add to Cart — '+pf:'Sold Out'; }
+    var u=new URL(window.location); u.searchParams.set('variant',v.id); history.replaceState({},'',u);
+  }
+  document.querySelectorAll('.pdpv63__vr').forEach(function(r){ r.addEventListener('change',upd); });
+
+  var fm=document.getElementById('pdpv63-form');
+  if(fm) fm.addEventListener('submit',function(e){
+    e.preventDefault(); var b=document.getElementById('pdpv63-atc'), ot=b.textContent;
+    b.disabled=true; b.textContent='Adding...';
+    var q=parseInt(document.getElementById('pdpv63-qi').value)||1;
+    document.getElementById('pdpv63-fq').value=q;
+    fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cid,quantity:q})})
+    .then(function(r){return r.json();})
+    .then(function(){ b.textContent='✓ Added!'; toast63(); setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); })
+    .catch(function(){ b.textContent='Error'; setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); });
+  });
+
+  function toast63(){ var t=document.getElementById('pdpv63-toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+  var qi=document.getElementById('pdpv63-qi');
+  document.getElementById('pdpv63-qm').addEventListener('click',function(){ var v=parseInt(qi.value); if(v>1) qi.value=v-1; });
+  document.getElementById('pdpv63-qp').addEventListener('click',function(){ var v=parseInt(qi.value); if(v<10) qi.value=v+1; });
+
+  document.querySelectorAll('.pdpv63__th').forEach(function(th){
+    th.addEventListener('click',function(){
+      document.querySelectorAll('.pdpv63__th').forEach(function(t){ t.classList.remove('on'); });
+      th.classList.add('on');
+      var hi=document.getElementById('pdpv63-himg'), ti=th.querySelector('img');
+      if(hi&&ti) hi.src=ti.src.replace(/width=\d+/,'width=900');
+    });
+  });
+
+  var sb=document.getElementById('pdpv63-sticky'), ab=document.getElementById('pdpv63-atc');
+  if(sb&&ab) window.addEventListener('scroll',function(){ sb.classList.toggle('show', ab.getBoundingClientRect().top<-50); });
+  var sbn=document.getElementById('pdpv63-sbtn');
+  if(sbn) sbn.addEventListener('click',function(){ document.getElementById('pdpv63-atc').click(); });
+
+  document.querySelectorAll('.pdpv63__acc-btn').forEach(function(b){ b.addEventListener('click',function(){ b.closest('.pdpv63__acc-item').classList.toggle('open'); }); });
+
+  var ce=document.getElementById('pdpv63-cd');
+  if(ce){
+    var hrs=parseInt('{{ section.settings.cd_hrs | default: 6 }}')||6, ts=hrs*3600;
+    var sk=sessionStorage.getItem('pdpv63_cd'); if(sk) ts=parseInt(sk);
+    setInterval(function(){ ts--; if(ts<=0){ ce.textContent='EXPIRED'; return; } var h=Math.floor(ts/3600), m=Math.floor((ts%3600)/60), s=ts%60; ce.textContent=h+'h '+(m<10?'0':'')+m+'m '+(s<10?'0':'')+s+'s'; sessionStorage.setItem('pdpv63_cd',ts); },1000);
+  }
+
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target.querySelector('video'); if(v){ e.isIntersecting?v.play():v.pause(); } }); },{threshold:0.5});
+    document.querySelectorAll('.pdpv63__reel').forEach(function(r){ ro.observe(r); });
+  }
+
+  var RK='pdpv63_rv', cp={handle:'{{ product.handle }}',title:'{{ product.title | escape }}',price:'{{ product.price | money }}',image:'{{ product.featured_image | image_url: width: 400 }}',url:'{{ product.url }}'};
+  try{ var its=JSON.parse(localStorage.getItem(RK)||'[]'); its=its.filter(function(i){ return i.handle!==cp.handle; }); its.unshift(cp); if(its.length>8) its=its.slice(0,8); localStorage.setItem(RK,JSON.stringify(its)); }catch(e){}
+  try{
+    var its2=JSON.parse(localStorage.getItem(RK)||'[]').filter(function(i){ return i.handle!==cp.handle; });
+    var c=document.getElementById('pdpv63-rv'), g=document.getElementById('pdpv63-rvg');
+    if(g&&its2.length>0){ c.classList.add('has'); var h=''; its2.slice(0,4).forEach(function(i){ h+='<a href="'+i.url+'" class="pdpv63__pcard"><img src="'+i.image+'" alt="'+i.title+'" loading="lazy"><div class="pdpv63__pcard-info"><div class="pdpv63__pcard-title">'+i.title+'</div><div class="pdpv63__pcard-price">'+i.price+'</div></div></a>'; }); g.innerHTML=h; }
+  }catch(e){}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PDP V63 — Glacier Frost",
+  "tag": "section",
+  "class": "pdpv63-section",
+  "settings": [
+    { "type": "header", "content": "Rating" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "text", "id": "rating_val", "label": "Rating score", "default": "4.96" },
+    { "type": "text", "id": "rev_count", "label": "Total reviews", "default": "1,860" },
+    { "type": "header", "content": "Offer Banner" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show offer", "default": true },
+    { "type": "text", "id": "offer_text", "label": "Offer text", "default": "❄️ GLACIER FROST: ENJOY 20% DISCOUNT WITH CODE 'GLACIER20'" },
+    { "type": "header", "content": "Promo" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show promo", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Code", "default": "GLACIER20" },
+    { "type": "text", "id": "promo_disc", "label": "Discount", "default": "20%" },
+    { "type": "header", "content": "Urgency" },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show urgency", "default": true },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "range", "id": "cd_hrs", "label": "Countdown hours", "min": 1, "max": 48, "default": 6 },
+    { "type": "header", "content": "Accordion" },
+    { "type": "richtext", "id": "glc_specs", "label": "Arctic craftsmanship & materials" },
+    { "type": "header", "content": "FBT" },
+    { "type": "collection", "id": "fbt_coll", "label": "FBT collection" },
+    { "type": "header", "content": "Reels" },
+    { "type": "checkbox", "id": "show_reels", "label": "Show reels", "default": true },
+    { "type": "url", "id": "r1", "label": "Reel 1 URL" },
+    { "type": "url", "id": "r2", "label": "Reel 2 URL" },
+    { "type": "url", "id": "r3", "label": "Reel 3 URL" },
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews", "default": true },
+    { "type": "text", "id": "rv1", "label": "Review 1", "default": "Glacier frost aesthetic is so crisp and clean." },
+    { "type": "text", "id": "rv1n", "label": "Author 1", "default": "Lukas N." },
+    { "type": "text", "id": "rv2", "label": "Review 2", "default": "Minimal Nordic styling with ice blue accents." },
+    { "type": "text", "id": "rv2n", "label": "Author 2", "default": "Henrik S." },
+    { "type": "text", "id": "rv3", "label": "Review 3", "default": "100% arctic quality craftsmanship." },
+    { "type": "text", "id": "rv3n", "label": "Author 3", "default": "Astrid K." },
+    { "type": "header", "content": "Featured" },
+    { "type": "collection", "id": "feat_coll", "label": "Featured collection" }
+  ],
+  "presets": [{ "name": "PDP V63 — Glacier Frost" }]
+}
+{% endschema %}

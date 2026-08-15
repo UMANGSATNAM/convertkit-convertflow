@@ -1,0 +1,272 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  .hp31-story-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp31-story-wrapper {
+      flex-direction: column;
+      gap: 40px;
+      padding: 0 20px;
+    }
+  }
+
+  .hp31-story__image-col {
+    flex: 1;
+    position: relative;
+  }
+
+  .hp31-story__image-wrap {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 4/5;
+  }
+
+  .hp31-story__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp31-story__shape {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: #EAE6DF;
+    border-radius: 24px;
+    bottom: -30px;
+    left: -30px;
+    z-index: -1;
+  }
+
+  .hp31-story__content-col {
+    flex: 1;
+    max-width: 500px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp31-story__content-col {
+      text-align: center;
+      margin: 0 auto;
+    }
+  }
+
+  .hp31-story__tagline {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin-bottom: 24px;
+    display: block;
+    opacity: 0.6;
+  }
+
+  .hp31-story__title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.5vw, {{ section.settings.title_size }}px);
+    line-height: 1.2;
+    color: var(--text-color);
+    margin: 0 0 32px;
+    font-weight: 400;
+  }
+
+  .hp31-story__title em {
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  .hp31-story__text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0 0 40px;
+    font-weight: 300;
+  }
+
+  .hp31-story__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--text-color);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--text-color);
+    transition: opacity 0.3s ease;
+  }
+
+  .hp31-story__btn:hover {
+    opacity: 0.5;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp31-story-wrapper" id="HP31Story-{{ section.id }}">
+  <div class="hp31-story__image-col">
+    <div class="hp31-story__shape"></div>
+    <div class="hp31-story__image-wrap">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" class="hp31-story__image" loading="lazy">
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'hp31-story__image' }}
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="hp31-story__content-col">
+    <span class="hp31-story__tagline">{{ section.settings.tagline }}</span>
+    <h2 class="hp31-story__title">{{ section.settings.title }}</h2>
+    <div class="hp31-story__text">{{ section.settings.text }}</div>
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp31-story__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP31 - Zen Brand Story",
+  "class": "section-hp31-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Our Philosophy"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Designing for <em>slowness</em> in a hurried world."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We believe in the beauty of pause. Our objects are crafted to ground you, bringing an understated elegance and quiet utility to your sanctuary.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Read Our Story"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Zen Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP31 - Zen Brand Story"
+    }
+  ]
+}
+{% endschema %}

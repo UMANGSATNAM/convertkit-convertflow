@@ -1,0 +1,240 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-video-wrapper {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp30-video__header {
+    padding: 30px 40px;
+    border-bottom: 4px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp30-video__header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+      gap: 15px;
+    }
+  }
+
+  .hp30-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(30px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hp30-video__tag {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--bg-color);
+    background: var(--text-color);
+    padding: 5px 15px;
+  }
+
+  .hp30-video__container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .hp30-video__media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(150%) grayscale(100%);
+  }
+
+  .hp30-video__play-btn {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: var(--accent-color);
+    border: 4px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0s;
+    z-index: 2;
+  }
+
+  .hp30-video__play-btn:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .hp30-video__play-icon {
+    width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 30px solid var(--bg-color);
+    margin-left: 10px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-video-wrapper" id="HP30Video-{{ section.id }}">
+  <div class="hp30-video__header">
+    <h2 class="hp30-video__title">{{ section.settings.title }}</h2>
+    <div class="hp30-video__tag">CAMPAIGN FILM</div>
+  </div>
+
+  <div class="hp30-video__container">
+    {%- if section.settings.video_url != blank -%}
+      {%- if section.settings.video_url.type == 'youtube' -%}
+        <iframe class="hp30-video__media" src="https://www.youtube.com/embed/{{ section.settings.video_url.id }}?autoplay=0&controls=0&mute=1&loop=1&playlist={{ section.settings.video_url.id }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      {%- elsif section.settings.video_url.type == 'vimeo' -%}
+        <iframe class="hp30-video__media" src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?background=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      {%- endif -%}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hp30-video__media' }}
+    {%- endif -%}
+
+    <div class="hp30-video__play-btn" aria-label="Play Video">
+      <div class="hp30-video__play-icon"></div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Video",
+  "class": "section-hp30-video-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYSTEM.OVERRIDE"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "Video URL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / Play Btn (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Video"
+    }
+  ]
+}
+{% endschema %}

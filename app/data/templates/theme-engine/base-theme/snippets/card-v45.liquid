@@ -1,0 +1,200 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V45 — ARTISANAL STONEWARE POTTERY & CERAMIC D2C (EAST FORK / STUDIO POTTERY STYLE)
+  Usage: {% render 'card-v45', product: product %}
+  Design: Terracotta Clay (#A0522D), Linen Cream (#FDFBF7), Cormorant Garamond & Inter fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
+
+  .cv45-card {
+    --cv45-bg: #FFFFFF;
+    --cv45-text: #5A2E19;
+    --cv45-muted: #A0522D;
+    --cv45-clay: #A0522D;
+    --cv45-cream: #FDFBF7;
+    --cv45-border: #E8D8CD;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv45-bg);
+    border: 1px solid var(--cv45-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv45-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv45-clay);
+    box-shadow: 0 12px 24px -6px rgba(160, 82, 45, 0.22);
+  }
+
+  .cv45-card *, .cv45-card *::before, .cv45-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv45-card a { color: inherit; text-decoration: none; }
+  .cv45-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv45-card img { max-width: 100%; display: block; }
+
+  .cv45-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv45-cream);
+    overflow: hidden;
+  }
+  .cv45-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv45-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv45-card:hover .cv45-img-pri { opacity: 0; }
+  .cv45-card:hover .cv45-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Pottery Tag Top Left */
+  .cv45-badge-pottery {
+    position: absolute; top: 10px; left: 10px;
+    background: #5A2E19; color: #FDFBF7;
+    font-family: 'Cormorant Garamond', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv45-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv45-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv45-clay); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv45-wish:hover, .cv45-wish.active { background: var(--cv45-clay); color: #FFFFFF; border-color: var(--cv45-clay); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv45-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(90, 46, 25, 0.95); color: #FDFBF7;
+    font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv45-clay);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv45-card:hover .cv45-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv45-qv-overlay:hover { background: #FDFBF7; color: #5A2E19; }
+
+  .cv45-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv45-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv45-muted); font-weight: 600; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
+  .cv45-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #5A2E19; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Clay Specs Subtitle */
+  .cv45-specs { font-size: 11px; color: var(--cv45-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv45-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #A0522D; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv45-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv45-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #5A2E19; }
+  .cv45-cmp { font-size: 13px; color: #A8A29E; text-decoration: line-through; }
+  .cv45-disc { font-size: 10px; font-weight: 700; color: #5A2E19; background: var(--cv45-cream); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv45-border); }
+
+  /* Glaze Color Swatches */
+  .cv45-swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .cv45-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cv45-border); cursor: pointer; }
+  .cv45-swatch.active { transform: scale(1.25); border-color: var(--cv45-clay); }
+
+  /* Bottom Button */
+  .cv45-action-box { padding: 0 14px 14px; }
+  .cv45-atc-btn {
+    width: 100%; padding: 11px;
+    background: #A0522D; color: #FFFFFF;
+    font-family: 'Cormorant Garamond', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+  }
+  .cv45-atc-btn:hover { background: #5A2E19; transform: scale(1.01); }
+  .cv45-atc-btn:disabled { background: #E7E5E4; color: #A8A29E; cursor: not-allowed; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv45-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv45-badge-pottery">HAND-THROWN STONEWARE 🏺</span>
+
+    <button type="button" class="cv45-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv45-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv45-img cv45-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv45-img cv45-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv45-img' }}
+      {% endif %}
+
+      <button type="button" class="cv45-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv45-content">
+      {% if card_prod.vendor != blank %}<span class="cv45-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv45-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv45-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv45-specs">Lead-Free Matte Glaze | Dishwasher Safe</span>
+
+      <div class="cv45-rating">
+        <span>★ 4.9</span> <span>(2,100 reviews)</span>
+      </div>
+
+      <div class="cv45-price-row">
+        <span class="cv45-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv45-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv45-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv45-swatches">
+          {% for variant in card_prod.variants limit: 3 %}
+            <span class="cv45-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#A0522D', '#FDFBF7', '#6B705C' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cv45-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv45-atc-btn" data-add-cart="{{ cur_var.id }}">BRING TABLEWARE HOME</button>
+      {% else %}
+        <button type="button" class="cv45-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv45-card">
+    <div class="cv45-media">{{ 'product-1' | placeholder_svg_tag: 'cv45-img' }}</div>
+    <div class="cv45-content">
+      <span class="cv45-vendor">POTTERY STUDIO D2C</span>
+      <div class="cv45-title">Stoneware Ceramic Dinner Plate Set (Set of 4)</div>
+
+      {% if card_r_show != false %}
+      <div class="cv45-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv45-specs">Lead-Free Matte Glaze | Dishwasher Safe</span>
+      <div class="cv45-price-row"><span class="cv45-price">₹ 2,899</span><span class="cv45-cmp">₹ 3,699</span><span class="cv45-disc">21% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

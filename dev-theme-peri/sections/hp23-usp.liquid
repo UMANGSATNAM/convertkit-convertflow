@@ -1,0 +1,375 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    --shadow-offset: 6px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp23-usp-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-usp-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp23-usp__header {
+    margin-bottom: {{ section.settings.header_margin }}px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: var(--border-width) solid var(--border-color);
+    padding-bottom: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-usp__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp23-usp__title {
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  .hp23-usp__title em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text-color);
+  }
+
+  .hp23-usp__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp23-usp__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp23-usp__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp23-usp__item {
+    background: #ffffff;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    padding: 40px 30px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hp23-usp__item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+  }
+
+  /* Different background colors for cards to make them pop */
+  .hp23-usp__item:nth-child(4n+1) { background: #ffffff; }
+  .hp23-usp__item:nth-child(4n+2) { background: var(--accent-color); }
+  .hp23-usp__item:nth-child(4n+3) { background: #E0E0E0; }
+  .hp23-usp__item:nth-child(4n+4) { background: #FFEB3B; } /* Bright Yellow override */
+
+  .hp23-usp__icon {
+    width: 60px;
+    height: 60px;
+    border: var(--border-width) solid var(--border-color);
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 2px 2px 0 var(--border-color);
+  }
+
+  .hp23-usp__icon svg {
+    width: 30px;
+    height: 30px;
+    fill: var(--text-color);
+  }
+  
+  .hp23-usp__icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+
+  .hp23-usp__item-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-color);
+    margin: 0 0 12px;
+    text-transform: uppercase;
+  }
+
+  .hp23-usp__item-text {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp23-usp-wrapper" id="HP23Usp-{{ section.id }}">
+  
+  {%- if section.settings.title != blank -%}
+    <div class="hp23-usp__header">
+      <h2 class="hp23-usp__title">{{ section.settings.title }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hp23-usp__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp23-usp__item" {{ block.shopify_attributes }}>
+        
+        {%- if block.settings.custom_icon != blank -%}
+          <div class="hp23-usp__icon">
+            <img src="{{ block.settings.custom_icon | image_url: width: 60 }}" alt="" loading="lazy">
+          </div>
+        {%- else -%}
+          <div class="hp23-usp__icon">
+            {%- case block.settings.icon -%}
+              {%- when 'shield' -%}
+                <svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7V10H16.5C16.14,12.5 14.39,14.7 12,15.6V19C15.64,17.7 18.27,13.97 18.5,10H12V7Z"/></svg>
+              {%- when 'lightning' -%}
+                <svg viewBox="0 0 24 24"><path d="M11 15H6L13 1V9H18L11 23V15Z"/></svg>
+              {%- when 'leaf' -%}
+                <svg viewBox="0 0 24 24"><path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 7,14 7,14C18,14 17,8 17,8Z"/></svg>
+              {%- when 'flask' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 2C12.55 2 13 2.45 13 3V7.5L18.46 16.5C18.82 17.07 19 17.77 19 18.5C19 20.43 17.43 22 15.5 22H8.5C6.57 22 5 20.43 5 18.5C5 17.77 5.18 17.07 5.54 16.5L11 7.5V3C11 2.45 11.45 2 12 2M12 4H12V8L7.54 15.4C7.18 15.96 7 16.73 7 17.5C7 18.33 7.67 19 8.5 19H15.5C16.33 19 17 18.33 17 17.5C17 16.73 16.82 15.96 16.46 15.4L12 8V4Z"/></svg>
+            {%- endcase -%}
+          </div>
+        {%- endif -%}
+
+        <h3 class="hp23-usp__item-title">{{ block.settings.title | escape }}</h3>
+        <p class="hp23-usp__item-text">{{ block.settings.text | escape }}</p>
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist USP",
+  "class": "section-hp23-usp",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>WHY CHOOSE <em>US</em></p>"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Section Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Card 2)",
+      "default": "#39FF14",
+      "info": "Try Lime Green, Cyan, or Hot Pink"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "SVG Icon",
+          "options": [
+            { "value": "shield", "label": "Shield" },
+            { "value": "lightning", "label": "Lightning" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "flask", "label": "Flask" }
+          ],
+          "default": "flask"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom Image Icon (Overrides SVG)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CLINICALLY PROVEN"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "No guessing. Just hardcore science backed by real dermatologist testing."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "CLINICALLY PROVEN", "icon": "flask" } },
+        { "type": "usp", "settings": { "title": "CRUELTY FREE", "icon": "leaf" } },
+        { "type": "usp", "settings": { "title": "FAST ACTING", "icon": "lightning" } },
+        { "type": "usp", "settings": { "title": "SKIN SAFE", "icon": "shield" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

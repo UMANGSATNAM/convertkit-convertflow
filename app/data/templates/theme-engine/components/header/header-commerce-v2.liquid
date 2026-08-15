@@ -3,24 +3,31 @@
     <div class="page-width">
       <div class="tier-b-inner">
         <div class="header-logo">
-          {% if section.settings.logo_url != blank %}
-            <img src="{{ section.settings.logo_url }}" alt="Logo" width="120" />
-          {% else %}
-            <span class="logo-text">{{ shop.name | default: 'Store Name' }}</span>
-          {% endif %}
-        </div>
-        <div class="header-search">
-          <input type="text" placeholder="{{ section.settings.search_placeholder | default: 'Search for products, brands, or categories...' }}" class="search-input" />
-          <button class="search-btn">
-             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </button>
-        </div>
-        <div class="header-icons">
-          <a href="#" class="icon-link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            <span class="icon-text">Wishlist</span>
+          <a href="/" class="logo-link">
+            <svg class="logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+            <div class="logo-text-group">
+              <span class="logo-title">peri beauty</span>
+              <span class="logo-tagline">TASTE OF TRADITION</span>
+            </div>
           </a>
-          <a href="/cart" class="icon-link cart-link">
+        </div>
+        <form class="header-search" action="{{ routes.search_url }}" method="get" role="search">
+          <input
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ section.settings.search_placeholder | default: 'Search for products, brands, or categories...' }}"
+            class="search-input"
+            data-predictive-search
+            data-predictive-limit="6"
+            aria-label="Search products">
+          <button type="submit" class="search-btn-solid">
+             Search
+          </button>
+        </form>
+        <div class="header-icons">
+          {% render 'wishlist-icon', class: 'icon-link', size: 24, label: 'Wishlist' %}
+          <a href="/cart" data-cart-open class="icon-link cart-link">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             <span class="icon-text">Cart</span>
             <span class="cart-badge">2</span>
@@ -65,47 +72,80 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-16) 0;
+  height: 72px;
   gap: var(--space-32);
 }
-.header-logo .logo-text {
+.header-logo .logo-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  text-decoration: none;
+}
+.logo-icon {
+  color: var(--primary);
+}
+.logo-text-group {
+  display: flex;
+  flex-direction: column;
+}
+.logo-title {
   font-size: var(--text-24);
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.5px;
+  line-height: 1;
+}
+.logo-tagline {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 .header-search {
   flex: 1;
   max-width: 600px;
   display: flex;
   position: relative;
+  align-items: center;
 }
 .search-input {
   width: 100%;
-  padding: 14px 48px 14px 20px;
+  padding: 10px 100px 10px 20px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-pill);
   font-size: var(--text-14);
-  background-color: var(--bg-base);
+  background-color: var(--surface);
   outline: none;
   transition: all 0.2s ease;
   font-family: var(--font-family);
+  height: 44px;
 }
 .search-input:focus {
   border-color: var(--primary);
   background-color: var(--surface);
 }
-.search-btn {
+.search-btn-solid {
   position: absolute;
-  right: 16px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background-color: var(--primary);
+  color: var(--surface);
   border: none;
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  color: var(--text-muted);
+  height: 36px;
   display: flex;
   align-items: center;
+  transition: background-color 0.2s;
+}
+.search-btn-solid:hover {
+  background-color: var(--primary-hover);
 }
 .header-icons {
   display: flex;
@@ -146,35 +186,40 @@
 }
 .header-tier-c {
   border-top: 1px solid var(--border);
+  background-color: var(--bg-base);
 }
 .tier-c-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 52px;
 }
 .browse-categories {
-  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .browse-btn {
   background-color: var(--primary);
   color: var(--surface);
   border: none;
-  padding: 14px var(--space-24);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
   font-size: var(--text-14);
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: var(--space-12);
+  gap: 8px;
   transition: background-color 0.2s;
   font-family: var(--font-family);
 }
 .browse-btn:hover {
-  background-color: var(--primary-hover, #146c43);
+  background-color: var(--primary-hover);
 }
 .header-nav {
   display: flex;
   gap: var(--space-32);
+  align-items: center;
 }
 .header-nav a {
   color: var(--text-main);
@@ -236,6 +281,11 @@
       "type": "text",
       "id": "help_phone",
       "label": "Help Phone Number"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header Commerce V2"
     }
   ]
 }

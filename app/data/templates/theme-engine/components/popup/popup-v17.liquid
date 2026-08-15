@@ -1,0 +1,205 @@
+{% comment %}
+  Popup Variant 17: Background Image Full Cover
+{% endcomment %}
+
+<div id="cf-popup-17" class="cf-popup-wrapper popup-v17" aria-hidden="true" data-delay="{{ section.settings.popup_delay }}" data-exit="{{ section.settings.enable_exit_intent }}">
+  <div class="cf-popup__overlay" onclick="closePopup17()"></div>
+
+  <div class="cf-popup__panel">
+    <button type="button" class="cf-popup__close" onclick="closePopup17()" aria-label="Close">
+      &times;
+    </button>
+    
+    <div class="cf-popup__content">
+      
+      {% if 0 != 0 %}
+      <div class="cf-popup__image-container" style="order: 0;">
+        {% if section.settings.image %}
+          <img src="{{ section.settings.image | image_url: width: 800 }}" alt="Offer Image">
+        {% else %}
+          <img src="" alt="Placeholder">
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="cf-popup__text" style="order: 1;">
+        <h2 class="cf-popup__title">{{ section.settings.heading }}</h2>
+        <div class="cf-popup__sub">{{ section.settings.subheading }}</div>
+        
+        <div id="cf-popup-17-form" class="cf-popup__form-area">
+          <input type="email" id="cf-popup-17-email" placeholder="Enter your email" required class="cf-popup__input">
+          <button type="button" class="cf-popup__btn" id="cf-popup-17-claim-btn" onclick="claimOffer17()">{{ section.settings.button_text }}</button>
+          <div class="cf-popup__disclaimer">No thanks, I prefer paying full price. <button class="link-btn" onclick="closePopup17()">Close</button></div>
+        </div>
+
+        <div id="cf-popup-17-result" class="cf-popup__result-area" style="display: none;">
+          <h3>Welcome!</h3>
+          <p>Use code below at checkout:</p>
+          <div class="cf-popup__code-box">
+             <span id="cf-popup-17-code">{{ section.settings.discount_code }}</span>
+             <button onclick="copyCode17()">Copy</button>
+          </div>
+          <a href="/collections/all" class="cf-popup__btn shop-btn" onclick="closePopup17()">Shop Now</a>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<style>
+  .popup-v17 {
+    position: fixed; inset: 0; z-index: 9999999; display: flex; align-items: center; justify-content: center;
+    visibility: hidden; opacity: 0; transition: all 0.3s ease;
+    font-family: sans-serif;
+  }
+  .popup-v17[aria-hidden="false"] { visibility: visible; opacity: 1; }
+  
+  .popup-v17 .cf-popup__overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+  }
+  
+  .popup-v17 .cf-popup__panel {
+    position: relative; width: 90%; max-width: 600px;
+    {% if section.settings.image %}background-image: url({{ section.settings.image | image_url: width: 1200 }});{% endif %} color: #ffffff;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(20px) scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    grid-template-columns: 1fr; border-radius: 16px; background-size: cover; background-position: center; background-blend-mode: overlay; background-color: rgba(0,0,0,0.6);
+  }
+  
+  .popup-v17[aria-hidden="false"] .cf-popup__panel { transform: translateY(0) scale(1); }
+
+  .popup-v17 .cf-popup__close {
+    position: absolute; top: 15px; right: 15px; background: rgba(128,128,128,0.2); border: none;
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; color: #ffffff; z-index: 10;
+  }
+
+  .popup-v17 .cf-popup__content {
+    display: contents; /* Inherit grid from panel */
+  }
+  
+  .popup-v17 .cf-popup__image-container {
+    width: 100%; height: 100%; min-height: 250px; overflow: hidden;
+  }
+  
+  .popup-v17 .cf-popup__image-container img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  
+  @media (max-width: 768px) {
+    .popup-v17 .cf-popup__panel { grid-template-columns: 1fr; width: 90%; max-width: 400px; height: auto !important; inset: auto !important; position: relative !important; margin: auto !important; transform: none !important; }
+    .popup-v17 .cf-popup__image-container { height: 200px; order: 1 !important; }
+    .popup-v17 .cf-popup__text { order: 2 !important; padding: 30px 20px !important; text-align: center; }
+  }
+
+  .popup-v17 .cf-popup__text { padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  .popup-v17 .cf-popup__title { font-size: 32px; font-weight: 800; margin: 0 0 10px; color: #ffffff; line-height: 1.1; }
+  .popup-v17 .cf-popup__sub { font-size: 16px; margin-bottom: 25px; opacity: 0.8; }
+
+  .popup-v17 .cf-popup__form-area, .popup-v17 .cf-popup__result-area { width: 100%; }
+
+  .popup-v17 .cf-popup__input {
+    width: 100%; padding: 14px; margin-bottom: 15px;
+    border: 1px solid #ffffff; border-radius: 8px;
+    font-family: inherit; font-size: 15px;
+    background: transparent; color: #ffffff;
+  }
+  
+  .popup-v17 .cf-popup__btn {
+    width: 100%; padding: 16px; background: #ffffff; color: #000000;
+    border: none; border-radius: 8px; font-size: 18px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s; display: block; text-align: center; text-decoration: none; box-sizing: border-box;
+  }
+  .popup-v17 .cf-popup__btn:hover { opacity: 0.9; }
+  
+  .popup-v17 .cf-popup__disclaimer { font-size: 12px; text-align: center; margin-top: 15px; opacity: 0.6; }
+  .popup-v17 .link-btn { background: none; border: none; text-decoration: underline; cursor: pointer; color: inherit; font-family: inherit; }
+
+  .popup-v17 .cf-popup__result-area h3 { font-size: 28px; margin: 0 0 10px; color: #ffffff; }
+  .popup-v17 .cf-popup__code-box {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(128,128,128,0.1); padding: 10px 15px; border-radius: 8px;
+    margin-bottom: 20px; border: 2px dashed #ffffff;
+  }
+  .popup-v17 .cf-popup__code-box span { font-size: 20px; font-weight: 800; letter-spacing: 2px; }
+  .popup-v17 .cf-popup__code-box button { background: #ffffff; color: #111111; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+</style>
+
+<script>
+  function closePopup17() {
+    document.getElementById('cf-popup-17').setAttribute('aria-hidden', 'true');
+    localStorage.setItem('popup_seen_v17', 'true');
+  }
+
+  function claimOffer17() {
+    const emailInput = document.getElementById('cf-popup-17-email');
+    if(emailInput && !emailInput.value.includes('@')) {
+      alert('Please enter a valid email to claim offer!');
+      return;
+    }
+    
+    document.getElementById('cf-popup-17-claim-btn').disabled = true;
+    document.getElementById('cf-popup-17-claim-btn').innerText = "Processing...";
+
+    setTimeout(() => {
+      document.getElementById('cf-popup-17-form').style.display = 'none';
+      document.getElementById('cf-popup-17-result').style.display = 'block';
+    }, 1000);
+  }
+
+  function copyCode17() {
+    const code = document.getElementById('cf-popup-17-code').innerText;
+    navigator.clipboard.writeText(code);
+    alert('Code copied to clipboard!');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById('cf-popup-17');
+    if(!popup) return;
+    
+    if(window.location.search.includes('view=popup-v17')) {
+      setTimeout(() => popup.setAttribute('aria-hidden', 'false'), 500);
+      return;
+    }
+
+    if(!localStorage.getItem('popup_seen_v17')) {
+      const delay = parseInt(popup.dataset.delay) * 1000;
+      const isExitIntent = popup.dataset.exit === 'true';
+      
+      if(delay > 0) {
+        setTimeout(() => popup.setAttribute('aria-hidden', 'false'), delay);
+      }
+      
+      if(isExitIntent) {
+        document.addEventListener('mouseleave', (e) => {
+          if(e.clientY < 0 && popup.getAttribute('aria-hidden') === 'true') {
+            popup.setAttribute('aria-hidden', 'false');
+          }
+        });
+      }
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Popup V17 Full Cover",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Offer Image" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Unlock 20% Off!" },
+    { "type": "richtext", "id": "subheading", "label": "Subheading", "default": "<p>Sign up to our newsletter and get an instant discount code.</p>" },
+    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Claim Offer" },
+    { "type": "text", "id": "discount_code", "label": "Discount Code to Reveal", "default": "WELCOME20" },
+    { "type": "range", "id": "popup_delay", "min": 0, "max": 30, "step": 1, "unit": "sec", "label": "Delay before showing", "default": 5 },
+    { "type": "checkbox", "id": "enable_exit_intent", "label": "Enable Exit Intent", "default": true }
+  ],
+  "presets": [
+    { "name": "Popup V17 Full Cover" }
+  ]
+}
+{% endschema %}

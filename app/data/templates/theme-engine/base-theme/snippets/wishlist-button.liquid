@@ -1,0 +1,66 @@
+{%- comment -%}
+  Wishlist heart button — works with the shared store in assets/wishlist.js.
+
+  Usage:
+    {% render 'wishlist-button', product: product %}
+    {% render 'wishlist-button', product: product, class: 'pcv1__wish' %}
+
+  Params:
+    product  - required
+    class    - extra class so each section keeps its own look (e.g. 'pcv7__wish')
+    size     - icon px, default 20
+
+  The button carries everything the drawer needs to render the saved item
+  without an extra network request. Active state is painted by wishlist.js
+  (adds .active / .is-wishlisted and flips aria-pressed).
+{%- endcomment -%}
+
+{%- liquid
+  assign wl_class = class | default: ''
+  assign wl_size = size | default: 20
+-%}
+
+<button
+  type="button"
+  class="cf-wish {{ wl_class }}"
+  data-wishlist-toggle
+  data-wishlist-handle="{{ product.handle }}"
+  data-wishlist-id="{{ product.id }}"
+  data-wishlist-title="{{ product.title | escape }}"
+  data-wishlist-price="{{ product.price | money | strip_html | escape }}"
+  data-wishlist-image="{{ product.featured_image | image_url: width: 300 }}"
+  data-wishlist-url="{{ product.url }}"
+  aria-pressed="false"
+  aria-label="Add to wishlist">
+  <svg class="cf-wish__icon" width="{{ wl_size }}" height="{{ wl_size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+</button>
+
+{%- unless wishlist_button_styles -%}
+  {%- assign wishlist_button_styles = true -%}
+  <style>
+    .cf-wish {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: inherit;
+      line-height: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .cf-wish__icon { transition: transform 0.15s ease, fill 0.15s ease; }
+    .cf-wish:hover .cf-wish__icon { transform: scale(1.12); }
+    .cf-wish.active .cf-wish__icon,
+    .cf-wish.is-wishlisted .cf-wish__icon { fill: currentColor; }
+    .cf-wish:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) {
+      .cf-wish__icon { transition: none; }
+      .cf-wish:hover .cf-wish__icon { transform: none; }
+    }
+  </style>
+{%- endunless -%}

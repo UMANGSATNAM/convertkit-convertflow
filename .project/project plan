@@ -1,0 +1,71 @@
+Shop Forge — Full Plan (current state → shipped generator)
+Kahan se kahan (the switch, short)
+
+Pehle: ek reference store (Peri Beauty) hand-build kiya — poori homepage (announcement, header, hero, featured categories, deals, why-us, testimonials, cta-band, footer, product-card) + PDP, sab approved. Phir ek token engine banaya: ek chassis + component library + 5 token sets (Inter, Poppins, Montserrat, Outfit, Manrope) jo color, font, radius, shadow badalte hain. Token-loader settings.design_token padh ke apply karta hai. Ye render-verify bhi hua (Manrope flat/0px vs Poppins rounded/shadow).
+
+The switch: token engine kaam karta hai, par uski ceiling thematic hai — woh sirf recolor/restyle karta hai, structure kabhi nahi badalta. Isliye do generated variants (Manrope vs Poppins) same store lage, sirf alag paint. Umang ne sahi bola: ye generic hai, do merchant ke store alag nahi dikhenge.
+
+Ab: ek structural section-variant library — har section ke 5-6 layout-level alag variants. Store generation in variants ko assemble karega; token engine uske upar ki polish layer hai, replacement nahi. Structural = "alag store"; token = "alag paint".
+
+Kya ban chuka hai (done)
+Reference store Peri Beauty — full homepage + PDP, approved.
+Chassis / base-theme + component library (~10 sections, ~25 snippets).
+Token engine: 5 semantic token sets, token-loader wired to settings.design_token, CSS copied to base-theme/assets/ (404-safe). Variation render-proven.
+Neutral-data discipline locked: no fabricated reviews/names, trust signals default-hidden, neutral fallback for missing images, instance data doesn't leak into library.
+Working tooling: Antigravity prompt template (locked rules) + section library tracker.
+Kya banana hai (next)
+
+Ek structural variant library (~55-65 variants across ~14 section types) + generation engine (assembly + CRO-swap + merchant products) + per-niche blueprints.
+
+Phased roadmap
+Phase A — Codebase inventory (reuse before building) ← START HERE
+
+Antigravity poora codebase scan kare (dev-theme-peri, theme-engine/components, base-theme, + Umang's 500 Liquid files). Har existing section/template ko type-wise categorize kare aur mark: REUSE (normalize) / DUPLICATE / JUNK / GAP. Output: "X existing → N reuse, M gaps to build." Tracker ki inventory table bhare. Why first: bahut variants already exist — duplicate labor mat karo.
+
+Phase B — Gap analysis
+
+Har section type ke liye: target variants vs existing reuse-able = kitne naye chahiye. Tracker update. Priority high-impact + product-focused sections pe (hero, product-card, product-grid, pdp, featured-grid).
+
+Phase C — Prove the method on ONE section
+
+Ek section lo (recommend: hero ya product-card). Uske gaps build karo + existing ko normalize karo, taaki uske 5-6 variants complete hon. Render-verify (Umang's eyes, real preview link). Confirm woh 5-6 genuinely alag feel dete hain, sirf alag nahi dikhte. Jab tak ye prove na ho, scale mat karo.
+
+Phase D — Scale to all section types
+
+Phase C ka pattern baaki 13 section types pe repeat. Har variant Definition-of-Done se guzre (token-driven, neutral data, responsive, render-verified). Tracker se progress track.
+
+Phase E — Per-niche blueprints
+
+Har niche ke liye ek recipe: section mix + palette family + copy/imagery tone + variant bias. Naya Liquid nahi — ek shared library, blueprints se niche-identity aati hai. 2-3 niches se shuru.
+
+Phase F — Generation engine
+
+Assembly logic banao:
+
+Merchant ke catalog + niche input lo (products, images, count).
+Blueprint pick karo → section types + variant pool decide.
+Har slot ke liye variant randomly-but-coherently pick karo (aesthetic coherence rules — clashing combos avoid).
+templates/*.json programmatically compose karo (section order + which sections).
+Ek token set apply karo (color/font/radius layer).
+Merchant ke apne products/images inject karo (live Liquid objects; missing-asset fallback).
+CRO checklist run karo — fail hone wale section ko dusre variant se swap karo.
+3 stores output do; reject hone pe naye 3 (unlimited, non-colliding).
+Phase G — End-to-end test
+
+Ek real merchant store pe poora flow chalao: niche → 3 stores → render-verify (responsive both devices) → CRO pass → merchant products live dikhe. Collision-check: do stores perceptibly alag hon.
+
+Locked principles (har phase mein binding)
+Structural variation, not cosmetic — variants layout-level alag, color-level token layer sambhalta hai.
+Token-driven from the start — no hardcoded hex; text-on-colored-bg = #fff/--text-on-accent, not --surface.
+Zero fabricated data — neutral defaults, trust signals default-hidden, merchant products live-pulled.
+Adapt to merchant catalog — image/product availability ke hisaab se variant pick.
+Responsive both devices — har variant mobile + desktop.
+Prove small, then scale — ek section render-verified (Umang's eyes) before scaling.
+CRO checklist = hygiene, not guaranteed conversion — real CRO live A/B se prove hota hai.
+Reuse before build — existing codebase sections/templates pehle inventory + normalize.
+Render-proof viewable — real preview link, local-path screenshot nahi; close Umang's eyes se.
+Immediate next action
+Antigravity ko Phase A (codebase inventory) chalao — dekho kitna already hai.
+Parallel: Umang ek design de first section ke liye (hero ya product-card).
+Claude us design ka base spec + 6 structural variant specs likhe → filled Antigravity prompt.
+Antigravity gaps build kare + existing normalize kare → render-verify → Phase C complete.

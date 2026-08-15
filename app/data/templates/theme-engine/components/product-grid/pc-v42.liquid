@@ -1,0 +1,531 @@
+{%- comment -%}
+  PC V42 — FUTURISTIC CYBER-MEDICAL BIOTECH PRODUCT GRID
+  Design: Deep Oceanic Navy (#07111E), Medical Teal (#00F5D4) accents, Space Grotesk & Outfit typography
+  Card Shape: 10px corners, 1px teal borders, clinical biotech futuristic aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
+  .pcv42 {
+    --bg: {{ section.settings.bg_color | default: '#07111E' }};
+    --card-bg: {{ section.settings.card_bg | default: '#0E1D31' }};
+    --text: {{ section.settings.text_color | default: '#E2F1F8' }};
+    --muted: {{ section.settings.muted_color | default: '#64748B' }};
+    --accent: {{ section.settings.accent_color | default: '#00F5D4' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#00D6B9' }};
+    --border: {{ section.settings.border_color | default: '#1E3A5F' }};
+    --badge-sale-bg: #00F5D4;
+    --badge-sale-text: #07111E;
+    --f-heading: 'Space Grotesk', sans-serif;
+    --f-body: 'Outfit', sans-serif;
+    --r-card: 10px;
+    --ease: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv42 *, .pcv42 *::before, .pcv42 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv42 a { color: inherit; text-decoration: none; }
+  .pcv42 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv42 img { max-width: 100%; display: block; }
+
+  .pcv42__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv42__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv42__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv42__title { font-family: var(--f-heading); font-size: 28px; font-weight: 700; color: #FFFFFF; text-shadow: 0 0 10px rgba(0, 245, 212, 0.4); letter-spacing: -0.01em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv42__title { font-size: 38px; } }
+  .pcv42__sub { font-size: 15px; color: var(--muted); }
+  .pcv42__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; font-family: var(--f-heading); text-transform: uppercase; letter-spacing: 0.1em; color: #07111E; background: var(--accent); padding: 8px 20px; border-radius: 20px; box-shadow: 0 0 15px rgba(0, 245, 212, 0.4); transition: var(--ease); }
+  .pcv42__viewall:hover { background: #00B4D8; color: #FFFFFF; box-shadow: 0 0 25px rgba(0, 180, 216, 0.6); }
+
+  /* GRID */
+  .pcv42__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv42__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv42__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv42__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 8px 24px -6px rgba(0, 245, 212, 0.08);
+    transition: var(--ease);
+  }
+  .pcv42__card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv42__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #040912;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .pcv42__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv42__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv42__card:hover .pcv42__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv42__card:hover .pcv42__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv42__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv42__badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.05em; font-family: var(--f-heading); }
+  .pcv42__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv42__badge--tag { background: #00B4D8; color: #07111E; }
+  .pcv42__badge--sold { background: #1E3A5F; color: #64748B; }
+
+  /* WISHLIST BUTTON */
+  .pcv42__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(7, 17, 30, 0.85);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv42__wish:hover { background: var(--accent); color: #07111E; border-color: var(--accent); box-shadow: 0 0 12px #00F5D4; transform: scale(1.1); }
+  .pcv42__wish.active { color: #07111E; background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px #00F5D4; }
+
+  /* QUICK ADD HOVER */
+  .pcv42__quick-box { padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border); }
+  .pcv42__quick-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: #07111E;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    font-family: var(--f-heading);
+    border-radius: 20px;
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 0 12px rgba(0, 245, 212, 0.3);
+  }
+  .pcv42__quick-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(0, 245, 212, 0.6); }
+  .pcv42__quick-btn:disabled { background: #1E3A5F; color: #64748B; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv42__content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv42__vendor { font-size: 10px; text-transform: uppercase; color: var(--accent); font-weight: 700; font-family: var(--f-heading); letter-spacing: 0.1em; }
+  .pcv42__item-title { font-family: var(--f-heading); font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv42__rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--accent); font-weight: 700; }
+  .pcv42__stars { letter-spacing: 1px; text-shadow: 0 0 6px var(--accent); }
+  .pcv42__rev-cnt { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  /* PRICE */
+  .pcv42__price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv42__price { font-size: 17px; font-weight: 700; color: #FFFFFF; font-family: var(--f-heading); text-shadow: 0 0 6px rgba(0, 245, 212, 0.3); }
+  .pcv42__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv42__swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv42__swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv42__swatch:hover, .pcv42__swatch.active { transform: scale(1.25); border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv42__urgency { font-size: 11px; color: var(--accent); font-weight: 700; font-family: var(--f-heading); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; text-shadow: 0 0 6px var(--accent); }
+
+  /* TOAST */
+  .pcv42__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #07111E;
+    padding: 12px 22px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; font-family: var(--f-heading); text-transform: uppercase;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 20px rgba(0, 245, 212, 0.6);
+  }
+  .pcv42__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv42">
+  <div class="pcv42__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv42__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv42__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv42__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv42__viewall">
+            {{ section.settings.view_all_label | default: 'Explore Biotech Lab' }} 🧬 &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv42__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v42', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v42', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv42__toast" id="pcv42-toast">FORMULA DISPENSED</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv42-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv42Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'DISPENSING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ DISPENSED';
+        showT('FORMULA DISPENSED');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv42-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V42 — Cyber-Medical Bi",
+  "tag": "section",
+  "class": "pcv42-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "BIOTECH N°42 🧬"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "CYBER-MEDICAL BIOTECH"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Clinical biotech formulations and advanced peptide health."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore Biotech Lab"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#07111E"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#0E1D31"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2F1F8"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#64748B"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#00F5D4"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#1E3A5F"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V42 — Cyber-Medical Bi"
+    }
+  ]
+}
+{% endschema %}

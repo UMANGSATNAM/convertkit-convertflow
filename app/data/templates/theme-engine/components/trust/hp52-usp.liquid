@@ -1,0 +1,128 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp52-usp-bg: {{ section.settings.bg_color | default: '#F7EFE6' }};
+    --hp52-card-bg: {{ section.settings.card_bg | default: '#FFFDF9' }};
+    --hp52-title: {{ section.settings.title_color | default: '#2D3B2D' }};
+    --hp52-terracotta: {{ section.settings.accent_terra | default: '#C2593F' }};
+    
+    background-color: var(--hp52-usp-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp52-usp__grid {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp52-usp__card {
+    background: var(--hp52-card-bg);
+    border: 1px solid rgba(194, 89, 63, 0.15);
+    border-radius: 20px 20px 8px 8px;
+    padding: 36px 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(45, 59, 45, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp52-usp__card:hover {
+    border-color: var(--hp52-terracotta);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(194, 89, 63, 0.1);
+  }
+
+  .hp52-usp__icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .hp52-usp__title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--hp52-title);
+    margin: 0 0 10px;
+  }
+
+  .hp52-usp__desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #5C675B;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp52-usp__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media screen and (max-width: 576px) {
+    .hp52-usp__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp52-usp__grid">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <div class="hp52-usp__card" {{ block.shopify_attributes }}>
+        <div class="hp52-usp__icon">{{ block.settings.icon | default: '☀️' }}</div>
+        <h3 class="hp52-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp52-usp__desc">{{ block.settings.description }}</p>
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div class="hp52-usp__card">
+      <div class="hp52-usp__icon">☀️</div>
+      <h3 class="hp52-usp__title">Tuscan Squalane</h3>
+      <p class="hp52-usp__desc">Biocompatible plant lipids that mirror natural skin barrier sebum for deep repair.</p>
+    </div>
+    <div class="hp52-usp__card">
+      <div class="hp52-usp__icon">🏺</div>
+      <h3 class="hp52-usp__title">Sicilian Clay</h3>
+      <p class="hp52-usp__desc">Sun-cured volcanic terracotta clay absorbs cellular impurities without stripping moisture.</p>
+    </div>
+    <div class="hp52-usp__card">
+      <div class="hp52-usp__icon">✈️</div>
+      <h3 class="hp52-usp__title">Air Express DDP</h3>
+      <p class="hp52-usp__desc">Priority global shipping with all customs duties pre-paid for seamless arrival.</p>
+    </div>
+    <div class="hp52-usp__card">
+      <div class="hp52-usp__icon">🛡️</div>
+      <h3 class="hp52-usp__title">Artisanal Purity</h3>
+      <p class="hp52-usp__desc">Clean organic botanical extracts crafted in small batches in Tuscany.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP52 - Terra Pillars",
+  "class": "section-hp52-usp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F7EFE6" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FFFDF9" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#2D3B2D" },
+    { "type": "color", "id": "accent_terra", "label": "Terracotta Accent", "default": "#C2593F" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pillar Card",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "default": "☀️" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Tuscan Squalane" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Biocompatible plant lipids." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP52 - Terra Pillars" }
+  ]
+}
+{% endschema %}

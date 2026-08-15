@@ -1,0 +1,200 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp40-video-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    background: var(--accent-color);
+    overflow: hidden;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp40-video-wrapper {
+      min-height: 60vh;
+    }
+  }
+
+  .hp40-video__bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    filter: grayscale(100%) contrast(1.2);
+    z-index: 1;
+  }
+
+  .hp40-video__content {
+    position: relative;
+    z-index: 2;
+    padding: 60px 40px;
+    background: var(--bg-color);
+    border: 2px solid var(--text-color);
+    margin-left: 40px;
+    max-width: 500px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp40-video__content {
+      margin: 20px;
+      padding: 40px 20px;
+    }
+  }
+
+  .hp40-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 20px;
+    letter-spacing: -2px;
+  }
+
+  .hp40-video__play {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--bg-color);
+    background: var(--text-color);
+    padding: 10px 20px 10px 10px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .hp40-video__play:hover {
+    background: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .hp40-video__play svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp40-video-wrapper" id="HP40Video-{{ section.id }}">
+  
+  {%- if section.settings.video_url != blank -%}
+    <video class="hp40-video__bg" autoplay loop muted playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {%- else -%}
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 1400 }}" class="hp40-video__bg" alt="Video Fallback" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp40-video__bg' }}
+    {%- endif -%}
+  {%- endif -%}
+
+  <div class="hp40-video__content">
+    <h2 class="hp40-video__title">{{ section.settings.title }}</h2>
+    
+    <a href="#" class="hp40-video__play">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      {{ section.settings.btn_label }}
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP40 - Swiss Video",
+  "class": "section-hp40-video-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "MOTION\nSTUDY"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "PLAY ARCHIVE"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "MP4 Video URL (Direct link)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback Image"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Swiss Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Box Background",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Lines",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Video Overlay Blend Color",
+      "default": "#0055FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP40 - Swiss Video"
+    }
+  ]
+}
+{% endschema %}

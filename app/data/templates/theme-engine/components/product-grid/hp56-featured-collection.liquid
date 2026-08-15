@@ -1,0 +1,82 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FFFFFF' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp56-fc__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp56-fc__header { text-align: center; margin-bottom: 50px; }
+  .hp56-fc__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#0284C7' }}; margin: 0 0 12px; }
+  .hp56-fc__heading { font-family: 'Syne', sans-serif; font-size: clamp(30px, 4vw, 46px); font-weight: 800; color: #082F49; margin: 0; }
+  .hp56-fc__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr); gap: 20px; }
+  .hp56-fc__card {
+    background: {{ section.settings.card_bg | default: '#F0F9FF' }};
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    border-radius: 14px; overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hp56-fc__card:hover { transform: translateY(-6px); box-shadow: 0 20px 45px rgba(2, 132, 199, 0.15); }
+  .hp56-fc__img-wrap { aspect-ratio: 3/4; overflow: hidden; background: #E0F2FE; }
+  .hp56-fc__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .hp56-fc__card:hover .hp56-fc__img { transform: scale(1.06); }
+  .hp56-fc__info { padding: 18px 16px; }
+  .hp56-fc__product-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #082F49; margin: 0 0 6px; text-decoration: none; display: block; }
+  .hp56-fc__price { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; color: {{ section.settings.accent_color | default: '#0284C7' }}; margin: 0; }
+  .hp56-fc__view-all { display: block; text-align: center; margin-top: 40px; }
+  .hp56-fc__view-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 14px 34px;
+    background: {{ section.settings.btn_bg | default: '#082F49' }}; color: #FFFFFF;
+    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700;
+    text-decoration: none; border-radius: 8px; transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(8, 47, 73, 0.2);
+  }
+  .hp56-fc__view-btn:hover { background: #0284C7; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.35); transform: translateY(-2px); }
+  @media screen and (max-width: 992px) { .hp56-fc__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media screen and (max-width: 480px) { .hp56-fc__grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+{%- endstyle -%}
+<div class="hp56-fc__container">
+  <div class="hp56-fc__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp56-fc__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp56-fc__heading">{{ section.settings.heading | default: 'Glacial Formulations' }}</h2>
+  </div>
+  {%- assign collection = collections[section.settings.collection] -%}
+  <div class="hp56-fc__grid">
+    {%- for product in collection.products limit: section.settings.products_to_show -%}
+      <div class="hp56-fc__card">
+        <a href="{{ product.url }}" class="hp56-fc__img-wrap">
+          {%- if product.featured_image != blank -%}<img src="{{ product.featured_image | image_url: width: 600 }}" class="hp56-fc__img" alt="{{ product.title }}" loading="lazy">{%- endif -%}
+        </a>
+        <div class="hp56-fc__info">
+          <a href="{{ product.url }}" class="hp56-fc__product-title">{{ product.title }}</a>
+          <p class="hp56-fc__price">{{ product.price | money }}</p>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+  {%- if section.settings.show_view_all -%}
+    <div class="hp56-fc__view-all"><a href="{{ collection.url | default: '/collections/all' }}" class="hp56-fc__view-btn">{{ section.settings.view_all_text | default: 'View All' }} &rarr;</a></div>
+  {%- endif -%}
+</div>
+{% schema %}
+{
+  "name": "HP56 Collection",
+  "class": "section-hp56-fc",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFFFFF" },
+    { "type": "color", "id": "card_bg", "label": "Card BG", "default": "#F0F9FF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#0284C7" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#082F49" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "❄️ NORDIC SELECTION" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Glacial Formulations" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "min": 2, "max": 12, "step": 1, "label": "Products", "default": 4 },
+    { "type": "range", "id": "columns", "min": 2, "max": 4, "step": 1, "label": "Columns", "default": 4 },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show View All", "default": true },
+    { "type": "text", "id": "view_all_text", "label": "View All Text", "default": "View All" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "presets": [{ "name": "HP56 Collection" }]
+}
+{% endschema %}

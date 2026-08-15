@@ -1,0 +1,34 @@
+{% comment %}
+  Universal Badge Snippet
+  Accepts: product (Liquid product object), custom_badge_text
+{% endcomment %}
+
+{% assign badge_prod = product %}
+
+<div class="cf-badges-wrapper" style="position: absolute; top: 10px; left: 10px; z-index: 5; display: flex; flex-direction: column; gap: 4px; pointer-events: none;">
+  {% if badge_prod != blank %}
+    {% assign target_var = badge_prod.selected_or_first_available_variant %}
+    {% if target_var.compare_at_price > target_var.price %}
+      {% assign save_pct = target_var.compare_at_price | minus: target_var.price | times: 100.0 | divided_by: target_var.compare_at_price | round %}
+      <span class="cf-badge cf-badge--sale" style="display: inline-block; background: var(--color-sale, #DC2626); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-badge, 99px); text-transform: uppercase;">
+        SAVE {{ save_pct }}%
+      </span>
+    {% endif %}
+
+    {% if target_var.available == false %}
+      <span class="cf-badge cf-badge--soldout" style="display: inline-block; background: #374151; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-badge, 99px); text-transform: uppercase;">
+        SOLD OUT
+      </span>
+    {% endif %}
+  {% else %}
+    <span class="cf-badge cf-badge--sale" style="display: inline-block; background: #DC2626; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 99px;">
+      BESTSELLER
+    </span>
+  {% endif %}
+
+  {% if custom_badge_text != blank %}
+    <span class="cf-badge cf-badge--custom" style="display: inline-block; background: var(--color-primary, #111827); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-badge, 99px);">
+      {{ custom_badge_text }}
+    </span>
+  {% endif %}
+</div>

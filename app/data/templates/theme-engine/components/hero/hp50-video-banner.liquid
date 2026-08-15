@@ -1,0 +1,89 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp50-vid-bg: {{ section.settings.bg_color | default: '#000000' }};
+    
+    background-color: var(--hp50-vid-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp50-video__box {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp50-video__media {
+    width: 100%;
+    height: {{ section.settings.video_height | default: 480 }}px;
+    background: #111111;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(226, 232, 240, 0.25);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  }
+
+  .hp50-video__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(40%) contrast(1.1);
+  }
+
+  .hp50-video__play-btn {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .hp50-video__play-btn:hover {
+    transform: scale(1.1);
+    background: #E2E8F0;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp50-video__media { height: 320px; }
+  }
+{%- endstyle -%}
+
+<div class="hp50-video__box">
+  <div class="hp50-video__media">
+    {%- if section.settings.poster_image != blank -%}
+      <img src="{{ section.settings.poster_image | image_url: width: 1400 }}" class="hp50-video__poster" alt="Video" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hp50-video__poster' }}
+    {%- endif -%}
+    <div class="hp50-video__play-btn" onclick="alert('Streaming Paris Fashion Week Editorial Film');">▶</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP50 - Runway Video",
+  "class": "section-hp50-video",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#000000" },
+    { "type": "image_picker", "id": "poster_image", "label": "Poster Image" },
+    { "type": "range", "id": "video_height", "min": 300, "max": 700, "step": 20, "unit": "px", "label": "Video Height", "default": 480 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "presets": [
+    { "name": "HP50 - Runway Video" }
+  ]
+}
+{% endschema %}

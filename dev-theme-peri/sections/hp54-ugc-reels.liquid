@@ -1,0 +1,71 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0F1D32' }};
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+  .hp54-ugc__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp54-ugc__header { text-align: center; margin-bottom: 40px; }
+  .hp54-ugc__eyebrow { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#60A5FA' }}; margin: 0 0 12px; }
+  .hp54-ugc__heading { font-family: 'Tenor Sans', serif; font-size: clamp(28px, 3.5vw, 42px); color: #FFFFFF; margin: 0; }
+  .hp54-ugc__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr); gap: 16px; }
+  .hp54-ugc__item {
+    aspect-ratio: 9/16; border-radius: 12px; overflow: hidden; position: relative;
+    background: #111D33; border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+  .hp54-ugc__item img { width: 100%; height: 100%; object-fit: cover; }
+  .hp54-ugc__overlay {
+    position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
+    background: linear-gradient(transparent, rgba(10, 22, 40, 0.9));
+  }
+  .hp54-ugc__handle { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #E0E7FF; margin: 0; }
+  @media screen and (max-width: 992px) { .hp54-ugc__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media screen and (max-width: 480px) { .hp54-ugc__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+{%- endstyle -%}
+<div class="hp54-ugc__container">
+  <div class="hp54-ugc__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp54-ugc__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp54-ugc__heading">{{ section.settings.heading | default: 'Midnight Collective' }}</h2>
+  </div>
+  <div class="hp54-ugc__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp54-ugc__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.handle }}" loading="lazy">
+        {%- endif -%}
+        <div class="hp54-ugc__overlay">
+          <p class="hp54-ugc__handle">{{ block.settings.handle | default: '@midnight_glow' }}</p>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP54 - Sapphire UGC",
+  "class": "section-hp54-ugc",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0F1D32" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#60A5FA" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "◆ COMMUNITY" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Midnight Collective" },
+    { "type": "range", "id": "columns", "min": 2, "max": 6, "step": 1, "label": "Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{
+    "type": "reel", "name": "Reel",
+    "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "text", "id": "handle", "label": "Handle", "default": "@midnight_glow" }
+    ]
+  }],
+  "presets": [{ "name": "HP54 - Sapphire UGC", "blocks": [
+    { "type": "reel" },
+    { "type": "reel", "settings": { "handle": "@sapphire_skin" } },
+    { "type": "reel", "settings": { "handle": "@lunar_routine" } },
+    { "type": "reel", "settings": { "handle": "@bluetansy_glow" } }
+  ]}]
+}
+{% endschema %}

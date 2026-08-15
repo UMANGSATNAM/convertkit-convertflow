@@ -1,0 +1,383 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-video-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-video-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  /* The actual video container */
+  .hp24-video__container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.video_aspect_ratio }};
+    background: #000;
+    border: 2px solid var(--accent-primary);
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  /* Scanlines over the video */
+  .hp24-video__container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.5) 3px,
+      rgba(0,0,0,0.5) 4px
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  /* Color tint / glitch overlay */
+  .hp24-video__container::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 243, 255, 0.1);
+    mix-blend-mode: color;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hp24-video__media {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    filter: sepia(0.5) hue-rotate(150deg) contrast(1.2);
+  }
+  
+  .hp24-video__container:hover .hp24-video__media {
+    filter: none;
+  }
+
+  /* HUD Overlay Elements */
+  .hp24-video__hud-top-left {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 3;
+    font-family: var(--font-body);
+    color: var(--accent-secondary);
+    font-size: 14px;
+    pointer-events: none;
+    text-shadow: 0 0 5px #000;
+  }
+
+  .hp24-video__hud-top-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 3;
+    font-family: var(--font-body);
+    color: #f00;
+    font-size: 14px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 0 5px #000;
+  }
+  
+  .hp24-video__hud-top-right::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #f00;
+    border-radius: 50%;
+    animation: alertBlink 1s infinite;
+  }
+
+  .hp24-video__hud-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 3;
+    font-family: var(--font-body);
+    color: var(--text-color);
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  /* Play Button */
+  .hp24-video__play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid var(--accent-primary);
+    color: var(--accent-primary);
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    padding: 15px 30px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+  }
+
+  .hp24-video__play-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  .hp24-video__container:hover .hp24-video__play-btn {
+    background: var(--accent-primary);
+    color: var(--bg-color);
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.6);
+  }
+
+  /* Content Below Video */
+  .hp24-video__content {
+    margin-top: 40px;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hp24-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0 0 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp24-video__text {
+    font-family: var(--font-body);
+    font-size: clamp(16px, 2vw, 18px);
+    color: var(--text-color);
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-video-wrapper" id="HP24Video-{{ section.id }}">
+  
+  <div class="hp24-video__container">
+    
+    <div class="hp24-video__hud-top-left">CAM_04 // SECTOR 7G</div>
+    <div class="hp24-video__hud-top-right">LIVE_FEED</div>
+    <div class="hp24-video__hud-bottom">
+      10.43.20.100 : 403 FORBIDDEN<br>
+      DECRYPTING SIGNAL...
+    </div>
+
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 1400 }}" alt="Video Poster" class="hp24-video__media" loading="lazy">
+    {%- else -%}
+      <div style="width:100%;height:100%;background:#111;position:absolute;top:0;left:0;display:flex;align-items:center;justify-content:center;color:#444;font-family:'Share Tech Mono';font-size:24px;">NO_SIGNAL</div>
+    {%- endif -%}
+
+    <div class="hp24-video__play-btn">
+      <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+      EXECUTE
+    </div>
+  </div>
+
+  {%- if section.settings.title != blank or section.settings.text != blank -%}
+    <div class="hp24-video__content">
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp24-video__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="hp24-video__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber Video",
+  "class": "section-hp24-video-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Cover Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (Youtube/Vimeo)"
+    },
+    {
+      "type": "select",
+      "id": "video_aspect_ratio",
+      "label": "Video Aspect Ratio",
+      "options": [
+        { "value": "16/9", "label": "Widescreen (16:9)" },
+        { "value": "21/9", "label": "Cinematic (21:9)" },
+        { "value": "4/3", "label": "Standard (4:3)" }
+      ],
+      "default": "16/9"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "TRANSMISSION INTERCEPTED"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Body Text",
+      "default": "<p>Viewing restricted access files. Proceed with caution.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber Video"
+    }
+  ]
+}
+{% endschema %}

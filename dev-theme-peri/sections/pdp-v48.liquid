@@ -1,0 +1,493 @@
+{%- comment -%}
+  PDP V48 — INDUSTRIAL RAW BRUTALIST METAL
+  Design: Heavy raw metal brutalist aesthetic, Space Mono display + Syne body font
+  Charcoal Dark (#0F172A), Raw Steel (#334155), Hazard Yellow (#EAB308), Industrial Off-White (#F8FAFC)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inv_qty = current_variant.inventory_quantity | default: 15 -%}
+{%- if inv_qty <= 0 -%}{%- assign inv_qty = 6 -%}{%- endif -%}
+{%- assign viewer_count = inv_qty | times: 9 | modulo: 50 | plus: 34 -%}
+{%- assign sold_count = inv_qty | times: 18 | modulo: 450 | plus: 240 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Syne:wght@600;700;800&display=swap');
+
+  .pdpv48 {
+    --bg: #F8FAFC; --surface: #FFFFFF; --border: #0F172A; --border-dark: #0F172A;
+    --text: #0F172A; --muted: #475569; --accent: #0F172A; --accent-hover: #1E293B;
+    --hazard: #EAB308; --danger: #EF4444;
+    --f-head: 'Space Mono', monospace; --f-body: 'Syne', sans-serif;
+    --r: 0px; --r-pill: 0px; --ease: all 0.15s ease;
+    background: var(--bg); color: var(--text); font-family: var(--f-body); font-size: 15px; line-height: 1.4; -webkit-font-smoothing: antialiased;
+  }
+  .pdpv48 *, .pdpv48 *::before, .pdpv48 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pdpv48 img { max-width: 100%; display: block; }
+  .pdpv48 button { font-family: inherit; cursor: pointer; }
+  .pdpv48__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* OFFER BAR */
+  .pdpv48__offer { background: var(--hazard); color: #000; padding: 12px; text-align: center; font-family: var(--f-head); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 3px solid #000; }
+
+  /* GRID */
+  .pdpv48__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding: 36px 0; }
+  @media (min-width: 992px) { .pdpv48__grid { grid-template-columns: 1.1fr 1fr; gap: 48px; padding: 48px 0; } }
+
+  /* GALLERY */
+  .pdpv48__gal { display: flex; flex-direction: column; gap: 12px; }
+  .pdpv48__hero { width: 100%; aspect-ratio: 1; border-radius: 0; overflow: hidden; background: var(--surface); border: 3px solid var(--border-dark); display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 0px #0F172A; position: relative; }
+  .pdpv48__hero img { width: 100%; height: 100%; object-fit: contain; }
+  .pdpv48__raw-tag { position: absolute; top: 14px; left: 14px; background: #000; color: var(--hazard); font-family: var(--f-head); font-size: 11px; font-weight: 700; padding: 4px 10px; border: 2px solid #000; text-transform: uppercase; }
+
+  .pdpv48__thumbs { display: flex; gap: 10px; overflow-x: auto; }
+  .pdpv48__th { width: 64px; height: 64px; flex-shrink: 0; border: 2px solid var(--border); border-radius: 0; overflow: hidden; cursor: pointer; background: var(--surface); transition: var(--ease); }
+  .pdpv48__th:hover, .pdpv48__th.on { border-color: #000; box-shadow: 3px 3px 0px #000; }
+  .pdpv48__th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .pdpv48__info { display: flex; flex-direction: column; gap: 18px; }
+  .pdpv48__crumb { font-family: var(--f-head); font-size: 12px; letter-spacing: 2px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .pdpv48__title { font-family: var(--f-head); font-size: 32px; font-weight: 700; line-height: 1.1; color: var(--text); text-transform: uppercase; }
+  @media (min-width: 992px) { .pdpv48__title { font-size: 40px; } }
+
+  .pdpv48__rating { display: flex; align-items: center; gap: 8px; font-family: var(--f-head); font-size: 13px; color: var(--muted); font-weight: 700; }
+  .pdpv48__stars { color: #000; }
+
+  /* PRICE CARD */
+  .pdpv48__price-card { background: var(--surface); border: 3px solid var(--border-dark); padding: 16px 20px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 5px 5px 0px #0F172A; }
+  .pdpv48__price { font-family: var(--f-head); font-size: 36px; font-weight: 700; color: var(--text); }
+  .pdpv48__cmp { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+  .pdpv48__badge { background: var(--hazard); color: #000; font-family: var(--f-head); font-weight: 700; font-size: 12px; padding: 4px 10px; border: 2px solid #000; text-transform: uppercase; }
+
+  /* VARIANTS */
+  .pdpv48__vlabel { font-family: var(--f-head); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 8px; }
+  .pdpv48__vopts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdpv48__vr { display: none; }
+  .pdpv48__vbtn { padding: 10px 22px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--f-head); font-size: 13px; font-weight: 700; text-transform: uppercase; transition: var(--ease); cursor: pointer; }
+  .pdpv48__vbtn:hover { border-color: #000; box-shadow: 3px 3px 0px #000; }
+  .pdpv48__vr:checked + .pdpv48__vbtn { border-color: #000; background: #000; color: var(--hazard); box-shadow: 3px 3px 0px #000; }
+
+  /* PROMO */
+  .pdpv48__promo { background: var(--hazard); border: 3px solid #000; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; font-family: var(--f-head); font-size: 13px; font-weight: 700; color: #000; text-transform: uppercase; }
+  .pdpv48__promo-code { background: #000; color: var(--hazard); padding: 4px 10px; }
+
+  /* URGENCY */
+  .pdpv48__urg { background: var(--surface); border: 3px solid #000; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-family: var(--f-head); font-size: 13px; font-weight: 700; text-transform: uppercase; box-shadow: 5px 5px 0px #000; }
+  .pdpv48__pulse { display: inline-block; width: 10px; height: 10px; background: var(--hazard); border: 1px solid #000; margin-right: 6px; animation: pdpv48p 1.5s infinite; }
+  @keyframes pdpv48p { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pdpv48__bar { height: 8px; background: #E2E8F0; border: 2px solid #000; overflow: hidden; margin-top: 4px; }
+  .pdpv48__fill { height: 100%; background: #000; }
+
+  /* QTY & CTA */
+  .pdpv48__qty-row { display: flex; align-items: center; gap: 14px; }
+  .pdpv48__qty { display: flex; border: 3px solid #000; background: var(--surface); }
+  .pdpv48__qty button { width: 44px; height: 48px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: var(--text); }
+  .pdpv48__qty input { width: 44px; height: 48px; border: none; border-left: 3px solid #000; border-right: 3px solid #000; text-align: center; font-size: 15px; font-weight: 700; background: transparent; }
+
+  .pdpv48__atc { width: 100%; padding: 18px; border: 3px solid #000; background: #000; color: var(--hazard); font-family: var(--f-head); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--ease); box-shadow: 6px 6px 0px var(--hazard); }
+  .pdpv48__atc:hover { background: var(--hazard); color: #000; box-shadow: 6px 6px 0px #000; transform: translateY(-2px); }
+  .pdpv48__atc:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .pdpv48__buynow .shopify-payment-button__button { border-radius: 0 !important; }
+
+  /* TRUST */
+  .pdpv48__trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; padding: 18px 0; border-top: 3px solid #000; border-bottom: 3px solid #000; }
+  .pdpv48__trust-item { font-family: var(--f-head); font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text); }
+  .pdpv48__trust-icon { font-size: 20px; margin-bottom: 3px; color: #000; }
+  @media (max-width: 480px) { .pdpv48__trust { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ACCORDION */
+  .pdpv48__acc { border-top: 3px solid #000; margin-top: 48px; }
+  .pdpv48__acc-item { border-bottom: 3px solid #000; }
+  .pdpv48__acc-btn { width: 100%; padding: 18px 0; border: none; background: transparent; display: flex; justify-content: space-between; align-items: center; font-family: var(--f-head); font-size: 16px; font-weight: 700; text-transform: uppercase; color: var(--text); }
+  .pdpv48__acc-btn::after { content: '[+]'; font-size: 16px; color: #000; }
+  .pdpv48__acc-item.open .pdpv48__acc-btn::after { content: '[−]'; }
+  .pdpv48__acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pdpv48__acc-item.open .pdpv48__acc-body { max-height: 500px; }
+  .pdpv48__acc-inner { padding: 0 0 18px; font-size: 14px; line-height: 1.6; color: var(--muted); }
+
+  /* SECTION TITLE */
+  .pdpv48__sh { font-family: var(--f-head); font-size: 24px; font-weight: 700; text-transform: uppercase; text-align: center; margin: 48px 0 20px; color: var(--text); letter-spacing: 2px; }
+
+  /* REELS */
+  .pdpv48__reels { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .pdpv48__reel { min-width: 180px; width: 180px; aspect-ratio: 9/16; background: #000; border: 3px solid #000; overflow: hidden; flex-shrink: 0; position: relative; }
+  .pdpv48__reel video { width: 100%; height: 100%; object-fit: cover; }
+  .pdpv48__reel-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: #000; color: var(--hazard); font-family: var(--f-head); font-size: 11px; text-transform: uppercase; }
+  .pdpv48__reel-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--hazard); font-size: 36px; }
+
+  /* CARDS */
+  .pdpv48__pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdpv48__pgrid { grid-template-columns: repeat(4, 1fr); } }
+  .pdpv48__pcard { background: var(--surface); border: 3px solid #000; overflow: hidden; transition: var(--ease); text-decoration: none; color: inherit; display: block; }
+  .pdpv48__pcard:hover { transform: translateY(-2px); box-shadow: 5px 5px 0px #000; }
+  .pdpv48__pcard img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .pdpv48__pcard-info { padding: 14px; }
+  .pdpv48__pcard-title { font-family: var(--f-head); font-size: 14px; font-weight: 700; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-transform: uppercase; }
+  .pdpv48__pcard-price { font-family: var(--f-head); font-size: 16px; font-weight: 700; color: var(--text); }
+
+  /* REVIEWS */
+  .pdpv48__revgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .pdpv48__revgrid { grid-template-columns: repeat(3, 1fr); } }
+  .pdpv48__revcard { background: var(--surface); border: 3px solid #000; padding: 20px; box-shadow: 4px 4px 0px #000; }
+  .pdpv48__rev-stars { color: #000; font-size: 14px; margin-bottom: 8px; }
+  .pdpv48__rev-txt { font-size: 14px; line-height: 1.6; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+  .pdpv48__rev-auth { font-family: var(--f-head); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+  .pdpv48__rev-vf { font-family: var(--f-head); font-size: 11px; color: #000; font-weight: 700; }
+
+  /* RECENTLY VIEWED */
+  #pdpv48-rv { display: none; }
+  #pdpv48-rv.has { display: block; }
+
+  /* STICKY ATC */
+  .pdpv48__sticky { position: fixed; bottom: -80px; left: 0; width: 100%; background: var(--surface); border-top: 3px solid #000; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; transition: bottom 0.3s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.2); }
+  .pdpv48__sticky.show { bottom: 0; }
+  .pdpv48__sticky-l { display: flex; align-items: center; gap: 14px; }
+  .pdpv48__sticky-img { width: 42px; height: 42px; border: 2px solid #000; object-fit: cover; }
+  .pdpv48__sticky-t { font-family: var(--f-head); font-size: 14px; font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
+  .pdpv48__sticky-p { font-family: var(--f-head); font-size: 16px; font-weight: 700; color: var(--text); }
+  .pdpv48__sticky-btn { background: #000; color: var(--hazard); border: 2px solid #000; padding: 12px 26px; font-family: var(--f-head); font-weight: 700; font-size: 14px; text-transform: uppercase; transition: var(--ease); }
+  .pdpv48__sticky-btn:hover { background: var(--hazard); color: #000; }
+  @media (max-width: 600px) { .pdpv48__sticky-l { display: none; } .pdpv48__sticky-btn { width: 100%; padding: 15px; } }
+
+  .pdpv48__toast { position: fixed; top: 20px; right: 20px; background: #000; color: var(--hazard); border: 3px solid #000; padding: 12px 24px; font-family: var(--f-head); font-size: 14px; font-weight: 700; z-index: 10000; transform: translateX(130%); transition: transform 0.3s ease; box-shadow: 5px 5px 0px var(--hazard); }
+  .pdpv48__toast.show { transform: translateX(0); }
+</style>
+
+<div class="pdpv48">
+  {% if section.settings.show_offer %}<div class="pdpv48__offer">{{ section.settings.offer_text }}</div>{% endif %}
+
+  <div class="pdpv48__wrap">
+    <div class="pdpv48__grid">
+
+      <!-- GALLERY -->
+      <div class="pdpv48__gal">
+        <div class="pdpv48__hero" id="pdpv48-hero">
+          <span class="pdpv48__raw-tag">⚙️ INDUSTRIAL STEEL</span>
+          {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.title | escape }}" id="pdpv48-himg">{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
+        </div>
+        <div class="pdpv48__thumbs">
+          {% for media in product.media limit: 6 %}
+            <div class="pdpv48__th {% if forloop.first %}on{% endif %}">
+              <img src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" loading="lazy">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pdpv48__info">
+        <div class="pdpv48__crumb">[RAW] {% if product.collections.size > 0 %}{{ product.collections.first.title }}{% else %}Industrial Brutalist{% endif %}</div>
+        <h1 class="pdpv48__title">{{ product.title }}</h1>
+
+        {% if section.settings.show_rating %}
+          <div class="pdpv48__rating">
+            <span class="pdpv48__stars">★★★★★</span>
+            <span>{{ section.settings.rating_val }} · {{ section.settings.rev_count }} Industrial Reviews</span>
+          </div>
+        {% endif %}
+
+        <div class="pdpv48__price-card">
+          <span class="pdpv48__price" id="pdpv48-price">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="pdpv48__cmp">{{ current_variant.compare_at_price | money }}</span>
+            {%- assign sv = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+            <span class="pdpv48__badge">SAVE {{ sv }}%</span>
+          {% endif %}
+        </div>
+
+        {% if product.variants.size > 1 %}
+          {% for option in product.options_with_values %}
+            <div>
+              <div class="pdpv48__vlabel">SELECT {{ option.name | upcase }}</div>
+              <div class="pdpv48__vopts">
+                {% for value in option.values %}
+                  <label>
+                    <input type="radio" name="pdpv48-o-{{ option.position }}" value="{{ value | escape }}" class="pdpv48__vr" data-pos="{{ option.position }}" {% if option.selected_value == value %}checked{% endif %}>
+                    <span class="pdpv48__vbtn">{{ value }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if section.settings.show_promo %}
+          <div class="pdpv48__promo">
+            <span>Steel Pass: Apply {{ section.settings.promo_code }}</span>
+            <span class="pdpv48__promo-code">Save {{ section.settings.promo_disc }}</span>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_urgency %}
+          <div class="pdpv48__urg">
+            <div><span class="pdpv48__pulse"></span><strong>{{ viewer_count }}</strong> industrial operators online</div>
+            <div>⚙️ <strong>{{ sold_count }}</strong> steel orders completed today</div>
+            <div>Inventory: Only <strong>{{ inv_qty }}</strong> remaining
+              <div class="pdpv48__bar">
+                {%- assign sp = inv_qty | times: 100 | divided_by: 45 -%}
+                {%- if sp > 100 -%}{%- assign sp = 100 -%}{%- endif -%}
+                <div class="pdpv48__fill" style="width:{{ sp }}%"></div>
+              </div>
+            </div>
+            {% if section.settings.show_countdown %}
+              <div>⏳ Shift Ends In: <strong id="pdpv48-cd" style="color:var(--text)">{{ section.settings.cd_hrs }}h 00m 00s</strong></div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="pdpv48__qty-row">
+          <div class="pdpv48__qty">
+            <button type="button" id="pdpv48-qm">−</button>
+            <input type="number" id="pdpv48-qi" value="1" min="1" max="10" readonly>
+            <button type="button" id="pdpv48-qp">+</button>
+          </div>
+          {% form 'product', product, id: 'pdpv48-form', style: 'flex:1' %}
+            <input type="hidden" name="id" id="pdpv48-vid" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" id="pdpv48-fq" value="1">
+            <button type="submit" name="add" class="pdpv48__atc" id="pdpv48-atc" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}ADD TO CART — {{ current_variant.price | money }}{% else %}SOLD OUT{% endif %}
+            </button>
+            <div class="pdpv48__buynow" style="margin-top:10px">{{ form | payment_button }}</div>
+          {% endform %}
+        </div>
+
+        <div class="pdpv48__trust">
+          <div class="pdpv48__trust-item"><div class="pdpv48__trust-icon">🔒</div>HEAVY LOCK</div>
+          <div class="pdpv48__trust-item"><div class="pdpv48__trust-icon">⚙️</div>RAW STEEL</div>
+          <div class="pdpv48__trust-item"><div class="pdpv48__trust-icon">↩️</div>30D RETURN</div>
+          <div class="pdpv48__trust-item"><div class="pdpv48__trust-icon">✓</div>TESTED</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION -->
+    <div class="pdpv48__acc">
+      <div class="pdpv48__acc-item open">
+        <button class="pdpv48__acc-btn" type="button">Raw Steel Engineering & Specifications</button>
+        <div class="pdpv48__acc-body"><div class="pdpv48__acc-inner">{{ product.description }}</div></div>
+      </div>
+      {% if section.settings.raw_specs != blank %}
+        <div class="pdpv48__acc-item">
+          <button class="pdpv48__acc-btn" type="button">Structural Testing & Durability</button>
+          <div class="pdpv48__acc-body"><div class="pdpv48__acc-inner">{{ section.settings.raw_specs }}</div></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FBT -->
+    {% if section.settings.fbt_coll != blank %}
+      {%- assign fbt = collections[section.settings.fbt_coll] -%}
+      {% if fbt.products.size > 0 %}
+        <div class="pdpv48__sh">Industrial Brutalist Pairings</div>
+        <div class="pdpv48__pgrid">
+          {% for item in fbt.products limit: 4 %}
+            <a href="{{ item.url }}" class="pdpv48__pcard">
+              <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+              <div class="pdpv48__pcard-info">
+                <div class="pdpv48__pcard-title">{{ item.title }}</div>
+                <div class="pdpv48__pcard-price">{{ item.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- REELS -->
+    {% if section.settings.show_reels %}
+      <div class="pdpv48__sh">Industrial Stream</div>
+      <div class="pdpv48__reels">
+        {% if section.settings.r1 != blank %}<div class="pdpv48__reel"><video src="{{ section.settings.r1 }}" muted playsinline loop></video><div class="pdpv48__reel-cap">⚙️ RAW TEST 1</div></div>{% else %}<div class="pdpv48__reel"><div class="pdpv48__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r2 != blank %}<div class="pdpv48__reel"><video src="{{ section.settings.r2 }}" muted playsinline loop></video><div class="pdpv48__reel-cap">⚙️ STEEL TEST 2</div></div>{% else %}<div class="pdpv48__reel"><div class="pdpv48__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r3 != blank %}<div class="pdpv48__reel"><video src="{{ section.settings.r3 }}" muted playsinline loop></video><div class="pdpv48__reel-cap">⚙️ HEAVY BUILD</div></div>{% else %}<div class="pdpv48__reel"><div class="pdpv48__reel-ph">▶</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- REVIEWS -->
+    {% if section.settings.show_reviews %}
+      <div class="pdpv48__sh" id="reviews">Industrial Reviews</div>
+      <div class="pdpv48__revgrid">
+        {% if section.settings.rv1 != blank %}<div class="pdpv48__revcard"><div class="pdpv48__rev-stars">★★★★★</div><div class="pdpv48__rev-txt">"{{ section.settings.rv1 }}"</div><div class="pdpv48__rev-auth">{{ section.settings.rv1n }}</div><div class="pdpv48__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv2 != blank %}<div class="pdpv48__revcard"><div class="pdpv48__rev-stars">★★★★★</div><div class="pdpv48__rev-txt">"{{ section.settings.rv2 }}"</div><div class="pdpv48__rev-auth">{{ section.settings.rv2n }}</div><div class="pdpv48__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv3 != blank %}<div class="pdpv48__revcard"><div class="pdpv48__rev-stars">★★★★★</div><div class="pdpv48__rev-txt">"{{ section.settings.rv3 }}"</div><div class="pdpv48__rev-auth">{{ section.settings.rv3n }}</div><div class="pdpv48__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURED -->
+    {% if section.settings.feat_coll != blank %}
+      {%- assign fc = collections[section.settings.feat_coll] -%}
+      {% if fc.products.size > 0 %}
+        <div class="pdpv48__sh">Recommended Industrial Items</div>
+        <div class="pdpv48__pgrid">
+          {% for item in fc.products limit: 4 %}
+            {% if item.handle != product.handle %}
+              <a href="{{ item.url }}" class="pdpv48__pcard">
+                <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+                <div class="pdpv48__pcard-info">
+                  <div class="pdpv48__pcard-title">{{ item.title }}</div>
+                  <div class="pdpv48__pcard-price">{{ item.price | money }}</div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- RECENTLY VIEWED -->
+    <div id="pdpv48-rv">
+      <div class="pdpv48__sh">Recently Viewed</div>
+      <div class="pdpv48__pgrid" id="pdpv48-rvg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY ATC -->
+<div class="pdpv48__sticky" id="pdpv48-sticky">
+  <div class="pdpv48__sticky-l">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 80 }}" class="pdpv48__sticky-img" alt="{{ product.title | escape }}">{% endif %}
+    <div>
+      <div class="pdpv48__sticky-t">{{ product.title }}</div>
+      <div class="pdpv48__sticky-p" id="pdpv48-sp">{{ current_variant.price | money }}</div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      {% if product.available %}
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b>{% render 'countdown-timer', product: product %}</b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% render 'back-in-stock', product: product %}
+
+      {% if product.available %}
+      <button type="button" class="pdpv48__sticky-btn" id="pdpv48-sbtn">Add to Cart</button>
+      {% else %}
+      <button class="pdpv48__sticky-btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      {% endif %}
+</div>
+
+<div class="pdpv48__toast" id="pdpv48-toast">RAW: Added to cart!</div>
+
+<script>
+(function(){
+  var PJ={{ product | json }}, cid={{ current_variant.id }};
+  function getO(){ var o=[]; document.querySelectorAll('.pdpv48__vr:checked').forEach(function(r){ o.push({p:parseInt(r.dataset.pos),v:r.value}); }); o.sort(function(a,b){return a.p-b.p}); return o.map(function(x){return x.v}); }
+  function findV(o){ for(var i=0;i<PJ.variants.length;i++){ var v=PJ.variants[i],ok=true; for(var j=0;j<o.length;j++){ if(v.options[j]!==o[j]){ ok=false; break; } } if(ok) return v; } return null; }
+  function upd(){
+    var o=getO(); if(!o.length) return; var v=findV(o); if(!v) return; cid=v.id;
+    document.getElementById('pdpv48-vid').value=v.id;
+    var pf=(v.price/100).toLocaleString('en-US',{style:'currency',currency:PJ.currency||'USD'});
+    var pe=document.getElementById('pdpv48-price'); if(pe) pe.textContent=pf;
+    var sp=document.getElementById('pdpv48-sp'); if(sp) sp.textContent=pf;
+    var ab=document.getElementById('pdpv48-atc');
+    if(ab){ ab.disabled=!v.available; ab.textContent=v.available?'ADD TO CART — '+pf:'SOLD OUT'; }
+    var u=new URL(window.location); u.searchParams.set('variant',v.id); history.replaceState({},'',u);
+  }
+  document.querySelectorAll('.pdpv48__vr').forEach(function(r){ r.addEventListener('change',upd); });
+
+  var fm=document.getElementById('pdpv48-form');
+  if(fm) fm.addEventListener('submit',function(e){
+    e.preventDefault(); var b=document.getElementById('pdpv48-atc'), ot=b.textContent;
+    b.disabled=true; b.textContent='ADDING...';
+    var q=parseInt(document.getElementById('pdpv48-qi').value)||1;
+    document.getElementById('pdpv48-fq').value=q;
+    fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cid,quantity:q})})
+    .then(function(r){return r.json();})
+    .then(function(){ b.textContent='✓ ADDED!'; toast48(); setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); })
+    .catch(function(){ b.textContent='ERROR'; setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); });
+  });
+
+  function toast48(){ var t=document.getElementById('pdpv48-toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+  var qi=document.getElementById('pdpv48-qi');
+  document.getElementById('pdpv48-qm').addEventListener('click',function(){ var v=parseInt(qi.value); if(v>1) qi.value=v-1; });
+  document.getElementById('pdpv48-qp').addEventListener('click',function(){ var v=parseInt(qi.value); if(v<10) qi.value=v+1; });
+
+  document.querySelectorAll('.pdpv48__th').forEach(function(th){
+    th.addEventListener('click',function(){
+      document.querySelectorAll('.pdpv48__th').forEach(function(t){ t.classList.remove('on'); });
+      th.classList.add('on');
+      var hi=document.getElementById('pdpv48-himg'), ti=th.querySelector('img');
+      if(hi&&ti) hi.src=ti.src.replace(/width=\d+/,'width=900');
+    });
+  });
+
+  var sb=document.getElementById('pdpv48-sticky'), ab=document.getElementById('pdpv48-atc');
+  if(sb&&ab) window.addEventListener('scroll',function(){ sb.classList.toggle('show', ab.getBoundingClientRect().top<-50); });
+  var sbn=document.getElementById('pdpv48-sbtn');
+  if(sbn) sbn.addEventListener('click',function(){ document.getElementById('pdpv48-atc').click(); });
+
+  document.querySelectorAll('.pdpv48__acc-btn').forEach(function(b){ b.addEventListener('click',function(){ b.closest('.pdpv48__acc-item').classList.toggle('open'); }); });
+
+  var ce=document.getElementById('pdpv48-cd');
+  if(ce){
+    var hrs=parseInt('{{ section.settings.cd_hrs | default: 6 }}')||6, ts=hrs*3600;
+    var sk=sessionStorage.getItem('pdpv48_cd'); if(sk) ts=parseInt(sk);
+    setInterval(function(){ ts--; if(ts<=0){ ce.textContent='EXPIRED'; return; } var h=Math.floor(ts/3600), m=Math.floor((ts%3600)/60), s=ts%60; ce.textContent=h+'h '+(m<10?'0':'')+m+'m '+(s<10?'0':'')+s+'s'; sessionStorage.setItem('pdpv48_cd',ts); },1000);
+  }
+
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target.querySelector('video'); if(v){ e.isIntersecting?v.play():v.pause(); } }); },{threshold:0.5});
+    document.querySelectorAll('.pdpv48__reel').forEach(function(r){ ro.observe(r); });
+  }
+
+  var RK='pdpv48_rv', cp={handle:'{{ product.handle }}',title:'{{ product.title | escape }}',price:'{{ product.price | money }}',image:'{{ product.featured_image | image_url: width: 400 }}',url:'{{ product.url }}'};
+  try{ var its=JSON.parse(localStorage.getItem(RK)||'[]'); its=its.filter(function(i){ return i.handle!==cp.handle; }); its.unshift(cp); if(its.length>8) its=its.slice(0,8); localStorage.setItem(RK,JSON.stringify(its)); }catch(e){}
+  try{
+    var its2=JSON.parse(localStorage.getItem(RK)||'[]').filter(function(i){ return i.handle!==cp.handle; });
+    var c=document.getElementById('pdpv48-rv'), g=document.getElementById('pdpv48-rvg');
+    if(g&&its2.length>0){ c.classList.add('has'); var h=''; its2.slice(0,4).forEach(function(i){ h+='<a href="'+i.url+'" class="pdpv48__pcard"><img src="'+i.image+'" alt="'+i.title+'" loading="lazy"><div class="pdpv48__pcard-info"><div class="pdpv48__pcard-title">'+i.title+'</div><div class="pdpv48__pcard-price">'+i.price+'</div></div></a>'; }); g.innerHTML=h; }
+  }catch(e){}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PDP V48 — Raw Brutalist",
+  "tag": "section",
+  "class": "pdpv48-section",
+  "settings": [
+    { "type": "header", "content": "Rating" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "text", "id": "rating_val", "label": "Rating score", "default": "4.95" },
+    { "type": "text", "id": "rev_count", "label": "Total reviews", "default": "1,940" },
+    { "type": "header", "content": "Offer Banner" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show offer", "default": true },
+    { "type": "text", "id": "offer_text", "label": "Offer text", "default": "⚙️ INDUSTRIAL RAW: ENJOY 20% DISCOUNT WITH CODE 'RAWSTEEL20'" },
+    { "type": "header", "content": "Promo" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show promo", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Code", "default": "RAWSTEEL20" },
+    { "type": "text", "id": "promo_disc", "label": "Discount", "default": "20%" },
+    { "type": "header", "content": "Urgency" },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show urgency", "default": true },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "range", "id": "cd_hrs", "label": "Countdown hours", "min": 1, "max": 48, "default": 6 },
+    { "type": "header", "content": "Accordion" },
+    { "type": "richtext", "id": "raw_specs", "label": "Structural testing & durability" },
+    { "type": "header", "content": "FBT" },
+    { "type": "collection", "id": "fbt_coll", "label": "FBT collection" },
+    { "type": "header", "content": "Reels" },
+    { "type": "checkbox", "id": "show_reels", "label": "Show reels", "default": true },
+    { "type": "url", "id": "r1", "label": "Reel 1 URL" },
+    { "type": "url", "id": "r2", "label": "Reel 2 URL" },
+    { "type": "url", "id": "r3", "label": "Reel 3 URL" },
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews", "default": true },
+    { "type": "text", "id": "rv1", "label": "Review 1", "default": "Industrial raw brutalist style is extremely sharp!" },
+    { "type": "text", "id": "rv1n", "label": "Author 1", "default": "Axel R." },
+    { "type": "text", "id": "rv2", "label": "Review 2", "default": "Heavy duty build quality and zero fluff." },
+    { "type": "text", "id": "rv2n", "label": "Author 2", "default": "Klay B." },
+    { "type": "text", "id": "rv3", "label": "Review 3", "default": "100% industrial raw excellence." },
+    { "type": "text", "id": "rv3n", "label": "Author 3", "default": "Brock M." },
+    { "type": "header", "content": "Featured" },
+    { "type": "collection", "id": "feat_coll", "label": "Featured collection" }
+  ],
+  "presets": [{ "name": "PDP V48 — Raw Brutalist" }]
+}
+{% endschema %}

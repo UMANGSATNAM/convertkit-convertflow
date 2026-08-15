@@ -1,0 +1,137 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp44-faq-bg: {{ section.settings.bg_color | default: '#EDF4EE' }};
+    --hp44-faq-card: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    --hp44-faq-border: {{ section.settings.card_border | default: '#D8E8DC' }};
+    --hp44-faq-q: {{ section.settings.q_color | default: '#143D2B' }};
+    --hp44-faq-a: {{ section.settings.a_color | default: '#406352' }};
+    
+    background-color: var(--hp44-faq-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp44-faq__wrap {
+    max-width: {{ section.settings.container_width | default: 840 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp44-faq__header {
+    text-align: center;
+    margin-bottom: 45px;
+  }
+
+  .hp44-faq__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--hp44-faq-q);
+    margin: 0 0 10px;
+  }
+
+  .hp44-faq__sub {
+    font-size: 15px;
+    color: var(--hp44-faq-a);
+    margin: 0;
+  }
+
+  .hp44-faq__item {
+    background: var(--hp44-faq-card);
+    border: 1px solid var(--hp44-faq-border);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(20, 61, 43, 0.04);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .hp44-faq__item:hover {
+    border-color: #2D6A4F;
+  }
+
+  .hp44-faq__q {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--hp44-faq-q);
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hp44-faq__a {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--hp44-faq-a);
+    margin: 14px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid #EDF4EE;
+  }
+{%- endstyle -%}
+
+<div class="hp44-faq__wrap">
+  <div class="hp44-faq__header">
+    <h2 class="hp44-faq__title">{{ section.settings.heading | default: 'Herbarium Knowledge Base' }}</h2>
+    <p class="hp44-faq__sub">{{ section.settings.subheading | default: 'Everything you need to know about our clary sage extraction and shipping.' }}</p>
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <div class="hp44-faq__item" {{ block.shopify_attributes }}>
+        <h3 class="hp44-faq__q">
+          <span>{{ block.settings.question }}</span>
+          <span>+</span>
+        </h3>
+        <p class="hp44-faq__a">{{ block.settings.answer }}</p>
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div class="hp44-faq__item">
+      <h3 class="hp44-faq__q"><span>How is your Nordic clary sage harvested?</span><span>+</span></h3>
+      <p class="hp44-faq__a">Harvested sustainably from organic fields in Sweden and Denmark. We use low-temperature hydro-distillation to preserve 100% of the active botanical flavonoids and terpenoids.</p>
+    </div>
+    <div class="hp44-faq__item">
+      <h3 class="hp44-faq__q"><span>Is the formula safe for sensitive and acne-prone skin?</span><span>+</span></h3>
+      <p class="hp44-faq__a">Yes, our formulas are non-comedogenic, free of essential oils that trigger dermatitis, hypoallergenic, and certified by independent European dermatologists.</p>
+    </div>
+    <div class="hp44-faq__item">
+      <h3 class="hp44-faq__q"><span>Are international import duties included at checkout?</span><span>+</span></h3>
+      <p class="hp44-faq__a">Yes, all international tariffs and customs taxes are calculated and pre-paid at checkout, guaranteeing seamless door delivery to 180+ countries.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP44 - Sage FAQ",
+  "class": "section-hp44-faq",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#EDF4EE" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FFFFFF" },
+    { "type": "color", "id": "card_border", "label": "Card Border", "default": "#D8E8DC" },
+    { "type": "color", "id": "q_color", "label": "Question Color", "default": "#143D2B" },
+    { "type": "color", "id": "a_color", "label": "Answer Color", "default": "#406352" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Herbarium Knowledge Base" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Everything you need to know about our clary sage extraction and shipping." },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 600, "max": 1200, "step": 20, "unit": "px", "label": "Container Width", "default": 840 }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Accordion Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How is your Nordic clary sage harvested?" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "Harvested sustainably from organic fields in Sweden and Denmark using low-temperature hydro-distillation." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP44 - Sage FAQ" }
+  ]
+}
+{% endschema %}

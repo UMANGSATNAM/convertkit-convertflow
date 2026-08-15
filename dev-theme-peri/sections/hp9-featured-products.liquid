@@ -1,0 +1,240 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ff88'
+  assign heading = section.settings.heading | default: '/// HARDWARE_DROP'
+  assign collection = collections[section.settings.collection]
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp9-featured-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp9-featured-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+    padding-bottom: 15px;
+  }
+  
+  .hp9-featured-header-{{ section_id }} h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+    margin: 0;
+    color: {{ accent_color }};
+    letter-spacing: 2px;
+  }
+  
+  .hp9-featured-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  
+  .hp9-product-card-{{ section_id }} {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 4px;
+    padding: 15px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hp9-product-card-{{ section_id }}:hover {
+    border-color: {{ accent_color }};
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+    transform: translateY(-5px);
+  }
+  
+  /* Techy corner brackets */
+  .hp9-product-card-{{ section_id }}::before,
+  .hp9-product-card-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .hp9-product-card-{{ section_id }}::before {
+    top: 0;
+    left: 0;
+    border-top-color: {{ accent_color }};
+    border-left-color: {{ accent_color }};
+    opacity: 0;
+  }
+  
+  .hp9-product-card-{{ section_id }}::after {
+    bottom: 0;
+    right: 0;
+    border-bottom-color: {{ accent_color }};
+    border-right-color: {{ accent_color }};
+    opacity: 0;
+  }
+  
+  .hp9-product-card-{{ section_id }}:hover::before,
+  .hp9-product-card-{{ section_id }}:hover::after {
+    opacity: 1;
+  }
+  
+  .hp9-product-image-wrapper-{{ section_id }} {
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    margin-bottom: 20px;
+    border-radius: 2px;
+  }
+  
+  .hp9-product-image-{{ section_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    transition: transform 0.5s ease;
+  }
+  
+  .hp9-product-card-{{ section_id }}:hover .hp9-product-image-{{ section_id }} {
+    transform: scale(1.1);
+  }
+  
+  .hp9-product-info-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .hp9-product-title-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .hp9-product-price-{{ section_id }} {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: {{ accent_color }};
+  }
+
+  @media (max-width: 1200px) {
+    .hp9-featured-grid-{{ section_id }} {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hp9-featured-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .hp9-product-card-{{ section_id }} {
+      padding: 10px;
+    }
+    .hp9-featured-header-{{ section_id }} h2 {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<div class="hp9-featured-container-{{ section_id }}">
+  {% if heading != blank %}
+    <div class="hp9-featured-header-{{ section_id }}">
+      <h2>{{ heading }}</h2>
+      <a href="{{ collection.url | default: '/collections/all' }}" style="color: #fff; font-family: 'Space Mono', monospace; font-size: 0.8rem; text-decoration: none;">VIEW_ALL_></a>
+    </div>
+  {% endif %}
+  
+  <div class="hp9-featured-grid-{{ section_id }}">
+    {% if collection != blank and collection.products_count > 0 %}
+      {% for product in collection.products limit: 4 %}
+        <a href="{{ product.url }}" class="hp9-product-card-{{ section_id }}">
+          <div class="hp9-product-image-wrapper-{{ section_id }}">
+            <img src="{{ product.featured_image | image_url: width: 600, height: 600, crop: 'center' }}" alt="{{ product.title }}" class="hp9-product-image-{{ section_id }}" loading="lazy" width="300" height="300">
+          </div>
+          <div class="hp9-product-info-{{ section_id }}">
+            <h3 class="hp9-product-title-{{ section_id }}">{{ product.title }}</h3>
+            <div class="hp9-product-price-{{ section_id }}">{{ product.price | money }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..4) %}
+        <a href="#" class="hp9-product-card-{{ section_id }}">
+          <div class="hp9-product-image-wrapper-{{ section_id }}">
+            <div style="width:100%; height:100%; background:#1a1a1a; display:flex; align-items:center; justify-content:center; color:#333; font-family:'Space Mono', monospace;">IMG_MISSING</div>
+          </div>
+          <div class="hp9-product-info-{{ section_id }}">
+            <h3 class="hp9-product-title-{{ section_id }}">PROTOTYPE_0{{ i }}</h3>
+            <div class="hp9-product-price-{{ section_id }}">$199.99</div>
+          </div>
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP9 Featured Products",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ff88"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "/// HARDWARE_DROP"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Featured Products"
+    }
+  ]
+}
+{% endschema %}

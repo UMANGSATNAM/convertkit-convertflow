@@ -1,4 +1,4 @@
-﻿import { graphqlRequest } from "./app/services/shopify-api.server.js";
+import { graphqlRequest } from "./app/services/shopify-api.server.js";
 import prisma from "./app/db.server.js";
 
 async function main() {
@@ -7,7 +7,7 @@ async function main() {
 
   const query = `
     query {
-      themes(first: 5, sortKey: UPDATED_AT, reverse: true) {
+      themes(first: 5) {
         nodes {
           id
           name

@@ -1,0 +1,171 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAFAFA'
+  assign text_color = section.settings.text_color | default: '#333333'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #E5E5E5;
+  }
+  
+  .hp12-header-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .hp12-header-nav-{{ section_id }} {
+    display: flex;
+    gap: 40px;
+    flex: 1;
+  }
+  
+  .hp12-header-nav-link-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: {{ text_color }};
+    text-decoration: none;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp12-header-nav-link-{{ section_id }}:hover {
+    opacity: 0.5;
+  }
+  
+  .hp12-header-logo-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: {{ text_color }};
+    text-decoration: none;
+    letter-spacing: 4px;
+    text-align: center;
+    flex: 1;
+  }
+  
+  .hp12-header-icons-{{ section_id }} {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+  }
+  
+  .hp12-header-icon-{{ section_id }} {
+    color: {{ text_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp12-header-icon-{{ section_id }} svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+  }
+  
+  .hp12-header-icon-{{ section_id }}:hover {
+    opacity: 0.5;
+  }
+  
+  @media (max-width: 768px) {
+    .hp12-header-container-{{ section_id }} {
+      padding: 20px;
+    }
+    .hp12-header-nav-{{ section_id }} {
+      display: none;
+    }
+    .hp12-header-logo-{{ section_id }} {
+      font-size: 1.2rem;
+      text-align: left;
+    }
+    .hp12-header-menu-btn-{{ section_id }} {
+      display: block;
+      margin-right: 20px;
+    }
+    .hp12-header-icons-{{ section_id }} {
+      flex: none;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .hp12-header-menu-btn-{{ section_id }} {
+      display: none;
+    }
+  }
+</style>
+
+<div class="hp12-header-container-{{ section_id }}">
+  <div class="hp12-header-menu-btn-{{ section_id }}">
+    <a href="#" class="hp12-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/></svg>
+    </a>
+  </div>
+
+  <nav class="hp12-header-nav-{{ section_id }}">
+    {% for link in linklists.main-menu.links limit: 3 %}
+      <a href="{{ link.url }}" class="hp12-header-nav-link-{{ section_id }}">{{ link.title }}</a>
+    {% else %}
+      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Collection</a>
+      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Objects</a>
+      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Spaces</a>
+    {% endfor %}
+  </nav>
+  
+  <a href="/" class="hp12-header-logo-{{ section_id }}">
+    {{ shop.name | default: 'AURA' }}
+  </a>
+  
+  <div class="hp12-header-icons-{{ section_id }}">
+    <a href="/search" class="hp12-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="/account" class="hp12-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    {% render 'search-bar', compact: true %}
+    {% render 'wishlist-icon' %}
+    <a href="/cart" data-cart-open class="hp12-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP12 Header",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP12 Header"
+    }
+  ]
+}
+{% endschema %}

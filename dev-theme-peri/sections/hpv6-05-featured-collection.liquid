@@ -1,0 +1,441 @@
+{%- liquid
+  assign section_id = section.id
+  assign collection = collections[section.settings.collection]
+  assign bg_color = section.settings.bg_color | default: '#F7FAFC'
+  assign text_color = section.settings.text_color | default: '#2D3748'
+  assign padding_top = section.settings.padding_top | default: 80
+  assign padding_bottom = section.settings.padding_bottom | default: 80
+  assign padding_top_mobile = section.settings.padding_top_mobile | default: 40
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile | default: 40
+  assign product_limit = section.settings.product_limit | default: 4
+  assign cols_desktop = section.settings.columns_desktop | default: 2
+  assign cols_mobile = section.settings.columns_mobile | default: 1
+  assign image_ratio = section.settings.image_ratio | default: '4/5'
+  assign show_hover_image = section.settings.show_hover_image
+  assign show_quick_add = section.settings.show_quick_add
+  assign stagger_layout = section.settings.stagger_layout
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --padding-top: {{ padding_top }}px;
+    --padding-bottom: {{ padding_bottom }}px;
+    --padding-top-mobile: {{ padding_top_mobile }}px;
+    --padding-bottom-mobile: {{ padding_bottom_mobile }}px;
+    --cols-desktop: {{ cols_desktop }};
+    --cols-mobile: {{ cols_mobile }};
+    --image-ratio: {% if image_ratio == 'square' %}1/1{% elsif image_ratio == 'portrait' %}4/5{% else %}auto{% endif %};
+    
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .hpv6-fc-{{ section_id }} {
+    max-width: var(--page-width, 1400px);
+    margin: 0 auto;
+    padding: 0 4vw;
+  }
+
+  .hpv6-fc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hpv6-fc__title {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .hpv6-fc__shop-all {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 4px;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .hpv6-fc__shop-all:hover {
+    opacity: 0.6;
+  }
+  
+  .hpv6-fc__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-desktop), 1fr);
+    gap: 2rem;
+  }
+  
+  {% if stagger_layout and cols_desktop == 2 %}
+  .hpv6-product-card:nth-child(2n) {
+    margin-top: 6rem;
+  }
+  {% endif %}
+  
+  .hpv6-product-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    group: product;
+  }
+
+  .hpv6-product-card__image-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--image-ratio);
+    background-color: #E2E8F0;
+    margin-bottom: 1.5rem;
+  }
+
+  .hpv6-product-card__image, .hpv6-product-card__image-hover {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease, transform 0.8s ease;
+  }
+
+  .hpv6-product-card__image-hover {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  
+  {% if show_hover_image %}
+  .hpv6-product-card:hover .hpv6-product-card__image-hover {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .hpv6-product-card:hover .hpv6-product-card__image--has-hover {
+    opacity: 0;
+  }
+  {% endif %}
+  
+  .hpv6-product-card__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hpv6-product-card__title {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .hpv6-product-card__price {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  .hpv6-product-card__form {
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .hpv6-product-card__add-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hpv6-product-card__add-btn:hover:not([disabled]) {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hpv6-product-card__add-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 989px) {
+    .hpv6-fc__grid { gap: 1.5rem; }
+    {% if stagger_layout and cols_desktop == 2 %}
+    .hpv6-product-card:nth-child(2n) { margin-top: 3rem; }
+    {% endif %}
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding-top: var(--padding-top-mobile);
+      padding-bottom: var(--padding-bottom-mobile);
+    }
+    .hpv6-fc__grid { 
+      grid-template-columns: repeat(var(--cols-mobile), 1fr); 
+      gap: 3rem; 
+    }
+    .hpv6-product-card:nth-child(2n) { margin-top: 0; }
+    .hpv6-fc__header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<div class="hpv6-fc-{{ section_id }}">
+  <div class="hpv6-fc__header">
+    <h2 class="hpv6-fc__title">{{ section.settings.title | escape }}</h2>
+    {%- if section.settings.show_collection_link and collection != blank -%}
+      <a href="{{ collection.url }}" class="hpv6-fc__shop-all">
+        {{ section.settings.collection_link_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+  
+  <div class="hpv6-fc__grid">
+    {%- if collection != blank and collection.products.size > 0 -%}
+      {%- for product in collection.products limit: product_limit -%}
+        <div class="hpv6-product-card">
+          <a href="{{ product.url }}" class="hpv6-product-card__image-wrap" aria-label="{{ product.title | escape }}">
+            {%- if product.featured_image -%}
+              {%- assign has_hover = false -%}
+              {%- if product.images[1] != blank and show_hover_image -%}
+                {%- assign has_hover = true -%}
+              {%- endif -%}
+
+              {%- assign img_class = 'hpv6-product-card__image' -%}
+              {%- if has_hover -%}
+                {%- assign img_class = img_class | append: ' hpv6-product-card__image--has-hover' -%}
+              {%- endif -%}
+
+              {{ product.featured_image | image_url: width: 800 | image_tag: class: img_class, loading: 'lazy', sizes: '(min-width: 768px) 50vw, 100vw', widths: '400, 600, 800, 1000' }}
+
+              {%- if has_hover -%}
+                {{ product.images[1] | image_url: width: 800 | image_tag: class: 'hpv6-product-card__image-hover', loading: 'lazy', sizes: '(min-width: 768px) 50vw, 100vw', widths: '400, 600, 800, 1000' }}
+              {%- endif -%}
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'hpv6-product-card__image' }}
+            {%- endif -%}
+          </a>
+
+          <div class="hpv6-product-card__info">
+            <h3 class="hpv6-product-card__title">
+              <a href="{{ product.url }}" style="text-decoration:none; color:inherit;">{{ product.title }}</a>
+            </h3>
+            <span class="hpv6-product-card__price">{{ product.price | money }}</span>
+          </div>
+
+          {%- if show_quick_add -%}
+            <div class="hpv6-product-card__form">
+              {%- form 'product', product -%}
+                <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                <button type="submit" class="hpv6-product-card__add-btn" 
+                  {% unless product.available %}disabled{% endunless %}>
+                  {%- if product.available -%}
+                    Add to Cart
+                  {%- else -%}
+                    Sold Out
+                  {%- endif -%}
+                </button>
+              {%- endform -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..product_limit) -%}
+        <div class="hpv6-product-card">
+          <div class="hpv6-product-card__image-wrap">
+            {{ 'product-' | append: i | placeholder_svg_tag: 'hpv6-product-card__image' }}
+          </div>
+          <div class="hpv6-product-card__info">
+            <h3 class="hpv6-product-card__title">Minimal Object {{ i }}</h3>
+            <span class="hpv6-product-card__price">$120.00</span>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HPV6 Featured Collection",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Curated Essentials"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Number of products to show",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F7FAFC"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D3748"
+    },
+    {
+      "type": "header",
+      "content": "Product Cards"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image Ratio",
+      "options": [
+        { "value": "auto", "label": "Adapt to image" },
+        { "value": "square", "label": "Square (1:1)" },
+        { "value": "portrait", "label": "Portrait (4:5)" }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hover_image",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show 'Add to Cart' button",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Desktop Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns on Desktop",
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "stagger_layout",
+      "label": "Enable Asymmetric Staggering",
+      "info": "Only works well if desktop columns is exactly 2.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Mobile Layout"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Collection Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_link",
+      "label": "Show link to collection",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "collection_link_label",
+      "label": "Link Label",
+      "default": "Shop Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HPV6 Featured Collection"
+    }
+  ]
+}
+{% endschema %}

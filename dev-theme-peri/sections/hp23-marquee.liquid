@@ -1,0 +1,248 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    
+    background-color: var(--bg-color);
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+    position: relative;
+    overflow: hidden;
+    padding: {{ section.settings.padding_y }}px 0;
+  }
+
+  .hp23-marquee__track {
+    display: flex;
+    white-space: nowrap;
+    width: max-content;
+    animation: hp23-marquee-scroll {{ section.settings.speed }}s linear infinite;
+  }
+
+  {% if section.settings.direction == 'right' %}
+    .hp23-marquee__track {
+      animation-direction: reverse;
+    }
+  {% endif %}
+
+  .hp23-marquee__track:hover {
+    animation-play-state: {% if section.settings.pause_on_hover %}paused{% else %}running{% endif %};
+  }
+
+  @keyframes hp23-marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .hp23-marquee__content {
+    display: flex;
+    align-items: center;
+  }
+
+  .hp23-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    font-size: clamp(24px, 4vw, {{ section.settings.text_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    padding: 0 {{ section.settings.gap }}px;
+  }
+
+  .hp23-marquee__item em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--text-color);
+  }
+
+  .hp23-marquee__icon {
+    margin: 0 {{ section.settings.gap | divided_by: 2 }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+  }
+
+  .hp23-marquee__icon svg {
+    width: clamp(24px, 4vw, {{ section.settings.text_size }}px);
+    height: clamp(24px, 4vw, {{ section.settings.text_size }}px);
+    fill: currentColor;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div id="HP23Marquee-{{ section.id }}">
+  <div class="hp23-marquee__track">
+    <div class="hp23-marquee__content">
+      {%- for i in (1..3) -%}
+        {%- for block in section.blocks -%}
+          <div class="hp23-marquee__item" {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+          </div>
+          {%- if block.settings.show_icon -%}
+            <div class="hp23-marquee__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'star' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
+                {%- when 'lightning' -%}
+                  <svg viewBox="0 0 24 24"><path d="M11 15H6L13 1V9H18L11 23V15Z"/></svg>
+                {%- when 'asterisk' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M15.5,15.5L12,13.5L8.5,15.5L9.5,11.5L6.5,9L10.5,8.5L12,5L13.5,8.5L17.5,9L14.5,11.5L15.5,15.5Z"/></svg>
+                {%- when 'arrow' -%}
+                  <svg viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"/></svg>
+              {%- endcase -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist Marquee",
+  "class": "section-hp23-marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Functionality"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "left", "label": "Right to Left" },
+        { "value": "right", "label": "Left to Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout & Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 16,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Item Spacing",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FF3B30"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Item",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>100% <em>RAW</em> FORMULAS</p>",
+          "info": "Use italic for hollow stroke text"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_icon",
+          "label": "Show Icon After Text",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "star", "label": "Star" },
+            { "value": "lightning", "label": "Lightning" },
+            { "value": "asterisk", "label": "Asterisk" },
+            { "value": "arrow", "label": "Arrow" }
+          ],
+          "default": "lightning"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "<p>NO <em>BS</em> BEAUTY</p>", "icon": "lightning" } },
+        { "type": "text", "settings": { "text": "<p>TESTED ON <em>HUMANS</em></p>", "icon": "star" } },
+        { "type": "text", "settings": { "text": "<p>MAXIMUM <em>EFFICACY</em></p>", "icon": "asterisk" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

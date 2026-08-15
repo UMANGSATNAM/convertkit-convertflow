@@ -1,0 +1,246 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+  assign heading = section.settings.heading | default: 'EXPLORE COLLECTIONS'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp8-cat-container-{{ section_id }} {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .hp8-cat-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid {{ text_color | color_modify: 'alpha', 0.2 }};
+  }
+  
+  .hp8-cat-header-{{ section_id }} h2 {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .hp8-cat-view-all-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: {{ text_color }};
+    text-decoration: none;
+    position: relative;
+  }
+  
+  .hp8-cat-view-all-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  
+  .hp8-cat-view-all-{{ section_id }}:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  
+  .hp8-cat-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px; /* Super thin gap for a sharp editorial look */
+    background-color: {{ text_color | color_modify: 'alpha', 0.1 }};
+  }
+  
+  .hp8-cat-item-{{ section_id }} {
+    position: relative;
+    aspect-ratio: 4/5;
+    background-color: {{ bg_color }};
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+  }
+  
+  .hp8-cat-image-{{ section_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  .hp8-cat-item-{{ section_id }}:hover .hp8-cat-image-{{ section_id }} {
+    filter: grayscale(0%);
+    transform: scale(1.03);
+  }
+  
+  .hp8-cat-overlay-{{ section_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+    opacity: 0.8;
+    transition: opacity 0.4s ease;
+  }
+  
+  .hp8-cat-item-{{ section_id }}:hover .hp8-cat-overlay-{{ section_id }} {
+    opacity: 1;
+  }
+  
+  .hp8-cat-title-{{ section_id }} {
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    transform: translateY(10px);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  
+  .hp8-cat-count-{{ section_id }} {
+    color: rgba(255,255,255,0.7);
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s;
+  }
+  
+  .hp8-cat-item-{{ section_id }}:hover .hp8-cat-title-{{ section_id }},
+  .hp8-cat-item-{{ section_id }}:hover .hp8-cat-count-{{ section_id }} {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 992px) {
+    .hp8-cat-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hp8-cat-header-{{ section_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .hp8-cat-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="hp8-cat-container-{{ section_id }}">
+  <div class="hp8-cat-header-{{ section_id }}">
+    <h2>{{ heading }}</h2>
+    <a href="/collections" class="hp8-cat-view-all-{{ section_id }}">VIEW ALL COLLECTIONS</a>
+  </div>
+  
+  <div class="hp8-cat-grid-{{ section_id }}">
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.collection] %}
+      <a href="{{ collection.url | default: '#' }}" class="hp8-cat-item-{{ section_id }}" {{ block.shopify_attributes }}>
+        {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | image_url: width: 800, height: 1000, crop: 'center' }}" alt="{{ block.settings.title | default: collection.title }}" class="hp8-cat-image-{{ section_id }}" loading="lazy" width="400" height="500">
+        {% elsif collection.image != blank %}
+          <img src="{{ collection.image | image_url: width: 800, height: 1000, crop: 'center' }}" alt="{{ collection.title }}" class="hp8-cat-image-{{ section_id }}" loading="lazy" width="400" height="500">
+        {% else %}
+          <div style="width:100%; height:100%; background:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#999;" class="hp8-cat-image-{{ section_id }}">NO IMAGE</div>
+        {% endif %}
+        
+        <div class="hp8-cat-overlay-{{ section_id }}">
+          <h3 class="hp8-cat-title-{{ section_id }}">{{ block.settings.title | default: collection.title | default: 'COLLECTION' }}</h3>
+          <span class="hp8-cat-count-{{ section_id }}">{{ collection.products_count | default: '0' }} Products</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP8 Category Pills",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "EXPLORE COLLECTIONS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 Category Pills",
+      "blocks": [
+        { "type": "category", "settings": { "title": "OUTERWEAR" } },
+        { "type": "category", "settings": { "title": "KNITWEAR" } },
+        { "type": "category", "settings": { "title": "TAILORING" } },
+        { "type": "category", "settings": { "title": "ACCESSORIES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

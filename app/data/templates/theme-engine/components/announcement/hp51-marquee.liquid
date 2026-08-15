@@ -1,0 +1,79 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp51-marq-bg: {{ section.settings.bg_color | default: '#1E3A2B' }};
+    --hp51-marq-text: {{ section.settings.text_color | default: '#FAF8F5' }};
+    
+    background: var(--hp51-marq-bg);
+    color: var(--hp51-marq-text);
+    padding: {{ section.settings.padding_vertical | default: 16 }}px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .hp51-marquee__track {
+    display: inline-flex;
+    gap: 40px;
+    animation: hp51-scroll {{ section.settings.speed | default: 22 }}s linear infinite;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .hp51-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  @keyframes hp51-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+{%- endstyle -%}
+
+<div class="hp51-marquee__track">
+  {%- if section.blocks.size > 0 -%}
+    {%- for i in (1..2) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp51-marquee__item" {{ block.shopify_attributes }}>
+          <span>🍵</span>
+          <span>{{ block.settings.text }}</span>
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for i in (1..2) -%}
+      <div class="hp51-marquee__item"><span>🍵</span><span>SHADE-GROWN UJI CEREMONIAL MATCHA EGCG</span></div>
+      <div class="hp51-marquee__item"><span>🎍</span><span>JAPANESE BAMBOO SAP CALMING BARRIER</span></div>
+      <div class="hp51-marquee__item"><span>✈️</span><span>FREE EXPRESS AIR SHIPPING OVER $70</span></div>
+      <div class="hp51-marquee__item"><span>🛡️</span><span>ORGANIC HARVEST CERTIFIED ZERO ADDITIVES</span></div>
+    {%- endfor -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP51 - Zen Marquee",
+  "class": "section-hp51-marquee",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#1E3A2B" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#FAF8F5" },
+    { "type": "range", "id": "speed", "min": 10, "max": 60, "step": 2, "unit": "s", "label": "Scroll Duration", "default": 22 },
+    { "type": "range", "id": "padding_vertical", "min": 8, "max": 40, "step": 2, "unit": "px", "label": "Padding Vertical", "default": 16 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Ticker Item",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "SHADE-GROWN UJI CEREMONIAL MATCHA EGCG" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP51 - Zen Marquee" }
+  ]
+}
+{% endschema %}

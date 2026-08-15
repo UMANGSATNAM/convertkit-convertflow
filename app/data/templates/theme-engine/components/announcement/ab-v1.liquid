@@ -1,0 +1,102 @@
+{% comment %}
+  AB V1 — Glossier Soft Pink Glassmorphic Pill Announcement Bar
+{% endcomment %}
+<style>
+  .abv1 {
+    background: {{ section.settings.bg_color | default: '#FFF5F5' }};
+    color: {{ section.settings.text_color | default: '#1F2937' }};
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.font_size | default: 13 }}px;
+    height: {{ section.settings.bar_height | default: 42 }}px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid rgba(61, 154, 152, 0.15);
+    backdrop-filter: blur(8px); position: relative; z-index: 100;
+  }
+  .abv1__wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .abv1__slider { flex-grow: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .abv1__item { display: none; align-items: center; gap: 8px; text-decoration: none; color: inherit; font-weight: 600; }
+  .abv1__item.active { display: flex; animation: abv1Fade 0.4s ease; }
+  @keyframes abv1Fade { 0% { opacity: 0; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
+  .abv1__chip { background: {{ section.settings.accent_color | default: '#3D9A98' }}; color: {{ section.settings.chip_text_color | default: '#FFFFFF' }}; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; }
+  .abv1__close { background: none; border: none; color: inherit; cursor: pointer; opacity: 0.6; }
+  .abv1__close:hover { opacity: 1; }
+
+  @media screen and (max-width: 749px) {
+    .abv1 { font-size: {{ section.settings.font_size | default: 13 | minus: 1 }}px; height: auto; min-height: {{ section.settings.bar_height | default: 42 }}px; }
+    .abv1__wrap { padding: 6px 8px; gap: 8px; }
+    .abv1__item { font-size: inherit; }
+    .abv1__chip { font-size: 10px; padding: 3px 8px; }
+    .abv1__close { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .abv1__item.active { animation: none; }
+  }
+</style>
+<div class="abv1" id="ABV1-{{ section.id }}">
+  <div class="abv1__wrap">
+    {% if section.settings.promo_code != blank %}
+      <button class="abv1__chip" type="button" data-code="{{ section.settings.promo_code }}">
+        CODE: {{ section.settings.promo_code }} 📋
+      </button>
+    {% endif %}
+    <div class="abv1__slider">
+      {% for block in section.blocks %}
+        <a href="{{ block.settings.link | default: '#' }}" class="abv1__item {% if forloop.first %}active{% endif %}" {{ block.shopify_attributes }}>
+          <span>{{ block.settings.text }}</span>
+        </a>
+      {% endfor %}
+    </div>
+    {% if section.settings.show_close %}
+      <button class="abv1__close" type="button" aria-label="Close announcement">✕</button>
+    {% endif %}
+  </div>
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('ABV1-{{ section.id }}');
+    if (!bar) return;
+
+    var key = 'abv1-dismissed-{{ section.id }}';
+    try { if (localStorage.getItem(key) === '1') bar.style.display = 'none'; } catch (e) {}
+
+    var close = bar.querySelector('.abv1__close');
+    if (close) close.addEventListener('click', function () {
+      bar.style.display = 'none';
+      try { localStorage.setItem(key, '1'); } catch (e) {}
+    });
+
+    var chip = bar.querySelector('.abv1__chip');
+    if (chip && navigator.clipboard) chip.addEventListener('click', function () {
+      var original = chip.textContent;
+      navigator.clipboard.writeText(chip.getAttribute('data-code')).then(function () {
+        chip.textContent = 'COPIED! ✓';
+        setTimeout(function () { chip.textContent = original; }, 1500);
+      });
+    });
+
+    var items = bar.querySelectorAll('.abv1__item');
+    if (items.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var idx = 0;
+      setInterval(function () {
+        items[idx].classList.remove('active');
+        idx = (idx + 1) % items.length;
+        items[idx].classList.add('active');
+      }, {{ section.settings.rotate_speed | default: 4 }} * 1000);
+    }
+  })();
+</script>
+{% schema %}
+{
+  "name": "AB V1 — Glossier",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFF5F5" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#3D9A98" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#1F2937" },
+    { "type": "color", "id": "chip_text_color", "label": "Promo Chip Text Color", "default": "#FFFFFF" },
+    { "type": "text", "id": "promo_code", "label": "Promo Code", "default": "GLOW20" },
+    { "type": "checkbox", "id": "show_close", "label": "Show Close Button", "default": true }
+  ],
+  "blocks": [{ "type": "message", "name": "Message", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "🌸 Free Express Shipping on Orders Over ₹999!" }, { "type": "url", "id": "link", "label": "Link" }] }],
+  "presets": [{ "name": "AB V1 — Glossier", "blocks": [{ "type": "message" }] }]
+}
+{% endschema %}

@@ -1,0 +1,524 @@
+{%- comment -%}
+  PC V16 — URBAN STREETWEAR UNDERGROUND PRODUCT GRID
+  Design: Matte Charcoal (#171717), Volt Yellow (#CCFF00) accents, Anton & Oswald typography
+  Card Shape: Sharp 0px boxy card, solid 4px volt drop shadow, heavy urban aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&display=swap');
+
+  .pcv16 {
+    --bg: {{ section.settings.bg_color | default: '#171717' }};
+    --card-bg: {{ section.settings.card_bg | default: '#222222' }};
+    --text: {{ section.settings.text_color | default: '#FFFFFF' }};
+    --muted: {{ section.settings.muted_color | default: '#888888' }};
+    --accent: {{ section.settings.accent_color | default: '#CCFF00' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#B3E600' }};
+    --border: {{ section.settings.border_color | default: '#333333' }};
+    --badge-sale-bg: #CCFF00;
+    --badge-sale-text: #171717;
+    --f-heading: 'Anton', sans-serif;
+    --f-body: 'Oswald', sans-serif;
+    --ease: all 0.2s ease-in-out;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv16 *, .pcv16 *::before, .pcv16 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv16 a { color: inherit; text-decoration: none; }
+  .pcv16 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv16 img { max-width: 100%; display: block; }
+
+  .pcv16__wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv16__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv16__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv16__title { font-family: var(--f-heading); font-size: 36px; font-weight: 400; color: var(--text); letter-spacing: 0.05em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv16__title { font-size: 48px; } }
+  .pcv16__title-accent { color: var(--accent); }
+  .pcv16__sub { font-size: 15px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .pcv16__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; font-family: var(--f-body); text-transform: uppercase; letter-spacing: 0.1em; color: #171717; background: var(--accent); padding: 10px 20px; transition: var(--ease); }
+  .pcv16__viewall:hover { background: #FFFFFF; color: #171717; }
+
+  /* GRID */
+  .pcv16__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv16__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv16__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv16__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 3px 3px 0 #000000;
+    transition: var(--ease);
+  }
+  .pcv16__card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv16__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '3/4' }};
+    background: #111111;
+    overflow: hidden;
+  }
+  .pcv16__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .pcv16__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv16__card:hover .pcv16__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv16__card:hover .pcv16__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv16__badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv16__badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; font-family: var(--f-body); letter-spacing: 0.08em; }
+  .pcv16__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv16__badge--tag { background: #FFFFFF; color: #171717; }
+  .pcv16__badge--sold { background: #444444; color: #888888; }
+
+  /* WISHLIST BUTTON */
+  .pcv16__wish {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    background: #171717;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv16__wish:hover { background: var(--accent); color: #171717; border-color: var(--accent); }
+  .pcv16__wish.active { color: var(--accent); border-color: var(--accent); background: #171717; }
+
+  /* QUICK ADD BUTTON */
+  .pcv16__quick-box { padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border); }
+  .pcv16__quick-btn {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--accent);
+    color: #171717;
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: var(--f-body);
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv16__quick-btn:hover { background: #FFFFFF; color: #171717; }
+  .pcv16__quick-btn:disabled { background: #333333; color: #777777; cursor: not-allowed; }
+
+  /* CARD CONTENT */
+  .pcv16__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv16__vendor { font-size: 11px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+  .pcv16__item-title { font-family: var(--f-body); font-size: 16px; font-weight: 700; color: var(--text); text-transform: uppercase; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv16__rating { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); font-weight: 700; }
+  .pcv16__stars { letter-spacing: 1px; }
+  .pcv16__rev-cnt { color: var(--muted); font-size: 12px; }
+
+  /* PRICE */
+  .pcv16__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv16__price { font-size: 18px; font-weight: 700; color: var(--text); font-family: var(--f-body); }
+  .pcv16__cmp-price { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv16__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv16__swatch { width: 12px; height: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv16__swatch:hover, .pcv16__swatch.active { border-color: var(--accent); background: var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv16__urgency { font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv16__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #171717;
+    padding: 12px 22px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: var(--f-body);
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.2s ease-in-out;
+  }
+  .pcv16__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv16">
+  <div class="pcv16__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv16__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv16__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv16__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv16__viewall">
+            {{ section.settings.view_all_label | default: 'Cop Entire Vault' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv16__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v16', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v16', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv16__toast" id="pcv16-toast">PIECE COPPED</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv16-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv16Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'COPPING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ COPPED';
+        showT('PIECE COPPED');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv16-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V16 — Urban Streetwear",
+  "tag": "section",
+  "class": "pcv16-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "HEAVY WEIGHT"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "UNDERGROUND DROP"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Limited urban heavyweight garments built for maximum street presence."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Cop Entire Vault"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#222222"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#888888"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V16 — Urban Streetwear"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,79 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0B0F19' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp58-feat__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp58-feat__header { text-align: center; margin-bottom: 50px; }
+  .hp58-feat__eyebrow { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#06B6D4' }}; margin: 0 0 12px; }
+  .hp58-feat__heading { font-family: 'Syne', sans-serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; color: #FFFFFF; margin: 0; }
+  .hp58-feat__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: 24px; }
+  .hp58-feat__card {
+    background: {{ section.settings.card_bg | default: '#111827' }};
+    border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 8px; padding: 28px 24px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hp58-feat__card:hover { transform: translateY(-4px); border-color: #06B6D4; box-shadow: 0 0 25px rgba(6, 182, 212, 0.25); }
+  .hp58-feat__card-icon {
+    width: 48px; height: 48px; background: linear-gradient(135deg, #1E1B4B, #8B5CF6);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #06B6D4; margin-bottom: 18px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+  }
+  .hp58-feat__card-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: #FFFFFF; margin: 0 0 8px; }
+  .hp58-feat__card-desc { font-size: 13px; line-height: 1.6; color: #94A3B8; margin: 0; font-family: 'Space Grotesk', sans-serif; }
+  @media screen and (max-width: 992px) { .hp58-feat__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media screen and (max-width: 480px) { .hp58-feat__grid { grid-template-columns: 1fr; } }
+{%- endstyle -%}
+<div class="hp58-feat__container">
+  <div class="hp58-feat__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp58-feat__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp58-feat__heading">{{ section.settings.heading | default: 'The Tokyo Bio-Engine' }}</h2>
+  </div>
+  <div class="hp58-feat__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp58-feat__card" {{ block.shopify_attributes }}>
+        <div class="hp58-feat__card-icon">{{ block.settings.icon | default: '⚡' }}</div>
+        <h3 class="hp58-feat__card-title">{{ block.settings.title | default: 'Quantum Bio' }}</h3>
+        <p class="hp58-feat__card-desc">{{ block.settings.description | default: 'Advanced cellular regeneration.' }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP58 Features",
+  "class": "section-hp58-feat",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0B0F19" },
+    { "type": "color", "id": "card_bg", "label": "Card BG", "default": "#111827" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#06B6D4" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "⚡ BIO-ENGINE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Tokyo Bio-Engine" },
+    { "type": "range", "id": "columns", "min": 2, "max": 4, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{
+    "type": "feature", "name": "Feature",
+    "settings": [
+      { "type": "text", "id": "icon", "label": "Icon", "default": "⚡" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Quantum Bio" },
+      { "type": "textarea", "id": "description", "label": "Description", "default": "Advanced cellular regeneration." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP58 Features",
+    "blocks": [
+      { "type": "feature", "settings": { "icon": "🧬", "title": "Quantum Peptide 7X", "description": "7 precise bio-identical sequences stimulating collagen synthesis at the DNA level." } },
+      { "type": "feature", "settings": { "icon": "⚡", "title": "Mitochondrial ATP Booster", "description": "Fermented micro-algae that re-charges tired urban cellular batteries." } },
+      { "type": "feature", "settings": { "icon": "🛡️", "title": "HEV Optical Shield", "description": "Blocks 98% of high energy blue light and monitor radiation damage." } },
+      { "type": "feature", "settings": { "icon": "🧪", "title": "Nanoscale Transdermal Delivery", "description": "Sub-50nm liposomes penetrate 4x deeper than conventional emulsions." } },
+      { "type": "feature", "settings": { "icon": "❄️", "title": "Cryo-Sonic Laser Fusion", "description": "Preserves molecular integrity under absolute sterile nitrogen blanketing." } },
+      { "type": "feature", "settings": { "icon": "📊", "title": "Real-Time Efficacy Metrics", "description": "100% clinically verified with biometric skin elasticity instrumentation." } }
+    ]
+  }]
+}
+{% endschema %}

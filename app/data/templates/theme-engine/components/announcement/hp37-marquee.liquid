@@ -1,0 +1,160 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    background-color: var(--bg-color);
+    padding: {{ section.settings.padding_y }}px 0;
+    overflow: hidden;
+    position: relative;
+    border-top: 3px solid var(--text-color);
+    border-bottom: 3px solid var(--text-color);
+  }
+
+  .hp37-marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .hp37-marquee-track {
+    display: inline-flex;
+    align-items: center;
+    animation: hp37Marquee {{ section.settings.scroll_speed }}s linear infinite;
+  }
+
+  .hp37-marquee-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .hp37-marquee-icon {
+    margin-right: 40px;
+    color: var(--accent-color);
+    font-size: {{ section.settings.text_size | times: 1.2 }}px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes hp37Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp37-marquee-wrapper" id="HP37Marquee-{{ section.id }}">
+  <div class="hp37-marquee-track">
+    {%- for i in (1..6) -%}
+      {%- for block in section.blocks -%}
+        <span class="hp37-marquee-icon">✿</span>
+        <span class="hp37-marquee-item" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+        </span>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP37 - Retro Marquee",
+  "class": "section-hp37-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Retro Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#EAB059"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#4A3219"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Icon)",
+      "default": "#D96C4A"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 20
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "STAY GROOVY"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP37 - Retro Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "STAY GROOVY" } },
+        { "type": "text", "settings": { "text": "FREE SHIPPING ON $100+" } },
+        { "type": "text", "settings": { "text": "PEACE & LOVE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

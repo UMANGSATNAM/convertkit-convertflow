@@ -81,3 +81,4 @@ function processDir(dir) {
 }
 
 processDir('app');
+processDir('dev-theme-peri');

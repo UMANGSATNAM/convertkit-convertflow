@@ -1,0 +1,205 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V26 — FUTURISTIC HOLOGRAPHIC TECH & CYBERWEAR D2C (NOTHING TECH / CASETIFY STYLE)
+  Usage: {% render 'card-v26', product: product %}
+  Design: Pitch Black (#0A0A0C), Holographic Cyan Glow (#00F0FF), Orbitron & Syne fonts, 2px neon border
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Syne:wght@600;700;800&display=swap');
+
+  .cv26-card {
+    --cv26-bg: #0A0A0C;
+    --cv26-card-bg: #121216;
+    --cv26-text: #FFFFFF;
+    --cv26-muted: #71717A;
+    --cv26-cyan: #00F0FF;
+    --cv26-magenta: #D946EF;
+    --cv26-border: #00F0FF;
+    font-family: 'Syne', sans-serif;
+    background: var(--cv26-card-bg);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv26-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv26-cyan);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+  }
+
+  .cv26-card *, .cv26-card *::before, .cv26-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv26-card a { color: inherit; text-decoration: none; }
+  .cv26-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv26-card img { max-width: 100%; display: block; }
+
+  .cv26-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #050507;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  }
+  .cv26-img { width: 100%; height: 100%; object-fit: contain; padding: 16px; transition: transform 0.5s ease; }
+  .cv26-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv26-card:hover .cv26-img-pri { opacity: 0; }
+  .cv26-card:hover .cv26-img-sec { opacity: 1; transform: scale(1.06); }
+
+  /* Cyber Tag Top Left */
+  .cv26-badge-cyber {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv26-cyan); color: #0A0A0C;
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 2px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv26-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #0A0A0C; border: 1px solid var(--cv26-cyan);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv26-cyan); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv26-wish:hover, .cv26-wish.active { background: var(--cv26-cyan); color: #0A0A0C; transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv26-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(10, 10, 12, 0.95); color: var(--cv26-cyan);
+    font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv26-cyan);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv26-card:hover .cv26-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv26-qv-overlay:hover { background: var(--cv26-cyan); color: #0A0A0C; }
+
+  .cv26-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: left; }
+  .cv26-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv26-cyan); font-weight: 800; font-family: 'Orbitron', sans-serif; letter-spacing: 0.1em; }
+  .cv26-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: #FFFFFF; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Subtitle Cyber Specs */
+  .cv26-specs { font-size: 11px; color: var(--cv26-muted); font-weight: 600; }
+
+  /* Rating Row */
+  .cv26-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cv26-cyan); font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv26-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv26-price { font-family: 'Orbitron', sans-serif; font-size: 17px; font-weight: 800; color: #FFFFFF; }
+  .cv26-cmp { font-size: 13px; color: var(--cv26-muted); text-decoration: line-through; }
+  .cv26-disc { font-size: 10px; font-weight: 800; color: #0A0A0C; background: var(--cv26-cyan); padding: 2px 6px; border-radius: 2px; }
+
+  /* RAM/Storage Variant Selector */
+  .cv26-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv26-size-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 2px;
+    border: 1px solid #27272A; background: #18181B; color: #FFFFFF; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv26-size-btn.active, .cv26-size-btn:hover { background: var(--cv26-cyan); color: #0A0A0C; border-color: var(--cv26-cyan); }
+
+  /* Bottom Button */
+  .cv26-action-box { padding: 0 14px 14px; }
+  .cv26-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv26-cyan); color: #0A0A0C;
+    font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+  }
+  .cv26-atc-btn:hover { background: #FFFFFF; color: #0A0A0C; transform: scale(1.01); box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+  .cv26-atc-btn:disabled { background: #27272A; color: #71717A; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv26-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv26-badge-cyber">GLYPH INTERFACE ⚡</span>
+
+    <button type="button" class="cv26-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv26-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv26-img cv26-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv26-img cv26-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-6' | placeholder_svg_tag: 'cv26-img' }}
+      {% endif %}
+
+      <button type="button" class="cv26-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv26-content">
+      {% if card_prod.vendor != blank %}<span class="cv26-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv26-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv26-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv26-specs">Snapdragon 7200 Pro | 50MP Dual OIS</span>
+
+      <div class="cv26-rating">
+        <span>★ 4.9</span> <span>(5,600 reviews)</span>
+      </div>
+
+      <div class="cv26-price-row">
+        <span class="cv26-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv26-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv26-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- RAM/Storage Selector -->
+      <div class="cv26-sizes">
+        {% for variant in card_prod.variants limit: 2 %}
+          <button type="button" class="cv26-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv26-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv26-atc-btn" data-add-cart="{{ cur_var.id }}">INITIATE SYSTEM</button>
+      {% else %}
+        <button type="button" class="cv26-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv26-card">
+    <div class="cv26-media">{{ 'product-6' | placeholder_svg_tag: 'cv26-img' }}</div>
+    <div class="cv26-content">
+      <span class="cv26-vendor">CYBER TECH D2C</span>
+      <div class="cv26-title">Transparent Phone (2a) w/ Glyph LED Matrix</div>
+
+      {% if card_r_show != false %}
+      <div class="cv26-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv26-specs">Snapdragon 7200 Pro | 50MP Dual OIS</span>
+      <div class="cv26-price-row"><span class="cv26-price">₹ 23,999</span><span class="cv26-cmp">₹ 29,999</span><span class="cv26-disc">20% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

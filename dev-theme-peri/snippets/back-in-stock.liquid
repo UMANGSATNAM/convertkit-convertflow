@@ -1,0 +1,201 @@
+{%- comment -%}
+  Back-in-stock notify form — VARIANT AWARE.
+
+  Shows automatically whenever the *currently selected variant* is sold out,
+  even if other variants of the product are still available.
+
+  Usage:
+    {% render 'back-in-stock', product: product %}
+    {% render 'back-in-stock', product: product, heading: 'Out of stock', button_label: 'Notify me' %}
+
+  Params (all optional except product):
+    product        - required
+    heading        - text above the form
+    body           - supporting line
+    button_label   - submit button text
+    success_text   - shown after submit
+    accent         - button background colour (default #111111)
+
+  Submissions arrive in Shopify Admin > Customers > (contact form) tagged
+  `notify-me` with the product handle and variant id, so Flow / Klaviyo can
+  pick them up and trigger a restock email.
+{%- endcomment -%}
+
+{%- liquid
+  assign bis_heading = heading | default: 'Currently sold out'
+  assign bis_body = body | default: "Leave your email and we'll tell you the moment it's back."
+  assign bis_button = button_label | default: 'Notify me'
+  assign bis_success = success_text | default: "You're on the list. We'll email you as soon as it's back in stock."
+  assign bis_accent = accent | default: '#111111'
+  assign bis_id = 'bis-' | append: product.id
+-%}
+
+<div class="cf-bis" id="{{ bis_id }}" data-cf-bis hidden>
+  <p class="cf-bis__heading">{{ bis_heading }}</p>
+
+  {%- form 'contact', id: bis_id | append: '-form', class: 'cf-bis__form' -%}
+    {%- if form.posted_successfully? -%}
+      <p class="cf-bis__success" role="status">{{ bis_success }}</p>
+    {%- else -%}
+      {%- if form.errors -%}
+        <p class="cf-bis__error" role="alert">{{ form.errors.messages['email'] | default: 'Please enter a valid email address.' }}</p>
+      {%- endif -%}
+
+      <p class="cf-bis__body">{{ bis_body }}</p>
+
+      <input type="hidden" name="contact[tags]" value="notify-me">
+      <input type="hidden" name="contact[product]" value="{{ product.title | escape }}">
+      <input type="hidden" name="contact[product_handle]" value="{{ product.handle }}">
+      <input type="hidden" name="contact[product_url]" value="{{ shop.url }}{{ product.url }}">
+      <input type="hidden" name="contact[variant_id]" value="" data-cf-bis-variant-id>
+      <input type="hidden" name="contact[variant]" value="" data-cf-bis-variant-title>
+
+      <div class="cf-bis__row">
+        <label class="cf-bis__label" for="{{ bis_id }}-email">Email</label>
+        <input
+          class="cf-bis__input"
+          id="{{ bis_id }}-email"
+          type="email"
+          name="contact[email]"
+          autocomplete="email"
+          placeholder="you@example.com"
+          required>
+        <button class="cf-bis__btn" type="submit">{{ bis_button }}</button>
+      </div>
+
+      <p class="cf-bis__note" data-cf-bis-variant-note hidden></p>
+    {%- endif -%}
+  {%- endform -%}
+</div>
+
+<style>
+  .cf-bis {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .cf-bis[hidden] { display: none; }
+  .cf-bis__heading { margin: 0 0 4px; font-weight: 700; }
+  .cf-bis__body { margin: 0 0 12px; opacity: 0.75; font-size: 13px; }
+  .cf-bis__row { display: flex; gap: 8px; align-items: stretch; }
+  .cf-bis__label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  }
+  .cf-bis__input {
+    flex: 1 1 auto; min-width: 0;
+    padding: 12px; font-size: 16px; font-family: inherit;
+    border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 6px;
+    background: #FFFFFF; color: #111111;
+  }
+  .cf-bis__input:focus-visible { outline: 2px solid {{ bis_accent }}; outline-offset: 1px; }
+  .cf-bis__btn {
+    flex: 0 0 auto;
+    background: {{ bis_accent }}; color: #FFFFFF;
+    border: none; border-radius: 6px;
+    padding: 12px 18px; min-height: 44px;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer;
+  }
+  .cf-bis__btn:hover { opacity: 0.88; }
+  .cf-bis__success { margin: 0; font-weight: 600; color: #1B7F4B; }
+  .cf-bis__error { margin: 0 0 8px; font-weight: 600; color: #C0392B; }
+  .cf-bis__note { margin: 10px 0 0; font-size: 12px; opacity: 0.7; }
+  .cf-bis__note[hidden] { display: none; }
+
+  @media screen and (max-width: 749px) {
+    .cf-bis__row { flex-direction: column; }
+    .cf-bis__btn { width: 100%; padding: 14px; }
+  }
+</style>
+
+<script type="application/json" data-cf-bis-data="{{ bis_id }}">
+  {
+    "variants": [
+      {%- for v in product.variants -%}
+        {
+          "id": {{ v.id }},
+          "title": {{ v.title | json }},
+          "available": {{ v.available | json }}
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    "initial": {{ product.selected_or_first_available_variant.id | default: 0 }}
+  }
+</script>
+
+<script>
+  (function () {
+    var root = document.getElementById('{{ bis_id }}');
+    var dataEl = document.querySelector('[data-cf-bis-data="{{ bis_id }}"]');
+    if (!root || !dataEl) return;
+
+    var data;
+    try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+    if (!data.variants || !data.variants.length) return;
+
+    var byId = {};
+    data.variants.forEach(function (v) { byId[String(v.id)] = v; });
+
+    var idField = root.querySelector('[data-cf-bis-variant-id]');
+    var titleField = root.querySelector('[data-cf-bis-variant-title]');
+    var note = root.querySelector('[data-cf-bis-variant-note]');
+    var multi = data.variants.length > 1;
+
+    function currentIdFromUrl() {
+      var m = window.location.search.match(/[?&]variant=(\d+)/);
+      return m ? m[1] : null;
+    }
+
+    function currentIdFromForm() {
+      var input = document.querySelector('form[action*="/cart/add"] [name="id"]');
+      return input && input.value ? String(input.value) : null;
+    }
+
+    function apply(id) {
+      var v = byId[String(id)] || byId[String(data.initial)] || data.variants[0];
+      if (!v) return;
+
+      if (v.available) {
+        root.hidden = true;
+        return;
+      }
+
+      root.hidden = false;
+      if (idField) idField.value = v.id;
+      if (titleField) titleField.value = v.title;
+      if (note && multi) {
+        note.textContent = 'You will be notified about: ' + v.title;
+        note.hidden = false;
+      }
+    }
+
+    function resolve() {
+      apply(currentIdFromForm() || currentIdFromUrl() || data.initial);
+    }
+
+    resolve();
+
+    // Re-check whenever the shopper changes a variant, however the PDP does it:
+    // native variant pickers, custom swatches, or a history push from variant-swap.js
+    document.addEventListener('change', function (e) {
+      if (e.target.closest && e.target.closest('form[action*="/cart/add"]')) {
+        setTimeout(resolve, 0);
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('[data-variant-id], [data-option-value], .pdp-swatch, [class*="__s-item"]')) {
+        setTimeout(resolve, 50);
+      }
+    });
+    document.addEventListener('variant:changed', resolve);
+    window.addEventListener('popstate', resolve);
+
+    // If the form was just submitted successfully, keep the panel visible so the
+    // shopper sees the confirmation instead of an empty gap.
+    if (root.querySelector('.cf-bis__success')) root.hidden = false;
+  })();
+</script>

@@ -1,0 +1,379 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#0066cc'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign button_bg = section.settings.button_bg | default: '#ffffff'
+  assign button_text = section.settings.button_text | default: '#0066cc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp5-ob-bg: {{ bg_color }};
+    --hp5-ob-text: {{ text_color }};
+    --hp5-ob-btn-bg: {{ button_bg }};
+    --hp5-ob-btn-text: {{ button_text }};
+    
+    --hp5-ob-pt-desk: {{ padding_top_desktop }}px;
+    --hp5-ob-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp5-ob-pt-mob: {{ padding_top_mobile }}px;
+    --hp5-ob-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp5-health-ob-{{ section.id }} {
+    padding-top: var(--hp5-ob-pt-desk);
+    padding-bottom: var(--hp5-ob-pb-desk);
+    background-color: var(--hp5-ob-bg);
+    color: var(--hp5-ob-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp5-ob-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+
+  /* Image Side */
+  .hp5-ob-media {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+  .hp5-ob-img-wrap {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1/1;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+  }
+  .hp5-ob-img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    padding: 30px;
+    transition: transform 0.6s ease;
+  }
+  .hp5-health-ob-{{ section.id }}:hover .hp5-ob-img {
+    transform: scale(1.05);
+  }
+
+  /* Badge */
+  .hp5-ob-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #FF4B4B;
+    color: #fff;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    transform: rotate(15deg);
+    box-shadow: 0 10px 20px rgba(255,75,75,0.3);
+  }
+  .hp5-ob-badge span { font-size: 24px; }
+  .hp5-ob-badge small { font-size: 12px; font-weight: 600; text-transform: uppercase; }
+
+  /* Content Side */
+  .hp5-ob-content {
+    flex: 1;
+    max-width: 500px;
+  }
+
+  .hp5-ob-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  .hp5-ob-title {
+    font-size: clamp(36px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 20px 0;
+    letter-spacing: -1px;
+  }
+
+  .hp5-ob-desc {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 30px 0;
+  }
+
+  .hp5-ob-features {
+    list-style: none;
+    padding: 0; margin: 0 0 40px 0;
+  }
+  .hp5-ob-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .hp5-ob-features svg {
+    width: 20px; height: 20px;
+    color: #4CAF50; /* Green check */
+  }
+
+  .hp5-ob-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hp5-ob-btn-bg);
+    color: var(--hp5-ob-btn-text);
+    padding: 16px 36px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hp5-ob-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+
+  @media screen and (max-width: 900px) {
+    .hp5-ob-inner {
+      flex-direction: column;
+      text-align: center;
+      gap: 50px;
+    }
+    .hp5-ob-media {
+      order: 1;
+    }
+    .hp5-ob-content {
+      order: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hp5-ob-features li {
+      justify-content: center;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp5-health-ob-{{ section.id }} {
+      padding-top: var(--hp5-ob-pt-mob);
+      padding-bottom: var(--hp5-ob-pb-mob);
+    }
+    .hp5-ob-inner {
+      padding: 0 20px;
+    }
+    .hp5-ob-badge {
+      width: 70px; height: 70px;
+      top: 10px; right: 10px;
+    }
+    .hp5-ob-badge span { font-size: 18px; }
+    .hp5-ob-badge small { font-size: 10px; }
+  }
+</style>
+
+<section class="hp5-health-ob-{{ section.id }}" aria-label="Subscription Offer">
+  <div class="hp5-ob-inner">
+    
+    <div class="hp5-ob-media">
+      <div class="hp5-ob-img-wrap">
+        {%- if section.settings.image != blank -%}
+          <img src="{{ section.settings.image | image_url: width: 800 }}" class="hp5-ob-img" loading="lazy" alt="Offer">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'hp5-ob-img placeholder-svg' }}
+        {%- endif -%}
+      </div>
+      
+      {%- if section.settings.badge_text != blank -%}
+        <div class="hp5-ob-badge">
+          {{ section.settings.badge_text }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="hp5-ob-content">
+      {%- if section.settings.label != blank -%}
+        <div class="hp5-ob-label">{{ section.settings.label }}</div>
+      {%- endif -%}
+      
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp5-ob-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.description != blank -%}
+        <p class="hp5-ob-desc">{{ section.settings.description }}</p>
+      {%- endif -%}
+
+      <ul class="hp5-ob-features">
+        {%- for block in section.blocks -%}
+          <li {{ block.shopify_attributes }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            {{ block.settings.text }}
+          </li>
+        {%- endfor -%}
+        {%- if section.blocks.size == 0 -%}
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Save 20% on every order</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Free shipping always</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Cancel or pause anytime</li>
+        {%- endif -%}
+      </ul>
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_link }}" class="hp5-ob-btn">{{ section.settings.btn_label }}</a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP5 Health Offer Banner",
+  "tag": "section",
+  "class": "section-hp5-offer",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Product Image"
+    },
+    {
+      "type": "textarea",
+      "id": "badge_text",
+      "label": "Badge Text (HTML allowed)",
+      "default": "<span>20%</span><br><small>OFF</small>"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small Label",
+      "default": "SUBSCRIBE & SAVE"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Never run out of your daily essentials."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Build a consistent routine with our monthly subscription. Delivered fresh to your door exactly when you need it."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Start Your Subscription"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "#0066cc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 50
+    }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Subscription Perk",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Save 20% on every order"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP5 Health Offer Banner",
+      "category": "Promotional",
+      "blocks": [
+        { "type": "perk", "settings": { "text": "Save 20% on every order" } },
+        { "type": "perk", "settings": { "text": "Free shipping always" } },
+        { "type": "perk", "settings": { "text": "Cancel or pause anytime" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

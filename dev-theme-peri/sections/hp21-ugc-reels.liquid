@@ -1,0 +1,477 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: {{ section.settings.border_color }};
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp21-ugc-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp21-ugc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 24px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-ugc__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp21-ugc__title-area {
+    max-width: 600px;
+  }
+
+  .hp21-ugc__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 300;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 0 0 12px;
+  }
+
+  .hp21-ugc__title {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  .hp21-ugc__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp21-ugc__follow {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-color);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+  }
+
+  .hp21-ugc__follow:hover {
+    color: var(--accent-color);
+  }
+
+  /* Horizontal Scroll Container */
+  .hp21-ugc__scroller {
+    display: flex;
+    gap: {{ section.settings.gap }}px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    padding-bottom: 20px; /* space for hover scale */
+  }
+
+  .hp21-ugc__scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp21-ugc__item {
+    flex: 0 0 {{ section.settings.card_width }}px;
+    position: relative;
+    aspect-ratio: 9/16;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: #111;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-ugc__item {
+      flex: 0 0 {{ section.settings.mobile_card_width }}px;
+    }
+  }
+
+  .hp21-ugc__item img,
+  .hp21-ugc__item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease, filter 0.5s ease;
+  }
+  
+  .hp21-ugc__item:hover img,
+  .hp21-ugc__item:hover video {
+    transform: scale(1.05);
+    filter: brightness(0.8);
+  }
+
+  .hp21-ugc__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .hp21-ugc__item:hover .hp21-ugc__play {
+    background: var(--accent-color);
+    color: #000;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .hp21-ugc__play svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    margin-left: 2px;
+  }
+
+  .hp21-ugc__info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: #fff;
+    z-index: 2;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.4s ease;
+  }
+
+  .hp21-ugc__item:hover .hp21-ugc__info {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .hp21-ugc__handle {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0 0 4px;
+    color: var(--accent-color);
+  }
+
+  .hp21-ugc__product {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-ugc-wrapper" id="HP21Ugc-{{ section.id }}">
+  
+  <div class="hp21-ugc__header">
+    <div class="hp21-ugc__title-area">
+      {%- if section.settings.subtitle != blank -%}
+        <p class="hp21-ugc__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp21-ugc__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+    </div>
+    
+    {%- if section.settings.follow_text != blank -%}
+      <a href="{{ section.settings.follow_link | default: '#' }}" class="hp21-ugc__follow">
+        {{ section.settings.follow_text | escape }}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp21-ugc__scroller">
+    {%- for block in section.blocks -%}
+      <div class="hp21-ugc__item" {{ block.shopify_attributes }}>
+        
+        {%- if block.settings.video_url != blank -%}
+          <video muted loop playsinline onmouseover="this.play()" onmouseout="this.pause()">
+            <source src="{{ block.settings.video_url }}" type="video/mp4">
+          </video>
+        {%- elsif block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 600 }}" alt="UGC Reel" loading="lazy">
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag }}
+        {%- endif -%}
+
+        <div class="hp21-ugc__play">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+
+        <div class="hp21-ugc__info">
+          {%- if block.settings.handle != blank -%}
+            <p class="hp21-ugc__handle">{{ block.settings.handle | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.product_text != blank -%}
+            <h4 class="hp21-ugc__product">{{ block.settings.product_text | escape }}</h4>
+          {%- endif -%}
+        </div>
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Reels",
+  "class": "section-hp21-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "THE COMMUNITY"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>Worn by <em>Visionaries</em></p>"
+    },
+    {
+      "type": "text",
+      "id": "follow_text",
+      "label": "Follow Link Text",
+      "default": "FOLLOW OUR JOURNEY"
+    },
+    {
+      "type": "url",
+      "id": "follow_link",
+      "label": "Follow Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 250,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "Desktop Card Width",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile Card Width",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Gap",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Luxury Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "rgba(255, 255, 255, 0.1)"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel/Video",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (Fallback or Static)"
+        },
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "Video URL (MP4 optional)"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "@luxurybrand"
+        },
+        {
+          "type": "text",
+          "id": "product_text",
+          "label": "Product Featured",
+          "default": "The Signature Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Reels",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

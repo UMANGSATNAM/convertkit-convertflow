@@ -1,0 +1,138 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    
+    background-color: var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-press-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+  }
+
+  .hp38-press__logo-item {
+    background: var(--bg-color);
+    padding: 60px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 150px;
+  }
+
+  .hp38-press__logo {
+    max-height: 40px;
+    width: auto;
+    filter: grayscale(100%) contrast(200%);
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp38-press__logo-item:hover .hp38-press__logo {
+    opacity: 1;
+  }
+
+  .hp38-press__logo-text {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+  }
+
+  .hp38-press__meta {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: var(--font-heading);
+    font-size: 10px;
+    color: var(--text-color);
+    opacity: 0.3;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-press-wrapper" id="HP38Press-{{ section.id }}">
+  {%- for block in section.blocks -%}
+    <div class="hp38-press__logo-item" {{ block.shopify_attributes }}>
+      <div class="hp38-press__meta">PR_{{ forloop.index }}</div>
+      {%- if block.settings.image != blank -%}
+        <img src="{{ block.settings.image | image_url: height: 80 }}" alt="Press Logo" class="hp38-press__logo" loading="lazy">
+      {%- else -%}
+        <span class="hp38-press__logo-text">{{ block.settings.text_fallback }}</span>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Press",
+  "class": "section-hp38-press-logos",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Grid Lines & Text",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "text_fallback",
+          "label": "Text Fallback",
+          "default": "WIRED"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Press",
+      "blocks": [
+        { "type": "logo", "settings": { "text_fallback": "WIRED" } },
+        { "type": "logo", "settings": { "text_fallback": "GQ" } },
+        { "type": "logo", "settings": { "text_fallback": "HYPEBEAST" } },
+        { "type": "logo", "settings": { "text_fallback": "FAST CO." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

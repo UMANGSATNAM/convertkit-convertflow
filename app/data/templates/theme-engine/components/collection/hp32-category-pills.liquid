@@ -1,0 +1,178 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-body: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp32-pills-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp32-pills-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp32-pills__title {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: #000;
+    margin: 0 0 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .hp32-pills__title::before {
+    content: '> ~/';
+    color: var(--accent-color);
+  }
+
+  .hp32-pills__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .hp32-pills__item {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+    text-transform: uppercase;
+    background: #fff;
+    border: 3px solid var(--border-color);
+    padding: 12px 24px;
+    box-shadow: 4px 4px 0 var(--border-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp32-pills__item:hover,
+  .hp32-pills__item.is-active {
+    background: #000;
+    color: var(--accent-color);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--border-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp32-pills-wrapper" id="HP32Pills-{{ section.id }}">
+  <h2 class="hp32-pills__title">{{ section.settings.title }}</h2>
+  
+  <div class="hp32-pills__container">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp32-pills__item {% if forloop.first %}is-active{% endif %}" {{ block.shopify_attributes }}>
+        [{{ block.settings.title }}]
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP32 - Brutalist Pills",
+  "class": "section-hp32-category-pills",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "categories"
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Light Grey)",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (e.g. Lime)",
+      "default": "#ccff00"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "OUTERWEAR"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP32 - Brutalist Pills",
+      "blocks": [
+        { "type": "pill", "settings": { "title": "OUTERWEAR" } },
+        { "type": "pill", "settings": { "title": "HARDWARE" } },
+        { "type": "pill", "settings": { "title": "ACCESSORIES" } },
+        { "type": "pill", "settings": { "title": "ARCHIVE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

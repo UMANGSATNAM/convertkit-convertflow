@@ -1,0 +1,169 @@
+{%- liquid
+  assign sec_id = section.id
+-%}
+
+<style>
+  #shopify-section-{{ sec_id }} {
+    background-color: {{ section.settings.bg_color }};
+  }
+
+  .hp20-map-{{ sec_id }} {
+    width: 100%;
+    height: {{ section.settings.desktop_height }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp20-map-{{ sec_id }} iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    filter: {% if section.settings.grayscale %}grayscale(100%) contrast(1.2){% else %}none{% endif %};
+  }
+  
+  .hp20-map-{{ sec_id }}__card {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    background: {{ section.settings.card_bg }};
+    padding: 48px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    z-index: 2;
+    max-width: 400px;
+  }
+
+  .hp20-map-{{ sec_id }}__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: {{ section.settings.text_color }};
+    margin: 0 0 24px 0;
+  }
+
+  .hp20-map-{{ sec_id }}__address {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+    opacity: 0.8;
+    margin: 0 0 32px 0;
+  }
+
+  .hp20-map-{{ sec_id }}__link {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 1px solid {{ section.settings.text_color }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-map-{{ sec_id }} {
+      height: auto;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .hp20-map-{{ sec_id }} iframe {
+      height: {{ section.settings.mobile_height }}px;
+    }
+    .hp20-map-{{ sec_id }}__card {
+      position: relative;
+      top: 0; left: 0;
+      transform: none;
+      max-width: 100%;
+      padding: 40px 24px;
+      box-shadow: none;
+      text-align: center;
+    }
+  }
+</style>
+
+<section class="hp20-map-{{ sec_id }}">
+  <div class="hp20-map-{{ sec_id }}__card">
+    <h2 class="hp20-map-{{ sec_id }}__title">{{ section.settings.title }}</h2>
+    <div class="hp20-map-{{ sec_id }}__address">{{ section.settings.address | newline_to_br }}</div>
+    <a href="{{ section.settings.map_link }}" target="_blank" class="hp20-map-{{ sec_id }}__link">Get Directions</a>
+  </div>
+  
+  {% if section.settings.iframe_html != blank %}
+    {{ section.settings.iframe_html }}
+  {% else %}
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.119763973046!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "HP20 Map",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Store Name",
+      "default": "Flagship Studio"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Address",
+      "default": "123 Minimalist Ave\nNew York, NY 10012\nUnited States"
+    },
+    {
+      "type": "url",
+      "id": "map_link",
+      "label": "Directions Link"
+    },
+    {
+      "type": "html",
+      "id": "iframe_html",
+      "label": "Google Maps Iframe HTML",
+      "info": "Paste the embed code from Google Maps"
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale",
+      "label": "Grayscale Map",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 400, "max": 1000, "step": 50, "unit": "px",
+      "label": "Desktop Height", "default": 600
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 300, "max": 800, "step": 50, "unit": "px",
+      "label": "Mobile Map Height", "default": 400
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 Map"
+    }
+  ]
+}
+{% endschema %}

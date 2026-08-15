@@ -8,5 +8,8 @@
   - Recompiled server application via `npm run build`.
   - Approved Shop Forge V4 Enterprise AI Commerce Operating System architecture.
   - Initialized `.project/` persistent state system ("UmangTracker").
-- **Modified Files:** `.project/*`, `validators.server.ts`, `compiler.server.ts`.
-- **Next Task:** Freeze 4 Core Architectural Contract Schemas (`blueprint`, `component-metadata`, `dependency-graph`, `theme-dna`).
+- **Phase A (Active):**
+  - Completed full Codebase Inventory of 1,074 Liquid sections.
+  - Extracted, normalized, and built 6 Hero variants into `dev-theme-peri/sections/`.
+- **Modified Files:** `dev-theme-peri/sections/hero-*`, `base-theme/assets/base-tokens.css`, `.project/*`.
+- **Next Task:** Await Umang's visual verification of Hero variants before moving to Library sync.

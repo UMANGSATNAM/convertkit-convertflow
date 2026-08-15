@@ -1,0 +1,435 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp20-tiles__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    padding-bottom: 24px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-tiles__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp20-tiles__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .hp20-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+    gap: {{ section.settings.grid_gap }}px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-tiles__grid {
+      grid-template-columns: repeat({{ section.settings.tablet_columns }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-tiles__grid {
+      grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+      gap: {{ section.settings.mobile_grid_gap }}px;
+    }
+  }
+
+  .hp20-tiles__item {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    background: #fff; /* fallback */
+    overflow: hidden;
+    aspect-ratio: {{ section.settings.aspect_ratio }};
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hp20-tiles__item:hover {
+    transform: translate(calc(var(--shadow-offset) * -0.2), calc(var(--shadow-offset) * -0.2));
+    box-shadow: calc(var(--shadow-offset) * 1.2) calc(var(--shadow-offset) * 1.2) 0px var(--shadow-color);
+  }
+
+  .hp20-tiles__image {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: {% if section.settings.image_grayscale %}grayscale(100%) contrast(120%){% else %}none{% endif %};
+    transition: filter 0.3s;
+    z-index: 1;
+  }
+  
+  .hp20-tiles__item:hover .hp20-tiles__image {
+    filter: {% if section.settings.image_grayscale %}grayscale(0%) contrast(100%){% else %}none{% endif %};
+  }
+
+  .hp20-tiles__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    background: {{ section.settings.overlay_bg }};
+    border-top: var(--border-thickness) solid var(--border-color);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .hp20-tiles__label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: {{ section.settings.label_size }}px;
+    color: {{ section.settings.overlay_text }};
+    text-transform: uppercase;
+    margin: 0;
+  }
+  
+  .hp20-tiles__arrow {
+    width: 24px;
+    height: 24px;
+    color: {{ section.settings.overlay_text }};
+    transition: transform 0.2s;
+  }
+  
+  .hp20-tiles__item:hover .hp20-tiles__arrow {
+    transform: translate(4px, -4px);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-tiles-wrapper" id="HP20CategoryTiles-{{ section.id }}">
+  
+  {%- if section.settings.title != blank -%}
+  <div class="hp20-tiles__header">
+    <h2 class="hp20-tiles__title">{{ section.settings.title | escape }}</h2>
+  </div>
+  {%- endif -%}
+
+  <div class="hp20-tiles__grid">
+    {%- for block in section.blocks -%}
+      {%- assign link_url = block.settings.link | default: '#' -%}
+      
+      <a href="{{ link_url }}" class="hp20-tiles__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp20-tiles__image" loading="lazy">
+        {%- else -%}
+          {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg hp20-tiles__image' }}
+        {%- endif -%}
+        
+        <div class="hp20-tiles__overlay">
+          <span class="hp20-tiles__label">{{ block.settings.title | escape }}</span>
+          <svg class="hp20-tiles__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+      
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Tiles",
+  "class": "section-hp20-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "CHOOSE YOUR PATH."
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Tablet Columns",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 2,
+      "step": 1,
+      "label": "Mobile Columns",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid Gap (Desktop)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "mobile_grid_gap",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid Gap (Mobile)",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Tile Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/3", "label": "Landscape (4:3)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tile Label Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Image Styling"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_grayscale",
+      "label": "Enable High-Contrast Grayscale",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading & Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "overlay_bg",
+      "label": "Tile Overlay Background",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "overlay_text",
+      "label": "Tile Overlay Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category Tile",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "MENS"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "FOOTWEAR" } },
+        { "type": "tile", "settings": { "title": "OUTERWEAR" } },
+        { "type": "tile", "settings": { "title": "ACCESSORIES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

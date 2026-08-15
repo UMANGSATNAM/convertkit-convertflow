@@ -22,8 +22,8 @@ const path = require('path');
     if (adminBar) adminBar.remove();
   });
   
-  await pageDesktop.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\098137be-6634-4c8b-a34e-f4a14e59c150\\screenshots\\homepage_top_1440px_v2.png', fullPage: false });
-  await pageDesktop.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\098137be-6634-4c8b-a34e-f4a14e59c150\\screenshots\\hero_full_1440px_v2.png', fullPage: true });
+  await pageDesktop.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\f27b8253-d194-457b-9ccb-e08d94cf68dd\\homepage_top_1440px_v2.png', fullPage: false });
+  await pageDesktop.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\f27b8253-d194-457b-9ccb-e08d94cf68dd\\hero_full_1440px_v2.png', fullPage: true });
 
   // Mobile
   const contextMobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
@@ -34,8 +34,7 @@ const path = require('path');
     const adminBar = document.getElementById('preview-bar-iframe');
     if (adminBar) adminBar.remove();
   });
-  
-  await pageMobile.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\098137be-6634-4c8b-a34e-f4a14e59c150\\screenshots\\homepage_top_390px_v2.png', fullPage: false });
+  await pageMobile.screenshot({ path: 'C:\\Users\\onwer\\.gemini\\antigravity-ide\\brain\\f27b8253-d194-457b-9ccb-e08d94cf68dd\\homepage_top_390px_v2.png', fullPage: false });
 
   await browser.close();
   console.log('Screenshots saved!');

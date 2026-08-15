@@ -1,0 +1,436 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;600;800&display=swap&family=Caveat:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-orange: {{ section.settings.accent_orange }};
+    --accent-yellow: {{ section.settings.accent_yellow }};
+    --font-heading: 'Fraunces', serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-handwriting: 'Caveat', cursive;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    /* Subtle grainy texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp25-ugc-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp25-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp25-ugc__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    position: relative;
+  }
+
+  .hp25-ugc__badge {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: var(--accent-orange);
+    color: var(--bg-color);
+    font-family: var(--font-body);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    transform: rotate(-3deg);
+    border: 2px solid var(--text-color);
+  }
+
+  .hp25-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-shadow: 2px 2px 0 var(--accent-yellow), 4px 4px 0 var(--text-color);
+  }
+
+  .hp25-ugc__grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp25-ugc__grid {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 20px 0 40px; /* space for shadows */
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hp25-ugc__grid::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Polaroid Style Cards */
+  .hp25-ugc__item {
+    width: calc(100% / {{ section.settings.columns_desktop }} - (40px * ({{ section.settings.columns_desktop }} - 1) / {{ section.settings.columns_desktop }}));
+    background: #fff;
+    padding: 15px 15px 30px;
+    border: 2px solid var(--text-color);
+    box-shadow: 6px 6px 0 var(--accent-orange);
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+
+  /* Apply slight random rotations for messy pinboard look */
+  .hp25-ugc__item:nth-child(even) {
+    transform: rotate(3deg);
+  }
+  .hp25-ugc__item:nth-child(odd) {
+    transform: rotate(-2deg);
+  }
+  .hp25-ugc__item:nth-child(3n) {
+    transform: rotate(4deg);
+  }
+
+  .hp25-ugc__item:hover {
+    transform: scale(1.05) rotate(0deg);
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp25-ugc__item {
+      width: calc(50% - 20px);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp25-ugc__item {
+      flex: 0 0 80%;
+      scroll-snap-align: center;
+    }
+  }
+
+  /* Masking tape piece */
+  .hp25-ugc__item::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-5deg);
+    width: 60px;
+    height: 25px;
+    background: rgba(226, 177, 68, 0.7); /* translucent mustard */
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    z-index: 3;
+  }
+
+  .hp25-ugc__item:nth-child(even)::before {
+    transform: translateX(-50%) rotate(4deg);
+    background: rgba(209, 95, 60, 0.7); /* translucent orange */
+  }
+
+  .hp25-ugc__video-wrapper {
+    width: 100%;
+    aspect-ratio: 9/16;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--text-color);
+  }
+
+  .hp25-ugc__media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.3) saturate(1.2);
+  }
+
+  .hp25-ugc__play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+
+  .hp25-ugc__item:hover .hp25-ugc__play-overlay {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .hp25-ugc__play-overlay svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-color);
+    margin-left: 3px;
+  }
+
+  .hp25-ugc__caption {
+    font-family: var(--font-handwriting);
+    font-size: 24px;
+    color: var(--text-color);
+    text-align: center;
+    margin: 15px 0 0;
+    line-height: 1.2;
+    transform: rotate(-2deg);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp25-ugc-wrapper" id="HP25UGC-{{ section.id }}">
+  <div class="hp25-ugc__header">
+    {%- if section.settings.badge_text != blank -%}
+      <div class="hp25-ugc__badge">{{ section.settings.badge_text }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp25-ugc__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp25-ugc__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp25-ugc__item" {{ block.shopify_attributes }}>
+        <div class="hp25-ugc__video-wrapper">
+          {%- if block.settings.video_url != blank -%}
+             <video class="hp25-ugc__media" muted loop playsinline>
+                <source src="{{ block.settings.video_url }}" type="video/mp4">
+             </video>
+          {%- elsif block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.author | escape }}" class="hp25-ugc__media" loading="lazy">
+          {%- else -%}
+            <div style="width:100%;height:100%;background:var(--accent-orange);display:flex;align-items:center;justify-content:center;color:#fff;">VIDEO</div>
+          {%- endif -%}
+          
+          <div class="hp25-ugc__play-overlay">
+            <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+          </div>
+        </div>
+        
+        {%- if block.settings.author != blank -%}
+          <p class="hp25-ugc__caption">@{{ block.settings.author }}</p>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  // Simple script to play videos on hover (simulating GIF/UGC interaction)
+  document.addEventListener('DOMContentLoaded', function() {
+    const ugcItems = document.querySelectorAll('#HP25UGC-{{ section.id }} .hp25-ugc__item');
+    ugcItems.forEach(item => {
+      const video = item.querySelector('video');
+      if(video) {
+        item.addEventListener('mouseenter', () => video.play());
+        item.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0;
+        });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP25 - Retro UGC",
+  "class": "section-hp25-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "COMMUNITY VIBES"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Seen in the Wild"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Retro 70s Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#76834F"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Border (Dark Brown)",
+      "default": "#3E2723"
+    },
+    {
+      "type": "color",
+      "id": "accent_orange",
+      "label": "Accent (Burnt Orange)",
+      "default": "#D15F3C"
+    },
+    {
+      "type": "color",
+      "id": "accent_yellow",
+      "label": "Accent (Mustard)",
+      "default": "#E2B144"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "UGC Reel",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL (.mp4)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Fallback Image"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Handle",
+          "default": "groovy_soul"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP25 - Retro UGC",
+      "blocks": [
+        { "type": "reel", "settings": { "author": "retro_babe" } },
+        { "type": "reel", "settings": { "author": "vintage_finds" } },
+        { "type": "reel", "settings": { "author": "groovy_soul" } },
+        { "type": "reel", "settings": { "author": "70s_style" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

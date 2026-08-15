@@ -1,0 +1,521 @@
+{%- comment -%}
+  PC V12 — TACTICAL OUTDOOR & PERFORMANCE GEAR PRODUCT GRID
+  Design: Slate Gray (#1E293B), Safety Orange (#F97316) accents, Roboto Condensed typography
+  Card Shape: Angular clipped corners, tactical grid frame, heavy outdoor aesthetic
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  .pcv12 {
+    --bg: {{ section.settings.bg_color | default: '#1E293B' }};
+    --card-bg: {{ section.settings.card_bg | default: '#0F172A' }};
+    --text: {{ section.settings.text_color | default: '#F8FAFC' }};
+    --muted: {{ section.settings.muted_color | default: '#94A3B8' }};
+    --accent: {{ section.settings.accent_color | default: '#F97316' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#EA580C' }};
+    --border: {{ section.settings.border_color | default: '#334155' }};
+    --badge-sale-bg: #F97316;
+    --badge-sale-text: #0F172A;
+    --f-main: 'Roboto Condensed', sans-serif;
+    --ease: all 0.25s ease-in-out;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-main);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv12 *, .pcv12 *::before, .pcv12 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv12 a { color: inherit; text-decoration: none; }
+  .pcv12 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv12 img { max-width: 100%; display: block; }
+
+  .pcv12__wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv12__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; border-bottom: 2px solid var(--border); padding-bottom: 20px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv12__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv12__title { font-size: 32px; font-weight: 700; color: var(--text); letter-spacing: 0.04em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv12__title { font-size: 40px; } }
+  .pcv12__sub { font-size: 15px; color: var(--muted); font-weight: 400; letter-spacing: 0.02em; }
+  .pcv12__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); border: 2px solid var(--accent); padding: 8px 18px; transition: var(--ease); }
+  .pcv12__viewall:hover { background: var(--accent); color: #0F172A; }
+
+  /* GRID */
+  .pcv12__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .pcv12__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 20px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv12__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 24px; }
+  }
+
+  /* CARD */
+  .pcv12__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--ease);
+  }
+  .pcv12__card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 25px -5px rgba(249, 115, 22, 0.25);
+    transform: translateY(-4px);
+  }
+
+  /* IMAGE BOX */
+  .pcv12__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #020617;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .pcv12__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .pcv12__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv12__card:hover .pcv12__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv12__card:hover .pcv12__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv12__badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv12__badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; letter-spacing: 0.05em; }
+  .pcv12__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv12__badge--tag { background: #334155; color: #F8FAFC; }
+  .pcv12__badge--sold { background: #64748B; color: #F8FAFC; }
+
+  /* WISHLIST BUTTON */
+  .pcv12__wish {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv12__wish:hover { background: var(--accent); color: #0F172A; border-color: var(--accent); }
+  .pcv12__wish.active { color: #EF4444; border-color: #EF4444; background: rgba(15, 23, 42, 0.9); }
+
+  /* QUICK ADD BUTTON */
+  .pcv12__quick-box { padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border); }
+  .pcv12__quick-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: #0F172A;
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv12__quick-btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .pcv12__quick-btn:disabled { background: #334155; color: #64748B; border-color: #334155; cursor: not-allowed; }
+
+  /* CARD CONTENT */
+  .pcv12__content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv12__vendor { font-size: 11px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.08em; }
+  .pcv12__item-title { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv12__rating { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); font-weight: 700; }
+  .pcv12__stars { letter-spacing: 1px; }
+  .pcv12__rev-cnt { color: var(--muted); font-size: 12px; }
+
+  /* PRICE */
+  .pcv12__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv12__price { font-size: 18px; font-weight: 700; color: var(--text); }
+  .pcv12__cmp-price { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv12__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv12__swatch { width: 14px; height: 14px; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv12__swatch:hover, .pcv12__swatch.active { border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv12__urgency { font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv12__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #0F172A;
+    border: 1px solid var(--accent); padding: 12px 20px;
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.25s ease-in-out;
+  }
+  .pcv12__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv12">
+  <div class="pcv12__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv12__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv12__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv12__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv12__viewall">
+            {{ section.settings.view_all_label | default: 'View Tactical Reserve' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv12__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v12', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v12', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv12__toast" id="pcv12-toast">DEPLOYED TO GEAR BAG</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv12-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv12Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'DEPLOYING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ DEPLOYED';
+        showT('DEPLOYED TO GEAR BAG');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv12-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V12 — Tactical Outdoor",
+  "tag": "section",
+  "class": "pcv12-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "FIELD PROVEN"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "TACTICAL GEAR RESERVE"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Rugged high-performance equipment built for extreme outdoor environments."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "View Tactical Reserve"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#1E293B"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#0F172A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F8FAFC"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#94A3B8"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#F97316"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#334155"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V12 — Tactical Outdoor"
+    }
+  ]
+}
+{% endschema %}

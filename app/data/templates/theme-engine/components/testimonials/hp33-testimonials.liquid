@@ -1,0 +1,311 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --gold-color: {{ section.settings.gold_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  }
+
+  .hp33-testi-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-testi-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp33-testi__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .hp33-testi__subtitle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gold-color);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .hp33-testi__subtitle::before,
+  .hp33-testi__subtitle::after {
+    content: '';
+    height: 1px;
+    width: 30px;
+    background: var(--gold-color);
+  }
+
+  .hp33-testi__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .hp33-testi__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp33-testi__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-testi__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp33-testi__item {
+    position: relative;
+    padding: 40px 30px;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.4s ease;
+  }
+
+  .hp33-testi__item::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    transition: all 0.4s ease;
+  }
+
+  .hp33-testi__item:hover {
+    border-color: var(--gold-color);
+  }
+  .hp33-testi__item:hover::before {
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+
+  .hp33-testi__stars {
+    color: var(--gold-color);
+    font-size: 16px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+
+  .hp33-testi__quote {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0 0 30px;
+    font-style: italic;
+  }
+
+  /* Ornate quote marks */
+  .hp33-testi__quote::before,
+  .hp33-testi__quote::after {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    color: var(--gold-color);
+    line-height: 0;
+    vertical-align: bottom;
+  }
+
+  .hp33-testi__quote::before {
+    content: '“';
+    margin-right: 5px;
+  }
+
+  .hp33-testi__quote::after {
+    content: '”';
+    margin-left: 5px;
+  }
+
+  .hp33-testi__author {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+    padding-top: 15px;
+  }
+
+  .hp33-testi__author::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 1px;
+    background: var(--gold-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp33-testi-wrapper" id="HP33Testi-{{ section.id }}">
+  <div class="hp33-testi__header">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp33-testi__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    <h2 class="hp33-testi__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp33-testi__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp33-testi__item" {{ block.shopify_attributes }}>
+        <div class="hp33-testi__stars">
+          {%- for i in (1..5) -%}★{%- endfor -%}
+        </div>
+        <p class="hp33-testi__quote">{{ block.settings.quote }}</p>
+        <div class="hp33-testi__author">{{ block.settings.author }}</div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP33 - Deco Testimonials",
+  "class": "section-hp33-testimonials",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "WORDS OF THE DISCERNING"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Patron Reflections"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Deco Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Deep Emerald)",
+      "default": "#0e1a14"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gold_color",
+      "label": "Gold Accent",
+      "default": "#d4af37"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "An absolute masterpiece. The craftsmanship is evident in every detail."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "A. KENSINGTON"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP33 - Deco Testimonials",
+      "blocks": [
+        { "type": "quote" },
+        { "type": "quote", "settings": { "quote": "True elegance never fades. These pieces are a testament to that philosophy.", "author": "C. VANDERBILT" } },
+        { "type": "quote", "settings": { "quote": "Unparalleled quality. It has become the centerpiece of my collection.", "author": "E. ROTHSCHILD" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,98 @@
+{% comment %} CL V67 — Fitness / Gym (Neon Green/Dark Grey) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv67 { background: {{ section.settings.bg_color | default: '#1C1C1C' }}; color: {{ section.settings.text_color | default: '#FFFFFF' }}; padding: 40px 20px; font-family: 'Anton', 'Impact', sans-serif; text-transform: uppercase; }
+  .clv67-hero { text-align: left; margin-bottom: 40px; padding: 60px 40px; background: #2A2A2A; border-bottom: 10px solid #39FF14; transform: skewX(-5deg); margin-left: 10px; margin-right: 10px; }
+  .clv67-hero h1 { font-size: 64px; font-weight: normal; margin-bottom: 5px; color: #FFF; line-height: 1; letter-spacing: 2px; }
+  .clv67-hero p { font-size: 20px; color: #39FF14; max-width: 600px; font-family: 'Arial', sans-serif; font-weight: 800; }
+  .clv67-chips { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv67-chips a { padding: 12px 25px; background: #333; color: #FFF; text-decoration: none; font-size: 16px; font-family: 'Arial', sans-serif; font-weight: 900; transition: 0.2s; border-left: 4px solid transparent; }
+  .clv67-chips a:hover, .clv67-chips a.active { background: #444; border-left: 4px solid #39FF14; color: #39FF14; }
+  .clv67-toolbar { background: #2A2A2A; padding: 15px 25px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #39FF14; font-family: 'Arial', sans-serif; }
+  .clv67-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv67-promo { grid-column: span 1; background: #39FF14; color: #1C1C1C; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; transform: skewX(-5deg); }
+  .clv67-promo h3 { font-size: 42px; font-weight: normal; margin-bottom: 15px; line-height: 1; }
+  .clv67-promo a { display: inline-block; padding: 10px 25px; background: #1C1C1C; color: #39FF14; text-decoration: none; font-family: 'Arial', sans-serif; font-weight: 900; font-size: 14px; transition: 0.2s; }
+  .clv67-promo a:hover { background: #FFF; color: #1C1C1C; }
+  .clv67-seo { margin-top: 60px; background: #2A2A2A; padding: 40px; text-align: center; border-bottom: 4px solid #39FF14; }
+  @media (max-width: 768px) { .clv67-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv67-hero { transform: none; padding: 40px 20px; margin-left: 0; margin-right: 0; } .clv67-hero h1 { font-size: 48px; } .clv67-promo { transform: none; } }
+</style>
+<div class="clv67" style="max-width: 1400px; margin: 0 auto;">
+  <div class="clv67-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}NO EXCUSES{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Push your limits with gear that keeps up.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv67-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv67-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 900; color: #FFF; letter-spacing: 1px;">{{ filter.label }} >></summary>
+              <div style="position: absolute; background: #2A2A2A; border: 1px solid #444; border-top: 4px solid #39FF14; padding: 20px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #FFF; font-weight: bold; text-transform: none;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #39FF14;">
+                    {{ value.label }} <span style="color: #888;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #333; border: none; color: #FFF; padding: 10px 15px; font-size: 14px; font-weight: 900; cursor: pointer; outline: none; text-transform: uppercase;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv67-grid">
+      {% for product in collection.products %}
+        {% render 'card-v67', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv67-promo">
+            <h3>SUPPLEMENT<br>STACKS</h3>
+            <a href="/collections/supps">FUEL UP</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v67', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 28px; font-weight: normal; color: #39FF14;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv67-seo">
+      <h2 style="font-size: 32px; font-weight: normal; color: #FFF; margin-bottom: 10px; letter-spacing: 1px;">{{ section.settings.seo_title | default: 'TRAIN LIKE A PRO' }}</h2>
+      <p style="font-size: 16px; font-family: 'Arial', sans-serif; font-weight: bold; color: #AAA; max-width: 800px; margin: 0 auto; line-height: 1.5; text-transform: none;">{{ section.settings.seo_text | default: 'Our apparel is engineered for mobility, breathability, and durability. Sweat hard, look sharp, break records.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V67 — Fitness", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#1C1C1C"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#FFFFFF"}
+  ], "presets": [{"name": "CL V67 — Fitness"}]
+}
+{% endschema %}

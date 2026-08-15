@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .unique-body {
+            background-color: #f0f0f0; /* Açık gri arka plan rengi */
+            font-family: 'Poppins', sans-serif;
+        }
+        .notification-unique {
+            display: none; /* Başlangıçta gizli */
+            align-items: center;
+            font-size: 15px;
+            color: #333;
+            margin: 10px 0; /* Yukarı ve aşağı 10 px boşluk ekleme */
+            opacity: 0;
+            transform: translateY(20px); /* Başlangıç pozisyonu */
+            transition: opacity 0.5s, transform 0.5s; /* Geçiş animasyonu */
+            background-color: #ffffff; /* Beyaz arka plan rengi */
+            border: 1px solid #e0e0e0; /* Daha açık gri kenarlık */
+            padding: 8px; /* İç boşluk ekleme */
+            border-radius: 11px; /* Kenarları yuvarlama */
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+        }
+        .notification-unique-show {
+            display: flex; /* Görünür olduğunda flex */
+            opacity: 1;
+            transform: translateY(0); /* Son pozisyon */
+        }
+        .icon-unique {
+            margin-right: 5px; /* Metne daha yakın yapmak için azaltıldı */
+        }
+        .icon-unique img {
+            width: 30px; /* İkonun boyutu büyütüldü */
+        }
+        .text-unique {
+            font-weight: normal;
+        }
+        .highlight-unique {
+            color: #ff0000; /* Kırmızı renk */
+            font-weight: bold;
+            transition: all 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="unique-body">
+    <!-- Ana Kod -->
+    <div class="notification-unique" id="notification-1">
+        <div class="icon-unique">
+            <img src="https://www.svgrepo.com/show/421045/conference-live-video.svg" alt="Conference Live Video Icon">
+        </div>
+        <span class="text-unique">Hurry up! <span class="highlight-unique" id="items-sold">500+</span> items have been sold</span>
+    </div>
+
+    <!-- Varyasyon 1 -->
+    <div class="notification-unique" id="notification-2">
+        <div class="icon-unique">
+            <img src="https://www.svgrepo.com/show/421061/alert-bell-notice.svg" alt="Alert Bell Notice Icon">
+        </div>
+        <span class="text-unique"><span class="highlight-unique" id="people-cart">9M</span> people have it in their cart</span>
+    </div>
+
+    <!-- Varyasyon 2 -->
+    <div class="notification-unique" id="notification-3">
+        <div class="icon-unique">
+            <img src="https://www.svgrepo.com/show/421069/fire-like-trend.svg" alt="Fire Like Trend Icon">
+        </div>
+        <span class="text-unique">Loved product! <span class="highlight-unique" id="people-favorited">1.1M</span> favorited it!</span>
+    </div>
+
+    <script>
+        let notifications = document.querySelectorAll('.notification-unique');
+        let index = 0;
+
+        function showNextNotification() {
+            notifications.forEach(notification => notification.classList.remove('notification-unique-show')); // Tüm bildirimleri gizle
+            notifications[index].classList.add('notification-unique-show'); // Geçerli bildirimi göster
+            index = (index + 1) % notifications.length; // Sonraki bildirim için indeksi güncelle
+            setTimeout(showNextNotification, 4000); // 4 saniye sonra bir sonraki bildirimi göster
+        }
+
+        // İlk bildirimi göster
+        showNextNotification();
+
+        // Sayıları artırma fonksiyonu
+        function incrementCounter(elementId, startValue, minIncrement, maxIncrement, minInterval, maxInterval) {
+            let element = document.getElementById(elementId);
+            let value = startValue;
+
+            function updateCounter() {
+                let incrementValue = Math.floor(Math.random() * (maxIncrement - minIncrement + 1)) + minIncrement;
+                value += incrementValue;
+                element.textContent = value.toLocaleString(); // Sayıyı formatla
+                let interval = Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
+                setTimeout(updateCounter, interval); // Rastgele bir aralıkta güncelle
+            }
+
+            updateCounter();
+        }
+
+        // Her bir bildirimi artır (rastgele artış ve aralıklar)
+        incrementCounter('items-sold', 500, 1, 10, 1000, 5000); // Çok yavaş artan küçük artışlar
+        incrementCounter('people-cart', 900000, 1000, 100000, 500, 2000); // Orta hızda artan büyük artışlar
+        incrementCounter('people-favorited', 110000, 10, 100, 200, 1000); // Yavaş artan orta artışlar
+    </script>
+</body>
+</html>

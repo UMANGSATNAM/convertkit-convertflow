@@ -1,0 +1,91 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#D1FAE5' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp62-comp__container { max-width: {{ section.settings.container_width | default: 1000 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp62-comp__header { text-align: center; margin-bottom: 50px; }
+  .hp62-comp__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#064E3B' }}; margin: 0 0 12px; }
+  .hp62-comp__heading { font-family: 'Italiana', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #064E3B; margin: 0; }
+  .hp62-comp__table {
+    width: 100%; border-collapse: collapse; background: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    border-radius: 16px; overflow: hidden; border: 1px solid rgba(6, 78, 59, 0.15);
+    box-shadow: 0 4px 20px rgba(6, 78, 59, 0.05);
+  }
+  .hp62-comp__table th {
+    background: #ECFDF5; color: #064E3B; font-family: 'Outfit', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 18px 20px; text-align: left; border-bottom: 1px solid rgba(6, 78, 59, 0.15);
+  }
+  .hp62-comp__table td {
+    padding: 16px 20px; font-size: 14px; color: #334155;
+    border-bottom: 1px solid rgba(6, 78, 59, 0.08);
+  }
+  .hp62-comp__table tr:last-child td { border-bottom: none; }
+  .hp62-comp__check { color: #059669; font-weight: 700; }
+  @media screen and (max-width: 768px) {
+    .hp62-comp__table { font-size: 13px; }
+    .hp62-comp__table th, .hp62-comp__table td { padding: 12px 14px; }
+  }
+{%- endstyle -%}
+<div class="hp62-comp__container">
+  <div class="hp62-comp__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp62-comp__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp62-comp__heading">{{ section.settings.heading | default: 'Alpine Purity Benchmark' }}</h2>
+  </div>
+  <table class="hp62-comp__table">
+    <thead>
+      <tr>
+        <th>{{ section.settings.col1_head | default: 'Botanical Standard' }}</th>
+        <th>{{ section.settings.col2_head | default: 'Swiss Alpine Edelweiss' }}</th>
+        <th>{{ section.settings.col3_head | default: 'Mass Market Skincare' }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for block in section.blocks -%}
+        <tr {{ block.shopify_attributes }}>
+          <td>{{ block.settings.feature | default: 'Antioxidant Potency' }}</td>
+          <td class="hp62-comp__check">{{ block.settings.us | default: '🏔️ 2x Vitamin C Equivalent' }}</td>
+          <td style="color:#94A3B8;">{{ block.settings.them | default: 'Standard Ascorbic Acid' }}</td>
+        </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+</div>
+{% schema %}
+{
+  "name": "HP62 Compare",
+  "class": "section-hp62-comp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#D1FAE5" },
+    { "type": "color", "id": "card_bg", "label": "Table BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#064E3B" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🏔️ PURITY BENCHMARK" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Alpine Purity Benchmark" },
+    { "type": "text", "id": "col1_head", "label": "Column 1", "default": "Botanical Standard" },
+    { "type": "text", "id": "col2_head", "label": "Column 2", "default": "Swiss Alpine Edelweiss" },
+    { "type": "text", "id": "col3_head", "label": "Column 3", "default": "Mass Market Skincare" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 700, "max": 1200, "step": 20, "unit": "px", "label": "Container Width", "default": 1000 }
+  ],
+  "blocks": [{
+    "type": "row", "name": "Row",
+    "settings": [
+      { "type": "text", "id": "feature", "label": "Feature", "default": "Antioxidant Potency" },
+      { "type": "text", "id": "us", "label": "Us", "default": "🏔️ 2x Vitamin C Equivalent" },
+      { "type": "text", "id": "them", "label": "Others", "default": "Standard Ascorbic Acid" }
+    ]
+  }],
+  "presets": [{
+    "name": "HP62 Compare",
+    "blocks": [
+      { "type": "row", "settings": { "feature": "Harvest Altitude", "us": "🏔️ 3,000m Valais High Peaks", "them": "Lowland Greenhouses" } },
+      { "type": "row", "settings": { "feature": "Carrier Water Purity", "us": "🏔️ 100% Zermatt Glacial Dew", "them": "Municipal Tap Water" } },
+      { "type": "row", "settings": { "feature": "Cellular Longevity", "us": "🏔️ Alpine Rose Stem Cells", "them": "Synthetic Fillers" } },
+      { "type": "row", "settings": { "feature": "Barrier Resilience Index", "us": "🏔️ +74% Moisture Barrier Recovery", "them": "Temporary Occlusives" } }
+    ]
+  }]
+}
+{% endschema %}

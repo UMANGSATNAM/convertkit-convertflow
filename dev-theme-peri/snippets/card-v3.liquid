@@ -1,0 +1,208 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V3 — AYURVEDIC BEAUTY & COSMETICS D2C (JUST HERBS / MINIMALIST BEAUTY STYLE)
+  Usage: {% render 'card-v3', product: product %}
+  Design: Clean Herbal White, Botanical Forest Green (#2E7D32), Cormorant & Outfit fonts, 12px clean green border
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+  .cv3-card {
+    --cv3-bg: #FFFFFF;
+    --cv3-text: #1F2937;
+    --cv3-muted: #6B7280;
+    --cv3-green: #2E7D32;
+    --cv3-light-green: #E8F5E9;
+    --cv3-border: #E5E7EB;
+    font-family: 'Outfit', sans-serif;
+    background: var(--cv3-bg);
+    border: 1px solid var(--cv3-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv3-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv3-green);
+    box-shadow: 0 12px 24px -6px rgba(46, 125, 50, 0.12);
+  }
+
+  .cv3-card *, .cv3-card *::before, .cv3-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv3-card a { color: inherit; text-decoration: none; }
+  .cv3-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv3-card img { max-width: 100%; display: block; }
+
+  .cv3-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #FAFAFA;
+    overflow: hidden;
+  }
+  .cv3-img { width: 100%; height: 100%; object-fit: contain; padding: 12px; transition: transform 0.5s ease; }
+  .cv3-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv3-card:hover .cv3-img-pri { opacity: 0; }
+  .cv3-card:hover .cv3-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Save Badge Top Left */
+  .cv3-badge-save {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv3-light-green); color: var(--cv3-green);
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; z-index: 3;
+  }
+
+  /* Bestseller Badge Top Right */
+  .cv3-badge-best {
+    position: absolute; top: 10px; right: 46px;
+    color: #374151; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; z-index: 3;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv3-wish {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid #E5E7EB;
+    display: flex; align-items: center; justify-content: center;
+    color: #4B5563; z-index: 3; transition: all 0.2s ease;
+  }
+  .cv3-wish:hover, .cv3-wish.active { background: var(--cv3-green); color: #FFFFFF; border-color: var(--cv3-green); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv3-qv-overlay {
+    position: absolute; bottom: 8px; left: 8px; right: 8px;
+    padding: 8px; background: rgba(255, 255, 255, 0.9); color: var(--cv3-green);
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 6px; border: 1px solid var(--cv3-green);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv3-card:hover .cv3-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv3-qv-overlay:hover { background: var(--cv3-green); color: #FFFFFF; }
+
+  .cv3-content { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+  .cv3-title { font-size: 14px; font-weight: 600; color: #1F2937; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Benefit / Subtitle Tagline */
+  .cv3-subtitle { font-size: 11px; color: var(--cv3-green); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Star Rating */
+  .cv3-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #F59E0B; font-weight: 700; margin-top: 2px; }
+
+  /* Shade Swatches / Variant Pills */
+  .cv3-swatches { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+  .cv3-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #D1D5DB; cursor: pointer; }
+  .cv3-swatch.active { transform: scale(1.2); border-color: var(--cv3-green); }
+
+  /* Bottom Row: Price Pill on Left + Green Add Pill Button on Right */
+  .cv3-bottom-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 8px; }
+  .cv3-price-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 16px; border: 1px solid var(--cv3-green); background: #F9FAFB;
+  }
+  .cv3-price { font-size: 14px; font-weight: 800; color: #1F2937; }
+  .cv3-cmp { font-size: 12px; color: #9CA3AF; text-decoration: line-through; }
+
+  .cv3-add-btn {
+    padding: 6px 18px; background: var(--cv3-green); color: #FFFFFF;
+    font-size: 12px; font-weight: 700; border-radius: 16px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(46, 125, 50, 0.25);
+  }
+  .cv3-add-btn:hover { background: #1B5E20; transform: scale(1.05); }
+  .cv3-add-btn:disabled { background: #CCCCCC; color: #777777; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv3-card" data-product-id="{{ card_prod.id }}">
+    {% if card_prod.compare_at_price > card_prod.price %}
+      {% assign save_amt = card_prod.compare_at_price | minus: card_prod.price | money %}
+      <span class="cv3-badge-save">Save {{ save_amt }}</span>
+    {% endif %}
+
+    <span class="cv3-badge-best">BEST SELLER</span>
+
+    <button type="button" class="cv3-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv3-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 500 }}" alt="{{ card_prod.title | escape }}" class="cv3-img cv3-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 500 }}" alt="{{ card_prod.title | escape }}" class="cv3-img cv3-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-3' | placeholder_svg_tag: 'cv3-img' }}
+      {% endif %}
+
+      <button type="button" class="cv3-qv-overlay" data-quick-view="{{ card_prod.handle }}">Quick View</button>
+    </a>
+
+    <div class="cv3-content">
+      <a href="{{ card_prod.url }}" class="cv3-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv3-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv3-subtitle">Nurtures & Repairs | 100% Ayurvedic</span>
+
+      <div class="cv3-rating">
+        <span>★ 4.8</span> <span>({{ card_prod.id | times: 13 | modulo: 800 | plus: 150 }})</span>
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv3-swatches">
+          {% for variant in card_prod.variants limit: 4 %}
+            <span class="cv3-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#D81B60', '#8E24AA', '#E53935', '#FB8C00' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="cv3-bottom-row">
+        <div class="cv3-price-pill">
+          <span class="cv3-price">{{ card_prod.price | money }}</span>
+          {% if card_prod.compare_at_price > card_prod.price %}
+            <span class="cv3-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% endif %}
+        </div>
+
+        {% if card_prod.available %}
+          <button type="button" class="cv3-add-btn" data-add-cart="{{ cur_var.id }}">Add</button>
+        {% else %}
+          <button type="button" class="cv3-add-btn" disabled>Sold</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="cv3-card">
+    <div class="cv3-media">{{ 'product-3' | placeholder_svg_tag: 'cv3-img' }}</div>
+    <div class="cv3-content">
+      <div class="cv3-title">Herb Enriched Ayurvedic Liquid Lipstick Set</div>
+
+      {% if card_r_show != false %}
+      <div class="cv3-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv3-subtitle">Weightless-matte | Hydrating</span>
+      <div class="cv3-bottom-row">
+        <div class="cv3-price-pill"><span class="cv3-price">₹ 303</span><span class="cv3-cmp">₹ 745</span></div>
+        <button type="button" class="cv3-add-btn">Add</button>
+      </div>
+    </div>
+  </div>
+{% endif %}

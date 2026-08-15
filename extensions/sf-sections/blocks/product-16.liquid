@@ -1,19 +1,220 @@
-<div class="sf-product-section" id="sf-product-16">
-  <!-- Placeholder for Product Block 16 -->
-  <h2 style="color: {{ section.settings.heading_color }}">{{ section.settings.title }}</h2>
-  {% if section.settings.show_button %}
-    <a href="#" class="sf-btn">Click Here</a>
-  {% endif %}
+{%- assign product = all_products[section.settings.product] | default: product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  /* Dark Mode & Tech Elegant Aesthetic */
+  .sf-pdp-{{ section.id }} {
+    --primary-color: {{ section.settings.primary_color }};
+    --bg-color: #000000;
+    --text-color: #a1a1aa;
+    --heading-color: #ffffff;
+    --border-color: #27272a;
+    --radius: 0px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  .sf-pdp-{{ section.id }} * { box-sizing: inherit; }
+  .sf-pdp-container { max-width: 1400px; margin: 0 auto; }
+  
+  .sf-pdp-grid { display: grid; grid-template-columns: 1fr; gap: 40px; border-top: 1px solid var(--border-color); padding-top: 40px; }
+  @media(min-width: 900px) {
+    .sf-pdp-grid { grid-template-columns: 1.2fr 1fr; gap: 80px; }
+  }
+
+  /* Gallery */
+  .sf-media-wrapper { display: flex; flex-direction: column; gap: 12px; }
+  .sf-gallery-main { width: 100%; border: 1px solid var(--border-color); background: #09090b; }
+  .sf-gallery-main img { width: 100%; height: auto; display: block; object-fit: cover; opacity: 0.9; }
+  .sf-gallery-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sf-thumb-item { cursor: pointer; border: 1px solid var(--border-color); opacity: 0.5; transition: all 0.2s ease; background: #09090b; }
+  .sf-thumb-item.active, .sf-thumb-item:hover { opacity: 1; border-color: var(--heading-color); }
+  .sf-thumb-item img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1/1; mix-blend-mode: luminosity; }
+  .sf-thumb-item.active img { mix-blend-mode: normal; }
+
+  /* Details */
+  .sf-pdp-title { font-size: 3rem; font-weight: 300; color: var(--heading-color); margin: 0 0 8px 0; letter-spacing: -0.02em; }
+  .sf-pdp-vendor { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--primary-color); margin-bottom: 24px; font-weight: 600; }
+  
+  .sf-pdp-price-wrapper { display: flex; align-items: baseline; gap: 16px; margin-bottom: 40px; }
+  .sf-pdp-price { font-size: 2rem; font-weight: 400; color: var(--heading-color); }
+  .sf-pdp-compare-price { font-size: 1.25rem; color: #52525b; text-decoration: line-through; }
+
+  /* Form */
+  .sf-variant-group { margin-bottom: 32px; }
+  .sf-variant-label { display: block; font-weight: 400; margin-bottom: 16px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #d4d4d8; }
+  .sf-variant-options { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sf-variant-option { padding: 12px 24px; border: 1px solid var(--border-color); background: transparent; cursor: pointer; font-size: 0.95rem; color: #d4d4d8; transition: all 0.3s; }
+  .sf-variant-option:hover { border-color: #52525b; }
+  .sf-variant-option.selected { border-color: var(--heading-color); background: var(--heading-color); color: var(--bg-color); }
+  
+  .sf-action-group { display: flex; gap: 16px; margin-bottom: 40px; height: 64px; }
+  .sf-quantity-selector { display: flex; align-items: center; border: 1px solid var(--border-color); width: 140px; }
+  .sf-qty-btn { width: 40px; height: 100%; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-color); transition: color 0.2s; }
+  .sf-qty-btn:hover { color: var(--heading-color); }
+  .sf-qty-input { flex: 1; height: 100%; border: none; text-align: center; font-size: 1.1rem; appearance: textfield; padding: 0; background: transparent; color: var(--heading-color); }
+  .sf-qty-input::-webkit-inner-spin-button { display: none; }
+  
+  .sf-add-to-cart { flex: 1; background: var(--primary-color); color: #000; border: none; font-size: 1.125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.3s; }
+  .sf-add-to-cart:hover { background: var(--heading-color); }
+
+  .sf-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    font-weight: 300;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  /* Recently Viewed (Dark Mode adjusted) */
+  .sf-recently-viewed { margin-top: 100px; padding-top: 60px; border-top: 1px solid var(--border-color); }
+  .sf-rv-title { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-bottom: 40px; font-weight: 300; color: var(--heading-color); }
+  .sf-rv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media(min-width: 768px) { .sf-rv-grid { grid-template-columns: repeat(4, 1fr); gap: 40px; } }
+  .sf-rv-card { display: block; text-decoration: none; color: inherit; transition: opacity 0.3s; }
+  .sf-rv-card:hover { opacity: 0.7; }
+  .sf-rv-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 16px; border: 1px solid var(--border-color); filter: grayscale(50%); transition: filter 0.3s; }
+  .sf-rv-card:hover img { filter: grayscale(0%); }
+  .sf-rv-card-title { font-size: 0.95rem; margin: 0 0 8px; color: var(--heading-color); font-weight: 400; }
+  .sf-rv-card-price { font-weight: 400; font-size: 0.95rem; color: var(--primary-color); }
+</style>
+
+<div class="sf-pdp-{{ section.id }}">
+  <div class="sf-pdp-container">
+    {% if product != blank %}
+      <div class="sf-pdp-grid">
+        
+        <!-- Media Gallery -->
+        <div class="sf-media-wrapper">
+          <div class="sf-gallery-main" id="sf-main-image-{{ section.id }}">
+            <img src="{{ current_variant.featured_image | default: product.featured_image | img_url: '1200x' }}" alt="{{ product.title | escape }}" id="sf-image-el-{{ section.id }}">
+          </div>
+          {% if product.images.size > 1 %}
+            <div class="sf-gallery-thumbs">
+              {% for image in product.images limit:4 %}
+                <div class="sf-thumb-item {% if forloop.first %}active{% endif %}" data-img-url="{{ image | img_url: '1200x' }}" onclick="sfSwitchImage('{{ section.id }}', this)">
+                  <img src="{{ image | img_url: '200x200', crop: 'center' }}" alt="{{ image.alt | escape }}">
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Product Details -->
+        <div class="sf-details-wrapper">
+          <h1 class="sf-pdp-title">{{ product.title }}</h1>
+          <div class="sf-pdp-vendor">{{ product.vendor }}</div>
+          
+          <div class="sf-pdp-price-wrapper">
+            <span class="sf-pdp-price" id="sf-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="sf-pdp-compare-price" id="sf-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+            {% endif %}
+          </div>
+
+          <form method="post" action="/cart/add" id="sf-form-{{ section.id }}" accept-charset="UTF-8" enctype="multipart/form-data">
+            <input type="hidden" name="form_type" value="product">
+            <input type="hidden" name="utf8" value="✓">
+            <input type="hidden" name="id" id="sf-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+
+            {% unless product.has_only_default_variant %}
+              <div class="sf-variants-container">
+                {% for option in product.options_with_values %}
+                  <div class="sf-variant-group">
+                    <span class="sf-variant-label">{{ option.name }}</span>
+                    <div class="sf-variant-options" data-option-index="option{{ forloop.index }}">
+                      {% for value in option.values %}
+                        <div class="sf-variant-option {% if option.selected_value == value %}selected{% endif %}" 
+                             data-value="{{ value | escape }}"
+                             onclick="sfSelectOption('{{ section.id }}', this)">
+                          {{ value }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endunless %}
+
+            <div class="sf-action-group">
+              <div class="sf-quantity-selector">
+                <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', -1)">−</button>
+                <input type="number" class="sf-qty-input" name="quantity" id="sf-qty-{{ section.id }}" value="1" min="1">
+                <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', 1)">+</button>
+              </div>
+              <button type="submit" class="sf-add-to-cart" id="sf-atc-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+                {% if current_variant.available %}Add to Cart{% else %}Out of Stock{% endif %}
+              </button>
+            </div>
+          </form>
+
+          <div class="sf-description">
+            {{ product.description }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recently Viewed Section -->
+      {% if section.settings.show_recently_viewed %}
+      <div class="sf-recently-viewed" id="sf-rv-{{ section.id }}" style="display: none;">
+        <h3 class="sf-rv-title">{{ section.settings.rv_title }}</h3>
+        <div class="sf-rv-grid" id="sf-rv-grid-{{ section.id }}"></div>
+      </div>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          if (typeof window.sfTrackRecentlyViewed === 'function') {
+            window.sfTrackRecentlyViewed('{{ product.handle }}');
+            window.sfRenderRecentlyViewed('{{ section.id }}', '{{ product.handle }}', '{{ cart.currency.symbol }}');
+          }
+        });
+      </script>
+      {% endif %}
+
+      <script>
+        window.sfVariants_{{ section.id | replace: '-', '_' }} = [
+          {% for variant in product.variants %}
+            {
+              id: {{ variant.id }},
+              title: {{ variant.title | json }},
+              option1: {{ variant.option1 | json }},
+              option2: {{ variant.option2 | json }},
+              option3: {{ variant.option3 | json }},
+              price: '{{ variant.price | money }}',
+              compare_at_price: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
+              available: {{ variant.available }},
+              featured_image: {% if variant.featured_image %}'{{ variant.featured_image | img_url: "1200x" }}'{% else %}null{% endif %}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ];
+      </script>
+
+    {% else %}
+      <div style="text-align: center; padding: 100px 20px; border: 1px dashed var(--border-color);">
+        <p style="font-size: 1.25rem; color: var(--text-color);">Select a product in the theme editor.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 {% schema %}
 {
-  "name": "Product Block 16",
+  "name": "Product Block 16 (Dark)",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Title", "default": "Product Block 16" },
-    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "checkbox", "id": "show_button", "label": "Show Button", "default": true }
+    { "type": "product", "id": "product", "label": "Select Product" },
+    { "type": "header", "content": "Colors (Optimized for Dark)" },
+    { "type": "color", "id": "primary_color", "label": "Primary Accent (e.g. Neon)", "default": "#22c55e" },
+    { "type": "header", "content": "Recently Viewed" },
+    { "type": "checkbox", "id": "show_recently_viewed", "label": "Enable Recently Viewed", "default": true },
+    { "type": "text", "id": "rv_title", "label": "Recently Viewed Title", "default": "Viewed Recently" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "padding_horizontal", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Horizontal", "default": 40 }
   ]
 }
 {% endschema %}

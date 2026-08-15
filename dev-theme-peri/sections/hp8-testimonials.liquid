@@ -1,0 +1,218 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#f4f4f4'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 150px 20px;
+    color: {{ text_color }};
+    overflow: hidden;
+  }
+  
+  .hp8-test-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .hp8-test-quote-icon-{{ section_id }} {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 15rem;
+    line-height: 1;
+    position: absolute;
+    top: -80px;
+    left: -40px;
+    color: {{ text_color | color_modify: 'alpha', 0.05 }};
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hp8-test-slider-{{ section_id }} {
+    display: flex;
+    overflow-x: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .hp8-test-slide-{{ section_id }} {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+  }
+  
+  .hp8-test-slide-{{ section_id }}.is-active {
+    opacity: 1;
+  }
+  
+  .hp8-test-text-{{ section_id }} {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-style: italic;
+    line-height: 1.2;
+    margin: 0 0 40px 0;
+    max-width: 900px;
+  }
+  
+  .hp8-test-author-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  
+  .hp8-test-nav-{{ section_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 60px;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hp8-test-dot-{{ section_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: {{ text_color | color_modify: 'alpha', 0.2 }};
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .hp8-test-dot-{{ section_id }}.is-active {
+    background-color: {{ text_color }};
+    transform: scale(1.5);
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 100px 20px;
+    }
+    .hp8-test-slide-{{ section_id }} {
+      padding: 0 10px;
+    }
+    .hp8-test-quote-icon-{{ section_id }} {
+      font-size: 10rem;
+      top: -40px;
+      left: 0;
+    }
+  }
+</style>
+
+<div class="hp8-test-container-{{ section_id }}">
+  <div class="hp8-test-quote-icon-{{ section_id }}">"</div>
+  
+  <div class="hp8-test-slider-{{ section_id }}" id="hp8-test-slider-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp8-test-slide-{{ section_id }} {% if forloop.first %}is-active{% endif %}" {{ block.shopify_attributes }}>
+        <p class="hp8-test-text-{{ section_id }}">"{{ block.settings.quote }}"</p>
+        <div class="hp8-test-author-{{ section_id }}">{{ block.settings.author }}</div>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <div class="hp8-test-nav-{{ section_id }}" id="hp8-test-nav-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp8-test-dot-{{ section_id }} {% if forloop.first %}is-active{% endif %}" data-index="{{ forloop.index0 }}"></div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('hp8-test-slider-{{ section_id }}');
+    const dots = document.querySelectorAll('#hp8-test-nav-{{ section_id }} .hp8-test-dot-{{ section_id }}');
+    const slides = document.querySelectorAll('#hp8-test-slider-{{ section_id }} .hp8-test-slide-{{ section_id }}');
+    
+    if (slider && dots.length > 0) {
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          const slideWidth = slider.clientWidth;
+          slider.scrollTo({
+            left: index * slideWidth,
+            behavior: 'smooth'
+          });
+          
+          updateActiveState(index);
+        });
+      });
+      
+      slider.addEventListener('scroll', () => {
+        const slideWidth = slider.clientWidth;
+        const scrollPosition = slider.scrollLeft;
+        const activeIndex = Math.round(scrollPosition / slideWidth);
+        
+        updateActiveState(activeIndex);
+      });
+      
+      function updateActiveState(index) {
+        dots.forEach(d => d.classList.remove('is-active'));
+        slides.forEach(s => s.classList.remove('is-active'));
+        
+        if (dots[index]) dots[index].classList.add('is-active');
+        if (slides[index]) slides[index].classList.add('is-active');
+      }
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP8 Testimonials",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "A masterclass in modern tailoring. Every piece feels like it was bespoke made just for me."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "ALEXANDER W."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 Testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial", "settings": { "quote": "The attention to detail is unparalleled. These aren't just clothes; they are investments.", "author": "SARAH J." } },
+        { "type": "testimonial", "settings": { "quote": "Absolutely stunning quality. I've completely overhauled my wardrobe.", "author": "MICHAEL T." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

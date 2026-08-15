@@ -1,0 +1,530 @@
+{%- comment -%}
+  PC V22 — MINIMALIST LUXURY MONOLITH PRODUCT GRID
+  Design: Dark Slate Monolith (#141414), Warm Gold (#C5A059) accents, Tenor Sans typography
+  Card Shape: Borderless clean layout, zero radius, gold accent line indicators
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
+
+  .pcv22 {
+    --bg: {{ section.settings.bg_color | default: '#141414' }};
+    --card-bg: {{ section.settings.card_bg | default: '#1C1C1C' }};
+    --text: {{ section.settings.text_color | default: '#F5F5F0' }};
+    --muted: {{ section.settings.muted_color | default: '#999990' }};
+    --accent: {{ section.settings.accent_color | default: '#C5A059' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#A88440' }};
+    --border: {{ section.settings.border_color | default: '#2A2A2A' }};
+    --badge-sale-bg: #C5A059;
+    --badge-sale-text: #141414;
+    --f-main: 'Tenor Sans', sans-serif;
+    --ease: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-main);
+    padding: {{ section.settings.padding_top | default: 64 }}px 0 {{ section.settings.padding_bottom | default: 64 }}px 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv22 *, .pcv22 *::before, .pcv22 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv22 a { color: inherit; text-decoration: none; }
+  .pcv22 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv22 img { max-width: 100%; display: block; }
+
+  .pcv22__wrap { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+
+  /* HEADER */
+  .pcv22__head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 44px; text-align: {{ section.settings.header_align | default: 'center' }}; }
+  @media (min-width: 768px) {
+    .pcv22__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv22__title { font-size: 32px; font-weight: 400; color: var(--text); letter-spacing: 0.08em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv22__title { font-size: 42px; } }
+  .pcv22__sub { font-size: 14px; color: var(--muted); letter-spacing: 0.05em; }
+  .pcv22__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); border-bottom: 1px solid var(--accent); padding-bottom: 3px; transition: var(--ease); }
+  .pcv22__viewall:hover { color: #FFFFFF; border-color: #FFFFFF; }
+
+  /* GRID */
+  .pcv22__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 640px) {
+    .pcv22__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 28px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv22__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 32px; }
+  }
+
+  /* CARD */
+  .pcv22__card {
+    background: var(--card-bg);
+    border-radius: 0px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--ease);
+  }
+  .pcv22__card:hover {
+    box-shadow: 0 15px 35px -10px rgba(197, 160, 89, 0.15);
+  }
+
+  /* IMAGE BOX */
+  .pcv22__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '4/5' }};
+    background: #0E0E0E;
+    overflow: hidden;
+  }
+  .pcv22__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pcv22__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv22__card:hover .pcv22__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv22__card:hover .pcv22__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv22__badges { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv22__badge { font-size: 10px; font-weight: 500; text-transform: uppercase; padding: 4px 10px; letter-spacing: 0.15em; font-family: var(--f-main); }
+  .pcv22__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv22__badge--tag { background: rgba(255, 255, 255, 0.1); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.2); }
+  .pcv22__badge--sold { background: #333333; color: #888888; }
+
+  /* WISHLIST BUTTON */
+  .pcv22__wish {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 36px; height: 36px;
+    background: rgba(20, 20, 20, 0.7);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv22__wish:hover { background: var(--accent); color: #141414; border-color: var(--accent); }
+  .pcv22__wish.active { color: var(--accent); border-color: var(--accent); background: rgba(20, 20, 20, 0.9); }
+
+  /* QUICK ADD HOVER */
+  .pcv22__quick-box {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 3;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: var(--ease);
+  }
+  .pcv22__card:hover .pcv22__quick-box { transform: translateY(0); opacity: 1; }
+  @media (max-width: 767px) {
+    .pcv22__quick-box { transform: translateY(0); opacity: 1; position: relative; bottom: auto; left: auto; right: auto; padding: 0 16px 16px; }
+  }
+
+  .pcv22__quick-btn {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--accent);
+    color: #141414;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em;
+    font-family: var(--f-main);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv22__quick-btn:hover { background: #FFFFFF; color: #141414; }
+  .pcv22__quick-btn:disabled { background: #2A2A2A; color: #777777; cursor: not-allowed; }
+
+  /* CARD CONTENT */
+  .pcv22__content { padding: 18px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv22__vendor { font-size: 10px; text-transform: uppercase; color: var(--accent); font-weight: 500; letter-spacing: 0.2em; }
+  .pcv22__item-title { font-size: 16px; font-weight: 400; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: 0.05em; }
+
+  /* RATING */
+  .pcv22__rating { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--accent); }
+  .pcv22__stars { letter-spacing: 2px; }
+  .pcv22__rev-cnt { color: var(--muted); font-size: 11px; }
+
+  /* PRICE */
+  .pcv22__price-row { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-top: auto; padding-top: 4px; }
+  .pcv22__price { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 0.05em; }
+  .pcv22__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv22__swatches { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv22__swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv22__swatch:hover, .pcv22__swatch.active { transform: scale(1.3); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv22__urgency { font-size: 11px; color: var(--accent); font-style: italic; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv22__toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent); color: #141414;
+    padding: 14px 24px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pcv22__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv22">
+  <div class="pcv22__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv22__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv22__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv22__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv22__viewall">
+            {{ section.settings.view_all_label | default: 'Explore Monolith' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv22__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v22', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v22', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv22__toast" id="pcv22-toast">Specimen Acquired</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv22-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv22Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Acquiring...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = 'Acquired';
+        showT('Specimen Acquired');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'Error';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv22-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V22 — Luxury Monolith",
+  "tag": "section",
+  "class": "pcv22-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "MONOLITH EDITION"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "THE MONOLITH VAULT"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Architectural luxury items sculpted in dark monolithic tones."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore Monolith"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#141414"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#1C1C1C"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F5F5F0"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#999990"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#C5A059"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#2A2A2A"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 64
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V22 — Luxury Monolith"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V42 — CLEAN NOOTROPIC & COGNITIVE BRAIN SUPPLEMENTS D2C (THESIS / MIND LAB PRO STYLE)
+  Usage: {% render 'card-v42', product: product %}
+  Design: Bio-Teal (#0D9488), Lab Ice Blue (#F0FDFA), Space Grotesk & Inter fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
+  .cv42-card {
+    --cv42-bg: #FFFFFF;
+    --cv42-text: #0F766E;
+    --cv42-muted: #0D9488;
+    --cv42-teal: #0D9488;
+    --cv42-ice: #F0FDFA;
+    --cv42-border: #99F6E4;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv42-bg);
+    border: 1px solid var(--cv42-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv42-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv42-teal);
+    box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.25);
+  }
+
+  .cv42-card *, .cv42-card *::before, .cv42-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv42-card a { color: inherit; text-decoration: none; }
+  .cv42-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv42-card img { max-width: 100%; display: block; }
+
+  .cv42-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv42-ice);
+    overflow: hidden;
+  }
+  .cv42-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv42-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv42-card:hover .cv42-img-pri { opacity: 0; }
+  .cv42-card:hover .cv42-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Nootropic Tag Top Left */
+  .cv42-badge-lab {
+    position: absolute; top: 10px; left: 10px;
+    background: #0F766E; color: #FFFFFF;
+    font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 4px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv42-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv42-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv42-teal); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv42-wish:hover, .cv42-wish.active { background: var(--cv42-teal); color: #FFFFFF; border-color: var(--cv42-teal); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv42-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(15, 118, 110, 0.95); color: #FFFFFF;
+    font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv42-teal);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv42-card:hover .cv42-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv42-qv-overlay:hover { background: #FFFFFF; color: #0F766E; }
+
+  .cv42-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv42-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv42-teal); font-weight: 700; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.08em; }
+  .cv42-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: #0F766E; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Formula Specs Subtitle */
+  .cv42-specs { font-size: 11px; color: var(--cv42-muted); font-weight: 600; }
+
+  /* Rating Row */
+  .cv42-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #0F766E; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv42-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv42-price { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 800; color: #0F766E; }
+  .cv42-cmp { font-size: 13px; color: #9CA3AF; text-decoration: line-through; }
+  .cv42-disc { font-size: 10px; font-weight: 800; color: #0F766E; background: var(--cv42-ice); padding: 2px 6px; border-radius: 4px; }
+
+  /* Dosage Variant Selector */
+  .cv42-sizes { display: flex; gap: 6px; overflow-x: auto; justify-content: center; margin-top: 4px; }
+  .cv42-size-btn {
+    font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 4px;
+    border: 1px solid var(--cv42-border); background: #FFFFFF; color: #0F766E; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv42-size-btn.active, .cv42-size-btn:hover { background: #0D9488; color: #FFFFFF; border-color: #0D9488; }
+
+  /* Bottom Button */
+  .cv42-action-box { padding: 0 14px 14px; }
+  .cv42-atc-btn {
+    width: 100%; padding: 11px;
+    background: #0D9488; color: #FFFFFF;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+  }
+  .cv42-atc-btn:hover { background: #0F766E; transform: scale(1.01); }
+  .cv42-atc-btn:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv42-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv42-badge-lab">CLINICALLY BACKED NOOTROPIC 🧬</span>
+
+    <button type="button" class="cv42-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv42-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv42-img cv42-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv42-img cv42-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-6' | placeholder_svg_tag: 'cv42-img' }}
+      {% endif %}
+
+      <button type="button" class="cv42-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv42-content">
+      {% if card_prod.vendor != blank %}<span class="cv42-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv42-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv42-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv42-specs">500mg Lion's Mane | Alpha-GPC Stack</span>
+
+      <div class="cv42-rating">
+        <span>★ 4.9</span> <span>(2,850 reviews)</span>
+      </div>
+
+      <div class="cv42-price-row">
+        <span class="cv42-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv42-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv42-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Dosage Selector -->
+      <div class="cv42-sizes">
+        {% for variant in card_prod.variants limit: 3 %}
+          <button type="button" class="cv42-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv42-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv42-atc-btn" data-add-cart="{{ cur_var.id }}">OPTIMIZE COGNITION</button>
+      {% else %}
+        <button type="button" class="cv42-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv42-card">
+    <div class="cv42-media">{{ 'product-6' | placeholder_svg_tag: 'cv42-img' }}</div>
+    <div class="cv42-content">
+      <span class="cv42-vendor">NOOTROPICS D2C</span>
+      <div class="cv42-title">Clarity Focus & Memory Nootropic Stack</div>
+
+      {% if card_r_show != false %}
+      <div class="cv42-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv42-specs">500mg Lion's Mane | Alpha-GPC Stack</span>
+      <div class="cv42-price-row"><span class="cv42-price">₹ 2,499</span><span class="cv42-cmp">₹ 3,199</span><span class="cv42-disc">22% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

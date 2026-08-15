@@ -1,0 +1,98 @@
+{% comment %} CL V36 — High-End Jewelry {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv36 { background: {{ section.settings.bg_color | default: '#0B132B' }}; color: {{ section.settings.text_color | default: '#F8F9FA' }}; padding: 60px 20px; font-family: 'Playfair Display', serif; }
+  .clv36-hero { text-align: center; margin-bottom: 60px; padding: 40px 0; border-top: 1px solid #495057; border-bottom: 1px solid #495057; }
+  .clv36-hero h1 { font-size: 48px; font-weight: 400; color: #E9ECEF; margin-bottom: 20px; letter-spacing: 4px; text-transform: uppercase; }
+  .clv36-hero p { font-size: 14px; font-family: 'Lato', sans-serif; color: #ADB5BD; max-width: 600px; margin: 0 auto; letter-spacing: 1px; line-height: 1.8; }
+  .clv36-chips { display: flex; gap: 20px; justify-content: center; margin-bottom: 50px; flex-wrap: wrap; }
+  .clv36-chips a { padding: 8px 0; color: #ADB5BD; text-decoration: none; font-size: 13px; font-family: 'Lato', sans-serif; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid transparent; transition: 0.3s; }
+  .clv36-chips a:hover, .clv36-chips a.active { color: #FFF; border-bottom: 1px solid #FFF; }
+  .clv36-toolbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #343A40; padding-bottom: 20px; margin-bottom: 50px; font-family: 'Lato', sans-serif; }
+  .clv36-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 40px 20px; }
+  .clv36-promo { grid-column: span 1; background: #1C2541; color: #F8F9FA; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 1px solid #343A40; }
+  .clv36-promo h3 { font-size: 24px; font-weight: 400; margin-bottom: 20px; letter-spacing: 2px; line-height: 1.4; }
+  .clv36-promo a { display: inline-block; padding: 12px 30px; border: 1px solid #F8F9FA; color: #F8F9FA; text-decoration: none; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-family: 'Lato', sans-serif; transition: 0.3s; }
+  .clv36-promo a:hover { background: #F8F9FA; color: #0B132B; }
+  .clv36-seo { margin-top: 80px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+  @media (max-width: 768px) { .clv36-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 20px; } .clv36-hero h1 { font-size: 32px; } }
+</style>
+<div class="clv36" style="max-width: 1400px; margin: 0 auto;">
+  <div class="clv36-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}FINE JEWELRY{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Exquisite craftsmanship and timeless elegance. Discover pieces designed to be cherished for generations.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv36-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv36-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 30px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #ADB5BD;">{{ filter.label }} +</summary>
+              <div style="position: absolute; background: #0B132B; border: 1px solid #343A40; padding: 20px; z-index: 10; margin-top: 15px; min-width: 250px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 15px; cursor: pointer; font-size: 13px; color: #E9ECEF; letter-spacing: 1px;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} <span style="color: #6C757D;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; border-bottom: 1px solid #ADB5BD; color: #F8F9FA; padding: 5px 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}" style="background: #0B132B;"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv36-grid">
+      {% for product in collection.products %}
+        {% render 'card-v36', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv36-promo">
+            <h3>Bespoke<br>Design</h3>
+            <a href="/pages/bespoke">Consult an Expert</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v36', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 60px; text-align: center; font-family: 'Lato', sans-serif; letter-spacing: 2px; font-size: 12px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv36-seo">
+      <h2 style="font-size: 28px; font-weight: 400; margin-bottom: 20px; letter-spacing: 2px;">{{ section.settings.seo_title | default: 'An Heirloom in the Making' }}</h2>
+      <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #ADB5BD; line-height: 2; letter-spacing: 1px;">{{ section.settings.seo_text | default: 'Every gemstone is ethically sourced and meticulously set by master artisans, ensuring a piece that captures light and commands attention.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V36 — High-End", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#0B132B"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#F8F9FA"}
+  ], "presets": [{"name": "CL V36 — High-End"}]
+}
+{% endschema %}

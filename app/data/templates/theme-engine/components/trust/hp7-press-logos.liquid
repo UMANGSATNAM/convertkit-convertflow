@@ -1,0 +1,200 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#2b302a'
+  assign accent_color = section.settings.accent_color | default: '#4a6741'
+  assign heading = section.settings.heading | default: 'As Seen In'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 80px 20px;
+    border-top: 1px solid rgba(43, 48, 42, 0.05);
+    border-bottom: 1px solid rgba(43, 48, 42, 0.05);
+  }
+  
+  .hp7-press-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .hp7-press-heading-{{ section_id }} {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: {{ text_color | color_modify: 'alpha', 0.6 }};
+    margin: 0 0 40px 0;
+  }
+  
+  .hp7-press-grid-{{ section_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 40px 80px;
+  }
+  
+  .hp7-press-logo-{{ section_id }} {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.4s ease;
+  }
+  
+  .hp7-press-logo-{{ section_id }}:hover {
+    transform: translateY(-5px);
+  }
+  
+  .hp7-press-logo-{{ section_id }} img {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(100%) opacity(40%);
+    transition: filter 0.4s ease;
+  }
+  
+  .hp7-press-logo-{{ section_id }}:hover img {
+    filter: grayscale(0%) opacity(100%);
+  }
+  
+  .hp7-press-quote-{{ section_id }} {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: {{ text_color }};
+    color: {{ bg_color }};
+    padding: 15px 25px;
+    border-radius: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  
+  .hp7-press-quote-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: {{ text_color }} transparent transparent transparent;
+  }
+  
+  .hp7-press-logo-{{ section_id }}:hover .hp7-press-quote-{{ section_id }} {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .hp7-press-grid-{{ section_id }} {
+      gap: 30px 40px;
+    }
+    .hp7-press-logo-{{ section_id }} img {
+      max-height: 30px;
+    }
+    .hp7-press-quote-{{ section_id }} {
+      display: none; /* Hide hover quotes on mobile for better UX */
+    }
+  }
+</style>
+
+<div class="hp7-press-container-{{ section_id }}">
+  {% if heading != blank %}
+    <h3 class="hp7-press-heading-{{ section_id }}">{{ heading }}</h3>
+  {% endif %}
+  
+  <div class="hp7-press-grid-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp7-press-logo-{{ section_id }}" {{ block.shopify_attributes }}>
+        {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | image_url: width: 400 }}" alt="Press Logo" loading="lazy" width="150" height="50">
+        {% else %}
+          <div style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: {{ text_color }}; opacity: 0.5;">
+            PUBLICATION
+          </div>
+        {% endif %}
+        
+        {% if block.settings.quote != blank %}
+          <div class="hp7-press-quote-{{ section_id }}">
+            "{{ block.settings.quote }}"
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP7 Press Logos",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2b302a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#4a6741"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "As Seen In"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "quote",
+          "label": "Hover Quote",
+          "default": "The most comfortable eco-friendly gear."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 Press Logos",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

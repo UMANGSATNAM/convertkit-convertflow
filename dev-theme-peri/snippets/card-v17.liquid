@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V17 — ORGANIC BABYCARE & MOM ESSENTIALS D2C (MOTHERCARE / SUPERBOTTOMS STYLE)
+  Usage: {% render 'card-v17', product: product %}
+  Design: Pastel Mint (#E8F5E9), Gentle Lavender (#F3E5F5), Deep Forest (#1B4D3E), Plus Jakarta Sans & Outfit fonts, 18px cloud-soft corners
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  .cv17-card {
+    --cv17-bg: #FFFFFF;
+    --cv17-text: #1B4D3E;
+    --cv17-muted: #4E6E63;
+    --cv17-mint: #2E7D32;
+    --cv17-light-mint: #E8F5E9;
+    --cv17-border: #C8E6C9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cv17-bg);
+    border: 1.5px solid var(--cv17-border);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv17-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv17-mint);
+    box-shadow: 0 12px 24px -6px rgba(46, 125, 50, 0.2);
+  }
+
+  .cv17-card *, .cv17-card *::before, .cv17-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv17-card a { color: inherit; text-decoration: none; }
+  .cv17-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv17-card img { max-width: 100%; display: block; }
+
+  .cv17-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv17-light-mint);
+    overflow: hidden;
+  }
+  .cv17-img { width: 100%; height: 100%; object-fit: contain; padding: 16px; transition: transform 0.5s ease; }
+  .cv17-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv17-card:hover .cv17-img-pri { opacity: 0; }
+  .cv17-card:hover .cv17-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Organic Tag Top Left */
+  .cv17-badge-baby {
+    position: absolute; top: 10px; left: 10px;
+    background: #1B4D3E; color: #FFFFFF;
+    font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 20px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv17-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv17-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv17-mint); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv17-wish:hover, .cv17-wish.active { background: var(--cv17-mint); color: #FFFFFF; border-color: var(--cv17-mint); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv17-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(27, 77, 62, 0.95); color: #FFFFFF;
+    font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 8px; border: 1px solid var(--cv17-mint);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv17-card:hover .cv17-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv17-qv-overlay:hover { background: var(--cv17-mint); color: #FFFFFF; }
+
+  .cv17-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+  .cv17-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv17-mint); font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: 0.08em; }
+  .cv17-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: #1B4D3E; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Certifications Subtitle */
+  .cv17-certs { font-size: 11px; color: var(--cv17-muted); font-weight: 500; }
+
+  /* Rating Row */
+  .cv17-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #2E7D32; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv17-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv17-price { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: #1B4D3E; }
+  .cv17-cmp { font-size: 13px; color: #9E9E9E; text-decoration: line-through; }
+  .cv17-disc { font-size: 10px; font-weight: 700; color: var(--cv17-mint); background: var(--cv17-light-mint); padding: 2px 6px; border-radius: 4px; }
+
+  /* Baby Size Variant Selector */
+  .cv17-sizes { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv17-size-btn {
+    font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--cv17-border); background: #FFFFFF; color: #1B4D3E; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv17-size-btn.active, .cv17-size-btn:hover { background: var(--cv17-mint); color: #FFFFFF; border-color: var(--cv17-mint); }
+
+  /* Bottom Button */
+  .cv17-action-box { padding: 0 14px 14px; }
+  .cv17-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv17-mint); color: #FFFFFF;
+    font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 20px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  }
+  .cv17-atc-btn:hover { background: #1B4D3E; transform: scale(1.01); }
+  .cv17-atc-btn:disabled { background: #E0E0E0; color: #9E9E9E; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv17-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv17-badge-baby">100% ORGANIC COTTON 👶</span>
+
+    <button type="button" class="cv17-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv17-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv17-img cv17-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv17-img cv17-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'cv17-img' }}
+      {% endif %}
+
+      <button type="button" class="cv17-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv17-content">
+      {% if card_prod.vendor != blank %}<span class="cv17-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv17-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv17-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv17-certs">GOTS Certified Organic | Hypoallergenic</span>
+
+      <div class="cv17-rating">
+        <span>★ 4.9</span> <span>(1,420 reviews)</span>
+      </div>
+
+      <div class="cv17-price-row">
+        <span class="cv17-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv17-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv17-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Baby Size Variant Selector -->
+      <div class="cv17-sizes">
+        {% for variant in card_prod.variants limit: 4 %}
+          <button type="button" class="cv17-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv17-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv17-atc-btn" data-add-cart="{{ cur_var.id }}">ADD TO BABY BASKET</button>
+      {% else %}
+        <button type="button" class="cv17-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv17-card">
+    <div class="cv17-media">{{ 'product-1' | placeholder_svg_tag: 'cv17-img' }}</div>
+    <div class="cv17-content">
+      <span class="cv17-vendor">ORGANIC BABY D2C</span>
+      <div class="cv17-title">Reusable Padded Cloth Diaper w/ Organic Soaker</div>
+
+      {% if card_r_show != false %}
+      <div class="cv17-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv17-certs">GOTS Certified Organic | Hypoallergenic</span>
+      <div class="cv17-price-row"><span class="cv17-price">₹ 899</span><span class="cv17-cmp">₹ 1,199</span><span class="cv17-disc">25% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

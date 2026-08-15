@@ -1,0 +1,183 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAFAFA'
+  assign text_color = section.settings.text_color | default: '#333333'
+  assign image_position = section.settings.image_position | default: 'left'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 40px;
+    color: {{ text_color }};
+    border-bottom: 1px solid #E5E5E5;
+  }
+  
+  .hp12-iwt-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 100px;
+    flex-direction: {% if image_position == 'right' %}row-reverse{% else %}row{% endif %};
+  }
+  
+  .hp12-iwt-image-wrap-{{ section_id }} {
+    flex: 1;
+    position: relative;
+    padding-top: 60%;
+    background: #E5E5E5;
+  }
+  
+  .hp12-iwt-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  
+  .hp12-iwt-content-{{ section_id }} {
+    flex: 1;
+    padding: 40px 0;
+  }
+  
+  .hp12-iwt-heading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    margin: 0 0 30px 0;
+    line-height: 1.2;
+    letter-spacing: 1px;
+  }
+  
+  .hp12-iwt-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    margin: 0 0 40px 0;
+    opacity: 0.8;
+    max-width: 500px;
+  }
+  
+  .hp12-iwt-btn-{{ section_id }} {
+    display: inline-block;
+    padding: 10px 0;
+    color: {{ text_color }};
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 2px;
+    border-bottom: 1px solid {{ text_color }};
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp12-iwt-btn-{{ section_id }}:hover {
+    opacity: 0.5;
+  }
+
+  @media (max-width: 992px) {
+    .hp12-iwt-container-{{ section_id }} {
+      flex-direction: column;
+      gap: 60px;
+    }
+    .hp12-iwt-content-{{ section_id }} {
+      padding: 0;
+      text-align: center;
+    }
+    .hp12-iwt-text-{{ section_id }} {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp12-iwt-container-{{ section_id }}">
+  <div class="hp12-iwt-image-wrap-{{ section_id }}">
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | image_url: width: 1000 }}" alt="{{ section.settings.heading | escape }}" class="hp12-iwt-image-{{ section_id }}" loading="lazy">
+    {% else %}
+      <div class="hp12-iwt-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+    {% endif %}
+  </div>
+  
+  <div class="hp12-iwt-content-{{ section_id }}">
+    <h2 class="hp12-iwt-heading-{{ section_id }}">{{ section.settings.heading | default: 'Quiet forms.' }}</h2>
+    <div class="hp12-iwt-text-{{ section_id }}">
+      {% if section.settings.text != blank %}
+        {{ section.settings.text }}
+      {% else %}
+        <p>A study in minimalism. We believe that true luxury lies in simplicity, restraint, and an unwavering commitment to craftsmanship.</p>
+      {% endif %}
+    </div>
+    {% if section.settings.button_label != blank %}
+      <a href="{{ section.settings.button_link | default: '#' }}" class="hp12-iwt-btn-{{ section_id }}">
+        {{ section.settings.button_label }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP12 Image with Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Quiet forms."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>A study in minimalism. We believe that true luxury lies in simplicity, restraint, and an unwavering commitment to craftsmanship.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Read the journal"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP12 Image with Text"
+    }
+  ]
+}
+{% endschema %}

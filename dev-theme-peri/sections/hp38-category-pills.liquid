@@ -1,0 +1,169 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding: {{ section.settings.padding_y }}px 40px;
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding: {{ section.settings.padding_y | divided_by: 2 }}px 20px;
+    }
+  }
+
+  .hp38-pills-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .hp38-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--text-color);
+    border: 2px solid var(--text-color);
+    background: var(--bg-color);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp38-pill::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--text-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+
+  .hp38-pill:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .hp38-pill span {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+  }
+
+  .hp38-pill:hover span {
+    color: var(--bg-color);
+  }
+
+  .hp38-pill__meta {
+    font-size: 10px;
+    margin-right: 10px;
+    opacity: 0.5;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-pills-wrapper" id="HP38Pills-{{ section.id }}">
+  {%- for block in section.blocks -%}
+    <a href="{{ block.settings.link | default: '#' }}" class="hp38-pill" {{ block.shopify_attributes }}>
+      <span class="hp38-pill__meta">0{{ forloop.index }}</span>
+      <span>{{ block.settings.title }}</span>
+    </a>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Tabs",
+  "class": "section-hp38-category-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top/Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "OUTERWEAR"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Tabs",
+      "blocks": [
+        { "type": "pill", "settings": { "title": "OUTERWEAR" } },
+        { "type": "pill", "settings": { "title": "TOPS" } },
+        { "type": "pill", "settings": { "title": "BOTTOMS" } },
+        { "type": "pill", "settings": { "title": "ACCESSORIES" } },
+        { "type": "pill", "settings": { "title": "EQUIPMENT" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

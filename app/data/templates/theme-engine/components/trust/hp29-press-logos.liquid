@@ -1,0 +1,235 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-press-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp29-press__title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    opacity: 0.8;
+  }
+
+  .hp29-press__logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 40px 60px;
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp29-press__logos {
+      gap: 30px 40px;
+    }
+  }
+
+  .hp29-press__logo {
+    opacity: 0.4;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    filter: grayscale(100%) contrast(120%) sepia(20%) hue-rotate(15deg); /* Earthy blend */
+  }
+
+  .hp29-press__logo:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+  }
+
+  .hp29-press__logo img,
+  .hp29-press__logo svg {
+    max-width: 140px;
+    max-height: 40px;
+    width: auto;
+    height: auto;
+    display: block;
+    fill: var(--text-color);
+    color: var(--text-color);
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp29-press__logo img,
+    .hp29-press__logo svg {
+      max-width: 100px;
+      max-height: 30px;
+    }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-press-wrapper" id="HP29Press-{{ section.id }}">
+  {%- if section.settings.title != blank -%}
+    <h2 class="hp29-press__title">{{ section.settings.title }}</h2>
+  {%- endif -%}
+
+  <div class="hp29-press__logos">
+    {%- for block in section.blocks -%}
+      <div class="hp29-press__logo" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 300 }}" alt="{{ block.settings.image.alt | default: 'Press Logo' }}" loading="lazy">
+        {%- else -%}
+          <!-- Fallback generic text logo -->
+          <svg viewBox="0 0 150 40" width="150" height="40">
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="currentColor">
+              LOGO {{ forloop.index }}
+            </text>
+          </svg>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP29 - Boho Press Logos",
+  "class": "section-hp29-press-logos",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "As seen in"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text/Logo (Charcoal)",
+      "default": "#3D405B"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image (Transparent PNG)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 - Boho Press Logos",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,372 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --link-color: {{ section.settings.link_color }};
+    --grid-gap: {{ section.settings.grid_gap }}px;
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+      --grid-gap: {{ section.settings.mobile_grid_gap }}px;
+    }
+  }
+
+  .hp19-featured-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp19-featured__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    {% if section.settings.show_header_border %}
+    border-bottom: 1px solid rgba(69,26,3,0.1);
+    padding-bottom: 24px;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-featured__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp19-featured__title {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: clamp(28px, 5vw, {{ section.settings.title_size }}px);
+    color: var(--heading-color);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .hp19-featured__link {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .hp19-featured__link:hover {
+    transform: translateX(4px);
+  }
+
+  .hp19-featured__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+    gap: var(--grid-gap);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp19-featured__grid {
+      grid-template-columns: repeat({{ section.settings.tablet_columns }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp19-featured__grid {
+      grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+    }
+  }
+  
+  .hp19-featured__empty-card {
+    background: #FEF3C7;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #D97706;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-radius: {{ section.settings.card_radius }}px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp19-featured-wrapper" id="HP19Featured-{{ section.id }}">
+  <div class="hp19-featured__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp19-featured__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.link_text != blank and section.settings.link_url != blank -%}
+      <a href="{{ section.settings.link_url }}" class="hp19-featured__link">
+        {{ section.settings.link_text | escape }} 
+        {% if section.settings.show_link_arrow %}&rarr;{% endif %}
+      </a>
+    {%- endif -%}
+  </div>
+  
+  <div class="hp19-featured__grid">
+    {%- assign target_coll = collections[section.settings.collection] -%}
+    {%- assign product_limit = section.settings.product_limit -%}
+    
+    {%- if target_coll != blank and target_coll.products.size > 0 -%}
+      {%- for product in target_coll.products limit: product_limit -%}
+        {%- render 'card-v19', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, show_rating: section.settings.show_rating -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..product_limit) -%}
+        <div class="hp19-featured__empty-card">
+          Placeholder {{ i }}
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP19 - Featured Coll Pro",
+  "class": "section-hp19-featured",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link Text",
+      "default": "Shop All"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_link_arrow",
+      "label": "Show Arrow next to link",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1350
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Maximum Products to Show",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns on Desktop",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columns on Tablet",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Columns on Mobile",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid Gap (Desktop)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "mobile_grid_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid Gap (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Spacing Below Header",
+      "default": 48
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header_border",
+      "label": "Show Border Under Header",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Card Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show product rating",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Border Radius (if applicable)",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link Color",
+      "default": "#D97706"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - Featured Coll Pro",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

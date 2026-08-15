@@ -1,0 +1,155 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 40px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hp17-story-bg-text-{{ section_id }} {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Arial Black', sans-serif;
+    font-size: 15vw;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0, 255, 65, 0.05);
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hp17-story-container-{{ section_id }} {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 60px;
+    backdrop-filter: blur(10px);
+  }
+  
+  .hp17-story-container-{{ section_id }}::before {
+    content: '[ SYS_CORE ]';
+    position: absolute;
+    top: -12px; left: 40px;
+    background: #000;
+    padding: 0 10px;
+    color: #00FF41;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+  }
+  
+  .hp17-story-title-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    text-transform: uppercase;
+    color: #FFF;
+    margin: 0 0 30px 0;
+    letter-spacing: 2px;
+  }
+  
+  .hp17-story-title-{{ section_id }} span {
+    color: transparent;
+    -webkit-text-stroke: 1px #00FF41;
+  }
+  
+  .hp17-story-text-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 40px 0;
+  }
+  
+  .hp17-story-btn-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #00FF41;
+    background: transparent;
+    border: 1px solid #00FF41;
+    text-decoration: none;
+    padding: 15px 40px;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .hp17-story-btn-{{ section_id }}:hover {
+    background: #00FF41;
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp17-story-container-{{ section_id }} {
+      padding: 40px 20px;
+    }
+  }
+</style>
+
+<div class="hp17-story-bg-text-{{ section_id }}">MANIFESTO</div>
+
+<div class="hp17-story-container-{{ section_id }}">
+  <h2 class="hp17-story-title-{{ section_id }}">{{ section.settings.title | default: 'BORN IN THE <span>MEGACITY</span>' }}</h2>
+  <div class="hp17-story-text-{{ section_id }}">
+    {{ section.settings.text | default: '<p>We forge armor for the modern dystopia. When the neon flickers and the rain falls acidic, our gear stands between you and the grid. Engineered with stolen corp-tech and rebel ingenuity.</p>' }}
+  </div>
+  {% if section.settings.btn_text != blank %}
+    <a href="{{ section.settings.btn_link | default: '#' }}" class="hp17-story-btn-{{ section_id }}">{{ section.settings.btn_text }}</a>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "HP17 Brand Story",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "BORN IN THE <span>MEGACITY</span>"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We forge armor for the modern dystopia. When the neon flickers and the rain falls acidic, our gear stands between you and the grid. Engineered with stolen corp-tech and rebel ingenuity.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "READ DECRYPTED FILES"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP17 Brand Story"
+    }
+  ]
+}
+{% endschema %}

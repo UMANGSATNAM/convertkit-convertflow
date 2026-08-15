@@ -1,0 +1,177 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --font-body: 'Lato', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  .hp31-marquee-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 15px 0;
+  }
+
+  .hp31-marquee__track {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: hp31Marquee {{ section.settings.scroll_speed }}s linear infinite;
+  }
+
+  .hp31-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 40px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    opacity: 0.7;
+  }
+
+  .hp31-marquee__separator {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    margin: 0 20px;
+    opacity: 0.4;
+  }
+
+  @keyframes hp31Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Smooth pause on hover for a calm interaction */
+  .hp31-marquee-wrapper:hover .hp31-marquee__track {
+    animation-play-state: paused;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp31-marquee-wrapper" id="HP31Marquee-{{ section.id }}">
+  <div class="hp31-marquee__track">
+    {%- capture marquee_content -%}
+      {%- for block in section.blocks -%}
+        <div class="hp31-marquee__item" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+        </div>
+        <div class="hp31-marquee__separator"></div>
+      {%- endfor -%}
+    {%- endcapture -%}
+    
+    {{ marquee_content }}
+    {{ marquee_content }}
+    {{ marquee_content }}
+    {{ marquee_content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP31 - Zen Marquee",
+  "class": "section-hp31-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Zen Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Marquee Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Sustainable Materials"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP31 - Zen Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Mindfully Crafted" } },
+        { "type": "text", "settings": { "text": "Free Shipping on Orders over $150" } },
+        { "type": "text", "settings": { "text": "Designed in Copenhagen" } },
+        { "type": "text", "settings": { "text": "Ethically Sourced" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

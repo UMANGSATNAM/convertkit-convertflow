@@ -1,0 +1,174 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#fcfaf8'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+-%}
+
+<section class="hp1-beauty-faq" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-faq-{{ section.id }}">
+  <div class="hp1-faq-inner">
+    
+    <div class="hp1-section-header">
+      {%- if section.settings.subheading != blank -%}
+        <span class="hp1-section-subheading">{{ section.settings.subheading }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hp1-section-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="hp1-faq-list">
+      {%- for block in section.blocks -%}
+        <details class="hp1-faq-item" {{ block.shopify_attributes }}>
+          <summary class="hp1-faq-question">
+            <span>{{ block.settings.question }}</span>
+            <span class="hp1-faq-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="hp1-faq-icon-v" d="M7 0v14" stroke="currentColor" stroke-width="1.5"/>
+                <path class="hp1-faq-icon-h" d="M0 7h14" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </span>
+          </summary>
+          <div class="hp1-faq-answer">
+            <p>{{ block.settings.answer }}</p>
+          </div>
+        </details>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-faq {
+    padding: 80px 0;
+    font-family: 'Inter', sans-serif;
+  }
+  .hp1-faq-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .hp1-section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .hp1-section-subheading {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8a7a6c;
+    margin-bottom: 10px;
+  }
+  .hp1-section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .hp1-faq-list {
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .hp1-faq-item {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .hp1-faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .hp1-faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+    cursor: pointer;
+    list-style: none;
+  }
+  .hp1-faq-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: #8a7a6c;
+    transition: transform 0.3s ease;
+  }
+  .hp1-faq-item[open] .hp1-faq-icon {
+    transform: rotate(45deg);
+  }
+  
+  .hp1-faq-answer {
+    padding-bottom: 25px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #666;
+    animation: hp1FaqFadeIn 0.3s ease-out;
+  }
+  .hp1-faq-answer p { margin: 0; }
+
+  @keyframes hp1FaqFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 767px) {
+    .hp1-beauty-faq { padding: 50px 0; }
+    .hp1-faq-question { font-size: 18px; padding: 20px 0; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 FAQ",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Got Questions?"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#fcfaf8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "Are your products cruelty-free?" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "Yes! We are proud to be 100% cruelty-free. We never test on animals, and we only work with suppliers who share our values." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

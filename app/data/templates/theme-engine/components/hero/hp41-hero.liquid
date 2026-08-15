@@ -1,0 +1,273 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --border-color: #000000;
+    --shadow-color: #000000;
+    
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp41-hero-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp41-hero-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp41-hero__text-col {
+    padding: 40px;
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 12px 12px 0px var(--shadow-color);
+    position: relative;
+  }
+
+  /* Decorative Badge */
+  .hp41-hero__badge {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: #FF4911; /* Bright orange */
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 900;
+    padding: 10px 20px;
+    border: 3px solid var(--border-color);
+    border-radius: 50px;
+    transform: rotate(15deg);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    z-index: 2;
+  }
+
+  .hp41-hero__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--border-color);
+    margin: 0 0 20px;
+    text-transform: uppercase;
+  }
+
+  .hp41-hero__text {
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--border-color);
+    margin: 0 0 40px;
+  }
+
+  .hp41-hero__btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: #D7FF43; /* Neon Lime */
+    color: var(--border-color);
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp41-hero__btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+  }
+  
+  .hp41-hero__btn:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0px var(--shadow-color);
+  }
+
+  /* Right side image */
+  .hp41-hero__image-col {
+    position: relative;
+    aspect-ratio: 4/3;
+  }
+
+  .hp41-hero__image-wrap {
+    width: 100%;
+    height: 100%;
+    border: 4px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 12px 12px 0px var(--shadow-color);
+    overflow: hidden;
+    background: #FFF;
+  }
+
+  .hp41-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Floating stars */
+  .hp41-star {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    z-index: 0;
+  }
+  .hp41-star-1 {
+    top: -20px;
+    left: -20px;
+    animation: hp41-spin 10s linear infinite;
+  }
+  .hp41-star-2 {
+    bottom: -30px;
+    right: -10px;
+    animation: hp41-spin 15s linear infinite reverse;
+  }
+
+  @keyframes hp41-spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp41-hero-wrapper" id="HP41Hero-{{ section.id }}">
+  
+  <div class="hp41-hero__text-col">
+    <div class="hp41-hero__badge">{{ section.settings.badge }}</div>
+    
+    <h1 class="hp41-hero__title">{{ section.settings.title }}</h1>
+    <p class="hp41-hero__text">{{ section.settings.text }}</p>
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp41-hero__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp41-hero__image-col">
+    <!-- SVG Stars -->
+    <svg class="hp41-star hp41-star-1" viewBox="0 0 100 100">
+      <path d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z" fill="#38C6F4" stroke="#000" stroke-width="4"/>
+    </svg>
+    <svg class="hp41-star hp41-star-2" viewBox="0 0 100 100">
+      <path d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z" fill="#FF4911" stroke="#000" stroke-width="4"/>
+    </svg>
+
+    <div class="hp41-hero__image-wrap">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 1200 }}" alt="{{ section.settings.title | escape }}" class="hp41-hero__image" loading="eager">
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'hp41-hero__image' }}
+      {%- endif -%}
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP41 - Neo Hero",
+  "class": "section-hp41-hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Sticker Text",
+      "default": "NEW SHIT!"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "BOLD. LOUD. FUN."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Body Text",
+      "default": "Stop being boring. Add some actual flavor to your life with these crazy good things."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Desktop)",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Neo Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FDF0D5"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#F0A8E3"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP41 - Neo Hero"
+    }
+  ]
+}
+{% endschema %}

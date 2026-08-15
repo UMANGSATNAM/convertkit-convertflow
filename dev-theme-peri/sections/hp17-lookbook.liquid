@@ -1,0 +1,226 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+  }
+  
+  .hp17-lb-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    border: 1px solid #00FF41;
+    padding: 10px;
+  }
+  
+  .hp17-lb-image-wrap-{{ section_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .hp17-lb-image-{{ section_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: sepia(20%) hue-rotate(100deg);
+  }
+  
+  .hp17-lb-hotspot-{{ section_id }} {
+    position: absolute;
+    width: 30px; height: 30px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .hp17-lb-hotspot-{{ section_id }}::before {
+    content: '+';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00FF41;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: monospace;
+    z-index: 2;
+  }
+  
+  .hp17-lb-hotspot-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border: 1px solid #00FF41;
+    border-radius: 50%;
+    animation: hp17-pulse-{{ section_id }} 2s infinite;
+  }
+  
+  @keyframes hp17-pulse-{{ section_id }} {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  
+  .hp17-lb-card-{{ section_id }} {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    border: 1px solid #00FF41;
+    padding: 15px;
+    width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0,255,65,0.2);
+  }
+  
+  .hp17-lb-card-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: #00FF41 transparent transparent transparent;
+  }
+  
+  .hp17-lb-hotspot-{{ section_id }}:hover .hp17-lb-card-{{ section_id }} {
+    opacity: 1;
+    visibility: visible;
+    bottom: calc(100% + 25px);
+  }
+  
+  .hp17-lb-title-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #FFF;
+    font-size: 0.9rem;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+  }
+  
+  .hp17-lb-price-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    color: #B800FF;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .hp17-lb-btn-{{ section_id }} {
+    display: block;
+    background: #00FF41;
+    color: #000;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 5px;
+    text-transform: uppercase;
+  }
+  
+  .hp17-lb-scan-{{ section_id }} {
+    position: absolute;
+    top: 20px; left: 20px;
+    color: #00FF41;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    background: rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    border: 1px solid #00FF41;
+    z-index: 5;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp17-lb-container-{{ section_id }}">
+  <div class="hp17-lb-image-wrap-{{ section_id }}">
+    <div class="hp17-lb-scan-{{ section_id }}">SCANNING_AREA...</div>
+    {% if section.settings.image != blank %}
+      <img src="{{ section.settings.image | image_url: width: 1200 }}" class="hp17-lb-image-{{ section_id }}" loading="lazy" alt="Lookbook">
+    {% else %}
+      <div class="hp17-lb-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px); height: 600px;"></div>
+    {% endif %}
+    
+    {% for block in section.blocks %}
+      {% assign product = all_products[block.settings.product] %}
+      <div class="hp17-lb-hotspot-{{ section_id }}" style="top: {{ block.settings.top }}%; left: {{ block.settings.left }}%;" {{ block.shopify_attributes }}>
+        <div class="hp17-lb-card-{{ section_id }}">
+          {% if product != blank %}
+            <div class="hp17-lb-title-{{ section_id }}">{{ product.title }}</div>
+            <div class="hp17-lb-price-{{ section_id }}">{{ product.price | money }}</div>
+            <a href="{{ product.url }}" class="hp17-lb-btn-{{ section_id }}">VIEW SPECS</a>
+          {% else %}
+            <div class="hp17-lb-title-{{ section_id }}">GEAR MODULE</div>
+            <div class="hp17-lb-price-{{ section_id }}">$120.00</div>
+            <a href="#" class="hp17-lb-btn-{{ section_id }}">VIEW SPECS</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP17 Lookbook",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Lookbook Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "top",
+          "label": "Top Position (%)",
+          "min": 0, "max": 100, "step": 1, "default": 50
+        },
+        {
+          "type": "range",
+          "id": "left",
+          "label": "Left Position (%)",
+          "min": 0, "max": 100, "step": 1, "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP17 Lookbook",
+      "blocks": [
+        { "type": "hotspot", "settings": { "top": 30, "left": 40 } },
+        { "type": "hotspot", "settings": { "top": 60, "left": 60 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

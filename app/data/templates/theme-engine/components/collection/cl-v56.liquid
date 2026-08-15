@@ -1,0 +1,100 @@
+{% comment %} CL V56 — Surfing / Tropical (Aqua/Coral) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv56 { background: {{ section.settings.bg_color | default: '#F0FFFF' }}; color: {{ section.settings.text_color | default: '#005C5C' }}; padding: 30px 15px; font-family: 'Poppins', sans-serif; }
+  .clv56-hero { text-align: center; margin-bottom: 40px; padding: 60px 20px; background: linear-gradient(135deg, #00B4DB, #0083B0); color: #FFF; border-radius: 20px 20px 100px 20px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 180, 219, 0.3); }
+  .clv56-hero::before { content: '🌊'; position: absolute; font-size: 150px; opacity: 0.1; right: -20px; bottom: -40px; }
+  .clv56-hero h1 { font-size: 52px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0px #FF7F50; }
+  .clv56-hero p { font-size: 18px; font-weight: 500; max-width: 600px; margin: 0 auto; }
+  .clv56-chips { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv56-chips a { padding: 10px 25px; background: #FFF; color: #0083B0; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 30px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .clv56-chips a:hover, .clv56-chips a.active { background: #FF7F50; color: #FFF; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(255, 127, 80, 0.3); }
+  .clv56-toolbar { background: #FFF; border-radius: 15px; padding: 15px 25px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,180,219,0.1); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #FF7F50; }
+  .clv56-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 25px; }
+  .clv56-promo { grid-column: span 1; background: #FF7F50; color: #FFF; border-radius: 15px; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+  .clv56-promo::before { content: '🌴'; position: absolute; left: -10px; bottom: -20px; font-size: 80px; opacity: 0.2; }
+  .clv56-promo h3 { font-size: 26px; font-weight: 800; margin-bottom: 15px; z-index: 1; line-height: 1.2; text-transform: uppercase; }
+  .clv56-promo a { display: inline-block; padding: 12px 25px; background: #FFF; color: #FF7F50; text-decoration: none; font-weight: 700; border-radius: 30px; font-size: 14px; z-index: 1; }
+  .clv56-promo a:hover { background: #0083B0; color: #FFF; }
+  .clv56-seo { margin-top: 50px; background: #FFF; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; border-bottom: 5px solid #00B4DB; }
+  @media (max-width: 768px) { .clv56-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv56-hero h1 { font-size: 38px; } }
+</style>
+<div class="clv56" style="max-width: 1250px; margin: 0 auto;">
+  <div class="clv56-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Surf's Up{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Catch the best gear before the tide rolls out.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv56-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv56-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 25px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 15px; font-weight: 600; color: #0083B0;">{{ filter.label }} ▼</summary>
+              <div style="position: absolute; background: #FFF; border: none; padding: 20px; border-radius: 12px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 0 15px 30px rgba(0,180,219,0.2);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #005C5C;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #FF7F50;">
+                    {{ value.label }} <span style="opacity: 0.6; font-size: 12px;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #F0FFFF; border: none; color: #0083B0; padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv56-grid">
+      {% for product in collection.products %}
+        {% render 'card-v56', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv56-promo">
+            <h3>Summer<br>Swell<br>Sale</h3>
+            <a href="/collections/sale">Dive In</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v56', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 18px; font-weight: 700; color: #0083B0;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv56-seo">
+      <h2 style="font-size: 24px; font-weight: 800; color: #0083B0; margin-bottom: 15px; text-transform: uppercase;">{{ section.settings.seo_title | default: 'Born in the Water' }}</h2>
+      <p style="font-size: 15px; color: #005C5C; max-width: 700px; margin: 0 auto; line-height: 1.6;">{{ section.settings.seo_text | default: 'Our boards, wetsuits, and apparel are tested in the toughest breaks to ensure maximum performance and stoke.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V56 — Tropical", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F0FFFF"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#005C5C"}
+  ], "presets": [{"name": "CL V56 — Tropical"}]
+}
+{% endschema %}

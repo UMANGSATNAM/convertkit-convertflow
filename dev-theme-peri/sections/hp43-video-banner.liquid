@@ -1,0 +1,261 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: "#080B10" }};
+    padding: {{ section.settings.padding_top | default: 80 }}px 20px {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp43-video__container {
+    max-width: 1320px;
+    margin: 0 auto;
+    height: {{ section.settings.height | default: 520 }}px;
+    background: {{ section.settings.card_bg | default: "#101622" }};
+    border: 1px solid {{ section.settings.border_color | default: "#1E293B" }};
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  }
+
+  .hp43-video__poster,
+  .hp43-video__container svg.placeholder-svg,
+  .hp43-video__container video,
+  .hp43-video__container iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+    display: block;
+  }
+  .hp43-video__poster { opacity: {{ section.settings.overlay_opacity | default: 80 | divided_by: 100.0 }}; }
+
+  .hp43-video__play-btn {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    background: {{ section.settings.accent_color | default: "#00F0FF" }};
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ section.settings.bg_color | default: "#080B10" }};
+    cursor: pointer;
+    box-shadow: 0 0 40px {{ section.settings.accent_color | default: "#00F0FF" }}99;
+    transition: transform 0.25s ease;
+  }
+  .hp43-video__play-btn svg { width: 34px; height: 34px; margin-left: 4px; }
+  .hp43-video__play-btn:hover { transform: scale(1.1); background: #FFFFFF; }
+  .hp43-video__play-btn:focus-visible { outline: 3px solid #FFFFFF; outline-offset: 3px; }
+
+  .hp43-video__caption {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    color: #FFFFFF;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+    max-width: 70%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .hp43-video__container { height: {{ section.settings.height_mobile | default: 320 }}px; }
+    .hp43-video__play-btn { width: 64px; height: 64px; }
+    .hp43-video__play-btn svg { width: 24px; height: 24px; }
+    .hp43-video__caption { font-size: 15px; left: 16px; bottom: 16px; max-width: 85%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hp43-video__play-btn { transition: none; }
+    .hp43-video__play-btn:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<div class="hp43-video__container" id="hp43-video-{{ section.id }}">
+  {%- if section.settings.video != blank -%}
+    {{ section.settings.video | video_tag: image_size: '1200x', controls: true, muted: false }}
+  {%- else -%}
+    {%- if section.settings.poster != blank -%}
+      <img
+        src="{{ section.settings.poster | image_url: width: 1400 }}"
+        class="hp43-video__poster"
+        alt="{{ section.settings.poster.alt | default: section.settings.caption | escape }}"
+        width="1400" height="{{ section.settings.height | default: 520 }}" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+
+    {%- if section.settings.video_url != blank -%}
+      <button
+        type="button"
+        class="hp43-video__play-btn"
+        data-hp43-play
+        data-video-url="{{ section.settings.video_url }}"
+        aria-label="{{ section.settings.play_label | default: 'Play video' | escape }}">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    {%- endif -%}
+
+    {%- if section.settings.caption != blank -%}
+      <div class="hp43-video__caption">{{ section.settings.caption }}</div>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{%- if section.settings.video == blank and section.settings.video_url != blank -%}
+  <script>
+    (function () {
+      var box = document.getElementById('hp43-video-{{ section.id }}');
+      if (!box) return;
+      var btn = box.querySelector('[data-hp43-play]');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-video-url') || '';
+        var embed = '';
+        var yt = url.match(/(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([\w-]{11})/);
+        var vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        if (yt) embed = 'https://www.youtube.com/embed/' + yt[1] + '?autoplay=1&rel=0';
+        else if (vm) embed = 'https://player.vimeo.com/video/' + vm[1] + '?autoplay=1';
+        if (!embed) { window.open(url, '_blank', 'noopener'); return; }
+        var f = document.createElement('iframe');
+        f.src = embed;
+        f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+        f.setAttribute('allowfullscreen', '');
+        f.setAttribute('title', {{ section.settings.play_label | default: 'Video' | json }});
+        box.innerHTML = '';
+        box.appendChild(f);
+      });
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "HP43 - Cyber Video",
+  "class": "section-hp43-video",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Shopify-hosted video. Plays inline with controls."
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "label": "Or a YouTube / Vimeo URL",
+      "accept": ["youtube", "vimeo"],
+      "info": "Used only when no Shopify video is chosen. Loads the player after the visitor clicks play."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Cover image"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "play_label",
+      "label": "Play button label",
+      "info": "Read by screen readers.",
+      "default": "Play video"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height (desktop)",
+      "min": 260,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Height (mobile)",
+      "min": 200,
+      "max": 520,
+      "step": 20,
+      "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Cover image opacity",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#080B10"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Frame",
+      "default": "#101622"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Play button",
+      "default": "#00F0FF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#1E293B"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP43 - Cyber Video"
+    }
+  ]
+}
+{% endschema %}

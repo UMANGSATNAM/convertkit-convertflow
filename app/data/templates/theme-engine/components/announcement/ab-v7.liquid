@@ -1,0 +1,83 @@
+{% comment %}
+  AB V7 — Liquid Death Gold Foil Punk Bar
+{% endcomment %}
+{%- assign s = section.settings -%}
+<style>
+  .abv7 {
+    background: {{ s.bg_color }}; color: {{ s.text_color }};
+    font-family: Impact, 'Arial Black', sans-serif; font-size: {{ s.font_size }}px; letter-spacing: 2px;
+    text-transform: uppercase;
+    min-height: {{ s.bar_height }}px; display: flex; align-items: center; justify-content: center;
+    gap: 14px; padding: 6px 40px; text-align: center; position: relative; z-index: 100;
+    border-bottom: 3px solid {{ s.accent_color }};
+  }
+  .abv7__msg { text-decoration: none; color: inherit; }
+  .abv7__code { background: {{ s.accent_color }}; color: {{ s.bg_color }}; padding: 3px 10px;
+    font-size: 0.85em; font-family: inherit; letter-spacing: 1px; border: none; cursor: pointer; white-space: nowrap; }
+  .abv7__close { position: absolute; right: 8px; background: none; border: none; color: inherit;
+    cursor: pointer; opacity: 0.6; font-size: 20px; line-height: 1; padding: 8px; }
+  .abv7__close:hover { opacity: 1; }
+  @media screen and (max-width: 749px) {
+    .abv7 { font-size: {{ s.font_size | minus: 3 }}px; letter-spacing: 1px; padding: 8px 40px 8px 12px; flex-wrap: wrap; gap: 8px; }
+    .abv7__close { min-width: 44px; min-height: 44px; right: 0; }
+  }
+</style>
+
+{%- if s.enable -%}
+<div class="abv7" id="abv7-{{ section.id }}" role="region" aria-label="Announcement">
+  {%- if s.link != blank -%}
+    <a class="abv7__msg" href="{{ s.link }}">{{ s.message }}</a>
+  {%- else -%}
+    <span class="abv7__msg">{{ s.message }}</span>
+  {%- endif -%}
+  {%- if s.promo_code != blank -%}
+    <button class="abv7__code" type="button" data-code="{{ s.promo_code }}">{{ s.promo_code }}</button>
+  {%- endif -%}
+  {%- if s.dismissible -%}
+    <button class="abv7__close" type="button" aria-label="Close announcement">&times;</button>
+  {%- endif -%}
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('abv7-{{ section.id }}');
+    if (!bar) return;
+    var key = 'abv7-dismissed-{{ section.id }}';
+    {%- if s.dismissible -%}
+    try { if (localStorage.getItem(key) === '1') bar.style.display = 'none'; } catch (e) {}
+    var close = bar.querySelector('.abv7__close');
+    if (close) close.addEventListener('click', function () {
+      bar.style.display = 'none';
+      try { localStorage.setItem(key, '1'); } catch (e) {}
+    });
+    {%- endif -%}
+    var chip = bar.querySelector('.abv7__code');
+    if (chip && navigator.clipboard) chip.addEventListener('click', function () {
+      var original = chip.textContent;
+      navigator.clipboard.writeText(chip.getAttribute('data-code')).then(function () {
+        chip.textContent = 'COPIED';
+        setTimeout(function () { chip.textContent = original; }, 1500);
+      });
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AB V7 — Gold Foil Punk",
+  "settings": [
+    { "type": "checkbox", "id": "enable", "label": "Show bar", "default": true },
+    { "type": "text", "id": "message", "label": "Message", "default": "💀 MURDER YOUR THIRST — 6 PACK MOUNTAIN WATER BUNDLE DISCOUNT 💀" },
+    { "type": "url", "id": "link", "label": "Message link" },
+    { "type": "text", "id": "promo_code", "label": "Promo code chip (tap to copy)" },
+    { "type": "checkbox", "id": "dismissible", "label": "Allow visitors to close", "default": false },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#FFD700" },
+    { "type": "color", "id": "accent_color", "label": "Accent / Border", "default": "#FFD700" },
+    { "type": "range", "id": "font_size", "min": 10, "max": 22, "step": 1, "unit": "px", "label": "Font size", "default": 15 },
+    { "type": "range", "id": "bar_height", "min": 30, "max": 70, "step": 2, "unit": "px", "label": "Bar height", "default": 44 }
+  ],
+  "presets": [{ "name": "AB V7 — Gold Foil Punk" }]
+}
+{% endschema %}

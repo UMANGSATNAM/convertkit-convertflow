@@ -1,0 +1,224 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 20px;
+    border-bottom: 4px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .hp41-testi-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .hp41-testi__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--border-color);
+    margin: 0 0 60px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .hp41-testi__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp41-testi__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp41-testi-card {
+    background: #FFF;
+    border: 4px solid var(--border-color);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 10px 10px 0px var(--border-color);
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  /* Fun tilt logic */
+  .hp41-testi-card:nth-child(1) { transform: rotate(-2deg); background: #D7FF43; }
+  .hp41-testi-card:nth-child(2) { transform: rotate(1deg); background: #F0A8E3; }
+  .hp41-testi-card:nth-child(3) { transform: rotate(-3deg); background: #38C6F4; }
+
+  .hp41-testi-card:hover {
+    transform: rotate(0) translate(-4px, -4px);
+    box-shadow: 14px 14px 0px var(--border-color);
+    z-index: 2;
+  }
+
+  /* Fake Tape */
+  .hp41-testi__tape {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 100px;
+    height: 30px;
+    background: rgba(255,255,255,0.6);
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0px var(--border-color);
+    z-index: 3;
+  }
+
+  .hp41-testi__quote {
+    font-family: var(--font-body);
+    font-size: clamp(18px, 2vw, {{ section.settings.quote_size }}px);
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--border-color);
+    margin: 0 0 30px;
+  }
+
+  .hp41-testi__author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .hp41-testi__avatar {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    background: #FF4911;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    color: #FFF;
+    box-shadow: 3px 3px 0px var(--border-color);
+  }
+
+  .hp41-testi__name {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--border-color);
+    text-transform: uppercase;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp41-testi-wrapper" id="HP41Testi-{{ section.id }}">
+  <h2 class="hp41-testi__title">{{ section.settings.title }}</h2>
+
+  <div class="hp41-testi__grid">
+    {%- for block in section.blocks limit: 3 -%}
+      <div class="hp41-testi-card" {{ block.shopify_attributes }}>
+        <div class="hp41-testi__tape"></div>
+        <div class="hp41-testi__quote">"{{ block.settings.quote }}"</div>
+        <div class="hp41-testi__author">
+          <div class="hp41-testi__avatar">{{ block.settings.author | slice: 0 }}</div>
+          <div class="hp41-testi__name">{{ block.settings.author }}</div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP41 - Neo Testimonials",
+  "class": "section-hp41-testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "THE HYPE IS REAL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Quote Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Neo Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FDF0D5"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "Literally the coolest thing I have ever bought. Period."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "ALEX M."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP41 - Neo Testimonials",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review", "settings": { "quote": "I get stopped in the street every time I wear this. So sick.", "author": "SARAH J." } },
+        { "type": "review", "settings": { "quote": "If you don't buy this right now you are making a huge mistake.", "author": "JAKE T." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

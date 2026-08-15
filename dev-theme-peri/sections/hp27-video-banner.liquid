@@ -1,0 +1,432 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Syncopate', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+  }
+
+  .hp27-video {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.desktop_height }}vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-video {
+      height: {{ section.settings.mobile_height }}vh;
+      min-height: 400px;
+    }
+  }
+
+  .hp27-video__bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+    background: #000;
+  }
+
+  .hp27-video__bg img,
+  .hp27-video__bg video,
+  .hp27-video__bg iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: {{ section.settings.media_opacity | divided_by: 100.0 }};
+    filter: grayscale(80%) contrast(1.2);
+  }
+
+  /* HUD Elements Overlay */
+  .hp27-video__hud {
+    position: absolute;
+    top: 40px; left: 40px; right: 40px; bottom: 40px;
+    z-index: 2;
+    pointer-events: none;
+    border: 1px solid rgba(226, 226, 226, 0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-video__hud {
+      top: 20px; left: 20px; right: 20px; bottom: 20px;
+    }
+  }
+
+  /* HUD Corners */
+  .hp27-video__hud::before,
+  .hp27-video__hud::after {
+    content: '';
+    position: absolute;
+    width: 30px; height: 30px;
+    border: 2px solid var(--accent-color);
+  }
+
+  .hp27-video__hud::before {
+    top: -2px; left: -2px;
+    border-right: none; border-bottom: none;
+  }
+
+  .hp27-video__hud::after {
+    bottom: -2px; right: -2px;
+    border-left: none; border-top: none;
+  }
+
+  /* Crosshair center */
+  .hp27-video__crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; height: 100px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hp27-video__crosshair::before,
+  .hp27-video__crosshair::after {
+    content: '';
+    position: absolute;
+    background: rgba(226, 226, 226, 0.3);
+  }
+
+  .hp27-video__crosshair::before {
+    top: 50%; left: 0; width: 100%; height: 1px;
+  }
+
+  .hp27-video__crosshair::after {
+    top: 0; left: 50%; width: 1px; height: 100%;
+  }
+
+  /* Recording indicator */
+  .hp27-video__rec {
+    position: absolute;
+    top: 20px; right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: 0.15em;
+    z-index: 2;
+  }
+
+  .hp27-video__rec-dot {
+    width: 8px; height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    animation: pulseRec 1.5s infinite;
+  }
+
+  @keyframes pulseRec {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+
+  .hp27-video__content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .hp27-video__play {
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    border: 1px solid var(--text-color);
+    border-radius: 0; /* Square/technical */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp27-video__play::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: var(--text-color);
+    transition: left 0.4s ease;
+    z-index: 0;
+  }
+
+  .hp27-video__play svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-color);
+    position: relative;
+    z-index: 1;
+    margin-left: 5px; /* Visual center for triangle */
+    transition: fill 0.3s ease;
+  }
+
+  .hp27-video__play:hover {
+    border-color: var(--text-color);
+    box-shadow: 0 0 20px rgba(226, 226, 226, 0.3);
+  }
+
+  .hp27-video__play:hover::before {
+    left: 0;
+  }
+
+  .hp27-video__play:hover svg {
+    fill: var(--bg-color);
+  }
+
+  .hp27-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  /* Modal Styles */
+  .hp27-video__modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 10, 10, 0.95);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .hp27-video__modal.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .hp27-video__modal-close {
+    position: absolute;
+    top: 40px; right: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-family: var(--font-heading);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .hp27-video__modal-close:hover {
+    color: var(--accent-color);
+  }
+
+  .hp27-video__modal-content {
+    width: 90%;
+    max-width: 1200px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border: 1px solid rgba(226, 226, 226, 0.2);
+  }
+
+  .hp27-video__modal-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp27-video" id="HP27Video-{{ section.id }}">
+  <div class="hp27-video__bg">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp27-video__hud">
+    <div class="hp27-video__rec">
+      <div class="hp27-video__rec-dot"></div> REC
+    </div>
+  </div>
+  <div class="hp27-video__crosshair"></div>
+
+  <div class="hp27-video__content">
+    {%- if section.settings.video_url != blank -%}
+      <button class="hp27-video__play" aria-label="Play Video">
+        <svg viewBox="0 0 24 24"><path d="M8 5V19L19 12L8 5Z"/></svg>
+      </button>
+    {%- endif -%}
+
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp27-video__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if section.settings.video_url != blank -%}
+<div class="hp27-video__modal" id="HP27VideoModal-{{ section.id }}">
+  <button class="hp27-video__modal-close" aria-label="Close">&times;</button>
+  <div class="hp27-video__modal-content">
+    {%- if section.settings.video_url.type == 'youtube' -%}
+      <iframe data-src="https://www.youtube.com/embed/{{ section.settings.video_url.id }}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    {%- elsif section.settings.video_url.type == 'vimeo' -%}
+      <iframe data-src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const playBtn = document.querySelector('#HP27Video-{{ section.id }} .hp27-video__play');
+    const modal = document.getElementById('HP27VideoModal-{{ section.id }}');
+    const closeBtn = modal ? modal.querySelector('.hp27-video__modal-close') : null;
+    const iframe = modal ? modal.querySelector('iframe') : null;
+
+    if(playBtn && modal && iframe) {
+      playBtn.addEventListener('click', () => {
+        iframe.src = iframe.getAttribute('data-src');
+        modal.classList.add('is-active');
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('is-active');
+        iframe.src = '';
+      });
+
+      modal.addEventListener('click', (e) => {
+        if(e.target === modal) {
+          modal.classList.remove('is-active');
+          iframe.src = '';
+        }
+      });
+    }
+  });
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "HP27 - Eng Video",
+  "class": "section-hp27-video-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Cover Image"
+    },
+    {
+      "type": "range",
+      "id": "media_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "label": "Media Opacity (%)",
+      "default": 40
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "Video URL",
+      "info": "YouTube or Vimeo URL"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "FIELD TESTING"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Desktop Height",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Mobile Height",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Dark Engineered Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2E2E2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF2A2A"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP27 - Eng Video"
+    }
+  ]
+}
+{% endschema %}

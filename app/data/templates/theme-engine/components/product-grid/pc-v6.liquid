@@ -1,0 +1,519 @@
+{%- comment -%}
+  PC V6 — SWISS ARCHITECTURAL MONOCHROME GRID
+  Design: Stark Dark Monochrome (#111111), Pure White accents, Archivo typography
+  Card Shape: Sharp 0px corners, thin grid dividers, grayscale-to-color image hover
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap');
+
+  .pcv6 {
+    --bg: {{ section.settings.bg_color | default: '#111111' }};
+    --card-bg: {{ section.settings.card_bg | default: '#181818' }};
+    --text: {{ section.settings.text_color | default: '#FFFFFF' }};
+    --muted: {{ section.settings.muted_color | default: '#888888' }};
+    --accent: {{ section.settings.accent_color | default: '#FFFFFF' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#E0E0E0' }};
+    --border: {{ section.settings.border_color | default: '#2A2A2A' }};
+    --badge-sale-bg: #FFFFFF;
+    --badge-sale-text: #111111;
+    --f-main: 'Archivo', sans-serif;
+    --ease: all 0.25s ease;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-main);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv6 *, .pcv6 *::before, .pcv6 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv6 a { color: inherit; text-decoration: none; }
+  .pcv6 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv6 img { max-width: 100%; display: block; }
+
+  .pcv6__wrap { max-width: 1360px; margin: 0 auto; padding: 0 24px; }
+
+  /* HEADER */
+  .pcv6__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv6__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv6__title { font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -0.04em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv6__title { font-size: 44px; } }
+  .pcv6__sub { font-size: 14px; color: var(--muted); font-weight: 500; letter-spacing: 0.02em; }
+  .pcv6__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text); border: 1px solid var(--border); padding: 10px 20px; transition: var(--ease); }
+  .pcv6__viewall:hover { background: var(--text); color: #111111; }
+
+  /* GRID */
+  .pcv6__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  @media (min-width: 640px) {
+    .pcv6__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .pcv6__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); }
+  }
+
+  /* CARD */
+  .pcv6__card {
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--ease);
+  }
+  .pcv6__card:hover {
+    background: #202020;
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv6__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '3/4' }};
+    background: #141414;
+    overflow: hidden;
+  }
+  .pcv6__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.4s ease, transform 0.4s ease;
+  }
+  .pcv6__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv6__card:hover .pcv6__img { filter: grayscale(0%); }
+  .pcv6__card:hover .pcv6__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.03);
+    {% endif %}
+  }
+  .pcv6__card:hover .pcv6__img--sec { opacity: 1; transform: scale(1.03); }
+
+  /* BADGES */
+  .pcv6__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 2; pointer-events: none; }
+  .pcv6__badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; letter-spacing: 0.08em; }
+  .pcv6__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv6__badge--tag { background: #333333; color: #FFFFFF; }
+  .pcv6__badge--sold { background: #555555; color: #888888; }
+
+  /* WISHLIST BUTTON */
+  .pcv6__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 34px; height: 34px;
+    background: #111111;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: #888888;
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv6__wish:hover { background: #FFFFFF; color: #111111; }
+  .pcv6__wish.active { background: #FFFFFF; color: #111111; }
+
+  /* QUICK ADD BUTTON */
+  .pcv6__quick-box { padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border); }
+  .pcv6__quick-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--text);
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv6__quick-btn:hover { background: var(--text); color: #111111; border-color: var(--text); }
+  .pcv6__quick-btn:disabled { color: #555555; border-color: #333333; cursor: not-allowed; }
+
+  /* CARD CONTENT */
+  .pcv6__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv6__vendor { font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 600; letter-spacing: 0.12em; }
+  .pcv6__item-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv6__rating { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); font-weight: 600; }
+  .pcv6__stars { letter-spacing: 1px; }
+  .pcv6__rev-cnt { color: var(--muted); font-size: 11px; }
+
+  /* PRICE */
+  .pcv6__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv6__price { font-size: 16px; font-weight: 700; color: var(--text); }
+  .pcv6__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv6__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv6__swatch { width: 12px; height: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv6__swatch:hover, .pcv6__swatch.active { border-color: var(--text); background: var(--text); }
+
+  /* URGENCY MICRO */
+  .pcv6__urgency { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 2px; }
+
+  /* TOAST */
+  .pcv6__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: #FFFFFF; color: #111111;
+    padding: 12px 24px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.25s ease;
+  }
+  .pcv6__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv6">
+  <div class="pcv6__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv6__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv6__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv6__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv6__viewall">
+            {{ section.settings.view_all_label | default: 'View All Items' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv6__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v6', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v6', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv6__toast" id="pcv6-toast">ITEM ADDED</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv6-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv6Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'PROCESSING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ ADDED';
+        showT('ITEM ADDED');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv6-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V6 — Swiss Monochrome",
+  "tag": "section",
+  "class": "pcv6-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "ARCHIVE"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "ARCHITECTURAL INDEX"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Precision engineered minimal goods for structured living."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "View All Items"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#181818"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#888888"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#2A2A2A"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V6 — Swiss Monochrome"
+    }
+  ]
+}
+{% endschema %}

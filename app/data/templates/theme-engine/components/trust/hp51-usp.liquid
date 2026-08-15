@@ -1,0 +1,128 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp51-usp-bg: {{ section.settings.bg_color | default: '#F2EFE9' }};
+    --hp51-card-bg: {{ section.settings.card_bg | default: '#FAF8F5' }};
+    --hp51-title: {{ section.settings.title_color | default: '#1E3A2B' }};
+    --hp51-matcha: {{ section.settings.accent_matcha | default: '#2D5A3D' }};
+    
+    background-color: var(--hp51-usp-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp51-usp__grid {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp51-usp__card {
+    background: var(--hp51-card-bg);
+    border: 1px solid rgba(30, 58, 43, 0.12);
+    border-radius: 16px;
+    padding: 36px 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(30, 58, 43, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp51-usp__card:hover {
+    border-color: var(--hp51-matcha);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(30, 58, 43, 0.08);
+  }
+
+  .hp51-usp__icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .hp51-usp__title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--hp51-title);
+    margin: 0 0 10px;
+  }
+
+  .hp51-usp__desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4A5B50;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp51-usp__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media screen and (max-width: 576px) {
+    .hp51-usp__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp51-usp__grid">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <div class="hp51-usp__card" {{ block.shopify_attributes }}>
+        <div class="hp51-usp__icon">{{ block.settings.icon | default: '🍵' }}</div>
+        <h3 class="hp51-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp51-usp__desc">{{ block.settings.description }}</p>
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div class="hp51-usp__card">
+      <div class="hp51-usp__icon">🍵</div>
+      <h3 class="hp51-usp__title">Uji Matcha EGCG</h3>
+      <p class="hp51-usp__desc">Potent antioxidant polyphenols that neutralize oxidative urban pollution stress.</p>
+    </div>
+    <div class="hp51-usp__card">
+      <div class="hp51-usp__icon">🎍</div>
+      <h3 class="hp51-usp__title">Bamboo Silica Sap</h3>
+      <p class="hp51-usp__desc">Pure organic bamboo water rich in natural silica to rebuild dermal elasticity.</p>
+    </div>
+    <div class="hp51-usp__card">
+      <div class="hp51-usp__icon">✈️</div>
+      <h3 class="hp51-usp__title">Direct DDP Air Courier</h3>
+      <p class="hp51-usp__desc">Fast doorstep delivery with all customs duties pre-paid across 180+ countries.</p>
+    </div>
+    <div class="hp51-usp__card">
+      <div class="hp51-usp__icon">🛡️</div>
+      <h3 class="hp51-usp__title">Zen Purity Protocol</h3>
+      <p class="hp51-usp__desc">100% vegan, clean botanical extraction certified hypoallergenic for sensitive skin.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP51 - Zen Pillars",
+  "class": "section-hp51-usp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F2EFE9" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FAF8F5" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#1E3A2B" },
+    { "type": "color", "id": "accent_matcha", "label": "Matcha Accent", "default": "#2D5A3D" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pillar Card",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "default": "🍵" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Uji Matcha EGCG" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Potent antioxidant polyphenols." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP51 - Zen Pillars" }
+  ]
+}
+{% endschema %}

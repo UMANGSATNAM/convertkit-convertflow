@@ -1,0 +1,251 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=DM+Sans:wght@400;500;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Shrikhand', cursive;
+    --font-body: 'DM Sans', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp37-video-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-video-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp37-video__container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: 5px solid var(--text-color);
+    border-radius: 60px; /* Retro TV shape */
+    overflow: hidden;
+    box-shadow: 12px 12px 0px var(--accent-color);
+    background: #000;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-video__container {
+      aspect-ratio: 4/5;
+      border-radius: 30px;
+      box-shadow: 6px 6px 0px var(--accent-color);
+    }
+  }
+
+  .hp37-video__media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+  }
+
+  .hp37-video__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .hp37-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--bg-color);
+    margin: 0;
+    text-shadow: 4px 4px 0px var(--text-color);
+    transform: rotate(-2deg);
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .hp37-video__play-btn {
+    position: absolute;
+    bottom: -30px;
+    right: 60px;
+    width: 100px; height: 100px;
+    background: var(--text-color);
+    border: 3px solid var(--text-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-color);
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--accent-color);
+    z-index: 4;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp37-video__play-btn {
+      right: 20px;
+      width: 80px; height: 80px;
+      bottom: -20px;
+    }
+  }
+
+  .hp37-video__play-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--accent-color);
+  }
+
+  .hp37-video__play-btn svg {
+    width: 40px; height: 40px;
+    fill: currentColor;
+    margin-left: 5px;
+  }
+
+  /* Scanlines effect for the video */
+  .hp37-video__scanlines {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp37-video-wrapper" id="HP37Video-{{ section.id }}">
+  <div class="hp37-video__container">
+    {%- if section.settings.video_url != blank -%}
+      {%- if section.settings.video_url.type == 'youtube' -%}
+        <iframe class="hp37-video__media" src="https://www.youtube.com/embed/{{ section.settings.video_url.id }}?autoplay=0&controls=0&mute=1&loop=1&playlist={{ section.settings.video_url.id }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      {%- elsif section.settings.video_url.type == 'vimeo' -%}
+        <iframe class="hp37-video__media" src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?background=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      {%- endif -%}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hp37-video__media' }}
+    {%- endif -%}
+    
+    <div class="hp37-video__scanlines"></div>
+
+    <div class="hp37-video__overlay">
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp37-video__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+    </div>
+  </div>
+  
+  <button class="hp37-video__play-btn" aria-label="Play Video">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+</div>
+
+{% schema %}
+{
+  "name": "HP37 - Retro Video",
+  "class": "section-hp37-video-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Catch the Wave"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "Video URL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 140,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Retro Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4E3C5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#4A3219"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#EAB059"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP37 - Retro Video"
+    }
+  ]
+}
+{% endschema %}

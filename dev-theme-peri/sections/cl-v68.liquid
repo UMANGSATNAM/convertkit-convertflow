@@ -1,0 +1,100 @@
+{% comment %} CL V68 — Art Supply (Creative/Splatters) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv68 { background: {{ section.settings.bg_color | default: '#FFFFFF' }}; color: {{ section.settings.text_color | default: '#1A1A1A' }}; padding: 40px 20px; font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; }
+  .clv68-hero { text-align: center; margin-bottom: 50px; padding: 70px 20px; background: #F8F9FA; border-radius: 20px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.05); }
+  .clv68-hero::before { content: ''; position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: #FF3366; border-radius: 50%; filter: blur(30px); opacity: 0.5; }
+  .clv68-hero::after { content: ''; position: absolute; bottom: -20px; right: -20px; width: 120px; height: 120px; background: #00CCFF; border-radius: 50%; filter: blur(40px); opacity: 0.5; }
+  .clv68-hero h1 { font-size: 54px; font-weight: bold; color: #1A1A1A; margin-bottom: 15px; position: relative; z-index: 1; transform: rotate(-2deg); }
+  .clv68-hero p { font-size: 18px; color: #666; max-width: 600px; margin: 0 auto; position: relative; z-index: 1; line-height: 1.5; }
+  .clv68-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv68-chips a { padding: 10px 20px; background: #FFF; color: #1A1A1A; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 10px; border: 3px solid #1A1A1A; box-shadow: 4px 4px 0 #FFCC00; transition: 0.1s; }
+  .clv68-chips a:hover, .clv68-chips a.active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #FFCC00; background: #1A1A1A; color: #FFF; }
+  .clv68-toolbar { background: #F8F9FA; border: 3px solid #1A1A1A; border-radius: 15px; padding: 15px 25px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0 #00CCFF; }
+  .clv68-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 25px; }
+  .clv68-promo { grid-column: span 1; background: #FF3366; color: #FFF; border-radius: 20px; border: 3px solid #1A1A1A; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 6px 6px 0 #1A1A1A; transform: rotate(2deg); }
+  .clv68-promo h3 { font-size: 32px; font-weight: bold; margin-bottom: 15px; line-height: 1.2; }
+  .clv68-promo a { display: inline-block; padding: 12px 25px; background: #FFF; color: #1A1A1A; text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 10px; border: 2px solid #1A1A1A; box-shadow: 2px 2px 0 #1A1A1A; }
+  .clv68-promo a:hover { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #1A1A1A; }
+  .clv68-seo { margin-top: 60px; background: #FFF; padding: 40px; border-radius: 20px; border: 3px dashed #1A1A1A; text-align: center; }
+  @media (max-width: 768px) { .clv68-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv68-hero h1 { font-size: 40px; transform: none; } .clv68-promo { transform: none; } }
+</style>
+<div class="clv68" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv68-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Get Creative!{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Everything you need to turn your imagination into reality.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv68-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv68-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; font-weight: bold; color: #1A1A1A;">{{ filter.label }} ✨</summary>
+              <div style="position: absolute; background: #FFF; border: 3px solid #1A1A1A; padding: 20px; border-radius: 15px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 5px 5px 0 #FF3366;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 15px; color: #1A1A1A;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #00CCFF;">
+                    {{ value.label }} <span style="opacity: 0.6; font-size: 13px;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #FFF; border: 2px solid #1A1A1A; color: #1A1A1A; padding: 8px 15px; border-radius: 10px; font-size: 15px; font-family: inherit; cursor: pointer; outline: none; font-weight: bold;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv68-grid">
+      {% for product in collection.products %}
+        {% render 'card-v68', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv68-promo">
+            <h3>Student<br>Bundles</h3>
+            <a href="/collections/bundles">Save 20%</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v68', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 20px; font-weight: bold; color: #1A1A1A;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv68-seo">
+      <h2 style="font-size: 26px; font-weight: bold; color: #1A1A1A; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Studio Quality Supplies' }}</h2>
+      <p style="font-size: 16px; color: #666; max-width: 600px; margin: 0 auto; line-height: 1.6;">{{ section.settings.seo_text | default: "We test every paint, pen, and paper we sell. Stock your studio with professional-grade materials that won't let you down." }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V68 — Art Supply", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFFFFF"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#1A1A1A"}
+  ], "presets": [{"name": "CL V68 — Art Supply"}]
+}
+{% endschema %}

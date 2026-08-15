@@ -1,0 +1,97 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#00FFA3'
+  assign text_color = section.settings.text_color | default: '#050505'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 20px 0;
+    overflow: hidden;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+  }
+  
+  .hp13-scrolling-text-container-{{ section_id }} {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .hp13-scrolling-text-content-{{ section_id }} {
+    display: flex;
+    animation: hp13-scroll-text-{{ section_id }} 15s linear infinite;
+  }
+  
+  .hp13-scrolling-text-item-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    color: {{ text_color }};
+    text-transform: uppercase;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+  }
+  
+  .hp13-scrolling-text-item-{{ section_id }} span {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 40px;
+    color: #FFF;
+  }
+
+  @keyframes hp13-scroll-text-{{ section_id }} {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
+
+<div class="hp13-scrolling-text-container-{{ section_id }}">
+  <div class="hp13-scrolling-text-content-{{ section_id }}">
+    {% for i in (1..4) %}
+      <div class="hp13-scrolling-text-item-{{ section_id }}">
+        {{ section.settings.text | default: 'WARNING: HIGH VOLTAGE' }} <span>///</span>
+      </div>
+    {% endfor %}
+    {% for i in (1..4) %}
+      <div class="hp13-scrolling-text-item-{{ section_id }}">
+        {{ section.settings.text | default: 'WARNING: HIGH VOLTAGE' }} <span>///</span>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP13 Scrolling Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#00FFA3"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#050505"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "WARNING: HIGH VOLTAGE"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 Scrolling Text"
+    }
+  ]
+}
+{% endschema %}

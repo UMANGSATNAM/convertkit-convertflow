@@ -1,0 +1,200 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V58 — LUXURY SOY CANDLES & HOME FRAGRANCE D2C (BOY SMELLS / DIPTYQUE STYLE)
+  Usage: {% render 'card-v58', product: product %}
+  Design: Amber Gold (#B45309), Illumination Glow (#FFFBEB), Playfair Display & Inter fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
+
+  .cv58-card {
+    --cv58-bg: #FFFFFF;
+    --cv58-text: #78350F;
+    --cv58-muted: #B45309;
+    --cv58-amber: #B45309;
+    --cv58-glow: #FFFBEB;
+    --cv58-border: #FDE68A;
+    font-family: 'Inter', sans-serif;
+    background: var(--cv58-bg);
+    border: 1px solid var(--cv58-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv58-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv58-amber);
+    box-shadow: 0 12px 24px -6px rgba(180, 83, 9, 0.22);
+  }
+
+  .cv58-card *, .cv58-card *::before, .cv58-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv58-card a { color: inherit; text-decoration: none; }
+  .cv58-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv58-card img { max-width: 100%; display: block; }
+
+  .cv58-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv58-glow);
+    overflow: hidden;
+  }
+  .cv58-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv58-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv58-card:hover .cv58-img-pri { opacity: 0; }
+  .cv58-card:hover .cv58-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Candle Tag Top Left */
+  .cv58-badge-candle {
+    position: absolute; top: 10px; left: 10px;
+    background: #78350F; color: #FFFBEB;
+    font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv58-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv58-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv58-amber); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv58-wish:hover, .cv58-wish.active { background: var(--cv58-amber); color: #FFFFFF; border-color: var(--cv58-amber); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv58-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(120, 53, 15, 0.95); color: #FFFBEB;
+    font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv58-amber);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv58-card:hover .cv58-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv58-qv-overlay:hover { background: #FFFBEB; color: #78350F; }
+
+  .cv58-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv58-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv58-muted); font-weight: 600; font-family: 'Playfair Display', serif; letter-spacing: 0.1em; }
+  .cv58-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #78350F; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Fragrance Specs Subtitle */
+  .cv58-specs { font-size: 11px; color: var(--cv58-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv58-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #B45309; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv58-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv58-price { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #78350F; }
+  .cv58-cmp { font-size: 13px; color: #A8A29E; text-decoration: line-through; }
+  .cv58-disc { font-size: 10px; font-weight: 700; color: #78350F; background: var(--cv58-glow); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv58-border); }
+
+  /* Fragrance Swatches */
+  .cv58-swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .cv58-swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cv58-border); cursor: pointer; }
+  .cv58-swatch.active { transform: scale(1.25); border-color: var(--cv58-amber); }
+
+  /* Bottom Button */
+  .cv58-action-box { padding: 0 14px 14px; }
+  .cv58-atc-btn {
+    width: 100%; padding: 11px;
+    background: #B45309; color: #FFFFFF;
+    font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+  }
+  .cv58-atc-btn:hover { background: #78350F; transform: scale(1.01); }
+  .cv58-atc-btn:disabled { background: #E7E5E4; color: #A8A29E; cursor: not-allowed; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv58-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv58-badge-candle">100% NATURAL SOY WAX 🕯️</span>
+
+    <button type="button" class="cv58-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv58-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv58-img cv58-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv58-img cv58-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-2' | placeholder_svg_tag: 'cv58-img' }}
+      {% endif %}
+
+      <button type="button" class="cv58-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv58-content">
+      {% if card_prod.vendor != blank %}<span class="cv58-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv58-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv58-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv58-specs">Hand-Poured Glass | 50h Clean Burn</span>
+
+      <div class="cv58-rating">
+        <span>★ 4.9</span> <span>(3,200 reviews)</span>
+      </div>
+
+      <div class="cv58-price-row">
+        <span class="cv58-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv58-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv58-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      {% if card_prod.variants.size > 1 %}
+        <div class="cv58-swatches">
+          {% for variant in card_prod.variants limit: 3 %}
+            <span class="cv58-swatch {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}" style="background: {% cycle '#B45309', '#78350F', '#D97706' %};"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cv58-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv58-atc-btn" data-add-cart="{{ cur_var.id }}">ILLUMINATE SANCTUARY</button>
+      {% else %}
+        <button type="button" class="cv58-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv58-card">
+    <div class="cv58-media">{{ 'product-2' | placeholder_svg_tag: 'cv58-img' }}</div>
+    <div class="cv58-content">
+      <span class="cv58-vendor">SOY CANDLES D2C</span>
+      <div class="cv58-title">Smokey Cedarwood & Wild Fig Scented Soy Candle</div>
+
+      {% if card_r_show != false %}
+      <div class="cv58-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv58-specs">Hand-Poured Glass | 50h Clean Burn</span>
+      <div class="cv58-price-row"><span class="cv58-price">₹ 1,699</span><span class="cv58-cmp">₹ 2,099</span><span class="cv58-disc">19% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

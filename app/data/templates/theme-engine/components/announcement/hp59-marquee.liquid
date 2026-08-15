@@ -1,0 +1,54 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp59-marq-bg: {{ section.settings.bg_color | default: '#F97316' }};
+    --hp59-marq-text: {{ section.settings.text_color | default: '#FFFFFF' }};
+    background: var(--hp59-marq-bg);
+    overflow: hidden;
+    padding: {{ section.settings.padding_vertical | default: 10 }}px 0;
+  }
+  .hp59-marquee__track {
+    display: flex; gap: 50px;
+    animation: hp59MarqueeScroll {{ section.settings.speed | default: 25 }}s linear infinite;
+    width: max-content;
+  }
+  .hp59-marquee__item {
+    display: flex; align-items: center; gap: 50px; white-space: nowrap;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: {{ section.settings.font_size | default: 13 }}px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--hp59-marq-text);
+  }
+  .hp59-marquee__dot {
+    width: 6px; height: 6px;
+    background: {{ section.settings.dot_color | default: '#FFFBEB' }};
+    border-radius: 50%; flex-shrink: 0;
+  }
+  @keyframes hp59MarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+{%- endstyle -%}
+<div class="hp59-marquee__track">
+  {%- for i in (1..12) -%}
+    <div class="hp59-marquee__item">
+      <span>{{ section.settings.marquee_text | default: '🪸 MARINE ASTAXANTHIN 🪸 DEEP OCEAN SEA KELP 🪸 GOLDEN HOUR RADIANCE 🪸 CORAL REEF NUTRIENTS' }}</span>
+      <span class="hp59-marquee__dot"></span>
+    </div>
+  {%- endfor -%}
+</div>
+{% schema %}
+{
+  "name": "HP59 Marquee",
+  "class": "section-hp59-marquee",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F97316" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#FFFFFF" },
+    { "type": "color", "id": "dot_color", "label": "Dot Color", "default": "#FFFBEB" },
+    { "type": "text", "id": "marquee_text", "label": "Marquee Text", "default": "🪸 MARINE ASTAXANTHIN 🪸 DEEP OCEAN SEA KELP 🪸 GOLDEN HOUR RADIANCE 🪸 CORAL REEF NUTRIENTS" },
+    { "type": "range", "id": "speed", "min": 10, "max": 50, "step": 5, "unit": "s", "label": "Speed", "default": 25 },
+    { "type": "range", "id": "font_size", "min": 10, "max": 22, "step": 1, "unit": "px", "label": "Font Size", "default": 13 },
+    { "type": "range", "id": "padding_vertical", "min": 4, "max": 24, "step": 2, "unit": "px", "label": "Padding", "default": 10 }
+  ],
+  "presets": [{ "name": "HP59 Marquee" }]
+}
+{% endschema %}

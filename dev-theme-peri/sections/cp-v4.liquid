@@ -1,0 +1,379 @@
+{% comment %}
+  CP V4 — Cyberpunk Y2K D2C Collection Page Section
+  Includes: Hero Header, Sub-collection chips, Filter + Sort Bar, Product Grid with card-v4, In-Grid Promo Tile every 8 products, Bottom SEO Text Block, and Pagination
+{% endcomment %}
+
+<style>
+  .cpv4 {
+    background-color: {{ section.settings.bg_color | default: '#0D0D12' }};
+    color: {{ section.settings.text_color | default: '#FF0055' }};
+    padding: {{ section.settings.padding_top | default: 40 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px;
+    font-family: var(--font-body);
+  }
+  .cpv4__wrap {
+    max-width: var(--page-width, 1280px);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Collection Hero Header */
+  .cpv4__hero {
+    background: {{ section.settings.hero_bg | default: '#FFFFFF' }};
+    border-radius: var(--radius-card, 16px);
+    padding: 36px 32px;
+    margin-bottom: 24px;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    text-align: {{ section.settings.hero_align | default: 'left' }};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+  .cpv4__hero-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: {{ section.settings.text_color | default: '#FF0055' }};
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+  }
+  .cpv4__hero-sub {
+    font-size: 15px;
+    color: {{ section.settings.sub_color | default: '#6B7280' }};
+    margin: 0;
+    max-width: 720px;
+    line-height: 1.6;
+    display: inline-block;
+  }
+
+  /* Sub-collection Category Chips */
+  .cpv4__chips-box {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .cpv4__chips-box::-webkit-scrollbar { display: none; }
+  .cpv4__chip {
+    padding: 8px 18px;
+    background: #FFFFFF;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    color: {{ section.settings.text_color | default: '#FF0055' }};
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .cpv4__chip.active, .cpv4__chip:hover {
+    background: #00F0FF;
+    color: #FFFFFF;
+    border-color: #00F0FF;
+  }
+
+  /* Filter & Sort Bar */
+  .cpv4__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: #FFFFFF;
+    border-radius: var(--radius-button, 10px);
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+    margin-bottom: 28px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cpv4__filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .cpv4__filter-select {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #D1D5DB;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    background: #FFFFFF;
+    cursor: pointer;
+  }
+
+  /* Product Grid */
+  .cpv4__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr);
+    gap: {{ section.settings.grid_gap | default: 24 }}px;
+  }
+  @media (max-width: 1024px) {
+    .cpv4__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .cpv4__grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 16px; }
+  }
+
+  /* In-Grid Promo Banner Tile (Inserts every 8 products) */
+  .cpv4__promo-tile {
+    grid-column: span 1;
+    background: linear-gradient(135deg, #FF0055 0%, #00F0FF 100%);
+    border-radius: var(--radius-card, 16px);
+    padding: 24px;
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .cpv4__promo-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    align-self: flex-start;
+    margin-bottom: 12px;
+  }
+  .cpv4__promo-title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 0 0 10px;
+  }
+  .cpv4__promo-code-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cpv4__promo-btn {
+    width: 100%;
+    padding: 10px;
+    background: #FFFFFF;
+    color: #FF0055;
+    border-radius: var(--radius-button, 8px);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
+  /* Bottom SEO Text Block */
+  .cpv4__seo-block {
+    margin-top: 50px;
+    background: #FFFFFF;
+    border-radius: var(--radius-card, 12px);
+    padding: 32px;
+    border: 1px solid {{ section.settings.border_color | default: '#E5E7EB' }};
+  }
+  .cpv4__seo-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: {{ section.settings.text_color | default: '#FF0055' }};
+    margin: 0 0 12px;
+  }
+  .cpv4__seo-content {
+    font-size: 14px;
+    color: #4B5563;
+    line-height: 1.7;
+    max-height: 90px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .cpv4__seo-block.expanded .cpv4__seo-content {
+    max-height: 1000px;
+  }
+  .cpv4__seo-toggle {
+    margin-top: 12px;
+    background: none;
+    border: none;
+    color: #00F0FF;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+  }
+</style>
+
+<div class="cpv4">
+  <div class="cpv4__wrap">
+    
+    <!-- 1. Collection Hero Banner Header -->
+    <div class="cpv4__hero">
+      <h1 class="cpv4__hero-title">
+        {% if collection.title != blank %}{{ collection.title | escape }}{% else %}{{ section.settings.title | default: 'Cyberpunk Y2K' }}{% endif %}
+      </h1>
+      <div class="cpv4__hero-sub">
+        {% if collection.description != blank %}{{ collection.description }}{% else %}{{ section.settings.subheading | default: 'Discover our premium handcrafted collection designed for modern living.' }}{% endif %}
+      </div>
+    </div>
+
+    <!-- 2. Sub-Collection Chips / Quick Category Tabs -->
+    {% if section.settings.show_chips %}
+      <div class="cpv4__chips-box">
+        <a href="#" class="cpv4__chip active">All Products</a>
+        <a href="#" class="cpv4__chip">Best Sellers</a>
+        <a href="#" class="cpv4__chip">New Arrivals</a>
+        <a href="#" class="cpv4__chip">Special Offers</a>
+        <a href="#" class="cpv4__chip">Trending Now</a>
+      </div>
+    {% endif %}
+
+    <!-- 3. Filter + Sort Controls Bar -->
+    <div class="cpv4__toolbar">
+      <div class="cpv4__filter-group">
+        <span style="font-size: 13px; font-weight: 700; color: #374151;">Filters:</span>
+        <select class="cpv4__filter-select">
+          <option>Price: All</option>
+          <option>Under ₹1,000</option>
+          <option>₹1,000 - ₹3,000</option>
+          <option>Above ₹3,000</option>
+        </select>
+        <select class="cpv4__filter-select">
+          <option>Availability: All</option>
+          <option>In Stock Only</option>
+        </select>
+        <select class="cpv4__filter-select">
+          <option>Size: All</option>
+          <option>Small</option>
+          <option>Medium</option>
+          <option>Large</option>
+        </select>
+      </div>
+
+      <div class="cpv4__filter-group">
+        <span style="font-size: 13px; font-weight: 700; color: #374151;">Sort By:</span>
+        <select class="cpv4__filter-select">
+          <option>Featured</option>
+          <option>Best Selling</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Newest</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 4. Product Grid (with In-Grid Promo Tile every 8 products) -->
+    <div class="cpv4__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 12 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% render 'card-v4', product: product %}
+
+          {% comment %} Insert In-Grid Promo Banner Card after 8th product {% endcomment %}
+          {% if forloop.index == 8 and section.settings.show_promo_tile %}
+            <div class="cpv4__promo-tile">
+              <div>
+                <span class="cpv4__promo-badge">SPECIAL OFFER</span>
+                <h3 class="cpv4__promo-title">NEON STREETWEAR DROP — FLAT 25% OFF</h3>
+              </div>
+              <div>
+                <div class="cpv4__promo-code-box">
+                  <span>USE CODE:</span>
+                  <span style="letter-spacing: 1px;">CYBER25</span>
+                </div>
+                <a href="/discount/CYBER25" class="cpv4__promo-btn">CLAIM DISCOUNT</a>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% comment %} Fallback Demo Mode {% endcomment %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v4', product: nil %}
+
+          {% if forloop.index == 8 and section.settings.show_promo_tile %}
+            <div class="cpv4__promo-tile">
+              <div>
+                <span class="cpv4__promo-badge">SPECIAL OFFER</span>
+                <h3 class="cpv4__promo-title">NEON STREETWEAR DROP — FLAT 25% OFF</h3>
+              </div>
+              <div>
+                <div class="cpv4__promo-code-box">
+                  <span>USE CODE:</span>
+                  <span style="letter-spacing: 1px;">CYBER25</span>
+                </div>
+                <a href="/discount/CYBER25" class="cpv4__promo-btn">CLAIM DISCOUNT</a>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- 5. Bottom Expandable SEO Text Block -->
+    {% if section.settings.show_seo_block %}
+      <div class="cpv4__seo-block" id="cpv4-seo-block">
+        <h2 class="cpv4__seo-title">{{ section.settings.seo_title | default: 'About Our Collection' }}</h2>
+        <div class="cpv4__seo-content">
+          <p>{{ section.settings.seo_text | default: 'Explore our complete range of high-performance products crafted with sustainable materials and cutting-edge design. Designed to deliver exceptional durability, comfort, and style for daily use.' }}</p>
+          <p>Our commitment to quality ensures every item meets rigorous international standards. Shop with confidence backed by fast express delivery and easy 30-day hassle-free returns.</p>
+        </div>
+        <button type="button" class="cpv4__seo-toggle" onclick="document.getElementById('cpv4-seo-block').classList.toggle('expanded'); this.textContent = document.getElementById('cpv4-seo-block').classList.contains('expanded') ? 'Read Less ↑' : 'Read More ↓';">
+          Read More ↓
+        </button>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CP V4 — Cyberpunk Y2K",
+  "tag": "section",
+  "class": "cpv4-section",
+  "settings": [
+    { "type": "header", "content": "Collection Settings" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 4, "max": 24, "step": 4, "default": 12 },
+    { "type": "header", "content": "Grid Layout" },
+    { "type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4 },
+    { "type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [
+      { "value": "1", "label": "1 Column" },
+      { "value": "2", "label": "2 Columns" }
+    ], "default": "2" },
+    { "type": "header", "content": "Hero Banner" },
+    { "type": "text", "id": "title", "label": "Collection Title", "default": "Cyberpunk Y2K" },
+    { "type": "text", "id": "subheading", "label": "Collection Subheading", "default": "Handcrafted essentials designed for modern living." },
+    { "type": "select", "id": "hero_align", "label": "Hero Alignment", "options": [
+      { "value": "left", "label": "Left" },
+      { "value": "center", "label": "Center" }
+    ], "default": "left" },
+    { "type": "header", "content": "Features & In-Grid Promo" },
+    { "type": "checkbox", "id": "show_chips", "label": "Show Sub-collection Chips", "default": true },
+    { "type": "checkbox", "id": "show_promo_tile", "label": "Show In-Grid Promo Card", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Promo Code", "default": "CYBER25" },
+    { "type": "header", "content": "SEO Text Block" },
+    { "type": "checkbox", "id": "show_seo_block", "label": "Show Bottom SEO Text Block", "default": true },
+    { "type": "text", "id": "seo_title", "label": "SEO Section Title", "default": "About Our Collection" },
+    { "type": "header", "content": "Colors & Spacing" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0D0D12" },
+    { "type": "color", "id": "hero_bg", "label": "Hero Card Background", "default": "#FFFFFF" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#FF0055" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#E5E7EB" },
+    { "type": "range", "id": "padding_top", "label": "Top Padding (px)", "min": 0, "max": 100, "step": 4, "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom Padding (px)", "min": 0, "max": 100, "step": 4, "default": 60 }
+  ],
+  "presets": [
+    {
+      "name": "CP V4 — Cyberpunk Y2K"
+    }
+  ]
+}
+{% endschema %}

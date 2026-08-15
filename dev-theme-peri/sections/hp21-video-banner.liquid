@@ -1,0 +1,351 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --overlay-color: {{ section.settings.overlay_color }};
+    --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    
+    background-color: var(--bg-color);
+  }
+
+  .hp21-video-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: {{ section.settings.desktop_height }}px;
+    display: flex;
+    align-items: center;
+    justify-content: {{ section.settings.text_alignment }};
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-video-wrapper {
+      min-height: {{ section.settings.mobile_height }}px;
+      justify-content: center;
+    }
+  }
+
+  .hp21-video__media {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hp21-video__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .hp21-video__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp21-video__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--overlay-color);
+    opacity: var(--overlay-opacity);
+    z-index: 2;
+  }
+
+  .hp21-video__content {
+    position: relative;
+    z-index: 3;
+    padding: 60px;
+    max-width: 800px;
+    text-align: {% if section.settings.text_alignment == 'center' %}center{% elsif section.settings.text_alignment == 'flex-start' %}left{% else %}right{% endif %};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-video__content {
+      padding: 40px 20px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  .hp21-video__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 300;
+    letter-spacing: 5px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards 0.5s;
+  }
+
+  .hp21-video__title {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    line-height: 1.1;
+    margin: 0 0 32px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards 0.7s;
+  }
+  
+  .hp21-video__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp21-video__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 48px;
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--accent-color);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-decoration: none;
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards 0.9s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp21-video__btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+  }
+
+  .hp21-video__btn:hover {
+    color: #000;
+    border-color: var(--accent-color);
+  }
+  
+  .hp21-video__btn:hover::before {
+    transform: scaleX(1);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-video-wrapper" id="HP21Video-{{ section.id }}">
+  
+  <div class="hp21-video__media">
+    {%- if section.settings.video_url != blank -%}
+      <video autoplay muted loop playsinline poster="{{ section.settings.image | image_url: width: 2000 }}">
+        <source src="{{ section.settings.video_url }}" type="video/mp4">
+      </video>
+    {%- elsif section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="lazy">
+    {%- else -%}
+      <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;color:#333;">CINEMATIC VIDEO</div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp21-video__overlay"></div>
+
+  <div class="hp21-video__content">
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp21-video__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp21-video__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+      <a href="{{ section.settings.btn_link }}" class="hp21-video__btn">
+        {{ section.settings.btn_text | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Video",
+  "class": "section-hp21-video-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Upload an MP4 file to Shopify Files and paste URL here."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback / Poster Image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "EXPERIENCE THE CRAFT"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>Where <em>Art</em> meets Innovation</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "WATCH FILM"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 400,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "Desktop Height",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Mobile Height",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Content Alignment (Desktop)",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Luxury Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fallback Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Video"
+    }
+  ]
+}
+{% endschema %}

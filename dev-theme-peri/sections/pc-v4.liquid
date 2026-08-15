@@ -1,0 +1,523 @@
+{%- comment -%}
+  PC V4 — HIGH-CONTRAST NEO-BRUTALIST PRODUCT GRID
+  Design: Raw White (#FFFFFF), Canary Yellow (#FFE600) accents, 2px Solid Black Borders & Hard Drop Shadows
+  Card Shape: Sharp 0px corners, hard 4px black shadow, Space Grotesk typography
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  .pcv4 {
+    --bg: {{ section.settings.bg_color | default: '#FFFFFF' }};
+    --card-bg: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    --text: {{ section.settings.text_color | default: '#000000' }};
+    --muted: {{ section.settings.muted_color | default: '#555555' }};
+    --accent: {{ section.settings.accent_color | default: '#FFE600' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#FFD700' }};
+    --border: {{ section.settings.border_color | default: '#000000' }};
+    --badge-sale-bg: #FFE600;
+    --badge-sale-text: #000000;
+    --f-main: 'Space Grotesk', sans-serif;
+    --ease: all 0.15s ease-in-out;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-main);
+    padding: {{ section.settings.padding_top | default: 56 }}px 0 {{ section.settings.padding_bottom | default: 56 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv4 *, .pcv4 *::before, .pcv4 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv4 a { color: inherit; text-decoration: none; }
+  .pcv4 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv4 img { max-width: 100%; display: block; }
+
+  .pcv4__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv4__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv4__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv4__title { font-size: 32px; font-weight: 700; color: var(--text); letter-spacing: -0.03em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv4__title { font-size: 40px; } }
+  .pcv4__sub { font-size: 15px; color: var(--muted); font-weight: 500; }
+  .pcv4__viewall { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; background: var(--accent); border: 2px solid #000000; padding: 8px 16px; box-shadow: 3px 3px 0 #000000; transition: var(--ease); }
+  .pcv4__viewall:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #000000; }
+
+  /* GRID */
+  .pcv4__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 640px) {
+    .pcv4__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv4__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv4__card {
+    background: var(--card-bg);
+    border: 2px solid #000000;
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 4px 4px 0 #000000;
+    transition: var(--ease);
+  }
+  .pcv4__card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0 #000000;
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv4__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #F0F0F0;
+    overflow: hidden;
+    border-bottom: 2px solid #000000;
+  }
+  .pcv4__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .pcv4__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv4__card:hover .pcv4__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.04);
+    {% endif %}
+  }
+  .pcv4__card:hover .pcv4__img--sec { opacity: 1; transform: scale(1.04); }
+
+  /* BADGES */
+  .pcv4__badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv4__badge { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border: 2px solid #000000; letter-spacing: 0.05em; box-shadow: 2px 2px 0 #000000; }
+  .pcv4__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv4__badge--tag { background: #FFFFFF; color: #000000; }
+  .pcv4__badge--sold { background: #000000; color: #FFFFFF; }
+
+  /* WISHLIST BUTTON */
+  .pcv4__wish {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    box-shadow: 2px 2px 0 #000000;
+    display: flex; align-items: center; justify-content: center;
+    color: #000000;
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv4__wish:hover { background: var(--accent); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 #000000; }
+  .pcv4__wish.active { background: #FF3366; color: #FFFFFF; }
+
+  /* QUICK ADD BUTTON */
+  .pcv4__quick-box { padding: 12px 14px 14px; background: var(--card-bg); }
+  .pcv4__quick-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: #000000;
+    color: #FFFFFF;
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    border: 2px solid #000000;
+    box-shadow: 3px 3px 0 var(--accent);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv4__quick-btn:hover { background: var(--accent); color: #000000; box-shadow: 3px 3px 0 #000000; transform: translate(-1px, -1px); }
+  .pcv4__quick-btn:disabled { background: #CCCCCC; color: #666666; border-color: #666666; box-shadow: none; cursor: not-allowed; }
+
+  /* CARD CONTENT */
+  .pcv4__content { padding: 14px 14px 0 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv4__vendor { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: 0.08em; }
+  .pcv4__item-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv4__rating { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #000000; font-weight: 700; }
+  .pcv4__stars { letter-spacing: 1px; color: #000000; }
+  .pcv4__rev-cnt { color: var(--muted); font-size: 11px; }
+
+  /* PRICE */
+  .pcv4__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv4__price { font-size: 18px; font-weight: 700; color: var(--text); }
+  .pcv4__cmp-price { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv4__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv4__swatch { width: 14px; height: 14px; border: 2px solid #000000; cursor: pointer; transition: var(--ease); }
+  .pcv4__swatch:hover, .pcv4__swatch.active { transform: scale(1.2); box-shadow: 2px 2px 0 #000000; }
+
+  /* URGENCY MICRO */
+  .pcv4__urgency { font-size: 11px; color: #000000; background: var(--accent); border: 1px solid #000000; padding: 2px 6px; font-weight: 700; display: inline-flex; align-items: center; width: fit-content; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv4__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #000000;
+    border: 2px solid #000000; box-shadow: 4px 4px 0 #000000;
+    padding: 12px 20px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.2s ease-in-out;
+  }
+  .pcv4__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv4">
+  <div class="pcv4__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv4__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv4__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv4__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv4__viewall">
+            {{ section.settings.view_all_label | default: 'Shop All Now' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv4__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v4', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v4', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv4__toast" id="pcv4-toast">⚡ Added to Cart!</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv4-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv4Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'ADDING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ ADDED';
+        showT('ADDED TO CART!');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv4-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V4 — Neo-Brutalist",
+  "tag": "section",
+  "class": "pcv4-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "NEO DROP"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "BRUTALIST SELECTION"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Unapologetic design. Bold D2C street performance staples."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Shop All Now"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#FFE600"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V4 — Neo-Brutalist"
+    }
+  ]
+}
+{% endschema %}

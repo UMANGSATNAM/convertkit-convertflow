@@ -1,0 +1,142 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#CCFF00'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    border-bottom: 3px solid #000;
+  }
+  
+  .hp11-faq-container-{{ section_id }} {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .hp11-faq-heading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 60px 0;
+    color: {{ text_color }};
+    letter-spacing: -2px;
+  }
+  
+  .hp11-faq-item-{{ section_id }} {
+    background: #FFF;
+    border: 3px solid #000;
+    margin-bottom: 20px;
+    box-shadow: 6px 6px 0 #000;
+  }
+  
+  .hp11-faq-question-{{ section_id }} {
+    padding: 25px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .hp11-faq-question-{{ section_id }}:hover {
+    background: #FF00FF;
+    color: #FFF;
+  }
+  
+  .hp11-faq-icon-{{ section_id }} {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+  
+  .hp11-faq-answer-{{ section_id }} {
+    padding: 0 25px 25px 25px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #000;
+    display: none;
+    border-top: 2px dashed #000;
+    margin-top: -10px;
+    padding-top: 20px;
+  }
+
+  /* Note: Vanilla JS toggling logic normally added here, CSS hover acts as fallback for now */
+</style>
+
+<div class="hp11-faq-container-{{ section_id }}">
+  <h2 class="hp11-faq-heading-{{ section_id }}">{{ section.settings.heading | default: 'INFO' }}</h2>
+  
+  <div class="hp11-faq-list-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp11-faq-item-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp11-faq-question-{{ section_id }}" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';">
+          {{ block.settings.question | default: 'QUESTION?' }}
+          <span class="hp11-faq-icon-{{ section_id }}">+</span>
+        </div>
+        <div class="hp11-faq-answer-{{ section_id }}">
+          {{ block.settings.answer | default: 'Answer goes here. Brutal and direct.' }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP11 FAQ",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "INFO"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "HOW DOES IT FIT?"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Everything is intentionally oversized. Go true to size for the intended look."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP11 FAQ",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "HOW DOES IT FIT?" } },
+        { "type": "faq", "settings": { "question": "SHIPPING TIMES?" } },
+        { "type": "faq", "settings": { "question": "RETURN POLICY?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

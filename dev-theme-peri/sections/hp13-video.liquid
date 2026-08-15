@@ -1,0 +1,135 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00FFA3'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 80px 40px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .hp13-video-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    border: 1px solid {{ text_color }};
+    padding: 10px;
+  }
+  
+  .hp13-video-inner-{{ section_id }} {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 */
+    background: #111;
+    overflow: hidden;
+  }
+  
+  .hp13-video-element-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: contrast(120%) grayscale(20%);
+  }
+  
+  .hp13-video-ui-{{ section_id }} {
+    position: absolute;
+    top: 20px; left: 20px;
+    color: {{ text_color }};
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 2;
+  }
+  
+  .hp13-video-play-btn-{{ section_id }} {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px; height: 80px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid {{ text_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s ease;
+  }
+  
+  .hp13-video-play-btn-{{ section_id }}:hover {
+    background: {{ text_color }};
+  }
+  
+  .hp13-video-play-btn-{{ section_id }} svg {
+    width: 30px; height: 30px;
+    fill: {{ text_color }};
+    margin-left: 5px;
+    transition: fill 0.2s ease;
+  }
+  
+  .hp13-video-play-btn-{{ section_id }}:hover svg {
+    fill: {{ bg_color }};
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 40px 20px;
+    }
+  }
+</style>
+
+<div class="hp13-video-container-{{ section_id }}">
+  <div class="hp13-video-inner-{{ section_id }}">
+    <div class="hp13-video-ui-{{ section_id }}">
+      <div>SYS.CAM.01</div>
+      <div style="color: #FF003C; margin-top: 5px;">[LIVE_FEED]</div>
+    </div>
+    
+    {% if section.settings.cover_image != blank %}
+      <img src="{{ section.settings.cover_image | image_url: width: 2000 }}" class="hp13-video-element-{{ section_id }}" alt="Video Cover">
+    {% else %}
+      <div class="hp13-video-element-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+    {% endif %}
+    
+    <div class="hp13-video-play-btn-{{ section_id }}">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP13 Video",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Highlight Color",
+      "default": "#00FFA3"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 Video"
+    }
+  ]
+}
+{% endschema %}

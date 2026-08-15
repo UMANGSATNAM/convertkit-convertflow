@@ -1,0 +1,178 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 4px solid var(--text-color);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .hp30-marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  .hp30-marquee__content {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 20px;
+    animation: hp30MarqueeScroll {{ section.settings.speed }}s linear infinite;
+  }
+
+  .hp30-marquee__text {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.text_size }}px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-color);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .hp30-marquee__divider {
+    color: var(--text-color);
+    font-size: clamp(24px, 4vw, {{ section.settings.text_size | times: 0.8 | round }}px);
+    font-weight: 700;
+  }
+
+  @keyframes hp30MarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* Brutalist hover pause */
+  .hp30-marquee-wrapper:hover .hp30-marquee__content {
+    animation-play-state: paused;
+    color: #fff;
+    mix-blend-mode: difference;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-marquee-wrapper" id="HP30Marquee-{{ section.id }}" aria-hidden="true">
+  {%- for i in (1..6) -%}
+    <div class="hp30-marquee__content">
+      {%- for block in section.blocks -%}
+        <div class="hp30-marquee__text">{{ block.settings.text }}</div>
+        <div class="hp30-marquee__divider">++</div>
+      {%- endfor -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Marquee",
+  "class": "section-hp30-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll Speed (Lower is faster)",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "NO COMPROMISES"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "NEW COLLECTION" } },
+        { "type": "text", "settings": { "text": "AVAILABLE NOW" } },
+        { "type": "text", "settings": { "text": "LIMITED STOCK" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

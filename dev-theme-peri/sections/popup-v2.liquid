@@ -1,0 +1,240 @@
+{% comment %}
+  Popup Variant 2: Reverse Split (Left Wheel)
+{% endcomment %}
+
+<div id="cf-popup-2" class="cf-popup-wrapper popup-v2" aria-hidden="true" data-delay="{{ section.settings.popup_delay }}" data-exit="{{ section.settings.enable_exit_intent }}">
+  <div class="cf-popup__overlay" onclick="closePopup2()"></div>
+
+  <div class="cf-popup__panel">
+    <button type="button" class="cf-popup__close" onclick="closePopup2()" aria-label="Close">
+      &times;
+    </button>
+    
+    <div class="cf-popup__content">
+      <div class="cf-popup__text" style="order: 2;">
+        <h2 class="cf-popup__title">{{ section.settings.heading }}</h2>
+        <div class="cf-popup__sub">{{ section.settings.subheading }}</div>
+        
+        <div id="cf-popup-2-form" class="cf-popup__form-area">
+          {% if section.settings.require_email %}
+          <input type="email" id="cf-popup-2-email" placeholder="Enter your email" required class="cf-popup__input">
+          {% endif %}
+          <button type="button" class="cf-popup__btn" id="cf-popup-2-spin-btn" onclick="spinWheel2()">{{ section.settings.button_text }}</button>
+          <div class="cf-popup__disclaimer">No thanks, I prefer paying full price. <button class="link-btn" onclick="closePopup2()">Close</button></div>
+        </div>
+
+        <div id="cf-popup-2-result" class="cf-popup__result-area" style="display: none;">
+          <h3>You won!</h3>
+          <p>Use code below at checkout:</p>
+          <div class="cf-popup__code-box">
+             <span id="cf-popup-2-code">{{ section.settings.discount_code }}</span>
+             <button onclick="copyCode2()">Copy</button>
+          </div>
+          <a href="/collections/all" class="cf-popup__btn shop-btn" onclick="closePopup2()">Shop Now</a>
+        </div>
+      </div>
+      
+      <div class="cf-popup__wheel-container" style="order: 1;">
+        <div class="cf-popup__wheel-pointer"></div>
+        <div class="cf-popup__wheel" id="cf-popup-2-wheel">
+          <div class="wheel-inner">
+            <!-- Adjusted segments so text doesn't overlap in center -->
+            <span class="segment seg-1">10% OFF</span>
+            <span class="segment seg-2">FREE SHIP</span>
+            <span class="segment seg-3">NO LUCK</span>
+            <span class="segment seg-4">{{ section.settings.discount_value }}</span>
+            <span class="segment seg-5">5% OFF</span>
+            <span class="segment seg-6">TRY AGAIN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .popup-v2 {
+    position: fixed; inset: 0; z-index: 9999999; display: flex; align-items: center; justify-content: center;
+    visibility: hidden; opacity: 0; transition: all 0.3s ease;
+    font-family: sans-serif;
+  }
+  .popup-v2[aria-hidden="false"] { visibility: visible; opacity: 1; }
+  
+  .popup-v2 .cf-popup__overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+  }
+  
+  .popup-v2 .cf-popup__panel {
+    position: relative; width: 90%; max-width: 800px;
+    background: #fafafa; color: #333333; 
+    border-radius: 20px; border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(20px) scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .popup-v2[aria-hidden="false"] .cf-popup__panel { transform: translateY(0) scale(1); }
+
+  .popup-v2 .cf-popup__close {
+    position: absolute; top: 15px; right: 15px; background: rgba(128,128,128,0.2); border: none;
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; color: #333333; z-index: 10;
+  }
+
+  .popup-v2 .cf-popup__content {
+    display: grid; align-items: center;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  @media (max-width: 768px) {
+    .popup-v2 .cf-popup__content { grid-template-columns: 1fr; grid-auto-flow: row dense; height: auto; border-radius: 20px; max-width: 90%; margin: 0 auto; }
+    .popup-v2 .cf-popup__text { order: 2 !important; padding: 20px !important; text-align: center; }
+    .popup-v2 .cf-popup__wheel-container { order: 1 !important; padding: 30px 20px 10px !important; transform: scale(0.8); }
+    .popup-v2 .cf-popup__panel { max-width: 400px; height: auto; }
+  }
+
+  .popup-v2 .cf-popup__text { padding: 40px; }
+  .popup-v2 .cf-popup__title { font-size: 32px; font-weight: 800; margin: 0 0 10px; color: #333333; line-height: 1.1; }
+  .popup-v2 .cf-popup__sub { font-size: 16px; margin-bottom: 25px; opacity: 0.8; }
+
+  .popup-v2 .cf-popup__input {
+    width: 100%; padding: 14px; margin-bottom: 15px;
+    border: 1px solid #666666; border-radius: 8px;
+    font-family: inherit; font-size: 15px;
+    background: transparent; color: #333333;
+  }
+  
+  .popup-v2 .cf-popup__btn {
+    width: 100%; padding: 16px; background: #666666; color: #ffffff;
+    border: none; border-radius: 8px; font-size: 18px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s; display: block; text-align: center; text-decoration: none;
+  }
+  .popup-v2 .cf-popup__btn:hover { opacity: 0.9; }
+  
+  .popup-v2 .cf-popup__disclaimer { font-size: 12px; text-align: center; margin-top: 15px; opacity: 0.6; }
+  .popup-v2 .link-btn { background: none; border: none; text-decoration: underline; cursor: pointer; color: inherit; font-family: inherit; }
+
+  .popup-v2 .cf-popup__result-area h3 { font-size: 28px; margin: 0 0 10px; color: #333333; }
+  .popup-v2 .cf-popup__code-box {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(128,128,128,0.1); padding: 10px 15px; border-radius: 8px;
+    margin-bottom: 20px; border: 2px dashed #666666;
+  }
+  .popup-v2 .cf-popup__code-box span { font-size: 20px; font-weight: 800; letter-spacing: 2px; }
+  .popup-v2 .cf-popup__code-box button { background: #333333; color: #fafafa; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+  .popup-v2 .cf-popup__wheel-container { padding: 40px; position: relative; display: flex; justify-content: center; overflow: visible; }
+  .popup-v2 .cf-popup__wheel-pointer {
+    position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #333333;
+    z-index: 2;
+  }
+  .popup-v2 .cf-popup__wheel {
+    width: 280px; height: 280px; border-radius: 50%;
+    background: conic-gradient(from -30deg, #666666 0deg 60deg, rgba(0,0,0,0.1) 60deg 120deg, #666666 120deg 180deg, rgba(0,0,0,0.1) 180deg 240deg, #666666 240deg 300deg, rgba(0,0,0,0.1) 300deg 360deg);
+    border: 8px solid #333333;
+    position: relative; transition: transform 4s cubic-bezier(0.25, 0.1, 0.15, 1);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  }
+  .popup-v2 .wheel-inner { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
+  
+  /* CRITICAL FIX: justify-content flex-end and padding-right to stop overlap at center */
+  .popup-v2 .segment {
+    position: absolute; top: 50%; left: 50%; width: 50%; height: 30px;
+    margin-top: -15px;
+    box-sizing: border-box;
+    transform-origin: 0% 50%; padding-right: 15px; font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: flex-end; color: #fafafa;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .popup-v2 .segment:nth-child(even) { color: #333333; text-shadow: none; }
+  
+  .popup-v2 .seg-1 { transform: rotate(-90deg); }
+  .popup-v2 .seg-2 { transform: rotate(-30deg); }
+  .popup-v2 .seg-3 { transform: rotate(30deg); }
+  .popup-v2 .seg-4 { transform: rotate(90deg); }
+  .popup-v2 .seg-5 { transform: rotate(150deg); }
+  .popup-v2 .seg-6 { transform: rotate(210deg); }
+
+</style>
+
+<script>
+  function closePopup2() {
+    document.getElementById('cf-popup-2').setAttribute('aria-hidden', 'true');
+    localStorage.setItem('popup_seen_v2', 'true');
+  }
+
+  function spinWheel2() {
+    const emailInput = document.getElementById('cf-popup-2-email');
+    if(emailInput && !emailInput.value.includes('@')) {
+      alert('Please enter a valid email to spin!');
+      return;
+    }
+    
+    document.getElementById('cf-popup-2-spin-btn').disabled = true;
+    document.getElementById('cf-popup-2-spin-btn').innerText = "Spinning...";
+
+    const wheel = document.getElementById('cf-popup-2-wheel');
+    const targetDeg = 1800 + 150; 
+    
+    wheel.style.transform = `rotate(${targetDeg}deg)`;
+    
+    setTimeout(() => {
+      document.getElementById('cf-popup-2-form').style.display = 'none';
+      document.getElementById('cf-popup-2-result').style.display = 'block';
+    }, 4000);
+  }
+
+  function copyCode2() {
+    const code = document.getElementById('cf-popup-2-code').innerText;
+    navigator.clipboard.writeText(code);
+    alert('Code copied to clipboard!');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById('cf-popup-2');
+    if(!popup) return;
+    
+    if(window.location.search.includes('view=popup-v2')) {
+      setTimeout(() => popup.setAttribute('aria-hidden', 'false'), 500);
+      return;
+    }
+
+    if(!localStorage.getItem('popup_seen_v2')) {
+      const delay = parseInt(popup.dataset.delay) * 1000;
+      const isExitIntent = popup.dataset.exit === 'true';
+      
+      if(delay > 0) {
+        setTimeout(() => popup.setAttribute('aria-hidden', 'false'), delay);
+      }
+      
+      if(isExitIntent) {
+        document.addEventListener('mouseleave', (e) => {
+          if(e.clientY < 0 && popup.getAttribute('aria-hidden') === 'true') {
+            popup.setAttribute('aria-hidden', 'false');
+          }
+        });
+      }
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Wheel Popup V2 Split L",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Spin to Win!" },
+    { "type": "richtext", "id": "subheading", "label": "Subheading", "default": "<p>Enter your email for a chance to win massive discounts!</p>" },
+    { "type": "checkbox", "id": "require_email", "label": "Require Email to Spin", "default": true },
+    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Spin the Wheel" },
+    { "type": "text", "id": "discount_value", "label": "Winning Segment Text", "default": "20% OFF" },
+    { "type": "text", "id": "discount_code", "label": "Discount Code to Reveal", "default": "LUCKY20" },
+    { "type": "range", "id": "popup_delay", "min": 0, "max": 30, "step": 1, "unit": "sec", "label": "Delay before showing", "default": 5 },
+    { "type": "checkbox", "id": "enable_exit_intent", "label": "Enable Exit Intent", "default": true }
+  ],
+  "presets": [
+    { "name": "Wheel Popup V2 Split L" }
+  ]
+}
+{% endschema %}

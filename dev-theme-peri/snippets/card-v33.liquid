@@ -1,0 +1,202 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V33 — ARTISANAL BEAN-TO-BAR DARK CHOCOLATE D2C (SUBKO / MASON & CO STYLE)
+  Usage: {% render 'card-v33', product: product %}
+  Design: Deep Cacao Brown (#3D2016), Warm Beige (#F7F3EE), Cormorant Garamond & Space Grotesk fonts, 8px card
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@600;700&display=swap');
+
+  .cv33-card {
+    --cv33-bg: #FFFFFF;
+    --cv33-text: #3D2016;
+    --cv33-muted: #6B4235;
+    --cv33-cacao: #3D2016;
+    --cv33-beige: #F7F3EE;
+    --cv33-border: #E8DEC8;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--cv33-bg);
+    border: 1px solid var(--cv33-border);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv33-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv33-cacao);
+    box-shadow: 0 12px 24px -6px rgba(61, 32, 22, 0.22);
+  }
+
+  .cv33-card *, .cv33-card *::before, .cv33-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv33-card a { color: inherit; text-decoration: none; }
+  .cv33-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv33-card img { max-width: 100%; display: block; }
+
+  .cv33-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--cv33-beige);
+    overflow: hidden;
+  }
+  .cv33-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv33-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv33-card:hover .cv33-img-pri { opacity: 0; }
+  .cv33-card:hover .cv33-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Cacao Tag Top Left */
+  .cv33-badge-cacao {
+    position: absolute; top: 10px; left: 10px;
+    background: #3D2016; color: #F7F3EE;
+    font-family: 'Cormorant Garamond', serif; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; z-index: 3; letter-spacing: 0.08em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv33-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid var(--cv33-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv33-cacao); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv33-wish:hover, .cv33-wish.active { background: var(--cv33-cacao); color: #FFFFFF; border-color: var(--cv33-cacao); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv33-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(61, 32, 22, 0.95); color: #F7F3EE;
+    font-family: 'Cormorant Garamond', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center; border-radius: 4px; border: 1px solid var(--cv33-cacao);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv33-card:hover .cv33-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv33-qv-overlay:hover { background: #F7F3EE; color: #3D2016; }
+
+  .cv33-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+  .cv33-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv33-muted); font-weight: 700; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
+  .cv33-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #3D2016; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Cacao Specs Subtitle */
+  .cv33-specs { font-size: 11px; color: var(--cv33-muted); font-style: italic; }
+
+  /* Rating Row */
+  .cv33-rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: #3D2016; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv33-price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv33-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #3D2016; }
+  .cv33-cmp { font-size: 13px; color: #A8A29E; text-decoration: line-through; }
+  .cv33-disc { font-size: 10px; font-weight: 700; color: #3D2016; background: var(--cv33-beige); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cv33-border); }
+
+  /* Bar Weight Variant Selector */
+  .cv33-sizes { display: flex; gap: 6px; overflow-x: auto; justify-content: center; margin-top: 4px; }
+  .cv33-size-btn {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--cv33-border); background: #FFFFFF; color: #3D2016; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv33-size-btn.active, .cv33-size-btn:hover { background: #3D2016; color: #FFFFFF; border-color: #3D2016; }
+
+  /* Bottom Button */
+  .cv33-action-box { padding: 0 14px 14px; }
+  .cv33-atc-btn {
+    width: 100%; padding: 11px;
+    background: #3D2016; color: #FFFFFF;
+    font-family: 'Cormorant Garamond', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 4px; border: none; transition: all 0.2s ease;
+  }
+  .cv33-atc-btn:hover { background: #6B4235; transform: scale(1.01); }
+  .cv33-atc-btn:disabled { background: #E7E5E4; color: #A8A29E; cursor: not-allowed; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv33-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv33-badge-cacao">72% SINGLE ORIGIN 🍫</span>
+
+    <button type="button" class="cv33-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv33-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv33-img cv33-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv33-img cv33-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-3' | placeholder_svg_tag: 'cv33-img' }}
+      {% endif %}
+
+      <button type="button" class="cv33-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv33-content">
+      {% if card_prod.vendor != blank %}<span class="cv33-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv33-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv33-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv33-specs">Notes of Wild Honey & Roasted Hazelnut</span>
+
+      <div class="cv33-rating">
+        <span>★ 4.9</span> <span>(1,890 reviews)</span>
+      </div>
+
+      <div class="cv33-price-row">
+        <span class="cv33-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv33-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv33-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Bar Weight Selector -->
+      <div class="cv33-sizes">
+        {% for variant in card_prod.variants limit: 3 %}
+          <button type="button" class="cv33-size-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv33-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv33-atc-btn" data-add-cart="{{ cur_var.id }}">INDULGE IN CACAO</button>
+      {% else %}
+        <button type="button" class="cv33-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv33-card">
+    <div class="cv33-media">{{ 'product-3' | placeholder_svg_tag: 'cv33-img' }}</div>
+    <div class="cv33-content">
+      <span class="cv33-vendor">CACAO D2C</span>
+      <div class="cv33-title">Malabar Forest 72% Dark Chocolate Bar</div>
+
+      {% if card_r_show != false %}
+      <div class="cv33-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv33-specs">Notes of Wild Honey & Roasted Hazelnut</span>
+      <div class="cv33-price-row"><span class="cv33-price">₹ 380</span><span class="cv33-cmp">₹ 480</span><span class="cv33-disc">20% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

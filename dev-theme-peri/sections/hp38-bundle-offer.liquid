@@ -1,0 +1,331 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-bundle-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp38-bundle-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp38-bundle__image-col {
+    background: var(--bg-color);
+    position: relative;
+    min-height: 500px;
+  }
+  @media screen and (max-width: 992px) {
+    .hp38-bundle__image-col {
+      min-height: 400px;
+    }
+  }
+
+  .hp38-bundle__image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+
+  .hp38-bundle__badge {
+    position: absolute;
+    top: 20px; left: 20px;
+    background: var(--accent-color);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    padding: 8px 16px;
+    text-transform: uppercase;
+  }
+
+  .hp38-bundle__content-col {
+    background: var(--bg-color);
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-bundle__content-col {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-bundle__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+
+  .hp38-bundle__subtitle {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  /* Technical Parts List */
+  .hp38-bundle__list {
+    margin-bottom: 40px;
+    flex-grow: 1;
+  }
+
+  .hp38-bundle__list-header {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .hp38-bundle__item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-color);
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .hp38-bundle__item-idx {
+    font-family: var(--font-heading);
+    opacity: 0.5;
+  }
+
+  .hp38-bundle__item-name {
+    font-weight: 600;
+  }
+
+  .hp38-bundle__item-desc {
+    opacity: 0.7;
+  }
+
+  .hp38-bundle__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 30px;
+    border-top: 2px solid var(--text-color);
+  }
+
+  .hp38-bundle__price {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    color: var(--text-color);
+  }
+
+  .hp38-bundle__btn {
+    display: inline-block;
+    padding: 15px 30px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid var(--text-color);
+    background: var(--text-color);
+    color: var(--bg-color);
+    transition: all 0.2s ease;
+  }
+
+  .hp38-bundle__btn:hover {
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-bundle-wrapper" id="HP38Bundle-{{ section.id }}">
+  <div class="hp38-bundle__image-col">
+    {%- if section.settings.badge_text != blank -%}
+      <div class="hp38-bundle__badge">{{ section.settings.badge_text }}</div>
+    {%- endif -%}
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" class="hp38-bundle__image" loading="lazy">
+    {%- else -%}
+      {{ 'collection-2' | placeholder_svg_tag: 'hp38-bundle__image' }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp38-bundle__content-col">
+    <h2 class="hp38-bundle__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp38-bundle__subtitle">SEQ: {{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    
+    <div class="hp38-bundle__list">
+      <div class="hp38-bundle__list-header">
+        <span>ID</span>
+        <span>COMPONENT</span>
+        <span>SPEC</span>
+      </div>
+      {%- for block in section.blocks -%}
+        <div class="hp38-bundle__item" {{ block.shopify_attributes }}>
+          <span class="hp38-bundle__item-idx">0{{ forloop.index }}</span>
+          <span class="hp38-bundle__item-name">{{ block.settings.item_name }}</span>
+          <span class="hp38-bundle__item-desc">{{ block.settings.item_desc }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+    
+    <div class="hp38-bundle__footer">
+      <div class="hp38-bundle__price">{{ section.settings.price }}</div>
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_link | default: '#' }}" class="hp38-bundle__btn">
+          {{ section.settings.btn_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Kit",
+  "class": "section-hp38-bundle-offer",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Bundle Image"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "SYSTEM KIT"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "OPERATOR KIT"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "ESSENTIAL GEAR"
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price",
+      "default": "$150"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "ACQUIRE"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Grid Lines",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Component",
+      "settings": [
+        {
+          "type": "text",
+          "id": "item_name",
+          "label": "Component Name",
+          "default": "JACKET_01"
+        },
+        {
+          "type": "text",
+          "id": "item_desc",
+          "label": "Spec",
+          "default": "BLK"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Kit",
+      "blocks": [
+        { "type": "item", "settings": { "item_name": "JACKET_01", "item_desc": "BLK" } },
+        { "type": "item", "settings": { "item_name": "PANT_02", "item_desc": "GRY" } },
+        { "type": "item", "settings": { "item_name": "BAG_01", "item_desc": "NYL" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

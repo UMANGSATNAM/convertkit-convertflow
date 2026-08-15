@@ -1,0 +1,266 @@
+# Shop Forge — The Complete Pro Store Manifest
+
+Two separate things:
+1. **The MANDATORY manifest** — every file that must exist in every generated store (fixed, non-negotiable)
+2. **The VARIETY ENGINE** — how you get infinite distinct pro stores without infinite components
+
+---
+
+# PART 1 — THE MANDATORY MANIFEST
+
+Every generated theme ships these. Missing any = Shopify rejects, or the store looks broken.
+
+## `layout/` (2 files)
+| File | Why |
+|---|---|
+| `theme.liquid` | Root. Contains `<head>` (SEO, tokens CSS injection, preconnect, font preload), section-group renders, `{{ content_for_layout }}`, JS defer |
+| `password.liquid` | Storefront password page |
+
+## `templates/` (18 files — ALL required)
+| File | Type | Notes |
+|---|---|---|
+| `index.json` | JSON | Homepage — the section playground |
+| `product.json` | JSON | PDP — `main-product` + PDP blocks |
+| `collection.json` | JSON | Collection listing |
+| `list-collections.json` | JSON | All collections |
+| `cart.json` | JSON | Cart page (drawer is separate) |
+| `search.json` | JSON | |
+| `404.json` | JSON | |
+| `page.json` | JSON | Default page |
+| `page.contact.json` | JSON | Contact form (Shopify convention) |
+| `blog.json` | JSON | |
+| `article.json` | JSON | |
+| `password.json` | JSON | |
+| **`gift_card.liquid`** | **LIQUID** | ⚠️ Must be `.liquid`, not JSON. **Shopify mandatory.** Currently MISSING from our chassis. |
+| `customers/account.json` | JSON | |
+| `customers/activate_account.json` | JSON | |
+| `customers/addresses.json` | JSON | |
+| `customers/login.json` | JSON | |
+| `customers/order.json` | JSON | |
+| `customers/register.json` | JSON | |
+| `customers/reset_password.json` | JSON | |
+
+**Optional but pro:** `page.about.json`, `page.faq.json`, `page.contact-us.json`, `collection.featured.json`
+
+## `sections/` — structural (must exist, always rendered)
+| File | Notes |
+|---|---|
+| `header-group.json` | **Section group** — announcement bar + header |
+| `footer-group.json` | **Section group** — footer |
+| `overlay-group.json` | Optional: popups, exit-intent, spin-wheel |
+| `header.liquid` | Fallback header (swapped by chosen variant) |
+| `footer.liquid` | Fallback footer |
+| `announcement-bar.liquid` | |
+| `main-product.liquid` | **With `{% schema %}` blocks** — this is where all 28 PDP blocks live |
+| `main-collection.liquid` | Grid + filters + pagination |
+| `main-list-collections.liquid` | |
+| `main-cart.liquid` (or `main-cart-items` + `main-cart-footer`) | |
+| `main-search.liquid` | |
+| `main-blog.liquid` | |
+| `main-article.liquid` | |
+| `main-page.liquid` | |
+| `main-404.liquid` | |
+| `main-password.liquid` | |
+| `main-login.liquid`, `main-register.liquid`, `main-account.liquid`, `main-addresses.liquid`, `main-order.liquid`, `main-activate-account.liquid`, `main-reset-password.liquid` | 7 customer sections |
+
+**Then: the 225 optional sections from the component library, injected per blueprint.**
+
+## `config/` (2 files)
+| File | Notes |
+|---|---|
+| `settings_schema.json` | Theme editor settings definition — colors, typography, spacing, India-first toggles. **This defines what a merchant can tweak.** |
+| `settings_data.json` | **The actual values.** This is where the extracted brand tokens land. `{"current": {"colors_background_1": "#FFFFFF", ...}}` |
+
+## `assets/`
+| File | Notes |
+|---|---|
+| `base.css` | Reset + primitives + layout utilities |
+| `base-tokens.css` | Static design token defaults |
+| `niche-tokens.css` | **GENERATED per merchant** — the extracted palette, fonts, radii, spacing |
+| `theme.js` | Core JS (nav, drawer, accordion) — defer |
+| `cart.js` | AJAX cart |
+| `motion.js` | Scroll reveals, hover states (the "pro" layer) |
+| `section-*.css` | Optional per-section CSS |
+| `icon-*.svg` | Icon set |
+
+## `locales/` (minimum 2, ideally 4)
+| File | Notes |
+|---|---|
+| `en.default.json` | Storefront strings |
+| **`en.default.schema.json`** | ⚠️ **Theme editor labels.** Often forgotten. Without it, the customizer shows raw keys. |
+| `hi.json` | Hindi storefront (optional but India-first) |
+| `hi.schema.json` | Hindi editor labels |
+
+## `snippets/` (core set)
+`product-card`, `price`, `pagination`, `icon-*`, `meta-tags`, `seo-schema` (JSON-LD), `cart-drawer`, `cart-notification`, `skeleton-loader`, `quantity-input`, `variant-picker`, `buy-buttons`, `product-media-gallery`, `share-button`, `country-localization`
+
+**India-first snippets:** `cod-badge`, `upi-badge`, `gst-note`, `pincode-checker`, `whatsapp-cta`, `trust-strip`
+
+---
+
+# PART 2 — WHAT MAKES IT LOOK "1000x PRO" (the 6 layers most themes skip)
+
+## Layer 1 — SEO / Structured Data (`snippets/seo-schema.liquid`)
+Every pro store emits JSON-LD:
+- `Organization` + `WebSite` (with `SearchAction`) — on every page
+- `Product` (with `offers`, `aggregateRating`, `review`) — on PDP
+- `BreadcrumbList` — on PDP + collection
+- `FAQPage` — on FAQ section
+- `Article` — on blog posts
+- `ItemList` — on collection pages
+
+Plus `meta-tags.liquid`: og:title/image/type, twitter:card, canonical, `hreflang` if multi-locale.
+
+**This alone puts you above 90% of Shopify themes.**
+
+## Layer 2 — Motion (`assets/motion.js`)
+Currently ZERO in our components. This is the biggest visual gap.
+- Scroll reveal (IntersectionObserver, fade + translateY 20px, stagger children)
+- Hover: card lift (translateY -4px + shadow), image scale 1.05
+- Image zoom on PDP gallery
+- Smooth drawer/accordion transitions (CSS transforms, not height)
+- Page transition fade
+- `prefers-reduced-motion` respected
+
+**~3KB of JS. Transforms the entire feel.**
+
+## Layer 3 — Typography system
+Not just "a font" — a **scale**:
+```css
+--font-display: clamp(2.5rem, 6vw, 5rem);
+--font-h1: clamp(2rem, 4vw, 3.5rem);
+--font-h2: clamp(1.5rem, 3vw, 2.5rem);
+--font-body: 1rem;
+--font-small: 0.875rem;
+--tracking-tight: -0.02em;
+--tracking-wide: 0.15em;   /* uppercase eyebrows */
+--leading-tight: 1.1;      /* display */
+--leading-body: 1.6;
+```
+Plus **font preload** in `theme.liquid` head — otherwise FOUT kills the premium feel.
+
+## Layer 4 — Image discipline (CLS = 0)
+- Every image has explicit `width`/`height` or `aspect-ratio`
+- `srcset` with 5 breakpoints
+- `loading="lazy"` below fold, `eager` + `fetchpriority="high"` on hero
+- Blur-up or skeleton placeholder
+- Hover second-image on product cards
+
+## Layer 5 — Speed (this IS half of "premium")
+- Critical CSS inlined in `<head>`
+- All JS `defer`
+- `preconnect` to cdn.shopify.com + fonts.gstatic.com
+- Sections below fold lazy-rendered
+- **Target: LCP < 2s on 4G mobile**
+
+## Layer 6 — Micro-copy
+- "Only 6 left" not "Low stock"
+- "Delivered by Tuesday, 15 Jul" not "5-8 business days"
+- "₹499 away from free shipping" not "Spend more for free shipping"
+- AI generates these per store.
+
+---
+
+# PART 3 — THE VARIETY ENGINE (how every store is different AND pro)
+
+**You do NOT need unlimited components. You need combinatorics.**
+
+## The math
+```
+Homepage has ~10 section slots.
+Each slot has ~5 valid candidate components (one per design direction).
+
+5^10 = 9,765,625 distinct homepage layouts
+
+× section ORDER permutations (DNA-driven)
+× token palettes (extracted per merchant — infinite)
+× typography pairings (30 curated pairs)
+× AI-generated content (unique per catalog)
+
+= EFFECTIVELY INFINITE distinct stores
+```
+
+**225 components → crores of distinct pro stores.** That's the answer.
+
+## The 5 variety dimensions
+
+### 1. Design Direction (chosen from Store DNA)
+LUXURY / MINIMAL / BOLD / EDITORIAL / PLAYFUL — each is a full token set + component variant family.
+
+### 2. Token palette (extracted per merchant)
+Colors from Claude Vision. Infinite by definition.
+
+### 3. Typography pairing (curated pool — 30 pairs)
+| Direction | Pairings |
+|---|---|
+| LUXURY | Playfair Display + Inter · Cormorant Garamond + Jost · Bodoni Moda + Karla · Libre Baskerville + Source Sans |
+| MINIMAL | Inter + Inter · Satoshi + Satoshi · DM Sans + DM Sans · Manrope + Manrope |
+| BOLD | Archivo Black + Inter · Anton + Roboto · Bebas Neue + Open Sans · Oswald + Lato |
+| EDITORIAL | Fraunces + Inter · Lora + Nunito Sans · Crimson Pro + IBM Plex Sans · Spectral + Work Sans |
+| PLAYFUL | Poppins + Poppins · Quicksand + Nunito · Baloo 2 + Mulish · Fredoka + Rubik |
+
+### 4. Section order recipes (DNA-driven, not random)
+```
+CATALOG SMALL (<20 products), HIGH PRICE  → hero → brand-story → craftsmanship → 
+   featured-few → testimonials → press → newsletter
+   (storytelling-heavy, few products, trust-first)
+
+CATALOG LARGE (>200), LOW-MID PRICE → hero → usp-bar → categories → bestsellers → 
+   deals → new-arrivals → reviews → newsletter
+   (discovery-heavy, browse-first)
+
+NEW STORE (<10 reviews) → hero → usp-bar → featured → brand-story → founder-note → 
+   guarantee → faq → newsletter
+   (compensate for missing social proof with trust + story)
+
+ESTABLISHED (>500 reviews) → hero → reviews-aggregate → bestsellers → ugc → 
+   press → categories → newsletter
+   (lead with social proof)
+```
+
+### 5. Layout density + motion preset
+Airy / Standard / Tight × Subtle / Standard / Dynamic motion.
+
+---
+
+# PART 4 — THE JSON FILES YOU GENERATE EVERY TIME
+
+| JSON | Where | Generated by |
+|---|---|---|
+| `templates/index.json` | theme | Template Generator from blueprint |
+| `templates/product.json` | theme | Blueprint (which PDP blocks, in what order) |
+| `templates/collection.json` | theme | Blueprint |
+| ...all 18 templates | theme | Blueprint |
+| `sections/header-group.json` | theme | Blueprint (chosen header component) |
+| `sections/footer-group.json` | theme | Blueprint (chosen footer) |
+| `config/settings_data.json` | theme | **Token engine** — the extracted palette lands here |
+| `config/settings_schema.json` | theme | Static (chassis), same every time |
+| `locales/en.default.json` | theme | Chassis + merged component keys |
+| `assets/niche-tokens.css` | theme | Token engine (`:root { --color-accent: ... }`) |
+| **`blueprint.json`** | internal | The intelligence layer — page structure, component choices, settings, content |
+| **`registry.json`** | internal | SSOT — all 225 components with scores |
+| **`{component}.meta.json`** | internal | Per-component scores (CRO, perf, a11y, taste, compat) |
+| **`chassis-manifest.json`** | internal | SHA-256 hashes for integrity |
+
+---
+
+# PART 5 — GAPS IN OUR CHASSIS TODAY
+
+| Gap | Impact | Fix |
+|---|---|---|
+| `templates/gift_card.liquid` missing | **Shopify will reject theme** | Build it properly (not a dummy) |
+| `en.default.schema.json` — verify exists | Theme editor shows raw keys | Add |
+| `assets/motion.js` doesn't exist | Store feels cheap | Build the motion layer |
+| No JSON-LD beyond basic | SEO leaves money on table | Full structured data snippet |
+| No typography scale in tokens | Fonts extracted but not used properly | Add scale to token engine |
+| `overlay-group.json` missing | Popups have nowhere to live | Add section group |
+| No `predictive-search` snippet | Search feels 2015 | Add |
+| Font preload not in `theme.liquid` | FOUT | Add |
+
+---
+
+# THE PRINCIPLE
+
+> **A pro store is not one with more sections. It is one where every section is token-driven, motion-aware, CLS-free, schema-rich, and fast — and where the ORDER of sections was chosen for that specific catalog.**
+
+Build 225 excellent components. Let combinatorics create the infinity.

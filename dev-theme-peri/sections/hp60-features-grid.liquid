@@ -1,0 +1,80 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FEFCE8' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp60-feat__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp60-feat__header { text-align: center; margin-bottom: 50px; }
+  .hp60-feat__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#3F6212' }}; margin: 0 0 12px; }
+  .hp60-feat__heading { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #1E293B; margin: 0; }
+  .hp60-feat__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: 24px; }
+  .hp60-feat__card {
+    background: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    border: 1px solid rgba(63, 98, 18, 0.2); border-radius: 6px; padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(63, 98, 18, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hp60-feat__card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(63, 98, 18, 0.12); }
+  .hp60-feat__card-icon {
+    width: 48px; height: 48px; background: linear-gradient(135deg, #FEF9C3, #FEF08A);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #3F6212; margin-bottom: 18px;
+    border: 1px solid rgba(63, 98, 18, 0.25);
+  }
+  .hp60-feat__card-title { font-family: 'Bodoni Moda', serif; font-size: 19px; font-weight: 700; color: #1E293B; margin: 0 0 8px; }
+  .hp60-feat__card-desc { font-size: 13px; line-height: 1.6; color: #475569; margin: 0; }
+  @media screen and (max-width: 992px) { .hp60-feat__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media screen and (max-width: 480px) { .hp60-feat__grid { grid-template-columns: 1fr; } }
+{%- endstyle -%}
+<div class="hp60-feat__container">
+  <div class="hp60-feat__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp60-feat__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp60-feat__heading">{{ section.settings.heading | default: 'The Mediterranean Botanical Codex' }}</h2>
+  </div>
+  <div class="hp60-feat__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp60-feat__card" {{ block.shopify_attributes }}>
+        <div class="hp60-feat__card-icon">{{ block.settings.icon | default: '🍋' }}</div>
+        <h3 class="hp60-feat__card-title">{{ block.settings.title | default: 'Bergamot Bio-Flavonoids' }}</h3>
+        <p class="hp60-feat__card-desc">{{ block.settings.description | default: 'Rich Mediterranean sun nutrients.' }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP60 Features",
+  "class": "section-hp60-feat",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FEFCE8" },
+    { "type": "color", "id": "card_bg", "label": "Card BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#3F6212" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🏛️ CODEX" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Mediterranean Botanical Codex" },
+    { "type": "range", "id": "columns", "min": 2, "max": 4, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{
+    "type": "feature", "name": "Feature",
+    "settings": [
+      { "type": "text", "id": "icon", "label": "Icon", "default": "🍋" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Bergamot Bio-Flavonoids" },
+      { "type": "textarea", "id": "description", "label": "Description", "default": "Rich Mediterranean sun nutrients." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP60 Features",
+    "blocks": [
+      { "type": "feature", "settings": { "icon": "🍋", "title": "Calabrian Bergamot Polyphenols", "description": "Naturally illuminates sunspots while boosting dermal collagen turnover." } },
+      { "type": "feature", "settings": { "icon": "🌿", "title": "Centenarian Olive Oleuropein", "description": "Extraordinary botanical shield preventing cellular glycation and lipid breakdown." } },
+      { "type": "feature", "settings": { "icon": "🏛️", "title": "Travertine Mineral Salts", "description": "Restores ideal skin osmotic equilibrium and epidermal hydration reservoirs." } },
+      { "type": "feature", "settings": { "icon": "🏺", "title": "Hand-Milled Granite Press", "description": "Gentle stone milling that protects delicate volatile bio-compounds." } },
+      { "type": "feature", "settings": { "icon": "🍇", "title": "Tuscan Chianti Resveratrol", "description": "High-potency polyphenols that enhance cellular longevity and firmness." } },
+      { "type": "feature", "settings": { "icon": "☀️", "title": "100% Sun-Safe Photostable", "description": "Patented cold distillation ensuring complete photostability under midday sunlight." } }
+    ]
+  }]
+}
+{% endschema %}

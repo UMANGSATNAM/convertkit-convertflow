@@ -1,0 +1,543 @@
+{%- comment -%}
+  PC V7 — GLASSMORPHIC TRANSLUCENT TECH PRODUCT GRID
+  Design: Deep Cyan Night (#0A0D14), Electric Cyan (#00F0FF) accents, Glassmorphic Backdrop Blur
+  Card Shape: 16px Glass corners, glowing cyan border, Outfit typography
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+
+  .pcv7 {
+    --bg: {{ section.settings.bg_color | default: '#0A0D14' }};
+    --card-bg: {{ section.settings.card_bg | default: 'rgba(255, 255, 255, 0.04)' }};
+    --text: {{ section.settings.text_color | default: '#F0F6FC' }};
+    --muted: {{ section.settings.muted_color | default: '#8B949E' }};
+    --accent: {{ section.settings.accent_color | default: '#00F0FF' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#00C4D4' }};
+    --border: {{ section.settings.border_color | default: 'rgba(0, 240, 255, 0.15)' }};
+    --badge-sale-bg: #00F0FF;
+    --badge-sale-text: #0A0D14;
+    --f-main: 'Outfit', sans-serif;
+    --r-card: 16px;
+    --ease: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--bg);
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.06), transparent 70%);
+    color: var(--text);
+    font-family: var(--f-main);
+    padding: {{ section.settings.padding_top | default: 56 }}px 0 {{ section.settings.padding_bottom | default: 56 }}px 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv7 *, .pcv7 *::before, .pcv7 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv7 a { color: inherit; text-decoration: none; }
+  .pcv7 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv7 img { max-width: 100%; display: block; }
+
+  .pcv7__wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv7__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv7__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv7__title { font-size: 30px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+  @media (min-width: 768px) { .pcv7__title { font-size: 38px; } }
+  .pcv7__sub { font-size: 15px; color: var(--muted); }
+  .pcv7__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--accent); background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; backdrop-filter: blur(8px); transition: var(--ease); }
+  .pcv7__viewall:hover { background: var(--accent); color: #0A0D14; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+
+  /* GRID */
+  .pcv7__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .pcv7__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 20px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv7__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 24px; }
+  }
+
+  /* CARD */
+  .pcv7__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--ease);
+  }
+  .pcv7__card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 12px 32px -10px rgba(0, 240, 255, 0.25);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  /* IMAGE BOX */
+  .pcv7__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '3/4' }};
+    background: rgba(10, 13, 20, 0.8);
+    overflow: hidden;
+  }
+  .pcv7__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv7__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv7__card:hover .pcv7__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.06);
+    {% endif %}
+  }
+  .pcv7__card:hover .pcv7__img--sec { opacity: 1; transform: scale(1.06); }
+
+  /* BADGES */
+  .pcv7__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv7__badge { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+  .pcv7__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv7__badge--tag { background: rgba(255, 255, 255, 0.15); color: #FFFFFF; backdrop-filter: blur(8px); }
+  .pcv7__badge--sold { background: rgba(139, 148, 158, 0.3); color: #8B949E; }
+
+  /* WISHLIST BUTTON */
+  .pcv7__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(10, 13, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv7__wish:hover { background: rgba(0, 240, 255, 0.2); border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
+  .pcv7__wish.active { color: #FF3B30; border-color: #FF3B30; background: rgba(255, 59, 48, 0.2); }
+
+  /* QUICK ADD HOVER */
+  .pcv7__quick-box {
+    position: absolute;
+    bottom: 12px; left: 12px; right: 12px;
+    z-index: 3;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: var(--ease);
+  }
+  .pcv7__card:hover .pcv7__quick-box { transform: translateY(0); opacity: 1; }
+  @media (max-width: 767px) {
+    .pcv7__quick-box { transform: translateY(0); opacity: 1; position: relative; bottom: auto; left: auto; right: auto; padding: 0 14px 14px; }
+  }
+
+  .pcv7__quick-btn {
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #0A0D14;
+    font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+  }
+  .pcv7__quick-btn:hover { background: var(--accent-hover); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
+  .pcv7__quick-btn:disabled { background: rgba(255, 255, 255, 0.1); color: #8B949E; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv7__content { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv7__vendor { font-size: 10px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+  .pcv7__item-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pcv7__item-title:hover { color: var(--accent); }
+
+  /* RATING */
+  .pcv7__rating { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .pcv7__stars { letter-spacing: 1px; }
+  .pcv7__rev-cnt { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  /* PRICE */
+  .pcv7__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv7__price { font-size: 17px; font-weight: 700; color: var(--text); }
+  .pcv7__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv7__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv7__swatch { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: var(--ease); }
+  .pcv7__swatch:hover, .pcv7__swatch.active { transform: scale(1.25); border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv7__urgency { font-size: 11px; color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv7__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #0A0D14;
+    padding: 12px 24px; border-radius: 20px;
+    font-size: 13px; font-weight: 800;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+  }
+  .pcv7__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv7">
+  <div class="pcv7__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv7__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv7__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv7__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv7__viewall">
+            {{ section.settings.view_all_label | default: 'Explore Glass Vault' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv7__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v7', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v7', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv7__toast" id="pcv7-toast">Added to Glass Cart!</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv7-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv7Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ Added';
+        showT('Product added to Glass Cart!');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'Error';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv7-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V7 — Glassmorphic Glow",
+  "tag": "section",
+  "class": "pcv7-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "PRO EDITION"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Futuristic Glass Collection"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "High-tech translucent gear engineered for optimal performance."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Explore Glass Vault"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#0A0D14"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "rgba(255, 255, 255, 0.04)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F0F6FC"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#8B949E"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#00F0FF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "rgba(0, 240, 255, 0.15)"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V7 — Glassmorphic Glow"
+    }
+  ]
+}
+{% endschema %}

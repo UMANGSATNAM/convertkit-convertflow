@@ -1,0 +1,332 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=DM+Sans:wght@400;500;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Shrikhand', cursive;
+    --font-body: 'DM Sans', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp37-best-wrapper {
+    overflow: hidden;
+  }
+
+  .hp37-best__header {
+    padding: 0 40px 40px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-best__header {
+      padding: 0 20px 30px;
+    }
+  }
+
+  .hp37-best__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0;
+    text-shadow: 2px 2px 0px var(--accent-color);
+  }
+
+  .hp37-best__carousel {
+    display: flex;
+    overflow-x: auto;
+    padding: 0 40px 40px;
+    gap: 30px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .hp37-best__carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-best__carousel {
+      padding: 0 20px 40px;
+      gap: 20px;
+    }
+  }
+
+  .hp37-best__item {
+    flex: 0 0 350px;
+    background: var(--card-bg);
+    border: 3px solid var(--text-color);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 6px 6px 0px var(--text-color);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    group: card;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-best__item {
+      flex: 0 0 280px;
+    }
+  }
+
+  .hp37-best__item:hover {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0px var(--text-color);
+  }
+
+  .hp37-best__image-wrap {
+    aspect-ratio: 1;
+    background: #e9e9e9;
+    border-radius: 50%; /* Circle images! */
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 3px solid var(--text-color);
+    position: relative;
+  }
+
+  .hp37-best__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+  }
+
+  .hp37-best__badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--accent-color);
+    color: var(--bg-color);
+    font-family: var(--font-heading);
+    font-size: 14px;
+    padding: 8px 15px;
+    border-radius: 50px;
+    border: 2px solid var(--text-color);
+    transform: rotate(-10deg);
+    z-index: 2;
+  }
+
+  .hp37-best__info {
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp37-best__product-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--text-color);
+    margin: 0 0 10px;
+  }
+
+  .hp37-best__price {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 20px;
+  }
+
+  .hp37-best__add-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: none;
+    border-radius: 50px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: auto;
+  }
+
+  .hp37-best__add-btn:hover {
+    background: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp37-best-wrapper" id="HP37Best-{{ section.id }}">
+  <div class="hp37-best__header">
+    <h2 class="hp37-best__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp37-best__carousel">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_link | default: '#' }}" class="hp37-best__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.badge_text != blank -%}
+          <div class="hp37-best__badge">{{ block.settings.badge_text }}</div>
+        {%- endif -%}
+        
+        <div class="hp37-best__image-wrap">
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp37-best__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'product-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp37-best__image' }}
+          {%- endif -%}
+        </div>
+        
+        <div class="hp37-best__info">
+          <h3 class="hp37-best__product-title">{{ block.settings.title }}</h3>
+          <div class="hp37-best__price">{{ block.settings.price }}</div>
+          <button class="hp37-best__add-btn">Add to Bag</button>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP37 - Retro Carousel",
+  "class": "section-hp37-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Crowd Favorites"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Retro Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4E3C5"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#F9F3EA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#4A3219"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#EAB059"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "default": "RAD"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Retro Boardshorts"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$55"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP37 - Retro Carousel",
+      "blocks": [
+        { "type": "product", "settings": { "badge_text": "RAD" } },
+        { "type": "product", "settings": { "badge_text": "GROOVY" } },
+        { "type": "product", "settings": { "badge_text": "NEW" } },
+        { "type": "product", "settings": { "badge_text": "HOT" } },
+        { "type": "product", "settings": { "badge_text": "RAD" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

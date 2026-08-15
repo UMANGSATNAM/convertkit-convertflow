@@ -1,0 +1,249 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&family=La+Belle+Aurore&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-signature: 'La Belle Aurore', cursive;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-founder-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-founder-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp29-founder__image-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 40px;
+  }
+
+  .hp29-founder__image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg-color);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Decorative ring */
+  .hp29-founder__image-wrap::before {
+    content: '';
+    position: absolute;
+    top: -10px; left: -10px; right: -10px; bottom: -10px;
+    border: 1px solid var(--accent-color);
+    border-radius: 50%;
+    opacity: 0.4;
+    z-index: 1;
+  }
+
+  .hp29-founder__note {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3.5vw, {{ section.settings.text_size }}px);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-color);
+    max-width: 800px;
+    margin: 0 0 40px;
+  }
+
+  .hp29-founder__signature {
+    font-family: var(--font-signature);
+    font-size: 40px;
+    color: var(--accent-color);
+    margin: 0 0 10px;
+    transform: rotate(-3deg);
+  }
+
+  .hp29-founder__name {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-color);
+    opacity: 0.6;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-founder-wrapper" id="HP29Founder-{{ section.id }}">
+  <div class="hp29-founder__image-wrap">
+    {%- if section.settings.image != blank -%}
+      <img src="{{ section.settings.image | image_url: width: 300 }}" alt="{{ section.settings.name | escape }}" class="hp29-founder__image" loading="lazy">
+    {%- else -%}
+      {{ 'image' | placeholder_svg_tag: 'hp29-founder__image' }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp29-founder__note">
+    {{ section.settings.note }}
+  </div>
+
+  <div class="hp29-founder__signature">
+    {%- if section.settings.signature_image != blank -%}
+      <img src="{{ section.settings.signature_image | image_url: width: 200 }}" alt="{{ section.settings.name }} Signature" style="max-height: 60px;">
+    {%- else -%}
+      {{ section.settings.name }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp29-founder__name">
+    Founder & Creative Director
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP29 - Boho Founder Note",
+  "class": "section-hp29-founder-note",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Founder Image"
+    },
+    {
+      "type": "richtext",
+      "id": "note",
+      "label": "Note",
+      "default": "<p>When we started this journey, our goal was simple: to create pieces that ground you, bringing a sense of calm and intentionality to your everyday life. Thank you for walking this path with us.</p>"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Founder Name",
+      "default": "Aria Woods"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature_image",
+      "label": "Signature Image (Optional)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 900
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Note Text Size",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#3D405B"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Terracotta)",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 - Boho Founder Note"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,98 @@
+{% comment %} CL V29 — Music / Vinyl Records {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv29 { background: {{ section.settings.bg_color | default: '#FDFBF7' }}; color: {{ section.settings.text_color | default: '#2E1114' }}; padding: 50px 20px; font-family: 'DM Serif Display', serif; }
+  .clv29-hero { text-align: center; margin-bottom: 50px; background: #2E1114; color: #FDFBF7; padding: 70px 40px; }
+  .clv29-hero h1 { font-size: 48px; font-weight: normal; margin-bottom: 15px; letter-spacing: 1px; }
+  .clv29-hero p { font-size: 16px; font-family: 'Karla', sans-serif; color: #D5C5B9; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  .clv29-chips { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv29-chips a { padding: 10px 24px; background: #EADCD1; color: #2E1114; text-decoration: none; font-family: 'Karla', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; border-radius: 0px; border: 1px solid #C4B0A1; transition: 0.2s; }
+  .clv29-chips a:hover, .clv29-chips a.active { background: #8B2635; color: #FDFBF7; border-color: #8B2635; }
+  .clv29-toolbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2E1114; padding-bottom: 20px; margin-bottom: 40px; font-family: 'Karla', sans-serif; }
+  .clv29-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 30px; }
+  .clv29-promo { grid-column: span 1; background: #8B2635; color: #FDFBF7; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; }
+  .clv29-promo::after { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(253,251,247,0.3); pointer-events: none; }
+  .clv29-promo h3 { font-size: 26px; margin-bottom: 20px; font-weight: normal; }
+  .clv29-promo a { display: inline-block; padding: 12px 25px; background: #FDFBF7; color: #8B2635; text-decoration: none; font-family: 'Karla', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; position: relative; z-index: 1; }
+  .clv29-seo { margin-top: 60px; text-align: center; padding: 50px; background: #EADCD1; border: 1px solid #C4B0A1; }
+  @media (max-width: 768px) { .clv29-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv29-hero h1 { font-size: 38px; } }
+</style>
+<div class="clv29" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv29-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}The Record Shop{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Analog sound for the digital age. Discover rare pressings.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv29-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv29-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: 700; text-transform: uppercase;">{{ filter.label }} ▿</summary>
+              <div style="position: absolute; background: #FDFBF7; border: 2px solid #2E1114; padding: 25px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 4px 4px 0 #2E1114;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; font-weight: 500; color: #2E1114;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-size: 14px; font-weight: 700; font-family: 'Karla', sans-serif; color: #2E1114; text-transform: uppercase; cursor: pointer;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv29-grid">
+      {% for product in collection.products %}
+        {% render 'card-v29', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv29-promo">
+            <h3>Turntable<br>Setup</h3>
+            <a href="/collections/gear">Shop Hardware</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v29', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-family: 'Karla', sans-serif; font-weight: 700;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv29-seo">
+      <h2 style="font-size: 28px; font-weight: normal; margin-bottom: 15px; color: #2E1114;">{{ section.settings.seo_title | default: 'Pure Fidelity' }}</h2>
+      <p style="font-family: 'Karla', sans-serif; font-size: 15px; color: #5B4043; max-width: 650px; margin: 0 auto; line-height: 1.8;">{{ section.settings.seo_text | default: 'Every record is ultrasonically cleaned and graded using Goldmine standards.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V29 — Vinyl", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FDFBF7"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#2E1114"}
+  ], "presets": [{"name": "CL V29 — Vinyl"}]
+}
+{% endschema %}

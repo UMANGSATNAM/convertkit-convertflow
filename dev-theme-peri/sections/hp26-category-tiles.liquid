@@ -1,0 +1,339 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp26-cat-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-cat-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp26-cat-tiles__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp26-cat-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .hp26-cat-tiles__title em {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .hp26-cat-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 20px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-cat-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp26-cat-tiles__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp26-cat-tiles__item {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    /* Soft border radius for Japandi */
+    border-radius: 4px;
+    background-color: #EAE6DF;
+    group;
+  }
+
+  .hp26-cat-tiles__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .hp26-cat-tiles__item:hover .hp26-cat-tiles__image {
+    transform: scale(1.05);
+  }
+
+  /* Overlay for text legibility */
+  .hp26-cat-tiles__overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 30px;
+    transition: opacity 0.4s ease;
+  }
+
+  .hp26-cat-tiles__item-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 400;
+    font-style: italic;
+    color: #fff;
+    margin: 0 0 10px;
+    text-align: center;
+    transform: translateY(10px);
+    transition: transform 0.4s ease;
+  }
+
+  .hp26-cat-tiles__item-link {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .hp26-cat-tiles__item-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1px;
+    background: #fff;
+    transition: width 0.4s ease;
+  }
+
+  .hp26-cat-tiles__item:hover .hp26-cat-tiles__item-title {
+    transform: translateY(0);
+  }
+
+  .hp26-cat-tiles__item:hover .hp26-cat-tiles__item-link {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hp26-cat-tiles__item:hover .hp26-cat-tiles__item-link::after {
+    width: 100%;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-cat-tiles-wrapper" id="HP26CatTiles-{{ section.id }}">
+  {%- if section.settings.title != blank -%}
+    <div class="hp26-cat-tiles__header">
+      <h2 class="hp26-cat-tiles__title">{{ section.settings.title }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hp26-cat-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp26-cat-tiles__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp26-cat-tiles__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#2C2A28;font-family:var(--font-heading);opacity:0.3;">IMAGE</div>
+        {%- endif -%}
+        
+        <div class="hp26-cat-tiles__overlay">
+          <h3 class="hp26-cat-tiles__item-title">{{ block.settings.title }}</h3>
+          <span class="hp26-cat-tiles__item-link">{{ block.settings.btn_text }}</span>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Cat Tiles",
+  "class": "section-hp26-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Explore <em>Spaces</em>"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category Tile",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Living Room"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Link Text",
+          "default": "DISCOVER"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Cat Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Living" } },
+        { "type": "tile", "settings": { "title": "Dining" } },
+        { "type": "tile", "settings": { "title": "Bedroom" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

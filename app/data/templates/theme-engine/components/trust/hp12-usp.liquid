@@ -1,0 +1,114 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAFAFA'
+  assign text_color = section.settings.text_color | default: '#333333'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    color: {{ text_color }};
+    border-bottom: 1px solid #E5E5E5;
+  }
+  
+  .hp12-usp-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+  }
+  
+  .hp12-usp-item-{{ section_id }} {
+    text-align: center;
+  }
+  
+  .hp12-usp-title-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0 0 15px 0;
+    letter-spacing: 2px;
+  }
+  
+  .hp12-usp-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 992px) {
+    .hp12-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 50px;
+      padding-top: 20px;
+    }
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp12-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp12-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <h3 class="hp12-usp-title-{{ section_id }}">{{ block.settings.title | default: 'SUSTAINABLE MATERIALS' }}</h3>
+      <p class="hp12-usp-text-{{ section_id }}">{{ block.settings.text | default: 'Responsibly sourced elements that respect both interior spaces and the natural world.' }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP12 USP",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "SUSTAINABLE MATERIALS"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Responsibly sourced elements that respect both interior spaces and the natural world."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP12 USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "SUSTAINABLE DESIGN", "text": "Responsibly sourced elements that respect both interior spaces and the natural world." } },
+        { "type": "usp", "settings": { "title": "MINDFUL CRAFT", "text": "Every object is shaped by artisans dedicated to enduring quality and subtle detailing." } },
+        { "type": "usp", "settings": { "title": "CURATED DELIVERY", "text": "Complimentary white-glove shipping to ensure your pieces arrive in perfect harmony." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

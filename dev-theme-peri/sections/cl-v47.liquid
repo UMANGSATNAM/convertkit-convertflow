@@ -1,0 +1,97 @@
+{% comment %} CL V47 — 70s Retro (Orange/Mustard/Brown) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv47 { background: {{ section.settings.bg_color | default: '#F4D03F' }}; color: {{ section.settings.text_color | default: '#5D4037' }}; padding: 50px 20px; font-family: 'Lobster', 'Cooper Black', cursive; }
+  .clv47-hero { text-align: center; margin-bottom: 50px; padding: 60px 20px; background: #D35400; border-radius: 100px; color: #FFF; box-shadow: 10px 10px 0 #5D4037; }
+  .clv47-hero h1 { font-size: 56px; margin-bottom: 10px; font-weight: normal; }
+  .clv47-hero p { font-size: 18px; font-family: 'Outfit', sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.5; font-weight: 500; }
+  .clv47-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv47-chips a { padding: 10px 25px; background: #E67E22; color: #FFF; text-decoration: none; font-size: 18px; font-family: 'Outfit', sans-serif; font-weight: 700; border-radius: 50px; border: 3px solid #5D4037; box-shadow: 4px 4px 0 #5D4037; transition: 0.1s; }
+  .clv47-chips a:hover, .clv47-chips a.active { background: #5D4037; color: #F4D03F; transform: translate(2px, 2px); box-shadow: 2px 2px 0 #D35400; }
+  .clv47-toolbar { background: #FFF; border: 3px solid #5D4037; border-radius: 50px; padding: 15px 30px; margin-bottom: 40px; box-shadow: 5px 5px 0 #5D4037; font-family: 'Outfit', sans-serif; font-weight: 700; }
+  .clv47-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 30px; }
+  .clv47-promo { grid-column: span 1; background: #E67E22; border: 3px solid #5D4037; border-radius: 40px; padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; color: #FFF; box-shadow: 8px 8px 0 #5D4037; }
+  .clv47-promo h3 { font-size: 32px; margin-bottom: 15px; font-weight: normal; }
+  .clv47-promo a { display: inline-block; padding: 10px 20px; background: #5D4037; color: #F4D03F; text-decoration: none; font-size: 14px; font-family: 'Outfit', sans-serif; border-radius: 30px; border: 2px solid #5D4037; }
+  .clv47-seo { margin-top: 60px; background: #FFF; border: 3px solid #5D4037; border-radius: 40px; padding: 40px; text-align: center; box-shadow: 10px 10px 0 #5D4037; font-family: 'Outfit', sans-serif; }
+  @media (max-width: 768px) { .clv47-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv47-hero { border-radius: 40px; } .clv47-hero h1 { font-size: 40px; } }
+</style>
+<div class="clv47" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv47-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Stay Groovy{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Vintage finds and modern pieces inspired by the golden era of the 1970s.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv47-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv47-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; color: #D35400;">{{ filter.label }} ✌️</summary>
+              <div style="position: absolute; background: #FFF; border: 3px solid #5D4037; padding: 20px; border-radius: 20px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 5px 5px 0 #5D4037;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 15px; color: #5D4037;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; color: #D35400; font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv47-grid">
+      {% for product in collection.products %}
+        {% render 'card-v47', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv47-promo">
+            <h3>Retro<br>Posters</h3>
+            <a href="/collections/posters">Decorate</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v47', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-size: 22px;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv47-seo">
+      <h2 style="font-family: 'Lobster', cursive; font-size: 32px; color: #D35400; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Good Vibes Only' }}</h2>
+      <p style="font-size: 16px; color: #5D4037; font-weight: 500; max-width: 700px; margin: 0 auto; line-height: 1.6;">{{ section.settings.seo_text | default: 'Embrace the bold colors, funky patterns, and carefree spirit of the 70s. From flared pants to lava lamps, we have it all.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V47 — 70s Retro", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F4D03F"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#5D4037"}
+  ], "presets": [{"name": "CL V47 — 70s Retro"}]
+}
+{% endschema %}

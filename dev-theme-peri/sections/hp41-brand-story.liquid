@@ -1,0 +1,207 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 20px;
+    border-bottom: 4px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .hp41-story-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp41-story-wrapper {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  .hp41-story__block-left {
+    background: #38C6F4;
+    border: 4px solid var(--border-color);
+    border-radius: 20px;
+    padding: 80px 40px;
+    box-shadow: 12px 12px 0px var(--border-color);
+    position: relative;
+    transform: rotate(-2deg);
+  }
+
+  .hp41-story__sticker {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    background: #D7FF43;
+    border: 4px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+    transform: rotate(15deg);
+    box-shadow: 6px 6px 0px var(--border-color);
+    animation: hp41-wobble 4s infinite ease-in-out;
+  }
+
+  @keyframes hp41-wobble {
+    0%, 100% { transform: rotate(15deg) scale(1); }
+    50% { transform: rotate(-5deg) scale(1.05); }
+  }
+
+  .hp41-story__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--border-color);
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .hp41-story__block-right {
+    padding: 20px;
+  }
+
+  .hp41-story__text {
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--border-color);
+    margin: 0 0 40px;
+  }
+
+  .hp41-story__btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: #FF4911;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px var(--border-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp41-story__btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px var(--border-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp41-story-wrapper" id="HP41Story-{{ section.id }}">
+  <div class="hp41-story__block-left">
+    <div class="hp41-story__sticker">EST.<br>2026</div>
+    <h2 class="hp41-story__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp41-story__block-right">
+    {%- if section.settings.text != blank -%}
+      <div class="hp41-story__text">
+        {{ section.settings.text }}
+      </div>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp41-story__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP41 - Neo Story",
+  "class": "section-hp41-brand-story",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "WE DON'T DO BORING."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Life is too short for bland colors and safe choices. We're here to make things that pop, snap, and crackle. Stand out or go home.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "OUR MANIFESTO"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Neo Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FDF0D5"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP41 - Neo Story"
+    }
+  ]
+}
+{% endschema %}

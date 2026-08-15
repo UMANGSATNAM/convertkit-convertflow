@@ -1,0 +1,60 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#1F0B18' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp55-test__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp55-test__header { text-align: center; margin-bottom: 50px; }
+  .hp55-test__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C084FC; margin: 0 0 12px; }
+  .hp55-test__heading { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 42px); color: #FFFFFF; margin: 0; }
+  .hp55-test__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: 20px; }
+  .hp55-test__card { background: #2A0E22; border: 1px solid rgba(233, 213, 255, 0.15); border-radius: 16px; padding: 32px 24px; }
+  .hp55-test__stars { color: #C084FC; font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+  .hp55-test__quote { font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; line-height: 1.6; color: #FDF4FF; margin: 0 0 20px; }
+  .hp55-test__author { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: #FFFFFF; margin: 0; }
+  .hp55-test__role { font-size: 11px; color: #C084FC; margin: 4px 0 0; letter-spacing: 1px; text-transform: uppercase; }
+  @media screen and (max-width: 992px) { .hp55-test__grid { grid-template-columns: 1fr; max-width: 600px; margin: 0 auto; } }
+{%- endstyle -%}
+<div class="hp55-test__container">
+  <div class="hp55-test__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp55-test__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp55-test__heading">{{ section.settings.heading | default: 'Imperial Praise' }}</h2>
+  </div>
+  <div class="hp55-test__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp55-test__card" {{ block.shopify_attributes }}>
+        <div class="hp55-test__stars">{{ block.settings.stars | default: '★★★★★' }}</div>
+        <p class="hp55-test__quote">"{{ block.settings.quote | default: 'My skin has achieved a glass pearl luminosity that makeup can never replicate.' }}"</p>
+        <p class="hp55-test__author">{{ block.settings.author | default: 'Lady Eleanor M.' }}</p>
+        <p class="hp55-test__role">{{ block.settings.role | default: 'VIP Patron' }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP55 Reviews",
+  "class": "section-hp55-test",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#1F0B18" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "✦ TESTIMONIALS" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Imperial Praise" },
+    { "type": "range", "id": "columns", "min": 1, "max": 3, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{ "type": "testimonial", "name": "Review", "settings": [
+    { "type": "text", "id": "stars", "label": "Stars", "default": "★★★★★" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "My skin has achieved a glass pearl luminosity." },
+    { "type": "text", "id": "author", "label": "Author", "default": "Lady Eleanor M." },
+    { "type": "text", "id": "role", "label": "Role", "default": "VIP Patron" }
+  ]}],
+  "presets": [{ "name": "HP55 Reviews", "blocks": [
+    { "type": "testimonial" },
+    { "type": "testimonial", "settings": { "quote": "The pearl nacre serum is truly unlike anything on the luxury market.", "author": "Countess Victoria V." } },
+    { "type": "testimonial", "settings": { "quote": "Every morning I wake up with radiant, porcelain-smooth skin.", "author": "Duchess Madeleine B." } }
+  ]}]
+}
+{% endschema %}

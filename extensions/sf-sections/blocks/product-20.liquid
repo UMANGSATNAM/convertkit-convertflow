@@ -1,8 +1,231 @@
-<div class="sf-product-section" id="sf-product-20">
-  <!-- Placeholder for Product Block 20 -->
-  <h2 style="color: {{ section.settings.heading_color }}">{{ section.settings.title }}</h2>
-  {% if section.settings.show_button %}
-    <a href="#" class="sf-btn">Click Here</a>
+{%- assign product = all_products[section.settings.product] | default: product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  /* Hyper-clean Split Screen Aesthetic */
+  .sf-pdp-{{ section.id }} {
+    --primary-color: {{ section.settings.primary_color }};
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --border-color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  .sf-pdp-{{ section.id }} * { box-sizing: inherit; }
+  
+  .sf-pdp-grid { display: grid; grid-template-columns: 1fr; }
+  @media(min-width: 1024px) {
+    .sf-pdp-grid { grid-template-columns: 1fr 1fr; min-height: 80vh; }
+  }
+
+  /* Media Gallery - Left Split (Fixed/Sticky behavior on desktop) */
+  .sf-media-wrapper { 
+    background: #f8fafc;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  @media(min-width: 1024px) {
+    .sf-media-wrapper { position: sticky; top: 0; height: 100vh; }
+  }
+  
+  .sf-gallery-main { width: 100%; max-width: 700px; }
+  .sf-gallery-main img { width: 100%; height: auto; display: block; object-fit: contain; mix-blend-mode: darken; }
+  
+  /* Details Panel - Right Split */
+  .sf-details-wrapper { 
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  @media(min-width: 1024px) {
+    .sf-details-wrapper { padding: 100px 80px; }
+  }
+  
+  .sf-pdp-vendor { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em; color: #94a3b8; margin-bottom: 12px; font-weight: 600; }
+  .sf-pdp-title { font-size: 3rem; font-weight: 800; color: var(--heading-color); margin: 0 0 24px 0; line-height: 1.1; letter-spacing: -0.04em; }
+  
+  .sf-pdp-price-wrapper { display: flex; align-items: center; gap: 16px; margin-bottom: 40px; }
+  .sf-pdp-price { font-size: 2rem; font-weight: 700; color: var(--primary-color); }
+  .sf-pdp-compare-price { font-size: 1.25rem; color: #94a3b8; text-decoration: line-through; }
+
+  /* Description */
+  .sf-description { font-size: 1.15rem; line-height: 1.8; color: #475569; margin-bottom: 48px; font-weight: 400; }
+  
+  /* Form */
+  .sf-variant-group { margin-bottom: 32px; }
+  .sf-variant-label { display: block; margin-bottom: 16px; font-size: 1rem; font-weight: 600; color: var(--heading-color); }
+  .sf-variant-options { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sf-variant-option { padding: 14px 28px; border: 2px solid var(--border-color); border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; font-weight: 600; color: var(--text-color); transition: all 0.2s; }
+  .sf-variant-option:hover { border-color: #cbd5e1; }
+  .sf-variant-option.selected { border-color: var(--primary-color); background: var(--primary-color); color: #fff; }
+  
+  .sf-action-group { display: flex; gap: 16px; margin-bottom: 24px; height: 64px; }
+  .sf-quantity-selector { display: flex; align-items: center; border-radius: 8px; width: 140px; background: #fff; border: 2px solid var(--border-color); }
+  .sf-qty-btn { width: 40px; height: 100%; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-color); font-weight: 600; }
+  .sf-qty-input { flex: 1; border: none; text-align: center; font-size: 1.1rem; font-weight: 700; appearance: textfield; padding: 0; background: transparent; }
+  .sf-qty-input::-webkit-inner-spin-button { display: none; }
+  
+  .sf-add-to-cart { 
+    flex: 1; 
+    background: var(--primary-color); 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 1.125rem; 
+    font-weight: 700; 
+    cursor: pointer; 
+    transition: all 0.3s; 
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); 
+  }
+  .sf-add-to-cart:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15); opacity: 0.95; }
+
+  /* Feature list under ATC */
+  .sf-feature-list { margin-top: 40px; padding-top: 40px; border-top: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 16px; }
+  .sf-feature-item { display: flex; align-items: center; gap: 16px; font-size: 1rem; color: #475569; font-weight: 500; }
+  .sf-feature-icon { width: 24px; height: 24px; color: var(--primary-color); }
+
+  /* Recently Viewed (Full Width) */
+  .sf-recently-viewed { margin-top: 0; padding: 100px 40px; background: #fff; }
+  .sf-rv-title { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 60px; color: var(--heading-color); letter-spacing: -0.03em; }
+  .sf-rv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 1400px; margin: 0 auto; }
+  @media(min-width: 768px) { .sf-rv-grid { grid-template-columns: repeat(4, 1fr); } }
+  .sf-rv-card { display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: transform 0.3s; }
+  .sf-rv-card:hover { transform: translateY(-8px); }
+  .sf-rv-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; margin-bottom: 20px; background: #f8fafc; }
+  .sf-rv-card-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; color: var(--heading-color); }
+  .sf-rv-card-price { font-size: 1.1rem; font-weight: 600; color: #64748b; }
+</style>
+
+<div class="sf-pdp-{{ section.id }}">
+  {% if product != blank %}
+    <div class="sf-pdp-grid">
+      
+      <!-- Media Gallery Split -->
+      <div class="sf-media-wrapper">
+        <div class="sf-gallery-main" id="sf-main-image-{{ section.id }}">
+          <img src="{{ current_variant.featured_image | default: product.featured_image | img_url: '1600x' }}" alt="{{ product.title | escape }}" id="sf-image-el-{{ section.id }}">
+        </div>
+      </div>
+
+      <!-- Product Details Split -->
+      <div class="sf-details-wrapper">
+        <div class="sf-pdp-vendor">{{ product.vendor }}</div>
+        <h1 class="sf-pdp-title">{{ product.title }}</h1>
+        
+        <div class="sf-pdp-price-wrapper">
+          <span class="sf-pdp-price" id="sf-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="sf-pdp-compare-price" id="sf-compare-price-{{ section.id }}">{{ current_variant.compare_at_price | money }}</span>
+          {% endif %}
+        </div>
+
+        <div class="sf-description">
+          {{ product.description | strip_html | truncatewords: 60 }}
+        </div>
+
+        <form method="post" action="/cart/add" id="sf-form-{{ section.id }}" accept-charset="UTF-8" enctype="multipart/form-data">
+          <input type="hidden" name="form_type" value="product">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="id" id="sf-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+
+          {% unless product.has_only_default_variant %}
+            <div class="sf-variants-container">
+              {% for option in product.options_with_values %}
+                <div class="sf-variant-group">
+                  <span class="sf-variant-label">{{ option.name }}</span>
+                  <div class="sf-variant-options" data-option-index="option{{ forloop.index }}">
+                    {% for value in option.values %}
+                      <div class="sf-variant-option {% if option.selected_value == value %}selected{% endif %}" 
+                           data-value="{{ value | escape }}"
+                           onclick="sfSelectOption('{{ section.id }}', this)">
+                        {{ value }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endunless %}
+
+          <div class="sf-action-group">
+            <div class="sf-quantity-selector">
+              <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', -1)">−</button>
+              <input type="number" class="sf-qty-input" name="quantity" id="sf-qty-{{ section.id }}" value="1" min="1">
+              <button type="button" class="sf-qty-btn" onclick="sfUpdateQty('{{ section.id }}', 1)">+</button>
+            </div>
+            <button type="submit" class="sf-add-to-cart" id="sf-atc-{{ section.id }}" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}Add To Bag{% else %}Sold Out{% endif %}
+            </button>
+          </div>
+        </form>
+
+        <div class="sf-feature-list">
+          <div class="sf-feature-item">
+            <svg class="sf-feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Premium materials & craftsmanship
+          </div>
+          <div class="sf-feature-item">
+            <svg class="sf-feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            Secure, encrypted checkout
+          </div>
+          <div class="sf-feature-item">
+            <svg class="sf-feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Fast, trackable shipping
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Recently Viewed Section -->
+    {% if section.settings.show_recently_viewed %}
+    <div class="sf-recently-viewed" id="sf-rv-{{ section.id }}" style="display: none;">
+      <h3 class="sf-rv-title">{{ section.settings.rv_title }}</h3>
+      <div class="sf-rv-grid" id="sf-rv-grid-{{ section.id }}"></div>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.sfTrackRecentlyViewed === 'function') {
+          window.sfTrackRecentlyViewed('{{ product.handle }}');
+          window.sfRenderRecentlyViewed('{{ section.id }}', '{{ product.handle }}', '{{ cart.currency.symbol }}');
+        }
+      });
+    </script>
+    {% endif %}
+
+    <script>
+      window.sfVariants_{{ section.id | replace: '-', '_' }} = [
+        {% for variant in product.variants %}
+          {
+            id: {{ variant.id }},
+            title: {{ variant.title | json }},
+            option1: {{ variant.option1 | json }},
+            option2: {{ variant.option2 | json }},
+            option3: {{ variant.option3 | json }},
+            price: '{{ variant.price | money }}',
+            compare_at_price: {% if variant.compare_at_price %}'{{ variant.compare_at_price | money }}'{% else %}null{% endif %},
+            available: {{ variant.available }},
+            featured_image: {% if variant.featured_image %}'{{ variant.featured_image | img_url: "1600x" }}'{% else %}null{% endif %}
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ];
+    </script>
+
+  {% else %}
+    <div style="text-align: center; padding: 100px 20px; border-bottom: 1px solid var(--border-color);">
+      <p style="font-size: 1.5rem; font-weight: 600;">Select a product in the theme editor.</p>
+    </div>
   {% endif %}
 </div>
 
@@ -11,9 +234,18 @@
   "name": "Product Block 20",
   "target": "section",
   "settings": [
-    { "type": "text", "id": "title", "label": "Title", "default": "Product Block 20" },
-    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
-    { "type": "checkbox", "id": "show_button", "label": "Show Button", "default": true }
+    { "type": "product", "id": "product", "label": "Select Product" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#334155" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#0f172a" },
+    { "type": "color", "id": "primary_color", "label": "Primary Accent Color", "default": "#000000" },
+    { "type": "header", "content": "Recently Viewed" },
+    { "type": "checkbox", "id": "show_recently_viewed", "label": "Enable Recently Viewed", "default": true },
+    { "type": "text", "id": "rv_title", "label": "Recently Viewed Title", "default": "Discover More" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Top", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Padding Bottom", "default": 0 }
   ]
 }
 {% endschema %}

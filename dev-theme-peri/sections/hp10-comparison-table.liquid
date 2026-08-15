@@ -1,0 +1,147 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#F9F6F0'
+  assign text_color = section.settings.text_color | default: '#2A3B2C'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp10-comp-container-{{ section_id }} {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .hp10-comp-header-{{ section_id }} {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hp10-comp-heading-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    margin: 0 0 15px 0;
+  }
+  
+  .hp10-comp-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    color: rgba(42, 59, 44, 0.7);
+  }
+  
+  .hp10-comp-table-{{ section_id }} {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFFFF;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  }
+  
+  .hp10-comp-th-{{ section_id }}, .hp10-comp-td-{{ section_id }} {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(42, 59, 44, 0.1);
+  }
+  
+  .hp10-comp-td-{{ section_id }}:first-child, .hp10-comp-th-{{ section_id }}:first-child {
+    text-align: left;
+    padding-left: 40px;
+    font-weight: 500;
+  }
+  
+  .hp10-comp-th-{{ section_id }} {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    background: #f4f0e6;
+  }
+  
+  .hp10-comp-td-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+  }
+  
+  .hp10-comp-icon-yes-{{ section_id }} {
+    color: #8A9A86;
+  }
+  
+  .hp10-comp-icon-no-{{ section_id }} {
+    color: rgba(42, 59, 44, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .hp10-comp-th-{{ section_id }}, .hp10-comp-td-{{ section_id }} {
+      padding: 15px 10px;
+    }
+    .hp10-comp-td-{{ section_id }}:first-child, .hp10-comp-th-{{ section_id }}:first-child {
+      padding-left: 15px;
+    }
+  }
+</style>
+
+<div class="hp10-comp-container-{{ section_id }}">
+  <div class="hp10-comp-header-{{ section_id }}">
+    <h2 class="hp10-comp-heading-{{ section_id }}">{{ section.settings.heading | default: 'The Botanica Standard' }}</h2>
+    <p class="hp10-comp-text-{{ section_id }}">{{ section.settings.text | default: 'See how we stack up against traditional skincare.' }}</p>
+  </div>
+  
+  <table class="hp10-comp-table-{{ section_id }}">
+    <thead>
+      <tr>
+        <th class="hp10-comp-th-{{ section_id }}">Feature</th>
+        <th class="hp10-comp-th-{{ section_id }}">{{ shop.name | default: 'Botanica' }}</th>
+        <th class="hp10-comp-th-{{ section_id }}">Others</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in (1..5) %}
+        <tr>
+          <td class="hp10-comp-td-{{ section_id }}">
+            {% cycle '100% Organic Ingredients', 'Cruelty Free & Vegan', 'Eco-Friendly Packaging', 'No Synthetic Fragrances', 'Locally Sourced' %}
+          </td>
+          <td class="hp10-comp-td-{{ section_id }}">
+            <svg class="hp10-comp-icon-yes-{{ section_id }}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </td>
+          <td class="hp10-comp-td-{{ section_id }}">
+            {% if forloop.index == 2 or forloop.index == 4 %}
+              <svg class="hp10-comp-icon-yes-{{ section_id }}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            {% else %}
+              <svg class="hp10-comp-icon-no-{{ section_id }}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% schema %}
+{
+  "name": "HP10 Comparison Table",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Botanica Standard"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP10 Comparison Table"
+    }
+  ]
+}
+{% endschema %}

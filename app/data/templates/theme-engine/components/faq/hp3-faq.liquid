@@ -1,0 +1,358 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#111111'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ffcc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp3-faq-bg: {{ bg_color }};
+    --hp3-faq-text: {{ text_color }};
+    --hp3-faq-accent: {{ accent_color }};
+    
+    --hp3-faq-pt-desk: {{ padding_top_desktop }}px;
+    --hp3-faq-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp3-faq-pt-mob: {{ padding_top_mobile }}px;
+    --hp3-faq-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp3-tech-faq-{{ section.id }} {
+    padding-top: var(--hp3-faq-pt-desk);
+    padding-bottom: var(--hp3-faq-pb-desk);
+    background-color: var(--hp3-faq-bg);
+    color: var(--hp3-faq-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp3-faq-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp3-faq-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp3-faq-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+  }
+  .hp3-faq-title span {
+    color: var(--hp3-faq-accent);
+  }
+
+  /* Accordion Styles - Cyber/Terminal look */
+  .hp3-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hp3-faq-item {
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  
+  .hp3-faq-item.is-open {
+    border-color: var(--hp3-faq-accent);
+  }
+
+  .hp3-faq-question {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--hp3-faq-text);
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .hp3-faq-question:hover {
+    color: var(--hp3-faq-accent);
+    background: rgba(0,255,204,0.02);
+  }
+
+  .hp3-faq-icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-left: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  .hp3-faq-question:hover .hp3-faq-icon,
+  .hp3-faq-item.is-open .hp3-faq-icon {
+    border-color: var(--hp3-faq-accent);
+    color: var(--hp3-faq-accent);
+  }
+  
+  .hp3-faq-icon::before,
+  .hp3-faq-icon::after {
+    content: '';
+    position: absolute;
+    background-color: currentColor;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hp3-faq-icon::before {
+    width: 10px;
+    height: 2px;
+  }
+  .hp3-faq-icon::after {
+    width: 2px;
+    height: 10px;
+  }
+  
+  .hp3-faq-item.is-open .hp3-faq-icon::after {
+    transform: rotate(90deg) scale(0);
+  }
+
+  .hp3-faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(255,255,255,0.02);
+  }
+  
+  .hp3-faq-item.is-open .hp3-faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .hp3-faq-answer-inner {
+    overflow: hidden;
+  }
+  
+  .hp3-faq-answer-content {
+    padding: 0 25px 25px 25px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+  }
+  .hp3-faq-answer-content p:first-child { margin-top: 0; }
+  .hp3-faq-answer-content p:last-child { margin-bottom: 0; }
+  .hp3-faq-answer-content a { color: var(--hp3-faq-accent); text-decoration: underline; }
+
+  @media screen and (max-width: 768px) {
+    .hp3-tech-faq-{{ section.id }} {
+      padding-top: var(--hp3-faq-pt-mob);
+      padding-bottom: var(--hp3-faq-pb-mob);
+    }
+    .hp3-faq-inner {
+      padding: 0 20px;
+    }
+    .hp3-faq-question {
+      font-size: 14px;
+      padding: 15px 20px;
+    }
+    .hp3-faq-answer-content {
+      font-size: 14px;
+      padding: 0 20px 20px 20px;
+    }
+  }
+</style>
+
+<section class="hp3-tech-faq-{{ section.id }}" aria-label="FAQ">
+  <div class="hp3-faq-inner">
+    
+    {%- if section.settings.heading != blank -%}
+      <div class="hp3-faq-header">
+        <h2 class="hp3-faq-title">{{ section.settings.heading }}</h2>
+      </div>
+    {%- endif -%}
+
+    <div class="hp3-faq-list">
+      {%- for block in section.blocks -%}
+        <div class="hp3-faq-item" {{ block.shopify_attributes }}>
+          <button class="hp3-faq-question" aria-expanded="false" aria-controls="faq-ans-{{ section.id }}-{{ forloop.index }}">
+            <span class="hp3-faq-q-text">> {{ block.settings.question }}</span>
+            <span class="hp3-faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="hp3-faq-answer" id="faq-ans-{{ section.id }}-{{ forloop.index }}" role="region">
+            <div class="hp3-faq-answer-inner">
+              <div class="hp3-faq-answer-content">
+                {{ block.settings.answer }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+      
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..4) -%}
+          <div class="hp3-faq-item">
+            <button class="hp3-faq-question" aria-expanded="false">
+              <span>> SYSTEM REQUIREMENT QUESTION {{ i }}</span>
+              <span class="hp3-faq-icon" aria-hidden="true"></span>
+            </button>
+            <div class="hp3-faq-answer">
+              <div class="hp3-faq-answer-inner">
+                <div class="hp3-faq-answer-content">
+                  <p>System operational logic dictates that this is a placeholder response.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.querySelector('.hp3-tech-faq-{{ section.id }}');
+    if (!section) return;
+
+    const questions = section.querySelectorAll('.hp3-faq-question');
+    
+    questions.forEach(question => {
+      question.addEventListener('click', function() {
+        const item = this.closest('.hp3-faq-item');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        {% if section.settings.close_others %}
+          // Close all others
+          questions.forEach(q => {
+            if(q !== this) {
+              q.setAttribute('aria-expanded', 'false');
+              q.closest('.hp3-faq-item').classList.remove('is-open');
+            }
+          });
+        {% endif %}
+        
+        // Toggle current
+        this.setAttribute('aria-expanded', !isExpanded);
+        item.classList.toggle('is-open');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP3 Tech FAQ",
+  "tag": "section",
+  "class": "section-hp3-faq",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "SYSTEM <span>SUPPORT</span>",
+      "info": "Use <span> for accent color"
+    },
+    {
+      "type": "checkbox",
+      "id": "close_others",
+      "label": "Close other items when one is opened",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ffcc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "IS THIS COMPATIBLE WITH MAC?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes, fully compatible with macOS, Windows, and Linux operating systems.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP3 Tech FAQ (Adv)",
+      "blocks": [
+        { "type": "faq", "settings": { "question": "WHAT IS THE WARRANTY PERIOD?" } },
+        { "type": "faq", "settings": { "question": "DO YOU SHIP INTERNATIONALLY?" } },
+        { "type": "faq", "settings": { "question": "HOW DO I UPDATE THE FIRMWARE?" } },
+        { "type": "faq", "settings": { "question": "WHAT IS YOUR RETURN POLICY?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

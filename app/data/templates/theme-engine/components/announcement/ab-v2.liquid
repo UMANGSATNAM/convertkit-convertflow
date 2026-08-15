@@ -1,0 +1,95 @@
+{% comment %}
+  AB V2 — Gymshark High-Performance Hazard Ticker
+{% endcomment %}
+{%- assign s = section.settings -%}
+<style>
+  .abv2 {
+    background: {{ s.bg_color }}; color: {{ s.text_color }};
+    font-family: 'Inter', -apple-system, sans-serif; font-weight: 900;
+    min-height: {{ s.bar_height }}px;
+    overflow: hidden; white-space: nowrap; display: flex; align-items: center;
+    border-top: 1px solid {{ s.accent_color }}; border-bottom: 1px solid {{ s.accent_color }};
+    position: relative; z-index: 100;
+  }
+  .abv2__viewport { flex: 1 1 auto; overflow: hidden; }
+  .abv2__track {
+    display: inline-flex; align-items: center; white-space: nowrap;
+    animation: abv2Ticker {{ s.speed }}s linear infinite;
+    font-size: {{ s.font_size }}px; letter-spacing: 2px;
+    will-change: transform;
+  }
+  .abv2:hover .abv2__track { animation-play-state: paused; }
+  .abv2__seq { padding-right: 0; }
+  .abv2__msg { text-decoration: none; color: inherit; }
+  @keyframes abv2Ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .abv2__close {
+    position: absolute; right: 6px; background: {{ s.bg_color }}; border: none; color: inherit;
+    cursor: pointer; opacity: 0.7; font-size: 18px; line-height: 1; padding: 8px 10px; z-index: 2;
+  }
+  .abv2__close:hover { opacity: 1; }
+
+  @media screen and (max-width: 749px) {
+    .abv2__track { font-size: {{ s.font_size | minus: 1 }}px; letter-spacing: 1px; animation-duration: {{ s.speed | times: 6 | divided_by: 10 }}s; }
+    .abv2__close { min-width: 44px; min-height: 44px; right: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .abv2__track { animation: none; padding-left: 12px; }
+  }
+</style>
+
+{%- if s.enable -%}
+<div class="abv2" id="abv2-{{ section.id }}" role="region" aria-label="Announcement">
+  <div class="abv2__viewport">
+    <div class="abv2__track">
+      {%- comment -%} duplicated once so the -50% loop is seamless {%- endcomment -%}
+      {%- for i in (1..2) -%}
+        <span class="abv2__seq" aria-hidden="{% if forloop.last %}true{% else %}false{% endif %}">
+          {%- if s.link != blank -%}
+            <a class="abv2__msg" href="{{ s.link }}">{{ s.message }}</a>
+          {%- else -%}
+            {{ s.message }}
+          {%- endif -%}
+        </span>
+      {%- endfor -%}
+    </div>
+  </div>
+  {%- if s.dismissible -%}
+    <button class="abv2__close" type="button" aria-label="Close announcement">&times;</button>
+  {%- endif -%}
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('abv2-{{ section.id }}');
+    if (!bar) return;
+    {%- if s.dismissible -%}
+    var key = 'abv2-dismissed-{{ section.id }}';
+    try { if (localStorage.getItem(key) === '1') bar.style.display = 'none'; } catch (e) {}
+    var close = bar.querySelector('.abv2__close');
+    if (close) close.addEventListener('click', function () {
+      bar.style.display = 'none';
+      try { localStorage.setItem(key, '1'); } catch (e) {}
+    });
+    {%- endif -%}
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AB V2 — Gymshark",
+  "settings": [
+    { "type": "checkbox", "id": "enable", "label": "Show bar", "default": true },
+    { "type": "text", "id": "message", "label": "Ticker message", "default": "★ BE A VISIONARY ★ SWEAT-WICKING SEAMLESS ACTIVEWEAR ★ FREE EXCHANGES & RETURNS ★ SAME DAY DISPATCH " },
+    { "type": "url", "id": "link", "label": "Message link" },
+    { "type": "checkbox", "id": "dismissible", "label": "Allow visitors to close", "default": false },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#00F0FF" },
+    { "type": "color", "id": "accent_color", "label": "Border", "default": "#00F0FF" },
+    { "type": "range", "id": "font_size", "min": 10, "max": 20, "step": 1, "unit": "px", "label": "Font size", "default": 13 },
+    { "type": "range", "id": "bar_height", "min": 30, "max": 70, "step": 2, "unit": "px", "label": "Bar height", "default": 42 },
+    { "type": "range", "id": "speed", "min": 6, "max": 40, "step": 1, "unit": "s", "label": "Scroll duration (lower = faster)", "default": 18 }
+  ],
+  "presets": [{ "name": "AB V2 — Gymshark" }]
+}
+{% endschema %}

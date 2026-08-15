@@ -1,0 +1,100 @@
+{% comment %} CL V52 — Pet Supplies (Blue/Yellow/Playful) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv52 { background: {{ section.settings.bg_color | default: '#EFF6FF' }}; color: {{ section.settings.text_color | default: '#1E3A8A' }}; padding: 40px 20px; font-family: 'Quicksand', 'Nunito', sans-serif; }
+  .clv52-hero { text-align: center; margin-bottom: 40px; background: #DBEAFE; padding: 50px 20px; border-radius: 50px; position: relative; overflow: hidden; border: 4px solid #93C5FD; }
+  .clv52-hero::before { content: '🐾 🐾 🐾'; position: absolute; top: 10px; left: 10px; font-size: 40px; opacity: 0.2; transform: rotate(-15deg); }
+  .clv52-hero::after { content: '🦴 🦴 🦴'; position: absolute; bottom: 10px; right: 10px; font-size: 40px; opacity: 0.2; transform: rotate(15deg); }
+  .clv52-hero h1 { font-size: 48px; font-weight: 800; color: #1D4ED8; margin-bottom: 15px; }
+  .clv52-hero p { font-size: 16px; font-weight: 600; color: #2563EB; max-width: 500px; margin: 0 auto; line-height: 1.5; }
+  .clv52-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv52-chips a { padding: 12px 24px; background: #FCD34D; color: #92400E; text-decoration: none; font-size: 15px; font-weight: 800; border-radius: 25px; transition: 0.2s; border: 3px solid #F59E0B; box-shadow: 0 4px 0 #F59E0B; }
+  .clv52-chips a:hover, .clv52-chips a.active { transform: translateY(4px); box-shadow: 0 0 0 transparent; background: #F59E0B; color: #FFF; }
+  .clv52-toolbar { background: #FFF; border-radius: 20px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(29,78,216,0.1); border: 2px solid #DBEAFE; }
+  .clv52-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv52-promo { grid-column: span 1; background: #3B82F6; color: #FFF; border-radius: 30px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 4px solid #2563EB; box-shadow: 0 8px 0 #2563EB; }
+  .clv52-promo h3 { font-size: 28px; font-weight: 800; margin-bottom: 20px; }
+  .clv52-promo a { display: inline-block; padding: 12px 25px; background: #FCD34D; color: #92400E; text-decoration: none; font-weight: 800; border-radius: 20px; font-size: 15px; border: 2px solid #F59E0B; transition: 0.2s; }
+  .clv52-promo a:hover { background: #FFF; }
+  .clv52-seo { margin-top: 50px; background: #FFF; padding: 40px; border-radius: 30px; text-align: center; border: 3px dashed #93C5FD; }
+  @media (max-width: 768px) { .clv52-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv52-hero h1 { font-size: 36px; } }
+</style>
+<div class="clv52" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv52-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Happy Tails{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Everything your best friend needs for a perfect day.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv52-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv52-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 16px; font-weight: 800; color: #1D4ED8;">{{ filter.label }} 🐾</summary>
+              <div style="position: absolute; background: #FFF; border: 2px solid #93C5FD; padding: 20px; border-radius: 15px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 15px; color: #1E3A8A; font-weight: 600;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: #F8FAFC; border: 2px solid #DBEAFE; color: #1D4ED8; padding: 10px 20px; border-radius: 15px; font-size: 15px; font-weight: 800; cursor: pointer; outline: none; font-family: inherit;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv52-grid">
+      {% for product in collection.products %}
+        {% render 'card-v52', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv52-promo">
+            <h3>Monthly<br>Bark Box</h3>
+            <a href="/products/box">Subscribe</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v52', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 20px; font-weight: 800; color: #1D4ED8;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv52-seo">
+      <h2 style="font-size: 26px; font-weight: 800; color: #1D4ED8; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Vet Approved Quality' }}</h2>
+      <p style="font-size: 15px; font-weight: 600; color: #2563EB; max-width: 700px; margin: 0 auto; line-height: 1.6;">{{ section.settings.seo_text | default: "We only stock nutritious food and safe, durable toys because we know they aren't just pets, they are family." }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V52 — Pet Supplies", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#EFF6FF"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#1E3A8A"}
+  ], "presets": [{"name": "CL V52 — Pet Supplies"}]
+}
+{% endschema %}

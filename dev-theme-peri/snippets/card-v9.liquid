@@ -1,0 +1,203 @@
+{% assign card_r_show = show_rating %}
+{% if card_r_show == nil %}{% assign card_r_show = true %}{% endif %}
+{% assign card_r_val = rating_value | default: card_prod.metafields.reviews.rating.value | default: '4.9' %}
+{% assign card_r_cnt = rating_count | default: card_prod.metafields.reviews.rating_count.value | default: '128' %}
+{%- comment -%}
+  CARD V9 — CLEAN NUTRITION & HEALTHY SNACKS D2C (WHOLE TRUTH / OPEN SECRET STYLE)
+  Usage: {% render 'card-v9', product: product %}
+  Design: Terracotta Punch (#E05A47), Sunny Yellow (#FFD166), Deep Slate (#1D2D44), Bricolage Grotesque & Outfit fonts, 12px rounded corners
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@400;500;600;700&display=swap');
+
+  .cv9-card {
+    --cv9-bg: #FFFFFF;
+    --cv9-text: #1D2D44;
+    --cv9-muted: #748CAB;
+    --cv9-orange: #E05A47;
+    --cv9-yellow: #FFD166;
+    --cv9-border: #E0E1DD;
+    font-family: 'Outfit', sans-serif;
+    background: var(--cv9-bg);
+    border: 1px solid var(--cv9-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cv9-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cv9-orange);
+    box-shadow: 0 12px 24px -6px rgba(224, 90, 71, 0.18);
+  }
+
+  .cv9-card *, .cv9-card *::before, .cv9-card *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .cv9-card a { color: inherit; text-decoration: none; }
+  .cv9-card button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .cv9-card img { max-width: 100%; display: block; }
+
+  .cv9-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #FFF9F5;
+    overflow: hidden;
+  }
+  .cv9-img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform 0.5s ease; }
+  .cv9-img-sec { position: absolute; top: 0; left: 0; opacity: 0; }
+  .cv9-card:hover .cv9-img-pri { opacity: 0; }
+  .cv9-card:hover .cv9-img-sec { opacity: 1; transform: scale(1.05); }
+
+  /* Clean Tag Top Left */
+  .cv9-badge-clean {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--cv9-yellow); color: #1D2D44;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 20px; z-index: 3; letter-spacing: 0.05em;
+  }
+
+  /* Wishlist Heart Top Right */
+  .cv9-wish {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #FFFFFF; border: 1px solid #E0E1DD;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cv9-orange); z-index: 3; transition: all 0.2s ease;
+  }
+  .cv9-wish:hover, .cv9-wish.active { background: var(--cv9-orange); color: #FFFFFF; border-color: var(--cv9-orange); transform: scale(1.1); }
+
+  /* Quick View Overlay */
+  .cv9-qv-overlay {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    padding: 9px; background: rgba(29, 45, 68, 0.95); color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center; border-radius: 8px; border: 1px solid var(--cv9-orange);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease; z-index: 4;
+  }
+  .cv9-card:hover .cv9-qv-overlay { opacity: 1; transform: translateY(0); }
+  .cv9-qv-overlay:hover { background: var(--cv9-orange); color: #FFFFFF; }
+
+  .cv9-content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+  .cv9-vendor { font-size: 10px; text-transform: uppercase; color: var(--cv9-orange); font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: 0.08em; }
+  .cv9-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 800; color: #1D2D44; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Nutritional Claims Subtitle */
+  .cv9-claims { font-size: 11px; color: var(--cv9-orange); font-weight: 600; }
+
+  /* Rating Row */
+  .cv9-rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #F59E0B; font-weight: 700; }
+
+  /* Price Row: ₹ Rupee + MRP + Discount */
+  .cv9-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .cv9-price { font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800; color: #1D2D44; }
+  .cv9-cmp { font-size: 13px; color: #9CA3AF; text-decoration: line-through; }
+  .cv9-disc { font-size: 11px; font-weight: 800; color: #1D2D44; background: var(--cv9-yellow); padding: 2px 6px; border-radius: 4px; }
+
+  /* Pack Size Variant Selector */
+  .cv9-packs { display: flex; gap: 6px; overflow-x: auto; margin-top: 4px; }
+  .cv9-pack-btn {
+    font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid #E0E1DD; background: #FFFFFF; color: #1D2D44; cursor: pointer; transition: all 0.2s ease;
+  }
+  .cv9-pack-btn.active, .cv9-pack-btn:hover { background: var(--cv9-orange); color: #FFFFFF; border-color: var(--cv9-orange); }
+
+  /* Bottom Button */
+  .cv9-action-box { padding: 0 14px 14px; }
+  .cv9-atc-btn {
+    width: 100%; padding: 11px;
+    background: var(--cv9-orange); color: #FFFFFF;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    border-radius: 8px; border: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(224, 90, 71, 0.3);
+  }
+  .cv9-atc-btn:hover { background: #C84635; transform: scale(1.01); }
+  .cv9-atc-btn:disabled { background: #CBD5E1; color: #64748B; cursor: not-allowed; box-shadow: none; }
+</style>
+
+{% assign card_prod = product %}
+{% if card_prod != blank %}
+  {% assign cur_var = card_prod.selected_or_first_available_variant %}
+  <div class="cv9-card" data-product-id="{{ card_prod.id }}">
+    <span class="cv9-badge-clean">NO ADDED SUGAR 🌿</span>
+
+    <button type="button" class="cv9-wish" data-wishlist-toggle data-wishlist-handle="{{ card_prod.handle }}" data-wishlist-id="{{ card_prod.id }}" data-wishlist-title="{{ card_prod.title | escape }}" data-wishlist-price="{{ card_prod.price | money | strip_html | escape }}" data-wishlist-image="{{ card_prod.featured_image | image_url: width: 300 }}" data-wishlist-url="{{ card_prod.url }}" aria-pressed="false" aria-label="Add to wishlist">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+
+    <a href="{{ card_prod.url }}" class="cv9-media">
+      {% if card_prod.featured_image %}
+        <img src="{{ card_prod.featured_image | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv9-img cv9-img-pri" loading="lazy">
+        {% if card_prod.images.size > 1 %}
+          <img src="{{ card_prod.images[1] | image_url: width: 600 }}" alt="{{ card_prod.title | escape }}" class="cv9-img cv9-img-sec" loading="lazy">
+        {% endif %}
+      {% else %}
+        {{ 'product-3' | placeholder_svg_tag: 'cv9-img' }}
+      {% endif %}
+
+      <button type="button" class="cv9-qv-overlay" data-quick-view="{{ card_prod.handle }}">QUICK VIEW</button>
+    </a>
+
+    <div class="cv9-content">
+      {% if card_prod.vendor != blank %}<span class="cv9-vendor">{{ card_prod.vendor }}</span>{% endif %}
+      <a href="{{ card_prod.url }}" class="cv9-title">{{ card_prod.title }}</a>
+
+      {% if card_r_show != false %}
+      <div class="cv9-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv9-claims">12g Raw Protein | 100% Whole Ingredients</span>
+
+      <div class="cv9-rating">
+        <span>★ 4.8</span> <span>(2,400 reviews)</span>
+      </div>
+
+      <div class="cv9-price-row">
+        <span class="cv9-price">{{ card_prod.price | money }}</span>
+        {% if card_prod.compare_at_price > card_prod.price %}
+          <span class="cv9-cmp">{{ card_prod.compare_at_price | money }}</span>
+          {% assign save_pct = card_prod.compare_at_price | minus: card_prod.price | times: 100.0 | divided_by: card_prod.compare_at_price | round %}
+          <span class="cv9-disc">{{ save_pct }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <!-- Pack Size Variant Selector -->
+      <div class="cv9-packs">
+        {% for variant in card_prod.variants limit: 4 %}
+          <button type="button" class="cv9-pack-btn {% if variant.id == cur_var.id %}active{% endif %}" data-variant-id="{{ variant.id }}">{{ variant.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="cv9-action-box">
+      {% if card_prod.available %}
+        <button type="button" class="cv9-atc-btn" data-add-cart="{{ cur_var.id }}">SNACK CLEAN NOW</button>
+      {% else %}
+        <button type="button" class="cv9-atc-btn" disabled>SOLD OUT</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="cv9-card">
+    <div class="cv9-media">{{ 'product-3' | placeholder_svg_tag: 'cv9-img' }}</div>
+    <div class="cv9-content">
+      <span class="cv9-vendor">CLEAN SNACKS D2C</span>
+      <div class="cv9-title">Dark Chocolate & Hazelnut Protein Bar (Pack of 6)</div>
+
+      {% if card_r_show != false %}
+      <div class="cv9-rating-box" style="display: flex; align-items: center; gap: 4px; margin: 4px 0 6px;">
+        <span style="color: #F59E0B; font-size: 12px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 12px; font-weight: 700; color: #111827;">{{ card_r_val }}</span>
+        <span style="font-size: 11px; color: #6B7280;">({{ card_r_cnt }})</span>
+      </div>
+    {% endif %}
+      <span class="cv9-claims">12g Raw Protein | 100% Whole Ingredients</span>
+      <div class="cv9-price-row"><span class="cv9-price">₹ 399</span><span class="cv9-cmp">₹ 480</span><span class="cv9-disc">17% OFF</span></div>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,492 @@
+{%- comment -%}
+  PDP V40 — SOFT LAVENDER CLOUD PASTEL
+  Design: Soft dreamlike lavender pastel aesthetic, Quicksand rounded display + Outfit body font
+  Powder Violet background (#F3E8FF), Lavender Soft (#C084FC), Soft Plum (#581C87), Mint Foam (#D1FAE5)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign inv_qty = current_variant.inventory_quantity | default: 15 -%}
+{%- if inv_qty <= 0 -%}{%- assign inv_qty = 10 -%}{%- endif -%}
+{%- assign viewer_count = inv_qty | times: 6 | modulo: 40 | plus: 20 -%}
+{%- assign sold_count = inv_qty | times: 14 | modulo: 300 | plus: 140 -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Quicksand:wght@600;700&display=swap');
+
+  .pdpv40 {
+    --bg: #F3E8FF; --surface: #FFFFFF; --border: #E9D5FF; --border-dark: #C084FC;
+    --text: #581C87; --muted: #7E22CE; --accent: #C084FC; --accent-hover: #A855F7;
+    --mint: #10B981; --danger: #EF4444;
+    --f-head: 'Quicksand', sans-serif; --f-body: 'Outfit', sans-serif;
+    --r: 20px; --r-pill: 9999px; --ease: all 0.25s ease;
+    background: var(--bg); color: var(--text); font-family: var(--f-body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .pdpv40 *, .pdpv40 *::before, .pdpv40 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pdpv40 img { max-width: 100%; display: block; }
+  .pdpv40 button { font-family: inherit; cursor: pointer; }
+  .pdpv40__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* OFFER BAR */
+  .pdpv40__offer { background: var(--accent); color: #FFF; padding: 12px; text-align: center; font-family: var(--f-head); font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+
+  /* GRID */
+  .pdpv40__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding: 36px 0; }
+  @media (min-width: 992px) { .pdpv40__grid { grid-template-columns: 1.1fr 1fr; gap: 48px; padding: 48px 0; } }
+
+  /* GALLERY */
+  .pdpv40__gal { display: flex; flex-direction: column; gap: 12px; }
+  .pdpv40__hero { width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(192,132,252,0.15); position: relative; }
+  .pdpv40__hero img { width: 100%; height: 100%; object-fit: contain; }
+  .pdpv40__cloud-tag { position: absolute; top: 14px; left: 14px; background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: var(--r-pill); }
+
+  .pdpv40__thumbs { display: flex; gap: 10px; overflow-x: auto; }
+  .pdpv40__th { width: 64px; height: 64px; flex-shrink: 0; border: 2px solid transparent; border-radius: 14px; overflow: hidden; cursor: pointer; background: var(--surface); transition: var(--ease); }
+  .pdpv40__th:hover, .pdpv40__th.on { border-color: var(--accent); }
+  .pdpv40__th img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .pdpv40__info { display: flex; flex-direction: column; gap: 18px; }
+  .pdpv40__crumb { font-family: var(--f-head); font-size: 14px; letter-spacing: 1px; color: var(--accent); font-weight: 700; text-transform: uppercase; }
+  .pdpv40__title { font-family: var(--f-head); font-size: 34px; font-weight: 700; line-height: 1.2; color: var(--text); }
+  @media (min-width: 992px) { .pdpv40__title { font-size: 42px; } }
+
+  .pdpv40__rating { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .pdpv40__stars { color: var(--accent); }
+
+  /* PRICE */
+  .pdpv40__price-row { display: flex; align-items: baseline; gap: 12px; }
+  .pdpv40__price { font-family: var(--f-head); font-size: 38px; font-weight: 700; color: var(--accent); }
+  .pdpv40__cmp { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+  .pdpv40__badge { background: var(--accent); color: #FFF; font-weight: 700; font-size: 12px; padding: 4px 12px; border-radius: var(--r-pill); }
+
+  /* VARIANTS */
+  .pdpv40__vlabel { font-family: var(--f-head); font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
+  .pdpv40__vopts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pdpv40__vr { display: none; }
+  .pdpv40__vbtn { padding: 10px 22px; border: 1px solid var(--border-dark); border-radius: var(--r-pill); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; transition: var(--ease); cursor: pointer; }
+  .pdpv40__vbtn:hover { border-color: var(--accent); }
+  .pdpv40__vr:checked + .pdpv40__vbtn { border-color: var(--accent); background: var(--accent); color: #FFF; }
+
+  /* PROMO */
+  .pdpv40__promo { background: var(--surface); border: 1px dashed var(--accent); border-radius: var(--r); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .pdpv40__promo-code { background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 8px; }
+
+  /* URGENCY */
+  .pdpv40__urg { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+  .pdpv40__pulse { display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-right: 6px; animation: pdpv40p 1.5s infinite; }
+  @keyframes pdpv40p { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .pdpv40__bar { height: 6px; background: #E9D5FF; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .pdpv40__fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* QTY & CTA */
+  .pdpv40__qty-row { display: flex; align-items: center; gap: 14px; }
+  .pdpv40__qty { display: flex; border: 1px solid var(--border-dark); border-radius: var(--r-pill); overflow: hidden; background: var(--surface); }
+  .pdpv40__qty button { width: 42px; height: 46px; border: none; background: transparent; font-size: 18px; color: var(--text); }
+  .pdpv40__qty input { width: 44px; height: 46px; border: none; border-left: 1px solid var(--border-dark); border-right: 1px solid var(--border-dark); text-align: center; font-size: 15px; font-weight: 700; background: transparent; }
+
+  .pdpv40__atc { width: 100%; padding: 16px; border: none; border-radius: var(--r-pill); background: var(--accent); color: #FFF; font-family: var(--f-head); font-size: 17px; font-weight: 700; letter-spacing: 1px; transition: var(--ease); box-shadow: 0 6px 18px rgba(192,132,252,0.3); }
+  .pdpv40__atc:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .pdpv40__atc:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .pdpv40__buynow .shopify-payment-button__button { border-radius: var(--r-pill) !important; }
+
+  /* TRUST */
+  .pdpv40__trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; padding: 18px 0; border-top: 1px solid var(--border-dark); border-bottom: 1px solid var(--border-dark); }
+  .pdpv40__trust-item { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .pdpv40__trust-icon { font-size: 20px; margin-bottom: 3px; color: var(--accent); }
+  @media (max-width: 480px) { .pdpv40__trust { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ACCORDION */
+  .pdpv40__acc { border-top: 1px solid var(--border-dark); margin-top: 48px; }
+  .pdpv40__acc-item { border-bottom: 1px solid var(--border-dark); }
+  .pdpv40__acc-btn { width: 100%; padding: 18px 0; border: none; background: transparent; display: flex; justify-content: space-between; align-items: center; font-family: var(--f-head); font-size: 19px; font-weight: 700; color: var(--text); }
+  .pdpv40__acc-btn::after { content: '☁️'; font-size: 18px; }
+  .pdpv40__acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pdpv40__acc-item.open .pdpv40__acc-body { max-height: 500px; }
+  .pdpv40__acc-inner { padding: 0 0 18px; font-size: 15px; line-height: 1.7; color: var(--muted); }
+
+  /* SECTION TITLE */
+  .pdpv40__sh { font-family: var(--f-head); font-size: 28px; font-weight: 700; text-align: center; margin: 48px 0 20px; color: var(--text); }
+
+  /* REELS */
+  .pdpv40__reels { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .pdpv40__reel { min-width: 180px; width: 180px; aspect-ratio: 9/16; background: #581C87; border-radius: var(--r); overflow: hidden; flex-shrink: 0; position: relative; }
+  .pdpv40__reel video { width: 100%; height: 100%; object-fit: cover; }
+  .pdpv40__reel-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #FFF; font-size: 12px; font-weight: 600; }
+  .pdpv40__reel-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--bg); font-size: 36px; }
+
+  /* CARDS */
+  .pdpv40__pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (min-width: 768px) { .pdpv40__pgrid { grid-template-columns: repeat(4, 1fr); } }
+  .pdpv40__pcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; transition: var(--ease); text-decoration: none; color: inherit; display: block; }
+  .pdpv40__pcard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(192,132,252,0.15); }
+  .pdpv40__pcard img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .pdpv40__pcard-info { padding: 14px; }
+  .pdpv40__pcard-title { font-family: var(--f-head); font-size: 16px; font-weight: 700; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pdpv40__pcard-price { font-size: 15px; font-weight: 700; color: var(--accent); }
+
+  /* REVIEWS */
+  .pdpv40__revgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .pdpv40__revgrid { grid-template-columns: repeat(3, 1fr); } }
+  .pdpv40__revcard { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); padding: 20px; }
+  .pdpv40__rev-stars { color: var(--accent); font-size: 14px; margin-bottom: 8px; }
+  .pdpv40__rev-txt { font-size: 14px; line-height: 1.6; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+  .pdpv40__rev-auth { font-family: var(--f-head); font-size: 15px; font-weight: 700; }
+  .pdpv40__rev-vf { font-size: 11px; color: var(--accent); font-weight: 700; }
+
+  /* RECENTLY VIEWED */
+  #pdpv40-rv { display: none; }
+  #pdpv40-rv.has { display: block; }
+
+  /* STICKY ATC */
+  .pdpv40__sticky { position: fixed; bottom: -80px; left: 0; width: 100%; background: var(--surface); border-top: 3px solid var(--accent); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; transition: bottom 0.3s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
+  .pdpv40__sticky.show { bottom: 0; }
+  .pdpv40__sticky-l { display: flex; align-items: center; gap: 14px; }
+  .pdpv40__sticky-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+  .pdpv40__sticky-t { font-family: var(--f-head); font-size: 15px; font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdpv40__sticky-p { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .pdpv40__sticky-btn { background: var(--accent); color: #FFF; border: none; padding: 12px 26px; border-radius: var(--r-pill); font-family: var(--f-head); font-weight: 700; font-size: 15px; transition: var(--ease); }
+  .pdpv40__sticky-btn:hover { background: var(--accent-hover); }
+  @media (max-width: 600px) { .pdpv40__sticky-l { display: none; } .pdpv40__sticky-btn { width: 100%; padding: 15px; } }
+
+  .pdpv40__toast { position: fixed; top: 20px; right: 20px; background: var(--accent); color: #FFF; padding: 12px 24px; border-radius: var(--r-pill); font-family: var(--f-head); font-size: 15px; font-weight: 700; z-index: 10000; transform: translateX(130%); transition: transform 0.3s ease; box-shadow: 0 4px 16px rgba(192,132,252,0.4); }
+  .pdpv40__toast.show { transform: translateX(0); }
+</style>
+
+<div class="pdpv40">
+  {% if section.settings.show_offer %}<div class="pdpv40__offer">{{ section.settings.offer_text }}</div>{% endif %}
+
+  <div class="pdpv40__wrap">
+    <div class="pdpv40__grid">
+
+      <!-- GALLERY -->
+      <div class="pdpv40__gal">
+        <div class="pdpv40__hero" id="pdpv40-hero">
+          <span class="pdpv40__cloud-tag">☁️ SOFT LAVENDER CLOUD</span>
+          {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 900 }}" alt="{{ product.title | escape }}" id="pdpv40-himg">{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
+        </div>
+        <div class="pdpv40__thumbs">
+          {% for media in product.media limit: 6 %}
+            <div class="pdpv40__th {% if forloop.first %}on{% endif %}">
+              <img src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" loading="lazy">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pdpv40__info">
+        <div class="pdpv40__crumb">☁️ {% if product.collections.size > 0 %}{{ product.collections.first.title }}{% else %}Lavender Cloud{% endif %}</div>
+        <h1 class="pdpv40__title">{{ product.title }}</h1>
+
+        {% if section.settings.show_rating %}
+          <div class="pdpv40__rating">
+            <span class="pdpv40__stars">★★★★★</span>
+            <span>{{ section.settings.rating_val }} · {{ section.settings.rev_count }} Cloud Reviews</span>
+          </div>
+        {% endif %}
+
+        <div class="pdpv40__price-row">
+          <span class="pdpv40__price" id="pdpv40-price">{{ current_variant.price | money }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="pdpv40__cmp">{{ current_variant.compare_at_price | money }}</span>
+            {%- assign sv = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+            <span class="pdpv40__badge">SAVE {{ sv }}%</span>
+          {% endif %}
+        </div>
+
+        {% if product.variants.size > 1 %}
+          {% for option in product.options_with_values %}
+            <div>
+              <div class="pdpv40__vlabel">Select {{ option.name }}</div>
+              <div class="pdpv40__vopts">
+                {% for value in option.values %}
+                  <label>
+                    <input type="radio" name="pdpv40-o-{{ option.position }}" value="{{ value | escape }}" class="pdpv40__vr" data-pos="{{ option.position }}" {% if option.selected_value == value %}checked{% endif %}>
+                    <span class="pdpv40__vbtn">{{ value }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if section.settings.show_promo %}
+          <div class="pdpv40__promo">
+            <span>☁️ Lavender Pass: Apply {{ section.settings.promo_code }}</span>
+            <span class="pdpv40__promo-code">Save {{ section.settings.promo_disc }}</span>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_urgency %}
+          <div class="pdpv40__urg">
+            <div><span class="pdpv40__pulse"></span><strong>{{ viewer_count }}</strong> lavender dreamers active</div>
+            <div>☁️ <strong>{{ sold_count }}</strong> cloud orders completed today</div>
+            <div>Availability: Only <strong>{{ inv_qty }}</strong> remaining
+              <div class="pdpv40__bar">
+                {%- assign sp = inv_qty | times: 100 | divided_by: 45 -%}
+                {%- if sp > 100 -%}{%- assign sp = 100 -%}{%- endif -%}
+                <div class="pdpv40__fill" style="width:{{ sp }}%"></div>
+              </div>
+            </div>
+            {% if section.settings.show_countdown %}
+              <div>⏳ Cloud Offer Ends In: <strong id="pdpv40-cd" style="color:var(--accent)">{{ section.settings.cd_hrs }}h 00m 00s</strong></div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="pdpv40__qty-row">
+          <div class="pdpv40__qty">
+            <button type="button" id="pdpv40-qm">−</button>
+            <input type="number" id="pdpv40-qi" value="1" min="1" max="10" readonly>
+            <button type="button" id="pdpv40-qp">+</button>
+          </div>
+          {% form 'product', product, id: 'pdpv40-form', style: 'flex:1' %}
+            <input type="hidden" name="id" id="pdpv40-vid" value="{{ current_variant.id }}">
+            <input type="hidden" name="quantity" id="pdpv40-fq" value="1">
+            <button type="submit" name="add" class="pdpv40__atc" id="pdpv40-atc" {% unless current_variant.available %}disabled{% endunless %}>
+              {% if current_variant.available %}Add to Cart — {{ current_variant.price | money }}{% else %}Sold Out{% endif %}
+            </button>
+            <div class="pdpv40__buynow" style="margin-top:10px">{{ form | payment_button }}</div>
+          {% endform %}
+        </div>
+
+        <div class="pdpv40__trust">
+          <div class="pdpv40__trust-item"><div class="pdpv40__trust-icon">🔒</div>Secure</div>
+          <div class="pdpv40__trust-item"><div class="pdpv40__trust-icon">☁️</div>Cloud Soft</div>
+          <div class="pdpv40__trust-item"><div class="pdpv40__trust-icon">↩️</div>Easy Returns</div>
+          <div class="pdpv40__trust-item"><div class="pdpv40__trust-icon">✨</div>Pure Pastel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION -->
+    <div class="pdpv40__acc">
+      <div class="pdpv40__acc-item open">
+        <button class="pdpv40__acc-btn" type="button">Lavender Story & Cloud Comfort</button>
+        <div class="pdpv40__acc-body"><div class="pdpv40__acc-inner">{{ product.description }}</div></div>
+      </div>
+      {% if section.settings.cloud_specs != blank %}
+        <div class="pdpv40__acc-item">
+          <button class="pdpv40__acc-btn" type="button">Soft Materials & Care</button>
+          <div class="pdpv40__acc-body"><div class="pdpv40__acc-inner">{{ section.settings.cloud_specs }}</div></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- FBT -->
+    {% if section.settings.fbt_coll != blank %}
+      {%- assign fbt = collections[section.settings.fbt_coll] -%}
+      {% if fbt.products.size > 0 %}
+        <div class="pdpv40__sh">Soft Lavender Pairings</div>
+        <div class="pdpv40__pgrid">
+          {% for item in fbt.products limit: 4 %}
+            <a href="{{ item.url }}" class="pdpv40__pcard">
+              <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+              <div class="pdpv40__pcard-info">
+                <div class="pdpv40__pcard-title">{{ item.title }}</div>
+                <div class="pdpv40__pcard-price">{{ item.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- REELS -->
+    {% if section.settings.show_reels %}
+      <div class="pdpv40__sh">Cloud Moments</div>
+      <div class="pdpv40__reels">
+        {% if section.settings.r1 != blank %}<div class="pdpv40__reel"><video src="{{ section.settings.r1 }}" muted playsinline loop></video><div class="pdpv40__reel-cap">☁️ Soft Glow</div></div>{% else %}<div class="pdpv40__reel"><div class="pdpv40__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r2 != blank %}<div class="pdpv40__reel"><video src="{{ section.settings.r2 }}" muted playsinline loop></video><div class="pdpv40__reel-cap">✨ Lavender Touch</div></div>{% else %}<div class="pdpv40__reel"><div class="pdpv40__reel-ph">▶</div></div>{% endif %}
+        {% if section.settings.r3 != blank %}<div class="pdpv40__reel"><video src="{{ section.settings.r3 }}" muted playsinline loop></video><div class="pdpv40__reel-cap">☁️ Cloud Unboxing</div></div>{% else %}<div class="pdpv40__reel"><div class="pdpv40__reel-ph">▶</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- REVIEWS -->
+    {% if section.settings.show_reviews %}
+      <div class="pdpv40__sh" id="reviews">Customer Reviews</div>
+      <div class="pdpv40__revgrid">
+        {% if section.settings.rv1 != blank %}<div class="pdpv40__revcard"><div class="pdpv40__rev-stars">★★★★★</div><div class="pdpv40__rev-txt">"{{ section.settings.rv1 }}"</div><div class="pdpv40__rev-auth">{{ section.settings.rv1n }}</div><div class="pdpv40__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv2 != blank %}<div class="pdpv40__revcard"><div class="pdpv40__rev-stars">★★★★★</div><div class="pdpv40__rev-txt">"{{ section.settings.rv2 }}"</div><div class="pdpv40__rev-auth">{{ section.settings.rv2n }}</div><div class="pdpv40__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+        {% if section.settings.rv3 != blank %}<div class="pdpv40__revcard"><div class="pdpv40__rev-stars">★★★★★</div><div class="pdpv40__rev-txt">"{{ section.settings.rv3 }}"</div><div class="pdpv40__rev-auth">{{ section.settings.rv3n }}</div><div class="pdpv40__rev-vf">✓ Verified Buyer</div></div>{% endif %}
+      </div>
+    {% endif %}
+
+    <!-- FEATURED -->
+    {% if section.settings.feat_coll != blank %}
+      {%- assign fc = collections[section.settings.feat_coll] -%}
+      {% if fc.products.size > 0 %}
+        <div class="pdpv40__sh">Recommended Cloud Products</div>
+        <div class="pdpv40__pgrid">
+          {% for item in fc.products limit: 4 %}
+            {% if item.handle != product.handle %}
+              <a href="{{ item.url }}" class="pdpv40__pcard">
+                <img src="{{ item.featured_image | image_url: width: 400 }}" alt="{{ item.title | escape }}" loading="lazy">
+                <div class="pdpv40__pcard-info">
+                  <div class="pdpv40__pcard-title">{{ item.title }}</div>
+                  <div class="pdpv40__pcard-price">{{ item.price | money }}</div>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- RECENTLY VIEWED -->
+    <div id="pdpv40-rv">
+      <div class="pdpv40__sh">Recently Viewed</div>
+      <div class="pdpv40__pgrid" id="pdpv40-rvg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY ATC -->
+<div class="pdpv40__sticky" id="pdpv40-sticky">
+  <div class="pdpv40__sticky-l">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 80 }}" class="pdpv40__sticky-img" alt="{{ product.title | escape }}">{% endif %}
+    <div>
+      <div class="pdpv40__sticky-t">{{ product.title }}</div>
+      <div class="pdpv40__sticky-p" id="pdpv40-sp">{{ current_variant.price | money }}</div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      {% if product.available %}
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b>{% render 'countdown-timer', product: product %}</b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% render 'back-in-stock', product: product %}
+
+      {% if product.available %}
+      <button type="button" class="pdpv40__sticky-btn" id="pdpv40-sbtn">Add to Cart</button>
+      {% else %}
+      <button class="pdpv40__sticky-btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      {% endif %}
+</div>
+
+<div class="pdpv40__toast" id="pdpv40-toast">☁️ Added to cart!</div>
+
+<script>
+(function(){
+  var PJ={{ product | json }}, cid={{ current_variant.id }};
+  function getO(){ var o=[]; document.querySelectorAll('.pdpv40__vr:checked').forEach(function(r){ o.push({p:parseInt(r.dataset.pos),v:r.value}); }); o.sort(function(a,b){return a.p-b.p}); return o.map(function(x){return x.v}); }
+  function findV(o){ for(var i=0;i<PJ.variants.length;i++){ var v=PJ.variants[i],ok=true; for(var j=0;j<o.length;j++){ if(v.options[j]!==o[j]){ ok=false; break; } } if(ok) return v; } return null; }
+  function upd(){
+    var o=getO(); if(!o.length) return; var v=findV(o); if(!v) return; cid=v.id;
+    document.getElementById('pdpv40-vid').value=v.id;
+    var pf=(v.price/100).toLocaleString('en-US',{style:'currency',currency:PJ.currency||'USD'});
+    var pe=document.getElementById('pdpv40-price'); if(pe) pe.textContent=pf;
+    var sp=document.getElementById('pdpv40-sp'); if(sp) sp.textContent=pf;
+    var ab=document.getElementById('pdpv40-atc');
+    if(ab){ ab.disabled=!v.available; ab.textContent=v.available?'Add to Cart — '+pf:'Sold Out'; }
+    var u=new URL(window.location); u.searchParams.set('variant',v.id); history.replaceState({},'',u);
+  }
+  document.querySelectorAll('.pdpv40__vr').forEach(function(r){ r.addEventListener('change',upd); });
+
+  var fm=document.getElementById('pdpv40-form');
+  if(fm) fm.addEventListener('submit',function(e){
+    e.preventDefault(); var b=document.getElementById('pdpv40-atc'), ot=b.textContent;
+    b.disabled=true; b.textContent='Adding...';
+    var q=parseInt(document.getElementById('pdpv40-qi').value)||1;
+    document.getElementById('pdpv40-fq').value=q;
+    fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cid,quantity:q})})
+    .then(function(r){return r.json();})
+    .then(function(){ b.textContent='✓ Added!'; toast40(); setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); })
+    .catch(function(){ b.textContent='Error'; setTimeout(function(){ b.disabled=false; b.textContent=ot; },2000); });
+  });
+
+  function toast40(){ var t=document.getElementById('pdpv40-toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+  var qi=document.getElementById('pdpv40-qi');
+  document.getElementById('pdpv40-qm').addEventListener('click',function(){ var v=parseInt(qi.value); if(v>1) qi.value=v-1; });
+  document.getElementById('pdpv40-qp').addEventListener('click',function(){ var v=parseInt(qi.value); if(v<10) qi.value=v+1; });
+
+  document.querySelectorAll('.pdpv40__th').forEach(function(th){
+    th.addEventListener('click',function(){
+      document.querySelectorAll('.pdpv40__th').forEach(function(t){ t.classList.remove('on'); });
+      th.classList.add('on');
+      var hi=document.getElementById('pdpv40-himg'), ti=th.querySelector('img');
+      if(hi&&ti) hi.src=ti.src.replace(/width=\d+/,'width=900');
+    });
+  });
+
+  var sb=document.getElementById('pdpv40-sticky'), ab=document.getElementById('pdpv40-atc');
+  if(sb&&ab) window.addEventListener('scroll',function(){ sb.classList.toggle('show', ab.getBoundingClientRect().top<-50); });
+  var sbn=document.getElementById('pdpv40-sbtn');
+  if(sbn) sbn.addEventListener('click',function(){ document.getElementById('pdpv40-atc').click(); });
+
+  document.querySelectorAll('.pdpv40__acc-btn').forEach(function(b){ b.addEventListener('click',function(){ b.closest('.pdpv40__acc-item').classList.toggle('open'); }); });
+
+  var ce=document.getElementById('pdpv40-cd');
+  if(ce){
+    var hrs=parseInt('{{ section.settings.cd_hrs | default: 8 }}')||8, ts=hrs*3600;
+    var sk=sessionStorage.getItem('pdpv40_cd'); if(sk) ts=parseInt(sk);
+    setInterval(function(){ ts--; if(ts<=0){ ce.textContent='EXPIRED'; return; } var h=Math.floor(ts/3600), m=Math.floor((ts%3600)/60), s=ts%60; ce.textContent=h+'h '+(m<10?'0':'')+m+'m '+(s<10?'0':'')+s+'s'; sessionStorage.setItem('pdpv40_cd',ts); },1000);
+  }
+
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target.querySelector('video'); if(v){ e.isIntersecting?v.play():v.pause(); } }); },{threshold:0.5});
+    document.querySelectorAll('.pdpv40__reel').forEach(function(r){ ro.observe(r); });
+  }
+
+  var RK='pdpv40_rv', cp={handle:'{{ product.handle }}',title:'{{ product.title | escape }}',price:'{{ product.price | money }}',image:'{{ product.featured_image | image_url: width: 400 }}',url:'{{ product.url }}'};
+  try{ var its=JSON.parse(localStorage.getItem(RK)||'[]'); its=its.filter(function(i){ return i.handle!==cp.handle; }); its.unshift(cp); if(its.length>8) its=its.slice(0,8); localStorage.setItem(RK,JSON.stringify(its)); }catch(e){}
+  try{
+    var its2=JSON.parse(localStorage.getItem(RK)||'[]').filter(function(i){ return i.handle!==cp.handle; });
+    var c=document.getElementById('pdpv40-rv'), g=document.getElementById('pdpv40-rvg');
+    if(g&&its2.length>0){ c.classList.add('has'); var h=''; its2.slice(0,4).forEach(function(i){ h+='<a href="'+i.url+'" class="pdpv40__pcard"><img src="'+i.image+'" alt="'+i.title+'" loading="lazy"><div class="pdpv40__pcard-info"><div class="pdpv40__pcard-title">'+i.title+'</div><div class="pdpv40__pcard-price">'+i.price+'</div></div></a>'; }); g.innerHTML=h; }
+  }catch(e){}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PDP V40 — Soft Lavender",
+  "tag": "section",
+  "class": "pdpv40-section",
+  "settings": [
+    { "type": "header", "content": "Rating" },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "text", "id": "rating_val", "label": "Rating score", "default": "4.95" },
+    { "type": "text", "id": "rev_count", "label": "Total reviews", "default": "1,620" },
+    { "type": "header", "content": "Offer Banner" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show offer", "default": true },
+    { "type": "text", "id": "offer_text", "label": "Offer text", "default": "☁️ SOFT LAVENDER: ENJOY 20% DISCOUNT WITH CODE 'LAVENDER20'" },
+    { "type": "header", "content": "Promo" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show promo", "default": true },
+    { "type": "text", "id": "promo_code", "label": "Code", "default": "LAVENDER20" },
+    { "type": "text", "id": "promo_disc", "label": "Discount", "default": "20%" },
+    { "type": "header", "content": "Urgency" },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show urgency", "default": true },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "range", "id": "cd_hrs", "label": "Countdown hours", "min": 1, "max": 48, "default": 8 },
+    { "type": "header", "content": "Accordion" },
+    { "type": "richtext", "id": "cloud_specs", "label": "Soft materials & care" },
+    { "type": "header", "content": "FBT" },
+    { "type": "collection", "id": "fbt_coll", "label": "FBT collection" },
+    { "type": "header", "content": "Reels" },
+    { "type": "checkbox", "id": "show_reels", "label": "Show reels", "default": true },
+    { "type": "url", "id": "r1", "label": "Reel 1 URL" },
+    { "type": "url", "id": "r2", "label": "Reel 2 URL" },
+    { "type": "url", "id": "r3", "label": "Reel 3 URL" },
+    { "type": "header", "content": "Reviews" },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show reviews", "default": true },
+    { "type": "text", "id": "rv1", "label": "Review 1", "default": "So soft and dreamy! Love the lavender vibe." },
+    { "type": "text", "id": "rv1n", "label": "Author 1", "default": "Luna P." },
+    { "type": "text", "id": "rv2", "label": "Review 2", "default": "Feels like floating on a cloud." },
+    { "type": "text", "id": "rv2n", "label": "Author 2", "default": "Hazel M." },
+    { "type": "text", "id": "rv3", "label": "Review 3", "default": "Pure pastel perfection." },
+    { "type": "text", "id": "rv3n", "label": "Author 3", "default": "Ivy C." },
+    { "type": "header", "content": "Featured" },
+    { "type": "collection", "id": "feat_coll", "label": "Featured collection" }
+  ],
+  "presets": [{ "name": "PDP V40 — Soft Lavender" }]
+}
+{% endschema %}

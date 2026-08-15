@@ -1,0 +1,100 @@
+{% comment %} CL V55 — Vintage Antiques (Sepia tones, ornate) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv55 { background: {{ section.settings.bg_color | default: '#F4EFEA' }}; color: {{ section.settings.text_color | default: '#3B2F2F' }}; padding: 60px 20px; font-family: 'Baskerville', 'Times New Roman', serif; }
+  .clv55-hero { text-align: center; margin-bottom: 50px; padding: 40px; border: 2px solid #8C7861; position: relative; }
+  .clv55-hero::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid #8C7861; pointer-events: none; }
+  .clv55-hero h1 { font-size: 42px; font-weight: normal; color: #3B2F2F; margin-bottom: 15px; letter-spacing: 2px; }
+  .clv55-hero p { font-size: 16px; color: #5A4A4A; max-width: 600px; margin: 0 auto; line-height: 1.6; font-style: italic; }
+  .clv55-chips { display: flex; gap: 20px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv55-chips a { padding: 5px 0; color: #5A4A4A; text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px dashed transparent; transition: 0.3s; }
+  .clv55-chips a:hover, .clv55-chips a.active { color: #3B2F2F; border-bottom: 1px dashed #3B2F2F; }
+  .clv55-toolbar { border-top: 1px solid #8C7861; border-bottom: 1px solid #8C7861; padding: 15px 0; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; }
+  .clv55-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 3 }}, 1fr); gap: 40px; }
+  .clv55-promo { grid-column: span 1; background: #E6DFD5; border: 1px solid #8C7861; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+  .clv55-promo::before { content: '❦'; font-size: 24px; color: #8C7861; position: absolute; top: 10px; }
+  .clv55-promo h3 { font-size: 26px; font-weight: normal; margin-bottom: 20px; color: #3B2F2F; margin-top: 20px; }
+  .clv55-promo a { display: inline-block; padding: 10px 25px; border: 1px solid #3B2F2F; color: #3B2F2F; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+  .clv55-promo a:hover { background: #3B2F2F; color: #F4EFEA; }
+  .clv55-seo { margin-top: 70px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+  @media (max-width: 768px) { .clv55-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 1 }}, 1fr); gap: 30px; } .clv55-hero h1 { font-size: 32px; } }
+</style>
+<div class="clv55" style="max-width: 1100px; margin: 0 auto;">
+  <div class="clv55-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Curiosities & Relics{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}A curated selection of artifacts, echoing the elegance of eras past.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv55-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv55-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 30px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 13px; font-style: italic; color: #5A4A4A; letter-spacing: 1px;">{{ filter.label }}</summary>
+              <div style="position: absolute; background: #F4EFEA; border: 1px solid #8C7861; padding: 20px; z-index: 10; margin-top: 15px; min-width: 250px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 15px; cursor: pointer; font-size: 14px; color: #3B2F2F;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #8C7861;">
+                    {{ value.label }} <span style="font-size: 12px; color: #8C7861; font-style: italic;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-family: inherit; font-size: 13px; font-style: italic; color: #5A4A4A; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 12 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv55-grid">
+      {% for product in collection.products %}
+        {% render 'card-v55', product: product %}
+        {% if forloop.index == 5 and section.settings.show_promo_tile %}
+          <div class="clv55-promo">
+            <h3>Appraisal<br>Services</h3>
+            <a href="/pages/appraisal">Inquire</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v55', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 60px; text-align: center; font-size: 14px; font-style: italic; color: #5A4A4A;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv55-seo">
+      <h2 style="font-size: 24px; font-weight: normal; color: #3B2F2F; margin-bottom: 15px;">{{ section.settings.seo_title | default: 'Preserving History' }}</h2>
+      <p style="font-size: 15px; color: #5A4A4A; line-height: 1.8; font-style: italic;">{{ section.settings.seo_text | default: 'Each piece in our collection is rigorously authenticated, possessing a unique provenance that connects the modern home to classical heritage.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V55 — Antiques", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 12},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "default": 3},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "1"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#F4EFEA"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#3B2F2F"}
+  ], "presets": [{"name": "CL V55 — Antiques"}]
+}
+{% endschema %}

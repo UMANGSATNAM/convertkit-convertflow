@@ -1,0 +1,306 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Nunito', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp35-tiles-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp35-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp35-tiles__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .hp35-tiles__subtitle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  .hp35-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.2;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 400;
+  }
+  
+  .hp35-tiles__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp35-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp35-tiles__grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+
+  .hp35-tile {
+    position: relative;
+    aspect-ratio: 4/5;
+    background: #e9e5de;
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    border-radius: 20px; /* Soft rounding */
+    group: card;
+  }
+  
+  /* Make the first tile taller, second wider, etc for an asymmetrical look */
+  .hp35-tile:nth-child(1) {
+    border-radius: 200px 200px 20px 20px;
+  }
+  
+  .hp35-tile:nth-child(4) {
+    border-radius: 20px 20px 200px 200px;
+  }
+
+  .hp35-tile__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .hp35-tile:hover .hp35-tile__image {
+    transform: scale(1.03);
+  }
+
+  .hp35-tile__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 40px;
+    z-index: 2;
+  }
+
+  .hp35-tile__title {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 4vw, 40px);
+    color: #fff;
+    margin: 0 0 10px;
+    font-weight: 400;
+  }
+
+  .hp35-tile__link {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: relative;
+  }
+
+  .hp35-tile__link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 0;
+    width: 100%; height: 1px;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease;
+  }
+
+  .hp35-tile:hover .hp35-tile__link::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp35-tiles-wrapper" id="HP35Tiles-{{ section.id }}">
+  <div class="hp35-tiles__header">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp35-tiles__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    <h2 class="hp35-tiles__title">{{ section.settings.title | replace: 'spaces', '<em>spaces</em>' }}</h2>
+  </div>
+
+  <div class="hp35-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp35-tile" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.title | escape }}" class="hp35-tile__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp35-tile__image' }}
+        {%- endif -%}
+        
+        <div class="hp35-tile__overlay">
+          <h3 class="hp35-tile__title">{{ block.settings.title }}</h3>
+          <div class="hp35-tile__link">Explore {{ block.settings.title }}</div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP35 - Organic Tiles",
+  "class": "section-hp35-category-tiles",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "CURATED SPACES"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Explore our spaces"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Organic Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FDFBF7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C422F"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#CC7B5E"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category Tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Living"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP35 - Organic Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Living" } },
+        { "type": "tile", "settings": { "title": "Dining" } },
+        { "type": "tile", "settings": { "title": "Kitchen" } },
+        { "type": "tile", "settings": { "title": "Bath" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

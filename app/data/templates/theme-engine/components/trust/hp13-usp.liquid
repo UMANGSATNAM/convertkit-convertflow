@@ -1,0 +1,143 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00FFA3'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 80px 40px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .hp13-usp-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp13-usp-item-{{ section_id }} {
+    background: #111;
+    border: 1px solid #333;
+    padding: 40px;
+    position: relative;
+    color: #FFF;
+  }
+  
+  .hp13-usp-item-{{ section_id }}::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px;
+    width: 20px; height: 20px;
+    border-top: 2px solid {{ text_color }};
+    border-left: 2px solid {{ text_color }};
+  }
+  
+  .hp13-usp-icon-{{ section_id }} {
+    margin-bottom: 20px;
+    color: {{ text_color }};
+    font-size: 2rem;
+  }
+  
+  .hp13-usp-title-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0 0 15px 0;
+    color: {{ text_color }};
+    letter-spacing: 1px;
+  }
+  
+  .hp13-usp-text-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 992px) {
+    .hp13-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp13-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp13-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <div class="hp13-usp-icon-{{ section_id }}">
+        {% if forloop.index == 1 %}
+          [SHIELD]
+        {% elsif forloop.index == 2 %}
+          [GEAR]
+        {% else %}
+          [SYNC]
+        {% endif %}
+      </div>
+      <h3 class="hp13-usp-title-{{ section_id }}">>> {{ block.settings.title | default: 'SYSTEM_UPGRADE' }}</h3>
+      <p class="hp13-usp-text-{{ section_id }}">{{ block.settings.text | default: 'Advanced materials integrated for optimal performance in harsh environments.' }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP13 USP",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Highlight Color",
+      "default": "#00FFA3"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "SYSTEM_UPGRADE"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Advanced materials integrated for optimal performance in harsh environments."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "WEATHER_PROOF", "text": "Hydrophobic coating ensuring zero penetration." } },
+        { "type": "usp", "settings": { "title": "MODULAR_GEAR", "text": "Attach and detach components based on mission requirements." } },
+        { "type": "usp", "settings": { "title": "GLOBAL_SHIPPING", "text": "Secure delivery network to any grid coordinate." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

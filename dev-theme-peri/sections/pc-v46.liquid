@@ -1,0 +1,528 @@
+{%- comment -%}
+  PC V46 — RETRO 70S PSYCHEDELIC GROOVY PRODUCT GRID
+  Design: Warm Cream (#FFF9E6), Terracotta (#E07A5F) & Mustard (#F2CC8F) accents, Bricolage Grotesque & Rubik typography
+  Card Shape: 20px corners, 2px terracotta borders, 70s offset drop shadow retro vibe
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Rubik:wght@500;600;700&display=swap');
+
+  .pcv46 {
+    --bg: {{ section.settings.bg_color | default: '#FFF9E6' }};
+    --card-bg: {{ section.settings.card_bg | default: '#FFF3D1' }};
+    --text: {{ section.settings.text_color | default: '#3D405B' }};
+    --muted: {{ section.settings.muted_color | default: '#81B29A' }};
+    --accent: {{ section.settings.accent_color | default: '#E07A5F' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#C86146' }};
+    --border: {{ section.settings.border_color | default: '#E07A5F' }};
+    --badge-sale-bg: #E07A5F;
+    --badge-sale-text: #FFF9E6;
+    --f-heading: 'Bricolage Grotesque', sans-serif;
+    --f-body: 'Rubik', sans-serif;
+    --r-card: 20px;
+    --ease: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding: {{ section.settings.padding_top | default: 56 }}px 0 {{ section.settings.padding_bottom | default: 56 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv46 *, .pcv46 *::before, .pcv46 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv46 a { color: inherit; text-decoration: none; }
+  .pcv46 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv46 img { max-width: 100%; display: block; }
+
+  .pcv46__wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv46__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; text-align: {{ section.settings.header_align | default: 'center' }}; }
+  @media (min-width: 768px) {
+    .pcv46__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv46__title { font-family: var(--f-heading); font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+  @media (min-width: 768px) { .pcv46__title { font-size: 42px; } }
+  .pcv46__sub { font-size: 16px; color: #81B29A; font-weight: 600; }
+  .pcv46__viewall { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; font-family: var(--f-heading); color: #FFF9E6; background: var(--accent); padding: 10px 22px; border-radius: 20px; border: 2px solid var(--text); box-shadow: 3px 3px 0px var(--text); transition: var(--ease); }
+  .pcv46__viewall:hover { background: #F2CC8F; color: #3D405B; transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--text); }
+
+  /* GRID */
+  .pcv46__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .pcv46__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv46__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv46__card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 4px 6px 0px #3D405B;
+    transition: var(--ease);
+  }
+  .pcv46__card:hover {
+    transform: translate(-3px, -4px);
+    box-shadow: 7px 10px 0px #3D405B;
+    border-color: #E07A5F;
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv46__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #F4F1DE;
+    overflow: hidden;
+  }
+  .pcv46__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .pcv46__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv46__card:hover .pcv46__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.06);
+    {% endif %}
+  }
+  .pcv46__card:hover .pcv46__img--sec { opacity: 1; transform: scale(1.06); }
+
+  /* BADGES */
+  .pcv46__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv46__badge { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.05em; font-family: var(--f-heading); border: 1.5px solid #3D405B; }
+  .pcv46__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv46__badge--tag { background: #F2CC8F; color: #3D405B; }
+  .pcv46__badge--sold { background: #81B29A; color: #FFF9E6; }
+
+  /* WISHLIST BUTTON */
+  .pcv46__wish {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #FFF9E6;
+    border: 2px solid #3D405B;
+    display: flex; align-items: center; justify-content: center;
+    color: #E07A5F;
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv46__wish:hover { background: #E07A5F; color: #FFF9E6; transform: scale(1.15); }
+  .pcv46__wish.active { color: #FFF9E6; background: #E07A5F; }
+
+  /* QUICK ADD BUTTON */
+  .pcv46__quick-box { padding: 12px; background: var(--card-bg); }
+  .pcv46__quick-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: #FFF9E6;
+    font-size: 13px; font-weight: 800; font-family: var(--f-heading);
+    border-radius: 20px;
+    border: 2px solid #3D405B;
+    box-shadow: 2px 3px 0px #3D405B;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+  }
+  .pcv46__quick-btn:hover { background: var(--accent-hover); transform: translate(-2px, -2px); box-shadow: 4px 5px 0px #3D405B; }
+  .pcv46__quick-btn:disabled { background: #E0E0E0; color: #888888; cursor: not-allowed; box-shadow: none; border-color: #CCCCCC; }
+
+  /* CARD CONTENT */
+  .pcv46__content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; text-align: center; }
+
+  .pcv46__vendor { font-size: 11px; text-transform: uppercase; color: #E07A5F; font-weight: 700; font-family: var(--f-heading); letter-spacing: 0.05em; }
+  .pcv46__item-title { font-family: var(--f-heading); font-size: 17px; font-weight: 800; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* RATING */
+  .pcv46__rating { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px; color: #E07A5F; font-weight: 700; }
+  .pcv46__stars { letter-spacing: 1px; }
+  .pcv46__rev-cnt { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+  /* PRICE */
+  .pcv46__price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv46__price { font-size: 18px; font-weight: 800; color: var(--text); font-family: var(--f-heading); }
+  .pcv46__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv46__swatches { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px; }
+  .pcv46__swatch { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #3D405B; cursor: pointer; transition: var(--ease); }
+  .pcv46__swatch:hover, .pcv46__swatch.active { transform: scale(1.25); border-color: #E07A5F; }
+
+  /* URGENCY MICRO */
+  .pcv46__urgency { font-size: 11px; color: #E07A5F; font-weight: 800; font-family: var(--f-heading); display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+
+  /* TOAST */
+  .pcv46__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #FFF9E6;
+    padding: 12px 22px; border-radius: 20px;
+    font-size: 13px; font-weight: 800; font-family: var(--f-heading);
+    border: 2px solid #3D405B; box-shadow: 4px 4px 0px #3D405B;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .pcv46__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv46">
+  <div class="pcv46__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv46__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv46__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv46__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv46__viewall">
+            {{ section.settings.view_all_label | default: 'Shop 70s Groovy' }} ✌️ &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv46__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v46', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v46', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv46__toast" id="pcv46-toast">GROOVY ITEM ADDED!</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv46-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv46Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'GROOVING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ ADDED';
+        showT('GROOVY ITEM ADDED!');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERROR';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv46-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V46 — 70s Psychedelic",
+  "tag": "section",
+  "class": "pcv46-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "70s GROOVY ✌️"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "70S PSYCHEDELIC GROOVY"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Warm terracotta retro vibes and vintage groovy aesthetics."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "Shop 70s Groovy"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFF9E6"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFF3D1"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#3D405B"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#81B29A"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V46 — 70s Psychedelic"
+    }
+  ]
+}
+{% endschema %}

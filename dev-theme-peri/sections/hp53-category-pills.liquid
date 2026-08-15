@@ -1,0 +1,101 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp53-pills-bg: {{ section.settings.bg_color | default: '#FAF5EF' }};
+
+    background-color: var(--hp53-pills-bg);
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+
+  .hp53-pills__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp53-pills__scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hp53-pills__scroll::-webkit-scrollbar { display: none; }
+
+  .hp53-pills__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: {{ section.settings.pill_bg | default: '#FFFFFF' }};
+    border: 1px solid {{ section.settings.pill_border | default: '#E8D5C0' }};
+    border-radius: 50px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: {{ section.settings.pill_text | default: '#5C3D2E' }};
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  .hp53-pills__pill:hover {
+    background: {{ section.settings.pill_hover_bg | default: '#5C3D2E' }};
+    color: {{ section.settings.pill_hover_text | default: '#FAF5EF' }};
+    border-color: {{ section.settings.pill_hover_bg | default: '#5C3D2E' }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp53-pills__scroll { justify-content: flex-start; flex-wrap: nowrap; }
+  }
+{%- endstyle -%}
+
+<div class="hp53-pills__container">
+  <div class="hp53-pills__scroll">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '#' }}" class="hp53-pills__pill" {{ block.shopify_attributes }}>
+        {%- if block.settings.icon != blank -%}<span>{{ block.settings.icon }}</span>{%- endif -%}
+        <span>{{ block.settings.label | default: 'Category' }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP53 - Dune Categories",
+  "class": "section-hp53-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FAF5EF" },
+    { "type": "color", "id": "pill_bg", "label": "Pill BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "pill_border", "label": "Pill Border", "default": "#E8D5C0" },
+    { "type": "color", "id": "pill_text", "label": "Pill Text", "default": "#5C3D2E" },
+    { "type": "color", "id": "pill_hover_bg", "label": "Hover BG", "default": "#5C3D2E" },
+    { "type": "color", "id": "pill_hover_text", "label": "Hover Text", "default": "#FAF5EF" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Padding", "default": 35 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Category",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "default": "◈" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Serums" },
+        { "type": "url", "id": "url", "label": "URL" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "HP53 - Dune Categories",
+    "blocks": [
+      { "type": "pill", "settings": { "icon": "🌵", "label": "Serums" } },
+      { "type": "pill", "settings": { "icon": "☀️", "label": "Sun Care" } },
+      { "type": "pill", "settings": { "icon": "✦", "label": "Oils" } },
+      { "type": "pill", "settings": { "icon": "🏜️", "label": "Masks" } },
+      { "type": "pill", "settings": { "icon": "💧", "label": "Hydrators" } }
+    ]
+  }]
+}
+{% endschema %}

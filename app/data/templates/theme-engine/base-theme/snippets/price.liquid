@@ -1,73 +1,38 @@
-{%- liquid
-  if use_variant
-    assign target = variant
-  else
-    assign target = product.selected_or_first_available_variant
-  endif
+{% comment %}
+  Universal Price Snippet
+  Accepts: product (Liquid product object)
+{% endcomment %}
 
-  assign compare_at_price = target.compare_at_price
-  assign price = target.price
-  assign available = target.available | default: false
-  assign money_price = price | money
+{% assign price_prod = product %}
 
-  if target == nil
-    assign money_price = 1999 | money
-    assign compare_at_price = 2999
-    assign price = 1999
-    assign available = true
-  endif
--%}
-
-<div class="price-container
-  {%- if available == false %} price--sold-out {% endif -%}
-  {%- if compare_at_price > price %} price--on-sale {% endif -%}">
+{% if price_prod != blank %}
+  {% assign target_var = price_prod.selected_or_first_available_variant %}
+  {% assign cur_price = target_var.price %}
+  {% assign cmp_price = target_var.compare_at_price %}
   
-  <div class="price__regular">
-    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-    <span class="price-item price-item--regular">
-      {{ money_price }}
+  <div class="cf-price-box" style="display: flex; align-items: center; gap: 6px; font-size: 14px; margin: 4px 0;">
+    <span class="cf-price-main" style="font-weight: 700; color: var(--color-text, #111827);">
+      {{ cur_price | money }}
     </span>
-  </div>
 
-  <div class="price__sale">
-    <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
-    <span class="price-item price-item--sale">
-      {{ money_price }}
-    </span>
-    {%- if compare_at_price > price -%}
-      <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-      <s class="price-item price-item--compare">
-        {{ compare_at_price | money }}
-      </s>
-    {%- endif -%}
-  </div>
-
-  {%- if target.unit_price_measurement -%}
-    <small class="unit-price caption">
-      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
-      <span class="price-item price-item--unit">
-        <span>{{ target.unit_price | money }}</span>
-        <span aria-hidden="true">/</span>
-        <span class="visually-hidden">&nbsp;{{ 'products.product.price.unit_price_separator' | t }}&nbsp;</span>
-        <span>
-          {%- if target.unit_price_measurement.reference_value != 1 -%}
-            {{- target.unit_price_measurement.reference_value -}}
-          {%- endif -%}
-          {{ target.unit_price_measurement.reference_unit }}
-        </span>
+    {% if cmp_price > cur_price %}
+      <span class="cf-price-cmp" style="font-size: 12px; text-decoration: line-through; color: var(--color-text-muted, #9CA3AF);">
+        {{ cmp_price | money }}
       </span>
-    </small>
-  {%- endif -%}
 
-  {%- if compare_at_price > price -%}
-    <span class="price__badge-sale font-badge">
-      {{ 'products.product.on_sale' | t }}
-    </span>
-  {%- endif -%}
+      {% assign save_pct = cmp_price | minus: cur_price | times: 100.0 | divided_by: cmp_price | round %}
+      <span class="cf-price-save" style="font-size: 11px; font-weight: 700; color: var(--color-sale, #DC2626); background: rgba(220, 38, 38, 0.08); padding: 2px 6px; border-radius: 4px;">
+        {{ save_pct }}% OFF
+      </span>
+    {% endif %}
+  </div>
 
-  {%- if available == false -%}
-    <span class="price__badge-sold font-badge">
-      {{ 'products.product.sold_out' | t }}
-    </span>
-  {%- endif -%}
-</div>
+{% else %}
+
+  <div class="cf-price-box" style="display: flex; align-items: center; gap: 6px; font-size: 14px; margin: 4px 0;">
+    <span class="cf-price-main" style="font-weight: 700; color: #111827;">₹ 1,499</span>
+    <span class="cf-price-cmp" style="font-size: 12px; text-decoration: line-through; color: #9CA3AF;">₹ 1,999</span>
+    <span class="cf-price-save" style="font-size: 11px; font-weight: 700; color: #DC2626; background: rgba(220, 38, 38, 0.08); padding: 2px 6px; border-radius: 4px;">25% OFF</span>
+  </div>
+
+{% endif %}

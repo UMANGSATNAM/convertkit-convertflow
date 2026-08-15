@@ -1,0 +1,423 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ffcc'
+  
+  assign product_1 = all_products[section.settings.product_1]
+  assign product_2 = all_products[section.settings.product_2]
+  assign product_3 = all_products[section.settings.product_3]
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp3-bundle-bg: {{ bg_color }};
+    --hp3-bundle-text: {{ text_color }};
+    --hp3-bundle-accent: {{ accent_color }};
+    
+    --hp3-bundle-pt-desk: {{ padding_top_desktop }}px;
+    --hp3-bundle-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp3-bundle-pt-mob: {{ padding_top_mobile }}px;
+    --hp3-bundle-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp3-tech-bundle-{{ section.id }} {
+    padding-top: var(--hp3-bundle-pt-desk);
+    padding-bottom: var(--hp3-bundle-pb-desk);
+    background-color: var(--hp3-bundle-bg);
+    color: var(--hp3-bundle-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp3-bundle-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hp3-bundle-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp3-bundle-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0 0 15px 0;
+  }
+  
+  .hp3-bundle-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Bundle Wrapper */
+  .hp3-bundle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    margin-bottom: 40px;
+  }
+
+  /* Plus Sign */
+  .hp3-bundle-plus {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hp3-bundle-text);
+    flex-shrink: 0;
+  }
+  .hp3-bundle-plus svg { width: 20px; height: 20px; }
+
+  /* Product Card */
+  .hp3-bundle-item {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    max-width: 300px;
+    text-align: center;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .hp3-bundle-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--hp3-bundle-accent);
+  }
+
+  .hp3-bundle-img-wrap {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #111;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .hp3-bundle-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+    transition: transform 0.3s ease;
+  }
+  .hp3-bundle-item:hover .hp3-bundle-img {
+    transform: scale(1.05);
+  }
+
+  .hp3-bundle-p-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: var(--hp3-bundle-text);
+    text-decoration: none;
+  }
+
+  .hp3-bundle-p-price {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Summary Section */
+  .hp3-bundle-summary {
+    background: rgba(0,255,204,0.05);
+    border: 1px solid var(--hp3-bundle-accent);
+    border-radius: 8px;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .hp3-bundle-totals {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp3-bundle-value {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: line-through;
+    margin-bottom: 5px;
+  }
+
+  .hp3-bundle-price {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--hp3-bundle-accent);
+    line-height: 1;
+  }
+
+  .hp3-bundle-btn {
+    background: var(--hp3-bundle-accent);
+    color: #000;
+    padding: 15px 30px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .hp3-bundle-btn:hover {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(255,255,255,0.5);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp3-tech-bundle-{{ section.id }} {
+      padding-top: var(--hp3-bundle-pt-mob);
+      padding-bottom: var(--hp3-bundle-pb-mob);
+    }
+    .hp3-bundle-inner {
+      padding: 0 20px;
+    }
+    .hp3-bundle-container {
+      flex-direction: column;
+      gap: 15px;
+    }
+    .hp3-bundle-item {
+      max-width: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      text-align: left;
+      gap: 20px;
+    }
+    .hp3-bundle-img-wrap {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 0;
+    }
+    .hp3-bundle-summary {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+      padding: 20px;
+    }
+  }
+</style>
+
+<section class="hp3-tech-bundle-{{ section.id }}" aria-label="Product Bundle Offer">
+  <div class="hp3-bundle-inner">
+    
+    <div class="hp3-bundle-header">
+      <h2 class="hp3-bundle-title">{{ section.settings.heading | default: 'THE ULTIMATE SETUP' }}</h2>
+      <p class="hp3-bundle-desc">{{ section.settings.description | default: 'Get everything you need to dominate. Bundle and save 15% instantly.' }}</p>
+    </div>
+
+    <div class="hp3-bundle-container">
+      
+      <!-- Product 1 -->
+      <div class="hp3-bundle-item">
+        <a href="{{ product_1.url | default: '#' }}" class="hp3-bundle-img-wrap">
+          {%- if product_1 != blank -%}
+            <img src="{{ product_1.featured_image | image_url: width: 300 }}" class="hp3-bundle-img" loading="lazy" alt="{{ product_1.title }}">
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'hp3-bundle-img placeholder-svg' }}
+          {%- endif -%}
+        </a>
+        <div>
+          <a href="{{ product_1.url | default: '#' }}" class="hp3-bundle-p-title">{{ product_1.title | default: 'Pro Keyboard V2' }}</a>
+          <div class="hp3-bundle-p-price">{{ product_1.price | default: 14900 | money }}</div>
+        </div>
+      </div>
+
+      <div class="hp3-bundle-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
+
+      <!-- Product 2 -->
+      <div class="hp3-bundle-item">
+        <a href="{{ product_2.url | default: '#' }}" class="hp3-bundle-img-wrap">
+          {%- if product_2 != blank -%}
+            <img src="{{ product_2.featured_image | image_url: width: 300 }}" class="hp3-bundle-img" loading="lazy" alt="{{ product_2.title }}">
+          {%- else -%}
+            {{ 'product-2' | placeholder_svg_tag: 'hp3-bundle-img placeholder-svg' }}
+          {%- endif -%}
+        </a>
+        <div>
+          <a href="{{ product_2.url | default: '#' }}" class="hp3-bundle-p-title">{{ product_2.title | default: 'Precision Mouse' }}</a>
+          <div class="hp3-bundle-p-price">{{ product_2.price | default: 8900 | money }}</div>
+        </div>
+      </div>
+
+      {%- if product_3 != blank or section.settings.product_3 != blank -%}
+        <div class="hp3-bundle-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
+
+        <!-- Product 3 -->
+        <div class="hp3-bundle-item">
+          <a href="{{ product_3.url | default: '#' }}" class="hp3-bundle-img-wrap">
+            {%- if product_3 != blank -%}
+              <img src="{{ product_3.featured_image | image_url: width: 300 }}" class="hp3-bundle-img" loading="lazy" alt="{{ product_3.title }}">
+            {%- else -%}
+              {{ 'product-3' | placeholder_svg_tag: 'hp3-bundle-img placeholder-svg' }}
+            {%- endif -%}
+          </a>
+          <div>
+            <a href="{{ product_3.url | default: '#' }}" class="hp3-bundle-p-title">{{ product_3.title | default: 'Desk Mat Pro' }}</a>
+            <div class="hp3-bundle-p-price">{{ product_3.price | default: 3900 | money }}</div>
+          </div>
+        </div>
+      {%- endif -%}
+      
+    </div>
+
+    <div class="hp3-bundle-summary">
+      <div class="hp3-bundle-totals">
+        {%- liquid 
+          assign total_val = product_1.price | plus: product_2.price
+          if product_3 != blank
+            assign total_val = total_val | plus: product_3.price
+          endif
+          if total_val == 0
+            assign total_val = 27700
+          endif
+          
+          assign discount_pct = section.settings.discount_pct | divided_by: 100.0
+          assign discount_amt = total_val | times: discount_pct
+          assign bundle_price = total_val | minus: discount_amt
+        -%}
+        <span class="hp3-bundle-value">Value: {{ total_val | money }}</span>
+        <span class="hp3-bundle-price">{{ bundle_price | money }}</span>
+      </div>
+      <button class="hp3-bundle-btn">{{ section.settings.btn_text | default: 'ADD BUNDLE TO CART' }}</button>
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP3 Tech Bundle",
+  "tag": "section",
+  "class": "section-hp3-bundle",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "THE ULTIMATE SETUP"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "Get everything you need to dominate. Bundle and save instantly."
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "Product 1"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product 2"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "Product 3 (Optional)"
+    },
+    {
+      "type": "header",
+      "content": "Discount Settings"
+    },
+    {
+      "type": "range",
+      "id": "discount_pct",
+      "min": 5, "max": 50, "step": 5, "unit": "%",
+      "label": "Bundle Discount Percentage",
+      "default": 15
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "ADD BUNDLE TO CART"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ffcc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP3 Tech Bundle (Adv)",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

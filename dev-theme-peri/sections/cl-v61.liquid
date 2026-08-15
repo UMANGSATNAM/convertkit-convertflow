@@ -1,0 +1,100 @@
+{% comment %} CL V61 — Floral / Spring (Pastel Pink/Green) {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv61 { background: {{ section.settings.bg_color | default: '#FFF5F8' }}; color: {{ section.settings.text_color | default: '#4A5D4E' }}; padding: 40px 20px; font-family: 'Playfair Display', serif; }
+  .clv61-hero { text-align: center; margin-bottom: 50px; padding: 70px 20px; background: #E8F0EA; border-radius: 100px; position: relative; overflow: hidden; border: 2px solid #D1E0D5; }
+  .clv61-hero::before { content: '🌸 🌿 🌷 🌿 🌸'; position: absolute; top: -10px; left: 0; width: 100%; font-size: 24px; opacity: 0.3; }
+  .clv61-hero::after { content: '🌸 🌿 🌷 🌿 🌸'; position: absolute; bottom: -10px; left: 0; width: 100%; font-size: 24px; opacity: 0.3; }
+  .clv61-hero h1 { font-size: 52px; font-weight: normal; color: #4A5D4E; margin-bottom: 15px; font-style: italic; }
+  .clv61-hero p { font-size: 16px; color: #6D8271; max-width: 600px; margin: 0 auto; font-family: 'Lato', sans-serif; }
+  .clv61-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .clv61-chips a { padding: 10px 25px; background: #FFF; color: #4A5D4E; text-decoration: none; font-size: 14px; font-family: 'Lato', sans-serif; border-radius: 30px; transition: 0.3s; border: 1px solid #FFD1DC; box-shadow: 0 4px 10px rgba(255,209,220,0.3); }
+  .clv61-chips a:hover, .clv61-chips a.active { background: #FFD1DC; color: #4A5D4E; }
+  .clv61-toolbar { background: #FFF; border-radius: 20px; padding: 15px 25px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #E8F0EA; font-family: 'Lato', sans-serif; }
+  .clv61-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 3 }}, 1fr); gap: 30px; }
+  .clv61-promo { grid-column: span 1; background: #FFD1DC; color: #4A5D4E; border-radius: 20px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 1px solid #F0B4C4; }
+  .clv61-promo h3 { font-size: 32px; font-weight: normal; margin-bottom: 20px; font-style: italic; }
+  .clv61-promo a { display: inline-block; padding: 12px 30px; background: #FFF; color: #4A5D4E; text-decoration: none; font-size: 13px; font-family: 'Lato', sans-serif; text-transform: uppercase; letter-spacing: 1px; border-radius: 30px; transition: 0.3s; }
+  .clv61-promo a:hover { background: #4A5D4E; color: #FFF; }
+  .clv61-seo { margin-top: 60px; background: #FFF; padding: 50px; border-radius: 40px; text-align: center; border: 1px solid #E8F0EA; }
+  @media (max-width: 768px) { .clv61-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 20px; } .clv61-hero h1 { font-size: 38px; } .clv61-hero { border-radius: 40px; padding: 40px 20px; } }
+</style>
+<div class="clv61" style="max-width: 1200px; margin: 0 auto;">
+  <div class="clv61-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}Spring Collection{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Fresh blooms and vibrant new styles for the season.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv61-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv61-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 25px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; font-weight: bold; color: #4A5D4E; letter-spacing: 1px;">{{ filter.label }} ⌄</summary>
+              <div style="position: absolute; background: #FFF; border: 1px solid #FFD1DC; padding: 20px; border-radius: 15px; z-index: 10; margin-top: 15px; min-width: 220px; box-shadow: 0 10px 20px rgba(255,209,220,0.4);">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #6D8271;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} style="accent-color: #FFD1DC;">
+                    {{ value.label }} <span style="font-size: 12px; opacity: 0.6;">({{ value.count }})</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; font-family: 'Lato', sans-serif; font-size: 14px; font-weight: bold; color: #4A5D4E; cursor: pointer; outline: none;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>Sort by: {{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 15 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv61-grid">
+      {% for product in collection.products %}
+        {% render 'card-v61', product: product %}
+        {% if forloop.index == 7 and section.settings.show_promo_tile %}
+          <div class="clv61-promo">
+            <h3>Custom<br>Bouquets</h3>
+            <a href="/pages/custom">Design Yours</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v61', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 50px; text-align: center; font-size: 18px; font-style: italic; color: #4A5D4E;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv61-seo">
+      <h2 style="font-size: 28px; font-weight: normal; color: #4A5D4E; margin-bottom: 15px; font-style: italic;">{{ section.settings.seo_title | default: 'Locally Sourced' }}</h2>
+      <p style="font-size: 15px; font-family: 'Lato', sans-serif; color: #6D8271; max-width: 700px; margin: 0 auto; line-height: 1.8;">{{ section.settings.seo_text | default: 'We partner with local farmers to bring you the freshest, most vibrant selections straight from the earth to your home.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V61 — Floral", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 15},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 4, "default": 3},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#FFF5F8"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#4A5D4E"}
+  ], "presets": [{"name": "CL V61 — Floral"}]
+}
+{% endschema %}

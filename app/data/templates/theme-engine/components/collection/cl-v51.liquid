@@ -1,0 +1,99 @@
+{% comment %} CL V51 — Sneakerhead / Streetwear {% endcomment %}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<style>
+  .clv51 { background: {{ section.settings.bg_color | default: '#ECECEC' }}; color: {{ section.settings.text_color | default: '#111111' }}; padding: 40px 20px; font-family: 'Arial Black', Impact, sans-serif; text-transform: uppercase; }
+  .clv51-hero { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 40px; padding: 60px 20px; background: #FF4500; color: #FFF; position: relative; overflow: hidden; transform: skewY(-2deg); }
+  .clv51-hero::before { content: 'HYPE HYPE HYPE HYPE'; position: absolute; font-size: 100px; color: rgba(255,255,255,0.1); white-space: nowrap; font-weight: 900; }
+  .clv51-hero h1 { font-size: 64px; font-weight: 900; margin: 0; position: relative; z-index: 1; letter-spacing: -2px; text-shadow: 4px 4px 0 #111; }
+  .clv51-hero p { font-size: 16px; background: #111; color: #FFF; padding: 5px 15px; position: relative; z-index: 1; font-family: 'Helvetica Neue', sans-serif; font-weight: bold; margin-top: 10px; }
+  .clv51-chips { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; margin-top: 20px; }
+  .clv51-chips a { padding: 10px 25px; background: #FFF; color: #111; text-decoration: none; font-size: 16px; font-weight: 900; border: 3px solid #111; box-shadow: 4px 4px 0 #111; transition: 0.1s; }
+  .clv51-chips a:hover, .clv51-chips a.active { background: #111; color: #FFF; transform: translate(2px, 2px); box-shadow: 2px 2px 0 #FF4500; border-color: #FF4500; }
+  .clv51-toolbar { background: #FFF; border: 3px solid #111; padding: 15px 25px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; font-family: 'Helvetica Neue', sans-serif; font-weight: bold; }
+  .clv51-grid { display: grid; grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 20px; }
+  .clv51-promo { grid-column: span 1; background: #111; color: #FFF; border: 3px solid #FF4500; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .clv51-promo h3 { font-size: 32px; font-weight: 900; margin-bottom: 15px; line-height: 1.1; }
+  .clv51-promo a { display: inline-block; padding: 10px 20px; background: #FF4500; color: #FFF; text-decoration: none; font-weight: 900; font-size: 14px; border: 2px solid #FFF; }
+  .clv51-promo a:hover { background: #FFF; color: #111; border-color: #111; }
+  .clv51-seo { margin-top: 60px; background: #FFF; border: 3px solid #111; padding: 40px; text-align: center; box-shadow: 8px 8px 0 #111; font-family: 'Helvetica Neue', sans-serif; }
+  @media (max-width: 768px) { .clv51-grid { grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr); gap: 15px; } .clv51-hero h1 { font-size: 42px; } }
+</style>
+<div class="clv51" style="max-width: 1300px; margin: 0 auto;">
+  <div class="clv51-hero">
+    <h1>{% if collection.title != blank %}{{ collection.title | escape }}{% else %}THE DROP{% endif %}</h1>
+    <p>{% if collection.description != blank %}{{ collection.description }}{% else %}Exclusive releases and limited editions.{% endif %}</p>
+  </div>
+  {% if section.settings.sub_collections != blank %}
+    <div class="clv51-chips">
+      {% for link in section.settings.sub_collections.links %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="clv51-toolbar">
+    <facet-filters-form style="width: 100%;">
+      <form id="FacetFiltersForm" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; gap: 20px;">
+          {%- for filter in collection.filters -%}
+            <details style="position: relative;">
+              <summary style="cursor: pointer; font-size: 14px; color: #111;">{{ filter.label }} [ + ]</summary>
+              <div style="position: absolute; background: #FFF; border: 3px solid #111; padding: 20px; z-index: 10; margin-top: 15px; min-width: 200px; box-shadow: 5px 5px 0 #FF4500;">
+                {%- for value in filter.values -%}
+                  <label style="display: block; margin-bottom: 12px; cursor: pointer; font-size: 14px; color: #111;">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %}>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endfor -%}
+        </div>
+        <select name="sort_by" onchange="this.form.submit()" style="background: transparent; border: none; border-bottom: 2px solid #111; padding: 5px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase;">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </form>
+    </facet-filters-form>
+  </div>
+  {% assign limit_num = section.settings.products_per_page | default: 16 %}
+  {% paginate collection.products by limit_num %}
+    <div class="clv51-grid">
+      {% for product in collection.products %}
+        {% render 'card-v51', product: product %}
+        {% if forloop.index == 8 and section.settings.show_promo_tile %}
+          <div class="clv51-promo">
+            <h3>RAFFLE<br>LIVE</h3>
+            <a href="/pages/raffle">ENTER NOW</a>
+          </div>
+        {% endif %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v51', product: nil %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div style="margin-top: 40px; text-align: center; font-size: 24px; font-weight: 900; font-family: 'Arial Black', sans-serif;">{{ paginate | default_pagination }}</div>
+  {% endpaginate %}
+  {% if section.settings.show_seo_block %}
+    <div class="clv51-seo">
+      <h2 style="font-family: 'Arial Black', sans-serif; font-size: 28px; margin-bottom: 15px; text-transform: uppercase;">{{ section.settings.seo_title | default: 'AUTHENTICITY GUARANTEED' }}</h2>
+      <p style="font-size: 14px; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.5; font-weight: bold;">{{ section.settings.seo_text | default: 'Every pair is authenticated by our team of experts. Shop the latest collabs and deadstock heat.' }}</p>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "CL V51 — Streetwear", "settings": [
+    {"type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16},
+    {"type": "range", "id": "cols_desktop", "label": "Desktop Columns", "min": 2, "max": 5, "default": 4},
+    {"type": "select", "id": "cols_mobile", "label": "Mobile Columns", "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}], "default": "2"},
+    {"type": "link_list", "id": "sub_collections", "label": "Sub-Collection Menu"},
+    {"type": "checkbox", "id": "show_promo_tile", "label": "Show Promo Card", "default": true},
+    {"type": "checkbox", "id": "show_seo_block", "label": "Show SEO Block", "default": true},
+    {"type": "color", "id": "bg_color", "label": "Background Color", "default": "#ECECEC"},
+    {"type": "color", "id": "text_color", "label": "Text Color", "default": "#111111"}
+  ], "presets": [{"name": "CL V51 — Streetwear"}]
+}
+{% endschema %}

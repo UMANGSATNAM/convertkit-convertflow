@@ -1,0 +1,119 @@
+# Antigravity Build Prompt — Section Variant Template
+
+> Ye reusable template hai. Har naye section/design ke liye sirf **PART A** (design + section) aur
+> **PART C** (variant specs) bharo. **PART B (Locked Rules)** kabhi mat badalna — ye poore project
+> ke hard-won rules hain, har build mein same rehte hain.
+>
+> Flow: Umang ek design deta hai → Claude PART A ka base spec + PART C ke 5-6 structural variant
+> specs likhta hai → ye poora prompt Antigravity ko paste hota hai → Antigravity Liquid banata hai.
+
+---
+
+## PART 0 — Codebase inventory FIRST (reuse before building)
+
+Antigravity, koi naya variant banane se pehle **poore codebase ko scan karo aur jo already hai use reuse karo.**
+Scratch se dobara banana sirf tab jab gap ho.
+
+1. **Scan** these sources and inventory every existing section + snippet + template:
+   - `dev-theme-peri/sections/`, `dev-theme-peri/snippets/`, `dev-theme-peri/templates/`
+   - `app/data/templates/theme-engine/components/` and `.../base-theme/`
+   - Imported library (Umang's 500+ Liquid section files, if present in repo)
+2. **Categorize** each existing section by type (hero / product-card / product-grid / pdp /
+   featured-grid / trust / testimonials / promo / brand-story / header / footer / announcement / newsletter).
+3. For the `{{SECTION_TYPE}}` being built this round, **list what already exists** and mark each:
+   - `REUSE` — already a valid structural variant; only needs normalization (token-driven, neutral data,
+     responsive check) per PART B. Do NOT rebuild — normalize and register.
+   - `DUPLICATE` — structurally same as another; drop.
+   - `JUNK` — low quality / broken; drop.
+   - `GAP` — a structural variant we want (see PART C) that does NOT exist yet → build new.
+4. **Reuse existing page templates** (`templates/*.json`, `*.liquid`) as scaffolds — don't recreate chassis/pages.
+5. Report the inventory result **before building**: "X existing → N reuse (after normalize), M gaps to build new."
+   Then build only the gaps.
+
+> Reason: humara goal fastest path to a clean library hai, duplicate labor nahi. Bahut variants already
+> codebase mein pade hain — pehle un ko normalize karke register karo.
+
+---
+
+## PART A — Iss build ka target (Claude bharega)
+
+- **Section type:** `{{SECTION_TYPE}}`  <!-- e.g. hero / product-card / product-grid / pdp / featured-product-grid -->
+- **Base design reference:** `{{DESIGN_REFERENCE}}`  <!-- screenshot path / Figma link / reference URL -->
+- **Base structural spec (what the design IS, layout-wise):**
+  `{{BASE_SPEC}}`
+  <!-- Layout skeleton in words: kahan kya baithta hai, columns, image placement, content order,
+       mobile vs desktop arrangement. Colors/fonts YAHAN mat likho — woh token layer handle karega. -->
+
+---
+
+## PART B — LOCKED RULES (kabhi mat badalna)
+
+Antigravity, ye har variant pe binding hain. Koi bhi rule tootne pe variant reject hoga.
+
+**1. Token-driven from the first line — NO hardcoded values.**
+- Har color, radius, shadow, spacing, font `var(--...)` se aaye. Ek bhi hardcoded hex (`#0F5132`),
+  hardcoded `border-radius: 8px`, ya hardcoded font-family allowed nahi.
+- Standard token names use karo (jo chassis define karta hai): `--primary`, `--secondary`,
+  `--surface`, `--bg-base`, `--text-main`, `--text-muted`, `--border`, `--radius-card`,
+  `--radius-btn`, `--shadow-md`, `--font-heading`, `--font-body`, `--space-*`.
+- **Text color on a colored background** (white text on a green/accent button, announcement bar):
+  use `#ffffff` fixed **or** `var(--text-on-accent)` — NEVER `var(--surface)`. (Surface = page/container
+  background only. Ye galti pehle ho chuki hai, dobara nahi.)
+
+**2. Structural variants, not cosmetic.**
+- Ye variant apne siblings se **layout-level** alag hona chahiye (image placement, columns, stacking,
+  grid vs carousel, alignment). Sirf color/spacing ka farak = INVALID variant (woh token layer ka kaam).
+
+**3. Zero fabricated data. Neutral placeholder defaults only.**
+- Koi fake naam ("Elena", "Customer Name" chalega but no realistic fake person), fake review text
+  ("Add your review here." placeholder chalega), fake ratings, ya fake counts default mein render mat karo.
+- Trust signals (stars, "Verified Buyer" badge, review counts) **default mein HIDDEN**, sirf tab render
+  hon jab merchant ne real data bhara ho (`is_placeholder`-style guard). Counts/claims settings-driven.
+
+**4. Merchant ke apne products + images pull karo (live Liquid objects).**
+- Products/collections/images Shopify objects se aayein: `product.featured_image`, `product.media`,
+  `collections[...]`, `product.price` (via `money` filter), etc. Koi hardcoded product/image nahi.
+- **Missing-asset fallback:** agar product/image nahi hai, ek **neutral branded placeholder** dikhao
+  (no dollar-sign line-art, no client-specific text). Section ko merchant ke actual catalog ke hisaab se
+  gracefully adapt karna chahiye (3 products vs 30, images present vs absent).
+
+**5. Responsive — mobile AND desktop, dono properly built.**
+- Mobile-first CSS, phir desktop breakpoints. Dono layouts spec ke mutabiq render hon. Tap targets
+  mobile pe ≥44px. Ek device pe toota hua variant = INVALID.
+
+**6. CRO-clean structure.**
+- Primary CTA above the fold aur clearly visible. Clear visual hierarchy. Agar section conversion-relevant
+  hai (hero, product card, grid), CTA/price/add-to-cart prominent hon.
+
+**7. Schema + naming discipline.**
+- Har section ka `{% schema %}` complete ho, merchant-editable settings ke saath.
+- File naming: `{{SECTION_TYPE}}-v{{N}}.liquid` (e.g. `hero-v3.liquid`). Dependent snippets alag files mein,
+  `snippets/` mein, shared aur token-driven.
+- Section ke andar scoped CSS `{%- style -%}` block mein, ya shared asset — par colors/tokens
+  `theme.liquid` ke `:root` se aayein (asset CSS mein hardcode nahi, warna theme editor live-preview toot-ta hai).
+
+---
+
+## PART C — Iss build ke 5-6 structural variants (Claude bharega)
+
+Antigravity, ek hi base design se ye variants banao. Har ek **layout-level alag** hai. Har variant PART B ke
+saare rules follow kare.
+
+- **Variant 1 — `{{V1_NAME}}`:** `{{V1_STRUCTURAL_SPEC}}`
+- **Variant 2 — `{{V2_NAME}}`:** `{{V2_STRUCTURAL_SPEC}}`
+- **Variant 3 — `{{V3_NAME}}`:** `{{V3_STRUCTURAL_SPEC}}`
+- **Variant 4 — `{{V4_NAME}}`:** `{{V4_STRUCTURAL_SPEC}}`
+- **Variant 5 — `{{V5_NAME}}`:** `{{V5_STRUCTURAL_SPEC}}`
+- **Variant 6 — `{{V6_NAME}}` (optional):** `{{V6_STRUCTURAL_SPEC}}`
+
+---
+
+## PART D — Delivery + proof (Antigravity must return)
+
+1. Har variant ka `.liquid` file (+ koi naye snippet).
+2. Ek chhota **self-check** har variant ke liye: "no hardcoded hex/radius (grep clean), token names match chassis,
+   responsive both breakpoints, no fabricated data, missing-image fallback present."
+3. **Render proof — real, viewable.** Screenshots LOCAL WINDOWS PATH pe mat do (woh render nahi hote).
+   Ek `shopify theme dev` / `theme share` / admin-preview **link** do jise Umang khud khol ke dekh sake,
+   ya proper uploaded image. Verification Umang ki aankh se close hoti hai, self-certified "done" se nahi.
+4. Do sabse contrasting variants side-by-side dikhao taaki structural difference clearly proven ho.

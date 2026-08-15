@@ -1,0 +1,261 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=DM+Sans:wght@400;500;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Shrikhand', cursive;
+    --font-body: 'DM Sans', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp37-tiles-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp37-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp37-tiles__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp37-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 6vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0;
+    text-shadow: 2px 2px 0px var(--accent-color);
+    transform: rotate(-1deg);
+  }
+
+  .hp37-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp37-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .hp37-tiles__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp37-tile {
+    position: relative;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    group: card;
+  }
+
+  .hp37-tile__image-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 4px solid var(--text-color);
+    overflow: hidden;
+    margin-bottom: 25px;
+    background: #e9e9e9;
+    box-shadow: 8px 8px 0px var(--accent-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
+  }
+
+  /* Make middle tile pill shaped instead of circle for variety */
+  .hp37-tile:nth-child(even) .hp37-tile__image-wrap {
+    border-radius: 30px;
+  }
+
+  .hp37-tile:hover .hp37-tile__image-wrap {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px var(--accent-color);
+  }
+
+  .hp37-tile__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+  }
+
+  .hp37-tile__title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    color: var(--text-color);
+    margin: 0 0 10px;
+    background: var(--bg-color);
+    border: 2px solid var(--text-color);
+    padding: 10px 25px;
+    border-radius: 50px;
+    z-index: 2;
+    margin-top: -40px; /* Overlap image */
+    transition: background 0.3s ease;
+  }
+
+  .hp37-tile:hover .hp37-tile__title {
+    background: var(--accent-color);
+    color: var(--bg-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp37-tiles-wrapper" id="HP37Tiles-{{ section.id }}">
+  <div class="hp37-tiles__header">
+    <h2 class="hp37-tiles__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp37-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp37-tile" {{ block.shopify_attributes }}>
+        <div class="hp37-tile__image-wrap">
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp37-tile__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'collection-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp37-tile__image' }}
+          {%- endif -%}
+        </div>
+        <h3 class="hp37-tile__title">{{ block.settings.title }}</h3>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP37 - Retro Tiles",
+  "class": "section-hp37-category-tiles",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Vibe"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Retro Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4E3C5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#4A3219"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#798A58"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category Tile",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Surf"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP37 - Retro Tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Surf" } },
+        { "type": "tile", "settings": { "title": "Skate" } },
+        { "type": "tile", "settings": { "title": "Lounge" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

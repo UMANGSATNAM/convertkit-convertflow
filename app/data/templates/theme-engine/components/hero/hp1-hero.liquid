@@ -1,0 +1,277 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#fcfaf8'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+  assign overlay_color = section.settings.overlay_color | default: '#000000'
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+<section class="hp1-beauty-hero" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-hero-{{ section.id }}">
+  <div class="hp1-hero-inner">
+    
+    {%- if section.settings.image != blank -%}
+      <div class="hp1-hero-image-wrapper">
+        <img class="hp1-hero-img" 
+             src="{{ section.settings.image | image_url: width: 1920 }}" 
+             alt="{{ section.settings.heading | escape }}" 
+             width="1920" 
+             height="1080"
+             loading="eager" 
+             fetchpriority="high">
+        <div class="hp1-hero-overlay" style="background-color: {{ overlay_color }}; opacity: {{ overlay_opacity }};"></div>
+      </div>
+    {%- else -%}
+      <div class="hp1-hero-image-wrapper hp1-hero-placeholder">
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'hp1-hero-img placeholder-svg' }}
+      </div>
+    {%- endif -%}
+
+    <div class="hp1-hero-content">
+      <div class="hp1-hero-content-box">
+        {%- if section.settings.subheading != blank -%}
+          <span class="hp1-hero-subheading">{{ section.settings.subheading }}</span>
+        {%- endif -%}
+        
+        {%- if section.settings.heading != blank -%}
+          <h1 class="hp1-hero-heading">{{ section.settings.heading }}</h1>
+        {%- endif -%}
+        
+        {%- if section.settings.text != blank -%}
+          <p class="hp1-hero-text">{{ section.settings.text }}</p>
+        {%- endif -%}
+        
+        {%- if section.settings.btn_label != blank and section.settings.btn_link != blank -%}
+          <a href="{{ section.settings.btn_link }}" class="hp1-hero-btn">
+            {{ section.settings.btn_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-hero {
+    position: relative;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Playfair Display', serif; /* Elegant Serif for Beauty */
+  }
+  .hp1-hero-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hp1-hero-image-wrapper {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+  }
+  .hp1-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    animation: hp1FadeInZoom 1.5s ease-out forwards;
+  }
+  .hp1-hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 2;
+  }
+  .hp1-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: {{ section.settings.content_alignment }};
+  }
+  .hp1-hero-content-box {
+    max-width: 500px;
+    text-align: {{ section.settings.text_alignment }};
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    animation: hp1SlideUp 1s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  .hp1-hero-subheading {
+    display: block;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #8a7a6c;
+  }
+  .hp1-hero-heading {
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.1;
+    margin: 0 0 20px;
+    font-weight: 400;
+  }
+  .hp1-hero-text {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 30px;
+    font-family: 'Inter', sans-serif;
+    color: #555;
+  }
+  .hp1-hero-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: {{ text_color }};
+    color: {{ bg_color }};
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 30px; /* Pill shape button */
+    transition: all 0.3s ease;
+  }
+  .hp1-hero-btn:hover {
+    background: #8a7a6c;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  @keyframes hp1FadeInZoom {
+    0% { opacity: 0; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes hp1SlideUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .hp1-beauty-hero { min-height: 70vh; }
+    .hp1-hero-inner { min-height: 70vh; flex-direction: column; }
+    .hp1-hero-content {
+      align-items: flex-end;
+      padding-bottom: 30px;
+    }
+    .hp1-hero-content-box {
+      padding: 30px 20px;
+      width: 100%;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.95);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Beauty Hero",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Pure & Natural"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Elevate Your Skincare Routine"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Description",
+      "default": "Discover our new botanical collection, crafted for glowing, healthy skin."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop the Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#fcfaf8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "label": "Overlay Opacity",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Box Position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Beauty Hero"
+    }
+  ]
+}
+{% endschema %}

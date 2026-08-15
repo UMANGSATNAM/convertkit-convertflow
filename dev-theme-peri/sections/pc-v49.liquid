@@ -1,0 +1,530 @@
+{%- comment -%}
+  PC V49 — DARK NEUMORPHIC CYBERPUNK HUD PRODUCT GRID
+  Design: Obsidian Slate (#0D0F12), Cyan HUD (#38BDF8) accents, Share Tech Mono typography
+  Card Shape: 12px corners, dual neumorphic HUD shadows, futuristic tech UI
+{%- endcomment -%}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  .pcv49 {
+    --bg: {{ section.settings.bg_color | default: '#0D0F12' }};
+    --card-bg: {{ section.settings.card_bg | default: '#141820' }};
+    --text: {{ section.settings.text_color | default: '#E2E8F0' }};
+    --muted: {{ section.settings.muted_color | default: '#64748B' }};
+    --accent: {{ section.settings.accent_color | default: '#38BDF8' }};
+    --accent-hover: {{ section.settings.accent_hover | default: '#0284C7' }};
+    --border: {{ section.settings.border_color | default: '#1E293B' }};
+    --badge-sale-bg: #38BDF8;
+    --badge-sale-text: #0D0F12;
+    --f-mono: 'Share Tech Mono', monospace;
+    --r-card: 12px;
+    --ease: all 0.25s ease;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--f-mono);
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 60 }}px 0;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .pcv49 *, .pcv49 *::before, .pcv49 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .pcv49 a { color: inherit; text-decoration: none; }
+  .pcv49 button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .pcv49 img { max-width: 100%; display: block; }
+
+  .pcv49__wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  .pcv49__head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 16px; text-align: {{ section.settings.header_align | default: 'left' }}; }
+  @media (min-width: 768px) {
+    .pcv49__head { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+  }
+  .pcv49__title { font-size: 28px; font-weight: 400; color: #FFFFFF; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); letter-spacing: 0.05em; text-transform: uppercase; }
+  @media (min-width: 768px) { .pcv49__title { font-size: 38px; } }
+  .pcv49__sub { font-size: 14px; color: var(--muted); }
+  .pcv49__viewall { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); border: 1px solid var(--accent); padding: 8px 18px; border-radius: 6px; box-shadow: 4px 4px 10px #07080A; transition: var(--ease); }
+  .pcv49__viewall:hover { background: var(--accent); color: #0D0F12; box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
+
+  /* GRID */
+  .pcv49__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_mobile | default: 2 }}, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 640px) {
+    .pcv49__grid { grid-template-columns: repeat({{ section.settings.cols_tablet | default: 3 }}, 1fr); gap: 24px; }
+  }
+  @media (min-width: 1024px) {
+    .pcv49__grid { grid-template-columns: repeat({{ section.settings.cols_desktop | default: 4 }}, 1fr); gap: 28px; }
+  }
+
+  /* CARD */
+  .pcv49__card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 6px 6px 14px #07080A, -6px -6px 14px #212836;
+    transition: var(--ease);
+  }
+  .pcv49__card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 8px 8px 20px #07080A, -8px -8px 20px #212836, 0 0 15px rgba(56, 189, 248, 0.3);
+  }
+
+  /* IMAGE CONTAINER */
+  .pcv49__img-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.img_ratio | default: '1/1' }};
+    background: #080A0D;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .pcv49__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .pcv49__img--sec {
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+  .pcv49__card:hover .pcv49__img--pri {
+    {% if section.settings.enable_sec_img %}
+      opacity: 0;
+    {% else %}
+      transform: scale(1.05);
+    {% endif %}
+  }
+  .pcv49__card:hover .pcv49__img--sec { opacity: 1; transform: scale(1.05); }
+
+  /* BADGES */
+  .pcv49__badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 2; pointer-events: none; }
+  .pcv49__badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--accent); letter-spacing: 0.05em; }
+  .pcv49__badge--sale { background: var(--badge-sale-bg); color: var(--badge-sale-text); }
+  .pcv49__badge--tag { background: #0F172A; color: #38BDF8; }
+  .pcv49__badge--sold { background: #1E293B; color: #64748B; border-color: #1E293B; }
+
+  /* WISHLIST BUTTON */
+  .pcv49__wish {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(13, 15, 18, 0.85);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    z-index: 3;
+    transition: var(--ease);
+  }
+  .pcv49__wish:hover { background: var(--accent); color: #0D0F12; border-color: var(--accent); box-shadow: 0 0 10px #38BDF8; }
+  .pcv49__wish.active { color: #0D0F12; background: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px #38BDF8; }
+
+  /* QUICK ADD HOVER */
+  .pcv49__quick-box { padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border); }
+  .pcv49__quick-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: #0D0F12;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: var(--f-mono);
+    border-radius: 6px;
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: var(--ease);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  }
+  .pcv49__quick-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(56, 189, 248, 0.7); }
+  .pcv49__quick-btn:disabled { background: #1E293B; color: #64748B; cursor: not-allowed; box-shadow: none; }
+
+  /* CARD CONTENT */
+  .pcv49__content { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
+  .pcv49__vendor { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; }
+  .pcv49__item-title { font-size: 15px; font-weight: 400; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-transform: uppercase; text-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
+
+  /* RATING */
+  .pcv49__rating { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); }
+  .pcv49__stars { letter-spacing: 1px; text-shadow: 0 0 6px var(--accent); }
+  .pcv49__rev-cnt { color: var(--muted); font-size: 11px; }
+
+  /* PRICE */
+  .pcv49__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .pcv49__price { font-size: 17px; font-weight: 700; color: #FFFFFF; text-shadow: 0 0 6px var(--accent); }
+  .pcv49__cmp-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+  /* SWATCHES */
+  .pcv49__swatches { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  .pcv49__swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; transition: var(--ease); }
+  .pcv49__swatch:hover, .pcv49__swatch.active { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  /* URGENCY MICRO */
+  .pcv49__urgency { font-size: 11px; color: var(--accent); text-transform: uppercase; display: flex; align-items: center; gap: 4px; margin-top: 2px; text-shadow: 0 0 6px var(--accent); }
+
+  /* TOAST */
+  .pcv49__toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent); color: #0D0F12;
+    border: 1px solid var(--accent); padding: 12px 20px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+  }
+  .pcv49__toast.show { transform: translateY(0); opacity: 1; }
+</style>
+
+<div class="pcv49">
+  <div class="pcv49__wrap">
+    
+    {% if section.settings.title != blank or section.settings.subheading != blank %}
+      <div class="pcv49__head">
+        <div>
+          {% if section.settings.title != blank %}
+            <h2 class="pcv49__title">{{ section.settings.title | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="pcv49__sub">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.show_view_all and section.settings.collection != blank %}
+          <a href="{{ collections[section.settings.collection].url }}" class="pcv49__viewall">
+            {{ section.settings.view_all_label | default: '> FETCH_HUD_GRID' }} &rarr;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="pcv49__grid">
+      {% assign target_coll = collections[section.settings.collection] %}
+      {% assign limit_num = section.settings.products_per_page | default: 8 %}
+
+      {% if target_coll != blank and target_coll.products.size > 0 %}
+        {% for product in target_coll.products limit: limit_num %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          
+          {% render 'card-v49', product: product, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit_num) %}
+          {% render 'card-v49', product: nil, show_rating: section.settings.show_rating, rating_value: section.settings.rating_value, rating_count: section.settings.rating_count %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<div class="pcv49__toast" id="pcv49-toast">NODE_INITIALIZED_OK</div>
+
+<script>
+(function(){
+  // Wishlist is handled globally by assets/wishlist.js (shared store: cf_wishlist_items).
+  // Buttons are rendered by snippets/wishlist-button.liquid — no per-section storage.
+
+
+  document.querySelectorAll('[data-pcv49-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var id = btn.dataset.pcv49Add, orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '> INITIALIZING...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, quantity: 1 })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML = '✓ INITIALIZED';
+        showT('NODE_INITIALIZED_OK');
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      })
+      .catch(function(){
+        btn.innerHTML = 'ERR_FAIL';
+        setTimeout(function(){ btn.disabled = false; btn.innerHTML = orig; }, 2000);
+      });
+    });
+  });
+
+  function showT(msg){
+    var t = document.getElementById('pcv49-toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "PC V49 — Dark Cyberpunk H",
+  "tag": "section",
+  "class": "pcv49-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cols_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 Column"
+        },
+        {
+          "value": "2",
+          "label": "2 Columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "img_ratio",
+      "label": "Image Ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4/5",
+          "label": "Tall (4:5)"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Card Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sec_img",
+      "label": "Show second image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable Quick Add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show color swatches preview",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show inventory urgency tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_custom_badge",
+      "label": "Show custom tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_badge_text",
+      "label": "Custom Badge Text",
+      "default": "[HUD_N°49]"
+    },
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "> CYBERPUNK_HUD_GRID"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Dark neumorphic HUD tech interface with glowing cyan metrics."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "'View All' text",
+      "default": "> FETCH_HUD_GRID"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#0D0F12"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#141820"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2E8F0"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#64748B"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / CTA Color",
+      "default": "#38BDF8"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Card Border Color",
+      "default": "#1E293B"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "rating_value",
+      "label": "Rating Value (e.g. 4.9)",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating Count (e.g. 128)",
+      "default": "128"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PC V49 — Dark Cyberpunk H"
+    }
+  ]
+}
+{% endschema %}

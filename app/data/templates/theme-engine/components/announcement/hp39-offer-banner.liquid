@@ -1,0 +1,218 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --banner-bg: {{ section.settings.banner_bg }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 60px 20px;
+  }
+
+  .hp39-offer-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--banner-bg);
+    border-radius: 100px; /* Big pill shape */
+    padding: 60px 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp39-offer-wrapper {
+      flex-direction: column;
+      text-align: center;
+      border-radius: 50px;
+      padding: 50px 30px;
+      gap: 30px;
+    }
+  }
+
+  /* Decorative glow inside the pill */
+  .hp39-offer__glow {
+    position: absolute;
+    width: 300px; height: 300px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    top: 50%; right: -50px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  @media screen and (max-width: 992px) {
+    .hp39-offer__glow {
+      right: 50%;
+      transform: translate(50%, -50%);
+    }
+  }
+
+  .hp39-offer__content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+  }
+
+  .hp39-offer__badge {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .hp39-offer__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -1px;
+  }
+
+  .hp39-offer__btn {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    padding: 20px 40px;
+    background: var(--text-color);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .hp39-offer__btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp39-offer-wrapper" id="HP39Offer-{{ section.id }}">
+  <div class="hp39-offer__glow"></div>
+  
+  <div class="hp39-offer__content">
+    {%- if section.settings.badge != blank -%}
+      <span class="hp39-offer__badge">{{ section.settings.badge }}</span>
+    {%- endif -%}
+    <h2 class="hp39-offer__title">{{ section.settings.title }}</h2>
+  </div>
+
+  {%- if section.settings.btn_label != blank -%}
+    <a href="{{ section.settings.btn_link | default: '#' }}" class="hp39-offer__btn">
+      {{ section.settings.btn_label }}
+    </a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP39 - Aura Offer",
+  "class": "section-hp39-offer-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge Text",
+      "default": "Limited Time"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Enjoy 15% off your first journey into softness."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Claim Offer"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Aura Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#faf9f8"
+    },
+    {
+      "type": "color_background",
+      "id": "banner_bg",
+      "label": "Banner Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Glow Color",
+      "default": "#c7ceea"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP39 - Aura Offer"
+    }
+  ]
+}
+{% endschema %}

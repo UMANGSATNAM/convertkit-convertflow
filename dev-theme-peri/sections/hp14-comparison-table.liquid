@@ -1,0 +1,161 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffe8d6'
+  assign text_color = section.settings.text_color | default: '#6b705c'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+  }
+  
+  .hp14-comparison-container-{{ section_id }} {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #f4f1de;
+    border-radius: 40px;
+    padding: 60px;
+    box-shadow: 0 20px 40px rgba(107, 112, 92, 0.05);
+  }
+  
+  .hp14-comparison-heading-{{ section_id }} {
+    font-family: 'Georgia', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: normal;
+    text-align: center;
+    margin: 0 0 50px 0;
+    color: {{ text_color }};
+  }
+  
+  .hp14-comparison-heading-{{ section_id }} span {
+    font-style: italic;
+    color: #cb997e;
+  }
+  
+  .hp14-comparison-table-wrap-{{ section_id }} {
+    overflow-x: auto;
+  }
+  
+  .hp14-comparison-table-{{ section_id }} {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 600px;
+  }
+  
+  .hp14-comparison-table-{{ section_id }} th,
+  .hp14-comparison-table-{{ section_id }} td {
+    padding: 25px;
+    border-bottom: 1px solid rgba(107, 112, 92, 0.1);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    color: {{ text_color }};
+  }
+  
+  .hp14-comparison-table-{{ section_id }} th {
+    font-family: 'Georgia', serif;
+    font-size: 1.2rem;
+    font-weight: normal;
+  }
+  
+  .hp14-comparison-table-{{ section_id }} td.hp14-feature-{{ section_id }} {
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  .hp14-comparison-table-{{ section_id }} td.hp14-us-{{ section_id }} {
+    color: #cb997e;
+    font-weight: bold;
+  }
+  
+  .hp14-comparison-table-{{ section_id }} td.hp14-them-{{ section_id }} {
+    color: #a5a58d;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp14-comparison-container-{{ section_id }} {
+      padding: 30px 20px;
+      border-radius: 20px;
+    }
+  }
+</style>
+
+<div class="hp14-comparison-container-{{ section_id }}">
+  <h2 class="hp14-comparison-heading-{{ section_id }}">The Botanical <span>Difference</span></h2>
+  
+  <div class="hp14-comparison-table-wrap-{{ section_id }}">
+    <table class="hp14-comparison-table-{{ section_id }}">
+      <thead>
+        <tr>
+          <th style="text-align: left;">Benefit</th>
+          <th>Botanica.</th>
+          <th>Standard Brands</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for block in section.blocks %}
+          <tr>
+            <td class="hp14-feature-{{ section_id }}">{{ block.settings.feature }}</td>
+            <td class="hp14-us-{{ section_id }}">✓</td>
+            <td class="hp14-them-{{ section_id }}">{% if block.settings.them_has %}✓{% else %}—{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP14 Comparison Table",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffe8d6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#6b705c"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "feature",
+          "label": "Feature Name",
+          "default": "100% Organic Ingredients"
+        },
+        {
+          "type": "checkbox",
+          "id": "them_has",
+          "label": "Standard Brands Have This?",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP14 Comparison Table",
+      "blocks": [
+        { "type": "feature", "settings": { "feature": "100% Organic Ingredients", "them_has": false } },
+        { "type": "feature", "settings": { "feature": "Cruelty-Free Certified", "them_has": false } },
+        { "type": "feature", "settings": { "feature": "Recyclable Packaging", "them_has": true } },
+        { "type": "feature", "settings": { "feature": "No Artificial Fragrances", "them_has": false } }
+      ]
+    }
+  ]
+}
+{% endschema %}

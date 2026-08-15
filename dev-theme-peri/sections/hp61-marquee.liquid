@@ -1,0 +1,57 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp61-marq-bg: {{ section.settings.bg_color | default: '#18181B' }};
+    --hp61-marq-text: {{ section.settings.text_color | default: '#EF4444' }};
+    background: var(--hp61-marq-bg);
+    overflow: hidden;
+    padding: {{ section.settings.padding_vertical | default: 10 }}px 0;
+    border-top: 1px solid rgba(239, 68, 68, 0.2);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  .hp61-marquee__track {
+    display: flex; gap: 50px;
+    animation: hp61MarqueeScroll {{ section.settings.speed | default: 25 }}s linear infinite;
+    width: max-content;
+  }
+  .hp61-marquee__item {
+    display: flex; align-items: center; gap: 50px; white-space: nowrap;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: {{ section.settings.font_size | default: 13 }}px;
+    font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--hp61-marq-text);
+  }
+  .hp61-marquee__dot {
+    width: 6px; height: 6px;
+    background: {{ section.settings.dot_color | default: '#F59E0B' }};
+    border-radius: 50%; flex-shrink: 0;
+    box-shadow: 0 0 8px #F59E0B;
+  }
+  @keyframes hp61MarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+{%- endstyle -%}
+<div class="hp61-marquee__track">
+  {%- for i in (1..12) -%}
+    <div class="hp61-marquee__item">
+      <span>{{ section.settings.marquee_text | default: '🌋 ICELANDIC BASALT ASH ⚡ GEOTHERMAL SILICA 💎 VOLCANIC OBSIDIAN PEPTIDES 🔥 MAGMA DETOX' }}</span>
+      <span class="hp61-marquee__dot"></span>
+    </div>
+  {%- endfor -%}
+</div>
+{% schema %}
+{
+  "name": "HP61 Marquee",
+  "class": "section-hp61-marquee",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#18181B" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#EF4444" },
+    { "type": "color", "id": "dot_color", "label": "Dot Color", "default": "#F59E0B" },
+    { "type": "text", "id": "marquee_text", "label": "Marquee Text", "default": "🌋 ICELANDIC BASALT ASH ⚡ GEOTHERMAL SILICA 💎 VOLCANIC OBSIDIAN PEPTIDES 🔥 MAGMA DETOX" },
+    { "type": "range", "id": "speed", "min": 10, "max": 50, "step": 5, "unit": "s", "label": "Speed", "default": 25 },
+    { "type": "range", "id": "font_size", "min": 10, "max": 22, "step": 1, "unit": "px", "label": "Font Size", "default": 13 },
+    { "type": "range", "id": "padding_vertical", "min": 4, "max": 24, "step": 2, "unit": "px", "label": "Padding", "default": 10 }
+  ],
+  "presets": [{ "name": "HP61 Marquee" }]
+}
+{% endschema %}
