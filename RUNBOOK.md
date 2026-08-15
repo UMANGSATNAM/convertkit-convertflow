@@ -89,7 +89,7 @@ Do this before any commit. It is the difference between a reviewable diff and an
 
   Proof: build completes. If it fails, the error names the file you deleted — restore just that one with `git checkout -- <file>`.
 
-- [ ] **1.5 Commit the cleanup on its own**
+- [x] **1.5 Commit the cleanup on its own**
 
   ```bash
   git add -A
@@ -104,7 +104,7 @@ Do this before any commit. It is the difference between a reviewable diff and an
 
 The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. Every theme change needs a sync.
 
-- [ ] **2.1 Dry run first**
+- [x] **2.1 Dry run first**
 
   ```bash
   node scripts/sync_peri_to_engine.cjs --dry
@@ -120,13 +120,13 @@ The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. 
 
   Six skips are correct: `header`, `footer`, `main-cart`, `main-collection`, `main-search` (template-bound, no preset) and `product-card-api` (no schema).
 
-- [ ] **2.2 Run it**
+- [x] **2.2 Run it**
 
   ```bash
   node scripts/sync_peri_to_engine.cjs
   ```
 
-- [ ] **2.3 Prove the registry is real**
+- [x] **2.3 Prove the registry is real**
 
   ```bash
   node -e "
@@ -143,7 +143,7 @@ The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. 
 
   **This is the anti-hallucination check.** If an AI says the sync worked, this command either agrees or it does not.
 
-- [ ] **2.4 Prove every blueprint type resolves**
+- [x] **2.4 Prove every blueprint type resolves**
 
   ```bash
   node -e "
@@ -162,6 +162,13 @@ The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. 
 ---
 
 ## Phase 3 — Local test before anything goes near a store
+
+> **These must run on your Windows machine, not in a sandbox.**
+> `node_modules` here contains Windows-only native binaries (`@rollup/rollup-win32-x64`).
+> Running `npm run build` from a Linux environment fails with
+> `Cannot find module @rollup/rollup-linux-x64-gnu` — that is an environment
+> mismatch, not a code fault. Open a terminal in `I:\converflow app` and run
+> these there.
 
 - [ ] **3.1 Unit tests**
 

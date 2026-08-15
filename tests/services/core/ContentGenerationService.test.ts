@@ -31,7 +31,7 @@ describe("ContentGenerationService Architecture", () => {
     expect(copy.button_label).toBe("Explore Jewels");
   });
 
-  it("injectContentIntoBlueprint injects section-instance keyed content into exact blueprint sections", () => {
+  it("injectContentIntoBlueprint injects section-instance keyed content into exact blueprint sections", async () => {
     const mockBlueprint = {
       pages: {
         index: {
@@ -54,7 +54,7 @@ describe("ContentGenerationService Architecture", () => {
       }
     };
 
-    const updated = ContentGenerationService.injectContentIntoBlueprint(mockBlueprint, generatedContent);
+    const updated = await ContentGenerationService.injectContentIntoBlueprint(mockBlueprint, generatedContent);
 
     expect(updated.pages.index.sections[0].settings).toEqual({
       existing: "val",

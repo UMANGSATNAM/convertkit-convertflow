@@ -208,8 +208,21 @@ function main() {
     const source = fs.readFileSync(path.join(PERI, 'sections', file), 'utf-8');
 
     const schema = schemaOf(source);
-    if (!schema) { skipped.push([id, 'no schema']); continue; }
-    if (!schema.presets) { skipped.push([id, 'no preset — engine cannot add it']); continue; }
+
+    // A section with no preset cannot be added by the customizer or the engine,
+    // but it may still be required — template-bound `main-*` sections, and
+    // Section Rendering API endpoints that JS fetches by `?section_id=`.
+    // Those belong in base-theme/sections/, not in the component registry.
+    if (!schema || !schema.presets) {
+      const reason = !schema ? 'no schema' : 'no preset';
+      const dest = path.join(BASE, 'sections', file);
+      if (!DRY) {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.copyFileSync(path.join(PERI, 'sections', file), dest);
+      }
+      skipped.push([id, `${reason} — copied to base-theme instead`]);
+      continue;
+    }
 
     const role = roleOf(id);
     const type = TYPE_MAP[role] || 'custom';
@@ -271,6 +284,37 @@ function main() {
   };
 
   if (!DRY) fs.writeFileSync(REGISTRY, JSON.stringify(registry, null, 2));
+
+  // 3. Rebuild chassis-manifest.json — verify-registry.ts treats any file in
+  //    base-theme that is not listed here as untracked and fails the build.
+  const crypto = require('crypto');
+  const manifestPath = path.join(BASE, 'chassis-manifest.json');
+  const manifestFiles = [];
+  const walkBase = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) { walkBase(full); continue; }
+      const rel = path.relative(ENGINE, full).replace(/\\/g, '/');
+      if (rel.endsWith('chassis-manifest.json')) continue;
+      const content = fs.readFileSync(full, 'utf-8').replace(/\r\n/g, '\n');
+      manifestFiles.push({
+        file: rel,
+        hash: crypto.createHash('sha256').update(content).digest('hex')
+      });
+    }
+  };
+  if (fs.existsSync(BASE)) walkBase(BASE);
+  if (!DRY) {
+    const prevManifest = fs.existsSync(manifestPath)
+      ? JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
+      : { version: '1.0.0', description: 'Base chassis files tracked by verify-registry' };
+    fs.writeFileSync(manifestPath, JSON.stringify({
+      ...prevManifest,
+      lastUpdated: new Date().toISOString().slice(0, 10),
+      files: manifestFiles.sort((a, b) => a.file.localeCompare(b.file))
+    }, null, 2));
+  }
+  console.log(`chassis-manifest: ${manifestFiles.length} files tracked`);
 
   console.log(`\nsynced   ${synced.length} sections`);
   console.log(`kept     ${kept.length} existing registry entries`);
