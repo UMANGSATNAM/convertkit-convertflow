@@ -99,6 +99,8 @@ describe('Stage 2.1: Hardened Layout Swapping & Generic Orphan Checker', () => {
     await fs.mkdir(path.join(baseThemeDir, 'config'), { recursive: true });
     await fs.mkdir(path.join(baseThemeDir, 'locales'), { recursive: true });
     await fs.mkdir(path.join(baseThemeDir, 'assets'), { recursive: true });
+    await fs.mkdir(path.join(sandboxDir, 'app', 'data'), { recursive: true });
+    await fs.copyFile(path.join(process.cwd(), 'app/data/niche-vocabulary.json'), path.join(sandboxDir, 'app/data/niche-vocabulary.json'));
 
     // Write minimal chassis files on disk
     const themeContent = '<html>{{ content_for_header }}</html>';

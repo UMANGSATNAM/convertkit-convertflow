@@ -43,7 +43,7 @@ describe('Stage 2.2: SSOT Registry Integrity & Hash Freshness Gates', () => {
     const canonicalContent = realContent.replace(/\r\n/g, "\n");
     realHash = crypto.createHash("sha256").update(canonicalContent).digest("hex");
     const registryData = JSON.parse(canonicalContent);
-    expectedCount = registryData.components.filter((c: any) => c.status === "approved").length;
+    expectedCount = registryData.components.filter((c: any) => c.status === "approved" || c.status === "production").length;
     mockExpectedComponents = Array(expectedCount).fill({ status: 'PUBLISHED', componentId: 'mock-id', sectionType: 'mock-id' });
   });
 

@@ -71,7 +71,7 @@ export async function cloneChassis(themeEngineDir: string): Promise<Record<strin
       const normalizedContent = content.replace(/\r\n/g, "\n");
       const hash = crypto.createHash("sha256").update(normalizedContent).digest("hex");
       if (hash !== expectedHash) {
-        console.warn(`[WARNING - MODE 1] Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
+        throw new ChassisTamperError(`Hash mismatch for chassis file: ${relPath}. Expected ${expectedHash}, got ${hash}`);
       }
     }
 
@@ -198,6 +198,13 @@ export function validateThemeIntegrity(
     }
   }
 
+  if (nicheId && nicheId !== 'ai-custom') {
+    const tokensContent = filesToUpload['assets/niche-tokens.css'];
+    if (tokensContent === undefined || tokensContent.trim() === '') {
+      throw new ValidationError('Niche tokens stylesheet is empty');
+    }
+  }
+
   // Ensure settings_schema.json font_picker defaults use valid Shopify font IDs
   try {
     const schemaContent = filesToUpload["config/settings_schema.json"];
@@ -260,7 +267,7 @@ export async function loadVerifiedComponents(): Promise<ComponentRegistry[]> {
     throw new ValidationError("Registry cache stale — run seed. No RegistryMeta record found in database.");
   }
   if (metaRecord.registryHash !== currentRegistryHash) {
-    console.warn(`[WARNING - MODE 1] Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
+    throw new ValidationError(`Registry cache stale — run seed. DB hash: ${metaRecord.registryHash}, Disk hash: ${currentRegistryHash}`);
   }
   const components = await prisma.componentRegistry.findMany({
     where: { status: "PUBLISHED" }

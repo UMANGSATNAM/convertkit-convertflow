@@ -72,6 +72,18 @@ vi.mock('fs/promises', () => {
   };
 });
 
+vi.mock('fs', async (importOriginal) => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    default: {
+      ...actual,
+      existsSync: vi.fn().mockReturnValue(true)
+    },
+    existsSync: vi.fn().mockReturnValue(true)
+  };
+});
+
 // Mock the cache and upload services to avoid making real calls
 vi.mock('../app/services/theme-engine/asset-cache.server', () => {
   return {
@@ -118,7 +130,7 @@ vi.mock('../app/db.server', () => {
           try {
             const content = fs.readFileSync(registryPath, 'utf-8');
             const reg = JSON.parse(content);
-            return reg.components.map((c: any) => ({
+            return reg.components.filter((c: any) => c.status === 'production' || c.status === 'approved').map((c: any) => ({
               status: 'PUBLISHED',
               componentId: c.componentId,
               sectionType: c.sectionType || c.componentId
@@ -140,8 +152,8 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     pages: {
       index: {
         sections: [
-          { componentId: 'jewellery-hero-banner', settings: {} },
-          { componentId: 'jewellery-featured-collection', settings: {} }
+          { componentId: 'hero-editorial-v1', settings: {} },
+          { componentId: 'grid-minimal-v1', settings: {} }
         ]
       }
     },
@@ -153,12 +165,12 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
   const mockRegistry = [
     {
       id: '1',
-      componentId: 'jewellery-hero-banner',
+      componentId: 'hero-editorial-v1',
       category: 'hero',
       niche: 'jewellery',
-      sectionType: 'hero-banner',
-      liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-banner.liquid',
-      filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-banner.liquid',
+      sectionType: 'hero-editorial',
+      liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-editorial.liquid',
+      filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/hero-editorial.liquid',
       family: "", metaPath: "", archetypes: [], visualStyle: "", compatibleSlots: [], industryTags: [],
       styleTags: [],
       searchKeywords: [],
@@ -173,12 +185,12 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
     },
     {
       id: '2',
-      componentId: 'jewellery-featured-collection',
-      category: 'featured-collection',
+      componentId: 'grid-minimal-v1',
+      category: 'grid',
       niche: 'jewellery',
-      sectionType: 'featured-collection',
-      liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/featured-collection.liquid',
-      filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/featured-collection.liquid',
+      sectionType: 'grid-minimal',
+      liquidPath: 'app/data/templates/theme-engine/niches/jewellery/sections/grid-minimal.liquid',
+      filePath: 'app/data/templates/theme-engine/niches/jewellery/sections/grid-minimal.liquid',
       family: "", metaPath: "", archetypes: [], visualStyle: "", compatibleSlots: [], industryTags: [],
       styleTags: [],
       searchKeywords: [],
@@ -267,8 +279,8 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       if (fileStr.includes('settings_data.json')) return '{}';
       if (fileStr.includes('en.default.json')) return '{}';
       if (fileStr.includes('niche-tokens.css')) return ':root { --color-primary: #123456; }';
-      if (fileStr.includes('hero-banner.liquid')) return 'hero liquid';
-      if (fileStr.includes('featured-collection.liquid')) return 'featured collection liquid';
+      if (fileStr.includes('hero-editorial.liquid')) return 'hero liquid';
+      if (fileStr.includes('grid-minimal.liquid')) return 'featured collection liquid';
       return 'generic js or css content';
     });
 
@@ -323,7 +335,9 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       "config/settings_schema.json": "[]",
       "config/settings_data.json": "{}",
       "locales/en.default.json": "{}",
-      "assets/niche-tokens.css": "   " // only whitespace
+      "assets/niche-tokens.css": "   ", // only whitespace
+      "sections/hero-editorial-v1.liquid": "hero",
+      "sections/grid-minimal-v1.liquid": "grid"
     };
 
     expect(() =>
@@ -388,8 +402,8 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
       if (fileStr.includes('settings_schema.json')) return '[]';
       if (fileStr.includes('settings_data.json')) return '{}';
       if (fileStr.includes('en.default.json')) return '{}';
-      if (fileStr.includes('hero-banner.liquid')) return 'hero liquid';
-      if (fileStr.includes('featured-collection.liquid')) return 'featured collection liquid';
+      if (fileStr.includes('hero-editorial.liquid')) return 'hero liquid';
+      if (fileStr.includes('grid-minimal.liquid')) return 'featured collection liquid';
       return 'generic core content';
     });
 
@@ -422,7 +436,9 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
             'config/settings_schema.json': invalidSchema,
             'config/settings_data.json': '{}',
             'locales/en.default.json': '{}',
-            'assets/niche-tokens.css': ':root {}'
+            'assets/niche-tokens.css': ':root {}',
+            'sections/hero-editorial.liquid': 'hero',
+            'sections/grid-minimal.liquid': 'grid'
           },
           { pages: {} } as any,
           []
@@ -451,7 +467,9 @@ describe('Theme Composer Merging and Validation (Phase 2)', () => {
             'config/settings_schema.json': validSchema,
             'config/settings_data.json': '{}',
             'locales/en.default.json': '{}',
-            'assets/niche-tokens.css': ':root {}'
+            'assets/niche-tokens.css': ':root {}',
+            'sections/hero-editorial.liquid': 'hero',
+            'sections/grid-minimal.liquid': 'grid'
           },
           { pages: {} } as any,
           []

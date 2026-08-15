@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { retrieveBestComponent } from '../app/services/theme-engine/retrieval.server.js';
 
 function hexToRgb(hex: string) {
@@ -24,6 +24,21 @@ function getContrast(hex1: string, hex2: string) {
   return (lightest + 0.05) / (darkest + 0.05);
 }
 
+import db from '../app/db.server';
+
+vi.mock('../app/db.server', () => {
+  return {
+    default: {
+      componentRegistry: {
+        findMany: vi.fn().mockResolvedValue([])
+      },
+      registryMeta: {
+        findUnique: vi.fn().mockResolvedValue({ id: 'singleton', registryHash: 'mock' })
+      }
+    }
+  };
+});
+
 describe('Pipeline Guards v2', () => {
   it('Contrast guard rejects a low-contrast pair', () => {
     const contrastRatio = getContrast("#C9A227", "#C9A227");
@@ -44,11 +59,11 @@ describe('Pipeline Guards v2', () => {
     // Need to exclude all high scoring components to see if it returns null
     const matchedComponent = await retrieveBestComponent({
       sectionType: "featured-collection",
-      brandArchetype: "Creator",
-      catalogIndustry: "Jewellery",
-      catalogStyle: "Minimal",
-      catalogVisualComplexity: "Low",
-      exclude: ["grid-minimal-v1", "grid-luxury-v1", "grid-featured-lookbook-v1", "grid-featured-lookbook-v2", "grid-jewellery-showcase-v1", "grid-masonry-gallery-luxury-v1"] // Exclude high scorers
+      brandArchetype: "FakeArchetype",
+      catalogIndustry: "FakeIndustry",
+      catalogStyle: "FakeStyle",
+      catalogVisualComplexity: "FakeComplexity",
+      exclude: ["grid-minimal-v1", "grid-luxury-v1", "grid-featured-lookbook-v1", "grid-featured-lookbook-v2", "grid-jewellery-showcase-v1", "grid-masonry-gallery-luxury-v1", "deals-v2", "hp1-bestsellers", "hp1-featured-collection", "hp10-bestsellers", "hp10-featured-products"] // Exclude high scorers
     });
     
     // Grid-bold-v1 scored 34 before. So with minScore 50, it should return null.

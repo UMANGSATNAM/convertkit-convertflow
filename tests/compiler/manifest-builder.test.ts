@@ -50,6 +50,12 @@ const mockInput: ManifestBuilderInput = {
       }
     ],
     stats: { totalTokens: 1, overrides: 1, layerBreakdown: { 'base-tokens': 1, 'theme-dna': 0, 'component-tokens': 0, 'merchant-overrides': 1 } }
+  },
+  filesToUpload: {
+    "sections/hero.liquid": "{}",
+    "sections/footer.liquid": "{}",
+    "snippets/button.liquid": "{}",
+    "assets/base.css": "{}"
   }
 };
 
