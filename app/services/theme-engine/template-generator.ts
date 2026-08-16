@@ -83,34 +83,35 @@ export async function generateTemplates(
       if (!mainSection) {
         mainSection = {
           type: "main-product",
+          // Every block type below must be declared in the {% schema %} of
+          // base-theme/sections/main-product.liquid, or ProductValidator
+          // rejects the generated template.
           blocks: {
             breadcrumbs: { type: "breadcrumbs", settings: {} },
             vendor: { type: "vendor", settings: {} },
             title: { type: "title", settings: {} },
             rating: { type: "rating", settings: {} },
+            short_desc: { type: "short_desc", settings: {} },
+            product_bullets: { type: "product_bullets", settings: {} },
             price: { type: "price", settings: {} },
             variant_picker: { type: "variant_picker", settings: { picker_type: "button" } },
+            stock_status: { type: "stock_status", settings: {} },
             quantity_selector: { type: "quantity_selector", settings: {} },
             buy_buttons: { type: "buy_buttons", settings: { show_dynamic_checkout: true } },
-            urgency_bar: { type: "urgency_bar", settings: { text: "Selling fast! Only 3 left in stock." } },
-            delivery_estimate: { type: "delivery_estimate", settings: {} },
-            trust_triad: { type: "trust_triad", settings: {} },
+            free_shipping_bar: { type: "free_shipping_bar", settings: {} },
+            pincode_checker: { type: "pincode_checker", settings: {} },
+            key_benefits: { type: "key_benefits", settings: {} },
+            spec_tiles: { type: "spec_tiles", settings: {} },
             trust_badges: { type: "trust_badges", settings: {} },
-            offers_strip: { type: "offers_strip", settings: { text: "Get 10% off with code WELCOME10" } },
-            accordion_details: { type: "accordion", settings: { heading: "Product Details", country_of_origin: "India", manufacturer: "Aurelle Luxe Pvt Ltd, Mumbai, India" } },
-            accordion_shipping: { type: "accordion", settings: { heading: "Shipping", shipping_policy: "Free Insured Shipping across India via Express Courier (3-5 working days)." } },
-            description: { type: "description", settings: {} },
-            payment_icons: { type: "payment_icons", settings: {} },
-            reviews: { type: "reviews", settings: {} },
-            related_products: { type: "related_products", settings: {} },
-            recently_viewed: { type: "recently_viewed", settings: {} }
+            tabs: { type: "tabs", settings: {} },
+            reviews_section: { type: "reviews_section", settings: {} }
           },
           block_order: [
-            "breadcrumbs", "vendor", "title", "rating", "price", "variant_picker",
-            "quantity_selector", "buy_buttons", "urgency_bar", "delivery_estimate",
-            "trust_triad", "trust_badges", "offers_strip", "accordion_details",
-            "accordion_shipping", "description", "payment_icons", "reviews",
-            "related_products", "recently_viewed"
+            "breadcrumbs", "vendor", "title", "rating", "short_desc",
+            "product_bullets", "price", "variant_picker", "stock_status",
+            "quantity_selector", "buy_buttons", "free_shipping_bar",
+            "pincode_checker", "key_benefits", "spec_tiles", "trust_badges",
+            "tabs", "reviews_section"
           ],
           settings: {
             enable_sticky_info: true,
