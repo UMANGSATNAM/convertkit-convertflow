@@ -189,7 +189,13 @@ export function initGeneratorWorker() {
         await updateStatus("INSTALLING_THEME", "5. Component Retrieval Engine: Matching exact components...");
 
         const resolvedSections: Array<{ sectionType: string; componentId: string; settings?: any }> = [];
-        
+
+        // Style family lock: the first resolved section — the hero — sets the
+        // design family for the entire store. Every later lookup is constrained
+        // to it, which is what makes the finished store read as one brand
+        // instead of a set of individually-good but unrelated sections.
+        let lockedFamily: string | undefined;
+
         for (const sectionType of indexSectionTypes) {
           const matchedComponent = await retrieveBestComponent({
             sectionType: sectionType,
@@ -197,10 +203,15 @@ export function initGeneratorWorker() {
             catalogIndustry: catalogContext.industry,
             catalogStyle: catalogContext.style,
             catalogVisualComplexity: catalogContext.visual_complexity,
-            exclude: resolvedSections.map(s => s.componentId)
+            exclude: resolvedSections.map(s => s.componentId),
+            lockFamily: lockedFamily
           });
 
           if (matchedComponent && matchedComponent.componentId) {
+            if (!lockedFamily && matchedComponent.family) {
+              lockedFamily = matchedComponent.family;
+              console.log(`[Phase 5] Style family locked to "${lockedFamily}" by ${matchedComponent.componentId}`);
+            }
             resolvedSections.push({
               sectionType,
               componentId: matchedComponent.componentId,
@@ -239,7 +250,8 @@ export function initGeneratorWorker() {
               catalogIndustry: catalogContext.industry,
               catalogStyle: catalogContext.style,
               catalogVisualComplexity: catalogContext.visual_complexity,
-              exclude: out.map(s => s.componentId)
+              exclude: out.map(s => s.componentId),
+              lockFamily: lockedFamily
             });
             if (matched?.componentId) {
               out.push({ sectionType, componentId: matched.componentId, settings: {} });
@@ -263,7 +275,8 @@ export function initGeneratorWorker() {
             brandArchetype: brandContext.brand_archetype,
             catalogIndustry: catalogContext.industry,
             catalogStyle: catalogContext.style,
-            catalogVisualComplexity: catalogContext.visual_complexity
+            catalogVisualComplexity: catalogContext.visual_complexity,
+            lockFamily: lockedFamily
           });
           if (matchedComponent && matchedComponent.componentId) {
              globalComponents.push(matchedComponent.componentId);

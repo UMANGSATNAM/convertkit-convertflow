@@ -8,11 +8,21 @@ export interface RetrievalParams {
   catalogStyle: string;
   catalogVisualComplexity: string;
   exclude?: string[];
+  /**
+   * Style family lock. Once the hero is chosen its design family is passed to
+   * every subsequent lookup for that store, so the whole theme reads as one
+   * brand rather than a mix of unrelated designs. Falls back to unlocked
+   * scoring only when a slot has no candidate in the locked family.
+   */
+  lockFamily?: string;
 }
 
 export interface ComponentRankingResult {
   componentId: string;
   score: number;
+  /** Design family of the winner — feed this back as `lockFamily`. */
+  family?: string;
+  visualStyle?: string;
   breakdown?: {
     compatibility: number;
     performance: number;
@@ -166,16 +176,35 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     }
   }
 
-  const components = (registryCache.components as any[]).filter(
+  const eligible = (registryCache.components as any[]).filter(
     (c: any) =>
       (c.category === registryType || c.sectionType === registryType) &&
-      (c.status === 'approved' || c.status === 'production' || c.status === 'PUBLISHED') && 
+      (c.status === 'approved' || c.status === 'production' || c.status === 'PUBLISHED') &&
       (!params.exclude || !params.exclude.includes(c.componentId))
   );
 
-  if (!components || components.length === 0) {
+  if (!eligible || eligible.length === 0) {
     console.warn(`[Retrieval] No approved components found for sectionType="${params.sectionType}"`);
     return null;
+  }
+
+  // ── Style family lock ────────────────────────────────────────────────────
+  // Prefer candidates from the locked family. This is a hard filter, not a
+  // score bonus — a bold footer under a luxury hero looks broken no matter how
+  // well it scores on the other axes. Relax only if the family has nothing for
+  // this slot, so a locked family can never leave a section empty.
+  let components = eligible;
+  if (params.lockFamily) {
+    const inFamily = eligible.filter(
+      (c: any) => String(c.family || '').toLowerCase() === params.lockFamily!.toLowerCase()
+    );
+    if (inFamily.length > 0) {
+      components = inFamily;
+    } else {
+      console.warn(
+        `[Retrieval] Family "${params.lockFamily}" has no ${registryType} component — falling back to unlocked scoring for this slot.`
+      );
+    }
   }
 
   let bestComponentId: string | null = null;
@@ -292,16 +321,21 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     return null;
   }
 
+  const winner = components.find((c: any) => c.componentId === bestComponentId) || {};
+
   console.log(
     `[Retrieval] Winner for "${params.sectionType}": ${bestComponentId} ` +
     `(total=${Math.round(highestScore)} | compat=${bestBreakdown.compatibility} ` +
     `perf=${bestBreakdown.performance} archetype=${bestBreakdown.archetypeMatch} ` +
-    `diversity=${bestBreakdown.diversityBonus})`
+    `diversity=${bestBreakdown.diversityBonus})` +
+    (params.lockFamily ? ` [family: ${params.lockFamily}]` : ` [family: ${winner.family || '?'}]`)
   );
 
   return {
     componentId: bestComponentId,
     score: Math.round(highestScore),
+    family: winner.family,
+    visualStyle: winner.visualStyle,
     breakdown: bestBreakdown
   };
 }

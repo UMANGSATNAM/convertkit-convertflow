@@ -207,7 +207,7 @@ async function defaultClaudeCaller(userPrompt: string, systemPrompt: string): Pr
   }
 
   const msg = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-latest",
+    model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5",
     max_tokens: 2048,
     temperature: 0,
     system: systemPrompt,

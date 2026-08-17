@@ -134,6 +134,17 @@ const TYPE_MAP = {
   'custom-liquid': 'custom'
 };
 
+// Style → design family. Sections in the same family are safe to combine,
+// which is what lets a generated store read as one brand.
+const FAMILY_OF = {
+  luxury: 'Luxury',
+  editorial: 'Editorial',
+  minimal: 'Minimal',
+  natural: 'Natural',
+  bold: 'Bold',
+  tech: 'Tech'
+};
+
 function roleOf(name) {
   let m = name.match(/^(pdp|pc|cl|cp|ab|cdr|popup)-v\d+$/);
   if (m) return m[1];
@@ -144,16 +155,96 @@ function roleOf(name) {
   return name;
 }
 
-// visual style is only a hint for scoring; derive it from the section name
+// ── Metadata derivation ────────────────────────────────────────────────
+// Read the section's own CSS and copy, not just its filename. The retrieval
+// engine scores 20% on archetype match and filters on visualStyle, so if every
+// section carries the same values the scoring goes flat and the engine ends up
+// ignoring most of the library.
+
+function signals(source) {
+  const css = (source.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n') +
+              (source.match(/{%-?\s*style\s*-?%}[\s\S]*?{%-?\s*endstyle\s*-?%}/g) || []).join('\n');
+  const fonts = (css.match(/font-family:\s*([^;}]+)/g) || []).join(' ').toLowerCase();
+  const radii = (css.match(/border-radius:\s*(\d+)px/g) || [])
+    .map(r => parseInt(r.match(/(\d+)/)[1], 10));
+  const weights = (css.match(/font-weight:\s*(\d{3})/g) || [])
+    .map(w => parseInt(w.match(/(\d{3})/)[1], 10));
+  return {
+    css,
+    fonts,
+    avgRadius: radii.length ? radii.reduce((a, b) => a + b, 0) / radii.length : 0,
+    maxWeight: weights.length ? Math.max(...weights) : 400,
+    serif: /playfair|cormorant|garamond|georgia|baskerville|didot|serif/.test(fonts),
+    mono: /courier|mono|space mono|ibm plex mono/.test(fonts),
+    heavy: /impact|arial black|anton|bebas|oswald|orbitron|rajdhani/.test(fonts),
+    uppercase: (css.match(/text-transform:\s*uppercase/g) || []).length,
+    letterSpaced: (css.match(/letter-spacing:\s*[1-9]/g) || []).length,
+    glass: /backdrop-filter/.test(css),
+    heavyShadow: (css.match(/box-shadow:[^;}]*\b(1[5-9]|[2-9]\d)px/g) || []).length
+  };
+}
+
+// Visual style drives the style-family lock, so it must reflect how the section
+// actually looks — fonts and shape carry more signal than any keyword.
 function styleOf(name, source) {
-  const s = (name + ' ' + source.slice(0, 400)).toLowerCase();
-  if (/luxur|couture|atelier|opulent/.test(s)) return 'luxury';
-  if (/brutal|neo-?brutal|hazard/.test(s)) return 'bold';
-  if (/cyber|neon|tech|hud|matrix/.test(s)) return 'tech';
-  if (/organic|botanic|eco|natural|clay|herbal/.test(s)) return 'natural';
-  if (/minimal|swiss|mono|nordic|japandi/.test(s)) return 'minimal';
-  if (/editorial|magazine|serif/.test(s)) return 'editorial';
+  const s = signals(source);
+  const text = (name + ' ' + source.slice(0, 600)).toLowerCase();
+
+  if (s.mono || /cyber|neon|hud|matrix|terminal/.test(text)) return 'tech';
+  if (s.heavy && s.uppercase >= 2) return 'bold';
+  if (/brutal|hazard/.test(text)) return 'bold';
+  if (s.serif && s.letterSpaced >= 1) return 'luxury';
+  if (s.serif) return 'editorial';
+  if (s.glass) return 'tech';
+  if (/organic|botanic|eco|natural|clay|herbal|wellness|ayurved/.test(text)) return 'natural';
+  if (s.avgRadius >= 16) return 'natural';
+  if (s.avgRadius <= 2 && s.maxWeight >= 700) return 'bold';
   return 'minimal';
+}
+
+// Which industries this section reads as, taken from the words it ships with.
+// A section defaulting to "Botanical Ritual" belongs to beauty; one defaulting
+// to "Iberian Terracotta" belongs to home-decor.
+// Word boundaries matter here. Without them "cat" matches inside "category" and
+// "catalog", "pet" matches "competitor", and "ring" matches "during" — which is
+// how a first pass tagged 239 sections as pet supplies.
+const INDUSTRY_WORDS = {
+  beauty: /\b(serum|skincare|botanical|dermatolog|cleanser|moisturis|moisturiz|cosmetic|fragrance|spf|k-beauty|complexion)\b/,
+  fashion: /\b(apparel|denim|t-?shirt|kurta|saree|streetwear|wardrobe|size guide|selvedge|couture|outfit|footwear)\b/,
+  jewellery: /\b(jewel(le)?ry|necklace|earring|carat|pendant|bangle|gemstone|18k|22k)\b/,
+  electronics: /\b(keyboard|headphone|charger|gadget|battery|wireless|magsafe|earbud|smartwatch|processor)\b/,
+  'home-decor': /\b(decor|vase|cushion|ceramic|terracotta|candle|furniture|bedding|homeware|tableware)\b/,
+  food: /\b(coffee|espresso|snack|beverage|roast|gourmet|bakery|sourdough|gelato|chocolate|brew)\b/,
+  wellness: /\b(supplement|vitamin|nutrition|protein|ayurved\w*|nootropic|electrolyte|probiotic|wellness)\b/,
+  pets: /\b(dog|puppy|kibble|veterinar\w*|pet food|pet care)\b/
+};
+
+function industriesOf(name, source) {
+  const text = (name + ' ' + source).toLowerCase();
+  const hits = Object.entries(INDUSTRY_WORDS)
+    .map(([ind, rx]) => [ind, (text.match(new RegExp(rx.source, 'g')) || []).length])
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1]);
+  // A section with no industry words is genuinely neutral and should be
+  // available everywhere rather than scored against a niche it never mentions.
+  return hits.length ? hits.slice(0, 3).map(([i]) => i) : ['universal'];
+}
+
+// Archetypes describe brand feel. Derived from density and ornamentation so the
+// scoring axis actually separates sections instead of returning a flat value.
+function archetypesOf(style, s) {
+  const map = {
+    luxury: ['premium', 'editorial_luxury', 'refined'],
+    editorial: ['premium', 'editorial_luxury', 'modern'],
+    minimal: ['modern', 'clinical', 'refined'],
+    natural: ['organic', 'wellness', 'artisanal'],
+    bold: ['bold', 'youthful', 'value'],
+    tech: ['modern', 'technical', 'bold']
+  };
+  const out = [...(map[style] || ['modern'])];
+  if (s.heavyShadow >= 2) out.push('premium');
+  if (s.avgRadius >= 20) out.push('playful');
+  return [...new Set(out)];
 }
 
 function schemaOf(source) {
@@ -200,6 +291,7 @@ function main() {
   const synced = [];
   const skipped = [];
   const byType = {};
+  const compat = {};
 
   const files = fs.readdirSync(path.join(PERI, 'sections')).filter(f => f.endsWith('.liquid')).sort();
 
@@ -226,7 +318,14 @@ function main() {
 
     const role = roleOf(id);
     const type = TYPE_MAP[role] || 'custom';
+    const sig = signals(source);
     const style = styleOf(id, source);
+    const industries = industriesOf(id, source);
+    const archetypes = archetypesOf(style, sig);
+
+    // Sections that share a style AND a design family should be pickable
+    // together, which is what the style-family lock relies on.
+    const family = FAMILY_OF[style] || 'Universal';
 
     const destDir = path.join(COMPONENTS, type);
     if (!DRY) {
@@ -239,8 +338,9 @@ function main() {
       type,
       sectionType: type,
       visualStyle: style,
-      family: 'Universal',
-      archetypes: ['premium', 'modern', 'clinical', 'organic', 'bold'],
+      family,
+      archetypes,
+      industries,
       compatibleSlots: [],
       status: 'production',
       version: 1,
@@ -259,8 +359,9 @@ function main() {
       liquidPath: `components/${type}/${file}`,
       metaPath: `components/${type}/${id}.meta.json`,
       visualStyle: style,
-      family: 'Universal',
-      archetypes: meta.archetypes,
+      family,
+      archetypes,
+      industries,
       compatibleSlots: [],
       status: 'production',
       version: 1,
@@ -270,6 +371,7 @@ function main() {
       source: 'dev-theme-peri'
     });
 
+    compat[id] = { archetypes, industries };
     byType[type] = (byType[type] || 0) + 1;
   }
 
@@ -284,6 +386,20 @@ function main() {
   };
 
   if (!DRY) fs.writeFileSync(REGISTRY, JSON.stringify(registry, null, 2));
+
+  // 2b. compatibility.json — the retrieval engine reads this for the 20%
+  //     archetype axis. Without an entry a component scores 0 there and will
+  //     lose every contest to one that has metadata.
+  const compatPath = path.join(ENGINE, 'compatibility.json');
+  if (!DRY && fs.existsSync(compatPath)) {
+    const prevCompat = JSON.parse(fs.readFileSync(compatPath, 'utf-8'));
+    fs.copyFileSync(compatPath, compatPath + '.bak');
+    const merged = { ...prevCompat };
+    for (const [id, entry] of Object.entries(compat)) merged[id] = entry;
+    merged._lastUpdated = new Date().toISOString().slice(0, 10);
+    fs.writeFileSync(compatPath, JSON.stringify(merged, null, 2));
+  }
+  console.log(`compatibility: ${Object.keys(compat).length} entries written`);
 
   // 3. Rebuild chassis-manifest.json — verify-registry.ts treats any file in
   //    base-theme that is not listed here as untracked and fails the build.
