@@ -37,6 +37,6 @@ COPY --from=builder /app/extensions ./extensions
 # ENOENT on /app/themes/ethnic-wear/catalog.json and imported an empty product
 # list — which is what put "Jewelry Item 1 @ $199" style placeholders on a
 # generated store.
-COPY --from=builder /app/themes ./themes
+COPY --from=builder /app/themes/ ./themes/
 
 CMD ["sh","-c","npm run docker-start"]
