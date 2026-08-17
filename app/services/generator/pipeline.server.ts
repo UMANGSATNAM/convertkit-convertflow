@@ -321,7 +321,7 @@ export function initGeneratorWorker() {
         console.log("Store Blueprint assembled with sections:", resolvedSections.length);
 
         // 9b. GENERATE & INJECT NICHE COPY (SECTION INSTANCE KEYED)
-        await updateStatus("GENERATING_COPY", "Crafting culturally tailored Indian D2C copy...");
+        await updateStatus("INSTALLING_THEME", "Crafting culturally tailored Indian D2C copy...");
         
         let copyResult: any;
         let injectionSuccess = false;
