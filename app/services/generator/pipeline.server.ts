@@ -51,7 +51,7 @@ export function initGeneratorWorker() {
   if (generatorWorker) return;
 
   generatorWorker = new Worker(
-    "generator-local",
+    "generator",
     async (job: Job) => {
       const { generationId } = job.data;
       const gen = await prisma.storeGeneration.findUnique({
