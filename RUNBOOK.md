@@ -170,7 +170,7 @@ The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. 
 > mismatch, not a code fault. Open a terminal in `I:\converflow app` and run
 > these there.
 
-- [ ] **3.1 Unit tests**
+- [x] **3.1 Unit tests**
 
   ```bash
   npm run test
@@ -178,13 +178,13 @@ The engine reads `app/data/templates/theme-engine/`, **not** `dev-theme-peri/`. 
 
   Proof: vitest reports pass. Record the failing count if any — do not proceed with new failures you did not have before.
 
-- [ ] **3.2 Theme validator**
+- [x] **3.2 Theme validator**
 
   ```bash
   npm run validate:theme
   ```
 
-- [ ] **3.3 Shopify Theme Check on the theme itself**
+- [x] **3.3 Shopify Theme Check on the theme itself**
 
   ```bash
   cd dev-theme-peri && shopify theme check ; cd ..
@@ -370,3 +370,38 @@ And it must back up before writing. If a proposed script does not do this, it is
 | `NEXT-STEPS.md` | Shorter handoff summary |
 
 **The one rule that matters most:** the engine reads `app/data/templates/theme-engine/`. Any change to `dev-theme-peri/` is invisible to the engine until you re-run the sync script.
+
+---
+
+## Incident log
+
+**color_modify bulk replacement — caught before it shipped**
+
+A script replaced `{{ color | color_modify: 'alpha', 0.1 }}` with
+`rgba({{ color | color_to_rgb ... }}, )` across 38 files — dropping the alpha value.
+`rgba(17, 24, 39, )` is invalid CSS, so every affected border, overlay and background
+would have silently failed to render on the live site.
+
+It passed every check that was run: 115/115 tests, `validate:theme` 0 errors, Liquid
+tags balanced, schema JSON valid. The breakage was in CSS output, which none of those
+inspect.
+
+Reverted via `git checkout HEAD -- <files>` and redone with guards that refuse to write
+when the replacement produces an empty value. 60/60 converted, 0 skipped, verified in
+both `dev-theme-peri` and the synced engine copy.
+
+**The lesson to carry into Phase 4:** structural checks and rendered output are
+different things, and passing the first proves nothing about the second. When you
+generate the first store, open the pages and look at them.
+
+**LiquidHTMLSyntaxError caught during Theme Check**
+
+A missing HTML entity in `sections/hp32-testimonials.liquid` (`< PREV`) triggered a `LiquidHTMLSyntaxError`. 
+A single syntax error can block the Shopify upload process entirely.
+This was found by running `shopify theme check` and tracing the non-MissingTemplate errors. It was fixed and synced to the engine.
+
+**ImgWidthAndHeight and CLS impact**
+
+Theme Check reported 1,045 `ImgWidthAndHeight` warnings. While these don't block upload, missing width and height attributes on images cause Cumulative Layout Shift (CLS) when the page loads. 
+Since CLS is a direct Core Web Vitals metric, it severely affects mobile conversions.
+*Phase 4 is not blocked by this*, but this must be addressed before Phase 6.5 (Lighthouse testing) to ensure good performance scores.
