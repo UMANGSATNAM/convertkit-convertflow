@@ -33,4 +33,4 @@ COPY --from=builder /app/app ./app
 COPY --from=builder /app/server.js ./server.js
 COPY --from=builder /app/extensions ./extensions
 
-CMD ["sh","-c","npx prisma db push --accept-data-loss && npm start"]
+CMD ["sh","-c","npm run docker-start"]
