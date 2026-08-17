@@ -337,19 +337,62 @@ function industriesOf(name, source) {
 
 // Archetypes describe brand feel. Derived from density and ornamentation so the
 // scoring axis actually separates sections instead of returning a flat value.
+/**
+ * The only brand archetypes the ranking engine understands.
+ *
+ * `analyzeBrand` is constrained to return exactly one of these, and
+ * retrieval.server.ts scores 20 of the 100 available points by comparing that
+ * value against a component's archetype list.
+ *
+ * This list must stay in step with VALID_ARCHETYPES in
+ * app/services/ai/brand-analyzer.server.ts.
+ */
+const VALID_ARCHETYPES = [
+  'modern_minimal',
+  'editorial_luxury',
+  'playful_modern',
+  'technical_performance',
+  'heritage_classic',
+  'bold_lifestyle',
+  'natural_organic',
+  'artisan_handcrafted'
+];
+
+/**
+ * Archetypes for a section, ordered — the first is its primary specialisation.
+ *
+ * The previous version emitted words like 'premium', 'refined', 'clinical' and
+ * 'organic'. None of those are brand archetypes, so for a store analysed as
+ * `editorial_luxury` almost every synced component scored 0 on the archetype
+ * axis. With the top achievable total sitting around 54 and the accept
+ * threshold at 50, losing 20 points there was the difference between a section
+ * being used and being dropped: one real run lost ugc, testimonials, faq and
+ * newsletter from the homepage for exactly this reason.
+ *
+ * Order matters. retrieval.server.ts awards 20 points when a component's *first*
+ * archetype matches, and only 12 for a match further down the list.
+ */
 function archetypesOf(style, s) {
   const map = {
-    luxury: ['premium', 'editorial_luxury', 'refined'],
-    editorial: ['premium', 'editorial_luxury', 'modern'],
-    minimal: ['modern', 'clinical', 'refined'],
-    natural: ['organic', 'wellness', 'artisanal'],
-    bold: ['bold', 'youthful', 'value'],
-    tech: ['modern', 'technical', 'bold']
+    luxury:    ['editorial_luxury', 'heritage_classic', 'artisan_handcrafted'],
+    editorial: ['editorial_luxury', 'modern_minimal', 'heritage_classic'],
+    minimal:   ['modern_minimal', 'technical_performance', 'editorial_luxury'],
+    natural:   ['natural_organic', 'artisan_handcrafted', 'heritage_classic'],
+    bold:      ['bold_lifestyle', 'playful_modern', 'technical_performance'],
+    tech:      ['technical_performance', 'modern_minimal', 'bold_lifestyle']
   };
-  const out = [...(map[style] || ['modern'])];
-  if (s.heavyShadow >= 2) out.push('premium');
-  if (s.avgRadius >= 20) out.push('playful');
-  return [...new Set(out)];
+
+  const out = [...(map[style] || ['modern_minimal'])];
+
+  // Secondary affinities read off the section's own CSS. These land after the
+  // primary entries so they can earn the 12-point secondary match without
+  // displacing the specialisation the style family established.
+  if (s.heavyShadow >= 2 && !out.includes('editorial_luxury')) out.push('editorial_luxury');
+  if (s.avgRadius >= 20 && !out.includes('playful_modern')) out.push('playful_modern');
+  if (s.uppercase >= 3 && !out.includes('bold_lifestyle')) out.push('bold_lifestyle');
+
+  const cleaned = [...new Set(out)].filter(a => VALID_ARCHETYPES.includes(a));
+  return cleaned.length ? cleaned : ['modern_minimal'];
 }
 
 function schemaOf(source) {

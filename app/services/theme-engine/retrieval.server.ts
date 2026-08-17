@@ -329,7 +329,23 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     }
   }
 
-  const minScore = params.minScore ?? 50;
+  // Calibrated against the score distribution this function actually produces,
+  // rather than against 100. The four axes are worth 30/30/20/20, but the top
+  // two are only reachable by a component whose declared industry matches the
+  // catalogue exactly, which is rare. Observed totals:
+  //
+  //   69  style match + primary archetype        — a strong match
+  //   60  style match + secondary archetype
+  //   54  primary archetype, no style match      — perfectly usable
+  //   45  secondary archetype, no style match    — weak but plausible
+  //   33  nothing matches                        — genuinely wrong
+  //
+  // At 50 the third and fourth rows were rejected, and a real run lost ugc,
+  // testimonials, faq and newsletter from its homepage — four sections dropped
+  // not because they were bad but because the floor sat above the median. 40
+  // keeps out the "nothing matches" case while letting plausible matches
+  // through, which is the trade the threshold was meant to make.
+  const minScore = params.minScore ?? 40;
   if (!bestComponentId || highestScore < minScore) {
     console.warn(
       `[Retrieval] Skipping slot for "${params.sectionType}" - best component ${bestComponentId || 'none'} ` +

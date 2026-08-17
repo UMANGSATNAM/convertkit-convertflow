@@ -19,6 +19,7 @@ import { calculateHealthScore } from "../theme-engine/health.server";
 import { validateSectionDependencies, validateTemplateStructure } from "../theme-engine/validators.server";
 import { composeThemeFromBlueprint } from "../theme-engine/compiler.server";
 import { loadNicheDesignTokens } from "../theme-engine/niche-tokens.server";
+import { createNavigationAndPages } from "./navigation.server";
 import { createGenerationProfile, logGenerationProfile, type ComponentSelection } from "./generation-profiler.server";
 import fs from "fs/promises";
 import path from "path";
@@ -295,8 +296,14 @@ export function initGeneratorWorker() {
             resolvedSections.push({
               sectionType,
               componentId: matchedComponent.componentId,
-              settings: {}
-            });
+              settings: {},
+              // Carried so the generation profile can report it. Without this
+              // the profile read `score=0` for every component, which made a
+              // slot that barely scraped past the threshold indistinguishable
+              // from a strong match.
+              score: matchedComponent.score,
+              breakdown: (matchedComponent as any).breakdown
+            } as any);
             console.log(`[Phase 5] Resolved ${sectionType} -> ${matchedComponent.componentId} (Score: ${matchedComponent.score})`);
           }
         }
@@ -706,6 +713,28 @@ export function initGeneratorWorker() {
           }
         } else {
           await patchSettings(shop, themeId, niche.settingsBase as any);
+        }
+
+        // 15.5 NAVIGATION AND SUPPORTING PAGES
+        //
+        // Runs after the theme is uploaded, because the pages it creates point
+        // at `templates/page.about.json` and friends, which only exist once the
+        // compiler has written them.
+        //
+        // This step used to be missing entirely: `createNavigationAndPages` was
+        // defined but had no call site anywhere in the app. Generated stores
+        // therefore had no About, Contact or FAQ page, and an empty main menu —
+        // the designed page templates were uploaded and then never reachable.
+        await updateStatus("CREATING_PAGES", "Creating store pages and navigation...");
+        try {
+          const navResult = await createNavigationAndPages(shop, niche);
+          console.log(
+            `[Pipeline] Navigation ready: ${navResult.pages.length} page(s), ${navResult.collections} collection link(s).`
+          );
+        } catch (navErr: any) {
+          // A store missing its About page is worth shipping; one missing its
+          // theme is not. Never fail generation here.
+          console.warn(`[Pipeline] Navigation setup failed: ${navErr.message}. Theme is unaffected.`);
         }
 
         // 16. PREVIEW GENERATION (Do not call publishTheme automatically; keep as draft)

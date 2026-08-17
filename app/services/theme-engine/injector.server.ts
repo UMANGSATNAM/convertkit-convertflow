@@ -49,14 +49,43 @@ export async function injectProductsIntoBlueprint(
         section.settings = {};
       }
 
-      // We infer the semantic meaning of the section.
-      // E.g. a featured collection should map to a collection picker.
-      const typeStr = section.componentId.toLowerCase();
+      // Which sections need a collection is decided by their `sectionType` —
+      // the field the blueprint sets deliberately — not by whether their
+      // filename happens to contain "grid" or "product".
+      //
+      // The name-matching version missed almost everything: `cp-v10` is a
+      // collection page, `hp1-featured` is a featured collection, and neither
+      // contains any of the matched substrings. On a real run it wired up 2
+      // sections out of 23, so the rest rendered with no collection set — which
+      // is what made grids come out empty or fall back to placeholder cards.
+      const sectionType = String(section.sectionType || "").toLowerCase();
+      const componentId = String(section.componentId || "").toLowerCase();
 
-      if (typeStr.includes("featured-collection") || typeStr.includes("product") || typeStr.includes("carousel") || typeStr.includes("grid")) {
-        // Only override if the setting doesn't already exist from the AI Phase 4 (though Phase 4 shouldn't hardcode handles).
-        section.settings.collection = (index % 2 === 0) ? primaryCollection : secondaryCollection;
-        injectedCount++;
+      const NEEDS_COLLECTION = new Set([
+        "featured-collection",
+        "collection",
+        "collection-page",
+        "collection-list",
+        "product-grid",
+        "product_grid",
+        "collections"
+      ]);
+
+      // Name matching stays as a secondary signal, so a component whose type is
+      // missing or unrecognised is still caught.
+      const needsCollection =
+        NEEDS_COLLECTION.has(sectionType) ||
+        /(^|-)(cp|grid|collection|carousel|slider|shop)(-|$)/.test(componentId) ||
+        componentId.includes("featured-collection") ||
+        componentId.includes("product-grid");
+
+      if (needsCollection) {
+        // Alternating keeps two adjacent grids from showing the same products.
+        // An explicit choice made earlier in the pipeline wins over this default.
+        if (!section.settings.collection) {
+          section.settings.collection = (index % 2 === 0) ? primaryCollection : secondaryCollection;
+          injectedCount++;
+        }
       }
     });
   }

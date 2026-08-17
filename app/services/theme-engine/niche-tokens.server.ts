@@ -60,6 +60,47 @@ function normalize(value: unknown): string {
     .replace(/[\s_]+/g, "-");
 }
 
+/**
+ * Tokens for niches the app offers but has no profile file for.
+ *
+ * `prisma/seed.ts` seeds ten niches — ethnic-wear, jewellery, grooming, beauty,
+ * streetwear, activewear, electronics, kids, home-decor, food — while
+ * `niche-profiles/` holds five. A merchant picking any of the other five got no
+ * tokens at all and fell back to white with near-black text, which is how an
+ * activewear store and a food store ended up looking identical.
+ *
+ * These live in code rather than as stub profile files because a profile is a
+ * larger object — archetypes, component pools, token CSS paths — and a
+ * half-filled one would be read as complete by everything else.
+ */
+const BUILT_IN: Record<string, Omit<NicheDesignTokens, "source">> = {
+  "ethnic-wear": {
+    background: "#FDF8F0", text: "#3A2A20", accent: "#A32E3C", surface: "#F5EADC",
+    fontHeading: "Playfair Display", fontBody: "Inter",
+    button_style: "rounded", card_style: "soft", section_density: "airy",
+  },
+  grooming: {
+    background: "#F6F7F8", text: "#14181C", accent: "#1F6F8B", surface: "#E9ECEF",
+    fontHeading: "Inter", fontBody: "Inter",
+    button_style: "square", card_style: "square", section_density: "tight",
+  },
+  activewear: {
+    background: "#FFFFFF", text: "#0D0D0D", accent: "#D12E06", surface: "#F2F2F2",
+    fontHeading: "Archivo", fontBody: "Inter",
+    button_style: "square", card_style: "square", section_density: "tight",
+  },
+  kids: {
+    background: "#FFFBF2", text: "#2B2B3A", accent: "#C2700A", surface: "#FFF2DC",
+    fontHeading: "Inter", fontBody: "Inter",
+    button_style: "pill", card_style: "rounded", section_density: "airy",
+  },
+  food: {
+    background: "#FFFAF3", text: "#2E2119", accent: "#B4530B", surface: "#F6EADB",
+    fontHeading: "Playfair Display", fontBody: "Inter",
+    button_style: "rounded", card_style: "soft", section_density: "airy",
+  },
+};
+
 const cache = new Map<string, NicheDesignTokens | null>();
 
 /**
@@ -80,8 +121,17 @@ export function loadNicheDesignTokens(
 
   for (const candidate of candidates) {
     const profileName = ALIASES[candidate] || candidate;
+
+    // A profile file wins; the built-in table covers the niches without one.
     const file = path.join(PROFILE_DIR, `${profileName}.json`);
-    if (!existsSync(file)) continue;
+    if (!existsSync(file)) {
+      const builtIn = BUILT_IN[profileName];
+      if (builtIn) {
+        result = { ...builtIn, source: `${profileName} (built-in)` };
+        break;
+      }
+      continue;
+    }
 
     try {
       const profile = JSON.parse(readFileSync(file, "utf-8"));
