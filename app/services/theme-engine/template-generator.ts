@@ -66,6 +66,29 @@ export async function generateTemplates(
     const newSections: Record<string, any> = {};
     const newOrder: string[] = [];
 
+    // Some registry components are entire pages rather than blocks on a page. A
+    // `product-page` component contains the gallery, buy box, variant picker,
+    // sticky add-to-cart, reviews and related products all by itself.
+    //
+    // When the blueprint resolves one of those, it must REPLACE the chassis
+    // `main-product` section, not sit below it. Appending it instead is what
+    // rendered two complete, differently-designed product pages stacked on one
+    // URL — the chassis PDP followed by the designed one.
+    //
+    // The component is looked up by sectionType rather than by an id convention
+    // so that renaming a component cannot silently reintroduce the duplicate.
+    const sectionsList: any[] = pageData.sections || [];
+    const consumedAsMain = new Set<string>();
+
+    const findFullPageComponent = (wantedType: string) => {
+      for (const section of sectionsList) {
+        if (!section.componentId) continue;
+        const comp = components.find(c => c.componentId === section.componentId);
+        if (comp && (comp as any).sectionType === wantedType) return { section, comp };
+      }
+      return null;
+    };
+
     // Rule 3: Ensure mandatory primary chassis sections are preserved or initialized
     if (pageHandle === "product") {
       let mainKey = "main";
@@ -122,6 +145,23 @@ export async function generateTemplates(
       if (pageData.mainSectionType || pageData.mainComponentId) {
         mainSection.type = pageData.mainSectionType || pageData.mainComponentId;
       }
+
+      // A designed PDP from the library takes over the main slot entirely. It
+      // carries no chassis blocks because it is not block-based — every part of
+      // the buy box is built into its own Liquid.
+      const fullPdp = findFullPageComponent("product-page");
+      if (fullPdp) {
+        consumedAsMain.add(fullPdp.section.componentId);
+        if (!usedComponents.some(c => c.componentId === fullPdp.comp.componentId)) {
+          usedComponents.push(fullPdp.comp);
+        }
+        mainSection = {
+          type: fullPdp.comp.componentId,
+          settings: sanitizeRichtextSettings(fullPdp.section.settings || {}, fullPdp.comp.componentId)
+        };
+        console.log(`[TemplateGenerator] product template main slot -> ${fullPdp.comp.componentId} (replaces main-product chassis)`);
+      }
+
       newSections[mainKey] = mainSection;
       newOrder.push(mainKey);
     } else if (pageHandle === "collection") {
@@ -147,16 +187,64 @@ export async function generateTemplates(
           }
         };
       }
+      // A designed collection layout takes over the main slot, exactly as a
+      // designed PDP does on the product template.
+      //
+      // These sections originally capped their grid with `limit:` and had no
+      // pagination, which would have truncated the catalogue — so they were kept
+      // off this template. They now wrap their grid in `{% paginate %}` and fall
+      // back to the collection the shopper is on, so they are real collection
+      // pages and belong here.
+      const fullCollection = findFullPageComponent("collection-page");
+      if (fullCollection) {
+        consumedAsMain.add(fullCollection.section.componentId);
+        if (!usedComponents.some(c => c.componentId === fullCollection.comp.componentId)) {
+          usedComponents.push(fullCollection.comp);
+        }
+        mainSection = {
+          type: fullCollection.comp.componentId,
+          settings: sanitizeRichtextSettings(fullCollection.section.settings || {}, fullCollection.comp.componentId)
+        };
+        console.log(`[TemplateGenerator] collection template main slot -> ${fullCollection.comp.componentId} (replaces main-collection chassis)`);
+      }
+
       newSections[mainKey] = mainSection;
       newOrder.push(mainKey);
+    } else {
+      // Every other template — cart, search, 404, blog, article, page,
+      // list-collections — ships a chassis `main-*` section that does the actual
+      // work of the page: the line items and checkout button, the search
+      // results, the article body.
+      //
+      // `templateJson.sections` is replaced wholesale further down, so anything
+      // not copied into `newSections` here is deleted. Before this branch
+      // existed, adding any of these handles to the blueprint silently produced
+      // a cart page with no cart on it.
+      const existingOrder: string[] = Array.isArray(templateJson.order) ? templateJson.order : [];
+      for (const key of existingOrder) {
+        const sec = templateJson.sections?.[key];
+        if (!sec) continue;
+        const isMain = key === "main" || (typeof sec.type === "string" && sec.type.startsWith("main-"));
+        if (!isMain) continue;
+        newSections[key] = sec;
+        newOrder.push(key);
+      }
+      if (newOrder.length === 0 && existingOrder.length > 0) {
+        console.warn(
+          `[TemplateGenerator] "${templatePath}" has sections but none named main-*; ` +
+          `blueprint sections will be the whole page.`
+        );
+      }
     }
 
     // Rule 4 & 5: Append page sections defined in blueprint using deterministic counter keys
     const counterMap = new Map<string, number>();
-    const sectionsList = pageData.sections || [];
 
     for (const section of sectionsList) {
       if (!section.componentId) continue;
+      // Already placed in the main slot, or deliberately dropped. Appending it
+      // here is precisely the duplicate-page bug.
+      if (consumedAsMain.has(section.componentId)) continue;
 
       const comp = components.find(c => c.componentId === section.componentId);
       if (!comp) {

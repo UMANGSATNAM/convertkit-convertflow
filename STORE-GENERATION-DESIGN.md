@@ -1,5 +1,21 @@
 # Store Generation — how it should work
 
+> **Status: phases A–F implemented.** Two assumptions in the original version of
+> this document turned out to be wrong, and the corrections changed the design:
+>
+> 1. **The `pdp-v*` sections are complete, working product pages** — all 70 have
+>    an add-to-cart form, price and variant handling once the snippets they
+>    render are followed. They replace the `main-product` chassis rather than
+>    stacking below it.
+> 2. **The `cp-v*` sections are not collection pages.** 66 of the 70 have no
+>    `{% paginate %}` and cap the grid with `limit:`, and 68 sourced products
+>    from `collections[section.settings.collection]` rather than the collection
+>    the shopper is on. They are homepage featured-collection blocks. The
+>    paginated `main-collection` chassis remains the collection template.
+>
+> Both were found by checking rendered behaviour rather than file structure,
+> which is the point Phase F makes.
+
 The goal: a merchant picks a niche, and the engine assembles a complete store —
 home, product, collection, cart, and supporting pages — that reads as one designed
 brand rather than a pile of sections.

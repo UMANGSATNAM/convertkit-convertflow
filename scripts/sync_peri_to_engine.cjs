@@ -186,19 +186,124 @@ function signals(source) {
 
 // Visual style drives the style-family lock, so it must reflect how the section
 // actually looks — fonts and shape carry more signal than any keyword.
+/**
+ * Reads the palette a section was authored with.
+ *
+ * The colours that matter are the ones in the section's own `{% schema %}`
+ * defaults — those are what the designer chose, and unlike the CSS they are not
+ * mixed in with greys for borders and shadows.
+ *
+ * Returns average saturation and lightness plus a hue histogram, all on 0–1
+ * except hue which is degrees.
+ */
+function paletteSignals(source) {
+  const schemaMatch = source.match(/\{%-?\s*schema\s*-?%\}([\s\S]*?)\{%-?\s*endschema\s*-?%\}/);
+  const hexes = [];
+  if (schemaMatch) {
+    for (const m of schemaMatch[1].matchAll(/"default"\s*:\s*"(#[0-9a-fA-F]{6})"/g)) hexes.push(m[1]);
+  }
+  // Fall back to literal hex in the CSS when a section hardcodes its palette.
+  if (hexes.length < 3) {
+    for (const m of source.matchAll(/#([0-9a-fA-F]{6})\b/g)) hexes.push('#' + m[1]);
+  }
+
+  const hsl = [];
+  for (const hex of hexes.slice(0, 40)) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const d = max - min;
+    const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = 60 * (((g - b) / d) % 6);
+      else if (max === g) h = 60 * ((b - r) / d + 2);
+      else h = 60 * ((r - g) / d + 4);
+    }
+    hsl.push({ h: (h + 360) % 360, s, l });
+  }
+
+  // Near-greys carry no hue information and would drag every average toward
+  // zero, so hue statistics ignore them.
+  const chromatic = hsl.filter(c => c.s > 0.15);
+  const avg = (arr, key) => (arr.length ? arr.reduce((a, c) => a + c[key], 0) / arr.length : 0);
+  const share = (lo, hi) =>
+    chromatic.length
+      ? chromatic.filter(c => (lo < hi ? c.h >= lo && c.h < hi : c.h >= lo || c.h < hi)).length / chromatic.length
+      : 0;
+
+  return {
+    count: hsl.length,
+    saturation: avg(chromatic, 's'),
+    lightness: avg(hsl, 'l'),
+    chromaticShare: hsl.length ? chromatic.length / hsl.length : 0,
+    earthy: share(20, 60) + share(60, 160) * 0.9,   // terracotta, ochre, sage, forest
+    cool: share(180, 260),                           // cyan through blue
+    hot: share(340, 20) + share(0, 20),              // red / signal orange
+  };
+}
+
+/**
+ * Classifies a section into a style family.
+ *
+ * ## Why this is not font-based any more
+ *
+ * The first version keyed off font names and `backdrop-filter`. Both signals are
+ * dead in this library:
+ *
+ *   - Sections declare `font-family: var(--font-body)` — correct practice, but it
+ *     means the font tells you about the *theme*, not the section. Every serif
+ *     and mono test silently returned false.
+ *   - `backdrop-filter` appears on sticky filter bars and overlay headers, which
+ *     is a functional touch, not a style statement. It was the only rule still
+ *     firing, so it swept 66 of the 70 collection layouts into "tech" and left
+ *     every other family with no collection page at all.
+ *
+ * What sections *do* author literally is colour and radius, so those lead now.
+ * Fonts and glass remain, demoted to tie-breaks.
+ */
 function styleOf(name, source) {
   const s = signals(source);
+  const p = paletteSignals(source);
   const text = (name + ' ' + source.slice(0, 600)).toLowerCase();
 
-  if (s.mono || /cyber|neon|hud|matrix|terminal/.test(text)) return 'tech';
+  // Explicit intent in the section's own name or header comment beats inference.
+  if (/cyber|neon|hud|matrix|terminal|glitch/.test(text)) return 'tech';
+  if (/brutal|hazard|graffiti|punk/.test(text)) return 'bold';
+  if (/organic|botanic|eco|natural|clay|herbal|wellness|ayurved|artisan/.test(text)) return 'natural';
+  if (/luxur|couture|atelier|heritage|bespoke/.test(text)) return 'luxury';
+  if (/editorial|magazine|journal|lookbook/.test(text)) return 'editorial';
+
+  // Real typographic evidence, when a section hardcodes a face rather than
+  // inheriting the theme token.
+  if (s.mono) return 'tech';
   if (s.heavy && s.uppercase >= 2) return 'bold';
-  if (/brutal|hazard/.test(text)) return 'bold';
-  if (s.serif && s.letterSpaced >= 1) return 'luxury';
-  if (s.serif) return 'editorial';
-  if (s.glass) return 'tech';
-  if (/organic|botanic|eco|natural|clay|herbal|wellness|ayurved/.test(text)) return 'natural';
+  if (s.serif) return s.letterSpaced >= 1 ? 'luxury' : 'editorial';
+
+  // Colour-led classification. Ordered most-distinctive first.
+  if (p.count >= 3) {
+    // Dark surfaces with cool accents read as tech regardless of type.
+    if (p.lightness < 0.35 && p.cool > 0.3) return 'tech';
+    // Loud and square is bold; loud and round is playful, which lives here too.
+    if (p.saturation > 0.6 && p.hot > 0.35) return 'bold';
+    // Greens and earths are the natural family's whole identity.
+    if (p.earthy > 0.45 && p.saturation > 0.15) return 'natural';
+    // Restrained palettes split on ornamentation: spaced-out capitals are
+    // luxury, plain is minimal.
+    if (p.saturation < 0.3 && p.chromaticShare < 0.5) {
+      if (s.uppercase >= 2 && s.letterSpaced >= 1) return 'luxury';
+      if (s.avgRadius <= 4) return 'editorial';
+      return 'minimal';
+    }
+    if (p.cool > 0.5) return 'tech';
+  }
+
+  // Shape as a last resort.
   if (s.avgRadius >= 16) return 'natural';
   if (s.avgRadius <= 2 && s.maxWeight >= 700) return 'bold';
+  if (s.glass) return 'tech';
   return 'minimal';
 }
 

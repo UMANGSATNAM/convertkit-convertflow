@@ -211,6 +211,51 @@ export function validateProductTemplateBlocks(filesToUpload: Record<string, stri
     const schemaBlocks = Array.isArray(schemaJson.blocks) ? schemaJson.blocks : [];
     const templateBlocks = Object.values(mainSec.blocks || {}) as any[];
 
+    // A designed PDP from the library is not block-based: its buy box, gallery
+    // and variant picker are written directly into its Liquid, so it declares no
+    // blocks at all. The block rules below cannot apply to it.
+    //
+    // The rule they exist to enforce still does: the page must be able to sell.
+    // For a self-contained PDP that means proving the rendered Liquid actually
+    // contains a working add-to-cart path — checked here against the section and
+    // any snippet it renders, because these layouts routinely delegate the form
+    // to a snippet.
+    if (schemaBlocks.length === 0 && templateBlocks.length === 0) {
+      const seen = new Set<string>();
+      let combined = liquidContent;
+      const collect = (src: string, depth: number) => {
+        if (depth > 3) return;
+        const renders = src.match(/\{%-?\s*(?:render|include)\s+'([^']+)'/g) || [];
+        for (const raw of renders) {
+          const name = raw.match(/'([^']+)'/)?.[1];
+          if (!name || seen.has(name)) continue;
+          seen.add(name);
+          const snippet = filesToUpload[`snippets/${name}.liquid`];
+          if (!snippet) continue;
+          combined += "\n" + snippet;
+          collect(snippet, depth + 1);
+        }
+      };
+      collect(liquidContent, 0);
+
+      const canAddToCart =
+        /\{%-?\s*form\s+['"]product['"]/.test(combined) ||
+        /\/cart\/add/.test(combined) ||
+        /product-form/.test(combined);
+      if (!canAddToCart) {
+        throw new ValidationError(
+          `[ProductValidator] Self-contained PDP "${liquidPath}" declares no blocks and contains no add-to-cart form ` +
+          `(searched the section and every snippet it renders). PDP cannot sell.`
+        );
+      }
+      if (!/product\.price|variant\.price/.test(combined)) {
+        throw new ValidationError(
+          `[ProductValidator] Self-contained PDP "${liquidPath}" never outputs a product price.`
+        );
+      }
+      continue;
+    }
+
     // Rule 2: Unconditional Buy Button Check ("dono jagah")
     if (!schemaBlocks.some(b => b && b.type === "buy_buttons")) {
       throw new ValidationError(
@@ -287,11 +332,31 @@ export function validateCollectionTemplate(filesToUpload: Record<string, string>
     }
 
     const content = filesToUpload[liquidPath];
-    if (!/\{%\s*paginate\s+collection\.products/.test(content) && !/paginate\s+collection\.products/.test(content)) {
-      throw new ValidationError(`[CollectionValidator] Collection section "${liquidPath}" must use '{% paginate collection.products ... %}' tag.`);
+
+    // These two checks used to match on exact names — `collection.products` and
+    // a snippet literally called `product-card`. That rejected every designed
+    // collection layout in the library, which paginates through a resolved
+    // variable and renders `card-v1` … `card-v70`.
+    //
+    // What actually matters is the behaviour: the page must page through
+    // products rather than truncate them, and it must render a card per product.
+    if (!/\{%-?\s*paginate\s+[\w.]*products\b/.test(content)) {
+      throw new ValidationError(
+        `[CollectionValidator] Collection section "${liquidPath}" has no '{% paginate ... products ... %}' tag. ` +
+        `Without it the grid silently truncates the catalogue and shoppers cannot reach page two.`
+      );
     }
-    if (!/render\s+['"]product-card['"]/.test(content) && !/include\s+['"]product-card['"]/.test(content)) {
-      throw new ValidationError(`[CollectionValidator] Collection section "${liquidPath}" must render product cards.`);
+
+    // The card may be inline or delegated to a snippet; both are fine, but a
+    // section that does neither is not rendering products.
+    const rendersCardSnippet = /\{%-?\s*(?:render|include)\s+['"][\w-]*card[\w-]*['"]/i.test(content);
+    const rendersInline = /\bproduct\.(url|title|featured_image)/.test(content) ||
+      /\{%-?\s*(?:render|include)\s+['"][^'"]+['"]\s*,\s*product\s*:/.test(content);
+    if (!rendersCardSnippet && !rendersInline) {
+      throw new ValidationError(
+        `[CollectionValidator] Collection section "${liquidPath}" renders no product cards ` +
+        `(no card snippet and no inline product output).`
+      );
     }
   }
 }

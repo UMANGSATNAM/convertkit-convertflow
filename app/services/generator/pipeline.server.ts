@@ -18,6 +18,7 @@ import { generateStoreBlueprint } from "../theme-engine/blueprint.server";
 import { calculateHealthScore } from "../theme-engine/health.server";
 import { validateSectionDependencies, validateTemplateStructure } from "../theme-engine/validators.server";
 import { composeThemeFromBlueprint } from "../theme-engine/compiler.server";
+import { loadNicheDesignTokens } from "../theme-engine/niche-tokens.server";
 import { createGenerationProfile, logGenerationProfile, type ComponentSelection } from "./generation-profiler.server";
 import fs from "fs/promises";
 import path from "path";
@@ -196,30 +197,81 @@ export function initGeneratorWorker() {
         // instead of a set of individually-good but unrelated sections.
         let lockedFamily: string | undefined;
 
-        for (const sectionType of indexSectionTypes) {
-          const matchedComponent = await retrieveBestComponent({
-            sectionType: sectionType,
+        // Store-wide uniqueness: a component used anywhere is never used again.
+        //
+        // Exclusion used to be scoped to a single page, and the global chrome had
+        // no exclusion at all. The result was the same newsletter block appearing
+        // on the homepage, the 404, the collection list, the about page and the
+        // FAQ, and the same trust strip on the homepage, cart, about and contact
+        // pages. A store that repeats itself reads as generated; a real theme
+        // uses each design once.
+        //
+        // With 1,711 components and roughly 25 slots to fill there is no
+        // shortage, so this almost never binds — but when a family genuinely runs
+        // out of a type, an exact repeat is better than a missing section, so the
+        // lookup retries without the uniqueness constraint and says so.
+        const usedComponentIds = new Set<string>();
+
+        /**
+         * The single place a component is chosen. Every slot in the store —
+         * homepage, page templates, global chrome — goes through here, so the
+         * family lock and the uniqueness rule cannot be forgotten at one call
+         * site the way they were before.
+         */
+        const resolveUnique = async (
+          sectionType: string,
+          label: string,
+          extraExclude: string[] = []
+        ) => {
+          const query = {
+            sectionType,
             brandArchetype: brandContext.brand_archetype,
             catalogIndustry: catalogContext.industry,
             catalogStyle: catalogContext.style,
             catalogVisualComplexity: catalogContext.visual_complexity,
-            exclude: resolvedSections.map(s => s.componentId),
             lockFamily: lockedFamily
+          };
+
+          let matched = await retrieveBestComponent({
+            ...query,
+            exclude: [...usedComponentIds, ...extraExclude]
           });
 
-          if (matchedComponent && matchedComponent.componentId) {
-            if (!lockedFamily && matchedComponent.family) {
-              lockedFamily = matchedComponent.family;
-              console.log(`[Phase 5] Style family locked to "${lockedFamily}" by ${matchedComponent.componentId}`);
+          if (!matched?.componentId) {
+            // Nothing unused left for this slot. Repeating a design is a smaller
+            // failure than shipping a page with a hole in it.
+            matched = await retrieveBestComponent({ ...query, exclude: extraExclude });
+            if (matched?.componentId) {
+              console.warn(
+                `[Phase 5] ${label} "${sectionType}": no unused component left in family "${lockedFamily ?? "any"}" — ` +
+                `reusing ${matched.componentId}, which already appears elsewhere in this store.`
+              );
             }
+          }
+
+          if (!matched?.componentId) {
+            console.warn(`[Phase 5] No component found for ${label} sectionType=${sectionType}`);
+            return null;
+          }
+
+          if (!lockedFamily && matched.family) {
+            lockedFamily = matched.family;
+            console.log(`[Phase 5] Style family locked to "${lockedFamily}" by ${matched.componentId}`);
+          }
+
+          usedComponentIds.add(matched.componentId);
+          return matched;
+        };
+
+        for (const sectionType of indexSectionTypes) {
+          const matchedComponent = await resolveUnique(sectionType, "INDEX");
+          if (matchedComponent) {
             resolvedSections.push({
               sectionType,
               componentId: matchedComponent.componentId,
               settings: {}
             });
             console.log(`[Phase 5] Resolved ${sectionType} -> ${matchedComponent.componentId} (Score: ${matchedComponent.score})`);
-          } else {
-            console.warn(`[Phase 5] No component found for sectionType=${sectionType}`);
           }
         }
 
@@ -241,48 +293,83 @@ export function initGeneratorWorker() {
         // Resolve the product and collection page templates the same way as the
         // homepage. Without this the PDP and collection layouts in the registry
         // are never picked and every generated store falls back to the base theme.
+        // Component types that are complete pages in their own right. A PDP
+        // layout already contains the gallery, buy box, reviews and related
+        // products; a collection layout already contains the banner, filters,
+        // sort and grid. Anything appended below one renders a visible second
+        // copy of the same page, so these are resolved exclusively.
+        const FULL_PAGE_TYPES = new Set(["product-page", "collection-page"]);
+
         const resolvePage = async (sectionTypes: string[], label: string) => {
           const out: Array<{ sectionType: string; componentId: string; settings?: any }> = [];
           for (const sectionType of sectionTypes) {
-            const matched = await retrieveBestComponent({
-              sectionType,
-              brandArchetype: brandContext.brand_archetype,
-              catalogIndustry: catalogContext.industry,
-              catalogStyle: catalogContext.style,
-              catalogVisualComplexity: catalogContext.visual_complexity,
-              exclude: out.map(s => s.componentId),
-              lockFamily: lockedFamily
-            });
+            if (out.length && FULL_PAGE_TYPES.has(out[0].sectionType)) {
+              console.warn(
+                `[Phase 5] Skipping ${label} "${sectionType}" — "${out[0].sectionType}" is a full page layout and cannot be stacked on.`
+              );
+              continue;
+            }
+            const matched = await resolveUnique(sectionType, label, out.map(s => s.componentId));
             if (matched?.componentId) {
               out.push({ sectionType, componentId: matched.componentId, settings: {} });
               console.log(`[Phase 5] Resolved ${label} ${sectionType} -> ${matched.componentId}`);
-            } else {
-              console.warn(`[Phase 5] No component found for ${label} sectionType=${sectionType}`);
             }
           }
           return out;
         };
 
-        const productSections = await resolvePage(generatedBlueprint.pages.product ?? [], "PRODUCT");
-        const collectionSections = await resolvePage(generatedBlueprint.pages.collection ?? [], "COLLECTION");
+        // Resolve every page the blueprint declares, not just product and
+        // collection. Each key becomes `templates/<key>.json`; the supporting
+        // pages append below the chassis `main-*` section their template already
+        // carries, so the cart keeps its line items and search keeps its results.
+        const resolvedPages: Record<string, Array<{ sectionType: string; componentId: string; settings?: any }>> = {};
+        for (const [pageKey, sectionTypes] of Object.entries(generatedBlueprint.pages)) {
+          if (pageKey === "index") continue; // already resolved above
+          const sections = await resolvePage((sectionTypes as string[]) ?? [], pageKey.toUpperCase());
+          if (sections.length > 0) resolvedPages[pageKey] = sections;
+        }
+
+        const productSections = resolvedPages.product ?? [];
+        const collectionSections = resolvedPages.collection ?? [];
+        console.log(
+          `[Phase 5] Pages resolved: ${Object.entries(resolvedPages)
+            .map(([k, v]) => `${k}(${v.length})`)
+            .join(", ") || "none"}`
+        );
 
         const globalComponents: string[] = [];
         const globalSectionTypes = generatedBlueprint.globals ?? ["announcement", "header", "footer"];
 
         for (const sectionType of globalSectionTypes) {
-          const matchedComponent = await retrieveBestComponent({
-            sectionType,
-            brandArchetype: brandContext.brand_archetype,
-            catalogIndustry: catalogContext.industry,
-            catalogStyle: catalogContext.style,
-            catalogVisualComplexity: catalogContext.visual_complexity,
-            lockFamily: lockedFamily
-          });
-          if (matchedComponent && matchedComponent.componentId) {
-             globalComponents.push(matchedComponent.componentId);
-             console.log(`[Phase 5] Resolved GLOBAL ${sectionType} -> ${matchedComponent.componentId}`);
-          } else {
-             console.warn(`[Phase 5] No component found for GLOBAL sectionType=${sectionType}`);
+          const matchedComponent = await resolveUnique(sectionType, "GLOBAL");
+          if (matchedComponent) {
+            globalComponents.push(matchedComponent.componentId);
+            console.log(`[Phase 5] Resolved GLOBAL ${sectionType} -> ${matchedComponent.componentId}`);
+          }
+        }
+
+        // Prove the uniqueness rule actually held, rather than assuming it did.
+        // Counted from what was resolved, not from the set that enforced it — a
+        // check that reads the same structure it is validating proves nothing.
+        {
+          const everySelection = [
+            ...resolvedSections.map(s => s.componentId),
+            ...Object.values(resolvedPages).flatMap(sections => sections.map(s => s.componentId)),
+            ...globalComponents
+          ];
+          const seen = new Map<string, number>();
+          for (const id of everySelection) seen.set(id, (seen.get(id) || 0) + 1);
+          const repeated = [...seen.entries()].filter(([, n]) => n > 1);
+
+          console.log(
+            `[Phase 5] Store composed from ${seen.size} distinct components across ${everySelection.length} slots` +
+            `${lockedFamily ? ` — family "${lockedFamily}"` : ""}.`
+          );
+          if (repeated.length > 0) {
+            console.warn(
+              `[Phase 5] ${repeated.length} component(s) used more than once: ` +
+              repeated.map(([id, n]) => `${id} x${n}`).join(", ")
+            );
           }
         }
         // 6. BRAND EXTRACTION SERVICE (Vision API extraction mapping if image payload exists)
@@ -297,36 +384,57 @@ export function initGeneratorWorker() {
           extractedColors = BrandExtractionService.mapToTokens(rawExtracted, false); // Light variant default
         }
 
+        // Where colour comes from, in order of confidence:
+        //   1. the merchant's own logo, read by the vision model
+        //   2. the brand context inferred from their catalogue
+        //   3. the niche's design tokens
+        //
+        // Step 3 used to be plain white with near-black text, which is why every
+        // store without a logo came out looking like the same blank template. A
+        // jewellery store now falls back to warm white and antique gold, a
+        // streetwear store to white and signal red.
+        const nicheTokens = loadNicheDesignTokens(gen.nicheId, catalogContext.industry);
+        if (nicheTokens) {
+          console.log(`[Design Tokens] Niche palette for "${nicheTokens.source}": ${nicheTokens.background} / ${nicheTokens.text} / ${nicheTokens.accent}`);
+        }
+
         const fallbackSettings = {
-          colors_background_1: brandContext.colors?.background || "#FFFFFF",
-          colors_accent_1: brandContext.colors?.primary || "#111111",
-          colors_accent_2: brandContext.colors?.accent || "#C9A84C",
-          colors_text_1: brandContext.colors?.text || "#111111",
-          colors_surface: "#F4F4F4",
-          fontHeading: brandContext.typography?.heading || "Inter",
-          fontBody: brandContext.typography?.body || "Inter",
-          button_style: brandContext.theme_tokens?.button_style || "rounded",
-          card_style: brandContext.theme_tokens?.card_style || "soft",
-          section_density: brandContext.theme_tokens?.section_density || "airy"
+          colors_background_1: brandContext.colors?.background || nicheTokens?.background || "#FFFFFF",
+          colors_accent_1: brandContext.colors?.primary || nicheTokens?.accent || "#111111",
+          colors_accent_2: brandContext.colors?.accent || nicheTokens?.accent || "#C9A84C",
+          colors_text_1: brandContext.colors?.text || nicheTokens?.text || "#111111",
+          colors_surface: nicheTokens?.surface || "#F4F4F4",
+          fontHeading: brandContext.typography?.heading || nicheTokens?.fontHeading || "Inter",
+          fontBody: brandContext.typography?.body || nicheTokens?.fontBody || "Inter",
+          button_style: brandContext.theme_tokens?.button_style || nicheTokens?.button_style || "rounded",
+          card_style: brandContext.theme_tokens?.card_style || nicheTokens?.card_style || "soft",
+          section_density: brandContext.theme_tokens?.section_density || nicheTokens?.section_density || "airy"
         };
-        
-        const baseSettings = extractedColors 
-          ? { ...fallbackSettings, ...extractedColors } 
+
+        const baseSettings = extractedColors
+          ? { ...fallbackSettings, ...extractedColors }
           : fallbackSettings;
 
-        const contrastRatio = getContrast(baseSettings.colors_background_1, baseSettings.colors_accent_1);
-        
+        // Contrast is no longer repaired by discarding the brand. The palette
+        // builder in the compiler nudges a failing colour toward black or white
+        // in small steps until it clears WCAG, which keeps the hue — an accent
+        // that is slightly too light becomes a deeper version of itself instead
+        // of turning into #111111. This log is left in place so a weak brand
+        // pairing is still visible in the generation record.
+        const contrastRatio = getContrast(baseSettings.colors_background_1, baseSettings.colors_text_1);
         if (contrastRatio < 4.5) {
-          console.warn(`[Color Guard] Invalid contrast (${contrastRatio.toFixed(2)}) for derived background ${baseSettings.colors_background_1} and text ${baseSettings.colors_accent_1}. Falling back to safe defaults.`);
-          baseSettings.colors_background_1 = "#FFFFFF";
-          baseSettings.colors_accent_1 = "#111111";
+          console.warn(
+            `[Color Guard] Brand background ${baseSettings.colors_background_1} and text ${baseSettings.colors_text_1} ` +
+            `contrast at only ${contrastRatio.toFixed(2)}:1. The palette builder will darken or lighten the text to reach 4.5:1.`
+          );
         }
 
         const storeBlueprintAi = {
           pages: {
             "index": { sections: resolvedSections },
-            ...(productSections.length ? { "product": { sections: productSections } } : {}),
-            ...(collectionSections.length ? { "collection": { sections: collectionSections } } : {})
+            ...Object.fromEntries(
+              Object.entries(resolvedPages).map(([pageKey, sections]) => [pageKey, { sections }])
+            )
           },
           settings: baseSettings,
           globalComponents

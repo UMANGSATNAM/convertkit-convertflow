@@ -13,6 +13,7 @@ import { optimizeBundle } from "./compiler/optimizer";
 import { staticValidate } from "./compiler/static-validator";
 import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
+import { buildStorePalette, applyStorePalette } from "./palette.server";
 import { uploadAssetWithCache } from "./asset-cache.server";
 import {
   ValidationError,
@@ -399,6 +400,7 @@ export async function compileTheme(
   // Soft Warn Gate: Check for unfilled generic placeholders in compiled output
   try {
     let unfilledCount = 0;
+    const placeholderHits: Array<{ placeholder: string; file: string }> = [];
     const nicheData = JSON.parse(readFileSync(path.resolve(process.cwd(), "app/data/niche-vocabulary.json"), "utf-8"));
     const placeholderPatterns = nicheData.placeholder_patterns || [];
     
@@ -414,15 +416,42 @@ export async function compileTheme(
       for (const placeholder of placeholderPatterns) {
         if (searchableContent.includes(placeholder)) {
           console.warn(`[WARNING] Unfilled placeholder found: "${placeholder}" in ${relPath}`);
+          placeholderHits.push({ placeholder, file: relPath });
           unfilledCount++;
         }
       }
     }
     
     if (unfilledCount > 0) {
-      console.warn(`[Compiler] ⚠️ SOFT WARN: Found ${unfilledCount} instances of unfilled generic placeholders in the final compiled bundle. Content injection may have missed fields.`);
+      // This used to be a soft warning, and stores shipped with "YOUR BRAND",
+      // "Jane Doe" and "@yourbrand" visible on the homepage. A build that fails
+      // loudly is recoverable; a store handed to a merchant with placeholder
+      // copy on it is not.
+      //
+      // Schema defaults are already excluded above, so every hit counted here is
+      // text that would actually render.
+      const detail = placeholderHits
+        .slice(0, 12)
+        .map(h => `  - "${h.placeholder}" in ${h.file}`)
+        .join("\n");
+      const more = placeholderHits.length > 12 ? `\n  …and ${placeholderHits.length - 12} more` : "";
+
+      if (process.env.ALLOW_PLACEHOLDER_CONTENT === "1") {
+        console.warn(
+          `[Compiler] ${unfilledCount} unfilled placeholder(s) present, but ALLOW_PLACEHOLDER_CONTENT=1 is set — continuing.\n${detail}${more}`
+        );
+      } else {
+        throw new ValidationError(
+          `[Compiler] ${unfilledCount} unfilled placeholder(s) would be visible in the generated store:\n${detail}${more}\n` +
+          `Content generation did not fill these fields. Fix the copy source, or set ALLOW_PLACEHOLDER_CONTENT=1 to ship anyway.`
+        );
+      }
     }
   } catch (err: any) {
+    // A genuine placeholder failure must propagate; only the scan's own
+    // infrastructure problems (missing vocabulary file, unreadable JSON) are
+    // downgraded to a warning.
+    if (err instanceof ValidationError || err.name === "ValidationError") throw err;
     console.warn(`[Compiler] Could not run placeholder scan: ${err.message}`);
   }
 
@@ -593,6 +622,17 @@ export async function assembleThemeBundle(
 
   // Step 2: Generate Dynamic Niche Tokens CSS
   const settings = blueprint.settings || {};
+
+  // One palette for the entire store. Both the CSS custom properties below and
+  // every section's own colour settings (applied in Step 5) are derived from
+  // this single object, so a section that reads `var(--color-accent)` and a
+  // section that reads `section.settings.accent_color` land on the same hex.
+  const storePalette = buildStorePalette({
+    background: settings.colors_background_1,
+    text: settings.colors_text_1,
+    accent: settings.colors_accent_1 || settings.colors_solid_button_labels || settings.colors_accent_2,
+    surface: settings.colors_surface,
+  });
   const isLuxury = settings.designDirection === 'LUXURY';
   const isBold = settings.designDirection === 'BOLD';
   const isMinimal = settings.designDirection === 'MINIMAL';
@@ -607,13 +647,24 @@ export async function assembleThemeBundle(
 
   filesToUpload["assets/niche-tokens.css"] = `/* Dynamically Generated StoreForge Theme Tokens */
 :root {
-  --color-background: ${settings.colors_background_1 || '#ffffff'};
-  --color-text: ${settings.colors_text_1 || '#1a1a1a'};
-  --color-text-muted: #64748b;
-  --color-text-secondary: #64748b;
-  --color-accent: ${settings.colors_accent_1 || settings.colors_solid_button_labels || settings.colors_accent_2 || '#008060'};
-  --color-border: #e2e8f0;
-  --color-surface: ${settings.colors_surface || '#f8fafc'};
+  --color-background: ${storePalette.light.background};
+  --color-text: ${storePalette.light.text};
+  --color-text-muted: ${storePalette.light.muted};
+  --color-text-secondary: ${storePalette.light.muted};
+  --color-accent: ${storePalette.light.accent};
+  --color-border: ${storePalette.light.border};
+  --color-surface: ${storePalette.light.surface};
+  --color-button-bg: ${storePalette.light.buttonBg};
+  --color-button-text: ${storePalette.light.buttonText};
+
+  /* Inverse set — for bands a section author designed dark. Derived from the
+     same brand colours, so a dark footer still belongs to this store. */
+  --color-background-inverse: ${storePalette.dark.background};
+  --color-surface-inverse: ${storePalette.dark.surface};
+  --color-text-inverse: ${storePalette.dark.text};
+  --color-text-muted-inverse: ${storePalette.dark.muted};
+  --color-accent-inverse: ${storePalette.dark.accent};
+  --color-border-inverse: ${storePalette.dark.border};
   --font-heading-family: '${fontHeading}', Georgia, serif;
   --font-body-family: '${fontBody}', -apple-system, sans-serif;
   --weight-display: ${isLuxury ? '400' : '700'};
@@ -768,6 +819,48 @@ export async function assembleThemeBundle(
         );
       }
       delete filesToUpload[fallbackFile];
+    }
+  }
+
+  // Step 5: Force one palette across every section.
+  //
+  // This runs last, after templates, section groups and section Liquid are all
+  // in the bundle, because it reads each section's `{% schema %}` to learn which
+  // of its settings are colours and what polarity its author intended.
+  //
+  // Without this, colour is the one axis the style-family lock does not cover:
+  // two sections can share a family and still ship a cream background and a
+  // forest-green one, which is what made earlier generated stores read as
+  // several brands stitched together.
+  const paletteStats = applyStorePalette(filesToUpload, storePalette);
+  console.log(
+    `[Palette] ${paletteStats.settingsWritten} colour settings unified across ` +
+    `${paletteStats.sectionsTouched} sections in ${paletteStats.filesTouched} files ` +
+    `(${paletteStats.contrastRepairs} contrast repairs, ${paletteStats.skipped} left as authored).`
+  );
+  console.log(
+    `[Palette] light bg ${storePalette.light.background} / text ${storePalette.light.text} / ` +
+    `accent ${storePalette.light.accent} — dark bg ${storePalette.dark.background} / text ${storePalette.dark.text}`
+  );
+  if (paletteStats.unresolved.length > 0) {
+    // A section in a template with no Liquid in the bundle keeps its authored
+    // colours and will visibly clash. Worth seeing in the log.
+    console.warn(
+      `[Palette] No Liquid found for ${paletteStats.unresolved.length} section type(s), ` +
+      `left un-recoloured: ${paletteStats.unresolved.slice(0, 10).join(", ")}`
+    );
+  }
+
+  // `templates` was parsed from filesToUpload back in Step 3, before the palette
+  // rewrote those same JSON files. Re-read them so the returned object is not a
+  // pre-palette snapshot.
+  for (const key of Object.keys(templates)) {
+    if (filesToUpload[key]) {
+      try {
+        templates[key] = JSON.parse(filesToUpload[key]);
+      } catch (e: any) {
+        throw new ValidationError(`[Palette] Template "${key}" is no longer valid JSON: ${e.message}`);
+      }
     }
   }
 
