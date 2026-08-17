@@ -1,0 +1,150 @@
+{%- comment -%}
+  cf-pagination — shared pagination control for the cp-v* collection layouts.
+
+  Usage:
+    {% render 'cf-pagination', paginate: paginate, show: true %}
+
+  `show` exists because the cp-v* sections serve two jobs. On a collection
+  template they are the collection page and need page links. On the homepage they
+  are a curated fixed-length grid, where page links would send a shopper away from
+  the homepage into ?page=2 of a section they were only browsing. The section
+  passes `show` only when it is rendering the collection the shopper is actually
+  on.
+
+  Colours come from the store palette custom properties rather than hardcoded
+  hex, so this control matches whatever palette the engine applied.
+{%- endcomment -%}
+
+{%- if show and paginate.pages > 1 -%}
+  <nav class="cf-pagination" role="navigation" aria-label="Pagination">
+    <ul class="cf-pagination__list">
+      {%- if paginate.previous -%}
+        <li>
+          <a href="{{ paginate.previous.url }}" class="cf-pagination__link cf-pagination__link--arrow" rel="prev" aria-label="Previous page">
+            <span aria-hidden="true">&larr;</span>
+            <span class="cf-pagination__label">Previous</span>
+          </a>
+        </li>
+      {%- else -%}
+        <li>
+          <span class="cf-pagination__link cf-pagination__link--arrow cf-pagination__link--disabled" aria-hidden="true">
+            <span>&larr;</span>
+            <span class="cf-pagination__label">Previous</span>
+          </span>
+        </li>
+      {%- endif -%}
+
+      {%- for part in paginate.parts -%}
+        {%- if part.is_link -%}
+          <li>
+            <a href="{{ part.url }}" class="cf-pagination__link" aria-label="Page {{ part.title }}">{{ part.title }}</a>
+          </li>
+        {%- elsif part.title == hellip -%}
+          <li><span class="cf-pagination__gap" aria-hidden="true">{{ part.title }}</span></li>
+        {%- else -%}
+          <li>
+            <span class="cf-pagination__link cf-pagination__link--current" aria-current="page">{{ part.title }}</span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if paginate.next -%}
+        <li>
+          <a href="{{ paginate.next.url }}" class="cf-pagination__link cf-pagination__link--arrow" rel="next" aria-label="Next page">
+            <span class="cf-pagination__label">Next</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      {%- else -%}
+        <li>
+          <span class="cf-pagination__link cf-pagination__link--arrow cf-pagination__link--disabled" aria-hidden="true">
+            <span class="cf-pagination__label">Next</span>
+            <span>&rarr;</span>
+          </span>
+        </li>
+      {%- endif -%}
+    </ul>
+
+    <p class="cf-pagination__count">
+      Showing {{ paginate.current_offset | plus: 1 }}&ndash;{{ paginate.current_offset | plus: paginate.page_size | at_most: paginate.items }}
+      of {{ paginate.items }}
+    </p>
+  </nav>
+
+  <style>
+    .cf-pagination {
+      grid-column: 1 / -1;
+      margin: 40px 0 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .cf-pagination__list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .cf-pagination__link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      /* 44px keeps every target above the WCAG 2.5.5 minimum on touch. */
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: var(--button-radius, 8px);
+      color: var(--color-text, #1a1a1a);
+      background: var(--color-background, #ffffff);
+      font-family: var(--font-body-family, inherit);
+      font-size: 0.9375rem;
+      line-height: 1;
+      text-decoration: none;
+      transition: background-color 150ms ease, border-color 150ms ease;
+    }
+    .cf-pagination__link:hover {
+      background: var(--color-surface, #f8fafc);
+      border-color: var(--color-accent, #111111);
+    }
+    .cf-pagination__link:focus-visible {
+      outline: 2px solid var(--color-accent, #111111);
+      outline-offset: 2px;
+    }
+    .cf-pagination__link--current {
+      background: var(--color-accent, #111111);
+      border-color: var(--color-accent, #111111);
+      color: var(--color-button-text, #ffffff);
+      font-weight: 600;
+    }
+    .cf-pagination__link--disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .cf-pagination__gap {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 4px;
+      color: var(--color-text-muted, #64748b);
+    }
+    .cf-pagination__count {
+      margin: 0;
+      color: var(--color-text-muted, #64748b);
+      font-family: var(--font-body-family, inherit);
+      font-size: 0.875rem;
+    }
+    @media (max-width: 640px) {
+      /* Word labels are the first thing to go when space is tight — the arrows
+         still communicate direction and the tap target keeps its size. */
+      .cf-pagination__label { display: none; }
+      .cf-pagination__link { padding: 0 10px; }
+    }
+  </style>
+{%- endif -%}

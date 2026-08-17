@@ -631,6 +631,7 @@ export async function assembleThemeBundle(
     background: settings.colors_background_1,
     text: settings.colors_text_1,
     accent: settings.colors_accent_1 || settings.colors_solid_button_labels || settings.colors_accent_2,
+    accentAlt: settings.colors_accent_2 || settings.colors_solid_button_labels,
     surface: settings.colors_surface,
   });
   const isLuxury = settings.designDirection === 'LUXURY';

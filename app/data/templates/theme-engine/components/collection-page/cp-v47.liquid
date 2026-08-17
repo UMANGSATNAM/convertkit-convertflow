@@ -269,10 +269,16 @@
     <!-- 4. Product Grid (with In-Grid Promo Tile every 8 products) -->
     <div class="cpv47__grid">
       {% assign target_coll = collections[section.settings.collection] %}
+      {% if target_coll == blank or target_coll.products.size == 0 %}{% assign target_coll = collection %}{% endif %}
+      {% if target_coll == blank %}{% assign target_coll = collections.all %}{% endif %}
+      {% assign cf_is_collection_page = false %}
+      {% if collection != blank and target_coll.handle == collection.handle %}{% assign cf_is_collection_page = true %}{% endif %}
       {% assign limit_num = section.settings.products_per_page | default: 12 %}
+      {% assign cf_per_page = limit_num | at_least: 1 | at_most: 50 %}
 
+      {% paginate target_coll.products by cf_per_page %}
       {% if target_coll != blank and target_coll.products.size > 0 %}
-        {% for product in target_coll.products limit: limit_num %}
+        {% for product in target_coll.products %}
           {% render 'card-v47', product: product %}
 
           {% comment %} Insert In-Grid Promo Banner Card after 8th product {% endcomment %}
@@ -314,6 +320,8 @@
           {% endif %}
         {% endfor %}
       {% endif %}
+        {% render 'cf-pagination', paginate: paginate, show: cf_is_collection_page %}
+      {% endpaginate %}
     </div>
 
     <!-- 5. Bottom Expandable SEO Text Block -->

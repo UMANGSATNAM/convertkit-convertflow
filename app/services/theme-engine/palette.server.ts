@@ -177,6 +177,17 @@ export interface PaletteInput {
   text?: string;
   accent?: string;
   surface?: string;
+  /**
+   * Second accent candidate, used when `accent` turns out to be the same colour
+   * as the text.
+   *
+   * Brand analysis reports a `primary` and an `accent`, and `primary` is very
+   * often the near-black used for body copy. Feeding that straight into the
+   * accent role paints every button, price and star in the text colour and
+   * throws away the colour the brand is actually known for — a luxury beauty
+   * brand with a #C9A97A gold ended up with black buttons.
+   */
+  accentAlt?: string;
 }
 
 /**
@@ -189,7 +200,16 @@ export interface PaletteInput {
 export function buildStorePalette(input: PaletteInput): StorePalette {
   const bg = parseColor(input.background) || WHITE;
   const rawText = parseColor(input.text) || BLACK;
-  const rawAccent = parseColor(input.accent) || rawText;
+
+  // Pick whichever accent candidate is actually a distinct colour. A contrast
+  // ratio below 1.35 against the text means the two are visually the same, so
+  // using it would make the accent role invisible as an accent.
+  const accentPrimary = parseColor(input.accent);
+  const accentSecondary = parseColor(input.accentAlt);
+  let rawAccent = accentPrimary || accentSecondary || rawText;
+  if (accentPrimary && accentSecondary && contrast(accentPrimary, rawText) < 1.35) {
+    if (contrast(accentSecondary, rawText) >= 1.35) rawAccent = accentSecondary;
+  }
 
   // A brand may hand us either polarity. When the supplied background is dark,
   // that pair *is* the dark set and the light set is derived from it — not the
