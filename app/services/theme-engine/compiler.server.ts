@@ -411,6 +411,27 @@ export async function compileTheme(
       if (relPath.endsWith('.liquid')) {
         // Strip the {% schema %} block to avoid scanning default values like "Shop Now"
         searchableContent = content.replace(/{%\s*schema\s*%}[\s\S]*?{%\s*endschema\s*%}/g, '');
+
+        // Drop comments. A `{% comment %}` block explaining *why* a placeholder
+        // was removed contains the placeholder string, so leaving comments in
+        // makes documenting the fix trip the gate — which is exactly what
+        // happened the first time this ran.
+        searchableContent = searchableContent
+          .replace(/{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g, ' ')
+          .replace(/<!--[\s\S]*?-->/g, ' ');
+
+        // Also drop the argument of a `| default:` filter.
+        //
+        // `{{ shop.name | default: 'YOUR BRAND' }}` is a defensive fallback for a
+        // Liquid object that is always populated on a real store — shop.name,
+        // product.title, collection.title. The literal never renders, so failing
+        // the build on it blocks generation over copy no shopper can ever see.
+        // Genuinely hardcoded placeholder text, which is what this gate is for,
+        // does not sit inside a default filter.
+        searchableContent = searchableContent.replace(
+          /\|\s*default:\s*(?:'[^']*'|"[^"]*")/g,
+          '| default: _'
+        );
       }
       
       for (const placeholder of placeholderPatterns) {

@@ -21,6 +21,16 @@
   <div class="slider-track-container w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8">
     <div class="flex gap-6 w-max pr-6">
       {%- assign collection = collections[section.settings.collection] -%}
+      {%- comment -%}
+        On a freshly generated store nobody has picked a collection yet, so this
+        used to fall through to the demo branch below and render six cards
+        reading "Featured Product 1" at "$49.99". Falling back to a real
+        collection shows real products instead, and leaves the demo branch for
+        the only case it should ever cover: a store with no products at all.
+      {%- endcomment -%}
+      {%- if collection == blank or collection.products_count == 0 -%}
+        {%- assign collection = collections.all -%}
+      {%- endif -%}
       {%- if collection != blank and collection.products_count > 0 -%}
         {%- for product in collection.products limit: section.settings.products_to_show -%}
           <div class="snap-start w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0">
@@ -36,8 +46,12 @@
                 <button class="w-full py-3 bg-[var(--color-background)] text-[var(--color-text)] font-bold text-sm uppercase rounded">Quick Add</button>
               </div>
             </div>
-            <h3 class="font-bold text-lg">Featured Product {{ i }}</h3>
-            <p class="text-[var(--color-text-secondary)]">$49.99</p>
+            {%- comment -%}
+              Reached only when the store genuinely has no products. Inventing a
+              name and a "$49.99" price here made an empty store look like a
+              stocked one, and hardcoded the currency for every merchant.
+            {%- endcomment -%}
+            <h3 class="font-bold text-lg text-[var(--color-text-secondary)]">{{ 'onboarding.product_title' | t: default: 'Your product' }}</h3>
           </div>
         {%- endfor -%}
       {%- endif -%}
