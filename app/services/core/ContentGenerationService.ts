@@ -131,12 +131,51 @@ export function buildDynamicZodSchema(instances: SectionInstance[]): z.ZodTypeAn
         maxLen = 35;
       }
 
-      compShape[setting.id] = z.string().min(1, `Field ${setting.id} is required`).max(maxLen);
+      // Optional, not required.
+      //
+      // Every field of every section used to be mandatory. With three page
+      // templates that was demanding; once cart, search, 404, list-collections
+      // and the about/contact/faq pages were added it became roughly 29 sections
+      // in one response, and the model reliably omitted a few. A single missing
+      // key failed the whole schema, all three attempts failed the same way, and
+      // the pipeline fell back to niche copy for *every* section — throwing away
+      // good copy for 25 sections because 4 were missing, and putting
+      // "Jane Doe" and "@yourbrand" back on the homepage.
+      //
+      // Length limits still apply to whatever does come back, so quality is
+      // unchanged. Gaps are filled per-section from niche copy after parsing.
+      compShape[setting.id] = z.string().max(maxLen).optional();
     }
-    shape[instance.sectionKey] = z.object(compShape);
+    shape[instance.sectionKey] = z.object(compShape).partial().optional();
   }
 
+  // Unknown keys are stripped rather than rejected — a model that invents an
+  // extra section should not invalidate the sections it got right.
   return z.object(shape);
+}
+
+/**
+ * Placeholder copy that must never be presented as real content.
+ *
+ * These are read from the same vocabulary the compiler's placeholder gate uses,
+ * so a string added there is caught here too and the two cannot drift apart.
+ */
+let placeholderPatternsCache: string[] | null = null;
+function placeholderPatterns(): string[] {
+  if (placeholderPatternsCache) return placeholderPatternsCache;
+  try {
+    const raw = fs.readFileSync(path.join("app/data/niche-vocabulary.json"), "utf-8");
+    placeholderPatternsCache = JSON.parse(raw).placeholder_patterns || [];
+  } catch {
+    // Hardcoded minimum so this still protects if the file cannot be read.
+    placeholderPatternsCache = ["Jane Doe", "Eleanor Vance", "@yourbrand", "YOUR BRAND", "Lorem ipsum"];
+  }
+  return placeholderPatternsCache!;
+}
+
+export function isPlaceholderText(value: string): boolean {
+  if (!value) return false;
+  return placeholderPatterns().some(p => value.includes(p));
 }
 
 export function getNicheFallbackContent(
@@ -193,7 +232,15 @@ export function getNicheFallbackContent(
       ) {
         result[instance.sectionKey][setting.id] = copy.cta;
       } else {
-        result[instance.sectionKey][setting.id] = setting.default || copy.heading;
+        // Falling back to the schema default is right for ordinary copy, but
+        // those defaults are also where the placeholders live: a testimonial's
+        // `author` defaults to "Jane Doe", a UGC handle to "@yourbrand". Using
+        // them here is how placeholder names reached generated stores even
+        // though the fallback "worked".
+        const schemaDefault = setting.default || "";
+        result[instance.sectionKey][setting.id] = isPlaceholderText(schemaDefault)
+          ? copy.heading
+          : (schemaDefault || copy.heading);
       }
     }
   }
@@ -328,7 +375,47 @@ Generate specific, distinct Indian D2C copy for every required section instance.
         const cleanedJson = rawResponse.replace(/```json\n?|\n?```/g, "").trim();
         const parsedData = JSON.parse(cleanedJson);
 
-        const validContent = dynamicZodSchema.parse(parsedData);
+        const validContent: Record<string, any> = dynamicZodSchema.parse(parsedData) as any;
+
+        // Fill whatever the model left out, section by section, from niche copy.
+        // Partial AI copy plus targeted fallback beats discarding the response:
+        // the sections the model did write keep their tailored copy, and only
+        // the gaps drop to generic wording. Empty strings count as gaps —
+        // a blank heading renders as a blank heading.
+        const fallback = getNicheFallbackContent(sectionInstances, input.industry) as Record<string, any>;
+        let filledSections = 0;
+        let filledFields = 0;
+
+        for (const instance of sectionInstances) {
+          const key = instance.sectionKey;
+          const fromAi = validContent[key];
+          const fromNiche = fallback?.[key];
+
+          if (!fromAi || typeof fromAi !== "object") {
+            if (fromNiche) {
+              validContent[key] = fromNiche;
+              filledSections++;
+            }
+            continue;
+          }
+
+          for (const setting of instance.settingsSchema) {
+            const value = fromAi[setting.id];
+            if (typeof value === "string" && value.trim() !== "") continue;
+            const replacement = fromNiche?.[setting.id];
+            if (typeof replacement === "string" && replacement.trim() !== "") {
+              fromAi[setting.id] = replacement;
+              filledFields++;
+            }
+          }
+        }
+
+        if (filledSections || filledFields) {
+          console.log(
+            `[ContentGenerationService] Filled ${filledSections} missing section(s) and ` +
+            `${filledFields} missing field(s) from niche copy; the rest is AI-written.`
+          );
+        }
 
         try {
           await redis.set(cacheKey, JSON.stringify(validContent), "EX", 86400 * 7);

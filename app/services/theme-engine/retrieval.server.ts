@@ -245,8 +245,14 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
       compatScore += 25; // Exact match in compatibility matrix
     } else if (registryFamilies.some(f => f === industryKey || f === 'universal')) {
       compatScore += 15; // Registry family match fallback
-    } else if (compatIndustries.length === 0 && registryFamilies.includes('universal')) {
-      compatScore += 10; // Universal component
+    } else if (compatIndustries.includes('universal') || compatIndustries.length === 0) {
+      // A component that declares itself universal fits any catalogue, and
+      // should score as such. The previous condition required the industries
+      // list to be *empty*, so a component explicitly tagged `["universal"]`
+      // fell through to zero — the strictly better-documented component was
+      // punished for saying so. That cost sections like hp1-faq and
+      // hp10-contact-form 10 points each on every store.
+      compatScore += 10;
     }
 
     // designDirection match to catalogStyle (15 pts) — Bug 1 fix (separate from layoutVariant)

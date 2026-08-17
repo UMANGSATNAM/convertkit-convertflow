@@ -324,15 +324,48 @@ const INDUSTRY_WORDS = {
   pets: /\b(dog|puppy|kibble|veterinar\w*|pet food|pet care)\b/
 };
 
-function industriesOf(name, source) {
+/**
+ * Section types that are structurally the same whatever the store sells.
+ *
+ * A header is a header on a jewellery store and on a coffee store. But these
+ * sections still ship *sample copy*, and one stray word in it was enough to
+ * lock them to a niche: `hp11-header` was tagged fashion, `cdr-v19` fashion,
+ * `footer-commerce-v2` beauty. On any other store those then scored 0 on the
+ * 30-point compatibility axis and lost to worse components.
+ *
+ * They keep whatever affinity their copy suggests — that still earns the
+ * 25-point exact match on a matching store — but `universal` is always added
+ * so they are never disqualified elsewhere.
+ */
+const INDUSTRY_AGNOSTIC_TYPES = new Set([
+  'header', 'footer', 'cart-drawer', 'announcement', 'popup',
+  'collection-page', 'faq', 'contact', 'newsletter'
+]);
+
+function industriesOf(name, source, sectionType) {
   const text = (name + ' ' + source).toLowerCase();
   const hits = Object.entries(INDUSTRY_WORDS)
     .map(([ind, rx]) => [ind, (text.match(new RegExp(rx.source, 'g')) || []).length])
     .filter(([, n]) => n > 0)
     .sort((a, b) => b[1] - a[1]);
+
   // A section with no industry words is genuinely neutral and should be
   // available everywhere rather than scored against a niche it never mentions.
-  return hits.length ? hits.slice(0, 3).map(([i]) => i) : ['universal'];
+  if (!hits.length) return ['universal'];
+
+  const out = hits.slice(0, 3).map(([i]) => i);
+
+  if (INDUSTRY_AGNOSTIC_TYPES.has(sectionType)) {
+    if (!out.includes('universal')) out.push('universal');
+    return out;
+  }
+
+  // A single passing mention is not evidence of specialisation — one "necklace"
+  // in placeholder copy should not stop a layout being used by a coffee brand.
+  const strongest = hits[0][1];
+  if (strongest < 2 && !out.includes('universal')) out.push('universal');
+
+  return out;
 }
 
 // Archetypes describe brand feel. Derived from density and ornamentation so the
@@ -468,7 +501,7 @@ function main() {
     const type = TYPE_MAP[role] || 'custom';
     const sig = signals(source);
     const style = styleOf(id, source);
-    const industries = industriesOf(id, source);
+    const industries = industriesOf(id, source, type);
     const archetypes = archetypesOf(style, sig);
 
     // Sections that share a style AND a design family should be pickable
