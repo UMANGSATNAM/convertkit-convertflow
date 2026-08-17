@@ -32,5 +32,11 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/server.js ./server.js
 COPY --from=builder /app/extensions ./extensions
+# Demo catalogues read at runtime by importCatalog(). Committed to the repo and
+# present in the builder stage, but never copied here, so production failed with
+# ENOENT on /app/themes/ethnic-wear/catalog.json and imported an empty product
+# list — which is what put "Jewelry Item 1 @ $199" style placeholders on a
+# generated store.
+COPY --from=builder /app/themes ./themes
 
 CMD ["sh","-c","npm run docker-start"]

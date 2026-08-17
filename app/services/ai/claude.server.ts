@@ -24,9 +24,14 @@ export async function generateStructuredJson<T>(
 ): Promise<T> {
   try {
     const msg = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
+      // Kept in step with ContentGenerationService — a stale default here means
+      // brand and catalogue analysis silently fall back while copy generation
+      // works, which is hard to spot from the outside.
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5",
       max_tokens: 1024,
-      temperature: 0.1, // Low temperature for deterministic output
+      // `temperature` is rejected by current models, and every call here is
+      // inside a try/catch that returns a fallback, so passing it turned this
+      // into a silent no-op.
       system: `${systemInstruction}\n\nCRITICAL: You MUST output ONLY valid JSON. Do not wrap it in markdown block quotes (e.g. \`\`\`json). Just the raw JSON.`,
       messages: [
         { role: "user", content: userPrompt }

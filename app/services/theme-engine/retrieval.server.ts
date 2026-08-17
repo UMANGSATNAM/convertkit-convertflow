@@ -15,6 +15,19 @@ export interface RetrievalParams {
    * scoring only when a slot has no candidate in the locked family.
    */
   lockFamily?: string;
+  /**
+   * Minimum score a component must reach to be accepted. Defaults to 50.
+   *
+   * The default exists to stop a poor match being forced into a decorative
+   * slot — an unconvincing "press" strip is worse than no press strip. But it
+   * was also being applied to the header, footer and cart drawer, and a store
+   * generated without those is simply broken: one real run produced a theme
+   * with no navigation and no footer because the best candidates scored 45.
+   *
+   * Callers filling a structurally required slot pass 0 as a last resort, after
+   * the normally-scored attempts have failed.
+   */
+  minScore?: number;
 }
 
 export interface ComponentRankingResult {
@@ -316,8 +329,12 @@ export async function retrieveBestComponent(params: RetrievalParams): Promise<Co
     }
   }
 
-  if (!bestComponentId || highestScore < 50) {
-    console.warn(`[Retrieval] Skipping slot for "${params.sectionType}" - best component ${bestComponentId || 'none'} scored ${Math.round(highestScore)}, which is below threshold (50)`);
+  const minScore = params.minScore ?? 50;
+  if (!bestComponentId || highestScore < minScore) {
+    console.warn(
+      `[Retrieval] Skipping slot for "${params.sectionType}" - best component ${bestComponentId || 'none'} ` +
+      `scored ${Math.round(highestScore)}, which is below threshold (${minScore})`
+    );
     return null;
   }
 

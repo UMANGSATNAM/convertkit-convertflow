@@ -232,20 +232,46 @@ export function initGeneratorWorker() {
             lockFamily: lockedFamily
           };
 
-          let matched = await retrieveBestComponent({
-            ...query,
-            exclude: [...usedComponentIds, ...extraExclude]
-          });
+          // Tried in order, each giving up one guarantee. Earlier tiers produce
+          // the better store; later ones exist so a slot is never left empty.
+          // Uniqueness is given up last, because a store that repeats the same
+          // block on five pages is the thing that reads as machine-made. A
+          // section borrowed from a neighbouring family is far less noticeable
+          // than the same newsletter three times.
+          const attempts: Array<{ why: string; params: any }> = [
+            { why: "", params: { ...query, exclude: [...usedComponentIds, ...extraExclude] } },
+            {
+              why: `no unused component in family "${lockedFamily ?? "any"}" — borrowing from another family to keep it unique`,
+              params: { ...query, lockFamily: undefined, exclude: [...usedComponentIds, ...extraExclude] }
+            },
+            {
+              why: `no unused component anywhere — reusing a design already in this store`,
+              params: { ...query, exclude: extraExclude }
+            }
+          ];
 
-          if (!matched?.componentId) {
-            // Nothing unused left for this slot. Repeating a design is a smaller
-            // failure than shipping a page with a hole in it.
-            matched = await retrieveBestComponent({ ...query, exclude: extraExclude });
+          // The chrome and the page main slots are structural. A store with no
+          // header, no footer or no cart drawer is broken, not merely plainer —
+          // and that is exactly what the score threshold produced on a real run,
+          // rejecting the best footer because it scored 45 against a floor of 50.
+          // For these, any component beats none.
+          const ESSENTIAL = new Set([
+            "header", "footer", "announcement", "cart-drawer",
+            "product-page", "collection-page"
+          ]);
+          if (ESSENTIAL.has(sectionType)) {
+            attempts.push({
+              why: `nothing cleared the score threshold — taking the best available so the store is not missing its ${sectionType}`,
+              params: { ...query, lockFamily: undefined, exclude: extraExclude, minScore: 0 }
+            });
+          }
+
+          let matched = null;
+          for (const attempt of attempts) {
+            matched = await retrieveBestComponent(attempt.params);
             if (matched?.componentId) {
-              console.warn(
-                `[Phase 5] ${label} "${sectionType}": no unused component left in family "${lockedFamily ?? "any"}" — ` +
-                `reusing ${matched.componentId}, which already appears elsewhere in this store.`
-              );
+              if (attempt.why) console.warn(`[Phase 5] ${label} "${sectionType}": ${attempt.why} — using ${matched.componentId}.`);
+              break;
             }
           }
 

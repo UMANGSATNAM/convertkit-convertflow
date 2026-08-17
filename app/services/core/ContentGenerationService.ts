@@ -206,10 +206,15 @@ async function defaultClaudeCaller(userPrompt: string, systemPrompt: string): Pr
     throw new Error("ANTHROPIC_API_KEY is not set.");
   }
 
+  // No `temperature`. The current models reject it outright —
+  // `400 invalid_request_error: temperature is deprecated for this model` —
+  // and because this call is wrapped in a 3-attempt retry, the failure was
+  // invisible except as a fallback to niche copy, which does not fill
+  // testimonial names or social handles. The schema defaults then rendered:
+  // "Jane Doe", "Eleanor Vance", "@yourbrand".
   const msg = await anthropic.messages.create({
     model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5",
     max_tokens: 2048,
-    temperature: 0,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }]
   });
