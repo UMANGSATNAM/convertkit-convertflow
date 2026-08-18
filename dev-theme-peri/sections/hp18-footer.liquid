@@ -193,9 +193,15 @@
               </ul>
             {% else %}
               <ul class="hp18-footer-{{ sec_id }}__menu-list">
-                <li><a href="#" class="hp18-footer-{{ sec_id }}__menu-link">Shop All</a></li>
-                <li><a href="#" class="hp18-footer-{{ sec_id }}__menu-link">New Arrivals</a></li>
-                <li><a href="#" class="hp18-footer-{{ sec_id }}__menu-link">About Us</a></li>
+                {%- assign cf_menu = section.settings.menu | default: linklists['footer'] -%}
+
+                {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+                {%- for link in cf_menu.links -%}
+
+                  <li><a href="{{ link.url }}" class="hp18-footer-{{ sec_id }}__menu-link">{{ link.title }}</a></li>
+
+                {%- endfor -%}
               </ul>
             {% endif %}
           </div>
@@ -293,6 +299,70 @@
       "id": "social_x",
       "label": "X (Twitter)",
       "default": "/"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "info": "Leave empty to use the store's main menu.",
+      "default": "footer"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright_note",
+      "label": "Copyright line",
+      "info": "The year and store name are added automatically.",
+      "default": "All rights reserved."
     }
   ],
   "blocks": [
@@ -318,8 +388,18 @@
     {
       "name": "HP18 Advanced Footer",
       "blocks": [
-        { "type": "menu", "settings": { "title": "SHOP" } },
-        { "type": "menu", "settings": { "title": "SUPPORT" } }
+        {
+          "type": "menu",
+          "settings": {
+            "title": "SHOP"
+          }
+        },
+        {
+          "type": "menu",
+          "settings": {
+            "title": "SUPPORT"
+          }
+        }
       ]
     }
   ]

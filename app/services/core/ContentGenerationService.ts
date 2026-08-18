@@ -178,6 +178,135 @@ export function isPlaceholderText(value: string): boolean {
   return placeholderPatterns().some(p => value.includes(p));
 }
 
+type NicheCopy = { heading: string; subheading: string; cta: string; title: string };
+
+/**
+ * What a section is *for*, inferred from the component it resolved to.
+ *
+ * Fallback copy was previously written once per store and pasted into every
+ * field, so a generated store said "Mindful Indian Beauty & Skincare" as its
+ * hero, as its FAQ title, as its newsletter heading and as the name of the
+ * customer who left a review — fifteen times down one page. Knowing the section
+ * role is what lets each one say something of its own.
+ */
+function inferSectionRole(instance: SectionInstance): string {
+  const id = `${instance.componentId} ${instance.sectionKey}`.toLowerCase();
+  const has = (...words: string[]) => words.some(w => id.includes(w));
+
+  if (has("hero", "banner-countdown", "image-banner")) return "hero";
+  if (has("faq", "question")) return "faq";
+  if (has("newsletter", "subscribe", "email-capture")) return "newsletter";
+  if (has("testimonial", "review")) return "testimonials";
+  if (has("instashop", "instagram", "ugc", "gallery")) return "ugc";
+  if (has("founder", "craftsman", "process", "made")) return "craftsmanship";
+  if (has("brand-story", "image-with-text", "about", "story")) return "brandStory";
+  if (has("press", "featured-review", "as-seen")) return "press";
+  if (has("comparison", "trust", "usp", "guarantee", "badge")) return "trust";
+  if (has("bestseller", "featured-collection", "product-grid", "grid", "collection")) return "products";
+  if (has("contact", "form", "map")) return "contact";
+  if (has("announcement", "marquee", "offer", "cta-band")) return "announcement";
+  if (has("popup", "modal")) return "popup";
+  return "generic";
+}
+
+/**
+ * Copy for each role. Deliberately short and concrete — fallback text is read by
+ * a real shopper, so it should sound like a shop rather than like a template.
+ * Nothing here claims a fact the store cannot back up (no invented review
+ * counts, ratings, awards or press names).
+ */
+const ROLE_COPY: Record<string, {
+  heading: (c: NicheCopy) => string;
+  sub: (c: NicheCopy) => string;
+  cta: (c: NicheCopy) => string;
+  eyebrow: string;
+}> = {
+  hero: {
+    heading: c => c.heading,
+    sub: c => c.subheading,
+    cta: c => c.cta,
+    eyebrow: "New in"
+  },
+  products: {
+    heading: c => c.title,
+    sub: () => "Picked for the things people come back for.",
+    cta: () => "Shop all",
+    eyebrow: "Shop"
+  },
+  brandStory: {
+    heading: () => "Why we started",
+    sub: () => "A small idea, made properly, and kept that way.",
+    cta: () => "Read our story",
+    eyebrow: "Our story"
+  },
+  craftsmanship: {
+    heading: () => "How it's made",
+    sub: () => "Fewer ingredients, chosen carefully, in small batches.",
+    cta: () => "See the process",
+    eyebrow: "Craft"
+  },
+  trust: {
+    heading: () => "Why shop with us",
+    sub: () => "Straight answers, fair prices and delivery you can plan around.",
+    cta: () => "Learn more",
+    eyebrow: "Why us"
+  },
+  testimonials: {
+    heading: () => "What people say",
+    sub: () => "In their words, not ours.",
+    cta: () => "Read reviews",
+    eyebrow: "Reviews"
+  },
+  ugc: {
+    heading: () => "From the community",
+    sub: () => "Tag us and your photo could land here.",
+    cta: () => "Shop the look",
+    eyebrow: "Community"
+  },
+  press: {
+    heading: () => "Recognised for the work",
+    sub: () => "What people outside the company have said.",
+    cta: () => "Read more",
+    eyebrow: "Press"
+  },
+  faq: {
+    heading: () => "Questions, answered",
+    sub: () => "Shipping, returns and the things people ask most.",
+    cta: () => "Contact us",
+    eyebrow: "FAQ"
+  },
+  newsletter: {
+    heading: () => "Stay in the loop",
+    sub: () => "New arrivals and early access. No noise.",
+    cta: () => "Subscribe",
+    eyebrow: "Newsletter"
+  },
+  contact: {
+    heading: () => "Get in touch",
+    sub: () => "Send a message and we'll come back to you.",
+    cta: () => "Send message",
+    eyebrow: "Contact"
+  },
+  announcement: {
+    heading: c => c.cta,
+    sub: () => "Free shipping on orders over the threshold.",
+    cta: () => "Shop now",
+    eyebrow: ""
+  },
+  popup: {
+    heading: () => "Before you go",
+    sub: () => "Join the list for first access to new arrivals.",
+    cta: () => "Sign up",
+    eyebrow: ""
+  },
+  generic: {
+    heading: c => c.title,
+    sub: c => c.subheading,
+    cta: c => c.cta,
+    eyebrow: ""
+  }
+};
+
 export function getNicheFallbackContent(
   instances: SectionInstance[],
   industry: string
@@ -218,30 +347,50 @@ export function getNicheFallbackContent(
   const result: Record<string, Record<string, string>> = {};
 
   for (const instance of instances) {
+    const role = inferSectionRole(instance);
+    const roleCopy = ROLE_COPY[role] || ROLE_COPY.generic;
+
     result[instance.sectionKey] = {};
     for (const setting of instance.settingsSchema) {
-      if (setting.id.includes("subheading") || setting.id.includes("description")) {
-        result[instance.sectionKey][setting.id] = copy.subheading;
-      } else if (setting.id === "heading" || setting.id.includes("title")) {
-        result[instance.sectionKey][setting.id] =
-          setting.id === "title" ? copy.title : copy.heading;
-      } else if (
-        setting.id.includes("button") ||
-        setting.id.includes("cta") ||
-        setting.id.includes("label")
-      ) {
-        result[instance.sectionKey][setting.id] = copy.cta;
-      } else {
-        // Falling back to the schema default is right for ordinary copy, but
-        // those defaults are also where the placeholders live: a testimonial's
-        // `author` defaults to "Jane Doe", a UGC handle to "@yourbrand". Using
-        // them here is how placeholder names reached generated stores even
-        // though the fallback "worked".
-        const schemaDefault = setting.default || "";
-        result[instance.sectionKey][setting.id] = isPlaceholderText(schemaDefault)
-          ? copy.heading
-          : (schemaDefault || copy.heading);
+      const id = setting.id.toLowerCase();
+
+      // People's names, handles and job titles. These must never receive a
+      // heading — a testimonial credited to "Mindful Indian Beauty & Skincare"
+      // is worse than one credited to nobody, and it was on every page.
+      if (/^(author|name|customer|reviewer|person|handle|username|user|role|job|designation|company)([_-]|$)/.test(id) ||
+          /(author|handle|username)$/.test(id)) {
+        result[instance.sectionKey][setting.id] = /handle|username/.test(id)
+          ? ""                    // an invented social handle links nowhere
+          : "Verified buyer";     // true, and says nothing it cannot back up
+        continue;
       }
+
+      if (id.includes("subheading") || id.includes("description") || id.includes("subtitle") || id.includes("subtext")) {
+        result[instance.sectionKey][setting.id] = roleCopy.sub(copy);
+        continue;
+      }
+
+      if (id === "heading" || id.includes("heading") || id.includes("title")) {
+        result[instance.sectionKey][setting.id] = roleCopy.heading(copy);
+        continue;
+      }
+
+      if (id.includes("button") || id.includes("cta") || id.includes("label") || id.includes("link_text")) {
+        result[instance.sectionKey][setting.id] = roleCopy.cta(copy);
+        continue;
+      }
+
+      if (id.includes("eyebrow") || id.includes("badge") || id.includes("tag") || id.includes("pill") || id.includes("kicker")) {
+        result[instance.sectionKey][setting.id] = roleCopy.eyebrow;
+        continue;
+      }
+
+      // Anything else keeps the section's own default, unless that default is
+      // placeholder copy — which is where "Jane Doe" and "@yourbrand" lived.
+      const schemaDefault = setting.default || "";
+      result[instance.sectionKey][setting.id] = isPlaceholderText(schemaDefault)
+        ? roleCopy.sub(copy)
+        : (schemaDefault || roleCopy.sub(copy));
     }
   }
 

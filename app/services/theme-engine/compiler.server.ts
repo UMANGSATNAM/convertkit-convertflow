@@ -14,6 +14,7 @@ import { staticValidate } from "./compiler/static-validator";
 import { designLint } from "./compiler/design-linter";
 import { ComponentRegistry } from "@prisma/client";
 import { buildStorePalette, applyStorePalette } from "./palette.server";
+import { fillSectionImages } from "./image-fill.server";
 import { uploadAssetWithCache } from "./asset-cache.server";
 import {
   ValidationError,
@@ -873,9 +874,29 @@ export async function assembleThemeBundle(
     );
   }
 
+  // Step 5.5: Put real photographs into the sections that have image slots.
+  //
+  // Without this every `image_picker` stays empty, and Shopify renders an empty
+  // picker as `placeholder_svg_tag` — the grey line drawings of a handbag and a
+  // shoe that appeared across a beauty store. The merchant's own images were
+  // already collected and classified upstream; they were simply never used.
+  const classifiedImages = (settings as any).classifiedImages || [];
+  if (Array.isArray(classifiedImages) && classifiedImages.length > 0) {
+    const imageStats = fillSectionImages(filesToUpload, classifiedImages, nicheId || "beauty");
+    console.log(
+      `[Images] ${imageStats.imagesAssigned} image slot(s) filled across ${imageStats.sectionsTouched} sections ` +
+      `(${imageStats.slotsLeftEmpty} left empty for typography-led layout, ${imageStats.skipped} logos/icons untouched).`
+    );
+  } else {
+    console.warn(
+      `[Images] No classified images available — every image slot will fall back to Shopify's placeholder SVG. ` +
+      `Check that the catalogue analyser returned image URLs.`
+    );
+  }
+
   // `templates` was parsed from filesToUpload back in Step 3, before the palette
-  // rewrote those same JSON files. Re-read them so the returned object is not a
-  // pre-palette snapshot.
+  // and image passes rewrote those same JSON files. Re-read them so the returned
+  // object is not a pre-palette snapshot.
   for (const key of Object.keys(templates)) {
     if (filesToUpload[key]) {
       try {

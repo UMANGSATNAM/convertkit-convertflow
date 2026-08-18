@@ -20,6 +20,7 @@ import { validateSectionDependencies, validateTemplateStructure } from "../theme
 import { composeThemeFromBlueprint } from "../theme-engine/compiler.server";
 import { loadNicheDesignTokens } from "../theme-engine/niche-tokens.server";
 import { createNavigationAndPages } from "./navigation.server";
+import { ImageAssignmentService } from "../theme-engine/image-assignment.server";
 import { createGenerationProfile, logGenerationProfile, type ComponentSelection } from "./generation-profiler.server";
 import fs from "fs/promises";
 import path from "path";
@@ -444,9 +445,39 @@ export function initGeneratorWorker() {
           section_density: brandContext.theme_tokens?.section_density || nicheTokens?.section_density || "airy"
         };
 
-        const baseSettings = extractedColors
+        const baseSettings: Record<string, any> = extractedColors
           ? { ...fallbackSettings, ...extractedColors }
-          : fallbackSettings;
+          : { ...fallbackSettings };
+
+        // Classify the merchant's own photographs so the compiler can place them
+        // into section image slots.
+        //
+        // These URLs were already being collected and counted — one run logged
+        // "imageUrls collected: 10" — but nothing consumed them, so every image
+        // slot stayed empty and Shopify drew its placeholder line art instead.
+        const merchantImageUrls: string[] = (catalogContext as any).sampleImageUrls || [];
+        if (merchantImageUrls.length > 0) {
+          try {
+            const classified = await ImageAssignmentService.classifyImages(merchantImageUrls);
+            baseSettings.classifiedImages = classified;
+            const byRole = classified.reduce((acc: Record<string, number>, c: any) => {
+              acc[c.role] = (acc[c.role] || 0) + 1;
+              return acc;
+            }, {});
+            console.log(
+              `[Images] Classified ${classified.length} of ${merchantImageUrls.length} merchant image(s): ` +
+              Object.entries(byRole).map(([r, n]) => `${r}=${n}`).join(", ")
+            );
+          } catch (imgErr: any) {
+            // Falling back to the niche placeholder pack is handled downstream;
+            // a classification failure must not stop the store being built.
+            console.warn(`[Images] Classification failed: ${imgErr.message}. Falling back to the niche placeholder pack.`);
+            baseSettings.classifiedImages = [];
+          }
+        } else {
+          console.warn(`[Images] The catalogue returned no image URLs — sections will use the niche placeholder pack.`);
+          baseSettings.classifiedImages = [];
+        }
 
         // Contrast is no longer repaired by discarding the brand. The palette
         // builder in the compiler nudges a failing colour toward black or white
@@ -556,7 +587,7 @@ export function initGeneratorWorker() {
         // 11. IMPORTING_PRODUCTS & CREATING_COLLECTIONS
         await updateStatus("IMPORTING_PRODUCTS", "Importing demo products and collections...");
         if (gen.catalogMode === "DEMO" && niche.demoCatalogUrl) {
-          await importCatalog(shop, niche.demoCatalogUrl);
+          await importCatalog(shop, niche.demoCatalogUrl, gen.nicheId);
         }
 
         // 12. THEME VALIDATOR (Phase 9) + REPAIR ENGINE (Phase 10)
