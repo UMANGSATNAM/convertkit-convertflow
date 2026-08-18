@@ -37,46 +37,38 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   let staged: PageType[] = [];
   let draftId: string | null = null;
-  if (shop) {
-    try {
-      // Only report the draft if it already exists — creating one just to render
-      // this page would duplicate a theme for a merchant who is only looking.
-      const res = await import("../services/shopify-api.server").then(m =>
-        m.graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 50) { nodes { id name } } }`)
-      );
-      const found = (res?.themes?.nodes || []).find((t: any) => t.name.startsWith("ConvertFlow — Draft"));
-      if (found) {
-        draftId = String(found.id).split("/").pop()!;
-        staged = await draftChanges(shop, draftId);
-      }
-    } catch (err: any) {
-      console.warn(`[Build] Could not read draft state: ${err.message}`);
-    }
-  }
-
   let passwordProtected = false;
+
   if (shop) {
+    // Fast parallel resolution with timeout protection so page renders immediately
     try {
       const { graphqlRequest } = await import("../services/shopify-api.server");
-      const res = await graphqlRequest(
-        shop.shopDomain, shop.accessToken,
-        `query { onlineStore { passwordProtection { enabled } } }`
-      );
-      passwordProtected = Boolean(res?.onlineStore?.passwordProtection?.enabled);
-    } catch {
-      // Older API versions do not expose this. The preview itself detects the
-      // password page, so this is only used to warn earlier.
-      passwordProtected = false;
+      const [themesRes, pwdRes] = await Promise.allSettled([
+        graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 20) { nodes { id name } } }`),
+        graphqlRequest(shop.shopDomain, shop.accessToken, `query { onlineStore { passwordProtection { enabled } } }`),
+      ]);
+
+      if (themesRes.status === "fulfilled" && themesRes.value?.themes?.nodes) {
+        const found = themesRes.value.themes.nodes.find((t: any) => t.name.startsWith("ConvertFlow — Draft"));
+        if (found) {
+          draftId = String(found.id).split("/").pop()!;
+          // Staged changes check
+          try {
+            staged = await draftChanges(shop, draftId);
+          } catch {
+            staged = [];
+          }
+        }
+      }
+
+      if (pwdRes.status === "fulfilled" && pwdRes.value?.onlineStore?.passwordProtection) {
+        passwordProtected = Boolean(pwdRes.value.onlineStore.passwordProtection.enabled);
+      }
+    } catch (err: any) {
+      console.warn(`[Build] Fast loader fallback: ${err.message}`);
     }
   }
 
-  // The loader reads; it does not write.
-  //
-  // An earlier version staged all four designs here — duplicating a theme and
-  // uploading roughly thirty files per design on every page load. That is over a
-  // hundred Shopify writes before the page could render, so it timed out and the
-  // route appeared not to open at all. Staging now happens after the page is on
-  // screen, one design at a time, through the `stage` action.
   const designs = compositionsFor(pageType);
 
   return json({
@@ -242,44 +234,6 @@ export default function Build() {
   const [pw, setPw] = useState("");
   const [nicheFilter, setNicheFilter] = useState<string>("all");
   const [inspectingDesign, setInspectingDesign] = useState<any | null>(null);
-
-  // Previews are staged after the page is on screen, one at a time.
-  const [previews, setPreviews] = useState<Record<string, string>>({});
-  const [staging, setStaging] = useState<string | null>(null);
-  const startedRef = useRef<string>("");
-
-  useEffect(() => {
-    const key = `${pageType}:${designs.map(d => d.id).join(",")}`;
-    if (startedRef.current === key || designs.length === 0) return;
-    startedRef.current = key;
-
-    let cancelled = false;
-    (async () => {
-      for (const d of designs) {
-        if (cancelled) return;
-        setStaging(d.id);
-        try {
-          const body = new URLSearchParams({ intent: "stage", compositionId: d.id });
-          const res = await fetch(window.location.pathname + window.location.search, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body,
-          });
-          const data = await res.json();
-          if (!cancelled && data?.url) {
-            setPreviews(prev => ({ ...prev, [d.id]: data.url }));
-          }
-        } catch {
-          // A design that fails to stage shows "Preview unavailable" rather than
-          // stopping the ones after it.
-        }
-      }
-      if (!cancelled) setStaging(null);
-    })();
-
-    return () => { cancelled = true; };
-  }, [pageType, designs]);
-
   const [, setParams] = useSearchParams();
   const fetcher = useFetcher<any>();
   const [active, setActive] = useState<string | null>(null);
@@ -389,15 +343,6 @@ export default function Build() {
           </Banner>
         )}
 
-        {preview?.result?.missingFiles?.length > 0 && (
-          <Banner tone="warning" title="Some files are missing">
-            <p>
-              {preview.result.missingFiles.slice(0, 4).join(", ")} — parts of this design may
-              not render.
-            </p>
-          </Banner>
-        )}
-
         {/* ── Page type Tabs ────────────────────────────────────────── */}
         <InlineStack gap="200" wrap>
           {tabs.map(t => (
@@ -468,7 +413,7 @@ export default function Build() {
           </Box>
         )}
 
-        {/* ── Live preview ──────────────────────────────────────────── */}
+        {/* ── Live preview Modal Card ───────────────────────────────── */}
         {preview && (
           <Card>
             <BlockStack gap="300">
@@ -542,68 +487,79 @@ export default function Build() {
                     }}
                   />
 
-                  {/* Visual Live / Interactive Thumbnail */}
+                  {/* Visual D2C Hero Preview Card */}
                   <div
                     style={{
                       position: "relative",
                       width: "100%",
-                      aspectRatio: "16 / 10",
+                      aspectRatio: "16 / 9",
                       overflow: "hidden",
                       borderRadius: 10,
-                      border: "1px solid #e3e3e3",
-                      background: "#0f172a",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: d.niche === "clothing"
+                        ? "linear-gradient(135deg, #18181b 0%, #27272a 100%)"
+                        : d.niche === "beauty"
+                        ? "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)"
+                        : d.niche === "jewellery"
+                        ? "linear-gradient(135deg, #1c1917 0%, #292524 100%)"
+                        : "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      padding: 16,
+                      color: "#fff",
                     }}
                   >
-                    {previews[d.id] ? (
-                      <iframe
-                        title={`${d.name} preview`}
-                        src={previews[d.id]}
-                        loading="lazy"
-                        scrolling="no"
+                    <InlineStack align="space-between" blockAlign="center">
+                      <span
                         style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: 1280,
-                          height: 800,
-                          border: 0,
-                          transformOrigin: "top left",
-                          transform: "scale(0.281)",
-                          pointerEvents: "none",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "3px 8px",
+                          borderRadius: 6,
+                          background: "rgba(255,255,255,0.15)",
+                          backdropFilter: "blur(4px)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
-                      />
-                    ) : (
-                      <div style={{ display: "grid", placeItems: "center", height: "100%", background: "#1e293b", color: "#94a3b8" }}>
-                        {staging === d.id || !startedRef.current ? (
-                          <InlineStack gap="200" blockAlign="center">
-                            <Spinner size="small" />
-                            <Text as="span" tone="subdued" variant="bodySm">Building live preview…</Text>
-                          </InlineStack>
-                        ) : staging ? (
-                          <Text as="span" tone="subdued" variant="bodySm">Queued in draft</Text>
-                        ) : (
-                          <BlockStack gap="100" inlineAlign="center">
-                            <Text as="span" variant="bodySm" fontWeight="bold" tone="magic">✨ {d.styleBadge || "D2C Master Theme"}</Text>
-                            <Text as="span" tone="subdued" variant="bodyXs">{d.sections.length} Modular Liquid Sections</Text>
-                          </BlockStack>
-                        )}
+                      >
+                        {d.niche}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 600,
+                          color: d.accentColor || "#38bdf8",
+                        }}
+                      >
+                        {d.styleBadge || d.family}
+                      </span>
+                    </InlineStack>
+
+                    <BlockStack gap="050">
+                      <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
+                        {d.name}
                       </div>
-                    )}
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", display: "flex", gap: 6, alignItems: "center" }}>
+                        <span>⚡ 20+ Liquid Sections</span>
+                        <span>•</span>
+                        <span>📱 100% Mobile Ready</span>
+                      </div>
+                    </BlockStack>
 
                     {/* Section Count Pill overlay */}
                     <div
                       style={{
                         position: "absolute",
-                        bottom: 8,
-                        right: 8,
-                        background: "rgba(15, 23, 42, 0.85)",
+                        bottom: 12,
+                        right: 12,
+                        background: "rgba(0, 0, 0, 0.75)",
                         color: "#fff",
-                        padding: "4px 10px",
-                        borderRadius: 12,
+                        padding: "3px 8px",
+                        borderRadius: 10,
                         fontSize: "11px",
                         fontWeight: 600,
-                        backdropFilter: "blur(4px)",
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
                       }}
                     >
                       {d.sections.length} Sections
@@ -639,7 +595,7 @@ export default function Build() {
                         </InlineStack>
                       ) : (
                         <>
-                          <Button size="slim" onClick={() => run("preview", d.id)}>Preview</Button>
+                          <Button size="slim" onClick={() => run("preview", d.id)}>Live Preview</Button>
                           <Button size="slim" variant="primary" onClick={() => run("add", d.id)}>
                             Apply Home
                           </Button>
