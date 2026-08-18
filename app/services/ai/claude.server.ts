@@ -20,7 +20,13 @@ const anthropic = new Anthropic({
  */
 export async function generateStructuredJson<T>(
   systemInstruction: string,
-  userPrompt: string
+  userPrompt: string,
+  /**
+   * Raise this when the reply is a list. A truncated response fails
+   * `JSON.parse`, and every caller here swallows that into a fallback, so the
+   * only symptom is quietly worse output rather than an error.
+   */
+  maxTokens: number = 2048
 ): Promise<T> {
   try {
     const msg = await anthropic.messages.create({
@@ -28,7 +34,12 @@ export async function generateStructuredJson<T>(
       // brand and catalogue analysis silently fall back while copy generation
       // works, which is hard to spot from the outside.
       model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5",
-      max_tokens: 1024,
+      // 1024 was not enough for any caller that returns a list. Image
+      // classification asks for 25 objects and the reply was cut off mid-string
+      // at position 2097, so `JSON.parse` threw "Unterminated string" and the
+      // service silently fell back to heuristics — which label almost everything
+      // `product_cutout`, so heroes and lifestyle slots got product shots.
+      max_tokens: maxTokens,
       // `temperature` is rejected by current models, and every call here is
       // inside a try/catch that returns a fallback, so passing it turned this
       // into a silent no-op.

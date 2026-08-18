@@ -359,9 +359,16 @@ export function getNicheFallbackContent(
       // is worse than one credited to nobody, and it was on every page.
       if (/^(author|name|customer|reviewer|person|handle|username|user|role|job|designation|company)([_-]|$)/.test(id) ||
           /(author|handle|username)$/.test(id)) {
-        result[instance.sectionKey][setting.id] = /handle|username/.test(id)
-          ? ""                    // an invented social handle links nowhere
-          : "Verified buyer";     // true, and says nothing it cannot back up
+        //
+        // Left empty rather than filled. An earlier version of this used
+        // "Verified buyer", which the compliance guard below correctly rejects:
+        // the store has verified nothing, so attributing a review that way is a
+        // trust claim it cannot support. An invented social handle is the same
+        // problem — it links nowhere.
+        //
+        // A testimonial with no name reads as a testimonial awaiting its source.
+        // A testimonial signed "Verified buyer" reads as evidence, and isn't.
+        result[instance.sectionKey][setting.id] = "";
         continue;
       }
 

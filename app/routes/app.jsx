@@ -12,25 +12,30 @@ export const loader = async ({ request }) => {
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
 
+/**
+ * Four navigation items, down from fourteen.
+ *
+ * The old menu listed Generator, AI Builder, Design Studio, Sections, Section
+ * Library, Toolkit, Campaigns, Health Monitor, Validation Lab, Tracking,
+ * Features, History and Pincode Settings. A merchant opening the app for the
+ * first time had fourteen doors and no indication which one builds their store.
+ * Several led to the same job by different names.
+ *
+ * These four follow the actual sequence of work: see where you are, add
+ * sections, review what is on your theme, change how it behaves. The other
+ * screens still exist and are reachable by URL — they are simply not the first
+ * thing a new merchant has to choose between.
+ */
 export default function App() {
   const { apiKey } = useLoaderData();
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
-        <Link to="/app" rel="home">Dashboard</Link>
-        <Link to="/app/generator">Generator</Link>
-        <Link to="/app/ai-build">AI Builder</Link>
-        <Link to="/app/design">Design Studio</Link>
-        <Link to="/app/library">Section Library</Link>
-        <Link to="/app/toolkit">Toolkit</Link>
-        <Link to="/app/campaigns">Campaigns</Link>
-        <Link to="/app/health">Health Monitor</Link>
-        <Link to="/app/validation">Validation Lab</Link>
-        <Link to="/app/tracking">Tracking</Link>
-        <Link to="/app/features">Features</Link>
-        <Link to="/app/history">History</Link>
-        <Link to="/app/settings">Pincode Settings</Link>
+        <Link to="/app" rel="home">Home</Link>
+        <Link to="/app/sections">Add sections</Link>
+        <Link to="/app/theme">My theme</Link>
+        <Link to="/app/settings">Settings</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>
@@ -44,5 +49,3 @@ export function ErrorBoundary() {
 export const headers = (headersArgs) => {
   return boundary.headers(headersArgs);
 };
-
-{/* <label>Form field</label> */}

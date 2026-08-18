@@ -43,28 +43,53 @@ export class ImageAssignmentService {
       - "product_cutout": Isolated product shot on plain white or transparent studio background.
       - "other": Gift cards, logos, icons, banners with text overlay, or low-quality/irrelevant shots.
 
+      Refer to each image by the index it was given. Do NOT repeat the URL back —
+      the URLs are long and echoing 25 of them is what previously truncated the
+      reply mid-string and lost the whole classification.
+
       Return ONLY valid JSON matching this schema:
       {
         "classified": [
           {
-            "url": "string (exact url passed)",
+            "i": "number (the index of the image being classified)",
             "role": "hero_lifestyle | texture_ingredient | lookbook_editorial | portrait_avatar | product_cutout | other",
-            "qualityScore": "number (0-100)",
-            "description": "short 5-word description"
+            "qualityScore": "number (0-100)"
           }
         ]
       }
     `;
 
+    const batch = imageUrls.slice(0, 25);
     const userPrompt = JSON.stringify({
-      imageCount: imageUrls.length,
-      imageUrls: imageUrls.slice(0, 25)
+      imageCount: batch.length,
+      images: batch.map((url, i) => ({ i, url }))
     });
 
     try {
-      const result = await generateStructuredJson<{ classified: ClassifiedImage[] }>(systemInstruction, userPrompt);
+      const result = await generateStructuredJson<{ classified: Array<{ i: number; role: ImageRole; qualityScore: number }> }>(
+        systemInstruction,
+        userPrompt,
+        3000
+      );
+
       if (result?.classified && Array.isArray(result.classified)) {
-        return result.classified;
+        const mapped = result.classified
+          .filter(c => typeof c?.i === "number" && batch[c.i])
+          .map(c => ({
+            url: batch[c.i],
+            role: c.role,
+            qualityScore: typeof c.qualityScore === "number" ? c.qualityScore : 50,
+          }));
+
+        if (mapped.length > 0) {
+          if (mapped.length < batch.length) {
+            console.warn(
+              `[ImageAssignmentService] Model classified ${mapped.length} of ${batch.length} images; ` +
+              `the rest fall back to heuristics.`
+            );
+          }
+          return mapped;
+        }
       }
     } catch (err) {
       console.error("[ImageAssignmentService] Classification failed, falling back to heuristics.", err);
