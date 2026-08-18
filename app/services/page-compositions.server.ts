@@ -716,17 +716,26 @@ export async function publishDraft(shop: any, themeId: string) {
  * button whose effect is a mystery.
  */
 export async function draftChanges(shop: any, themeId: string): Promise<PageType[]> {
+  const entries = Object.entries(TEMPLATE_FILE) as Array<[PageType, string]>;
   const changed: PageType[] = [];
-  for (const [pageType, file] of Object.entries(TEMPLATE_FILE) as Array<[PageType, string]>) {
-    try {
+
+  const results = await Promise.allSettled(
+    entries.map(async ([pageType, file]) => {
       const raw = await readFile(shop, themeId, file);
       const doc = JSON.parse(raw || "{}");
-      // Compositions write numbered keys; nothing else in a Shopify theme does.
       const keys: string[] = Array.isArray(doc.order) ? doc.order : [];
-      if (keys.some(k => /^\d{2}-/.test(k))) changed.push(pageType);
-    } catch {
-      /* a template that cannot be read simply is not counted as changed */
+      if (keys.some(k => /^\d{2}-/.test(k))) {
+        return pageType;
+      }
+      return null;
+    })
+  );
+
+  for (const res of results) {
+    if (res.status === "fulfilled" && res.value) {
+      changed.push(res.value);
     }
   }
+
   return changed;
 }

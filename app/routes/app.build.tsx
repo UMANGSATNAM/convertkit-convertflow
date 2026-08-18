@@ -29,62 +29,79 @@ const PAGE_TABS: Array<{ id: PageType; label: string }> = [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
-  const url = new URL(request.url);
-  const pageType = (url.searchParams.get("page") || "index") as PageType;
+  try {
+    const { session } = await authenticate.admin(request);
+    const url = new URL(request.url);
+    const pageType = (url.searchParams.get("page") || "index") as PageType;
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+    const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
 
-  let staged: PageType[] = [];
-  let draftId: string | null = null;
-  let passwordProtected = false;
+    let staged: PageType[] = [];
+    let draftId: string | null = null;
+    let passwordProtected = false;
 
-  if (shop) {
-    // Fast parallel resolution with timeout protection so page renders immediately
-    try {
-      const { graphqlRequest } = await import("../services/shopify-api.server");
-      const [themesRes, pwdRes] = await Promise.allSettled([
-        graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 20) { nodes { id name } } }`),
-        graphqlRequest(shop.shopDomain, shop.accessToken, `query { onlineStore { passwordProtection { enabled } } }`),
-      ]);
+    if (shop) {
+      // Fast parallel resolution with timeout protection so page renders immediately
+      try {
+        const { graphqlRequest } = await import("../services/shopify-api.server");
+        const [themesRes, pwdRes] = await Promise.allSettled([
+          graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 20) { nodes { id name } } }`),
+          graphqlRequest(shop.shopDomain, shop.accessToken, `query { onlineStore { passwordProtection { enabled } } }`),
+        ]);
 
-      if (themesRes.status === "fulfilled" && themesRes.value?.themes?.nodes) {
-        const found = themesRes.value.themes.nodes.find((t: any) => t.name.startsWith("ConvertFlow — Draft"));
-        if (found) {
-          draftId = String(found.id).split("/").pop()!;
-          // Staged changes check
-          try {
-            staged = await draftChanges(shop, draftId);
-          } catch {
-            staged = [];
+        if (themesRes.status === "fulfilled" && themesRes.value?.themes?.nodes) {
+          const found = themesRes.value.themes.nodes.find((t: any) => t.name.startsWith("ConvertFlow — Draft"));
+          if (found) {
+            draftId = String(found.id).split("/").pop()!;
+            try {
+              staged = await draftChanges(shop, draftId);
+            } catch {
+              staged = [];
+            }
           }
         }
-      }
 
-      if (pwdRes.status === "fulfilled" && pwdRes.value?.onlineStore?.passwordProtection) {
-        passwordProtected = Boolean(pwdRes.value.onlineStore.passwordProtection.enabled);
+        if (pwdRes.status === "fulfilled" && pwdRes.value?.onlineStore?.passwordProtection) {
+          passwordProtected = Boolean(pwdRes.value.onlineStore.passwordProtection.enabled);
+        }
+      } catch (err: any) {
+        console.warn(`[Build] Fast loader fallback: ${err.message}`);
       }
-    } catch (err: any) {
-      console.warn(`[Build] Fast loader fallback: ${err.message}`);
     }
+
+    const designs = compositionsFor(pageType);
+
+    return json({
+      passwordProtected,
+      hasPassword: Boolean((shop?.brandConfig as any)?.storefrontPassword),
+      shopDomain: session?.shop || "",
+      pageType,
+      tabs: PAGE_TABS,
+      designs,
+      counts: Object.fromEntries(
+        PAGE_TABS.map(t => [t.id, COMPOSITIONS.filter(c => c.pageType === t.id).length])
+      ),
+      staged,
+      draftId,
+      connected: Boolean(shop),
+    });
+  } catch (err: any) {
+    console.error("[Build Loader Error]", err);
+    return json({
+      passwordProtected: false,
+      hasPassword: false,
+      shopDomain: "",
+      pageType: "index" as PageType,
+      tabs: PAGE_TABS,
+      designs: compositionsFor("index"),
+      counts: Object.fromEntries(
+        PAGE_TABS.map(t => [t.id, COMPOSITIONS.filter(c => c.pageType === t.id).length])
+      ),
+      staged: [],
+      draftId: null,
+      connected: true,
+    });
   }
-
-  const designs = compositionsFor(pageType);
-
-  return json({
-    passwordProtected,
-    hasPassword: Boolean((shop?.brandConfig as any)?.storefrontPassword),
-    shopDomain: session.shop,
-    pageType,
-    tabs: PAGE_TABS,
-    designs,
-    counts: Object.fromEntries(
-      PAGE_TABS.map(t => [t.id, COMPOSITIONS.filter(c => c.pageType === t.id).length])
-    ),
-    staged,
-    draftId,
-    connected: Boolean(shop),
-  });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -728,6 +745,19 @@ export default function Build() {
         <Divider />
         <Text as="p" tone="subdued" variant="bodySm">{shopDomain}</Text>
       </BlockStack>
+    </Page>
+  );
+}
+
+export function ErrorBoundary() {
+  return (
+    <Page title="Make your store">
+      <Banner tone="warning" title="Could not load store builder">
+        <BlockStack gap="200">
+          <p>There was a temporary issue loading your store designs. Please refresh the page.</p>
+          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
+        </BlockStack>
+      </Banner>
     </Page>
   );
 }
