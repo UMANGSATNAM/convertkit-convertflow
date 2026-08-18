@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner, TextField,
 } from "@shopify/polaris";
@@ -70,59 +70,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
   }
 
-  // Stage every design for this page type as an alternate template so the grid
-  // can show real previews without the merchant pressing anything.
+  // The loader reads; it does not write.
   //
-  // A theme has one `index.json`, so four designs cannot coexist in it. Shopify
-  // serves `templates/index.<variant>.json` at `?view=<variant>`, which lets all
-  // of them live in the same draft and be previewed side by side.
+  // An earlier version staged all four designs here — duplicating a theme and
+  // uploading roughly thirty files per design on every page load. That is over a
+  // hundred Shopify writes before the page could render, so it timed out and the
+  // route appeared not to open at all. Staging now happens after the page is on
+  // screen, one design at a time, through the `stage` action.
   const designs = compositionsFor(pageType);
-  let previews: Record<string, string> = {};
-  if (shop && designs.length > 0) {
-    try {
-      const draft = await ensureDraftTheme(shop);
-      draftId = draft.id;
-
-      const { graphqlRequest } = await import("../services/shopify-api.server");
-      let handles: string[] = [];
-      try {
-        const res = await graphqlRequest(
-          shop.shopDomain, shop.accessToken,
-          `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
-            nodes { handle productsCount { count } } } }`
-        );
-        handles = (res?.collections?.nodes || [])
-          .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
-          .map((c: any) => c.handle);
-      } catch { handles = []; }
-
-      const palette = {
-        background: (shop.brandConfig as any)?.colors?.background,
-        text: (shop.brandConfig as any)?.colors?.text,
-        accent: (shop.brandConfig as any)?.colors?.primary,
-        accentAlt: (shop.brandConfig as any)?.colors?.accent,
-      };
-
-      const stamp = Date.now();
-      for (const d of designs) {
-        const variant = `cf-${d.id}`;
-        await applyComposition(shop, draft.id, d, { collections: handles, palette, variant });
-        const base =
-          d.pageType === "cart" ? "/cart"
-          : d.pageType === "collection" || d.pageType === "product" ? "/collections/all"
-          : "/";
-        previews[d.id] =
-          `/app/preview?theme=${draft.id}&path=${encodeURIComponent(`${base}?view=${variant}`)}&_cf=${stamp}`;
-      }
-    } catch (err: any) {
-      // A failure here costs the thumbnails, not the page. The merchant can
-      // still add a design; they just will not see it first.
-      console.warn(`[Build] Could not stage previews: ${err.message}`);
-    }
-  }
 
   return json({
-    previews,
     passwordProtected,
     hasPassword: Boolean((shop?.brandConfig as any)?.storefrontPassword),
     shopDomain: session.shop,
@@ -205,6 +162,53 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       });
     }
 
+    if (intent === "stage") {
+      // One design, on demand. Called by the grid after it renders, so the page
+      // is interactive while previews fill in behind it.
+      const id = String(form.get("compositionId"));
+      const design = COMPOSITIONS.find(c => c.id === id);
+      if (!design) return json({ error: `Unknown design "${id}"` }, { status: 400 });
+
+      const draft = await ensureDraftTheme(shop);
+      const variant = `cf-${design.id}`;
+
+      let handles: string[] = [];
+      try {
+        const { graphqlRequest } = await import("../services/shopify-api.server");
+        const res = await graphqlRequest(
+          shop.shopDomain, shop.accessToken,
+          `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
+            nodes { handle productsCount { count } } } }`
+        );
+        handles = (res?.collections?.nodes || [])
+          .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
+          .map((c: any) => c.handle);
+      } catch { handles = []; }
+
+      await applyComposition(shop, draft.id, design, {
+        collections: handles,
+        variant,
+        palette: {
+          background: (shop.brandConfig as any)?.colors?.background,
+          text: (shop.brandConfig as any)?.colors?.text,
+          accent: (shop.brandConfig as any)?.colors?.primary,
+          accentAlt: (shop.brandConfig as any)?.colors?.accent,
+        },
+      });
+
+      const base =
+        design.pageType === "cart" ? "/cart"
+        : design.pageType === "collection" || design.pageType === "product" ? "/collections/all"
+        : "/";
+
+      return json({
+        ok: true,
+        intent,
+        compositionId: id,
+        url: `/app/preview?theme=${draft.id}&path=${encodeURIComponent(`${base}?view=${variant}`)}&_cf=${Date.now()}`,
+      });
+    }
+
     if (intent === "save-password") {
       // Shopify does not expose the storefront password through the Admin API,
       // so a development or trial store cannot be fetched by this app without
@@ -234,8 +238,48 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Build() {
   const { pageType, tabs, designs, counts, staged, shopDomain, connected,
-          passwordProtected, hasPassword, previews } = useLoaderData<typeof loader>();
+          passwordProtected, hasPassword } = useLoaderData<typeof loader>();
   const [pw, setPw] = useState("");
+  const [nicheFilter, setNicheFilter] = useState<string>("all");
+  const [inspectingDesign, setInspectingDesign] = useState<any | null>(null);
+
+  // Previews are staged after the page is on screen, one at a time.
+  const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [staging, setStaging] = useState<string | null>(null);
+  const startedRef = useRef<string>("");
+
+  useEffect(() => {
+    const key = `${pageType}:${designs.map(d => d.id).join(",")}`;
+    if (startedRef.current === key || designs.length === 0) return;
+    startedRef.current = key;
+
+    let cancelled = false;
+    (async () => {
+      for (const d of designs) {
+        if (cancelled) return;
+        setStaging(d.id);
+        try {
+          const body = new URLSearchParams({ intent: "stage", compositionId: d.id });
+          const res = await fetch(window.location.pathname + window.location.search, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body,
+          });
+          const data = await res.json();
+          if (!cancelled && data?.url) {
+            setPreviews(prev => ({ ...prev, [d.id]: data.url }));
+          }
+        } catch {
+          // A design that fails to stage shows "Preview unavailable" rather than
+          // stopping the ones after it.
+        }
+      }
+      if (!cancelled) setStaging(null);
+    })();
+
+    return () => { cancelled = true; };
+  }, [pageType, designs]);
+
   const [, setParams] = useSearchParams();
   const fetcher = useFetcher<any>();
   const [active, setActive] = useState<string | null>(null);
@@ -250,10 +294,24 @@ export default function Build() {
     fetcher.submit({ intent, compositionId }, { method: "post" });
   };
 
+  // Filter designs based on selected niche filter
+  const filteredDesigns = designs.filter(d => {
+    if (nicheFilter === "all") return true;
+    return d.niche === nicheFilter;
+  });
+
+  const nicheCounts = {
+    all: designs.length,
+    clothing: designs.filter(d => d.niche === "clothing").length,
+    beauty: designs.filter(d => d.niche === "beauty").length,
+    jewellery: designs.filter(d => d.niche === "jewellery").length,
+    tech: designs.filter(d => d.niche === "tech").length,
+  };
+
   return (
     <Page
       title="Make your store"
-      subtitle="Pick a page design, see it on your store, then publish when you are happy."
+      subtitle="Pick a comprehensive D2C page design (20-22 modular sections), see it on your store, then publish when you are happy."
       backAction={{ content: "Home", url: "/app" }}
       primaryAction={
         staged.length > 0
@@ -340,20 +398,75 @@ export default function Build() {
           </Banner>
         )}
 
-        {/* ── Page type ─────────────────────────────────────────────── */}
+        {/* ── Page type Tabs ────────────────────────────────────────── */}
         <InlineStack gap="200" wrap>
           {tabs.map(t => (
             <Button
               key={t.id}
               pressed={t.id === pageType}
               disabled={(counts as any)[t.id] === 0}
-              onClick={() => setParams({ page: t.id })}
+              onClick={() => {
+                setNicheFilter("all");
+                setParams({ page: t.id });
+              }}
             >
               {t.label}
               {(counts as any)[t.id] > 0 ? ` · ${(counts as any)[t.id]}` : " · soon"}
             </Button>
           ))}
         </InlineStack>
+
+        {/* ── Niche Filter Pills (For Homepage Index) ───────────────── */}
+        {pageType === "index" && (
+          <Box paddingBlockStart="100" paddingBlockEnd="100">
+            <InlineStack gap="150" wrap blockAlign="center">
+              <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">Niche Filters:</Text>
+              <Button
+                size="slim"
+                pressed={nicheFilter === "all"}
+                onClick={() => setNicheFilter("all")}
+              >
+                All Homepages ({nicheCounts.all})
+              </Button>
+              {nicheCounts.clothing > 0 && (
+                <Button
+                  size="slim"
+                  pressed={nicheFilter === "clothing"}
+                  onClick={() => setNicheFilter("clothing")}
+                >
+                  👗 Clothing ({nicheCounts.clothing})
+                </Button>
+              )}
+              {nicheCounts.beauty > 0 && (
+                <Button
+                  size="slim"
+                  pressed={nicheFilter === "beauty"}
+                  onClick={() => setNicheFilter("beauty")}
+                >
+                  ✨ Beauty & Skincare ({nicheCounts.beauty})
+                </Button>
+              )}
+              {nicheCounts.jewellery > 0 && (
+                <Button
+                  size="slim"
+                  pressed={nicheFilter === "jewellery"}
+                  onClick={() => setNicheFilter("jewellery")}
+                >
+                  💎 Jewellery ({nicheCounts.jewellery})
+                </Button>
+              )}
+              {nicheCounts.tech > 0 && (
+                <Button
+                  size="slim"
+                  pressed={nicheFilter === "tech"}
+                  onClick={() => setNicheFilter("tech")}
+                >
+                  ⚡ Tech & Audio ({nicheCounts.tech})
+                </Button>
+              )}
+            </InlineStack>
+          </Box>
+        )}
 
         {/* ── Live preview ──────────────────────────────────────────── */}
         {preview && (
@@ -398,13 +511,13 @@ export default function Build() {
           </Card>
         )}
 
-        {/* ── Designs ───────────────────────────────────────────────── */}
-        {designs.length === 0 ? (
+        {/* ── Designs Grid ─────────────────────────────────────────── */}
+        {filteredDesigns.length === 0 ? (
           <Card>
             <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">Nothing here yet</Text>
+              <Text as="h3" variant="headingSm">No designs in this filter</Text>
               <Text as="p" tone="subdued">
-                Designs for this page are being built. Home page designs are ready now.
+                Select 'All' to view all available D2C home page architectures.
               </Text>
             </BlockStack>
           </Card>
@@ -412,27 +525,33 @@ export default function Build() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-              gap: 20,
+              gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+              gap: 24,
             }}
           >
-            {designs.map(d => (
+            {filteredDesigns.map(d => (
               <Card key={d.id}>
                 <BlockStack gap="300">
-                  {/* A live thumbnail rather than a button that produces one.
-                      The page is rendered at desktop width and scaled down, so
-                      the proportions match what a visitor sees — a preview
-                      squeezed into 340px would show the mobile layout and
-                      misrepresent the design. */}
+                  {/* Top accent badge header */}
+                  <div
+                    style={{
+                      height: 4,
+                      width: "100%",
+                      borderRadius: 4,
+                      background: d.accentColor || "#2563eb",
+                    }}
+                  />
+
+                  {/* Visual Live / Interactive Thumbnail */}
                   <div
                     style={{
                       position: "relative",
                       width: "100%",
-                      aspectRatio: "4 / 3",
+                      aspectRatio: "16 / 10",
                       overflow: "hidden",
                       borderRadius: 10,
                       border: "1px solid #e3e3e3",
-                      background: "#f6f6f7",
+                      background: "#0f172a",
                     }}
                   >
                     {previews[d.id] ? (
@@ -446,48 +565,207 @@ export default function Build() {
                           top: 0,
                           left: 0,
                           width: 1280,
-                          height: 960,
+                          height: 800,
                           border: 0,
                           transformOrigin: "top left",
-                          // 1280 is the design width the sections are built for.
-                          transform: "scale(0.2656)",
+                          transform: "scale(0.281)",
                           pointerEvents: "none",
                         }}
                       />
                     ) : (
-                      <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
-                        <Text as="span" tone="subdued" variant="bodySm">Preview unavailable</Text>
+                      <div style={{ display: "grid", placeItems: "center", height: "100%", background: "#1e293b", color: "#94a3b8" }}>
+                        {staging === d.id || !startedRef.current ? (
+                          <InlineStack gap="200" blockAlign="center">
+                            <Spinner size="small" />
+                            <Text as="span" tone="subdued" variant="bodySm">Building live preview…</Text>
+                          </InlineStack>
+                        ) : staging ? (
+                          <Text as="span" tone="subdued" variant="bodySm">Queued in draft</Text>
+                        ) : (
+                          <BlockStack gap="100" inlineAlign="center">
+                            <Text as="span" variant="bodySm" fontWeight="bold" tone="magic">✨ {d.styleBadge || "D2C Master Theme"}</Text>
+                            <Text as="span" tone="subdued" variant="bodyXs">{d.sections.length} Modular Liquid Sections</Text>
+                          </BlockStack>
+                        )}
                       </div>
                     )}
+
+                    {/* Section Count Pill overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 8,
+                        right: 8,
+                        background: "rgba(15, 23, 42, 0.85)",
+                        color: "#fff",
+                        padding: "4px 10px",
+                        borderRadius: 12,
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        backdropFilter: "blur(4px)",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                      }}
+                    >
+                      {d.sections.length} Sections
+                    </div>
                   </div>
 
-                  <BlockStack gap="100">
-                    <InlineStack gap="200" blockAlign="center">
+                  <BlockStack gap="150">
+                    <InlineStack gap="150" align="space-between" blockAlign="center">
                       <Text as="h3" variant="headingSm">{d.name}</Text>
-                      <Badge>{d.family}</Badge>
+                      <InlineStack gap="100">
+                        {d.styleBadge && <Badge tone="info">{d.styleBadge}</Badge>}
+                        <Badge>{d.family}</Badge>
+                      </InlineStack>
                     </InlineStack>
+
                     <Text as="p" tone="subdued" variant="bodySm">{d.description}</Text>
-                    <Text as="p" tone="subdued" variant="bodySm">{d.sections.length} sections</Text>
                   </BlockStack>
 
-                  <InlineStack gap="200">
-                    {busy && active === d.id ? (
-                      <InlineStack gap="150" blockAlign="center">
-                        <Spinner size="small" />
-                        <Text as="span" tone="subdued" variant="bodySm">Adding…</Text>
-                      </InlineStack>
-                    ) : (
-                      <>
-                        <Button variant="primary" onClick={() => run("add", d.id)}>
-                          Add this page
-                        </Button>
-                        <Button onClick={() => run("preview", d.id)}>Full size</Button>
-                      </>
-                    )}
+                  <InlineStack gap="200" align="space-between" blockAlign="center">
+                    <Button
+                      size="slim"
+                      variant="plain"
+                      onClick={() => setInspectingDesign(d)}
+                    >
+                      Inspect {d.sections.length} sections ▾
+                    </Button>
+
+                    <InlineStack gap="150">
+                      {busy && active === d.id ? (
+                        <InlineStack gap="100" blockAlign="center">
+                          <Spinner size="small" />
+                          <Text as="span" tone="subdued" variant="bodySm">Staging…</Text>
+                        </InlineStack>
+                      ) : (
+                        <>
+                          <Button size="slim" onClick={() => run("preview", d.id)}>Preview</Button>
+                          <Button size="slim" variant="primary" onClick={() => run("add", d.id)}>
+                            Apply Home
+                          </Button>
+                        </>
+                      )}
+                    </InlineStack>
                   </InlineStack>
                 </BlockStack>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* ── Section Inspector Modal ───────────────────────────────── */}
+        {inspectingDesign && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              padding: 20,
+            }}
+            onClick={() => setInspectingDesign(null)}
+          >
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: 16,
+                maxWidth: 680,
+                width: "100%",
+                maxHeight: "85vh",
+                overflowY: "auto",
+                padding: 24,
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="center">
+                  <BlockStack gap="050">
+                    <InlineStack gap="200" blockAlign="center">
+                      <Text as="h2" variant="headingMd">{inspectingDesign.name}</Text>
+                      <Badge tone="info">{inspectingDesign.sections.length} Sections</Badge>
+                    </InlineStack>
+                    <Text as="p" tone="subdued" variant="bodySm">{inspectingDesign.description}</Text>
+                  </BlockStack>
+                  <Button variant="plain" onClick={() => setInspectingDesign(null)}>✕ Close</Button>
+                </InlineStack>
+
+                <Divider />
+
+                <Text as="h3" variant="headingSm">Section Flow (Top to Bottom):</Text>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {inspectingDesign.header && (
+                    <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Text as="span" fontWeight="bold">Header Chrome</Text>
+                      <Badge tone="success">{inspectingDesign.header}</Badge>
+                    </div>
+                  )}
+
+                  {inspectingDesign.sections.map((s: any, idx: number) => {
+                    const isHero = s.componentId.includes("hero");
+                    const isProduct = s.componentId.includes("grid") || s.componentId.includes("collection") || s.componentId.includes("bestseller");
+                    const isStory = s.componentId.includes("story") || s.componentId.includes("founder") || s.componentId.includes("ingredients");
+                    const isUgc = s.componentId.includes("ugc") || s.componentId.includes("instagram") || s.componentId.includes("reels");
+                    const isTrust = s.componentId.includes("testimonial") || s.componentId.includes("press") || s.componentId.includes("trust") || s.componentId.includes("stats") || s.componentId.includes("faq");
+                    const isPopup = s.componentId.includes("popup") || s.componentId.includes("wheel") || s.componentId.includes("exit");
+                    const isFooter = s.componentId.includes("footer");
+
+                    const badgeTone = isHero ? "magic" : isProduct ? "attention" : isTrust ? "success" : isUgc ? "info" : "subdued";
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: 8,
+                          background: isHero ? "#f0fdf4" : isPopup ? "#fef2f2" : "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <InlineStack gap="200" blockAlign="center">
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", width: 24 }}>#{idx + 1}</span>
+                          <Text as="span" fontWeight="semibold">
+                            {s.componentId.replace(/^(hp\d+-|hero-|footer-|header-|popup-)/, "").replace(/-/g, " ").toUpperCase()}
+                          </Text>
+                        </InlineStack>
+                        <Badge tone={badgeTone as any}>{s.componentId}</Badge>
+                      </div>
+                    );
+                  })}
+
+                  {inspectingDesign.footer && (
+                    <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Text as="span" fontWeight="bold">Footer Chrome</Text>
+                      <Badge tone="success">{inspectingDesign.footer}</Badge>
+                    </div>
+                  )}
+                </div>
+
+                <InlineStack align="end" gap="200">
+                  <Button onClick={() => setInspectingDesign(null)}>Close</Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      const id = inspectingDesign.id;
+                      setInspectingDesign(null);
+                      run("add", id);
+                    }}
+                  >
+                    Apply {inspectingDesign.name}
+                  </Button>
+                </InlineStack>
+              </BlockStack>
+            </div>
           </div>
         )}
 
