@@ -270,6 +270,16 @@ export async function applyComposition(
     palette?: { background?: string; text?: string; accent?: string; accentAlt?: string; surface?: string };
     /** Collection handles to wire into any section that shows products. */
     collections?: string[];
+    /**
+     * Write as an alternate template (`templates/index.<variant>.json`) rather
+     * than replacing the page.
+     *
+     * A theme has one `index.json`, so staging four designs for side-by-side
+     * preview is impossible without this — each would overwrite the last.
+     * Shopify serves an alternate template at `?view=<variant>`, so every design
+     * can sit in the same draft theme at once and be previewed independently.
+     */
+    variant?: string;
   } = {}
 ): Promise<ApplyResult> {
   const { known } = await verifyCompositions();
@@ -297,7 +307,10 @@ export async function applyComposition(
     order.push(key);
   }
 
-  const templateFile = TEMPLATE_FILE[composition.pageType];
+  const base = TEMPLATE_FILE[composition.pageType];
+  const templateFile = options.variant
+    ? base.replace(/\.json$/, `.${options.variant}.json`)
+    : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
 
   // Header and footer live in section groups, which are shared across every
@@ -305,6 +318,10 @@ export async function applyComposition(
   // up with two headers — a mistake this project has already shipped once.
   for (const [slot, componentId] of [["header", composition.header], ["footer", composition.footer]] as const) {
     if (!componentId) continue;
+    // Section groups are shared across every template, so a variant staged only
+    // for preview must leave them alone. Otherwise previewing four designs would
+    // leave the header belonging to whichever was staged last.
+    if (options.variant) continue;
     const liquidPath = known.get(componentId);
     if (!liquidPath) {
       missingFiles.push(componentId);

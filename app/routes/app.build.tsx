@@ -70,13 +70,65 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
   }
 
+  // Stage every design for this page type as an alternate template so the grid
+  // can show real previews without the merchant pressing anything.
+  //
+  // A theme has one `index.json`, so four designs cannot coexist in it. Shopify
+  // serves `templates/index.<variant>.json` at `?view=<variant>`, which lets all
+  // of them live in the same draft and be previewed side by side.
+  const designs = compositionsFor(pageType);
+  let previews: Record<string, string> = {};
+  if (shop && designs.length > 0) {
+    try {
+      const draft = await ensureDraftTheme(shop);
+      draftId = draft.id;
+
+      const { graphqlRequest } = await import("../services/shopify-api.server");
+      let handles: string[] = [];
+      try {
+        const res = await graphqlRequest(
+          shop.shopDomain, shop.accessToken,
+          `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
+            nodes { handle productsCount { count } } } }`
+        );
+        handles = (res?.collections?.nodes || [])
+          .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
+          .map((c: any) => c.handle);
+      } catch { handles = []; }
+
+      const palette = {
+        background: (shop.brandConfig as any)?.colors?.background,
+        text: (shop.brandConfig as any)?.colors?.text,
+        accent: (shop.brandConfig as any)?.colors?.primary,
+        accentAlt: (shop.brandConfig as any)?.colors?.accent,
+      };
+
+      const stamp = Date.now();
+      for (const d of designs) {
+        const variant = `cf-${d.id}`;
+        await applyComposition(shop, draft.id, d, { collections: handles, palette, variant });
+        const base =
+          d.pageType === "cart" ? "/cart"
+          : d.pageType === "collection" || d.pageType === "product" ? "/collections/all"
+          : "/";
+        previews[d.id] =
+          `/app/preview?theme=${draft.id}&path=${encodeURIComponent(`${base}?view=${variant}`)}&_cf=${stamp}`;
+      }
+    } catch (err: any) {
+      // A failure here costs the thumbnails, not the page. The merchant can
+      // still add a design; they just will not see it first.
+      console.warn(`[Build] Could not stage previews: ${err.message}`);
+    }
+  }
+
   return json({
+    previews,
     passwordProtected,
     hasPassword: Boolean((shop?.brandConfig as any)?.storefrontPassword),
     shopDomain: session.shop,
     pageType,
     tabs: PAGE_TABS,
-    designs: compositionsFor(pageType),
+    designs,
     counts: Object.fromEntries(
       PAGE_TABS.map(t => [t.id, COMPOSITIONS.filter(c => c.pageType === t.id).length])
     ),
@@ -182,7 +234,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Build() {
   const { pageType, tabs, designs, counts, staged, shopDomain, connected,
-          passwordProtected, hasPassword } = useLoaderData<typeof loader>();
+          passwordProtected, hasPassword, previews } = useLoaderData<typeof loader>();
   const [pw, setPw] = useState("");
   const [, setParams] = useSearchParams();
   const fetcher = useFetcher<any>();
@@ -360,35 +412,76 @@ export default function Build() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 16,
+              gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+              gap: 20,
             }}
           >
             {designs.map(d => (
               <Card key={d.id}>
                 <BlockStack gap="300">
+                  {/* A live thumbnail rather than a button that produces one.
+                      The page is rendered at desktop width and scaled down, so
+                      the proportions match what a visitor sees — a preview
+                      squeezed into 340px would show the mobile layout and
+                      misrepresent the design. */}
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      aspectRatio: "4 / 3",
+                      overflow: "hidden",
+                      borderRadius: 10,
+                      border: "1px solid #e3e3e3",
+                      background: "#f6f6f7",
+                    }}
+                  >
+                    {previews[d.id] ? (
+                      <iframe
+                        title={`${d.name} preview`}
+                        src={previews[d.id]}
+                        loading="lazy"
+                        scrolling="no"
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: 1280,
+                          height: 960,
+                          border: 0,
+                          transformOrigin: "top left",
+                          // 1280 is the design width the sections are built for.
+                          transform: "scale(0.2656)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    ) : (
+                      <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
+                        <Text as="span" tone="subdued" variant="bodySm">Preview unavailable</Text>
+                      </div>
+                    )}
+                  </div>
+
                   <BlockStack gap="100">
                     <InlineStack gap="200" blockAlign="center">
                       <Text as="h3" variant="headingSm">{d.name}</Text>
                       <Badge>{d.family}</Badge>
                     </InlineStack>
                     <Text as="p" tone="subdued" variant="bodySm">{d.description}</Text>
-                    <Text as="p" tone="subdued" variant="bodySm">
-                      {d.sections.length} sections
-                    </Text>
+                    <Text as="p" tone="subdued" variant="bodySm">{d.sections.length} sections</Text>
                   </BlockStack>
+
                   <InlineStack gap="200">
                     {busy && active === d.id ? (
                       <InlineStack gap="150" blockAlign="center">
                         <Spinner size="small" />
-                        <Text as="span" tone="subdued" variant="bodySm">Building preview…</Text>
+                        <Text as="span" tone="subdued" variant="bodySm">Adding…</Text>
                       </InlineStack>
                     ) : (
                       <>
-                        <Button onClick={() => run("preview", d.id)}>Preview</Button>
                         <Button variant="primary" onClick={() => run("add", d.id)}>
                           Add this page
                         </Button>
+                        <Button onClick={() => run("preview", d.id)}>Full size</Button>
                       </>
                     )}
                   </InlineStack>

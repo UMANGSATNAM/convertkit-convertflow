@@ -187,9 +187,7 @@ export default function Home() {
               </Text>
             </BlockStack>
             <Box>
-              <Link to="/app/build">
-                <Button variant="primary" size="large">Get started</Button>
-              </Link>
+              <Button url="/app/build" variant="primary" size="large">Get started</Button>
             </Box>
           </BlockStack>
         </Card>

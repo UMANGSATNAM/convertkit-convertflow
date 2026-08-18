@@ -143,9 +143,7 @@ export default function MyTheme() {
                     see it on your store first.
                   </Text>
                   <Box>
-                    <Link to="/app/sections">
-                      <Button variant="primary">Browse sections</Button>
-                    </Link>
+                    <Button url="/app/sections" variant="primary">Browse sections</Button>
                   </Box>
                 </BlockStack>
               </Card>
@@ -181,9 +179,7 @@ export default function MyTheme() {
 
                           <InlineStack gap="200">
                             {s.meta && (
-                              <Link to={`/app/sections?type=${s.meta.sectionType}`}>
-                                <Button>Swap</Button>
-                              </Link>
+                              <Button url={`/app/sections?type=${s.meta.sectionType}`}>Swap</Button>
                             )}
                             {/* A section the merchant's own theme shipped is not
                                 ours to remove — offering it invites breaking
