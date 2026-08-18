@@ -43,7 +43,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
 
   const components = await prisma.componentRegistry.findMany({
-    where: { sectionType: type, status: "production" },
+    // The seed maps registry.json's "production" to "PUBLISHED" when it writes
+    // the DB, so querying for "production" here returned nothing and the browser
+    // showed "0 designs available" for every type.
+    where: { sectionType: type, status: "PUBLISHED" },
     orderBy: { componentId: "asc" },
     take: 60,
   });
