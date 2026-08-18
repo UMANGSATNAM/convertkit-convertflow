@@ -125,32 +125,75 @@ export async function importCatalog(shop: any, catalogUrl: string, nicheId?: str
         }
       );
 
-      const variantsInput = product.variants.map((variant: any) => ({
-        price: variant.price,
-        compareAtPrice: variant.compare_at_price || null,
-        optionValues: [{ optionName: product.option_name || "Size", name: String(variant.title || "Default Title") }],
-        inventoryItem: { sku: variant.sku, tracked: false }
-      }));
-
-      const vResponse = await graphqlRequest(
+      // `productOptionsCreate` does not only create the option — passing it
+      // `values` makes Shopify generate a variant for each one. Trying to create
+      // those same variants afterwards failed with "The variant '30 ml' already
+      // exists", and because the create failed the catalogue's prices were never
+      // applied: every product kept the default price Shopify assigned.
+      //
+      // So the variants are updated, not created. Their ids are read back and
+      // matched to the catalogue by option value.
+      const existing = await graphqlRequest(
         shop.shopDomain,
         shop.accessToken,
         `
-        mutation productVariantsBulkCreate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-          productVariantsBulkCreate(productId: $productId, variants: $variants) {
-            productVariants { id }
-            userErrors { field message }
+        query productVariants($id: ID!) {
+          product(id: $id) {
+            variants(first: 100) {
+              nodes { id selectedOptions { name value } }
+            }
           }
         }
         `,
-        {
-          productId,
-          variants: variantsInput
-        }
+        { id: productId }
       );
-      
-      if (vResponse.productVariantsBulkCreate?.userErrors?.length > 0) {
-        console.error("Variant bulk create errors:", vResponse.productVariantsBulkCreate.userErrors);
+
+      const nodes = existing.product?.variants?.nodes || [];
+      const byValue = new Map<string, string>();
+      for (const node of nodes) {
+        const value = (node.selectedOptions || [])[0]?.value;
+        if (value) byValue.set(String(value), node.id);
+      }
+
+      const updates = product.variants
+        .map((variant: any) => {
+          const id = byValue.get(String(variant.title || "Default Title"));
+          if (!id) return null;
+          return {
+            id,
+            price: variant.price,
+            compareAtPrice: variant.compare_at_price || null,
+            inventoryItem: { sku: variant.sku, tracked: false }
+          };
+        })
+        .filter(Boolean);
+
+      if (updates.length !== product.variants.length) {
+        console.warn(
+          `[Catalog] "${product.title}": matched ${updates.length} of ${product.variants.length} variants ` +
+          `by option value. Unmatched ones keep Shopify's default price.`
+        );
+      }
+
+      if (updates.length > 0) {
+        const vResponse = await graphqlRequest(
+          shop.shopDomain,
+          shop.accessToken,
+          `
+          mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+            productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+              productVariants { id price }
+              userErrors { field message }
+            }
+          }
+          `,
+          { productId, variants: updates }
+        );
+
+        const errs = vResponse.productVariantsBulkUpdate?.userErrors || [];
+        if (errs.length > 0) {
+          console.error(`[Catalog] Variant update errors for "${product.title}":`, errs);
+        }
       }
 
       await sleep(250); // Rate limit backoff
