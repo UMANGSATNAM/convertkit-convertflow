@@ -48,6 +48,13 @@ export interface PageComposition {
   /** One line a merchant can judge the design by before previewing it. */
   description: string;
   sections: CompositionSection[];
+  /**
+   * Chrome that lives in a section group rather than the page template.
+   * A home page design that leaves the merchant's old header in place is only
+   * two thirds of a design.
+   */
+  header?: string;
+  footer?: string;
 }
 
 /**
@@ -58,6 +65,37 @@ export interface PageComposition {
  * a renamed component cannot leave a design silently broken.
  */
 export const COMPOSITIONS: PageComposition[] = [
+  {
+    id: "atelier-home",
+    name: "Atelier",
+    pageType: "index",
+    niche: "beauty",
+    family: "Luxury",
+    description:
+      "Fifteen bands, every one of them configurable. Announcement, marquee, hero, categories, two product bands, offer banner, story, reviews, FAQ and signup.",
+    // The hp19 family is the most complete set in the library: 23 sections, all
+    // responsive, most with twenty to thirty settings each. Composing a page
+    // from one family is also what keeps it looking designed rather than
+    // assembled — the type, spacing and radius decisions already agree.
+    header: "hp19-header",
+    sections: [
+      { componentId: "hp19-announcement-bar" },
+      { componentId: "hp19-marquee" },
+      { componentId: "hp19-hero" },
+      { componentId: "hp19-usp" },
+      { componentId: "hp19-category-tiles" },
+      { componentId: "hp19-featured-collection" },
+      { componentId: "hp19-offer-banner" },
+      { componentId: "hp19-brand-story" },
+      { componentId: "hp19-bestsellers" },
+      { componentId: "hp19-founder-note" },
+      { componentId: "hp19-instagram" },
+      { componentId: "hp19-testimonials" },
+      { componentId: "hp19-press-logos" },
+      { componentId: "hp19-faq" },
+      { componentId: "hp19-newsletter" },
+    ],
+  },
   {
     id: "peri-beauty-home",
     name: "Peri Beauty",
@@ -261,6 +299,38 @@ export async function applyComposition(
 
   const templateFile = TEMPLATE_FILE[composition.pageType];
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
+
+  // Header and footer live in section groups, which are shared across every
+  // page. Replacing the entry rather than adding one keeps a store from ending
+  // up with two headers — a mistake this project has already shipped once.
+  for (const [slot, componentId] of [["header", composition.header], ["footer", composition.footer]] as const) {
+    if (!componentId) continue;
+    const liquidPath = known.get(componentId);
+    if (!liquidPath) {
+      missingFiles.push(componentId);
+      continue;
+    }
+    const bundle = await resolveSectionBundle(componentId, liquidPath);
+    Object.assign(files, bundle.files);
+    missingFiles.push(...bundle.missing);
+
+    const groupFile = `sections/${slot}-group.json`;
+    let group: any;
+    try {
+      group = JSON.parse((await readFile(shop, themeId, groupFile)) || "{}");
+    } catch {
+      group = {};
+    }
+    if (!group.sections || typeof group.sections !== "object") group.sections = {};
+    if (!Array.isArray(group.order)) group.order = [];
+    if (!group.type) group.type = slot;
+
+    const existingSettings = group.sections[slot]?.settings || {};
+    group.sections[slot] = { type: componentId, settings: existingSettings };
+    if (!group.order.includes(slot)) group.order.push(slot);
+
+    files[groupFile] = JSON.stringify(group, null, 2);
+  }
 
   // ── Point every product-showing section at a real collection ──────────
   // A grid with no collection set renders its placeholder branch, which is what

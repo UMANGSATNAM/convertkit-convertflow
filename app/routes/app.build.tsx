@@ -2,7 +2,7 @@ import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-r
 import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
 import {
-  Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner,
+  Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner, TextField,
 } from "@shopify/polaris";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
@@ -54,7 +54,25 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
   }
 
+  let passwordProtected = false;
+  if (shop) {
+    try {
+      const { graphqlRequest } = await import("../services/shopify-api.server");
+      const res = await graphqlRequest(
+        shop.shopDomain, shop.accessToken,
+        `query { onlineStore { passwordProtection { enabled } } }`
+      );
+      passwordProtected = Boolean(res?.onlineStore?.passwordProtection?.enabled);
+    } catch {
+      // Older API versions do not expose this. The preview itself detects the
+      // password page, so this is only used to warn earlier.
+      passwordProtected = false;
+    }
+  }
+
   return json({
+    passwordProtected,
+    hasPassword: Boolean((shop?.brandConfig as any)?.storefrontPassword),
     shopDomain: session.shop,
     pageType,
     tabs: PAGE_TABS,
@@ -123,12 +141,30 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         intent,
         compositionId: id,
         name: design.name,
-        // Cache-busting so the iframe reloads after a re-apply rather than
-        // showing the previous design from cache.
-        url: `https://${session.shop}${pagePath}?preview_theme_id=${draft.id}&_cf=${Date.now()}`,
+        // Framed through this app's own origin. Shopify sends X-Frame-Options on
+        // storefront responses, so pointing the iframe straight at the store
+        // gives the browser nothing to render but "refused to connect".
+        url: `/app/preview?theme=${draft.id}&path=${encodeURIComponent(pagePath)}&_cf=${Date.now()}`,
+        // The real storefront URL, for opening in a tab when the merchant wants
+        // to click around rather than just look.
+        directUrl: `https://${session.shop}${pagePath}?preview_theme_id=${draft.id}`,
         draftCreated: draft.created,
         result,
       });
+    }
+
+    if (intent === "save-password") {
+      // Shopify does not expose the storefront password through the Admin API,
+      // so a development or trial store cannot be fetched by this app without
+      // the merchant supplying it. Stored on the shop record and exchanged for a
+      // storefront_digest cookie each time a preview is rendered.
+      const password = String(form.get("password") || "").trim();
+      const brand = (shop.brandConfig as any) || {};
+      await prisma.shop.update({
+        where: { id: shop.id },
+        data: { brandConfig: { ...brand, storefrontPassword: password || undefined } },
+      });
+      return json({ ok: true, intent, saved: Boolean(password) });
     }
 
     if (intent === "publish") {
@@ -145,8 +181,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Build() {
-  const { pageType, tabs, designs, counts, staged, shopDomain, connected } =
-    useLoaderData<typeof loader>();
+  const { pageType, tabs, designs, counts, staged, shopDomain, connected,
+          passwordProtected, hasPassword } = useLoaderData<typeof loader>();
+  const [pw, setPw] = useState("");
   const [, setParams] = useSearchParams();
   const fetcher = useFetcher<any>();
   const [active, setActive] = useState<string | null>(null);
@@ -186,6 +223,44 @@ export default function Build() {
         {data?.error && (
           <Banner tone="critical" title="That did not work">
             <p>{data.error}</p>
+          </Banner>
+        )}
+
+        {passwordProtected && !hasPassword && (
+          <Banner tone="warning" title="Your store is password protected">
+            <BlockStack gap="300">
+              <Text as="p">
+                Shopify does not share that password with apps, so previews cannot load
+                until you enter it here. It is only used to fetch your own storefront.
+              </Text>
+              <InlineStack gap="200" blockAlign="center">
+                <div style={{ minWidth: 220 }}>
+                  <TextField
+                    label="Storefront password"
+                    labelHidden
+                    autoComplete="off"
+                    value={pw}
+                    onChange={setPw}
+                    placeholder="Storefront password"
+                  />
+                </div>
+                <Button
+                  loading={busy}
+                  onClick={() => fetcher.submit({ intent: "save-password", password: pw }, { method: "post" })}
+                >
+                  Save
+                </Button>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">
+                Or remove it under Online Store → Preferences.
+              </Text>
+            </BlockStack>
+          </Banner>
+        )}
+
+        {data?.ok && data.intent === "save-password" && (
+          <Banner tone="success" title={data.saved ? "Password saved" : "Password cleared"}>
+            <p>Previews should load now. Try one below.</p>
           </Banner>
         )}
 
@@ -251,6 +326,7 @@ export default function Build() {
                   </Button>
                 )}
                 {preview.intent === "add" && <Badge tone="success">Added to draft</Badge>}
+                <Button url={preview.directUrl} target="_blank">Open in a tab</Button>
               </InlineStack>
 
               <Box borderColor="border" borderWidth="025" borderRadius="200" overflowX="hidden">
@@ -263,7 +339,8 @@ export default function Build() {
               </Box>
 
               <Text as="p" tone="subdued" variant="bodySm">
-                Running on your store with your real products. Nothing is live until you publish.
+                Running on your store with your real products. Links are disabled inside the
+                preview — use Open in a tab to click through. Nothing is live until you publish.
               </Text>
             </BlockStack>
           </Card>
