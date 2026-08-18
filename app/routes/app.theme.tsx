@@ -143,7 +143,9 @@ export default function MyTheme() {
                     see it on your store first.
                   </Text>
                   <Box>
-                    <Button url="/app/sections" variant="primary">Browse sections</Button>
+                    <Link to="/app/sections" style={{ textDecoration: "none" }}>
+                      <Button variant="primary">Browse sections</Button>
+                    </Link>
                   </Box>
                 </BlockStack>
               </Card>

@@ -187,7 +187,9 @@ export default function Home() {
               </Text>
             </BlockStack>
             <Box>
-              <Button url="/app/build" variant="primary" size="large">Get started</Button>
+              <Link to="/app/build" style={{ textDecoration: "none" }}>
+                <Button variant="primary" size="large">Get started</Button>
+              </Link>
             </Box>
           </BlockStack>
         </Card>

@@ -1,32 +1,17 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
-import { useState, useEffect, useRef } from "react";
+import { useLoaderData, useFetcher, useSearchParams, Link } from "@remix-run/react";
+import { useState } from "react";
 import {
   Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner, TextField,
 } from "@shopify/polaris";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import {
-  compositionsFor, applyComposition, ensureDraftTheme, publishDraft, draftChanges,
-  COMPOSITIONS, type PageType,
+  PAGE_TABS, COMPOSITIONS, compositionsFor, type PageType, type PageComposition,
+} from "../data/page-compositions";
+import {
+  applyComposition, ensureDraftTheme, publishDraft, draftChanges,
 } from "../services/page-compositions.server";
-
-/**
- * Pick a whole page design, see it running on your store, add it, publish.
- *
- * Everything lands in an unpublished draft first. A merchant can add a home
- * page, then a product page, look at all of it against their real catalogue, and
- * only Publish makes any of it visible to shoppers. That is the difference
- * between a tool you can experiment with and one you have to be brave to open.
- */
-
-const PAGE_TABS: Array<{ id: PageType; label: string }> = [
-  { id: "index", label: "Home page" },
-  { id: "product", label: "Product page" },
-  { id: "collection", label: "Collection page" },
-  { id: "cart", label: "Cart page" },
-  { id: "cart-drawer", label: "Cart drawer" },
-];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
