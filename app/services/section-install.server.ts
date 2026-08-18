@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 import path from "path";
 import { upsertThemeFilesBatched, readFile } from "./theme-engine/index";
 import { buildStorePalette, applyStorePalette, readSchema } from "./theme-engine/palette.server";
+import { migrateSettings, describeMigration } from "./settings-migration.server";
 
 /**
  * Installs one section from the library into a merchant's theme.
@@ -226,6 +227,118 @@ export async function installSection(
     missing: bundle.missing,
     paletteApplied,
   };
+}
+
+export interface SwapResult extends InstallResult {
+  replaced: string;
+  carried: number;
+  dropped: number;
+  summary: string;
+}
+
+/**
+ * Replaces one section on a page with another, bringing its settings across.
+ *
+ * This is the operation the whole section browser exists for. Installing a new
+ * section beside the old one and asking the merchant to delete the old one and
+ * re-pick their collection is not a swap — it is two chores. The value is that
+ * the new design arrives already showing the same products.
+ */
+export async function swapSection(
+  shop: any,
+  themeId: string,
+  targetFile: string,
+  sectionKey: string,
+  incoming: { componentId: string; liquidPath: string; sectionType?: string },
+  options: {
+    palette?: { background?: string; text?: string; accent?: string; accentAlt?: string; surface?: string };
+  } = {}
+): Promise<SwapResult> {
+  const doc = await readThemeJson(shop, themeId, targetFile);
+  const existing = doc?.sections?.[sectionKey];
+  if (!existing) {
+    throw new Error(`There is no section "${sectionKey}" in ${targetFile} to replace.`);
+  }
+
+  const outgoingType = String(existing.type);
+  const outgoingSource = filesToUploadCache.get(outgoingType) ?? (await readSectionSource(shop, themeId, outgoingType));
+  const incomingSource = await fs.readFile(path.join(ENGINE, incoming.liquidPath), "utf-8");
+
+  // When the outgoing section's Liquid cannot be read — it may be a section the
+  // merchant's own theme shipped — the swap still proceeds, just without
+  // carrying anything. Refusing would leave them unable to replace exactly the
+  // sections they most want to replace.
+  const migration = outgoingSource
+    ? migrateSettings(existing.settings || {}, outgoingSource, incomingSource)
+    : { settings: {}, carried: [], dropped: [] };
+
+  const target: InstallTarget = targetFile.endsWith("-group.json")
+    ? {
+        kind: "group",
+        group: targetFile.includes("header") ? "header" : "footer",
+        replace: sectionKey,
+      }
+    : { kind: "template", template: path.basename(targetFile, ".json") };
+
+  const result = await installSection(shop, themeId, incoming, target, {
+    settings: migration.settings,
+    palette: options.palette,
+  });
+
+  // installSection appends when the target is a template; for a swap the new
+  // section has to take the old one's place in the order, not sit at the end.
+  if (!targetFile.endsWith("-group.json")) {
+    const updated = await readThemeJson(shop, themeId, targetFile);
+    if (updated?.sections) {
+      const oldIndex = (doc.order || []).indexOf(sectionKey);
+      delete updated.sections[sectionKey];
+      updated.order = (updated.order || []).filter((k: string) => k !== sectionKey && k !== result.sectionKey);
+      if (oldIndex >= 0) updated.order.splice(oldIndex, 0, result.sectionKey);
+      else updated.order.push(result.sectionKey);
+
+      await upsertThemeFilesBatched(shop, themeId, {
+        [targetFile]: JSON.stringify(updated, null, 2),
+      });
+    }
+  }
+
+  return {
+    ...result,
+    replaced: outgoingType,
+    carried: migration.carried.length,
+    dropped: migration.dropped.length,
+    summary: describeMigration(migration as any),
+  };
+}
+
+/** Reads a section's Liquid out of the theme so its schema can be inspected. */
+const filesToUploadCache = new Map<string, string>();
+async function readSectionSource(shop: any, themeId: string, sectionType: string): Promise<string | null> {
+  // Prefer the library copy — it is the same file and avoids an API call.
+  const local = path.join(ENGINE, "components");
+  const candidates = existsSync(local)
+    ? require("fs").readdirSync(local, { withFileTypes: true })
+        .filter((e: any) => e.isDirectory())
+        .map((e: any) => path.join(local, e.name, `${sectionType}.liquid`))
+    : [];
+  for (const c of candidates) {
+    if (existsSync(c)) {
+      const src = await fs.readFile(c, "utf-8");
+      filesToUploadCache.set(sectionType, src);
+      return src;
+    }
+  }
+
+  try {
+    const raw = await readFile(shop, themeId, `sections/${sectionType}.liquid`);
+    if (raw && raw !== "{}") {
+      filesToUploadCache.set(sectionType, raw);
+      return raw;
+    }
+  } catch {
+    /* falls through */
+  }
+  return null;
 }
 
 /**
