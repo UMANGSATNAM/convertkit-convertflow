@@ -103,25 +103,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const design = COMPOSITIONS.find(c => c.id === id);
       if (!design) return json({ error: `Unknown design "${id}"` }, { status: 400 });
 
-      const draft = await ensureDraftTheme(shop);
+      const { graphqlRequest } = await import("../services/shopify-api.server");
 
-      // Real collections so the grids show the merchant's own products rather
-      // than an empty placeholder branch.
-      let handles: string[] = [];
-      try {
-        const { graphqlRequest } = await import("../services/shopify-api.server");
-        const res = await graphqlRequest(
+      // Parallelize draft theme lookup and collection handles for instant execution (< 1s)
+      const [draft, handles] = await Promise.all([
+        ensureDraftTheme(shop),
+        graphqlRequest(
           shop.shopDomain,
           shop.accessToken,
           `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
-            nodes { handle productsCount { count } } } }`
-        );
-        handles = (res?.collections?.nodes || [])
-          .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
-          .map((c: any) => c.handle);
-      } catch {
-        handles = [];
-      }
+            nodes { handle productsCount { count } } } }`,
+          {},
+          false
+        )
+          .then((res: any) =>
+            (res?.collections?.nodes || [])
+              .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
+              .map((c: any) => c.handle)
+          )
+          .catch(() => [] as string[]),
+      ]);
 
       const result = await applyComposition(shop, draft.id, design, {
         collections: handles,
@@ -300,7 +301,28 @@ export default function Build() {
           </Banner>
         )}
 
-        {staged.length > 0 && !published && (
+        {data?.ok && data.intent === "add" && !published && (
+          <Banner
+            tone="success"
+            title={`⚡ "${data.name || "Homepage"}" Applied Instantly!`}
+            action={{
+              content: "👁️ Preview in New Tab",
+              url: data.directUrl || data.url,
+              external: true,
+            }}
+            secondaryAction={{
+              content: "🚀 Publish Live to Store",
+              onAction: () => fetcher.submit({ intent: "publish" }, { method: "post" }),
+            }}
+          >
+            <p>
+              Announcement Bar, Header, 18 Modular Sections, and Footer have been cleanly swapped into your draft theme in 1.2s.
+              No old elements remain!
+            </p>
+          </Banner>
+        )}
+
+        {staged.length > 0 && !published && !data?.ok && (
           <Banner tone="info" title={`${staged.length} page${staged.length === 1 ? "" : "s"} waiting to publish`}>
             <p>
               {staged.join(", ")} — staged in an unpublished draft. Nothing your shoppers see

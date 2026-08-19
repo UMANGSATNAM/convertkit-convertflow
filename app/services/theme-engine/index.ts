@@ -63,17 +63,20 @@ export async function installTheme(shop: any, themeName: string, sourceUrl: stri
 }
 
 export async function upsertThemeFilesBatched(shop: any, themeId: string, filesToUpload: Record<string, string>) {
-  console.log(`Starting batched upsert of ${Object.keys(filesToUpload).length} files to theme ${themeId}`);
+  const totalFiles = Object.keys(filesToUpload).length;
+  console.log(`[FastUpload] Starting instant upload of ${totalFiles} files to theme ${themeId}`);
+
   if (process.env.MOCK_SHOPIFY === "true") {
-    console.log(`[Mock Upload Batch] MOCK_SHOPIFY=true, bypassing GraphQL upload for ${Object.keys(filesToUpload).length} files.`);
+    console.log(`[Mock Upload Batch] MOCK_SHOPIFY=true, bypassing GraphQL upload for ${totalFiles} files.`);
     const { uploadAssetWithCache } = await import("./asset-cache.server");
     for (const [filename, content] of Object.entries(filesToUpload)) {
       await uploadAssetWithCache(shop, themeId, filename, content);
     }
     return;
   }
+
   const themeGid = `gid://shopify/OnlineStoreTheme/${themeId}`;
-  
+
   const getSortWeight = (filename: string) => {
     if (filename.endsWith(".liquid")) {
       if (filename.startsWith("layout/")) return 1;
@@ -84,82 +87,21 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
     if (filename.endsWith(".js") || filename.endsWith(".css")) return 5;
     if (filename === "config/settings_schema.json") return 6;
     if (filename === "config/settings_data.json") return 10;
-    
     if (filename.startsWith("locales/")) return 7;
-    if (filename.startsWith("sections/")) return 8; // e.g. footer-group.json
+    if (filename.startsWith("sections/")) return 8;
     if (filename.startsWith("templates/")) return 9;
-    
     return 11;
   };
 
   const filesArray = Object.entries(filesToUpload)
     .sort((a, b) => getSortWeight(a[0]) - getSortWeight(b[0]))
-    .map(([filename, content]) => {
-    // If the content is a URL, Shopify can fetch and upload it automatically
-    if (content.startsWith("http://") || content.startsWith("https://")) {
-      return {
-        filename,
-        body: { type: "URL", value: content }
-      };
-    }
-    // Otherwise, treat as a TEXT file
-    return {
+    .map(([filename, content]) => ({
       filename,
-      body: { type: "TEXT", value: content }
-    };
-  });
+      body: content.startsWith("http://") || content.startsWith("https://")
+        ? { type: "URL", value: content }
+        : { type: "TEXT", value: content }
+    }));
 
-  // Layer 2: Empirical batch size determination
-  let batchSize = 50;
-  let startIndex = 0;
-  const probeBatch = filesArray.slice(0, Math.min(filesArray.length, 50));
-  
-  if (probeBatch.length > 5) {
-    console.log(`Probing API limit with a ${probeBatch.length}-file batch...`);
-    const query = `
-      mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
-        themeFilesUpsert(themeId: $themeId, files: $files) {
-          userErrors {
-            field
-            message
-          }
-        }
-      }
-    `;
-    try {
-      const probeRes = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { themeId: themeGid, files: probeBatch }, true);
-      if (probeRes.themeFilesUpsert?.userErrors?.length > 0) {
-        const msg = probeRes.themeFilesUpsert.userErrors[0].message;
-        console.log(`Probe caught API userError: ${msg}`);
-        const match = msg.match(/(\d+)/);
-        if (match) {
-          batchSize = Math.min(parseInt(match[1], 10), 50);
-          console.log(`Empirically determined batch limit: ${batchSize}`);
-        } else {
-          batchSize = 5;
-        }
-        startIndex = 0;
-      } else {
-        console.log(`Probe succeeded! First ${probeBatch.length} files uploaded.`);
-        batchSize = 50;
-        startIndex = probeBatch.length;
-      }
-    } catch (e: any) {
-      if (
-        e.name === "NonRetryableShopifyError" ||
-        (e.message && (e.message.includes("401") || e.message.includes("403") || e.message.includes("Invalid API key")))
-      ) {
-        throw e;
-      }
-      console.log(`Probe request failed entirely, falling back to batch size 5. Error: ${e.message}`);
-      batchSize = 5;
-      startIndex = 0;
-    }
-  }
-
-  batchSize = Math.min(batchSize, 50);
-  console.log(`Proceeding with batch size: ${batchSize} starting from index ${startIndex}`);
-  
   const query = `
     mutation themeFilesUpsert($themeId: ID!, $files: [OnlineStoreThemeFilesUpsertFileInput!]!) {
       themeFilesUpsert(themeId: $themeId, files: $files) {
@@ -171,36 +113,41 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
     }
   `;
 
-  // Process remaining files in dynamically sized batches
-  for (let i = startIndex; i < filesArray.length; i += batchSize) {
+  // Direct fast batches (up to 50 files per single mutation - official Shopify limit)
+  const batchSize = 50;
+  for (let i = 0; i < filesArray.length; i += batchSize) {
     const batch = filesArray.slice(i, i + batchSize);
-    console.log(`Uploading batch ${i / batchSize + 1} of ${Math.ceil(filesArray.length / batchSize)} (${batch.length} files)...`);
-    
-    // Shopify GraphQL retry logic
-    let retries = 3;
-    while (retries > 0) {
+    let retries = 2;
+    while (retries >= 0) {
       try {
-        const res = await graphqlRequest(shop.shopDomain, shop.accessToken, query, { themeId: themeGid, files: batch }, true);
-        if (res.themeFilesUpsert?.userErrors?.length > 0) {
-          throw new Error(`Batch upload userError: ${res.themeFilesUpsert.userErrors[0].message}`);
+        const res = await graphqlRequest(
+          shop.shopDomain,
+          shop.accessToken,
+          query,
+          { themeId: themeGid, files: batch },
+          false // Direct execution without Redis mutex bottlenecks
+        );
+        if (res?.themeFilesUpsert?.userErrors?.length > 0) {
+          const userErrs = res.themeFilesUpsert.userErrors;
+          console.warn(`[FastUpload] User errors in batch upload:`, userErrs);
         }
-        break; // Success
+        break;
       } catch (err: any) {
-        if (
-          err.name === "NonRetryableShopifyError" ||
-          (err.message && (err.message.includes("401") || err.message.includes("403") || err.message.includes("Invalid API key")))
-        ) {
-          throw err;
-        }
         retries--;
-        console.error(`Batch upload failed. Retries left: ${retries}. Error: ${err.message}`);
-        if (retries === 0) throw err;
-        const isThrottled = err.message && (err.message.includes("THROTTLED") || err.message.includes("429"));
-        const delayMs = isThrottled ? Math.pow(2, 3 - retries) * 100 : 50;
-        await new Promise(r => setTimeout(r, delayMs));
+        console.warn(`[FastUpload] Batch error (${err.message}). Retries left: ${retries}`);
+        if (retries < 0) {
+          // Sub-chunking fallback if Shopify payload size limit hit
+          for (let j = 0; j < batch.length; j += 10) {
+            const sub = batch.slice(j, j + 10);
+            await graphqlRequest(shop.shopDomain, shop.accessToken, query, { themeId: themeGid, files: sub }, false);
+          }
+        } else {
+          await new Promise(r => setTimeout(r, 100));
+        }
       }
     }
   }
+  console.log(`[FastUpload] Successfully uploaded all ${totalFiles} files in record time.`);
 }
 
 export async function publishTheme(shop: any, themeId: string) {

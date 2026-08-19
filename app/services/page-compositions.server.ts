@@ -104,7 +104,9 @@ export async function ensureDraftTheme(shop: any): Promise<DraftTheme> {
   );
   const themes = res?.themes?.nodes || [];
 
-  const existing = themes.find((t: any) => t.name === DRAFT_NAME);
+  const existing = themes.find(
+    (t: any) => t.name === DRAFT_NAME || t.name.startsWith("ConvertFlow — Draft") || t.name.includes("ConvertFlow")
+  );
   if (existing) return { id: numericId(existing.id), created: false };
 
   const live = themes.find((t: any) => String(t.role).toLowerCase() === "main");
