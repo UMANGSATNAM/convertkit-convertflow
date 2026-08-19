@@ -248,7 +248,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
         .map((c: any) => c.handle);
 
-      const variant = intent === "preview" ? `cf-${design.id}` : undefined;
+      // For index pages, always write directly to templates/index.json in draft theme
+      // Shopify does not support ?view= on root index page
+      const variant = (intent === "preview" && design.pageType !== "index") ? `cf-${design.id}` : undefined;
 
       await applyComposition(shop, draft.id, design, {
         collections: handles,

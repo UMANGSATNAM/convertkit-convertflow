@@ -452,13 +452,14 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
 
   const base = TEMPLATE_FILE[composition.pageType];
-  const templateFile = options.variant
+  const isIndexPage = composition.pageType === "index";
+  const templateFile = (options.variant && !isIndexPage)
     ? base.replace(/\.json$/, `.${options.variant}.json`)
     : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
 
   // ── Header Group: Total Clean Replacement (Zero old theme elements) ─────
-  if (!options.variant && (composition.header || composition.announcement)) {
+  if ((!options.variant || isIndexPage) && (composition.header || composition.announcement)) {
     const headerGroupSections: Record<string, any> = {};
     const headerGroupOrder: string[] = [];
 
@@ -513,7 +514,7 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
 
   // ── Footer Group: Total Clean Replacement (Zero old theme elements) ─────
-  if (!options.variant && composition.footer) {
+  if ((!options.variant || isIndexPage) && composition.footer) {
     const footId = composition.footer;
     const liquidPath = known.get(footId);
     if (liquidPath) {
