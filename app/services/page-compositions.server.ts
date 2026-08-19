@@ -443,8 +443,9 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     Object.assign(files, bundle.files);
     missingFiles.push(...bundle.missing);
 
-    // Numbered so the key order matches visual order in theme editor
-    const key = `${String(sectionIndex).padStart(2, "0")}-${spec.componentId}`;
+    // Numbered so the key order matches visual order in theme editor and satisfies Shopify OS 2.0 identifier rules
+    const safeId = spec.componentId.replace(/[^a-zA-Z0-9]/g, "_");
+    const key = `section_${String(sectionIndex).padStart(2, "0")}_${safeId}`;
     sections[key] = hydrateSectionEntry(spec.componentId, composition, spec.settings || {});
     order.push(key);
     sectionIndex++;

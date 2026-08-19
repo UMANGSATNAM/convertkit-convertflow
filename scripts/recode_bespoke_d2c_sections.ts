@@ -1,29 +1,60 @@
-{% comment %}
+import fs from 'fs';
+import path from 'path';
+
+interface SectionDef {
+  filename: string;
+  niche: string;
+  brand: string;
+  sectionTitle: string;
+  type: string;
+  category: string;
+  accent: string;
+  bgDark: boolean;
+  bg: string;
+  cardBg: string;
+  textPrimary: string;
+  textSecondary: string;
+  border: string;
+  fontHeading: string;
+  fontBody: string;
+  badge: string;
+  headline: string;
+  desc: string;
+  cta1: string;
+  cta2: string;
+  items: Array<{ title: string; subtitle?: string; price?: string; tag?: string; img?: string; rating?: number; text?: string }>;
+}
+
+export function generateUltraHighEndLiquid(def: SectionDef): string {
+  const isDark = def.bgDark;
+  const itemsJson = JSON.stringify(def.items);
+
+  return `{% comment %}
   -----------------------------------------------------------------------------
-  Bespoke D2C Architecture: Tanishq / Amrapali - Tanishq / Amrapali CATEGORY TILES
-  Niche: JEWELLERY | Conversion Rate Optimized | 100% Mobile First
+  Bespoke D2C Architecture: ${def.brand} - ${def.sectionTitle}
+  Niche: ${def.niche.toUpperCase()} | Conversion Rate Optimized | 100% Mobile First
   -----------------------------------------------------------------------------
 {% endcomment %}
 
 {%- liquid
   assign section_id = section.id | default: 'd2c-sec'
-  assign bg_color = section.settings.bg_color | default: '#06150e'
-  assign text_color = section.settings.text_color | default: '#fef9c3'
-  assign accent_color = section.settings.accent_color | default: '#eab308'
-  assign heading_text = section.settings.heading | default: 'Tanishq / Amrapali CATEGORY TILES'
-  assign subheading_text = section.settings.subheading | default: '👑 100% BIS 916 HALLMARKED • UNCUT KUNDAN POLKI'
-  assign desc_text = section.settings.desc | default: 'Engineered with precision craftsmanship, high-converting CRO architecture, and ultra-responsive layout standards.'
-  assign btn_primary_text = section.settings.btn_primary_text | default: 'EXPLORE COLLECTION'
+  assign bg_color = section.settings.bg_color | default: '${def.bg}'
+  assign text_color = section.settings.text_color | default: '${def.textPrimary}'
+  assign accent_color = section.settings.accent_color | default: '${def.accent}'
+  assign heading_text = section.settings.heading | default: '${def.headline}'
+  assign subheading_text = section.settings.subheading | default: '${def.badge}'
+  assign desc_text = section.settings.desc | default: '${def.desc}'
+  assign btn_primary_text = section.settings.btn_primary_text | default: '${def.cta1}'
   assign btn_primary_link = section.settings.btn_primary_link | default: '/collections/all'
-  assign btn_secondary_text = section.settings.btn_secondary_text | default: 'LEARN MORE'
+  assign btn_secondary_text = section.settings.btn_secondary_text | default: '${def.cta2}'
   assign btn_secondary_link = section.settings.btn_secondary_link | default: '/pages/about'
 -%}
 
 <section
   id="d2c-section-{{ section_id }}"
-  class="d2c-ultra-section d2c-ultra-category-tiles d2c-theme-dark"
-  data-section-type="category-tiles"
-  data-niche="jewellery"
+  class="d2c-ultra-section d2c-ultra-${def.type} ${isDark ? 'd2c-theme-dark' : 'd2c-theme-light'}"
+  data-section-type="${def.type}"
+  data-niche="${def.niche}"
 >
   <div class="d2c-container">
     {%- if subheading_text != blank or heading_text != blank -%}
@@ -106,37 +137,37 @@
       {%- else -%}
         <!-- Curated High-Fidelity Archetype Fallback Grid -->
         <div class="d2c-dynamic-grid d2c-cols-{{ section.settings.grid_cols | default: 4 }}">
-          
+          ${def.items.map((item, idx) => `
             <div class="d2c-grid-card">
-              
+              ${item.img ? `
                 <div class="d2c-card-media">
                   <img
-                    src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80"
-                    alt="Imperial Mughal Jadau Uncut Polki Choker"
+                    src="${item.img}"
+                    alt="${item.title}"
                     loading="lazy"
                     class="d2c-img-cover"
                   />
-                  <span class="d2c-card-tag">ROYAL POLKI</span>
+                  ${item.tag ? `<span class="d2c-card-tag">${item.tag}</span>` : ''}
                 </div>
-              
+              ` : ''}
 
               <div class="d2c-card-body">
-                
+                ${item.rating ? `
                   <div class="d2c-stars">
                     ★★★★★ <span class="d2c-rating-val">(4.9)</span>
                   </div>
-                
+                ` : ''}
 
-                <h3 class="d2c-card-title">Imperial Mughal Jadau Uncut Polki Choker</h3>
-                
-                <p class="d2c-card-text">Premium luxury specifications engineered for maximum longevity and everyday comfort.</p>
+                <h3 class="d2c-card-title">${item.title}</h3>
+                ${item.subtitle ? `<div class="d2c-card-subtitle">${item.subtitle}</div>` : ''}
+                ${item.text ? `<p class="d2c-card-text">${item.text}</p>` : ''}
 
-                
+                ${item.price ? `
                   <div class="d2c-card-price-row">
-                    <span class="d2c-price-main">₹2,45,000</span>
+                    <span class="d2c-price-main">${item.price}</span>
                     <span class="d2c-stock-status">In Stock • 24hr Dispatch</span>
                   </div>
-                
+                ` : ''}
 
                 <div class="d2c-card-action">
                   <a href="/collections/all" class="d2c-btn-card">
@@ -145,127 +176,7 @@
                 </div>
               </div>
             </div>
-          
-
-            <div class="d2c-grid-card">
-              
-                <div class="d2c-card-media">
-                  <img
-                    src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&q=80"
-                    alt="22K BIS Hallmarked Temple Jhumka Earrings"
-                    loading="lazy"
-                    class="d2c-img-cover"
-                  />
-                  <span class="d2c-card-tag">ANTIQUE GOLD</span>
-                </div>
-              
-
-              <div class="d2c-card-body">
-                
-                  <div class="d2c-stars">
-                    ★★★★★ <span class="d2c-rating-val">(4.9)</span>
-                  </div>
-                
-
-                <h3 class="d2c-card-title">22K BIS Hallmarked Temple Jhumka Earrings</h3>
-                
-                <p class="d2c-card-text">Premium luxury specifications engineered for maximum longevity and everyday comfort.</p>
-
-                
-                  <div class="d2c-card-price-row">
-                    <span class="d2c-price-main">₹88,500</span>
-                    <span class="d2c-stock-status">In Stock • 24hr Dispatch</span>
-                  </div>
-                
-
-                <div class="d2c-card-action">
-                  <a href="/collections/all" class="d2c-btn-card">
-                    Explore Item &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-          
-
-            <div class="d2c-grid-card">
-              
-                <div class="d2c-card-media">
-                  <img
-                    src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80"
-                    alt="Heritage Emerald & South Sea Pearl Raani Haar"
-                    loading="lazy"
-                    class="d2c-img-cover"
-                  />
-                  <span class="d2c-card-tag">MASTERPIECE</span>
-                </div>
-              
-
-              <div class="d2c-card-body">
-                
-                  <div class="d2c-stars">
-                    ★★★★★ <span class="d2c-rating-val">(4.9)</span>
-                  </div>
-                
-
-                <h3 class="d2c-card-title">Heritage Emerald & South Sea Pearl Raani Haar</h3>
-                
-                <p class="d2c-card-text">Premium luxury specifications engineered for maximum longevity and everyday comfort.</p>
-
-                
-                  <div class="d2c-card-price-row">
-                    <span class="d2c-price-main">₹3,95,000</span>
-                    <span class="d2c-stock-status">In Stock • 24hr Dispatch</span>
-                  </div>
-                
-
-                <div class="d2c-card-action">
-                  <a href="/collections/all" class="d2c-btn-card">
-                    Explore Item &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-          
-
-            <div class="d2c-grid-card">
-              
-                <div class="d2c-card-media">
-                  <img
-                    src="https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=600&q=80"
-                    alt="Navratna Handcrafted Royal Bridal Kada"
-                    loading="lazy"
-                    class="d2c-img-cover"
-                  />
-                  <span class="d2c-card-tag">LIMITED RUN</span>
-                </div>
-              
-
-              <div class="d2c-card-body">
-                
-                  <div class="d2c-stars">
-                    ★★★★★ <span class="d2c-rating-val">(4.9)</span>
-                  </div>
-                
-
-                <h3 class="d2c-card-title">Navratna Handcrafted Royal Bridal Kada</h3>
-                
-                <p class="d2c-card-text">Premium luxury specifications engineered for maximum longevity and everyday comfort.</p>
-
-                
-                  <div class="d2c-card-price-row">
-                    <span class="d2c-price-main">₹1,65,000</span>
-                    <span class="d2c-stock-status">In Stock • 24hr Dispatch</span>
-                  </div>
-                
-
-                <div class="d2c-card-action">
-                  <a href="/collections/all" class="d2c-btn-card">
-                    Explore Item &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-          
+          `).join('\n')}
         </div>
       {%- endif -%}
     </div>
@@ -293,14 +204,14 @@
     --d2c-bg: {{ bg_color }};
     --d2c-text: {{ text_color }};
     --d2c-accent: {{ accent_color }};
-    --d2c-card-bg: #0c261c;
-    --d2c-border: rgba(234, 179, 8, 0.25);
-    --d2c-text-sub: #a7f3d0;
+    --d2c-card-bg: ${def.cardBg};
+    --d2c-border: ${def.border};
+    --d2c-text-sub: ${def.textSecondary};
 
     background-color: var(--d2c-bg);
     color: var(--d2c-text);
     padding: 72px 24px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: ${def.fontBody};
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
@@ -331,7 +242,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
+    background: ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'};
     color: var(--d2c-accent);
     padding: 6px 14px;
     border-radius: 99px;
@@ -352,14 +263,14 @@
   }
 
   #d2c-section-{{ section_id }} .d2c-section-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: ${def.fontHeading};
     font-size: clamp(28px, 4vw, 46px);
     font-weight: 900;
     line-height: 1.15;
     letter-spacing: -0.5px;
     color: var(--d2c-text);
     margin: 0;
-    text-transform: none;
+    text-transform: ${def.niche === 'clothing' && def.brand.includes('Bewakoof') ? 'uppercase' : 'none'};
   }
 
   #d2c-section-{{ section_id }} .d2c-section-desc {
@@ -393,7 +304,7 @@
   #d2c-section-{{ section_id }} .d2c-grid-card {
     background: var(--d2c-card-bg);
     border: 1px solid var(--d2c-border);
-    border-radius: 16px;
+    border-radius: ${def.niche === 'clothing' && def.brand.includes('Bewakoof') ? '4px' : '16px'};
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -404,7 +315,7 @@
   #d2c-section-{{ section_id }} .d2c-grid-card:hover {
     transform: translateY(-6px);
     border-color: var(--d2c-accent);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, ${isDark ? '0.4' : '0.12'});
   }
 
   #d2c-section-{{ section_id }} .d2c-card-media {
@@ -467,7 +378,7 @@
   }
 
   #d2c-section-{{ section_id }} .d2c-card-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: ${def.fontHeading};
     font-size: 16px;
     font-weight: 800;
     color: var(--d2c-text);
@@ -517,7 +428,7 @@
     display: block;
     width: 100%;
     text-align: center;
-    background: rgba(255,255,255,0.06);
+    background: ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'};
     color: var(--d2c-text);
     padding: 10px 16px;
     border-radius: 6px;
@@ -532,7 +443,7 @@
 
   #d2c-section-{{ section_id }} .d2c-btn-card:hover {
     background: var(--d2c-accent);
-    color: #000000;
+    color: ${isDark ? '#000000' : '#ffffff'};
     border-color: var(--d2c-accent);
   }
 
@@ -548,7 +459,7 @@
 
   #d2c-section-{{ section_id }} .d2c-btn-primary {
     background: var(--d2c-accent);
-    color: #000000;
+    color: ${isDark ? '#000000' : '#ffffff'};
     padding: 16px 36px;
     border-radius: 8px;
     font-size: 14px;
@@ -581,7 +492,7 @@
 
   #d2c-section-{{ section_id }} .d2c-btn-secondary:hover {
     border-color: var(--d2c-accent);
-    background: rgba(255,255,255,0.06);
+    background: ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'};
   }
 
   /* Responsive Media Queries */
@@ -617,7 +528,7 @@
 
 {% schema %}
 {
-  "name": "Tanishq / Amrapali CATEGORY TILES",
+  "name": "${def.sectionTitle.replace(/"/g, '\\"')}",
   "tag": "section",
   "class": "d2c-section-wrapper",
   "settings": [
@@ -625,43 +536,43 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Tanishq / Amrapali CATEGORY TILES"
+      "default": "${def.headline.replace(/"/g, '\\"')}"
     },
     {
       "type": "text",
       "id": "subheading",
       "label": "Subheading Badge",
-      "default": "👑 100% BIS 916 HALLMARKED • UNCUT KUNDAN POLKI"
+      "default": "${def.badge.replace(/"/g, '\\"')}"
     },
     {
       "type": "textarea",
       "id": "desc",
       "label": "Description",
-      "default": "Engineered with precision craftsmanship, high-converting CRO architecture, and ultra-responsive layout standards."
+      "default": "${def.desc.replace(/"/g, '\\"')}"
     },
     {
       "type": "color",
       "id": "bg_color",
       "label": "Background Color",
-      "default": "#06150e"
+      "default": "${def.bg}"
     },
     {
       "type": "color",
       "id": "text_color",
       "label": "Text Color",
-      "default": "#fef9c3"
+      "default": "${def.textPrimary}"
     },
     {
       "type": "color",
       "id": "accent_color",
       "label": "Accent Color",
-      "default": "#eab308"
+      "default": "${def.accent}"
     },
     {
       "type": "text",
       "id": "btn_primary_text",
       "label": "Primary Button Text",
-      "default": "EXPLORE COLLECTION"
+      "default": "${def.cta1.replace(/"/g, '\\"')}"
     },
     {
       "type": "url",
@@ -672,7 +583,7 @@
       "type": "text",
       "id": "btn_secondary_text",
       "label": "Secondary Button Text",
-      "default": "LEARN MORE"
+      "default": "${def.cta2.replace(/"/g, '\\"')}"
     },
     {
       "type": "url",
@@ -741,8 +652,10 @@
   ],
   "presets": [
     {
-      "name": "Tanishq / Amrapali CATEGORY TILES"
+      "name": "${def.sectionTitle.replace(/"/g, '\\"')}"
     }
   ]
 }
 {% endschema %}
+`;
+}
