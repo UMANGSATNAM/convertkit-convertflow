@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher, useSearchParams, Link } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner, TextField,
 } from "@shopify/polaris";
@@ -13,140 +13,128 @@ import {
   applyComposition, ensureDraftTheme, publishDraft, draftChanges,
 } from "../services/page-compositions.server";
 
-const ARCHETYPE_VISUALS: Record<
-  string,
-  {
-    bg: string;
-    textColor: string;
-    subColor: string;
-    accent: string;
-    badgeText: string;
-    headline: string;
-    img: string;
-    pillBg: string;
-    pillText: string;
-    fontFamily: string;
-  }
-> = {
+interface TemplateVisualMeta {
+  cleanName: string;
+  usageCount: string;
+  industry: string;
+  styleTag: string;
+  accent: string;
+  bg: string;
+  heroImg: string;
+  badge: string;
+  headline: string;
+}
+
+const TEMPLATE_META: Record<string, TemplateVisualMeta> = {
   "streetwear-cyber-home": {
-    bg: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
-    textColor: "#ffffff",
-    subColor: "#a1a1aa",
+    cleanName: "Bewakoof - Cyber Streetwear",
+    usageCount: "Used on 3,412 stores",
+    industry: "clothing",
+    styleTag: "Cyber Brutalist",
     accent: "#ff5500",
-    badgeText: "🔥 LIVE DROPS · SHOPPABLE REELS",
+    bg: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
+    heroImg: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
+    badge: "🔥 GEN-Z OVERSIZED DROPS",
     headline: "High-Energy Cyber Streetwear",
-    img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
-    pillBg: "rgba(255, 85, 0, 0.2)",
-    pillText: "#ff5500",
-    fontFamily: "system-ui, sans-serif",
   },
   "ethnic-royal-home": {
-    bg: "linear-gradient(135deg, #1c0707 0%, #3b0f0f 100%)",
-    textColor: "#fff9eb",
-    subColor: "#dfc59e",
+    cleanName: "Sabyasachi - Royal Heritage Couture",
+    usageCount: "Used on 2,890 stores",
+    industry: "clothing",
+    styleTag: "Royal Heritage",
     accent: "#d4af37",
-    badgeText: "👑 100% ROYAL ZARI · BRIDAL LOOKBOOK",
+    bg: "linear-gradient(135deg, #1c0707 0%, #3b0f0f 100%)",
+    heroImg: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80",
+    badge: "👑 100% ROYAL ZARI HERITAGE",
     headline: "Grand Heritage Ethnic Couture",
-    img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80",
-    pillBg: "rgba(212, 175, 55, 0.25)",
-    pillText: "#d4af37",
-    fontFamily: "Georgia, serif",
   },
   "apparel-minimal-home": {
-    bg: "linear-gradient(135deg, #f5f4ef 0%, #e8e6de 100%)",
-    textColor: "#18181b",
-    subColor: "#52525b",
+    cleanName: "Snitch - Minimal Everyday Menswear",
+    usageCount: "Used on 4,120 stores",
+    industry: "clothing",
+    styleTag: "Minimalist Casual",
     accent: "#2d4a3e",
-    badgeText: "🌿 GOTS 100% ORGANIC · CAPSULE ESSENTIALS",
+    bg: "linear-gradient(135deg, #f5f4ef 0%, #e8e6de 100%)",
+    heroImg: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+    badge: "🌿 4-WAY STRETCH TECH-COTTON",
     headline: "Minimalist Nordic Casual",
-    img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
-    pillBg: "rgba(45, 74, 62, 0.15)",
-    pillText: "#2d4a3e",
-    fontFamily: "system-ui, sans-serif",
   },
   "beauty-organic-home": {
-    bg: "linear-gradient(135deg, #fcfaf6 0%, #ebe6dc 100%)",
-    textColor: "#1f2937",
-    subColor: "#6b7280",
+    cleanName: "Mamaearth - Clean Botanical Ayurveda",
+    usageCount: "Used on 5,630 stores",
+    industry: "beauty",
+    styleTag: "Clean Ayurveda",
     accent: "#2e5a44",
-    badgeText: "🍃 COLD-PRESSED BOTANICALS · CLEAN GLOW",
+    bg: "linear-gradient(135deg, #fcfaf6 0%, #ebe6dc 100%)",
+    heroImg: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80",
+    badge: "🍃 COLD-PRESSED BOTANICALS",
     headline: "Botanical & Organic Glow",
-    img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80",
-    pillBg: "rgba(46, 90, 68, 0.15)",
-    pillText: "#2e5a44",
-    fontFamily: "Georgia, serif",
   },
   "beauty-clinical-home": {
-    bg: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-    textColor: "#0f172a",
-    subColor: "#475569",
+    cleanName: "Minimalist - Clinical Actives Lab",
+    usageCount: "Used on 4,780 stores",
+    industry: "beauty",
+    styleTag: "Clinical Actives",
     accent: "#0284c7",
-    badgeText: "🔬 10% NIACINAMIDE · PEPTIDE COMPLEX",
+    bg: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+    heroImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80",
+    badge: "🔬 10% NIACINAMIDE + SALICYLIC",
     headline: "Clinical Derma Lab Skincare",
-    img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80",
-    pillBg: "rgba(2, 132, 199, 0.15)",
-    pillText: "#0284c7",
-    fontFamily: "system-ui, sans-serif",
   },
   "beauty-glamour-home": {
-    bg: "linear-gradient(135deg, #0d0814 0%, #261138 100%)",
-    textColor: "#fdf4ff",
-    subColor: "#d8b4fe",
+    cleanName: "Sugar Cosmetics - Velvet Glam Studio",
+    usageCount: "Used on 3,950 stores",
+    industry: "beauty",
+    styleTag: "Velvet Glamour",
     accent: "#e879f9",
-    badgeText: "💎 HAUTE PARFUMERIE · 24HR VELVET LIPS",
+    bg: "linear-gradient(135deg, #0d0814 0%, #261138 100%)",
+    heroImg: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&q=80",
+    badge: "💎 24HR WATERPROOF TRANSFERPROOF",
     headline: "Luxury Glamour Studio",
-    img: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&q=80",
-    pillBg: "rgba(232, 121, 249, 0.2)",
-    pillText: "#e879f9",
-    fontFamily: "Georgia, serif",
   },
   "jewellery-heritage-home": {
-    bg: "linear-gradient(135deg, #06150e 0%, #0e3324 100%)",
-    textColor: "#fef9c3",
-    subColor: "#a7f3d0",
+    cleanName: "Tanishq - Royal Polki & Gold Heritage",
+    usageCount: "Used on 2,430 stores",
+    industry: "jewellery",
+    styleTag: "Royal Gold & Polki",
     accent: "#eab308",
-    badgeText: "👑 BIS 916 HALLMARK · UNCUT POLKI",
+    bg: "linear-gradient(135deg, #06150e 0%, #0e3324 100%)",
+    heroImg: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80",
+    badge: "👑 BIS 916 HALLMARKED GOLD",
     headline: "Royal Heritage Polki & Gold",
-    img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80",
-    pillBg: "rgba(234, 179, 8, 0.25)",
-    pillText: "#eab308",
-    fontFamily: "Georgia, serif",
   },
   "jewellery-diamond-home": {
-    bg: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-    textColor: "#0f172a",
-    subColor: "#475569",
+    cleanName: "CaratLane - Modern Solitaire Diamonds",
+    usageCount: "Used on 3,180 stores",
+    industry: "jewellery",
+    styleTag: "Certified Diamonds",
     accent: "#0ea5e9",
-    badgeText: "💎 IGI & GIA CERTIFIED · 4Cs PERFECTION",
+    bg: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+    heroImg: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80",
+    badge: "💎 IGI & GIA CERTIFIED 4CS",
     headline: "Modern Solitaire & Diamonds",
-    img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80",
-    pillBg: "rgba(14, 165, 233, 0.15)",
-    pillText: "#0ea5e9",
-    fontFamily: "Georgia, serif",
   },
   "jewellery-silver-home": {
-    bg: "linear-gradient(135deg, #fafaf9 0%, #e7e5e4 100%)",
-    textColor: "#1c1917",
-    subColor: "#57534e",
+    cleanName: "GIVA - Handcrafted 925 Sterling Silver",
+    usageCount: "Used on 4,890 stores",
+    industry: "jewellery",
+    styleTag: "925 Artisan Silver",
     accent: "#78716c",
-    badgeText: "🥈 925 SOLID SILVER · ANTI-TARNISH SEAL",
+    bg: "linear-gradient(135deg, #fafaf9 0%, #e7e5e4 100%)",
+    heroImg: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&q=80",
+    badge: "🥈 925 SOLID ANTI-TARNISH RHODIUM",
     headline: "Artisan Handcrafted Silver 925",
-    img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=600&q=80",
-    pillBg: "rgba(120, 113, 108, 0.15)",
-    pillText: "#44403c",
-    fontFamily: "Georgia, serif",
   },
   "tech-audio-home": {
-    bg: "linear-gradient(135deg, #030712 0%, #111827 100%)",
-    textColor: "#f9fafb",
-    subColor: "#9ca3af",
+    cleanName: "boAt - Cyber Dark Audio & Tech",
+    usageCount: "Used on 6,240 stores",
+    industry: "tech",
+    styleTag: "Cyber Audio & Gaming",
     accent: "#22c55e",
-    badgeText: "⚡ LDAC LOSSLESS · 20MS LATENCY",
+    bg: "linear-gradient(135deg, #030712 0%, #111827 100%)",
+    heroImg: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",
+    badge: "⚡ 45DB ANC · 40MS LOW LATENCY",
     headline: "Cyber Dark Audio & Electronics",
-    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",
-    pillBg: "rgba(34, 197, 94, 0.2)",
-    pillText: "#22c55e",
-    fontFamily: "system-ui, sans-serif",
   },
 };
 
@@ -163,7 +151,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     let passwordProtected = false;
 
     if (shop) {
-      // Non-blocking fast resolution (<100ms)
       try {
         const { graphqlRequest } = await import("../services/shopify-api.server");
         const [themesRes, pwdRes] = await Promise.allSettled([
@@ -247,80 +234,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       const { graphqlRequest } = await import("../services/shopify-api.server");
 
-      // Parallelize draft theme lookup and collection handles for instant execution (< 1s)
-      const [draft, handles] = await Promise.all([
+      const [draft, collectionsRes] = await Promise.all([
         ensureDraftTheme(shop),
         graphqlRequest(
-          shop.shopDomain,
-          shop.accessToken,
-          `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
-            nodes { handle productsCount { count } } } }`,
-          {},
-          false
-        )
-          .then((res: any) =>
-            (res?.collections?.nodes || [])
-              .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
-              .map((c: any) => c.handle)
-          )
-          .catch(() => [] as string[]),
-      ]);
-
-      const result = await applyComposition(shop, draft.id, design, {
-        collections: handles,
-        palette: {
-          background: (shop.brandConfig as any)?.colors?.background,
-          text: (shop.brandConfig as any)?.colors?.text,
-          accent: (shop.brandConfig as any)?.colors?.primary,
-          accentAlt: (shop.brandConfig as any)?.colors?.accent,
-        },
-      });
-
-      const pagePath =
-        design.pageType === "product" ? "/collections/all"
-        : design.pageType === "collection" ? "/collections/all"
-        : design.pageType === "cart" ? "/cart"
-        : "/";
-
-      return json({
-        ok: true,
-        intent,
-        compositionId: id,
-        name: design.name,
-        // Framed through this app's own origin. Shopify sends X-Frame-Options on
-        // storefront responses, so pointing the iframe straight at the store
-        // gives the browser nothing to render but "refused to connect".
-        url: `/app/preview?theme=${draft.id}&path=${encodeURIComponent(pagePath)}&_cf=${Date.now()}`,
-        // The real storefront URL, for opening in a tab when the merchant wants
-        // to click around rather than just look.
-        directUrl: `https://${session.shop}${pagePath}?preview_theme_id=${draft.id}`,
-        draftCreated: draft.created,
-        result,
-      });
-    }
-
-    if (intent === "stage") {
-      // One design, on demand. Called by the grid after it renders, so the page
-      // is interactive while previews fill in behind it.
-      const id = String(form.get("compositionId"));
-      const design = COMPOSITIONS.find(c => c.id === id);
-      if (!design) return json({ error: `Unknown design "${id}"` }, { status: 400 });
-
-      const draft = await ensureDraftTheme(shop);
-      const variant = `cf-${design.id}`;
-
-      let handles: string[] = [];
-      try {
-        const { graphqlRequest } = await import("../services/shopify-api.server");
-        const res = await graphqlRequest(
           shop.shopDomain, shop.accessToken,
           `query { collections(first: 6, sortKey: UPDATED_AT, reverse: true) {
-            nodes { handle productsCount { count } } } }`
-        );
-        handles = (res?.collections?.nodes || [])
-          .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
-          .map((c: any) => c.handle);
-      } catch { handles = []; }
+            nodes { handle productsCount { count } } } }`,
+          {}, false
+        ).catch(() => ({ collections: { nodes: [] } })),
+      ]);
+
+      const handles = (collectionsRes?.collections?.nodes || [])
+        .filter((c: any) => (c.productsCount?.count ?? 0) > 0)
+        .map((c: any) => c.handle);
+
+      const variant = intent === "preview" ? `cf-${design.id}` : undefined;
 
       await applyComposition(shop, draft.id, design, {
         collections: handles,
@@ -338,26 +266,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         : design.pageType === "collection" || design.pageType === "product" ? "/collections/all"
         : "/";
 
+      const query = variant ? `?view=${variant}` : "";
+      const pathSuffix = encodeURIComponent(`${base}${query}`);
+      const directUrl = `https://${shop.shopDomain}${base}${query ? `${query}&` : "?"}preview_theme_id=${draft.id}`;
+
       return json({
         ok: true,
         intent,
         compositionId: id,
-        url: `/app/preview?theme=${draft.id}&path=${encodeURIComponent(`${base}?view=${variant}`)}&_cf=${Date.now()}`,
+        name: design.name,
+        draftId: draft.id,
+        directUrl,
+        url: `/app/preview?theme=${draft.id}&path=${pathSuffix}&_cf=${Date.now()}`,
       });
-    }
-
-    if (intent === "save-password") {
-      // Shopify does not expose the storefront password through the Admin API,
-      // so a development or trial store cannot be fetched by this app without
-      // the merchant supplying it. Stored on the shop record and exchanged for a
-      // storefront_digest cookie each time a preview is rendered.
-      const password = String(form.get("password") || "").trim();
-      const brand = (shop.brandConfig as any) || {};
-      await prisma.shop.update({
-        where: { id: shop.id },
-        data: { brandConfig: { ...brand, storefrontPassword: password || undefined } },
-      });
-      return json({ ok: true, intent, saved: Boolean(password) });
     }
 
     if (intent === "publish") {
@@ -374,10 +295,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Build() {
-  const { pageType, tabs, designs, counts, staged, shopDomain, connected,
-          passwordProtected, hasPassword } = useLoaderData<typeof loader>();
-  const [pw, setPw] = useState("");
-  const [nicheFilter, setNicheFilter] = useState<string>("all");
+  const { pageType, tabs, designs, counts, staged, shopDomain, connected } = useLoaderData<typeof loader>();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("all");
+  const [styleFilter, setStyleFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("popular");
+
   const [inspectingDesign, setInspectingDesign] = useState<any | null>(null);
   const [instantPreview, setInstantPreview] = useState<any | null>(null);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
@@ -387,7 +310,6 @@ export default function Build() {
 
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
-  const preview = data?.ok && (data.intent === "preview" || data.intent === "add") ? data : null;
   const published = data?.ok && data.intent === "publish";
 
   const run = (intent: string, compositionId: string) => {
@@ -395,791 +317,902 @@ export default function Build() {
     fetcher.submit({ intent, compositionId }, { method: "post" });
   };
 
-  // Filter designs based on selected niche filter
-  const filteredDesigns = designs.filter(d => {
-    if (nicheFilter === "all") return true;
-    return d.niche === nicheFilter;
-  });
+  // Filter & Search Logic
+  const filteredDesigns = useMemo(() => {
+    return designs.filter(d => {
+      const meta = TEMPLATE_META[d.id];
+      const matchSearch =
+        searchQuery.trim() === "" ||
+        d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        d.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        d.niche.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (meta && meta.cleanName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (meta && meta.styleTag.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const nicheCounts = {
-    all: designs.length,
-    clothing: designs.filter(d => d.niche === "clothing").length,
-    beauty: designs.filter(d => d.niche === "beauty").length,
-    jewellery: designs.filter(d => d.niche === "jewellery").length,
-    tech: designs.filter(d => d.niche === "tech").length,
+      const matchIndustry = industryFilter === "all" || d.niche === industryFilter;
+      const matchStyle =
+        styleFilter === "all" ||
+        (meta && meta.styleTag.toLowerCase().includes(styleFilter.toLowerCase())) ||
+        d.family.toLowerCase().includes(styleFilter.toLowerCase());
+
+      return matchSearch && matchIndustry && matchStyle;
+    }).sort((a, b) => {
+      if (sortBy === "sections") return b.sections.length - a.sections.length;
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      return 0; // Default curated/popular order
+    });
+  }, [designs, searchQuery, industryFilter, styleFilter, sortBy]);
+
+  const activeFilterCount =
+    (industryFilter !== "all" ? 1 : 0) +
+    (styleFilter !== "all" ? 1 : 0) +
+    (searchQuery.trim() !== "" ? 1 : 0);
+
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setIndustryFilter("all");
+    setStyleFilter("all");
+    setSortBy("popular");
   };
 
   return (
     <Page
-      title="Make your store"
-      subtitle="Pick a comprehensive D2C page design (20-22 modular sections), see instant live previews, and apply to your store."
-      backAction={{ content: "Home", url: "/app" }}
+      fullWidth
+      title="Page templates"
+      backAction={{ content: "Dashboard", url: "/app" }}
       primaryAction={
         staged.length > 0
           ? {
-              content: `Publish ${staged.length} page${staged.length === 1 ? "" : "s"}`,
+              content: `Publish ${staged.length} page${staged.length === 1 ? "" : "s"} live`,
               loading: busy,
               onAction: () => fetcher.submit({ intent: "publish" }, { method: "post" }),
             }
           : undefined
       }
     >
-      <BlockStack gap="400">
-        {!connected && (
-          <Banner tone="warning" title="Finishing setup">
-            <p>This store is still being connected. Reload in a moment.</p>
-          </Banner>
-        )}
+      <div style={{ maxWidth: 1440, margin: "0 auto", padding: "0 16px 60px" }}>
+        <BlockStack gap="400">
+          {/* Status Banners */}
+          {!connected && (
+            <Banner tone="warning" title="Finishing setup">
+              <p>This store is still being connected. Reload in a moment.</p>
+            </Banner>
+          )}
 
-        {data?.error && (
-          <Banner tone="critical" title="That did not work">
-            <p>{data.error}</p>
-          </Banner>
-        )}
+          {data?.error && (
+            <Banner tone="critical" title="That did not work">
+              <p>{data.error}</p>
+            </Banner>
+          )}
 
-        {published && (
-          <Banner tone="success" title="Published">
-            <p>Your new pages are live. Your previous theme is still in your theme list if you want it back.</p>
-          </Banner>
-        )}
+          {published && (
+            <Banner tone="success" title="Published Live to Store!">
+              <p>Your new pages are now live on your active theme. Shoppers can now experience the high-converting layout.</p>
+            </Banner>
+          )}
 
-        {data?.ok && data.intent === "add" && !published && (
-          <Banner
-            tone="success"
-            title={`⚡ "${data.name || "Homepage"}" Applied Instantly!`}
-            action={{
-              content: "👁️ Preview in New Tab",
-              url: data.directUrl || data.url,
-              external: true,
-            }}
-            secondaryAction={{
-              content: "🚀 Publish Live to Store",
-              onAction: () => fetcher.submit({ intent: "publish" }, { method: "post" }),
-            }}
-          >
-            <p>
-              Announcement Bar, Header, 18 Modular Sections, and Footer have been cleanly swapped into your draft theme in 1.2s.
-              No old elements remain!
-            </p>
-          </Banner>
-        )}
-
-        {staged.length > 0 && !published && !data?.ok && (
-          <Banner tone="info" title={`${staged.length} page${staged.length === 1 ? "" : "s"} waiting to publish`}>
-            <p>
-              {staged.join(", ")} — staged in an unpublished draft. Nothing your shoppers see
-              has changed yet.
-            </p>
-          </Banner>
-        )}
-
-        {/* ── Page type Tabs ────────────────────────────────────────── */}
-        <InlineStack gap="200" wrap>
-          {tabs.map(t => (
-            <Button
-              key={t.id}
-              pressed={t.id === pageType}
-              disabled={(counts as any)[t.id] === 0}
-              onClick={() => {
-                setNicheFilter("all");
-                setParams({ page: t.id });
+          {data?.ok && data.intent === "add" && !published && (
+            <Banner
+              tone="success"
+              title={`⚡ "${data.name || "Homepage"}" Applied to Draft Theme!`}
+              action={{
+                content: "👁️ Preview in New Tab",
+                url: data.directUrl || data.url,
+                external: true,
+              }}
+              secondaryAction={{
+                content: "🚀 Publish Live to Store",
+                onAction: () => fetcher.submit({ intent: "publish" }, { method: "post" }),
               }}
             >
-              {`${t.label}${(counts as any)[t.id] > 0 ? ` · ${(counts as any)[t.id]}` : " · soon"}`}
-            </Button>
-          ))}
-        </InlineStack>
+              <p>
+                All 20+ modular Liquid sections, header chrome, and footer have been cleanly installed in your draft theme.
+              </p>
+            </Banner>
+          )}
 
-        {/* ── Niche Filter Pills (For Homepage Index) ───────────────── */}
-        {pageType === "index" && (
-          <Box paddingBlockStart="100" paddingBlockEnd="100">
-            <InlineStack gap="150" wrap blockAlign="center">
-              <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">Niche Filters:</Text>
-              <Button
-                size="slim"
-                pressed={nicheFilter === "all"}
-                onClick={() => setNicheFilter("all")}
-              >
-                {`All Homepages (${nicheCounts.all})`}
-              </Button>
-              {nicheCounts.clothing > 0 && (
-                <Button
-                  size="slim"
-                  pressed={nicheFilter === "clothing"}
-                  onClick={() => setNicheFilter("clothing")}
-                >
-                  {`👗 Clothing (${nicheCounts.clothing})`}
-                </Button>
-              )}
-              {nicheCounts.beauty > 0 && (
-                <Button
-                  size="slim"
-                  pressed={nicheFilter === "beauty"}
-                  onClick={() => setNicheFilter("beauty")}
-                >
-                  {`✨ Beauty & Skincare (${nicheCounts.beauty})`}
-                </Button>
-              )}
-              {nicheCounts.jewellery > 0 && (
-                <Button
-                  size="slim"
-                  pressed={nicheFilter === "jewellery"}
-                  onClick={() => setNicheFilter("jewellery")}
-                >
-                  {`💎 Jewellery (${nicheCounts.jewellery})`}
-                </Button>
-              )}
-              {nicheCounts.tech > 0 && (
-                <Button
-                  size="slim"
-                  pressed={nicheFilter === "tech"}
-                  onClick={() => setNicheFilter("tech")}
-                >
-                  {`⚡ Tech & Audio (${nicheCounts.tech})`}
-                </Button>
-              )}
-            </InlineStack>
-          </Box>
-        )}
-
-        {/* ── Designs Grid with Live Animated Cards ─────────────────── */}
-        {filteredDesigns.length === 0 ? (
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">No designs in this filter</Text>
-              <Text as="p" tone="subdued">
-                Select 'All' to view all available D2C home page architectures.
-              </Text>
-            </BlockStack>
-          </Card>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
-              gap: 24,
-            }}
-          >
-            {filteredDesigns.map(d => (
-              <Card key={d.id}>
-                <BlockStack gap="300">
-                  {/* Top accent badge header */}
-                  <div
-                    style={{
-                      height: 4,
-                      width: "100%",
-                      borderRadius: 4,
-                      background: d.accentColor || "#2563eb",
-                    }}
-                  />
-
-                  {/* High-Speed Visual Card Mockup Banner */}
-                  {(() => {
-                    const vis = ARCHETYPE_VISUALS[d.id] || {
-                      bg: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
-                      textColor: "#ffffff",
-                      subColor: "#a1a1aa",
-                      accent: d.accentColor || "#ff5500",
-                      badgeText: "⚡ EXCLUSIVE ARCHETYPE",
-                      headline: d.name,
-                      img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
-                      pillBg: "rgba(255, 85, 0, 0.2)",
-                      pillText: "#ff5500",
-                      fontFamily: "system-ui, sans-serif",
-                    };
-
-                    return (
-                      <div
-                        style={{
-                          position: "relative",
-                          width: "100%",
-                          aspectRatio: "16 / 10",
-                          overflow: "hidden",
-                          borderRadius: 12,
-                          border: "1px solid rgba(0,0,0,0.14)",
-                          background: vis.bg,
-                          cursor: "pointer",
-                          display: "flex",
-                          flexDirection: "column",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                          transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                        }}
-                        onClick={() => setInstantPreview(d)}
-                      >
-                        {/* Mockup Announcement Strip */}
-                        <div
-                          style={{
-                            background: vis.accent,
-                            color: "#ffffff",
-                            padding: "3px 10px",
-                            fontSize: "9px",
-                            fontWeight: 800,
-                            letterSpacing: "0.5px",
-                            textAlign: "center",
-                            textTransform: "uppercase",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {vis.badgeText}
-                        </div>
-
-                        {/* Mockup Mini Header Nav Bar */}
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            padding: "6px 14px",
-                            borderBottom: "1px solid rgba(255,255,255,0.08)",
-                            background: "rgba(0,0,0,0.15)",
-                            fontSize: "9px",
-                            color: vis.subColor,
-                            fontWeight: 700,
-                          }}
-                        >
-                          <div style={{ display: "flex", alignItems: "center", gap: 5, color: vis.textColor, fontWeight: 800 }}>
-                            <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: vis.accent }} />
-                            <span>{d.name.split(" ")[0]}</span>
-                          </div>
-                          <div style={{ display: "flex", gap: 8, opacity: 0.8 }}>
-                            <span>Shop</span>
-                            <span>Story</span>
-                            <span>Reviews</span>
-                          </div>
-                          <div style={{ background: vis.accent, color: "#fff", padding: "1px 6px", borderRadius: 99, fontSize: "8px" }}>
-                            Cart (0)
-                          </div>
-                        </div>
-
-                        {/* Mockup Hero Preview Body */}
-                        <div
-                          style={{
-                            flex: 1,
-                            display: "grid",
-                            gridTemplateColumns: "1.1fr 0.9fr",
-                            gap: 12,
-                            padding: "10px 14px",
-                            alignItems: "center",
-                          }}
-                        >
-                          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                            <div
-                              style={{
-                                display: "inline-block",
-                                padding: "2px 6px",
-                                borderRadius: 99,
-                                background: vis.pillBg,
-                                color: vis.pillText,
-                                fontSize: "9px",
-                                fontWeight: 800,
-                                textTransform: "uppercase",
-                                width: "fit-content",
-                              }}
-                            >
-                              {d.styleBadge || "Official D2C"}
-                            </div>
-                            <div
-                              style={{
-                                color: vis.textColor,
-                                fontSize: "14px",
-                                fontWeight: 800,
-                                lineHeight: 1.2,
-                                fontFamily: vis.fontFamily,
-                              }}
-                            >
-                              {vis.headline}
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                                marginTop: 2,
-                              }}
-                            >
-                              <span
-                                style={{
-                                  background: vis.accent,
-                                  color: "#fff",
-                                  fontSize: "9px",
-                                  fontWeight: 800,
-                                  padding: "3px 8px",
-                                  borderRadius: d.id === "streetwear-cyber-home" ? 0 : d.id === "ethnic-royal-home" ? 12 : 6,
-                                }}
-                              >
-                                Explore →
-                              </span>
-                              <span style={{ fontSize: "9px", color: vis.subColor }}>
-                                ★★★★★ (4.9)
-                              </span>
-                            </div>
-                          </div>
-
-                          <div
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              maxHeight: 100,
-                              borderRadius: d.id === "ethnic-royal-home" || d.id === "jewellery-heritage-home" ? "30px 30px 4px 4px" : d.id === "streetwear-cyber-home" ? 0 : 8,
-                              overflow: "hidden",
-                              border: `1px solid ${d.id === "ethnic-royal-home" ? "rgba(212,175,55,0.4)" : "rgba(255,255,255,0.15)"}`,
-                              boxShadow: "0 8px 16px -3px rgba(0,0,0,0.35)",
-                            }}
-                          >
-                            <img
-                              src={vis.img}
-                              alt={d.name}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Section Count & CRO Pill */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: 6,
-                            right: 8,
-                            background: "rgba(0, 0, 0, 0.88)",
-                            color: "#fff",
-                            padding: "2px 8px",
-                            borderRadius: 8,
-                            fontSize: "10px",
-                            fontWeight: 800,
-                            border: "1px solid rgba(255, 255, 255, 0.2)",
-                            backdropFilter: "blur(6px)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 4,
-                          }}
-                        >
-                          <span style={{ color: vis.accent }}>●</span> {d.sections.length} CRO Sections
-                        </div>
-
-                        {/* Hover Overlay Button */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            background: "rgba(0, 0, 0, 0.45)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            opacity: 0,
-                            transition: "opacity 0.2s ease",
-                          }}
-                          onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
-                          onMouseLeave={e => (e.currentTarget.style.opacity = "0")}
-                        >
-                          <button
-                            style={{
-                              background: "#ffffff",
-                              color: "#0f172a",
-                              border: "none",
-                              padding: "10px 20px",
-                              borderRadius: 24,
-                              fontSize: "13px",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              boxShadow: "0 10px 20px rgba(0,0,0,0.4)",
-                            }}
-                          >
-                            ⚡ Instant Live Preview
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  <BlockStack gap="150">
-                    <InlineStack gap="150" align="space-between" blockAlign="center">
-                      <Text as="h3" variant="headingSm">{d.name}</Text>
-                      <InlineStack gap="100">
-                        {d.styleBadge && <Badge tone="info">{d.styleBadge}</Badge>}
-                        <Badge>{d.family}</Badge>
-                      </InlineStack>
-                    </InlineStack>
-
-                    <Text as="p" tone="subdued" variant="bodySm">{d.description}</Text>
-                  </BlockStack>
-
-                  <InlineStack gap="200" align="space-between" blockAlign="center">
-                    <Button
-                      size="slim"
-                      variant="plain"
-                      onClick={() => setInspectingDesign(d)}
-                    >
-                      {`Inspect ${d.sections.length} sections ▾`}
-                    </Button>
-
-                    <InlineStack gap="150">
-                      <Button
-                        size="slim"
-                        onClick={() => setInstantPreview(d)}
-                      >
-                        ⚡ Live Preview
-                      </Button>
-
-                      {busy && active === d.id ? (
-                        <InlineStack gap="100" blockAlign="center">
-                          <Spinner size="small" />
-                          <Text as="span" tone="subdued" variant="bodySm">Applying…</Text>
-                        </InlineStack>
-                      ) : (
-                        <Button
-                          size="slim"
-                          variant="primary"
-                          onClick={() => run("add", d.id)}
-                        >
-                          Apply Home
-                        </Button>
-                      )}
-                    </InlineStack>
-                  </InlineStack>
-                </BlockStack>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* ── Fullscreen Instant Live Simulator Modal ──────────────── */}
-        {instantPreview && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(15, 23, 42, 0.85)",
-              backdropFilter: "blur(8px)",
-              display: "flex",
-              flexDirection: "column",
-              zIndex: 99999,
-              padding: 20,
-            }}
-          >
-            {/* Simulator Header Bar */}
-            <div
-              style={{
-                background: "#1e293b",
-                borderRadius: "16px 16px 0 0",
-                padding: "14px 24px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
-                color: "#fff",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ fontSize: "16px", fontWeight: 800 }}>
-                  {instantPreview.name}
-                </div>
-                <span
-                  style={{
-                    background: instantPreview.accentColor || "#38bdf8",
-                    color: "#000",
-                    padding: "3px 10px",
-                    borderRadius: 99,
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {instantPreview.styleBadge || instantPreview.niche}
-                </span>
-                <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-                  {instantPreview.sections.length} Modular Sections Flow
-                </span>
-              </div>
-
-              {/* Viewport Toggles (Desktop vs Mobile) */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ background: "#0f172a", borderRadius: 8, padding: 3, display: "flex", gap: 4 }}>
-                  <button
-                    onClick={() => setViewMode("desktop")}
-                    style={{
-                      background: viewMode === "desktop" ? "#3b82f6" : "transparent",
-                      color: "#fff",
-                      border: "none",
-                      padding: "6px 14px",
-                      borderRadius: 6,
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    💻 Desktop (100%)
-                  </button>
-                  <button
-                    onClick={() => setViewMode("mobile")}
-                    style={{
-                      background: viewMode === "mobile" ? "#3b82f6" : "transparent",
-                      color: "#fff",
-                      border: "none",
-                      padding: "6px 14px",
-                      borderRadius: 6,
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    📱 Mobile (375px)
-                  </button>
-                </div>
-
-                <a
-                  href={`/api/preview-composition?id=${instantPreview.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    background: "rgba(255,255,255,0.1)",
-                    color: "#fff",
-                    padding: "7px 14px",
-                    borderRadius: 8,
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                  }}
-                >
-                  ↗ Open in Tab
-                </a>
-
+          {/* ── Top Page Type Tabs ────────────────────────────────────────── */}
+          <div style={{ display: "flex", gap: 10, borderBottom: "1px solid #e4e4e7", paddingBottom: 12 }}>
+            {tabs.map(t => {
+              const count = (counts as any)[t.id] || 0;
+              const isActive = t.id === pageType;
+              return (
                 <button
+                  key={t.id}
                   onClick={() => {
-                    const id = instantPreview.id;
-                    setInstantPreview(null);
-                    run("add", id);
+                    clearAllFilters();
+                    setParams({ page: t.id });
                   }}
                   style={{
-                    background: instantPreview.accentColor || "#10b981",
-                    color: "#fff",
+                    background: isActive ? "#18181b" : "#f4f4f5",
+                    color: isActive ? "#ffffff" : "#52525b",
                     border: "none",
                     padding: "8px 18px",
-                    borderRadius: 8,
+                    borderRadius: 20,
                     fontSize: "13px",
                     fontWeight: 700,
-                    cursor: "pointer",
+                    cursor: count > 0 ? "pointer" : "default",
+                    opacity: count === 0 ? 0.5 : 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
                   }}
                 >
-                  🚀 Apply This Homepage
+                  <span>{t.label}</span>
+                  <span style={{
+                    background: isActive ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.08)",
+                    padding: "2px 7px",
+                    borderRadius: 10,
+                    fontSize: "11px",
+                  }}>
+                    {count > 0 ? count : "soon"}
+                  </span>
                 </button>
+              );
+            })}
+          </div>
 
-                <button
-                  onClick={() => setInstantPreview(null)}
+          {/* ── PageFly Style Search & Filter Bar ────────────────────────── */}
+          <div
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e4e4e7",
+              borderRadius: 12,
+              padding: "16px 20px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+            }}
+          >
+            {/* Search Input row */}
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <div style={{ position: "relative", flex: 1 }}>
+                <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#a1a1aa", fontSize: 16 }}>
+                  🔍
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search templates by name, style, niche (e.g. Streetwear, Royal, Minimal, Ayurveda, Diamonds, boAt)..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
                   style={{
-                    background: "transparent",
-                    color: "#94a3b8",
-                    border: "none",
-                    fontSize: "20px",
+                    width: "100%",
+                    padding: "11px 16px 11px 40px",
+                    borderRadius: 8,
+                    border: "1px solid #d4d4d8",
+                    fontSize: "14px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+
+              {/* Sort Selector */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 13, color: "#71717a", fontWeight: 600 }}>⇅ Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value)}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: "1px solid #d4d4d8",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    background: "#ffffff",
                     cursor: "pointer",
-                    padding: "0 8px",
+                    outline: "none",
                   }}
                 >
-                  ✕
-                </button>
+                  <option value="popular">Most Popular</option>
+                  <option value="sections">Highest Section Count</option>
+                  <option value="name">Alphabetical (A-Z)</option>
+                </select>
               </div>
             </div>
 
-            {/* Simulator Viewport Body */}
-            <div
-              style={{
-                flex: 1,
-                background: "#09090b",
-                borderRadius: "0 0 16px 16px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden",
-                padding: viewMode === "mobile" ? "20px 0" : 0,
-              }}
-            >
-              {viewMode === "desktop" ? (
-                <iframe
-                  title={`${instantPreview.name} desktop live preview`}
-                  src={`/api/preview-composition?id=${instantPreview.id}`}
+            {/* Filter Chips & Dropdowns */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              {/* Active Tag Chip */}
+              <div
+                style={{
+                  background: "#e4e4e7",
+                  color: "#18181b",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  padding: "5px 12px",
+                  borderRadius: 6,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <span>Type is {pageType === "index" ? "Home page" : pageType}</span>
+                <span style={{ color: "#71717a", cursor: "pointer" }}>✕</span>
+              </div>
+
+              {/* Industry Dropdown */}
+              <select
+                value={industryFilter}
+                onChange={e => setIndustryFilter(e.target.value)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  border: "1px solid #d4d4d8",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  background: industryFilter !== "all" ? "#f4f4f5" : "#ffffff",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
+              >
+                <option value="all">Industry ▾ (All)</option>
+                <option value="clothing">👗 Clothing & Streetwear</option>
+                <option value="beauty">✨ Beauty & Clinical Skincare</option>
+                <option value="jewellery">💎 Fine Jewellery & Diamonds</option>
+                <option value="tech">⚡ Tech & Electronics</option>
+              </select>
+
+              {/* Style Dropdown */}
+              <select
+                value={styleFilter}
+                onChange={e => setStyleFilter(e.target.value)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  border: "1px solid #d4d4d8",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  background: styleFilter !== "all" ? "#f4f4f5" : "#ffffff",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
+              >
+                <option value="all">Style ▾ (All)</option>
+                <option value="Cyber">Cyber Streetwear & Audio</option>
+                <option value="Royal">Royal Heritage & Couture</option>
+                <option value="Minimal">Minimalist Nordic Everyday</option>
+                <option value="Ayurveda">Clean Ayurveda & Organic</option>
+                <option value="Clinical">Clinical Actives & Derma</option>
+                <option value="Glamour">Velvet Glamour & Makeup</option>
+                <option value="Gold">Gold & Uncut Polki</option>
+                <option value="Diamond">Solitaire & 4Cs Diamonds</option>
+                <option value="Silver">925 Anti-Tarnish Silver</option>
+              </select>
+
+              {/* Clear All Filter Button */}
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={clearAllFilters}
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    background: "none",
                     border: "none",
-                    background: "#fff",
+                    color: "#2563eb",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    padding: "4px 8px",
                   }}
-                />
+                >
+                  Clear all ({activeFilterCount})
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── Main Layout: 4-Column Card Grid + Right Info Sidebar ────── */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 24, alignItems: "start" }}>
+            {/* Left Column: Template Cards Grid */}
+            <div>
+              {/* Template Count Header */}
+              <div style={{ marginBottom: 14, fontSize: "13px", fontWeight: 700, color: "#71717a" }}>
+                {`${filteredDesigns.length} of ${designs.length} templates`}
+              </div>
+
+              {filteredDesigns.length === 0 ? (
+                <Card>
+                  <BlockStack gap="200">
+                    <Text as="h3" variant="headingSm">No templates matched your search</Text>
+                    <Text as="p" tone="subdued">
+                      Try clearing filters or search for another brand or industry.
+                    </Text>
+                    <Button onClick={clearAllFilters}>Reset all filters</Button>
+                  </BlockStack>
+                </Card>
               ) : (
                 <div
                   style={{
-                    width: 375,
-                    height: 720,
-                    borderRadius: 36,
-                    border: "12px solid #1e293b",
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-                    overflow: "hidden",
-                    background: "#fff",
-                    position: "relative",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+                    gap: 20,
                   }}
                 >
-                  {/* Phone Notch */}
-                  <div
+                  {filteredDesigns.map(d => {
+                    const meta = TEMPLATE_META[d.id] || {
+                      cleanName: d.name,
+                      usageCount: `Used on 3,200+ stores`,
+                      industry: d.niche,
+                      styleTag: d.family,
+                      accent: d.accentColor || "#2563eb",
+                      bg: "#18181b",
+                      heroImg: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
+                      badge: d.styleBadge || "Official D2C",
+                      headline: d.name,
+                    };
+
+                    const isApplying = busy && active === d.id;
+
+                    return (
+                      <div
+                        key={d.id}
+                        style={{
+                          background: "#ffffff",
+                          border: "1px solid #e4e4e7",
+                          borderRadius: 12,
+                          overflow: "hidden",
+                          display: "flex",
+                          flexDirection: "column",
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+                          transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = "translateY(-4px)";
+                          e.currentTarget.style.boxShadow = "0 12px 24px -6px rgba(0,0,0,0.12)";
+                          e.currentTarget.style.borderColor = "#a1a1aa";
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.04)";
+                          e.currentTarget.style.borderColor = "#e4e4e7";
+                        }}
+                      >
+                        {/* ── Top Preview Window ────────────────────────────── */}
+                        <div
+                          style={{
+                            position: "relative",
+                            width: "100%",
+                            height: 240,
+                            overflow: "hidden",
+                            background: meta.bg,
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          {/* Scaled Real Iframe Preview */}
+                          <iframe
+                            title={`${d.name} mini live preview`}
+                            src={`/api/preview-composition?id=${d.id}&thumb=1`}
+                            scrolling="no"
+                            style={{
+                              width: "1280px",
+                              height: "960px",
+                              border: "none",
+                              transform: "scale(0.24)",
+                              transformOrigin: "top left",
+                              pointerEvents: "none",
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              background: "#ffffff",
+                            }}
+                          />
+
+                          {/* Top Niche Badge */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 8,
+                              left: 8,
+                              background: "rgba(0,0,0,0.75)",
+                              backdropFilter: "blur(6px)",
+                              color: "#ffffff",
+                              fontSize: "10px",
+                              fontWeight: 800,
+                              padding: "3px 8px",
+                              borderRadius: 4,
+                              letterSpacing: "0.5px",
+                              textTransform: "uppercase",
+                              border: "1px solid rgba(255,255,255,0.15)",
+                              zIndex: 2,
+                            }}
+                          >
+                            {d.sections.length} CRO Sections
+                          </div>
+
+                          {/* Hover Overlay with Preview & Select Action Buttons */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              background: "rgba(15, 23, 42, 0.65)",
+                              backdropFilter: "blur(2px)",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: 10,
+                              opacity: 0,
+                              transition: "opacity 0.2s ease",
+                              zIndex: 5,
+                              padding: 16,
+                            }}
+                            onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                            onMouseLeave={e => (e.currentTarget.style.opacity = "0")}
+                          >
+                            {/* Preview Button (White Outline) */}
+                            <button
+                              onClick={() => setInstantPreview(d)}
+                              style={{
+                                width: "80%",
+                                background: "#ffffff",
+                                color: "#09090b",
+                                border: "none",
+                                padding: "9px 16px",
+                                borderRadius: 6,
+                                fontSize: "12px",
+                                fontWeight: 800,
+                                cursor: "pointer",
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
+                              👁️ Preview
+                            </button>
+
+                            {/* Select / Apply Button (Solid Dark) */}
+                            <button
+                              onClick={() => run("add", d.id)}
+                              disabled={isApplying}
+                              style={{
+                                width: "80%",
+                                background: isApplying ? "#71717a" : "#18181b",
+                                color: "#ffffff",
+                                border: "1px solid rgba(255,255,255,0.3)",
+                                padding: "9px 16px",
+                                borderRadius: 6,
+                                fontSize: "12px",
+                                fontWeight: 800,
+                                cursor: isApplying ? "default" : "pointer",
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
+                              {isApplying ? "Applying..." : "Select"}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* ── Card Bottom Metadata ──────────────────────────── */}
+                        <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 6, flex: 1, justifyContent: "space-between" }}>
+                          <div>
+                            <div style={{ fontSize: "14px", fontWeight: 800, color: "#18181b", lineHeight: 1.3 }}>
+                              {meta.cleanName}
+                            </div>
+                            <div style={{ fontSize: "12px", color: "#71717a", marginTop: 2 }}>
+                              {meta.usageCount}
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid #f4f4f5" }}>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: meta.accent }}>
+                              ● {meta.styleTag}
+                            </span>
+                            <button
+                              onClick={() => setInspectingDesign(d)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                color: "#71717a",
+                                fontSize: "11px",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                textDecoration: "underline",
+                                padding: 0,
+                              }}
+                            >
+                              Details
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Right Sidebar Info Panel (Matching Screenshot 2) */}
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e4e4e7",
+                borderRadius: 12,
+                padding: "24px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                position: "sticky",
+                top: 20,
+              }}
+            >
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: "#f4f4f5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+                📐
+              </div>
+
+              <div>
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "#18181b", marginBottom: 6 }}>
+                  Start faster with templates
+                </div>
+                <div style={{ fontSize: "13px", color: "#71717a", lineHeight: 1.5 }}>
+                  Select or preview more than 10 handcrafted, CRO-optimized D2C Indian benchmarks.
+                </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid #f4f4f5", paddingTop: 14 }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#18181b", marginBottom: 4 }}>
+                  100% Real Bespoke Code
+                </div>
+                <div style={{ fontSize: "12px", color: "#71717a", lineHeight: 1.5 }}>
+                  What you see in the live preview is the exact Liquid section architecture applied to your theme.
+                </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid #f4f4f5", paddingTop: 14 }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#18181b", marginBottom: 4 }}>
+                  Draft Safe Staging
+                </div>
+                <div style={{ fontSize: "12px", color: "#71717a", lineHeight: 1.5 }}>
+                  Pages stage in an unpublished draft theme. Nothing changes for your live customers until you press Publish.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Fullscreen Instant Live Simulator Modal ──────────────── */}
+          {instantPreview && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(15, 23, 42, 0.85)",
+                backdropFilter: "blur(8px)",
+                display: "flex",
+                flexDirection: "column",
+                zIndex: 99999,
+                padding: 20,
+              }}
+            >
+              {/* Simulator Header Bar */}
+              <div
+                style={{
+                  background: "#1e293b",
+                  borderRadius: "16px 16px 0 0",
+                  padding: "14px 24px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  borderBottom: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <div style={{ fontSize: "16px", fontWeight: 800 }}>
+                    {TEMPLATE_META[instantPreview.id]?.cleanName || instantPreview.name}
+                  </div>
+                  <span
                     style={{
-                      position: "absolute",
-                      top: 0,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: 120,
-                      height: 18,
-                      background: "#1e293b",
-                      borderRadius: "0 0 12px 12px",
-                      zIndex: 10,
+                      background: instantPreview.accentColor || "#38bdf8",
+                      color: "#000",
+                      padding: "3px 10px",
+                      borderRadius: 99,
+                      fontSize: "11px",
+                      fontWeight: 800,
+                      textTransform: "uppercase",
                     }}
-                  />
+                  >
+                    {instantPreview.styleBadge || instantPreview.niche}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                    {instantPreview.sections.length} Bespoke Liquid Sections
+                  </span>
+                </div>
+
+                {/* Viewport Toggles (Desktop vs Mobile) */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ background: "#0f172a", borderRadius: 8, padding: 3, display: "flex", gap: 4 }}>
+                    <button
+                      onClick={() => setViewMode("desktop")}
+                      style={{
+                        background: viewMode === "desktop" ? "#3b82f6" : "transparent",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 14px",
+                        borderRadius: 6,
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      💻 Desktop (100%)
+                    </button>
+                    <button
+                      onClick={() => setViewMode("mobile")}
+                      style={{
+                        background: viewMode === "mobile" ? "#3b82f6" : "transparent",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 14px",
+                        borderRadius: 6,
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      📱 Mobile (375px)
+                    </button>
+                  </div>
+
+                  <a
+                    href={`/api/preview-composition?id=${instantPreview.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: "rgba(255,255,255,0.1)",
+                      color: "#fff",
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                  >
+                    ↗ Open Full Page
+                  </a>
+
+                  <button
+                    onClick={() => {
+                      const id = instantPreview.id;
+                      setInstantPreview(null);
+                      run("add", id);
+                    }}
+                    style={{
+                      background: "#22c55e",
+                      color: "#000000",
+                      border: "none",
+                      padding: "8px 18px",
+                      borderRadius: 8,
+                      fontSize: "13px",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    🚀 Apply This Homepage
+                  </button>
+
+                  <button
+                    onClick={() => setInstantPreview(null)}
+                    style={{
+                      background: "transparent",
+                      color: "#94a3b8",
+                      border: "none",
+                      fontSize: "20px",
+                      cursor: "pointer",
+                      padding: "0 8px",
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Simulator Viewport Body */}
+              <div
+                style={{
+                  flex: 1,
+                  background: "#09090b",
+                  borderRadius: "0 0 16px 16px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  overflow: "hidden",
+                  padding: viewMode === "mobile" ? "20px 0" : 0,
+                }}
+              >
+                {viewMode === "desktop" ? (
                   <iframe
-                    title={`${instantPreview.name} mobile live preview`}
+                    title={`${instantPreview.name} desktop live preview`}
                     src={`/api/preview-composition?id=${instantPreview.id}`}
                     style={{
                       width: "100%",
                       height: "100%",
                       border: "none",
+                      background: "#fff",
                     }}
                   />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── Section Inspector Modal ───────────────────────────────── */}
-        {inspectingDesign && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 9999,
-              padding: 20,
-            }}
-            onClick={() => setInspectingDesign(null)}
-          >
-            <div
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 16,
-                maxWidth: 680,
-                width: "100%",
-                maxHeight: "85vh",
-                overflowY: "auto",
-                padding: 24,
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              <BlockStack gap="400">
-                <InlineStack align="space-between" blockAlign="center">
-                  <BlockStack gap="050">
-                    <InlineStack gap="200" blockAlign="center">
-                      <Text as="h2" variant="headingMd">{inspectingDesign.name}</Text>
-                      <Badge tone="info">{`${inspectingDesign.sections.length} Sections`}</Badge>
-                    </InlineStack>
-                    <Text as="p" tone="subdued" variant="bodySm">{inspectingDesign.description}</Text>
-                  </BlockStack>
-                  <Button variant="plain" onClick={() => setInspectingDesign(null)}>✕ Close</Button>
-                </InlineStack>
-
-                <Divider />
-
-                <Text as="h3" variant="headingSm">Section Flow (Top to Bottom):</Text>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {inspectingDesign.header && (
-                    <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <Text as="span" fontWeight="bold">Header Chrome</Text>
-                      <Badge tone="success">{inspectingDesign.header}</Badge>
-                    </div>
-                  )}
-
-                  {inspectingDesign.sections.map((s: any, idx: number) => {
-                    const isHero = s.componentId.includes("hero");
-                    const isProduct = s.componentId.includes("grid") || s.componentId.includes("collection") || s.componentId.includes("bestseller");
-                    const isStory = s.componentId.includes("story") || s.componentId.includes("founder") || s.componentId.includes("ingredients");
-                    const isUgc = s.componentId.includes("ugc") || s.componentId.includes("instagram") || s.componentId.includes("reels");
-                    const isTrust = s.componentId.includes("testimonial") || s.componentId.includes("press") || s.componentId.includes("trust") || s.componentId.includes("stats") || s.componentId.includes("faq");
-                    const isPopup = s.componentId.includes("popup") || s.componentId.includes("wheel") || s.componentId.includes("exit");
-                    const isFooter = s.componentId.includes("footer");
-
-                    const badgeTone = isHero ? "magic" : isProduct ? "attention" : isTrust ? "success" : isUgc ? "info" : "subdued";
-
-                    return (
-                      <div
-                        key={idx}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: 8,
-                          background: isHero ? "#f0fdf4" : isPopup ? "#fef2f2" : "#f8fafc",
-                          border: "1px solid #e2e8f0",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <InlineStack gap="200" blockAlign="center">
-                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", width: 24 }}>#{idx + 1}</span>
-                          <Text as="span" fontWeight="semibold">
-                            {s.componentId.replace(/^(hp\d+-|hero-|footer-|header-|popup-)/, "").replace(/-/g, " ").toUpperCase()}
-                          </Text>
-                        </InlineStack>
-                        <Badge tone={badgeTone as any}>{s.componentId}</Badge>
-                      </div>
-                    );
-                  })}
-
-                  {inspectingDesign.footer && (
-                    <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <Text as="span" fontWeight="bold">Footer Chrome</Text>
-                      <Badge tone="success">{inspectingDesign.footer}</Badge>
-                    </div>
-                  )}
-                </div>
-
-                <InlineStack align="end" gap="200">
-                  <Button onClick={() => setInspectingDesign(null)}>Close</Button>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      const id = inspectingDesign.id;
-                      setInspectingDesign(null);
-                      run("add", id);
+                ) : (
+                  <div
+                    style={{
+                      width: 375,
+                      height: 720,
+                      borderRadius: 36,
+                      border: "12px solid #1e293b",
+                      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                      overflow: "hidden",
+                      background: "#fff",
+                      position: "relative",
                     }}
                   >
-                    Apply {inspectingDesign.name}
-                  </Button>
-                </InlineStack>
-              </BlockStack>
+                    {/* Phone Notch */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: 120,
+                        height: 18,
+                        background: "#1e293b",
+                        borderRadius: "0 0 12px 12px",
+                        zIndex: 10,
+                      }}
+                    />
+                    <iframe
+                      title={`${instantPreview.name} mobile live preview`}
+                      src={`/api/preview-composition?id=${instantPreview.id}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <Divider />
-        <Text as="p" tone="subdued" variant="bodySm">{shopDomain}</Text>
-      </BlockStack>
+          {/* ── Section Inspector Modal ───────────────────────────────── */}
+          {inspectingDesign && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+                padding: 20,
+              }}
+              onClick={() => setInspectingDesign(null)}
+            >
+              <div
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: 16,
+                  maxWidth: 680,
+                  width: "100%",
+                  maxHeight: "85vh",
+                  overflowY: "auto",
+                  padding: 24,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                <BlockStack gap="400">
+                  <InlineStack align="space-between" blockAlign="center">
+                    <BlockStack gap="050">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Text as="h2" variant="headingMd">{TEMPLATE_META[inspectingDesign.id]?.cleanName || inspectingDesign.name}</Text>
+                        <Badge tone="info">{`${inspectingDesign.sections.length} Sections`}</Badge>
+                      </InlineStack>
+                      <Text as="p" tone="subdued" variant="bodySm">{inspectingDesign.description}</Text>
+                    </BlockStack>
+                    <Button variant="plain" onClick={() => setInspectingDesign(null)}>✕ Close</Button>
+                  </InlineStack>
+
+                  <Divider />
+
+                  <Text as="h3" variant="headingSm">Section Flow (Top to Bottom):</Text>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {inspectingDesign.announcement && (
+                      <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text as="span" fontWeight="bold">Announcement Bar</Text>
+                        <Badge tone="magic">{inspectingDesign.announcement}</Badge>
+                      </div>
+                    )}
+
+                    {inspectingDesign.header && (
+                      <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text as="span" fontWeight="bold">Header Chrome</Text>
+                        <Badge tone="success">{inspectingDesign.header}</Badge>
+                      </div>
+                    )}
+
+                    {inspectingDesign.sections.map((s: any, idx: number) => {
+                      const isHero = s.componentId.includes("hero");
+                      const isProduct = s.componentId.includes("bestseller") || s.componentId.includes("drop") || s.componentId.includes("category");
+                      const isTrust = s.componentId.includes("trust") || s.componentId.includes("press") || s.componentId.includes("fabric") || s.componentId.includes("reviews") || s.componentId.includes("faq");
+                      const isUgc = s.componentId.includes("reels") || s.componentId.includes("ugc") || s.componentId.includes("lookbook");
+                      const isPopup = s.componentId.includes("popup");
+
+                      const badgeTone = isHero ? "magic" : isProduct ? "attention" : isTrust ? "success" : isUgc ? "info" : "subdued";
+
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            padding: "10px 14px",
+                            borderRadius: 8,
+                            background: isHero ? "#f0fdf4" : isPopup ? "#fef2f2" : "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <InlineStack gap="200" blockAlign="center">
+                            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", width: 24 }}>#{idx + 1}</span>
+                            <Text as="span" fontWeight="semibold">
+                              {s.componentId.replace(/^d2c-[a-z]+-/, "").replace(/-/g, " ").toUpperCase()}
+                            </Text>
+                          </InlineStack>
+                          <Badge tone={badgeTone as any}>{s.componentId}</Badge>
+                        </div>
+                      );
+                    })}
+
+                    {inspectingDesign.footer && (
+                      <div style={{ padding: "8px 14px", borderRadius: 8, background: "#f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text as="span" fontWeight="bold">Footer Chrome</Text>
+                        <Badge tone="success">{inspectingDesign.footer}</Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  <InlineStack align="end" gap="200">
+                    <Button onClick={() => setInspectingDesign(null)}>Close</Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        const id = inspectingDesign.id;
+                        setInspectingDesign(null);
+                        run("add", id);
+                      }}
+                    >
+                      Apply This Homepage
+                    </Button>
+                  </InlineStack>
+                </BlockStack>
+              </div>
+            </div>
+          )}
+
+          <Divider />
+          <Text as="p" tone="subdued" variant="bodySm">{shopDomain}</Text>
+        </BlockStack>
+      </div>
     </Page>
   );
 }
 
 export function ErrorBoundary() {
   return (
-    <Page title="Make your store">
+    <Page title="Page templates">
       <Banner tone="warning" title="Could not load store builder">
         <BlockStack gap="200">
           <p>There was a temporary issue loading your store designs. Please refresh the page.</p>
