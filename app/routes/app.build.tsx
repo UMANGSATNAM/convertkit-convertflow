@@ -236,6 +236,8 @@ export default function Build() {
   const [pw, setPw] = useState("");
   const [nicheFilter, setNicheFilter] = useState<string>("all");
   const [inspectingDesign, setInspectingDesign] = useState<any | null>(null);
+  const [instantPreview, setInstantPreview] = useState<any | null>(null);
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [, setParams] = useSearchParams();
   const fetcher = useFetcher<any>();
   const [active, setActive] = useState<string | null>(null);
@@ -267,7 +269,7 @@ export default function Build() {
   return (
     <Page
       title="Make your store"
-      subtitle="Pick a comprehensive D2C page design (20-22 modular sections), see it on your store, then publish when you are happy."
+      subtitle="Pick a comprehensive D2C page design (20-22 modular sections), see instant live previews, and apply to your store."
       backAction={{ content: "Home", url: "/app" }}
       primaryAction={
         staged.length > 0
@@ -289,44 +291,6 @@ export default function Build() {
         {data?.error && (
           <Banner tone="critical" title="That did not work">
             <p>{data.error}</p>
-          </Banner>
-        )}
-
-        {passwordProtected && !hasPassword && (
-          <Banner tone="warning" title="Your store is password protected">
-            <BlockStack gap="300">
-              <Text as="p">
-                Shopify does not share that password with apps, so previews cannot load
-                until you enter it here. It is only used to fetch your own storefront.
-              </Text>
-              <InlineStack gap="200" blockAlign="center">
-                <div style={{ minWidth: 220 }}>
-                  <TextField
-                    label="Storefront password"
-                    labelHidden
-                    autoComplete="off"
-                    value={pw}
-                    onChange={setPw}
-                    placeholder="Storefront password"
-                  />
-                </div>
-                <Button
-                  loading={busy}
-                  onClick={() => fetcher.submit({ intent: "save-password", password: pw }, { method: "post" })}
-                >
-                  Save
-                </Button>
-              </InlineStack>
-              <Text as="p" tone="subdued" variant="bodySm">
-                Or remove it under Online Store → Preferences.
-              </Text>
-            </BlockStack>
-          </Banner>
-        )}
-
-        {data?.ok && data.intent === "save-password" && (
-          <Banner tone="success" title={data.saved ? "Password saved" : "Password cleared"}>
-            <p>Previews should load now. Try one below.</p>
           </Banner>
         )}
 
@@ -415,50 +379,7 @@ export default function Build() {
           </Box>
         )}
 
-        {/* ── Live preview Modal Card ───────────────────────────────── */}
-        {preview && (
-          <Card>
-            <BlockStack gap="300">
-              <InlineStack align="space-between" blockAlign="center" gap="300">
-                <BlockStack gap="050">
-                  <Text as="h2" variant="headingMd">{preview.name}</Text>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    {preview.result.sectionsWritten} sections ·{" "}
-                    {preview.result.collectionsWired} wired to your collections ·{" "}
-                    {preview.result.paletteApplied} colours matched
-                  </Text>
-                </BlockStack>
-                {preview.intent === "preview" && (
-                  <Button
-                    variant="primary"
-                    loading={busy}
-                    onClick={() => run("add", preview.compositionId)}
-                  >
-                    Add this page
-                  </Button>
-                )}
-                {preview.intent === "add" && <Badge tone="success">Added to draft</Badge>}
-                <Button url={preview.directUrl} target="_blank">Open in a tab</Button>
-              </InlineStack>
-
-              <Box borderColor="border" borderWidth="025" borderRadius="200" overflowX="hidden">
-                <iframe
-                  key={preview.url}
-                  title={`Preview of ${preview.name}`}
-                  src={preview.url}
-                  style={{ width: "100%", height: 700, border: 0, display: "block" }}
-                />
-              </Box>
-
-              <Text as="p" tone="subdued" variant="bodySm">
-                Running on your store with your real products. Links are disabled inside the
-                preview — use Open in a tab to click through. Nothing is live until you publish.
-              </Text>
-            </BlockStack>
-          </Card>
-        )}
-
-        {/* ── Designs Grid ─────────────────────────────────────────── */}
+        {/* ── Designs Grid with Live Animated Cards ─────────────────── */}
         {filteredDesigns.length === 0 ? (
           <Card>
             <BlockStack gap="200">
@@ -489,79 +410,84 @@ export default function Build() {
                     }}
                   />
 
-                  {/* Visual D2C Hero Preview Card */}
+                  {/* Live Visual Iframe Thumbnail with Instant Click-To-Open */}
                   <div
                     style={{
                       position: "relative",
                       width: "100%",
-                      aspectRatio: "16 / 9",
+                      aspectRatio: "16 / 10",
                       overflow: "hidden",
                       borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      background: d.niche === "clothing"
-                        ? "linear-gradient(135deg, #18181b 0%, #27272a 100%)"
-                        : d.niche === "beauty"
-                        ? "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)"
-                        : d.niche === "jewellery"
-                        ? "linear-gradient(135deg, #1c1917 0%, #292524 100%)"
-                        : "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      padding: 16,
-                      color: "#fff",
+                      border: "1px solid rgba(0,0,0,0.1)",
+                      background: "#09090b",
+                      cursor: "pointer",
                     }}
+                    onClick={() => setInstantPreview(d)}
                   >
-                    <InlineStack align="space-between" blockAlign="center">
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: 700,
-                          padding: "3px 8px",
-                          borderRadius: 6,
-                          background: "rgba(255,255,255,0.15)",
-                          backdropFilter: "blur(4px)",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        {d.niche}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          color: d.accentColor || "#38bdf8",
-                        }}
-                      >
-                        {d.styleBadge || d.family}
-                      </span>
-                    </InlineStack>
+                    <iframe
+                      title={`${d.name} instant thumbnail`}
+                      src={`/api/preview-composition?id=${d.id}`}
+                      loading="lazy"
+                      scrolling="no"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: 1200,
+                        height: 750,
+                        border: 0,
+                        transformOrigin: "top left",
+                        transform: "scale(0.30)",
+                        pointerEvents: "none",
+                      }}
+                    />
 
-                    <BlockStack gap="050">
-                      <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
-                        {d.name}
-                      </div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", display: "flex", gap: 6, alignItems: "center" }}>
-                        <span>⚡ 20+ Liquid Sections</span>
-                        <span>•</span>
-                        <span>📱 100% Mobile Ready</span>
-                      </div>
-                    </BlockStack>
+                    {/* Quick Hover Action Overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        opacity: 0,
+                        transition: "opacity 0.2s ease",
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                      onMouseLeave={e => (e.currentTarget.style.opacity = "0")}
+                    >
+                      <button
+                        style={{
+                          background: "#fff",
+                          color: "#0f172a",
+                          border: "none",
+                          padding: "10px 18px",
+                          borderRadius: 20,
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        ⚡ Instant Live Preview
+                      </button>
+                    </div>
 
                     {/* Section Count Pill overlay */}
                     <div
                       style={{
                         position: "absolute",
-                        bottom: 12,
-                        right: 12,
-                        background: "rgba(0, 0, 0, 0.75)",
+                        bottom: 8,
+                        right: 8,
+                        background: "rgba(0, 0, 0, 0.8)",
                         color: "#fff",
                         padding: "3px 8px",
                         borderRadius: 10,
                         fontSize: "11px",
                         fontWeight: 600,
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        backdropFilter: "blur(4px)",
                       }}
                     >
                       {d.sections.length} Sections
@@ -590,24 +516,238 @@ export default function Build() {
                     </Button>
 
                     <InlineStack gap="150">
+                      <Button
+                        size="slim"
+                        onClick={() => setInstantPreview(d)}
+                      >
+                        ⚡ Live Preview
+                      </Button>
+
                       {busy && active === d.id ? (
                         <InlineStack gap="100" blockAlign="center">
                           <Spinner size="small" />
-                          <Text as="span" tone="subdued" variant="bodySm">Staging…</Text>
+                          <Text as="span" tone="subdued" variant="bodySm">Applying…</Text>
                         </InlineStack>
                       ) : (
-                        <>
-                          <Button size="slim" onClick={() => run("preview", d.id)}>Live Preview</Button>
-                          <Button size="slim" variant="primary" onClick={() => run("add", d.id)}>
-                            Apply Home
-                          </Button>
-                        </>
+                        <Button
+                          size="slim"
+                          variant="primary"
+                          onClick={() => run("add", d.id)}
+                        >
+                          Apply Home
+                        </Button>
                       )}
                     </InlineStack>
                   </InlineStack>
                 </BlockStack>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* ── Fullscreen Instant Live Simulator Modal ──────────────── */}
+        {instantPreview && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(15, 23, 42, 0.85)",
+              backdropFilter: "blur(8px)",
+              display: "flex",
+              flexDirection: "column",
+              zIndex: 99999,
+              padding: 20,
+            }}
+          >
+            {/* Simulator Header Bar */}
+            <div
+              style={{
+                background: "#1e293b",
+                borderRadius: "16px 16px 0 0",
+                padding: "14px 24px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                color: "#fff",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ fontSize: "16px", fontWeight: 800 }}>
+                  {instantPreview.name}
+                </div>
+                <span
+                  style={{
+                    background: instantPreview.accentColor || "#38bdf8",
+                    color: "#000",
+                    padding: "3px 10px",
+                    borderRadius: 99,
+                    fontSize: "11px",
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {instantPreview.styleBadge || instantPreview.niche}
+                </span>
+                <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                  {instantPreview.sections.length} Modular Sections Flow
+                </span>
+              </div>
+
+              {/* Viewport Toggles (Desktop vs Mobile) */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ background: "#0f172a", borderRadius: 8, padding: 3, display: "flex", gap: 4 }}>
+                  <button
+                    onClick={() => setViewMode("desktop")}
+                    style={{
+                      background: viewMode === "desktop" ? "#3b82f6" : "transparent",
+                      color: "#fff",
+                      border: "none",
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    💻 Desktop (100%)
+                  </button>
+                  <button
+                    onClick={() => setViewMode("mobile")}
+                    style={{
+                      background: viewMode === "mobile" ? "#3b82f6" : "transparent",
+                      color: "#fff",
+                      border: "none",
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    📱 Mobile (375px)
+                  </button>
+                </div>
+
+                <a
+                  href={`/api/preview-composition?id=${instantPreview.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    background: "rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    padding: "7px 14px",
+                    borderRadius: 8,
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}
+                >
+                  ↗ Open in Tab
+                </a>
+
+                <button
+                  onClick={() => {
+                    const id = instantPreview.id;
+                    setInstantPreview(null);
+                    run("add", id);
+                  }}
+                  style={{
+                    background: instantPreview.accentColor || "#10b981",
+                    color: "#fff",
+                    border: "none",
+                    padding: "8px 18px",
+                    borderRadius: 8,
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  🚀 Apply This Homepage
+                </button>
+
+                <button
+                  onClick={() => setInstantPreview(null)}
+                  style={{
+                    background: "transparent",
+                    color: "#94a3b8",
+                    border: "none",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                    padding: "0 8px",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Simulator Viewport Body */}
+            <div
+              style={{
+                flex: 1,
+                background: "#09090b",
+                borderRadius: "0 0 16px 16px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+                padding: viewMode === "mobile" ? "20px 0" : 0,
+              }}
+            >
+              {viewMode === "desktop" ? (
+                <iframe
+                  title={`${instantPreview.name} desktop live preview`}
+                  src={`/api/preview-composition?id=${instantPreview.id}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    background: "#fff",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 375,
+                    height: 720,
+                    borderRadius: 36,
+                    border: "12px solid #1e293b",
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                    overflow: "hidden",
+                    background: "#fff",
+                    position: "relative",
+                  }}
+                >
+                  {/* Phone Notch */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 120,
+                      height: 18,
+                      background: "#1e293b",
+                      borderRadius: "0 0 12px 12px",
+                      zIndex: 10,
+                    }}
+                  />
+                  <iframe
+                    title={`${instantPreview.name} mobile live preview`}
+                    src={`/api/preview-composition?id=${instantPreview.id}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 
