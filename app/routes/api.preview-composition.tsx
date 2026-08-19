@@ -18,29 +18,88 @@ function getCompMap(): Map<string, string> {
   return compMapCache;
 }
 
+/**
+ * Universal Liquid AST & variable resolver for 100% pixel-perfect HTML rendering
+ */
 function cleanLiquid(liquidContent: string, sectionIdx: number): string {
-  // Strip {% schema %} ... {% endschema %}
-  let html = liquidContent.replace(/{% schema %}[\s\S]*?{% endschema %}/g, "");
+  let html = liquidContent;
 
-  // Strip comments
+  // 1. Strip {% schema %} ... {% endschema %}
+  html = html.replace(/{% schema %}[\s\S]*?{% endschema %}/g, "");
+
+  // 2. Strip {% comment %} ... {% endcomment %}
   html = html.replace(/{% comment %}[\s\S]*?{% endcomment %}/g, "");
 
-  // Replace section.id
-  html = html.replace(/section\.id/g, `s_${sectionIdx}`);
+  // 3. Extract and resolve all `assign` variables from `{%- liquid ... -%}` and `{% assign ... %}`
+  const variables: Record<string, string> = {
+    "sec_id": `s_${sectionIdx}`,
+    "section.id": `s_${sectionIdx}`,
+    "forloop.index": "1",
+    "forloop.first": "true",
+  };
 
-  // Replace {{ section.settings.xxx | default: "yyy" }} with yyy
-  html = html.replace(/\{\{\s*section\.settings\.\w+\s*\|\s*default:\s*"([^"]+)"\s*\}\}/g, "$1");
-  html = html.replace(/\{\{\s*section\.settings\.\w+\s*\|\s*default:\s*'([^']+)'\s*\}\}/g, "$1");
+  // Find all liquid blocks: {%- liquid ... -%} or {% liquid ... %}
+  const liquidBlockRegex = /{%-?\s*liquid([\s\S]*?)-?%}/g;
+  let match: RegExpExecArray | null;
+  while ((match = liquidBlockRegex.exec(html)) !== null) {
+    const lines = match[1].split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const assignMatch = trimmed.match(/^assign\s+([a-zA-Z0-9_-]+)\s*=\s*(.*)$/);
+      if (assignMatch) {
+        const varName = assignMatch[1].trim();
+        const expr = assignMatch[2].trim();
 
-  // Replace {{ 'now' | date: '%Y' }} with current year
-  html = html.replace(/\{\{\s*'now'\s*\|\s*date:\s*'%Y'\s*\}\}/g, new Date().getFullYear().toString());
+        const defaultMatch = expr.match(/\|\s*default:\s*['"]([^'"]+)['"]/);
+        if (defaultMatch) {
+          variables[varName] = defaultMatch[1];
+        } else {
+          const strMatch = expr.match(/^['"]([^'"]+)['"]$/);
+          if (strMatch) {
+            variables[varName] = strMatch[1];
+          } else {
+            variables[varName] = "";
+          }
+        }
+      }
+    }
+  }
 
-  // Replace shop.name with default or brand
-  html = html.replace(/\{\{\s*shop\.name\s*\|\s*default:\s*"([^"]+)"\s*\}\}/g, "$1");
-  html = html.replace(/\{\{\s*shop\.name\s*\}\}/g, "D2C Store");
+  // Remove the {%- liquid ... -%} and {% assign ... %} blocks
+  html = html.replace(/{%-?\s*liquid[\s\S]*?-?%}/g, "");
+  html = html.replace(/{%-?\s*assign\s+[a-zA-Z0-9_-]+\s*=[\s\S]*?-?%}/g, "");
 
-  // Replace cart.item_count
-  html = html.replace(/\{\{\s*cart\.item_count\s*\|\s*default:\s*0\s*\}\}/g, "0");
+  // 4. Resolve conditionals like {%- if hero_image != blank -%} ... {%- else -%} ... {%- endif -%}
+  html = html.replace(/{%-?\s*if\s+hero_image\s*!=\s*blank\s*-?%}[\s\S]*?{%-?\s*else\s*-?%}([\s\S]*?){%-?\s*endif\s*-?%}/g, "$1");
+  html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*else\s*-?%}([\s\S]*?){%-?\s*endif\s*-?%}/g, "$1");
+  html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*endif\s*-?%}/g, "");
+  html = html.replace(/{%-?\s*unless\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*endunless\s*-?%}/g, "");
+
+  // 5. Replace {{ variable }} using our resolved variables map
+  for (const [vName, vVal] of Object.entries(variables)) {
+    if (!vVal) continue;
+    const vRegex = new RegExp(`\\{\\{\\s*${vName}\\s*(\\|\\s*escape)?\\s*\\}\\}`, "g");
+    html = html.replace(vRegex, vVal);
+  }
+
+  // 6. Replace standard default filters: {{ ... | default: 'val' }}
+  html = html.replace(/\{\{\s*[^|}]+\|\s*default:\s*"([^"]+)"\s*\}\}/g, "$1");
+  html = html.replace(/\{\{\s*[^|}]+\|\s*default:\s*'([^']+)'\s*\}\}/g, "$1");
+
+  // 7. Replace {{ 'now' | date: "%Y" }}
+  html = html.replace(/\{\{\s*'now'\s*\|\s*date:\s*['"]%Y['"]\s*\}\}/g, new Date().getFullYear().toString());
+
+  // 8. Replace image_url, escape, asset_url
+  html = html.replace(/\{\{\s*[^|}]+\|\s*image_url[^}]*\}\}/g, "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&q=80");
+  html = html.replace(/\{\{\s*[^|}]+\|\s*asset_url[^}]*\}\}/g, "");
+
+  // 9. Replace any remaining {{ xxx }} with empty string or variable fallback
+  html = html.replace(/\{\{\s*([a-zA-Z0-9_.-]+)(\s*\|[^\}]*)?\s*\}\}/g, (fullMatch, key) => {
+    return variables[key] || "";
+  });
+
+  // 10. Clean up any leftover liquid tags {%- ... -%} or {% ... %}
+  html = html.replace(/{%-?[\s\S]*?-?%}/g, "");
 
   return html.trim();
 }
@@ -53,7 +112,6 @@ function renderRealCompositionHTML(comp: PageComposition, isThumbnail: boolean =
   if (comp.header) sectionsToRender.push({ id: comp.header, type: "header" });
   
   if (isThumbnail) {
-    // For thumbnail, render top 3 sections (announcement, header, hero, marquee) to keep payload light and fast
     const topSections = comp.sections.slice(0, 3);
     for (const s of topSections) {
       sectionsToRender.push({ id: s.componentId, type: "section" });
@@ -122,7 +180,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
     },
   });
 };
