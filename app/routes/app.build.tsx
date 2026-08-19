@@ -83,7 +83,7 @@ const ARCHETYPE_VISUALS: Record<
     accent: "#0284c7",
     badgeText: "🔬 10% NIACINAMIDE · PEPTIDE COMPLEX",
     headline: "Clinical Derma Lab Skincare",
-    img: "https://images.unsplash.com/photo-1608248597359-0a69a19c7f99?w=600&q=80",
+    img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80",
     pillBg: "rgba(2, 132, 199, 0.15)",
     pillText: "#0284c7",
     fontFamily: "system-ui, sans-serif",

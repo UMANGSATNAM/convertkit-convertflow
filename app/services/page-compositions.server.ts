@@ -188,6 +188,154 @@ export async function applyComposition(
     [composition.announcement, composition.header, composition.footer].filter(Boolean)
   );
 
+// ── Archetype Palette Defaults for 10 D2C Homepages ─────────────────────────
+const ARCHETYPE_PALETTES: Record<string, { background: string; text: string; accent: string; surface: string }> = {
+  "streetwear-cyber-home": { background: "#09090b", text: "#ffffff", accent: "#ff5500", surface: "#18181b" },
+  "ethnic-royal-home": { background: "#1c0707", text: "#fff9eb", accent: "#d4af37", surface: "#3b0f0f" },
+  "apparel-minimal-home": { background: "#f5f4ef", text: "#18181b", accent: "#2d4a3e", surface: "#ffffff" },
+  "beauty-organic-home": { background: "#fcfaf6", text: "#1f2937", accent: "#2e5a44", surface: "#ffffff" },
+  "beauty-clinical-home": { background: "#f0f9ff", text: "#0f172a", accent: "#0284c7", surface: "#ffffff" },
+  "beauty-glamour-home": { background: "#0d0814", text: "#fdf4ff", accent: "#e879f9", surface: "#261138" },
+  "jewellery-heritage-home": { background: "#06150e", text: "#fef9c3", accent: "#eab308", surface: "#0e3324" },
+  "jewellery-diamond-home": { background: "#f8fafc", text: "#0f172a", accent: "#0ea5e9", surface: "#ffffff" },
+  "jewellery-silver-home": { background: "#fafaf9", text: "#1c1917", accent: "#78716c", surface: "#ffffff" },
+  "tech-audio-home": { background: "#030712", text: "#f9fafb", accent: "#22c55e", surface: "#111827" },
+};
+
+/**
+ * Hydrates a section entry with rich archetype settings, text blocks, USPs, FAQs, reviews, etc.
+ * so that when applied to Shopify, the store looks 100% complete and visually stunning without blank sections.
+ */
+function hydrateSectionEntry(componentId: string, composition: PageComposition, baseSettings: Record<string, any> = {}): {
+  type: string;
+  settings: Record<string, any>;
+  blocks?: Record<string, any>;
+  block_order?: string[];
+} {
+  const settings: Record<string, any> = { ...baseSettings };
+  const blocks: Record<string, any> = {};
+  const block_order: string[] = [];
+
+  const lowerId = componentId.toLowerCase();
+
+  // 1. MARQUEE / TICKER (4-6 rotating text badges)
+  if (lowerId.includes("marquee") || lowerId.includes("ticker")) {
+    settings.speed = settings.speed || 30;
+    settings.direction = settings.direction || "left";
+    const messages = [
+      "⚡ EXCLUSIVE DROP • LIMITED ARCHETYPE RUN",
+      "🚚 WORLDWIDE EXPRESS DISPATCH • 24HR",
+      "👑 100% CERTIFIED LUXURY QUALITY",
+      "⭐ 50,000+ VERIFIED 5-STAR CLIENTS",
+      "🛡️ 30-DAY RISK-FREE GLOBAL GUARANTEE",
+    ];
+    messages.forEach((msg, idx) => {
+      const bKey = `text_${idx + 1}`;
+      blocks[bKey] = { type: "text", settings: { text: msg } };
+      block_order.push(bKey);
+    });
+  }
+
+  // 2. USP / TRUST BADGES (4 certified pillars)
+  else if (lowerId.includes("usp") || lowerId.includes("trust") || lowerId.includes("feature-pills")) {
+    settings.subtitle = settings.subtitle || "OUR PROMISE";
+    settings.title = settings.title || `<p>Rooted in <em>Excellence</em></p>`;
+    const usps = [
+      { title: "Insured Global Express", text: "Door-to-door tracked delivery with tamper-proof security seals." },
+      { title: "Ethically Handcrafted", text: "100% genuine certified materials crafted to perfection." },
+      { title: "30-Day Easy Returns", text: "Complete peace of mind with 100% risk-free exchanges." },
+      { title: "VIP Concierge Support", text: "Dedicated 24/7 client care for all inquiries and sizing." },
+    ];
+    usps.forEach((item, idx) => {
+      const bKey = `usp_${idx + 1}`;
+      blocks[bKey] = { type: lowerId.includes("hp22") ? "usp" : "item", settings: item };
+      block_order.push(bKey);
+    });
+  }
+
+  // 3. FAQ ACCORDION (4 curated questions)
+  else if (lowerId.includes("faq")) {
+    settings.subtitle = settings.subtitle || "KNOWLEDGE BASE";
+    settings.title = settings.title || `<p>Frequently Asked <em>Questions</em></p>`;
+    const faqs = [
+      { question: "How long does shipping take?", answer: "Orders are dispatched within 24-48 business hours with express tracked delivery taking 3-5 business days." },
+      { question: "Are all items authentic and certified?", answer: "Every single piece comes with a certificate of authenticity, hallmark verification, and batch identification." },
+      { question: "What is your return & exchange policy?", answer: "We offer a hassle-free 30-day return policy. Unused items in original condition receive full refunds." },
+      { question: "How do I care for my purchase?", answer: "Each order includes a bespoke care guide and protective storage pouch to maintain peak quality for decades." },
+    ];
+    faqs.forEach((item, idx) => {
+      const bKey = `faq_${idx + 1}`;
+      blocks[bKey] = { type: lowerId.includes("hp22") ? "faq" : "item", settings: item };
+      block_order.push(bKey);
+    });
+  }
+
+  // 4. TESTIMONIALS / REVIEWS (3-4 verified reviews)
+  else if (lowerId.includes("testimonial") || lowerId.includes("review")) {
+    settings.subtitle = settings.subtitle || "COMMUNITY VOICES";
+    settings.title = settings.title || `<p>Loved by <em>50,000+ Clients</em></p>`;
+    const reviews = [
+      { author: "Aarav M.", location: "Mumbai", quote: "The quality and craftsmanship exceeded my expectations. Outstanding finish and lightning-fast delivery!", rating: 5 },
+      { author: "Priya S.", location: "Delhi", quote: "The packaging alone felt like a luxury unwrapping experience. Definitely ordering again!", rating: 5 },
+      { author: "Elena R.", location: "London", quote: "Pure perfection. The attention to detail is unmatched in this category.", rating: 5 },
+    ];
+    reviews.forEach((item, idx) => {
+      const bKey = `testimonial_${idx + 1}`;
+      blocks[bKey] = { type: lowerId.includes("hp22") ? "testimonial" : "item", settings: item };
+      block_order.push(bKey);
+    });
+  }
+
+  // 5. HERO SECTIONS
+  else if (lowerId.includes("hero")) {
+    settings.subtitle = settings.subtitle || composition.styleBadge || "OFFICIAL D2C COLLECTION";
+    settings.title = settings.title || `<p>${composition.name}</p>`;
+    settings.btn_text = settings.btn_text || "EXPLORE BESTSELLERS";
+    settings.btn_link = settings.btn_link || "/collections/all";
+  }
+
+  // 6. BESTSELLERS / PRODUCT GRID
+  else if (lowerId.includes("bestseller") || lowerId.includes("product") || lowerId.includes("collection")) {
+    settings.subtitle = settings.subtitle || "CURATED DROPS";
+    settings.title = settings.title || `<p>Bestselling <em>Iconics</em></p>`;
+    settings.products_to_show = settings.products_to_show || 6;
+    settings.show_reviews = true;
+  }
+
+  // 7. OFFER BANNER / PROMO
+  else if (lowerId.includes("offer") || lowerId.includes("promo") || lowerId.includes("banner")) {
+    settings.subtitle = settings.subtitle || "LIMITED PRIVILEGE";
+    settings.title = settings.title || `<p>Enjoy <em>20% Off</em> Your First Order</p>`;
+    settings.text = settings.text || "Use code VIP20 at checkout for instant luxury savings.";
+    settings.btn_text = settings.btn_text || "CLAIM OFFER NOW";
+    settings.btn_link = settings.btn_link || "/collections/all";
+  }
+
+  // 8. BRAND STORY
+  else if (lowerId.includes("story") || lowerId.includes("manifesto") || lowerId.includes("about")) {
+    settings.subtitle = settings.subtitle || "OUR PHILOSOPHY";
+    settings.title = settings.title || `<p>A return to <em>uncompromising quality</em>.</p>`;
+    settings.text = settings.text || `<p>Rooted in timeless aesthetics, ethical sourcing, and master artisanal craft. Every piece tells a story of dedication.</p>`;
+    settings.btn_text = settings.btn_text || "DISCOVER OUR STORY";
+    settings.btn_link = settings.btn_link || "/pages/about";
+  }
+
+  // 9. NEWSLETTER / VIP CLUB
+  else if (lowerId.includes("newsletter")) {
+    settings.subtitle = settings.subtitle || "JOIN THE CIRCLE";
+    settings.title = settings.title || `<p>Unlock <em>Private Drops</em> & Archival Access</p>`;
+    settings.btn_text = settings.btn_text || "SUBSCRIBE";
+  }
+
+  const result: any = { type: componentId, settings };
+  if (block_order.length > 0) {
+    result.blocks = blocks;
+    result.block_order = block_order;
+  }
+
+  return result;
+}
+
   let sectionIndex = 1;
   for (const spec of composition.sections) {
     // Prevent duplicate chrome inside the body template
@@ -207,7 +355,7 @@ export async function applyComposition(
 
     // Numbered so the key order matches visual order in theme editor
     const key = `${String(sectionIndex).padStart(2, "0")}-${spec.componentId}`;
-    sections[key] = { type: spec.componentId, settings: { ...(spec.settings || {}) } };
+    sections[key] = hydrateSectionEntry(spec.componentId, composition, spec.settings || {});
     order.push(key);
     sectionIndex++;
   }
@@ -234,7 +382,13 @@ export async function applyComposition(
       } else {
         missingFiles.push(annId);
       }
-      headerGroupSections["announcement"] = { type: annId, settings: {} };
+      headerGroupSections["announcement"] = {
+        type: annId,
+        settings: {
+          text: `🔥 FREE WORLDWIDE EXPRESS SHIPPING ON ORDERS OVER $99 • USE CODE WELCOME10`,
+          link: "/collections/all",
+        },
+      };
       headerGroupOrder.push("announcement");
     }
 
@@ -279,12 +433,64 @@ export async function applyComposition(
       missingFiles.push(footId);
     }
 
+    const footerEntry: any = {
+      type: footId,
+      settings: {},
+    };
+
+    // Populate footer column blocks if supported
+    if (footId.includes("hp") || footId.includes("footer")) {
+      footerEntry.blocks = {
+        col_1: {
+          type: footId.includes("bold") ? "link_list" : "column",
+          settings: {
+            title: "Collections",
+            heading: "Collections",
+            link_1_text: "New Arrivals",
+            link_1_url: "/collections/all",
+            link_2_text: "Bestsellers",
+            link_2_url: "/collections/all",
+            link_3_text: "Exclusive Drops",
+            link_3_url: "/collections/all",
+          },
+        },
+        col_2: {
+          type: footId.includes("bold") ? "link_list" : "column",
+          settings: {
+            title: "Client Services",
+            heading: "Client Services",
+            link_1_text: "Track Order",
+            link_1_url: "/pages/contact",
+            link_2_text: "Shipping Policy",
+            link_2_url: "/pages/contact",
+            link_3_text: "Returns & Exchanges",
+            link_3_url: "/pages/contact",
+          },
+        },
+        col_3: {
+          type: footId.includes("bold") ? "text" : "column",
+          settings: {
+            title: "About Us",
+            heading: "About Us",
+            text: "Dedicated to precision design, authentic craftsmanship, and world-class customer experience.",
+            link_1_text: "Our Heritage",
+            link_1_url: "/pages/about",
+            link_2_text: "Sustainability",
+            link_2_url: "/pages/about",
+            link_3_text: "Store Locator",
+            link_3_url: "/pages/contact",
+          },
+        },
+      };
+      footerEntry.block_order = ["col_1", "col_2", "col_3"];
+    }
+
     files["sections/footer-group.json"] = JSON.stringify(
       {
         name: "Footer Group",
         type: "footer",
         sections: {
-          footer: { type: footId, settings: {} },
+          footer: footerEntry,
         },
         order: ["footer"],
       },
@@ -303,8 +509,9 @@ export async function applyComposition(
       const entry = doc.sections[key];
       const source = files[`sections/${entry.type}.liquid`] || "";
       if (!/"type"\s*:\s*"collection"/.test(source)) continue;
-      if (entry.settings.collection) continue;
+      if (entry.settings && entry.settings.collection) continue;
       // Alternate so two adjacent grids do not show identical products.
+      if (!entry.settings) entry.settings = {};
       entry.settings.collection = handles[n % handles.length];
       n++;
       collectionsWired++;
@@ -312,11 +519,20 @@ export async function applyComposition(
     files[templateFile] = JSON.stringify(doc, null, 2);
   }
 
-  // ── Match the store's colours ─────────────────────────────────────────
+  // ── Match the store's colours with Archetype Palette ─────────────────
   let paletteApplied = 0;
-  if (options.palette) {
-    const stats = applyStorePalette(files, buildStorePalette(options.palette));
+  const targetPalette = options.palette || ARCHETYPE_PALETTES[composition.id] || {
+    background: "#ffffff",
+    text: "#0f172a",
+    accent: composition.accentColor || "#38bdf8",
+    surface: "#f8fafc",
+  };
+
+  try {
+    const stats = applyStorePalette(files, buildStorePalette(targetPalette));
     paletteApplied = stats.settingsWritten;
+  } catch (err) {
+    console.error("Store palette application non-fatal error:", err);
   }
 
   // Ensure utility stylesheet is always uploaded
