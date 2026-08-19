@@ -639,6 +639,59 @@ function generateInstantD2CPreview(comp: any): string {
       font-size: 15px;
       font-weight: 700;
     }
+
+    /* Archetype Custom Layout Overrides */
+    ${id === "streetwear-cyber-home" ? `
+      .hero-media { border-radius: 0px !important; border: 2px solid ${accent} !important; box-shadow: 12px 12px 0px #ff550044 !important; }
+      .product-card { border-radius: 0px !important; border: 1px solid rgba(255,85,0,0.3) !important; background: #121215 !important; }
+      .btn-primary { border-radius: 0px !important; font-family: monospace !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+      .category-card { border-radius: 0px !important; }
+    ` : id === "ethnic-royal-home" ? `
+      .hero-media { border-radius: 200px 200px 16px 16px !important; border: 2px solid rgba(212,175,55,0.4) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important; }
+      .product-card { border-radius: 16px !important; border: 1px solid rgba(212,175,55,0.3) !important; background: #220808 !important; }
+      .category-card { border-radius: 120px 120px 16px 16px !important; }
+      .btn-primary { background: linear-gradient(135deg, #d4af37 0%, #b45309 100%) !important; color: #180505 !important; font-weight: 800 !important; }
+    ` : id === "apparel-minimal-home" ? `
+      .hero-media { border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.06) !important; }
+      .product-card { border-radius: 10px !important; border: 1px solid rgba(0,0,0,0.06) !important; }
+      .category-card { border-radius: 10px !important; }
+      .btn-primary { border-radius: 8px !important; font-weight: 600 !important; letter-spacing: 0.2px !important; }
+    ` : id === "beauty-organic-home" ? `
+      .hero-media { border-radius: 36px !important; border: 1px solid rgba(46,90,68,0.2) !important; }
+      .product-card { border-radius: 24px !important; border: 1px solid rgba(46,90,68,0.15) !important; }
+      .category-card { border-radius: 28px !important; }
+      .btn-primary { border-radius: 99px !important; background: #2e5a44 !important; }
+    ` : id === "beauty-clinical-home" ? `
+      .hero-media { border-radius: 8px !important; border: 2px solid #0284c7 !important; background: #f8fafc !important; }
+      .product-card { border-radius: 8px !important; border: 1px solid #cbd5e1 !important; }
+      .category-card { border-radius: 8px !important; }
+      .btn-primary { border-radius: 6px !important; background: #0284c7 !important; font-family: monospace !important; }
+    ` : id === "beauty-glamour-home" ? `
+      .hero-media { border-radius: 28px !important; border: 1px solid rgba(232,121,249,0.3) !important; box-shadow: 0 0 35px rgba(232,121,249,0.2) !important; }
+      .product-card { border-radius: 20px !important; border: 1px solid rgba(232,121,249,0.25) !important; background: #160c20 !important; }
+      .category-card { border-radius: 24px !important; }
+      .btn-primary { border-radius: 99px !important; background: linear-gradient(135deg, #e879f9 0%, #c026d3 100%) !important; color: #fff !important; }
+    ` : id === "jewellery-heritage-home" ? `
+      .hero-media { border-radius: 180px 180px 20px 20px !important; border: 2px solid #eab308 !important; box-shadow: 0 0 30px rgba(234,179,8,0.2) !important; }
+      .product-card { border-radius: 16px !important; border: 1px solid rgba(234,179,8,0.3) !important; background: #0a1f15 !important; }
+      .category-card { border-radius: 100px 100px 16px 16px !important; }
+      .btn-primary { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%) !important; color: #06150e !important; font-weight: 800 !important; }
+    ` : id === "jewellery-diamond-home" ? `
+      .hero-media { border-radius: 16px !important; border: 1px solid rgba(14,165,233,0.3) !important; box-shadow: 0 15px 35px rgba(14,165,233,0.12) !important; }
+      .product-card { border-radius: 16px !important; border: 1px solid rgba(14,165,233,0.2) !important; }
+      .category-card { border-radius: 16px !important; }
+      .btn-primary { border-radius: 8px !important; background: #0f172a !important; color: #ffffff !important; }
+    ` : id === "jewellery-silver-home" ? `
+      .hero-media { border-radius: 20px !important; border: 1px solid rgba(120,113,108,0.25) !important; }
+      .product-card { border-radius: 14px !important; border: 1px solid rgba(120,113,108,0.2) !important; }
+      .category-card { border-radius: 18px !important; }
+      .btn-primary { border-radius: 8px !important; background: #292524 !important; color: #fafaf9 !important; }
+    ` : `
+      .hero-media { border-radius: 4px !important; border: 2px solid #22c55e !important; box-shadow: 0 0 25px rgba(34,197,94,0.25) !important; }
+      .product-card { border-radius: 4px !important; border: 1px solid rgba(34,197,94,0.3) !important; background: #0b1324 !important; }
+      .category-card { border-radius: 4px !important; }
+      .btn-primary { border-radius: 4px !important; background: #22c55e !important; color: #030712 !important; font-family: monospace !important; font-weight: 800 !important; }
+    `}
   </style>
 </head>
 <body>
