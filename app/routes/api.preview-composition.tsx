@@ -532,14 +532,7 @@ function generateInstantD2CPreview(comp: any): string {
     .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; text-align: center; font-size: 13px; }
 
-    @media (max-width: 900px) {
-      .hero-grid, .story-grid, .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-      .product-grid, .trust-grid, .ugc-grid, .category-grid, .reviews-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    }
-    @media (max-width: 600px) {
-      .product-grid, .trust-grid, .ugc-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-    }    /* Section 8: Offer & Promo Banner */
+    /* Section 8: Offer & Promo Banner */
     .offer-banner-section { padding: 40px 0; }
     .offer-box {
       background: ${isDark ? "#1c1924" : "#f1f5f9"};
@@ -632,12 +625,13 @@ function generateInstantD2CPreview(comp: any): string {
 
     /* Guarantee Bar */
     .guarantee-bar {
-      padding: 30px 0;
+      padding: 24px 16px;
       background: ${accent};
       color: #ffffff;
       text-align: center;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     /* Archetype Custom Layout Overrides */
@@ -692,6 +686,71 @@ function generateInstantD2CPreview(comp: any): string {
       .category-card { border-radius: 4px !important; }
       .btn-primary { border-radius: 4px !important; background: #22c55e !important; color: #030712 !important; font-family: monospace !important; font-weight: 800 !important; }
     `}
+
+    /* ── Comprehensive Mobile & Tablet Responsive Architecture ──────── */
+    @media (max-width: 992px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 36px; text-align: center; }
+      .hero-desc { margin: 0 auto 28px; }
+      .hero-cta-group { justify-content: center; }
+      .story-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+      .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .offer-box { grid-template-columns: 1fr; padding: 36px 24px; text-align: center; }
+      .offer-box .btn-primary { margin: 0 auto; }
+      .spec-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      .hero-section { padding: 40px 0; }
+      .hero-title { font-size: clamp(28px, 7vw, 42px); }
+      .hero-img { height: 340px; }
+      .hero-cta-group { flex-direction: column; width: 100%; }
+      .hero-cta-group .btn-primary, .hero-cta-group .btn-secondary { width: 100%; justify-content: center; padding: 14px 20px; }
+      
+      .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+      .trust-item h4 { font-size: 13px; }
+      .trust-item p { font-size: 11px; }
+
+      .category-section, .product-section, .ugc-section, .story-section, .reviews-section, .faq-section, .newsletter-section, .bundle-section, .spec-section {
+        padding: 50px 0;
+      }
+      .section-title { font-size: 26px; }
+
+      /* Mobile 2-column e-commerce grid */
+      .category-grid { grid-template-columns: 1fr; gap: 16px; }
+      .category-card { height: 240px; }
+
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .product-info { padding: 12px; }
+      .product-name { font-size: 13px; line-height: 1.3; }
+      .product-price { font-size: 15px; }
+      .product-atc { padding: 6px 10px; font-size: 11px; }
+
+      .ugc-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .spec-grid { grid-template-columns: 1fr; gap: 16px; }
+      .reviews-grid { grid-template-columns: 1fr; gap: 16px; }
+
+      .bundle-box { flex-direction: column; text-align: center; padding: 28px 20px; }
+      .bundle-box .btn-primary { width: 100%; justify-content: center; }
+
+      .newsletter-box { padding: 32px 18px; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form .btn-primary { width: 100%; justify-content: center; }
+
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; text-align: center; }
+      .footer-links { align-items: center; }
+
+      .nav-links { display: none; }
+      .announcement-bar { font-size: 11px; padding: 8px 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .product-pill { font-size: 8px; padding: 2px 5px; top: 6px; left: 6px; }
+      .product-stars { font-size: 10px; }
+      .press-logo { font-size: 16px; }
+      .hero-img { height: 280px; }
+    }
   </style>
 </head>
 <body>
