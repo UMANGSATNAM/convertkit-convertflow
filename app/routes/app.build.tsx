@@ -321,8 +321,7 @@ export default function Build() {
                 setParams({ page: t.id });
               }}
             >
-              {t.label}
-              {(counts as any)[t.id] > 0 ? ` · ${(counts as any)[t.id]}` : " · soon"}
+              {`${t.label}${(counts as any)[t.id] > 0 ? ` · ${(counts as any)[t.id]}` : " · soon"}`}
             </Button>
           ))}
         </InlineStack>
@@ -337,7 +336,7 @@ export default function Build() {
                 pressed={nicheFilter === "all"}
                 onClick={() => setNicheFilter("all")}
               >
-                All Homepages ({nicheCounts.all})
+                {`All Homepages (${nicheCounts.all})`}
               </Button>
               {nicheCounts.clothing > 0 && (
                 <Button
@@ -345,7 +344,7 @@ export default function Build() {
                   pressed={nicheFilter === "clothing"}
                   onClick={() => setNicheFilter("clothing")}
                 >
-                  👗 Clothing ({nicheCounts.clothing})
+                  {`👗 Clothing (${nicheCounts.clothing})`}
                 </Button>
               )}
               {nicheCounts.beauty > 0 && (
@@ -354,7 +353,7 @@ export default function Build() {
                   pressed={nicheFilter === "beauty"}
                   onClick={() => setNicheFilter("beauty")}
                 >
-                  ✨ Beauty & Skincare ({nicheCounts.beauty})
+                  {`✨ Beauty & Skincare (${nicheCounts.beauty})`}
                 </Button>
               )}
               {nicheCounts.jewellery > 0 && (
@@ -363,7 +362,7 @@ export default function Build() {
                   pressed={nicheFilter === "jewellery"}
                   onClick={() => setNicheFilter("jewellery")}
                 >
-                  💎 Jewellery ({nicheCounts.jewellery})
+                  {`💎 Jewellery (${nicheCounts.jewellery})`}
                 </Button>
               )}
               {nicheCounts.tech > 0 && (
@@ -372,7 +371,7 @@ export default function Build() {
                   pressed={nicheFilter === "tech"}
                   onClick={() => setNicheFilter("tech")}
                 >
-                  ⚡ Tech & Audio ({nicheCounts.tech})
+                  {`⚡ Tech & Audio (${nicheCounts.tech})`}
                 </Button>
               )}
             </InlineStack>
@@ -512,7 +511,7 @@ export default function Build() {
                       variant="plain"
                       onClick={() => setInspectingDesign(d)}
                     >
-                      Inspect {d.sections.length} sections ▾
+                      {`Inspect ${d.sections.length} sections ▾`}
                     </Button>
 
                     <InlineStack gap="150">
@@ -787,7 +786,7 @@ export default function Build() {
                   <BlockStack gap="050">
                     <InlineStack gap="200" blockAlign="center">
                       <Text as="h2" variant="headingMd">{inspectingDesign.name}</Text>
-                      <Badge tone="info">{inspectingDesign.sections.length} Sections</Badge>
+                      <Badge tone="info">{`${inspectingDesign.sections.length} Sections`}</Badge>
                     </InlineStack>
                     <Text as="p" tone="subdued" variant="bodySm">{inspectingDesign.description}</Text>
                   </BlockStack>
