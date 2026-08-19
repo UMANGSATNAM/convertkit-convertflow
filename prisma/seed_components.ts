@@ -22,31 +22,33 @@ async function main() {
   }
   
   const components = registry.components.map((comp: any) => {
-    const familyStr = Array.isArray(comp.family) ? comp.family.join(", ") : (comp.family || "");
-    const firstFamily = Array.isArray(comp.family) ? comp.family[0] : (comp.family || "");
+    const familyStr = Array.isArray(comp.family) ? comp.family.join(", ") : (comp.family || "General");
+    const firstFamily = Array.isArray(comp.family) ? comp.family[0] : (comp.family || "General");
     const industryTags = Array.isArray(comp.family) 
       ? comp.family.map((f: any) => String(f).toLowerCase())
       : (comp.family ? [String(comp.family).toLowerCase()] : ["generic"]);
     
+    const cat = comp.type || comp.category || "custom";
+
     return {
       componentId: comp.componentId,
-      category: comp.type, // Map 'type' to 'category'
+      category: cat,
       niche: firstFamily ? String(firstFamily).toLowerCase() : "core",
       sectionType: comp.sectionType || comp.componentId,
-      filePath: comp.liquidPath,
-      liquidPath: comp.liquidPath,
-      metaPath: comp.metaPath,
+      filePath: comp.liquidPath || comp.filePath || "",
+      liquidPath: comp.liquidPath || comp.filePath || "",
+      metaPath: comp.metaPath || "",
       family: familyStr,
       archetypes: comp.archetypes || [],
       visualStyle: comp.visualStyle || "",
       compatibleSlots: comp.compatibleSlots || [],
       industryTags: industryTags,
       styleTags: comp.visualStyle ? [comp.visualStyle] : [],
-      searchKeywords: [comp.type, comp.visualStyle, ...industryTags].filter(Boolean),
+      searchKeywords: [cat, comp.visualStyle, ...industryTags].filter(Boolean),
       croScore: 95.0,
       mobileScore: 95.0,
       version: String(comp.version || "1"),
-      status: comp.status === "production" ? "PUBLISHED" : "DRAFT",
+      status: comp.status === "draft" || comp.status === "DRAFT" ? "DRAFT" : "PUBLISHED",
       isUniversal: !!comp.isUniversal,
       performanceScore: 95.0
     };
@@ -79,7 +81,7 @@ async function main() {
     process.exit(1);
   }
 
-  const expectedCount = registry.components.filter((c: any) => c.status === "production").length;
+  const expectedCount = registry.components.filter((c: any) => c.status !== "draft" && c.status !== "DRAFT").length;
   const dbComponents = await prisma.componentRegistry.findMany({ where: { status: "PUBLISHED" } });
   if (dbComponents.length !== expectedCount) {
     console.error(`[SeedVerification] Expected exactly ${expectedCount} published components in DB, found ${dbComponents.length}!`);
@@ -92,8 +94,9 @@ async function main() {
       console.error(`[SeedVerification] DB Component "${dbComp.componentId}" not found in registry.json!`);
       process.exit(1);
     }
-    if (dbComp.category !== jsonComp.type) {
-      console.error(`[SeedVerification] Category drift detected: DB category "${dbComp.category}" !== JSON type "${jsonComp.type}" for "${dbComp.componentId}"`);
+    const expectedCat = jsonComp.type || jsonComp.category || "custom";
+    if (dbComp.category !== expectedCat) {
+      console.error(`[SeedVerification] Category drift detected: DB category "${dbComp.category}" !== JSON type "${expectedCat}" for "${dbComp.componentId}"`);
       process.exit(1);
     }
   }
