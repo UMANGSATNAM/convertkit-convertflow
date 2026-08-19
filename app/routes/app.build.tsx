@@ -596,12 +596,13 @@ export default function Build() {
                           aspectRatio: "16 / 10",
                           overflow: "hidden",
                           borderRadius: 12,
-                          border: "1px solid rgba(0,0,0,0.12)",
+                          border: "1px solid rgba(0,0,0,0.14)",
                           background: vis.bg,
                           cursor: "pointer",
                           display: "flex",
                           flexDirection: "column",
-                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                          transition: "transform 0.2s ease, box-shadow 0.2s ease",
                         }}
                         onClick={() => setInstantPreview(d)}
                       >
@@ -610,8 +611,8 @@ export default function Build() {
                           style={{
                             background: vis.accent,
                             color: "#ffffff",
-                            padding: "4px 10px",
-                            fontSize: "10px",
+                            padding: "3px 10px",
+                            fontSize: "9px",
                             fontWeight: 800,
                             letterSpacing: "0.5px",
                             textAlign: "center",
@@ -624,6 +625,34 @@ export default function Build() {
                           {vis.badgeText}
                         </div>
 
+                        {/* Mockup Mini Header Nav Bar */}
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            padding: "6px 14px",
+                            borderBottom: "1px solid rgba(255,255,255,0.08)",
+                            background: "rgba(0,0,0,0.15)",
+                            fontSize: "9px",
+                            color: vis.subColor,
+                            fontWeight: 700,
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: 5, color: vis.textColor, fontWeight: 800 }}>
+                            <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: vis.accent }} />
+                            <span>{d.name.split(" ")[0]}</span>
+                          </div>
+                          <div style={{ display: "flex", gap: 8, opacity: 0.8 }}>
+                            <span>Shop</span>
+                            <span>Story</span>
+                            <span>Reviews</span>
+                          </div>
+                          <div style={{ background: vis.accent, color: "#fff", padding: "1px 6px", borderRadius: 99, fontSize: "8px" }}>
+                            Cart (0)
+                          </div>
+                        </div>
+
                         {/* Mockup Hero Preview Body */}
                         <div
                           style={{
@@ -631,20 +660,21 @@ export default function Build() {
                             display: "grid",
                             gridTemplateColumns: "1.1fr 0.9fr",
                             gap: 12,
-                            padding: "14px 16px",
+                            padding: "10px 14px",
                             alignItems: "center",
                           }}
                         >
-                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                             <div
                               style={{
                                 display: "inline-block",
-                                padding: "2px 8px",
+                                padding: "2px 6px",
                                 borderRadius: 99,
                                 background: vis.pillBg,
                                 color: vis.pillText,
-                                fontSize: "10px",
-                                fontWeight: 700,
+                                fontSize: "9px",
+                                fontWeight: 800,
+                                textTransform: "uppercase",
                                 width: "fit-content",
                               }}
                             >
@@ -653,7 +683,7 @@ export default function Build() {
                             <div
                               style={{
                                 color: vis.textColor,
-                                fontSize: "15px",
+                                fontSize: "14px",
                                 fontWeight: 800,
                                 lineHeight: 1.2,
                                 fontFamily: vis.fontFamily,
@@ -666,7 +696,7 @@ export default function Build() {
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 6,
-                                marginTop: 4,
+                                marginTop: 2,
                               }}
                             >
                               <span
@@ -674,14 +704,14 @@ export default function Build() {
                                   background: vis.accent,
                                   color: "#fff",
                                   fontSize: "9px",
-                                  fontWeight: 700,
+                                  fontWeight: 800,
                                   padding: "3px 8px",
-                                  borderRadius: 4,
+                                  borderRadius: d.id === "streetwear-cyber-home" ? 0 : d.id === "ethnic-royal-home" ? 12 : 6,
                                 }}
                               >
-                                Shop Now →
+                                Explore →
                               </span>
-                              <span style={{ fontSize: "10px", color: vis.subColor }}>
+                              <span style={{ fontSize: "9px", color: vis.subColor }}>
                                 ★★★★★ (4.9)
                               </span>
                             </div>
@@ -691,11 +721,11 @@ export default function Build() {
                             style={{
                               width: "100%",
                               height: "100%",
-                              maxHeight: 110,
-                              borderRadius: 8,
+                              maxHeight: 100,
+                              borderRadius: d.id === "ethnic-royal-home" || d.id === "jewellery-heritage-home" ? "30px 30px 4px 4px" : d.id === "streetwear-cyber-home" ? 0 : 8,
                               overflow: "hidden",
-                              border: "1px solid rgba(255,255,255,0.15)",
-                              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)",
+                              border: `1px solid ${d.id === "ethnic-royal-home" ? "rgba(212,175,55,0.4)" : "rgba(255,255,255,0.15)"}`,
+                              boxShadow: "0 8px 16px -3px rgba(0,0,0,0.35)",
                             }}
                           >
                             <img
@@ -710,23 +740,26 @@ export default function Build() {
                           </div>
                         </div>
 
-                        {/* Section Count Pill */}
+                        {/* Section Count & CRO Pill */}
                         <div
                           style={{
                             position: "absolute",
-                            bottom: 8,
+                            bottom: 6,
                             right: 8,
-                            background: "rgba(0, 0, 0, 0.85)",
+                            background: "rgba(0, 0, 0, 0.88)",
                             color: "#fff",
-                            padding: "3px 8px",
-                            borderRadius: 10,
-                            fontSize: "11px",
-                            fontWeight: 700,
+                            padding: "2px 8px",
+                            borderRadius: 8,
+                            fontSize: "10px",
+                            fontWeight: 800,
                             border: "1px solid rgba(255, 255, 255, 0.2)",
-                            backdropFilter: "blur(4px)",
+                            backdropFilter: "blur(6px)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 4,
                           }}
                         >
-                          {d.sections.length} Sections
+                          <span style={{ color: vis.accent }}>●</span> {d.sections.length} CRO Sections
                         </div>
 
                         {/* Hover Overlay Button */}
