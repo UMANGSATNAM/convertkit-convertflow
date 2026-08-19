@@ -69,11 +69,10 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
   html = html.replace(/{%-?\s*liquid[\s\S]*?-?%}/g, "");
   html = html.replace(/{%-?\s*assign\s+[a-zA-Z0-9_-]+\s*=[\s\S]*?-?%}/g, "");
 
-  // 4. Resolve conditionals like {%- if hero_image != blank -%} ... {%- else -%} ... {%- endif -%}
-  html = html.replace(/{%-?\s*if\s+hero_image\s*!=\s*blank\s*-?%}[\s\S]*?{%-?\s*else\s*-?%}([\s\S]*?){%-?\s*endif\s*-?%}/g, "$1");
-  html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*else\s*-?%}([\s\S]*?){%-?\s*endif\s*-?%}/g, "$1");
-  html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*endif\s*-?%}/g, "");
-  html = html.replace(/{%-?\s*unless\s+[^%]+\s*-?%}[\s\S]*?{%-?\s*endunless\s*-?%}/g, "");
+  // 4. Resolve conditionals like {%- if ... -%} ... {%- else -%} ... {%- endif -%}
+  // Preserve inner HTML content instead of deleting it
+  html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}([\s\S]*?)(?:{%-?\s*else\s*-?%}[\s\S]*?)?{%-?\s*endif\s*-?%}/g, "$1");
+  html = html.replace(/{%-?\s*unless\s+[^%]+\s*-?%}([\s\S]*?){%-?\s*endunless\s*-?%}/g, "$1");
 
   // 5. Replace {{ variable }} using our resolved variables map
   for (const [vName, vVal] of Object.entries(variables)) {
