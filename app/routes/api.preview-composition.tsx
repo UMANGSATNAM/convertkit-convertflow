@@ -18,40 +18,125 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 function generateInstantD2CPreview(comp: any): string {
+  const id = comp.id || "streetwear-cyber-home";
   const niche = comp.niche || "clothing";
-  const accent = comp.accentColor || "#f59e0b";
   const name = comp.name || "D2C Brand";
   const badge = comp.styleBadge || "Official Store";
-  const archetype = comp.archetype || "";
 
-  // Archetype & niche specific typography & styling
-  const fontLink =
-    niche === "clothing"
-      ? '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">'
-      : niche === "beauty"
-      ? '<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">'
-      : niche === "jewellery"
-      ? '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">'
-      : '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+  // Highly distinct, tailor-made visual themes for each of the 10 homepages
+  let bg = "#09090b";
+  let cardBg = "#121216";
+  let textPrimary = "#f8fafc";
+  let textSecondary = "#94a3b8";
+  let borderCol = "rgba(255,255,255,0.08)";
+  let accent = "#ff5500";
+  let fontLink = '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">';
+  let headingFont = "'Syne', sans-serif";
+  let isDark = true;
 
-  const headingFont =
-    niche === "clothing"
-      ? "'Syne', sans-serif"
-      : niche === "beauty"
-      ? "'Italiana', serif"
-      : niche === "jewellery"
-      ? "'Cormorant Garamond', serif"
-      : "'Space Grotesk', sans-serif";
+  if (id === "streetwear-cyber-home") {
+    bg = "#09090b";
+    cardBg = "#141418";
+    textPrimary = "#ffffff";
+    textSecondary = "#a1a1aa";
+    borderCol = "rgba(255, 85, 0, 0.2)";
+    accent = "#ff5500";
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">';
+    headingFont = "'Syne', sans-serif";
+    isDark = true;
+  } else if (id === "ethnic-royal-home") {
+    bg = "#180505";
+    cardBg = "#260b0b";
+    textPrimary = "#fff7ed";
+    textSecondary = "#e2d2ba";
+    borderCol = "rgba(212, 175, 55, 0.25)";
+    accent = "#d4af37"; // Royal 22kt Gold
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Cormorant Garamond', serif";
+    isDark = true;
+  } else if (id === "apparel-minimal-home") {
+    bg = "#f7f6f2";
+    cardBg = "#ffffff";
+    textPrimary = "#18181b";
+    textSecondary = "#52525b";
+    borderCol = "rgba(0, 0, 0, 0.08)";
+    accent = "#2d4a3e"; // Forest Sage
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Plus Jakarta Sans', sans-serif";
+    isDark = false;
+  } else if (id === "beauty-organic-home") {
+    bg = "#fcfaf6";
+    cardBg = "#ffffff";
+    textPrimary = "#1f2937";
+    textSecondary = "#6b7280";
+    borderCol = "rgba(46, 90, 68, 0.12)";
+    accent = "#2e5a44"; // Botanical Emerald Green
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">';
+    headingFont = "'Italiana', serif";
+    isDark = false;
+  } else if (id === "beauty-clinical-home") {
+    bg = "#f8fafc";
+    cardBg = "#ffffff";
+    textPrimary = "#0f172a";
+    textSecondary = "#475569";
+    borderCol = "rgba(2, 132, 199, 0.15)";
+    accent = "#0284c7"; // Clinical Active Blue
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Space Grotesk', sans-serif";
+    isDark = false;
+  } else if (id === "beauty-glamour-home") {
+    bg = "#0d0814";
+    cardBg = "#1b1026";
+    textPrimary = "#fdf4ff";
+    textSecondary = "#d8b4fe";
+    borderCol = "rgba(217, 70, 239, 0.25)";
+    accent = "#e879f9"; // Glamour Orchid Rose
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">';
+    headingFont = "'Italiana', serif";
+    isDark = true;
+  } else if (id === "jewellery-heritage-home") {
+    bg = "#06150e";
+    cardBg = "#0c261c";
+    textPrimary = "#fef9c3";
+    textSecondary = "#a7f3d0";
+    borderCol = "rgba(234, 179, 8, 0.25)";
+    accent = "#eab308"; // Polki Jadau Gold
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Cormorant Garamond', serif";
+    isDark = true;
+  } else if (id === "jewellery-diamond-home") {
+    bg = "#f1f5f9";
+    cardBg = "#ffffff";
+    textPrimary = "#0f172a";
+    textSecondary = "#475569";
+    borderCol = "rgba(14, 165, 233, 0.18)";
+    accent = "#0ea5e9"; // Brilliant Platinum Diamond
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Cormorant Garamond', serif";
+    isDark = false;
+  } else if (id === "jewellery-silver-home") {
+    bg = "#fafaf9";
+    cardBg = "#ffffff";
+    textPrimary = "#1c1917";
+    textSecondary = "#57534e";
+    borderCol = "rgba(120, 113, 108, 0.15)";
+    accent = "#475569"; // 925 Solid Silver Slate
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Cormorant Garamond', serif";
+    isDark = false;
+  } else if (id === "tech-audio-home") {
+    bg = "#030712";
+    cardBg = "#0f172a";
+    textPrimary = "#f9fafb";
+    textSecondary = "#9ca3af";
+    borderCol = "rgba(34, 197, 94, 0.22)";
+    accent = "#22c55e"; // Cyber Neon Emerald
+    fontLink = '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">';
+    headingFont = "'Space Grotesk', sans-serif";
+    isDark = true;
+  }
 
   const bodyFont = "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif";
-
-  const isDark = niche === "clothing" || niche === "tech";
-  const bg = isDark ? "#09090b" : "#fdfbf7";
-  const cardBg = isDark ? "#18181b" : "#ffffff";
-  const textPrimary = isDark ? "#f8fafc" : "#1e293b";
-  const textSecondary = isDark ? "#94a3b8" : "#64748b";
-  const borderCol = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-
   const products = getProductsForComp(comp.id, niche);
   const copy = getCopyForComp(comp.id, niche, name);
 

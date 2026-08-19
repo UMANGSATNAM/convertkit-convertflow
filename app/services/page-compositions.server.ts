@@ -346,21 +346,52 @@ export async function applyComposition(
  * deleted — it is their rollback, and it is not ours to remove.
  */
 export async function publishDraft(shop: any, themeId: string) {
-  const res = await graphqlRequest(
+  const numericOnly = String(themeId).split("/").pop()!;
+
+  // 1. Try GraphQL themePublish
+  try {
+    const res = await graphqlRequest(
+      shop.shopDomain,
+      shop.accessToken,
+      `mutation themePublish($id: ID!) {
+        themePublish(id: $id) {
+          theme { id name role }
+          userErrors { field message }
+        }
+      }`,
+      { id: `gid://shopify/OnlineStoreTheme/${numericOnly}` },
+      false
+    );
+
+    const errs = res?.themePublish?.userErrors || [];
+    if (!errs.length && res?.themePublish?.theme) {
+      console.log(`[Publish] Theme ${numericOnly} published successfully via GraphQL.`);
+      return res.themePublish.theme;
+    }
+    if (errs.length) {
+      console.warn(`[Publish] GraphQL errors: ${errs.map((e: any) => e.message).join("; ")}`);
+    }
+  } catch (err: any) {
+    console.warn(`[Publish] GraphQL themePublish error: ${err.message}, trying REST fallback.`);
+  }
+
+  // 2. Guaranteed REST API Fallback
+  const { restRequest } = await import("./shopify-api.server");
+  const restRes = await restRequest(
     shop.shopDomain,
     shop.accessToken,
-    `mutation themePublish($id: ID!) {
-      themePublish(id: $id) {
-        theme { id name role }
-        userErrors { field message }
-      }
-    }`,
-    { id: `gid://shopify/OnlineStoreTheme/${themeId}` }
+    "PUT",
+    `themes/${numericOnly}.json`,
+    { theme: { id: numericOnly, role: "main" } },
+    false
   );
 
-  const errs = res?.themePublish?.userErrors || [];
-  if (errs.length) throw new Error(errs.map((e: any) => e.message).join("; "));
-  return res?.themePublish?.theme;
+  if (!restRes?.theme && !restRes?.id) {
+    throw new Error(`Failed to publish theme ${numericOnly}: ${JSON.stringify(restRes)}`);
+  }
+
+  console.log(`[Publish] Theme ${numericOnly} published successfully via REST.`);
+  return restRes.theme || restRes;
 }
 
 /**

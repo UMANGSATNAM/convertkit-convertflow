@@ -13,6 +13,143 @@ import {
   applyComposition, ensureDraftTheme, publishDraft, draftChanges,
 } from "../services/page-compositions.server";
 
+const ARCHETYPE_VISUALS: Record<
+  string,
+  {
+    bg: string;
+    textColor: string;
+    subColor: string;
+    accent: string;
+    badgeText: string;
+    headline: string;
+    img: string;
+    pillBg: string;
+    pillText: string;
+    fontFamily: string;
+  }
+> = {
+  "streetwear-cyber-home": {
+    bg: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
+    textColor: "#ffffff",
+    subColor: "#a1a1aa",
+    accent: "#ff5500",
+    badgeText: "🔥 LIVE DROPS · SHOPPABLE REELS",
+    headline: "High-Energy Cyber Streetwear",
+    img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
+    pillBg: "rgba(255, 85, 0, 0.2)",
+    pillText: "#ff5500",
+    fontFamily: "system-ui, sans-serif",
+  },
+  "ethnic-royal-home": {
+    bg: "linear-gradient(135deg, #1c0707 0%, #3b0f0f 100%)",
+    textColor: "#fff9eb",
+    subColor: "#dfc59e",
+    accent: "#d4af37",
+    badgeText: "👑 100% ROYAL ZARI · BRIDAL LOOKBOOK",
+    headline: "Grand Heritage Ethnic Couture",
+    img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80",
+    pillBg: "rgba(212, 175, 55, 0.25)",
+    pillText: "#d4af37",
+    fontFamily: "Georgia, serif",
+  },
+  "apparel-minimal-home": {
+    bg: "linear-gradient(135deg, #f5f4ef 0%, #e8e6de 100%)",
+    textColor: "#18181b",
+    subColor: "#52525b",
+    accent: "#2d4a3e",
+    badgeText: "🌿 GOTS 100% ORGANIC · CAPSULE ESSENTIALS",
+    headline: "Minimalist Nordic Casual",
+    img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+    pillBg: "rgba(45, 74, 62, 0.15)",
+    pillText: "#2d4a3e",
+    fontFamily: "system-ui, sans-serif",
+  },
+  "beauty-organic-home": {
+    bg: "linear-gradient(135deg, #fcfaf6 0%, #ebe6dc 100%)",
+    textColor: "#1f2937",
+    subColor: "#6b7280",
+    accent: "#2e5a44",
+    badgeText: "🍃 COLD-PRESSED BOTANICALS · CLEAN GLOW",
+    headline: "Botanical & Organic Glow",
+    img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80",
+    pillBg: "rgba(46, 90, 68, 0.15)",
+    pillText: "#2e5a44",
+    fontFamily: "Georgia, serif",
+  },
+  "beauty-clinical-home": {
+    bg: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+    textColor: "#0f172a",
+    subColor: "#475569",
+    accent: "#0284c7",
+    badgeText: "🔬 10% NIACINAMIDE · PEPTIDE COMPLEX",
+    headline: "Clinical Derma Lab Skincare",
+    img: "https://images.unsplash.com/photo-1608248597359-0a69a19c7f99?w=600&q=80",
+    pillBg: "rgba(2, 132, 199, 0.15)",
+    pillText: "#0284c7",
+    fontFamily: "system-ui, sans-serif",
+  },
+  "beauty-glamour-home": {
+    bg: "linear-gradient(135deg, #0d0814 0%, #261138 100%)",
+    textColor: "#fdf4ff",
+    subColor: "#d8b4fe",
+    accent: "#e879f9",
+    badgeText: "💎 HAUTE PARFUMERIE · 24HR VELVET LIPS",
+    headline: "Luxury Glamour Studio",
+    img: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&q=80",
+    pillBg: "rgba(232, 121, 249, 0.2)",
+    pillText: "#e879f9",
+    fontFamily: "Georgia, serif",
+  },
+  "jewellery-heritage-home": {
+    bg: "linear-gradient(135deg, #06150e 0%, #0e3324 100%)",
+    textColor: "#fef9c3",
+    subColor: "#a7f3d0",
+    accent: "#eab308",
+    badgeText: "👑 BIS 916 HALLMARK · UNCUT POLKI",
+    headline: "Royal Heritage Polki & Gold",
+    img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80",
+    pillBg: "rgba(234, 179, 8, 0.25)",
+    pillText: "#eab308",
+    fontFamily: "Georgia, serif",
+  },
+  "jewellery-diamond-home": {
+    bg: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+    textColor: "#0f172a",
+    subColor: "#475569",
+    accent: "#0ea5e9",
+    badgeText: "💎 IGI & GIA CERTIFIED · 4Cs PERFECTION",
+    headline: "Modern Solitaire & Diamonds",
+    img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80",
+    pillBg: "rgba(14, 165, 233, 0.15)",
+    pillText: "#0ea5e9",
+    fontFamily: "Georgia, serif",
+  },
+  "jewellery-silver-home": {
+    bg: "linear-gradient(135deg, #fafaf9 0%, #e7e5e4 100%)",
+    textColor: "#1c1917",
+    subColor: "#57534e",
+    accent: "#78716c",
+    badgeText: "🥈 925 SOLID SILVER · ANTI-TARNISH SEAL",
+    headline: "Artisan Handcrafted Silver 925",
+    img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=600&q=80",
+    pillBg: "rgba(120, 113, 108, 0.15)",
+    pillText: "#44403c",
+    fontFamily: "Georgia, serif",
+  },
+  "tech-audio-home": {
+    bg: "linear-gradient(135deg, #030712 0%, #111827 100%)",
+    textColor: "#f9fafb",
+    subColor: "#9ca3af",
+    accent: "#22c55e",
+    badgeText: "⚡ LDAC LOSSLESS · 20MS LATENCY",
+    headline: "Cyber Dark Audio & Electronics",
+    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",
+    pillBg: "rgba(34, 197, 94, 0.2)",
+    pillText: "#22c55e",
+    fontFamily: "system-ui, sans-serif",
+  },
+};
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
     const { session } = await authenticate.admin(request);
@@ -26,20 +163,25 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     let passwordProtected = false;
 
     if (shop) {
-      // Fast parallel resolution with timeout protection so page renders immediately
+      // Non-blocking fast resolution (<100ms)
       try {
         const { graphqlRequest } = await import("../services/shopify-api.server");
         const [themesRes, pwdRes] = await Promise.allSettled([
-          graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 20) { nodes { id name } } }`),
-          graphqlRequest(shop.shopDomain, shop.accessToken, `query { onlineStore { passwordProtection { enabled } } }`),
+          graphqlRequest(shop.shopDomain, shop.accessToken, `query { themes(first: 20) { nodes { id name } } }`, {}, false),
+          graphqlRequest(shop.shopDomain, shop.accessToken, `query { onlineStore { passwordProtection { enabled } } }`, {}, false),
         ]);
 
         if (themesRes.status === "fulfilled" && themesRes.value?.themes?.nodes) {
-          const found = themesRes.value.themes.nodes.find((t: any) => t.name.startsWith("ConvertFlow — Draft"));
+          const found = themesRes.value.themes.nodes.find((t: any) =>
+            t.name === "ConvertFlow — Draft (unpublished)" || t.name.startsWith("ConvertFlow — Draft") || t.name.includes("ConvertFlow")
+          );
           if (found) {
             draftId = String(found.id).split("/").pop()!;
             try {
-              staged = await draftChanges(shop, draftId);
+              staged = await Promise.race([
+                draftChanges(shop, draftId),
+                new Promise<PageType[]>(r => setTimeout(() => r([]), 800)),
+              ]);
             } catch {
               staged = [];
             }
@@ -431,89 +573,196 @@ export default function Build() {
                     }}
                   />
 
-                  {/* Live Visual Iframe Thumbnail with Instant Click-To-Open */}
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      aspectRatio: "16 / 10",
-                      overflow: "hidden",
-                      borderRadius: 10,
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      background: "#09090b",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => setInstantPreview(d)}
-                  >
-                    <iframe
-                      title={`${d.name} instant thumbnail`}
-                      src={`/api/preview-composition?id=${d.id}`}
-                      loading="lazy"
-                      scrolling="no"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: 1200,
-                        height: 750,
-                        border: 0,
-                        transformOrigin: "top left",
-                        transform: "scale(0.30)",
-                        pointerEvents: "none",
-                      }}
-                    />
+                  {/* High-Speed Visual Card Mockup Banner */}
+                  {(() => {
+                    const vis = ARCHETYPE_VISUALS[d.id] || {
+                      bg: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
+                      textColor: "#ffffff",
+                      subColor: "#a1a1aa",
+                      accent: d.accentColor || "#ff5500",
+                      badgeText: "⚡ EXCLUSIVE ARCHETYPE",
+                      headline: d.name,
+                      img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80",
+                      pillBg: "rgba(255, 85, 0, 0.2)",
+                      pillText: "#ff5500",
+                      fontFamily: "system-ui, sans-serif",
+                    };
 
-                    {/* Quick Hover Action Overlay */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "rgba(0, 0, 0, 0.4)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        opacity: 0,
-                        transition: "opacity 0.2s ease",
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
-                      onMouseLeave={e => (e.currentTarget.style.opacity = "0")}
-                    >
-                      <button
+                    return (
+                      <div
                         style={{
-                          background: "#fff",
-                          color: "#0f172a",
-                          border: "none",
-                          padding: "10px 18px",
-                          borderRadius: 20,
-                          fontSize: "13px",
-                          fontWeight: 700,
+                          position: "relative",
+                          width: "100%",
+                          aspectRatio: "16 / 10",
+                          overflow: "hidden",
+                          borderRadius: 12,
+                          border: "1px solid rgba(0,0,0,0.12)",
+                          background: vis.bg,
                           cursor: "pointer",
-                          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)",
+                          display: "flex",
+                          flexDirection: "column",
+                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
                         }}
+                        onClick={() => setInstantPreview(d)}
                       >
-                        ⚡ Instant Live Preview
-                      </button>
-                    </div>
+                        {/* Mockup Announcement Strip */}
+                        <div
+                          style={{
+                            background: vis.accent,
+                            color: "#ffffff",
+                            padding: "4px 10px",
+                            fontSize: "10px",
+                            fontWeight: 800,
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                            textTransform: "uppercase",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {vis.badgeText}
+                        </div>
 
-                    {/* Section Count Pill overlay */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 8,
-                        right: 8,
-                        background: "rgba(0, 0, 0, 0.8)",
-                        color: "#fff",
-                        padding: "3px 8px",
-                        borderRadius: 10,
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        backdropFilter: "blur(4px)",
-                      }}
-                    >
-                      {d.sections.length} Sections
-                    </div>
-                  </div>
+                        {/* Mockup Hero Preview Body */}
+                        <div
+                          style={{
+                            flex: 1,
+                            display: "grid",
+                            gridTemplateColumns: "1.1fr 0.9fr",
+                            gap: 12,
+                            padding: "14px 16px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            <div
+                              style={{
+                                display: "inline-block",
+                                padding: "2px 8px",
+                                borderRadius: 99,
+                                background: vis.pillBg,
+                                color: vis.pillText,
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                width: "fit-content",
+                              }}
+                            >
+                              {d.styleBadge || "Official D2C"}
+                            </div>
+                            <div
+                              style={{
+                                color: vis.textColor,
+                                fontSize: "15px",
+                                fontWeight: 800,
+                                lineHeight: 1.2,
+                                fontFamily: vis.fontFamily,
+                              }}
+                            >
+                              {vis.headline}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                                marginTop: 4,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  background: vis.accent,
+                                  color: "#fff",
+                                  fontSize: "9px",
+                                  fontWeight: 700,
+                                  padding: "3px 8px",
+                                  borderRadius: 4,
+                                }}
+                              >
+                                Shop Now →
+                              </span>
+                              <span style={{ fontSize: "10px", color: vis.subColor }}>
+                                ★★★★★ (4.9)
+                              </span>
+                            </div>
+                          </div>
+
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              maxHeight: 110,
+                              borderRadius: 8,
+                              overflow: "hidden",
+                              border: "1px solid rgba(255,255,255,0.15)",
+                              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)",
+                            }}
+                          >
+                            <img
+                              src={vis.img}
+                              alt={d.name}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Section Count Pill */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: 8,
+                            right: 8,
+                            background: "rgba(0, 0, 0, 0.85)",
+                            color: "#fff",
+                            padding: "3px 8px",
+                            borderRadius: 10,
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            backdropFilter: "blur(4px)",
+                          }}
+                        >
+                          {d.sections.length} Sections
+                        </div>
+
+                        {/* Hover Overlay Button */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: "rgba(0, 0, 0, 0.45)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: 0,
+                            transition: "opacity 0.2s ease",
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                          onMouseLeave={e => (e.currentTarget.style.opacity = "0")}
+                        >
+                          <button
+                            style={{
+                              background: "#ffffff",
+                              color: "#0f172a",
+                              border: "none",
+                              padding: "10px 20px",
+                              borderRadius: 24,
+                              fontSize: "13px",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              boxShadow: "0 10px 20px rgba(0,0,0,0.4)",
+                            }}
+                          >
+                            ⚡ Instant Live Preview
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <BlockStack gap="150">
                     <InlineStack gap="150" align="space-between" blockAlign="center">
