@@ -625,14 +625,15 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     surface: "#f8fafc",
   };
 
-  const storeBg = options.palette?.background;
-  const storeText = options.palette?.text;
   const storeAccent = options.palette?.accent;
   const storeAccentAlt = options.palette?.accentAlt;
 
+  // CRITICAL: Always use the archetype's curated background & text polarity.
+  // Dark themes (Streetwear #09090b, Couture #1c0707, Glamour #0d0814, Heritage #06150e, Tech #030712)
+  // must retain their signature dark backgrounds and NEVER get overwritten with white (#ffffff).
   const targetPalette = {
-    background: storeBg || archetypePalette.background,
-    text: storeText || archetypePalette.text,
+    background: archetypePalette.background,
+    text: archetypePalette.text,
     accent: storeAccent || archetypePalette.accent,
     surface: archetypePalette.surface,
     accentAlt: storeAccentAlt,
