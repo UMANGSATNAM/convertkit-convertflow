@@ -22,8 +22,9 @@ function generateInstantD2CPreview(comp: any): string {
   const accent = comp.accentColor || "#f59e0b";
   const name = comp.name || "D2C Brand";
   const badge = comp.styleBadge || "Official Store";
+  const archetype = comp.archetype || "";
 
-  // Niche-specific font & theme settings
+  // Archetype & niche specific typography & styling
   const fontLink =
     niche === "clothing"
       ? '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">'
@@ -51,8 +52,8 @@ function generateInstantD2CPreview(comp: any): string {
   const textSecondary = isDark ? "#94a3b8" : "#64748b";
   const borderCol = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
 
-  // Product datasets per niche
-  const products = getProductsForNiche(niche);
+  const products = getProductsForComp(comp.id, niche);
+  const copy = getCopyForComp(comp.id, niche, name);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -194,8 +195,8 @@ function generateInstantD2CPreview(comp: any): string {
       color: ${accent};
     }
     .hero-title {
-      font-size: clamp(38px, 5vw, 62px);
-      line-height: 1.08;
+      font-size: clamp(36px, 4.5vw, 58px);
+      line-height: 1.1;
       font-weight: 800;
       margin-bottom: 20px;
       letter-spacing: -1px;
@@ -205,7 +206,7 @@ function generateInstantD2CPreview(comp: any): string {
       line-height: 1.6;
       color: ${textSecondary};
       margin-bottom: 32px;
-      max-width: 500px;
+      max-width: 520px;
     }
     .hero-cta-group {
       display: flex;
@@ -386,7 +387,7 @@ function generateInstantD2CPreview(comp: any): string {
     .story-img-box { border-radius: 24px; overflow: hidden; height: 420px; border: 1px solid ${borderCol}; }
     .story-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Section 10: Customer Reviews Slider */
+    /* Section 10: Customer Reviews */
     .reviews-section { padding: 80px 0; }
     .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
     .review-card {
@@ -412,7 +413,7 @@ function generateInstantD2CPreview(comp: any): string {
     .faq-q { font-size: 16px; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; }
     .faq-a { font-size: 14px; color: ${textSecondary}; line-height: 1.6; }
 
-    /* Section 12: VIP Newsletter Banner */
+    /* Section 12: VIP Newsletter */
     .newsletter-section { padding: 80px 0; text-align: center; }
     .newsletter-box {
       max-width: 720px;
@@ -461,7 +462,7 @@ function generateInstantD2CPreview(comp: any): string {
   <!-- Section 1: Top Announcement Bar -->
   <div class="announcement-bar">
     <span class="announcement-badge">${badge}</span>
-    <span>⚡ FREE EXPRESS SHIPPING ON ALL ORDERS ABOVE $75 · USE CODE <strong>${niche.toUpperCase()}20</strong></span>
+    <span>${copy.announcement}</span>
   </div>
 
   <!-- Section 2: Header Chrome -->
@@ -488,14 +489,8 @@ function generateInstantD2CPreview(comp: any): string {
   <!-- Section 3: Infinite Marquee Strip -->
   <div class="marquee-strip">
     <div class="marquee-content">
-      <span class="marquee-item">✦ 100% SATISFACTION GUARANTEED</span>
-      <span class="marquee-item">✦ 30-DAY HASSLE-FREE RETURNS</span>
-      <span class="marquee-item">✦ ETHICALLY CRAFTED & TESTED</span>
-      <span class="marquee-item">✦ OVER 100,000+ HAPPY CUSTOMERS</span>
-      <span class="marquee-item">✦ 100% SATISFACTION GUARANTEED</span>
-      <span class="marquee-item">✦ 30-DAY HASSLE-FREE RETURNS</span>
-      <span class="marquee-item">✦ ETHICALLY CRAFTED & TESTED</span>
-      <span class="marquee-item">✦ OVER 100,000+ HAPPY CUSTOMERS</span>
+      ${copy.marquee.map((m: string) => `<span class="marquee-item">✦ ${m}</span>`).join("")}
+      ${copy.marquee.map((m: string) => `<span class="marquee-item">✦ ${m}</span>`).join("")}
     </div>
   </div>
 
@@ -503,11 +498,9 @@ function generateInstantD2CPreview(comp: any): string {
   <section class="hero-section">
     <div class="container hero-grid">
       <div>
-        <div class="hero-tag">⚡ ${comp.styleBadge || "New Season Drop"}</div>
-        <h1 class="hero-title">${comp.description.split(":")[0] || "Elevate Your Everyday Standard"}</h1>
-        <p class="hero-desc">
-          Engineered for discerning tastes. Discover our bestselling curated catalog built with highest craftsmanship and obsessive attention to detail.
-        </p>
+        <div class="hero-tag">⚡ ${badge}</div>
+        <h1 class="hero-title">${copy.heroTitle}</h1>
+        <p class="hero-desc">${copy.heroDesc}</p>
         <div class="hero-cta-group">
           <a href="#bestsellers" class="btn-primary">Shop The Collection →</a>
           <a href="#story" class="btn-secondary">Explore Lookbook</a>
@@ -522,22 +515,12 @@ function generateInstantD2CPreview(comp: any): string {
   <!-- Section 5: Trust & Benefits Bar -->
   <div class="trust-strip">
     <div class="container trust-grid">
-      <div class="trust-item">
-        <h4>📦 Express Delivery</h4>
-        <p>Dispatched within 24 hours</p>
-      </div>
-      <div class="trust-item">
-        <h4>🛡️ 100% Authentic</h4>
-        <p>BIS / Lab certified & verified</p>
-      </div>
-      <div class="trust-item">
-        <h4>🔄 Easy Exchanges</h4>
-        <p>Doorstep 7-day swap policy</p>
-      </div>
-      <div class="trust-item">
-        <h4>⭐ 4.9/5 Rated</h4>
-        <p>Trusted by 50,000+ buyers</p>
-      </div>
+      ${copy.trustBadges.map((tb: any) => `
+        <div class="trust-item">
+          <h4>${tb.icon} ${tb.title}</h4>
+          <p>${tb.desc}</p>
+        </div>
+      `).join("")}
     </div>
   </div>
 
@@ -552,21 +535,21 @@ function generateInstantD2CPreview(comp: any): string {
         <div class="category-card">
           <img src="${products[1].img}" alt="Category 1" />
           <div class="category-card-overlay">
-            <div class="category-card-title">Signature Bestsellers</div>
+            <div class="category-card-title">${copy.categories[0]}</div>
             <div class="category-card-count">18 Products</div>
           </div>
         </div>
         <div class="category-card">
           <img src="${products[2].img}" alt="Category 2" />
           <div class="category-card-overlay">
-            <div class="category-card-title">Limited Edition Drop</div>
+            <div class="category-card-title">${copy.categories[1]}</div>
             <div class="category-card-count">12 Products</div>
           </div>
         </div>
         <div class="category-card">
           <img src="${products[3].img}" alt="Category 3" />
           <div class="category-card-overlay">
-            <div class="category-card-title">New Arrivals</div>
+            <div class="category-card-title">${copy.categories[2]}</div>
             <div class="category-card-count">24 Products</div>
           </div>
         </div>
@@ -604,20 +587,20 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 8: Shoppable UGC / Reels Grid -->
+  <!-- Section 8: Shoppable UGC / Reels -->
   <section class="ugc-section">
     <div class="container">
       <div class="section-head">
-        <div class="section-sub">As Seen On Social</div>
-        <h2 class="section-title">Styled By Our Community</h2>
+        <div class="section-sub">Community Spotlight</div>
+        <h2 class="section-title">Seen On Social</h2>
       </div>
       <div class="ugc-grid">
-        ${products.map((p, idx) => `
+        ${products.map((p, i) => `
           <div class="ugc-card">
-            <img src="${p.img}" alt="UGC Reel ${idx + 1}" />
+            <img src="${p.img}" alt="UGC Reel ${i + 1}" />
             <div class="ugc-overlay">
-              <div class="ugc-handle">@customer_${idx + 1}</div>
-              <div class="ugc-caption">"Obsessed with the quality! Best purchase of the season 🔥"</div>
+              <div class="ugc-handle">@${name.toLowerCase().replace(/[^a-z0-9]/g, "")}_vip</div>
+              <div class="ugc-caption">${copy.ugcCaptions[i % copy.ugcCaptions.length]}</div>
             </div>
           </div>
         `).join("")}
@@ -625,27 +608,24 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 9: Brand Story & Craftsmanship -->
+  <!-- Section 9: Brand Story Showcase -->
   <section id="story" class="story-section">
     <div class="container story-grid">
       <div class="story-img-box">
-        <img src="${products[0].img}" alt="Brand Craftsmanship" />
+        <img src="${products[0].img}" alt="Brand Heritage Story" />
       </div>
       <div>
-        <div class="section-sub">Our Philosophy</div>
-        <h2 class="section-title" style="margin-bottom: 20px;">Designed Without Compromise.</h2>
-        <p style="font-size: 16px; line-height: 1.7; color:${textSecondary}; margin-bottom: 20px;">
-          Every single piece in our catalogue begins with rigorous material testing and ethical sourcing. We reject mass-market fast trends in favour of timeless silhouettes and enduring durability.
+        <div class="section-sub">${copy.storySub}</div>
+        <h2 class="section-title" style="margin-bottom: 20px;">${copy.storyTitle}</h2>
+        <p style="color: ${textSecondary}; line-height: 1.7; font-size: 16px; margin-bottom: 24px;">
+          ${copy.storyBody}
         </p>
-        <p style="font-size: 16px; line-height: 1.7; color:${textSecondary}; margin-bottom: 30px;">
-          Direct-to-consumer means premium luxury formulations without the traditional 8x retail markup.
-        </p>
-        <a href="#bestsellers" class="btn-primary">Learn More About Materials →</a>
+        <a href="#bestsellers" class="btn-primary">Learn Our Craft →</a>
       </div>
     </div>
   </section>
 
-  <!-- Section 10: Verified Customer Reviews -->
+  <!-- Section 10: Customer Reviews -->
   <section id="reviews" class="reviews-section">
     <div class="container">
       <div class="section-head">
@@ -653,24 +633,14 @@ function generateInstantD2CPreview(comp: any): string {
         <h2 class="section-title">Loved by Thousands</h2>
       </div>
       <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">"The packaging alone felt like opening a $500 luxury package. The actual product exceeded all my expectations!"</p>
-          <div class="review-author">Sarah M.</div>
-          <div class="review-verified">✓ Verified Buyer · New York</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">"Delivery was super fast (received in 2 days). The finish and fit are 10/10. Will definitely order again!"</p>
-          <div class="review-author">Ananya R.</div>
-          <div class="review-verified">✓ Verified Buyer · Mumbai</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">"Customer support helped me pick the right size immediately on WhatsApp. Unbeatable service."</p>
-          <div class="review-author">David K.</div>
-          <div class="review-verified">✓ Verified Buyer · London</div>
-        </div>
+        ${copy.reviews.map((r: any) => `
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"${r.text}"</p>
+            <div class="review-author">${r.author}</div>
+            <div class="review-verified">✓ Verified Buyer · ${r.location}</div>
+          </div>
+        `).join("")}
       </div>
     </div>
   </section>
@@ -683,18 +653,12 @@ function generateInstantD2CPreview(comp: any): string {
         <h2 class="section-title">Frequently Asked Questions</h2>
       </div>
       <div class="faq-wrap">
-        <div class="faq-item">
-          <div class="faq-q"><span>How long does delivery take?</span> <span>+</span></div>
-          <div class="faq-a">We process all orders within 24 hours. Standard shipping takes 2-4 business days across all major metro cities.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q"><span>What is your return & exchange policy?</span> <span>+</span></div>
-          <div class="faq-a">We offer an unconditional 7-day doorstep return and exchange policy. Zero questions asked.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q"><span>Are the products authentic and certified?</span> <span>+</span></div>
-          <div class="faq-a">100% authentic. Every product comes with standard laboratory certification and authenticity warranty cards.</div>
-        </div>
+        ${copy.faqs.map((f: any) => `
+          <div class="faq-item">
+            <div class="faq-q"><span>${f.q}</span> <span>+</span></div>
+            <div class="faq-a">${f.a}</div>
+          </div>
+        `).join("")}
       </div>
     </div>
   </section>
@@ -759,130 +723,385 @@ function generateInstantD2CPreview(comp: any): string {
 </html>`;
 }
 
-function getProductsForNiche(niche: string) {
-  if (niche === "clothing") {
+function getCopyForComp(id: string, niche: string, name: string) {
+  if (id === "streetwear-cyber-home") {
+    return {
+      announcement: "⚡ SECRET ARCHIVE DROP LIVE · USE CODE CYBER20 FOR 20% OFF",
+      marquee: ["100% HEAVYWEIGHT ORGANIC COTTON", "LIMITED TO 250 PIECES PER DROP", "FREE EXPRESS GLOBAL SHIPPING", "NO RESTOCKS"],
+      heroTitle: "Engineered For The New Underground",
+      heroDesc: "Heavyweight 480 GSM French Terry and tactical architectural cuts. Limited edition drops that never restock once sold out.",
+      trustBadges: [
+        { icon: "📦", title: "Global Express", desc: "Dispatched within 24 hours" },
+        { icon: "⚡", title: "480 GSM French Terry", desc: "Pre-shrunk custom fabric" },
+        { icon: "🔄", title: "Easy Returns", desc: "7-day doorstep pickup" },
+        { icon: "⭐", title: "4.9/5 Rated", desc: "15,000+ street reviews" },
+      ],
+      categories: ["Heavyweight Hoodies", "Vintage Acid Tees", "Tactical Cargos"],
+      ugcCaptions: ["Wearing the 480 GSM Acid Hoodie 🔥", "Best fitting cargo pants ever made", "Drop sold out in 3 mins!", "Unboxing the Archival Pack"],
+      storySub: "Our Streetwear Manifesto",
+      storyTitle: "Anti-Fast Fashion. Pure Substance.",
+      storyBody: "We set out to eliminate the throwaway polyester streetwear market. Every piece is constructed with heavyweight Portuguese organic cotton, custom-milled zippers, and double-needle reinforced stitching.",
+      reviews: [
+        { text: "The weight and drape on this hoodie is unreal. Better quality than designer brands charging $400.", author: "Marcus T.", location: "Berlin" },
+        { text: "Got the acid wash tee and tactical pants. Literally my daily uniform now.", author: "Karan S.", location: "Mumbai" },
+        { text: "Fastest shipping ever and packaging is 10/10.", author: "Liam D.", location: "London" },
+      ],
+      faqs: [
+        { q: "How do your sizes fit?", a: "Our apparel features an intentional boxy, slightly oversized streetwear drape. Stay true to size for an oversized look, or size down for standard." },
+        { q: "Will sold-out drops be restocked?", a: "Never. All collections are limited numbered runs to preserve rarity and design uniqueness." },
+        { q: "How do I care for 480 GSM French Terry?", a: "Machine wash cold inside-out. Lay flat or hang dry to preserve fabric density and custom dyes." },
+      ],
+    };
+  }
+
+  if (id === "ethnic-royal-home") {
+    return {
+      announcement: "✨ ROYAL BRIDAL COUTURE EDIT · COMPLIMENTARY VIDEO STYLING AVAILABLE",
+      marquee: ["HANDWOVEN PURE SILK & ZARI", "BIS CERTIFIED ARTISAN CRAFTSMANSHIP", "CUSTOM BRIDAL FIT GUARANTEED", "WORLDWIDE INSURED SHIPPING"],
+      heroTitle: "Grand Heirloom Ethnic Couture",
+      heroDesc: "Centuries-old Banarasi zari weaves, royal zardozi hand-embroidery, and couture silhouettes crafted for timeless bridal splendor.",
+      trustBadges: [
+        { icon: "👑", title: "Pure Silk Certified", desc: "Silk Mark & Handloom tag" },
+        { icon: "✨", title: "Master Zardozi", desc: "300+ artisan hours per piece" },
+        { icon: "📏", title: "Custom Tailoring", desc: "Personal bridal fit consultation" },
+        { icon: "💎", title: "Royal Legacy", desc: "Patroned by royal families" },
+      ],
+      categories: ["Bridal Lehengas", "Pure Banarasi Sarees", "Heritage Anarkalis"],
+      ugcCaptions: ["Felt like royalty on my wedding day", "The zari handwork is breathtaking", "Custom tailored to perfection", "Heirloom piece to pass down"],
+      storySub: "Artisan Heritage",
+      storyTitle: "Preserving Ancient Weaving Traditions",
+      storyBody: "Our master karigars in Varanasi and Jaipur have practiced the sacred art of Zardozi and Kadwa weaving across four generations. Every garment is a living piece of Indian couture history.",
+      reviews: [
+        { text: "My bridal lehenga was beyond anything I dreamed. The compliments have not stopped!", author: "Pooja Mehta", location: "New Delhi" },
+        { text: "Ordered from the US and the fit was 100% flawless. The pure silk sheen is extraordinary.", author: "Anjali Rao", location: "San Francisco" },
+        { text: "True couture luxury. The box, the certificate, and the garment were pristine.", author: "Devika Roy", location: "Kolkata" },
+      ],
+      faqs: [
+        { q: "Do you offer custom bridal sizing?", a: "Yes, every bridal piece includes a 1-on-1 virtual consultation with our master master-tailor for millimeter-accurate measurements." },
+        { q: "How long does bridal couture take?", a: "Hand-embroidered pieces take 3-6 weeks to weave and stitch. Ready-to-ship festive edits dispatch in 48 hours." },
+        { q: "Is international delivery insured?", a: "Yes, 100% of international consignments are fully insured via DHL Express." },
+      ],
+    };
+  }
+
+  if (id === "apparel-minimal-home") {
+    return {
+      announcement: "🌿 NORDIC CAPSULE WARDROBE · 100% GOTS ORGANIC & CARBON NEUTRAL",
+      marquee: ["ORGANIC COTTON & RECYCLED WOOL", "CARBON NEUTRAL WORLDWIDE SHIPPING", "TIMELESS SCANDINAVIAN SILHOUETTES", "CIRCULAR RECYCLING PROGRAM"],
+      heroTitle: "Pure Form. Essential Living.",
+      heroDesc: "Minimalist Scandinavian wardrobe essentials designed to outlast seasons. Crafted from certified organic fabrics with zero synthetic blends.",
+      trustBadges: [
+        { icon: "🌱", title: "100% Organic GOTS", desc: "Zero harmful chemicals" },
+        { icon: "🌍", title: "Carbon Neutral", desc: "Offset shipping footprint" },
+        { icon: "🔄", title: "Circular Promise", desc: "Trade-in recycling program" },
+        { icon: "⭐", title: "4.95 Rating", desc: "From 20,000+ conscious buyers" },
+      ],
+      categories: ["Capsule Essentials", "Merino Knitwear", "Tailored Linen"],
+      ugcCaptions: ["My 10-piece capsule wardrobe", "Softest organic cotton on earth", "Clean minimal silhouettes", "Zero-waste everyday look"],
+      storySub: "Slow Living Design",
+      storyTitle: "Simplicity Is The Ultimate Sophistication",
+      storyBody: "We design clothing meant to be worn 100+ times, not 3 times. By eliminating loud branding and fast-fashion cycles, we create wardrobe foundation pieces that retain their shape and elegance for years.",
+      reviews: [
+        { text: "Replaced my entire wardrobe with their capsule line. Incredibly versatile and well-made.", author: "Astrid Lind", location: "Stockholm" },
+        { text: "The linen shirt and merino crewneck are perfection. The drape is effortless.", author: "Oliver Hansen", location: "Copenhagen" },
+        { text: "Sustainable fashion done right. No gimmicks, just superior fabric and construction.", author: "Elena Weber", location: "Zurich" },
+      ],
+      faqs: [
+        { q: "What is your fabric certification?", a: "All cotton is GOTS-certified 100% organic, and all wool is RWS (Responsible Wool Standard) ethically sourced." },
+        { q: "How does the circular program work?", a: "Send back any well-loved garment for recycling and receive $25 store credit toward your next piece." },
+        { q: "Are dyes chemical-free?", a: "We exclusively use OEKO-TEX standard 100 non-toxic, closed-loop botanical and mineral dyes." },
+      ],
+    };
+  }
+
+  if (id === "beauty-organic-home") {
+    return {
+      announcement: "🍃 100% BOTANICAL SKINCARE · FREE MINI GLOW OIL ON ALL ORDERS",
+      marquee: ["COLD-PRESSED BOTANICAL ACTIVES", "DERMATOLOGIST VERIFIED CLEAN", "100% VEGAN & CRUELTY-FREE", "GLASS RECYCLABLE PACKAGING"],
+      heroTitle: "Pure Botanical Nutrition For Radiant Skin",
+      heroDesc: "Concentrated bioactive plant nutrients and cold-pressed botanical oils formulated to restore your natural skin barrier and luminous glow.",
+      trustBadges: [
+        { icon: "🌿", title: "100% Cold-Pressed", desc: "Bioactive nutrient rich" },
+        { icon: "🩺", title: "Derm Tested", desc: "Safe for sensitive skin" },
+        { icon: "🐰", title: "Cruelty Free", desc: "Leaping Bunny certified" },
+        { icon: "✨", title: "28-Day Glow", desc: "Clinically proven radiance" },
+      ],
+      categories: ["Barrier Serums", "Botanical Oils", "Balancing Toners"],
+      ugcCaptions: ["My skin barrier has never been healthier", "That dewy morning glow ✨", "28-day before and after results", "Clean ingredients that work"],
+      storySub: "From Farm to Bottle",
+      storyTitle: "The Science of Pure Plant Bio-Actives",
+      storyBody: "We partner directly with organic biodynamic farms to harvest botanicals at peak potency. No water fillers, no synthetic fragrances, no petroleum byproducts — only raw botanical nutrition.",
+      reviews: [
+        { text: "Saved my compromised skin barrier in 10 days. The hydration is unmatched.", author: "Maya Chen", location: "Vancouver" },
+        { text: "Lightweight, absorbs instantly, and smells like a fresh spa. My holy grail oil.", author: "Rachel Foster", location: "Melbourne" },
+        { text: "My dermatologist was shocked at how fast my redness calmed down. 10/10.", author: "Simran Gill", location: "Chandigarh" },
+      ],
+      faqs: [
+        { q: "Is this suitable for acne-prone skin?", a: "Yes, our oils are 100% non-comedogenic and high in linoleic acid, which actively balances sebum production." },
+        { q: "Are your products free of essential oil allergens?", a: "All sensitive skin formulations are fragrance-free and formulated without irritating essential oils." },
+        { q: "What is the shelf life?", a: "Our cold-pressed botanicals stay fresh for 18 months unopened, and 6 months after opening." },
+      ],
+    };
+  }
+
+  if (id === "beauty-clinical-home") {
+    return {
+      announcement: "🔬 CLINICAL DERMA LAB · EVIDENCE-BASED ACTIVE FORMULATIONS",
+      marquee: ["10% NIACINAMIDE + 2% ZINC", "TRIPLE PEPTIDE COMPLEX", "CLINICALLY PROVEN RESULTS", "0% PARABENS & FRAGRANCE"],
+      heroTitle: "Evidence-Based Clinical Formulations",
+      heroDesc: "Pharmaceutical-grade active ingredients at clinically validated percentages. Engineered by dermatologists to resolve hyperpigmentation and barrier damage.",
+      trustBadges: [
+        { icon: "🧪", title: "Active Precision", desc: "Validated concentration %" },
+        { icon: "📊", title: "Clinical Trials", desc: "98% showed skin repair" },
+        { icon: "🔬", title: "Biochemist Formulated", desc: "pH balanced for efficacy" },
+        { icon: "🛡️", title: "Non-Irritating", desc: "Zero parabens or scents" },
+      ],
+      categories: ["Clinical Serums", "Peptide Complexes", "Barrier Repair"],
+      ugcCaptions: ["Hyperpigmentation faded in 4 weeks!", "Doctor recommended clinical line", "Look at this pore refinement", "Science-backed daily routine"],
+      storySub: "Clinical Formulation Science",
+      storyTitle: "Transparency Over Marketing Hype",
+      storyBody: "Every single percentage in our bottles is backed by peer-reviewed dermatology literature. We list the exact percentage of every active on the front label, so you know exactly what is transforming your skin.",
+      reviews: [
+        { text: "This 10% Niacinamide + Zinc formula cleared my stubborn dark spots better than $200 treatments.", author: "Dr. James Liu", location: "Boston" },
+        { text: "The peptide barrier cream transformed my retinoid-irritated skin overnight.", author: "Hannah Kim", location: "Seoul" },
+        { text: "Honest concentrations, zero fluff, and results backed by science.", author: "Aarav Patel", location: "Bengaluru" },
+      ],
+      faqs: [
+        { q: "How do I layer multiple active serums?", a: "Apply water-based actives first (e.g. Niacinamide), followed by concentrated actives (e.g. Vitamin C/Retinol), and seal with peptide moisturizer." },
+        { q: "Can I use this with prescription Tretinoin?", a: "Our Barrier Recovery Serum is specifically formulated to soothe and support skin undergoing prescription retinoid therapy." },
+        { q: "Are results third-party tested?", a: "Yes, all clinical claims are verified by independent double-blind dermatological trial laboratories." },
+      ],
+    };
+  }
+
+  if (id === "beauty-glamour-home") {
+    return {
+      announcement: "💎 HAUTE PARFUMERIE & LUXURY COSMETICS · COMPLIMENTARY DISCOVERY SET",
+      marquee: ["GRASSE MASTER PERFUMER OILS", "24HR VELVET MATTE COUTURE", "HAND-CUT CRYSTAL ATOMIZERS", "VIP RED CARPET ARTISTRY"],
+      heroTitle: "Editorial Haute Parfumerie & Velvet Lip Couture",
+      heroDesc: "Extrait de Parfum steeped in Grasse rose oils and French vanilla, paired with weightless 24-hour velvet matte lips designed for the red carpet.",
+      trustBadges: [
+        { icon: "🌹", title: "Grasse Extraction", desc: "30% pure fragrance oil" },
+        { icon: "💄", title: "24-Hour Wear", desc: "Transfer-proof velvet feel" },
+        { icon: "✨", title: "Haute Packaging", desc: "Weighted crystal flacons" },
+        { icon: "👑", title: "VIP Exclusive", desc: "Private batch releases" },
+      ],
+      categories: ["Extrait de Parfum", "Velvet Couture Lips", "Luminous Complexion"],
+      ugcCaptions: ["The most intoxicating fragrance I own", "Velvet lips that lasted all night", "Opening this luxury box felt magical", "Red carpet glam at home"],
+      storySub: "Grasse Heritage",
+      storyTitle: "The Art of Haute Fragrance & Color Artistry",
+      storyBody: "Formulated in the fragrance capital of Grasse, France, each bottle undergoes a 6-month maceration process to achieve unmatched longevity and complex olfactory depth.",
+      reviews: [
+        { text: "The silage and projection on the Velvet Rose Extrait is breathtaking. I get stopped on the street daily.", author: "Camille Dubois", location: "Paris" },
+        { text: "The lipstick formula is pure silk. Zero drying, full pigmentation in one swipe.", author: "Zoe Kravitz Fan", location: "New York" },
+        { text: "Absolute luxury from presentation to performance.", author: "Rhea Kapoor", location: "Mumbai" },
+      ],
+      faqs: [
+        { q: "What fragrance concentration is used?", a: "We formulate exclusively at Extrait de Parfum concentration (30-35% pure perfume oils) for 16+ hour longevity." },
+        { q: "Are your lip elixirs smudge-proof?", a: "Yes, our proprietary polymer network locks pigments in place without drying or feathering for up to 24 hours." },
+        { q: "Can I sample before buying full size?", a: "Every full-size order includes a complimentary 2ml discovery vial so you can test before opening the seal." },
+      ],
+    };
+  }
+
+  if (id === "jewellery-heritage-home") {
+    return {
+      announcement: "👑 ROYAL POLKI & GOLD HEIRLOOMS · 100% BIS 916 HALLMARKED",
+      marquee: ["BIS 916 HALLMARKED GOLD", "UNCUT SYNDICATE POLKI DIAMONDS", "LIFETIME BUYBACK & EXCHANGE", "INSURED DOORSTEP DELIVERY"],
+      heroTitle: "Timeless Heirloom Polki & Gold Artistry",
+      heroDesc: "Grand Jadau chokers, uncut syndicate polki diamonds, and 22kt hallmarked gold masterpieces created to be treasured across generations.",
+      trustBadges: [
+        { icon: "👑", title: "BIS 916 Hallmarked", desc: "Government purity certified" },
+        { icon: "💎", title: "Uncut Syndicate Polki", desc: "Natural conflict-free stones" },
+        { icon: "🔄", title: "Lifetime Exchange", desc: "100% value buyback promise" },
+        { icon: "🛡️", title: "Fully Insured", desc: "Armored door delivery" },
+      ],
+      categories: ["Bridal Chokers", "Polki Bangles", "Kundan Jhumkas"],
+      ugcCaptions: ["Wearing our family heirloom choker", "The polki luster is unmatched", "Custom bridal jewelry journey", "Generations of royal craftsmanship"],
+      storySub: "Jadau Heritage",
+      storyTitle: "Crafting Heirlooms That Transcend Generations",
+      storyBody: "Each polki masterpiece is handcrafted using ancient Meenakari and Jadau techniques developed in the royal courts of Rajasthan. Over 180 hours of meticulous hand-setting go into every necklace.",
+      reviews: [
+        { text: "The craftsmanship on our bridal polki set left our entire family spellbound. The certificate and hallmark gave us complete trust.", author: "Sunita Singhania", location: "Jaipur" },
+        { text: "Purchased for my daughter's wedding. The weight and authenticity of the 22kt gold work is sublime.", author: "Rajeshwari Devi", location: "Udaipur" },
+        { text: "Seamless international insured delivery to London. Exceeded all expectations.", author: "Meera Patel", location: "London" },
+      ],
+      faqs: [
+        { q: "How is purity verified?", a: "Every piece bears government-authorized BIS 916 laser hallmarking along with a third-party gemstone certification card." },
+        { q: "What is the buyback and exchange policy?", a: "We guarantee 100% gold value and 90% polki diamond value on lifetime exchanges at any of our suites." },
+        { q: "Can I customize the gemstone drops?", a: "Yes, we customize pearls, Colombian emeralds, and Burmese rubies upon request during styling consultation." },
+      ],
+    };
+  }
+
+  if (id === "jewellery-diamond-home") {
+    return {
+      announcement: "💍 CERTIFIED FINE DIAMONDS · IGI & GIA CERTIFICATES INCLUDED",
+      marquee: ["IGI & GIA CERTIFIED DIAMONDS", "LIFETIME WARRANTY & FREE SIZING", "100% CONFLICT-FREE SOURCING", "30-DAY PRICE MATCH GUARANTEE"],
+      heroTitle: "Exceptional Modern Solitaire Diamonds",
+      heroDesc: "Master-cut brilliant lab and natural diamond engagement rings, eternity tennis bracelets, and modern fine pendants crafted with optical perfection.",
+      trustBadges: [
+        { icon: "💎", title: "4Cs Certified", desc: "Triple Excellent Cut grades" },
+        { icon: "📜", title: "GIA / IGI Verified", desc: "Individual certificate cards" },
+        { icon: "📏", title: "Free Resizing", desc: "Lifetime complimentary care" },
+        { icon: "🛡️", title: "Conflict Free", desc: "Ethically synthesized & mined" },
+      ],
+      categories: ["Solitaire Rings", "Tennis Bracelets", "Diamond Pendants"],
+      ugcCaptions: ["She said YES! 💍✨", "The fire and sparkle is insane", "1.5ct Oval Solitaire perfection", "Stacking my eternity bands"],
+      storySub: "Precision Cutters",
+      storyTitle: "Engineered For Unrivaled Brilliance",
+      storyBody: "We cut our diamonds to exact mathematical proportions to maximize light return, optical symmetry, and fire. Every diamond is individually inspected by senior gemologists.",
+      reviews: [
+        { text: "The ring was appraised at 40% higher than what I paid. The sparkle in natural sunlight is breathtaking.", author: "Alex Mitchell", location: "Chicago" },
+        { text: "Custom built my fiancée's dream ring in 2 weeks. Customer service was phenomenal.", author: "Vikram Malhotra", location: "Delhi" },
+        { text: "My tennis bracelet has not left my wrist since the day I received it. Pure luxury.", author: "Grace Taylor", location: "Sydney" },
+      ],
+      faqs: [
+        { q: "Are your diamonds certified?", a: "Every diamond above 0.30ct includes an original grading certificate from IGI or GIA specifying exact Cut, Color, Clarity, and Carat." },
+        { q: "What if the ring size is incorrect?", a: "We offer complimentary doorstep ring resizing within 60 days of delivery." },
+        { q: "What is the difference between lab and natural diamonds?", a: "Lab diamonds are chemically, physically, and optically identical to mined diamonds, sharing the same 10/10 Mohs hardness and crystal structure." },
+      ],
+    };
+  }
+
+  if (id === "jewellery-silver-home") {
+    return {
+      announcement: "✨ ARTISAN 925 STERLING SILVER · ANTI-TARNISH LIFETIME PROMISE",
+      marquee: ["925 SOLID STERLING SILVER", "RHODIUM ANTI-TARNISH COATING", "NICKEL-FREE & HYPOALLERGENIC", "FAIR-WAGE ARTISAN WORKSHOPS"],
+      heroTitle: "Bohemian Handcrafted 925 Sterling Silver",
+      heroDesc: "Hammered sterling silver cuffs, everyday stacking rings, and raw gemstone charms crafted for daily wear with advanced anti-tarnish rhodium shielding.",
+      trustBadges: [
+        { icon: "🥈", title: "925 Solid Silver", desc: "Stamped authenticity hallmark" },
+        { icon: "🛡️", title: "Anti-Tarnish Seal", desc: "Rhodium protected finish" },
+        { icon: "🌿", title: "Hypoallergenic", desc: "100% nickel & lead free" },
+        { icon: "🤝", title: "Fair-Wage Artisans", desc: "Supporting master smiths" },
+      ],
+      categories: ["Everyday Stacking Rings", "Hammered Cuffs", "Boho Statement Hoops"],
+      ugcCaptions: ["Worn every day for 6 months without tarnishing", "My everyday silver ring stack", "Hand-hammered texture is so unique", "Hypoallergenic and so comfortable"],
+      storySub: "Village Silversmiths",
+      storyTitle: "Hand-Hammered Textures With Modern Durability",
+      storyBody: "We blend traditional hand-hammering techniques with modern electro-plated rhodium barriers, ensuring that your silver stays bright and untarnished through workouts, showers, and daily life.",
+      reviews: [
+        { text: "I have sensitive skin and usually react to cheap metals. These 925 silver rings are completely irritation-free.", author: "Hannah S.", location: "Toronto" },
+        { text: "The hammered texture catches the light so beautifully. Sturdy, solid silver.", author: "Tanvi Kapur", location: "Pune" },
+        { text: "Great packaging and came with a complimentary polishing cloth. Highly recommend!", author: "Chloe Martin", location: "Manchester" },
+      ],
+      faqs: [
+        { q: "Can I wear this jewelry in the shower?", a: "Yes, our rhodium-shielded 925 silver is waterproof. We recommend drying with a soft cloth after water exposure." },
+        { q: "How do I clean my silver?", a: "Gently buff with the included micro-fiber silver polishing cloth to instantly restore mirror-like luster." },
+        { q: "Is the silver stamped 925?", a: "Every single piece carries the authentic '925' purity stamp." },
+      ],
+    };
+  }
+
+  // Tech
+  return {
+    announcement: "⚡ HI-RES AUDIO & CYBER GEAR · 2-YEAR ADVANCED HARDWARE REPLACEMENT",
+    marquee: ["LDAC LOSSLESS HI-RES WIRELESS", "40MM BERYLLIUM ACOUSTIC DRIVERS", "ULTRA-LOW 20MS LATENCY", "IPX8 WATERPROOF RATING"],
+    heroTitle: "Precision Engineered Cyber Audio & Tech",
+    heroDesc: "Audiophile-grade acoustic drivers, spatial audio tracking, and aerospace magnesium chassis designed for creators, gamers, and discerning listeners.",
+    trustBadges: [
+      { icon: "🎧", title: "LDAC Lossless Audio", desc: "990kbps 24-bit/96kHz sound" },
+      { icon: "⚡", title: "20ms Low Latency", desc: "Seamless gaming & mixing" },
+      { icon: "🔋", title: "60-Hour Battery", desc: "Fast USB-C power delivery" },
+      { icon: "🛡️", title: "2-Year Warranty", desc: "Immediate replacement cover" },
+    ],
+    categories: ["Pro Wireless Cans", "True Wireless Buds", "Studio DAC Amps"],
+    ugcCaptions: ["Soundstage on these is unbelievably wide", "My ultimate desk setup piece", "Noise cancellation silences the entire office", "Beryllium drivers hit so clean"],
+    storySub: "Acoustic Engineering",
+    storyTitle: "Tuned For Pure Acoustic Transparency",
+    storyBody: "We spent 2,400 hours in anechoic chambers measuring frequency response curves to eliminate harmonic distortion. What you hear is the artist's original studio master, uncolored and pristine.",
+    reviews: [
+      { text: "Blew my $500 studio monitors out of the water. The instrument separation is staggering.", author: "Dave Miller", location: "Seattle" },
+      { text: "ANC is top tier and the build quality feels like titanium. Best headphones I have ever owned.", author: "Rohan Varma", location: "Hyderabad" },
+      { text: "Fast shipping and companion EQ app lets you tune every frequency band.", author: "Kevin Zhang", location: "Austin" },
+    ],
+    faqs: [
+      { q: "What Bluetooth codecs are supported?", a: "We support LDAC, aptX Adaptive, AAC, and SBC with automatic bitrate switching." },
+      { q: "Does it support multipoint pairing?", a: "Yes, you can stay connected to your laptop and smartphone simultaneously with seamless instant handover." },
+      { q: "What is the warranty coverage?", a: "All hardware comes with 2 years of no-questions-asked advance replacement warranty." },
+    ],
+  };
+}
+
+function getProductsForComp(id: string, niche: string) {
+  if (id === "streetwear-cyber-home") {
     return [
-      {
-        title: "Heavyweight Boxy Hoodie (480 GSM)",
-        price: "$88.00",
-        reviews: "342",
-        pill: "Bestseller",
-        img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
-      },
-      {
-        title: "Oversized Vintage Acid Tee",
-        price: "$44.00",
-        reviews: "189",
-        pill: "Trending",
-        img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&q=80",
-      },
-      {
-        title: "Tactical Cargo Pants v2",
-        price: "$110.00",
-        reviews: "94",
-        pill: "Limited",
-        img: "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&q=80",
-      },
-      {
-        title: "Cyber Reflective Windbreaker",
-        price: "$145.00",
-        reviews: "210",
-        pill: "New Drop",
-        img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80",
-      },
-    ];
-  } else if (niche === "beauty") {
-    return [
-      {
-        title: "Triple Ceramide Barrier Glow Serum",
-        price: "$48.00",
-        reviews: "512",
-        pill: "Top Rated",
-        img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80",
-      },
-      {
-        title: "Centella Soothing Recovery Cream",
-        price: "$36.00",
-        reviews: "284",
-        pill: "Clean 100%",
-        img: "https://images.unsplash.com/photo-1608248597359-0a69a19c7f99?w=800&q=80",
-      },
-      {
-        title: "Haute Rose Velvet Lip Elixir",
-        price: "$28.00",
-        reviews: "410",
-        pill: "Bestseller",
-        img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800&q=80",
-      },
-      {
-        title: "Bakuchiol Botanical Night Oil",
-        price: "$62.00",
-        reviews: "178",
-        pill: "Derm Approved",
-        img: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=800&q=80",
-      },
-    ];
-  } else if (niche === "jewellery") {
-    return [
-      {
-        title: "Heritage Royal Kundan Choker",
-        price: "$340.00",
-        reviews: "128",
-        pill: "Heirloom",
-        img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80",
-      },
-      {
-        title: "1.5ct Solitaire Lab Diamond Ring",
-        price: "$890.00",
-        reviews: "245",
-        pill: "Certified",
-        img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80",
-      },
-      {
-        title: "Artisan 925 Pure Silver Stacking Cuff",
-        price: "$125.00",
-        reviews: "318",
-        pill: "Handcrafted",
-        img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=800&q=80",
-      },
-      {
-        title: "Emerald & Polki Chandbali Earrings",
-        price: "$280.00",
-        reviews: "95",
-        pill: "Bridal",
-        img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80",
-      },
-    ];
-  } else {
-    return [
-      {
-        title: "Spatial Pro Noise-Cancelling Headphones",
-        price: "$299.00",
-        reviews: "680",
-        pill: "Flagship",
-        img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-      },
-      {
-        title: "Magnetic 3-in-1 Fast Wireless Dock",
-        price: "$89.00",
-        reviews: "320",
-        pill: "Essential",
-        img: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&q=80",
-      },
-      {
-        title: "Lossless Studio Audio Interface",
-        price: "$180.00",
-        reviews: "154",
-        pill: "Pro Gear",
-        img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&q=80",
-      },
-      {
-        title: "Ultra-Slim Mechanical Ergonomic Board",
-        price: "$149.00",
-        reviews: "412",
-        pill: "Hot",
-        img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80",
-      },
+      { title: "Heavyweight Boxy Hoodie (480 GSM)", price: "$88.00", reviews: "342", pill: "Bestseller", img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80" },
+      { title: "Oversized Vintage Acid Tee", price: "$44.00", reviews: "189", pill: "Trending", img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&q=80" },
+      { title: "Tactical Cargo Pants v2", price: "$110.00", reviews: "94", pill: "Limited", img: "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&q=80" },
+      { title: "Cyber Reflective Windbreaker", price: "$145.00", reviews: "210", pill: "New Drop", img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80" },
     ];
   }
+  if (id === "ethnic-royal-home") {
+    return [
+      { title: "Royal Crimson Bridal Zari Lehenga", price: "$650.00", reviews: "142", pill: "Bridal Heirloom", img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80" },
+      { title: "Pure Katan Banarasi Silk Saree", price: "$290.00", reviews: "215", pill: "Handwoven", img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80" },
+      { title: "Zardozi Embroidered Silk Anarkali", price: "$380.00", reviews: "98", pill: "Festive Edit", img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80" },
+      { title: "Handcrafted Velvet Sherwani Dupatta", price: "$175.00", reviews: "64", pill: "Royal Edition", img: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=800&q=80" },
+    ];
+  }
+  if (id === "apparel-minimal-home") {
+    return [
+      { title: "Relaxed Heavyweight Organic T-Shirt", price: "$38.00", reviews: "410", pill: "GOTS Organic", img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&q=80" },
+      { title: "Merino Wool Everyday Crewneck", price: "$98.00", reviews: "285", pill: "Pure Merino", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80" },
+      { title: "Tailored French Linen Trouser", price: "$85.00", reviews: "160", pill: "Zero Waste", img: "https://images.unsplash.com/photo-1479064555552-3ef4979f8908?w=800&q=80" },
+      { title: "Minimalist Poplin Overshirt", price: "$78.00", reviews: "192", pill: "Capsule Essential", img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80" },
+    ];
+  }
+  if (id === "beauty-organic-home") {
+    return [
+      { title: "Triple Ceramide Barrier Glow Serum", price: "$48.00", reviews: "512", pill: "Top Rated", img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80" },
+      { title: "Centella Soothing Recovery Cream", price: "$36.00", reviews: "284", pill: "Clean 100%", img: "https://images.unsplash.com/photo-1608248597359-0a69a19c7f99?w=800&q=80" },
+      { title: "Bakuchiol Botanical Night Oil", price: "$62.00", reviews: "178", pill: "Derm Approved", img: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=800&q=80" },
+      { title: "Rosehip & Vitamin C Radiance Mist", price: "$28.00", reviews: "310", pill: "Bestseller", img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80" },
+    ];
+  }
+  if (id === "beauty-clinical-home") {
+    return [
+      { title: "10% Niacinamide + 2% Zinc Serum", price: "$38.00", reviews: "680", pill: "Clinical Active", img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80" },
+      { title: "Multi-Peptide Matrixyl 3000 Elixir", price: "$52.00", reviews: "420", pill: "98% Barrier Repair", img: "https://images.unsplash.com/photo-1608248597359-0a69a19c7f99?w=800&q=80" },
+      { title: "0.5% Encapsulated Retinol Complex", price: "$44.00", reviews: "315", pill: "Derm Tested", img: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=800&q=80" },
+      { title: "Ceramide Lipid Repair Balm", price: "$32.00", reviews: "290", pill: "Hypoallergenic", img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80" },
+    ];
+  }
+  if (id === "beauty-glamour-home") {
+    return [
+      { title: "Velvet Rose Extrait de Parfum (50ml)", price: "$145.00", reviews: "380", pill: "Grasse Extract", img: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80" },
+      { title: "Haute Matte 24Hr Liquid Lip Elixir", price: "$34.00", reviews: "520", pill: "Transfer Proof", img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800&q=80" },
+      { title: "Champagne Shimmer Silk Highlighter", price: "$42.00", reviews: "210", pill: "Red Carpet", img: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&q=80" },
+      { title: "Amber & Vanilla Nectar Extrait", price: "$165.00", reviews: "195", pill: "Exclusive Flacon", img: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=800&q=80" },
+    ];
+  }
+  if (id === "jewellery-heritage-home") {
+    return [
+      { title: "Royal Nizam Polki Choker Necklace", price: "$850.00", reviews: "115", pill: "BIS 916 Gold", img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80" },
+      { title: "Uncut Syndicate Polki Chandbali", price: "$340.00", reviews: "180", pill: "Heirloom Jadau", img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" },
+      { title: "Meenakari Emerald Kada Bangle", price: "$420.00", reviews: "92", pill: "Handcrafted", img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=800&q=80" },
+      { title: "Kundan & South Sea Pearl Maang Tikka", price: "$195.00", reviews: "140", pill: "Bridal Suite", img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80" },
+    ];
+  }
+  if (id === "jewellery-diamond-home") {
+    return [
+      { title: "1.5ct Solitaire Oval Diamond Ring", price: "$920.00", reviews: "310", pill: "GIA / IGI", img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80" },
+      { title: "4.0ct Brilliant Tennis Bracelet", price: "$1,450.00", reviews: "195", pill: "Triple Excellent", img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80" },
+      { title: "Bezel Set Floating Diamond Pendant", price: "$480.00", reviews: "260", pill: "Everyday Luxe", img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" },
+      { title: "Eternity Lab Diamond Stacking Band", price: "$390.00", reviews: "185", pill: "Lifetime Warranty", img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=800&q=80" },
+    ];
+  }
+  if (id === "jewellery-silver-home") {
+    return [
+      { title: "Artisan 925 Silver Hammered Cuff", price: "$125.00", reviews: "318", pill: "Solid 925", img: "https://images.unsplash.com/photo-1611591475152-47e24c65d7f7?w=800&q=80" },
+      { title: "Boho Turquoise Stacking Ring Set", price: "$68.00", reviews: "410", pill: "Anti-Tarnish", img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80" },
+      { title: "Chunky Twisted Silver Hoop Earrings", price: "$54.00", reviews: "230", pill: "Hypoallergenic", img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" },
+      { title: "Vintage Coin Pendant Necklace", price: "$82.00", reviews: "175", pill: "Fair Wage", img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80" },
+    ];
+  }
+  // tech
+  return [
+    { title: "Spatial Pro Noise-Cancelling Headphones", price: "$299.00", reviews: "680", pill: "LDAC Hi-Res", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80" },
+    { title: "Magnetic 3-in-1 Fast Wireless Dock", price: "$89.00", reviews: "320", pill: "MagSafe Fast", img: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&q=80" },
+    { title: "Lossless Studio Audio Interface 24-bit", price: "$180.00", reviews: "154", pill: "Pro Audio", img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&q=80" },
+    { title: "Ultra-Slim Mechanical Ergonomic Board", price: "$149.00", reviews: "412", pill: "Hot Swap", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80" },
+  ];
 }

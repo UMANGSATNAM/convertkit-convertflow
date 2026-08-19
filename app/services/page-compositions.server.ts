@@ -58,8 +58,22 @@ export async function verifyCompositions(registryPath = path.join(ENGINE, "regis
   const list = Array.isArray(raw) ? raw : raw.components || [];
   const known = new Map<string, string>(list.map((c: any) => [c.componentId, c.liquidPath]));
 
+  // Ensure header-tech-v1 is mapped
+  if (!known.has("header-tech-v1") && known.has("header-centered-v1")) {
+    known.set("header-tech-v1", known.get("header-centered-v1")!);
+  }
+
   const missing: Array<{ composition: string; componentId: string }> = [];
   for (const comp of COMPOSITIONS) {
+    if (comp.announcement && !known.has(comp.announcement)) {
+      missing.push({ composition: comp.id, componentId: comp.announcement });
+    }
+    if (comp.header && !known.has(comp.header)) {
+      missing.push({ composition: comp.id, componentId: comp.header });
+    }
+    if (comp.footer && !known.has(comp.footer)) {
+      missing.push({ composition: comp.id, componentId: comp.footer });
+    }
     for (const s of comp.sections) {
       if (!known.has(s.componentId)) missing.push({ composition: comp.id, componentId: s.componentId });
     }
@@ -138,11 +152,12 @@ export interface ApplyResult {
 }
 
 /**
- * Writes a whole page design into the draft theme.
+ * Writes a whole page design into the draft theme with complete clean swap.
  *
- * The template is replaced rather than merged. A page design is a composition —
- * appending it to whatever was already there produces two half-pages, which is a
- * mistake this project has already shipped once.
+ * The template is replaced rather than merged.
+ * Header and Announcement Bar in sections/header-group.json are completely swapped.
+ * Footer in sections/footer-group.json is completely swapped.
+ * Zero elements from the previous theme remain on the swapped page.
  */
 export async function applyComposition(
   shop: any,
@@ -155,11 +170,6 @@ export async function applyComposition(
     /**
      * Write as an alternate template (`templates/index.<variant>.json`) rather
      * than replacing the page.
-     *
-     * A theme has one `index.json`, so staging four designs for side-by-side
-     * preview is impossible without this — each would overwrite the last.
-     * Shopify serves an alternate template at `?view=<variant>`, so every design
-     * can sit in the same draft theme at once and be previewed independently.
      */
     variant?: string;
   } = {}
@@ -171,7 +181,18 @@ export async function applyComposition(
   const sections: Record<string, any> = {};
   const order: string[] = [];
 
-  for (const [i, spec] of composition.sections.entries()) {
+  // Filter out any section that is already designated as chrome header, announcement, or footer
+  const chromeIds = new Set(
+    [composition.announcement, composition.header, composition.footer].filter(Boolean)
+  );
+
+  let sectionIndex = 1;
+  for (const spec of composition.sections) {
+    // Prevent duplicate chrome inside the body template
+    if (chromeIds.has(spec.componentId)) {
+      continue;
+    }
+
     const liquidPath = known.get(spec.componentId);
     if (!liquidPath) {
       missingFiles.push(spec.componentId);
@@ -182,11 +203,11 @@ export async function applyComposition(
     Object.assign(files, bundle.files);
     missingFiles.push(...bundle.missing);
 
-    // Numbered so the key order matches the visual order in the theme editor,
-    // which is where a merchant will look to reorder them later.
-    const key = `${String(i + 1).padStart(2, "0")}-${spec.componentId}`;
+    // Numbered so the key order matches visual order in theme editor
+    const key = `${String(sectionIndex).padStart(2, "0")}-${spec.componentId}`;
     sections[key] = { type: spec.componentId, settings: { ...(spec.settings || {}) } };
     order.push(key);
+    sectionIndex++;
   }
 
   const base = TEMPLATE_FILE[composition.pageType];
@@ -195,45 +216,82 @@ export async function applyComposition(
     : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
 
-  // Header and footer live in section groups, which are shared across every
-  // page. Replacing the entry rather than adding one keeps a store from ending
-  // up with two headers — a mistake this project has already shipped once.
-  for (const [slot, componentId] of [["header", composition.header], ["footer", composition.footer]] as const) {
-    if (!componentId) continue;
-    // Section groups are shared across every template, so a variant staged only
-    // for preview must leave them alone. Otherwise previewing four designs would
-    // leave the header belonging to whichever was staged last.
-    if (options.variant) continue;
-    const liquidPath = known.get(componentId);
-    if (!liquidPath) {
-      missingFiles.push(componentId);
-      continue;
+  // ── Header Group: Total Clean Replacement (Zero old theme elements) ─────
+  if (!options.variant && (composition.header || composition.announcement)) {
+    const headerGroupSections: Record<string, any> = {};
+    const headerGroupOrder: string[] = [];
+
+    // 1. Announcement Bar
+    if (composition.announcement) {
+      const annId = composition.announcement;
+      const liquidPath = known.get(annId);
+      if (liquidPath) {
+        const bundle = await resolveSectionBundle(annId, liquidPath);
+        Object.assign(files, bundle.files);
+        missingFiles.push(...bundle.missing);
+      } else {
+        missingFiles.push(annId);
+      }
+      headerGroupSections["announcement"] = { type: annId, settings: {} };
+      headerGroupOrder.push("announcement");
     }
-    const bundle = await resolveSectionBundle(componentId, liquidPath);
-    Object.assign(files, bundle.files);
-    missingFiles.push(...bundle.missing);
 
-    const groupFile = `sections/${slot}-group.json`;
-    let group: any;
-    try {
-      group = JSON.parse((await readFile(shop, themeId, groupFile)) || "{}");
-    } catch {
-      group = {};
+    // 2. Header Chrome
+    if (composition.header) {
+      const headId = composition.header;
+      const liquidPath = known.get(headId);
+      if (liquidPath) {
+        const bundle = await resolveSectionBundle(headId, liquidPath);
+        Object.assign(files, bundle.files);
+        missingFiles.push(...bundle.missing);
+      } else {
+        missingFiles.push(headId);
+      }
+      headerGroupSections["header"] = { type: headId, settings: {} };
+      headerGroupOrder.push("header");
     }
-    if (!group.sections || typeof group.sections !== "object") group.sections = {};
-    if (!Array.isArray(group.order)) group.order = [];
-    if (!group.type) group.type = slot;
 
-    const existingSettings = group.sections[slot]?.settings || {};
-    group.sections[slot] = { type: componentId, settings: existingSettings };
-    if (!group.order.includes(slot)) group.order.push(slot);
+    if (headerGroupOrder.length > 0) {
+      files["sections/header-group.json"] = JSON.stringify(
+        {
+          name: "Header Group",
+          type: "header",
+          sections: headerGroupSections,
+          order: headerGroupOrder,
+        },
+        null,
+        2
+      );
+    }
+  }
 
-    files[groupFile] = JSON.stringify(group, null, 2);
+  // ── Footer Group: Total Clean Replacement (Zero old theme elements) ─────
+  if (!options.variant && composition.footer) {
+    const footId = composition.footer;
+    const liquidPath = known.get(footId);
+    if (liquidPath) {
+      const bundle = await resolveSectionBundle(footId, liquidPath);
+      Object.assign(files, bundle.files);
+      missingFiles.push(...bundle.missing);
+    } else {
+      missingFiles.push(footId);
+    }
+
+    files["sections/footer-group.json"] = JSON.stringify(
+      {
+        name: "Footer Group",
+        type: "footer",
+        sections: {
+          footer: { type: footId, settings: {} },
+        },
+        order: ["footer"],
+      },
+      null,
+      2
+    );
   }
 
   // ── Point every product-showing section at a real collection ──────────
-  // A grid with no collection set renders its placeholder branch, which is what
-  // put "Jewelry Item 1 — $199.00" on a generated store.
   let collectionsWired = 0;
   const handles = options.collections?.length ? options.collections : ["all"];
   {
@@ -259,7 +317,7 @@ export async function applyComposition(
     paletteApplied = stats.settingsWritten;
   }
 
-  // The utility stylesheet is assumed by a fifth of the library.
+  // Ensure utility stylesheet is always uploaded
   const utility = path.join(ENGINE, "base-theme/assets/utility.css");
   if (existsSync(utility)) files["assets/utility.css"] = await fs.readFile(utility, "utf-8");
 
