@@ -320,11 +320,101 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     settings.btn_link = settings.btn_link || "/pages/about";
   }
 
-  // 9. NEWSLETTER / VIP CLUB
-  else if (lowerId.includes("newsletter")) {
-    settings.subtitle = settings.subtitle || "JOIN THE CIRCLE";
-    settings.title = settings.title || `<p>Unlock <em>Private Drops</em> & Archival Access</p>`;
-    settings.btn_text = settings.btn_text || "SUBSCRIBE";
+  // 10. BESTSELLERS TABS
+  else if (lowerId.includes("bestsellers-tabs") || lowerId.includes("tabs")) {
+    settings.title = settings.title || `<p>Curated <em>Bestsellers</em></p>`;
+    settings.subtitle = settings.subtitle || "TOP RATED BY CUSTOMERS";
+    settings.products_to_show = 6;
+    settings.show_reviews = true;
+  }
+
+  // 11. FEATURED PRODUCT
+  else if (lowerId.includes("featured-product")) {
+    settings.title = settings.title || `<p>Hero <em>Drop of the Month</em></p>`;
+    settings.subtitle = settings.subtitle || "LIMITED EDITION";
+    settings.show_quantity = true;
+    settings.show_dynamic_checkout = true;
+  }
+
+  // 12. COLLECTION LIST / CATEGORY TILES
+  else if (lowerId.includes("collection-list") || lowerId.includes("category")) {
+    settings.title = settings.title || `<p>Explore by <em>Category</em></p>`;
+    settings.subtitle = settings.subtitle || "CURATED ARCHETYPES";
+    settings.columns_desktop = 4;
+  }
+
+  // 13. PROMO GRID
+  else if (lowerId.includes("promo-grid") || lowerId.includes("promo")) {
+    settings.title = settings.title || `<p>Exclusive <em>Privileges</em></p>`;
+    settings.subtitle = settings.subtitle || "SEASONAL OFFERS";
+  }
+
+  // 14. COUNTDOWN BANNER / FLASH OFFER
+  else if (lowerId.includes("countdown-banner") || lowerId.includes("countdown")) {
+    settings.title = settings.title || `<p>Limited Time <em>Vault Release</em></p>`;
+    settings.subtitle = settings.subtitle || "CLOSING SOON";
+    settings.end_date = "2026-12-31";
+    settings.btn_text = "CLAIM 20% OFF";
+    settings.btn_link = "/collections/all";
+  }
+
+  // 15. EDITORIAL LOOKBOOK
+  else if (lowerId.includes("editorial-lookbook") || lowerId.includes("lookbook")) {
+    settings.title = settings.title || `<p>The <em>Lookbook</em> Editorial</p>`;
+    settings.subtitle = settings.subtitle || "CURATED STYLING";
+  }
+
+  // 16. INGREDIENTS / MATERIALS / SPECS MATRIX
+  else if (lowerId.includes("ingredients") || lowerId.includes("materials")) {
+    settings.title = settings.title || `<p>Uncompromising <em>Purity & Craft</em></p>`;
+    settings.subtitle = settings.subtitle || "THE SPECIFICATIONS";
+  }
+
+  // 17. TIMELINE / HERITAGE
+  else if (lowerId.includes("timeline")) {
+    settings.title = settings.title || `<p>The <em>Journey</em> & Heritage</p>`;
+    settings.subtitle = settings.subtitle || "FOUNDED WITH PASSION";
+  }
+
+  // 18. PRESS STRIP / MEDIA LOGOS
+  else if (lowerId.includes("press-strip") || lowerId.includes("press")) {
+    settings.title = settings.title || `<p>As Featured In</p>`;
+    settings.subtitle = settings.subtitle || "CRITICALLY ACCLAIMED";
+  }
+
+  // 19. GUARANTEE BAR
+  else if (lowerId.includes("guarantee-bar") || lowerId.includes("guarantee")) {
+    settings.text = settings.text || "🛡️ 100% MONEY BACK GUARANTEE • 30 DAYS RISK-FREE • FREE GLOBAL EXPRESS";
+  }
+
+  // 20. VIDEO REELS / SHOPPABLE VIDEO
+  else if (lowerId.includes("video-reels") || lowerId.includes("video")) {
+    settings.title = settings.title || `<p>Shop the <em>Reels</em></p>`;
+    settings.subtitle = settings.subtitle || "WATCH & DISCOVER";
+  }
+
+  // 21. UGC GRID / COMMUNITY WALL
+  else if (lowerId.includes("ugc-grid") || lowerId.includes("community-wall") || lowerId.includes("community")) {
+    settings.title = settings.title || `<p>As Seen On <em>You</em></p>`;
+    settings.subtitle = settings.subtitle || "TAG @OFFICIAL TO BE FEATURED";
+  }
+
+  // 22. SHIPPING ESTIMATOR
+  else if (lowerId.includes("shipping-estimator") || lowerId.includes("shipping")) {
+    settings.title = settings.title || `<p>Worldwide <em>Express Delivery</em></p>`;
+    settings.subtitle = settings.subtitle || "DISPATCHED WITHIN 24 HOURS";
+  }
+
+  // 23. VIP PERKS & POPUPS
+  else if (lowerId.includes("vip-perks") || lowerId.includes("perks")) {
+    settings.title = settings.title || `<p>VIP Tier <em>Privileges</em></p>`;
+    settings.subtitle = settings.subtitle || "EARN POINTS ON EVERY ORDER";
+  } else if (lowerId.includes("popup-spin-wheel")) {
+    settings.title = "SPIN TO WIN UP TO 30% OFF";
+    settings.btn_text = "SPIN THE WHEEL";
+  } else if (lowerId.includes("popup-exit-intent")) {
+    settings.title = "WAIT! TAKE 15% OFF YOUR ORDER";
+    settings.btn_text = "CLAIM DISCOUNT";
   }
 
   const result: any = { type: componentId, settings };
