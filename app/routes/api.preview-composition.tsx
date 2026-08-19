@@ -539,47 +539,144 @@ function generateInstantD2CPreview(comp: any): string {
     @media (max-width: 600px) {
       .product-grid, .trust-grid, .ugc-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
+    }    /* Section 8: Offer & Promo Banner */
+    .offer-banner-section { padding: 40px 0; }
+    .offer-box {
+      background: ${isDark ? "#1c1924" : "#f1f5f9"};
+      border: 1px solid ${borderCol};
+      border-radius: 24px;
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 32px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .offer-badge {
+      display: inline-block;
+      background: ${accent};
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .offer-title { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .offer-desc { font-size: 15px; color: ${textSecondary}; line-height: 1.6; margin-bottom: 20px; }
+
+    /* Section 9: Spec Matrix / Comparison */
+    .spec-section { padding: 70px 0; background: ${isDark ? "#0c0c0e" : "#f8fafc"}; border-top: 1px solid ${borderCol}; border-bottom: 1px solid ${borderCol}; }
+    .spec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 36px; }
+    .spec-card {
+      background: ${cardBg};
+      border: 1px solid ${borderCol};
+      border-radius: 18px;
+      padding: 28px;
+    }
+    .spec-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: ${accent}; }
+    .spec-card p { font-size: 14px; color: ${textSecondary}; line-height: 1.6; }
+
+    /* Section 10: Press Strip */
+    .press-strip {
+      padding: 32px 0;
+      border-bottom: 1px solid ${borderCol};
+      background: ${isDark ? "#09090b" : "#ffffff"};
+    }
+    .press-flex {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      opacity: 0.7;
+    }
+    .press-logo { font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-family: ${headingFont}; }
+
+    /* Section 11: Bundle & Save */
+    .bundle-section { padding: 80px 0; }
+    .bundle-box {
+      background: ${cardBg};
+      border: 2px dashed ${accent};
+      border-radius: 24px;
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    /* FAQ interactive details */
+    details.faq-item {
+      background: ${cardBg};
+      border: 1px solid ${borderCol};
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    details.faq-item summary {
+      font-size: 16px;
+      font-weight: 700;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    details.faq-item summary::-webkit-details-marker { display: none; }
+    details.faq-item[open] summary { color: ${accent}; }
+    .faq-answer { margin-top: 14px; font-size: 14px; color: ${textSecondary}; line-height: 1.7; }
+
+    /* Guarantee Bar */
+    .guarantee-bar {
+      padding: 30px 0;
+      background: ${accent};
+      color: #ffffff;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
-  <!-- Section 1: Top Announcement Bar -->
+  <!-- Section 1: Announcement Bar -->
   <div class="announcement-bar">
-    <span class="announcement-badge">${badge}</span>
+    <span class="announcement-badge">Exclusive</span>
     <span>${copy.announcement}</span>
   </div>
 
   <!-- Section 2: Header Chrome -->
   <header class="site-header">
     <div class="container nav-row">
-      <div class="site-logo">
-        <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${accent};"></span>
-        <span>${name}</span>
-      </div>
+      <a href="#" class="site-logo">
+        <span class="accent-color">●</span> ${name}
+      </a>
       <nav class="nav-links">
+        <a href="#categories">Shop All</a>
         <a href="#bestsellers">Bestsellers</a>
-        <a href="#categories">Collections</a>
         <a href="#story">Our Story</a>
         <a href="#reviews">Reviews</a>
         <a href="#faq">FAQ</a>
       </nav>
       <div class="nav-actions">
-        <span>🔍 Search</span>
-        <a href="#cart" class="cart-btn">Cart (0)</a>
+        <a href="#bestsellers" class="cart-btn">Shop Collection →</a>
       </div>
     </div>
   </header>
 
-  <!-- Section 3: Infinite Marquee Strip -->
+  <!-- Section 3: Marquee Ticker -->
   <div class="marquee-strip">
     <div class="marquee-content">
-      ${copy.marquee.map((m: string) => `<span class="marquee-item">✦ ${m}</span>`).join("")}
-      ${copy.marquee.map((m: string) => `<span class="marquee-item">✦ ${m}</span>`).join("")}
+      ${copy.marquee.map((m: string) => `<span class="marquee-item">${m} ★</span>`).join("")}
+      ${copy.marquee.map((m: string) => `<span class="marquee-item">${m} ★</span>`).join("")}
     </div>
   </div>
 
-  <!-- Section 4: High Impact Hero Banner -->
+  <!-- Section 4: Hero Section -->
   <section class="hero-section">
     <div class="container hero-grid">
       <div>
@@ -597,7 +694,7 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 5: Trust & Benefits Bar -->
+  <!-- Section 5: Trust Badges Bar -->
   <div class="trust-strip">
     <div class="container trust-grid">
       ${copy.trustBadges.map((tb: any) => `
@@ -672,7 +769,57 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 8: Shoppable UGC / Reels -->
+  <!-- Section 8: Special Offer & Incentive Banner -->
+  <section class="offer-banner-section">
+    <div class="container">
+      <div class="offer-box">
+        <div>
+          <span class="offer-badge">${copy.offerBadge || "Limited Time Incentive"}</span>
+          <h2 class="offer-title">${copy.offerTitle || "Upgrade Your Daily Routine"}</h2>
+          <p class="offer-desc">${copy.offerDesc || "Unlock special tier savings, complimentary gifts, and fast tracked VIP shipping on your first order today."}</p>
+          <a href="#bestsellers" class="btn-primary">${copy.offerCta || "Claim Offer Now →"}</a>
+        </div>
+        <div style="text-align: center; background: ${cardBg}; padding: 24px; border-radius: 16px; border: 1px solid ${borderCol};">
+          <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: ${accent};">Exclusive Coupon Code</div>
+          <div style="font-size: 24px; font-weight: 900; letter-spacing: 2px; padding: 12px; background: ${isDark ? "#27272a" : "#e2e8f0"}; border-radius: 8px; font-family: monospace;">${copy.offerCode || "CONVERT20"}</div>
+          <div style="font-size: 11px; color: ${textSecondary}; margin-top: 8px;">Auto-applied at checkout · Limited slots</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9: Spec Matrix & Quality Breakdown -->
+  <section class="spec-section">
+    <div class="container">
+      <div class="section-head" style="margin-bottom: 24px;">
+        <div class="section-sub">Why We Are Different</div>
+        <h2 class="section-title">${copy.specTitle || "The Standard of Excellence"}</h2>
+      </div>
+      <div class="spec-grid">
+        ${(copy.specs || [
+          { title: "Zero Compromise Sourcing", desc: "Every raw material is ethically harvested, authenticated, and verified by third-party testing labs." },
+          { title: "Engineered For Longevity", desc: "Designed to maintain structural integrity, vibrant pigment, and performance across years of daily use." },
+          { title: "Direct-to-Consumer Value", desc: "By bypassing luxury distributor markups, we invest 4x more into pure formulation and artisan craft." },
+        ]).map((s: any) => `
+          <div class="spec-card">
+            <h3>✦ ${s.title}</h3>
+            <p>${s.desc}</p>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 10: As Seen In Press Strip -->
+  <div class="press-strip">
+    <div class="container press-flex">
+      ${(copy.pressLogos || ["VOGUE", "GQ", "WIRED", "ALLURE", "ELLE", "FORBES"]).map((p: string) => `
+        <span class="press-logo">${p}</span>
+      `).join("")}
+    </div>
+  </div>
+
+  <!-- Section 11: Shoppable UGC / Reels -->
   <section class="ugc-section">
     <div class="container">
       <div class="section-head">
@@ -693,7 +840,7 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 9: Brand Story Showcase -->
+  <!-- Section 12: Brand Story Showcase -->
   <section id="story" class="story-section">
     <div class="container story-grid">
       <div class="story-img-box">
@@ -710,7 +857,27 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 10: Customer Reviews -->
+  <!-- Section 13: Curated Bundle Builder -->
+  <section class="bundle-section">
+    <div class="container">
+      <div class="bundle-box">
+        <div>
+          <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: ${accent}; margin-bottom: 6px;">Curated Value Bundle</div>
+          <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">${copy.bundleTitle || "The Complete Essentials Trio"}</h2>
+          <p style="font-size: 14px; color: ${textSecondary}; max-width: 480px;">${copy.bundleDesc || "Bundle the top 3 bestsellers together and automatically save 25% plus receive complimentary luxury priority shipping."}</p>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <div style="text-align: right;">
+            <div style="font-size: 14px; text-decoration: line-through; color: ${textSecondary};">$180.00</div>
+            <div style="font-size: 24px; font-weight: 900; color: ${accent};">$135.00</div>
+          </div>
+          <a href="#bestsellers" class="btn-primary">Add Bundle & Save →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 14: Customer Reviews -->
   <section id="reviews" class="reviews-section">
     <div class="container">
       <div class="section-head">
@@ -730,7 +897,7 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 11: FAQ Accordion -->
+  <!-- Section 15: FAQ Accordion -->
   <section id="faq" class="faq-section">
     <div class="container">
       <div class="section-head">
@@ -739,16 +906,16 @@ function generateInstantD2CPreview(comp: any): string {
       </div>
       <div class="faq-wrap">
         ${copy.faqs.map((f: any) => `
-          <div class="faq-item">
-            <div class="faq-q"><span>${f.q}</span> <span>+</span></div>
-            <div class="faq-a">${f.a}</div>
-          </div>
+          <details class="faq-item">
+            <summary>${f.q} <span>▾</span></summary>
+            <div class="faq-answer">${f.a}</div>
+          </details>
         `).join("")}
       </div>
     </div>
   </section>
 
-  <!-- Section 12: VIP Newsletter -->
+  <!-- Section 16: VIP Newsletter -->
   <section class="newsletter-section">
     <div class="container">
       <div class="newsletter-box">
@@ -762,7 +929,14 @@ function generateInstantD2CPreview(comp: any): string {
     </div>
   </section>
 
-  <!-- Section 13: Mega Footer -->
+  <!-- Section 17: Risk-Reversal Guarantee Bar -->
+  <div class="guarantee-bar">
+    <div class="container">
+      ✦ 100% SATISFACTION GUARANTEED · 30-DAY HASSLE-FREE RETURNS · INSURED EXPRESS DISPATCH ✦
+    </div>
+  </div>
+
+  <!-- Section 18: Mega Footer -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
@@ -822,6 +996,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "⭐", title: "4.9/5 Rated", desc: "15,000+ street reviews" },
       ],
       categories: ["Heavyweight Hoodies", "Vintage Acid Tees", "Tactical Cargos"],
+      offerBadge: "Limited Drop Mystery Box",
+      offerTitle: "Archival Streetwear Mystery Box",
+      offerDesc: "Get 3 archival streetwear pieces (Worth $210) for only $99. Strictly limited to 100 boxes.",
+      offerCode: "MYSTERY99",
+      offerCta: "Claim Mystery Box →",
+      specTitle: "The Cyber Streetwear Benchmark",
+      specs: [
+        { title: "480 GSM Portuguese Terry", desc: "Double the weight of regular streetwear hoodies, custom-milled in Porto with zero pilling guarantee." },
+        { title: "Acid Mineral Wash", desc: "Individually hand-dyed using cold mineral washes for unique vintage marbling on every piece." },
+        { title: "Tactical Hardware", desc: "Japanese YKK matte black waterproof zips with reinforced bar-tack stitching on all stress points." },
+      ],
+      pressLogos: ["HYPEBEAST", "COMPLEX", "GQ STYLE", "HIGHSNOBIETY", "DAZED"],
+      bundleTitle: "The Cyber Street Uniform Bundle",
+      bundleDesc: "Bundle the 480 GSM Hoodie + Vintage Acid Tee + Tactical Cargo and save $55 automatically at checkout.",
       ugcCaptions: ["Wearing the 480 GSM Acid Hoodie 🔥", "Best fitting cargo pants ever made", "Drop sold out in 3 mins!", "Unboxing the Archival Pack"],
       storySub: "Our Streetwear Manifesto",
       storyTitle: "Anti-Fast Fashion. Pure Substance.",
@@ -852,6 +1040,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "💎", title: "Royal Legacy", desc: "Patroned by royal families" },
       ],
       categories: ["Bridal Lehengas", "Pure Banarasi Sarees", "Heritage Anarkalis"],
+      offerBadge: "Royal Trousseau Edit",
+      offerTitle: "Complete Bridal Trousseau Suite",
+      offerDesc: "Book your virtual bridal stylist session and receive a complimentary hand-embroidered velvet dupatta with your bridal set.",
+      offerCode: "ROYALTROUSSEAU",
+      offerCta: "Book Bridal Suite →",
+      specTitle: "Centuries of Handloom Mastery",
+      specs: [
+        { title: "Pure Katan Silk Base", desc: "100% pure Mulberry silk warp and weft woven on traditional wooden pit looms in Varanasi." },
+        { title: "Real Silver & Gold Zari", desc: "Electroplated 24kt gold and sterling silver zari threads woven directly into the fabric motifs." },
+        { title: "Bespoke Millimeter Tailoring", desc: "Hand-stitched by master ustaads to your exact posture and silhouette measurements." },
+      ],
+      pressLogos: ["VOGUE INDIA", "HARPER'S BAZAAR BRIDE", "WEDMEGOOD", "ELLE", "GRAZIA"],
+      bundleTitle: "The Grand Royal Wedding Duo",
+      bundleDesc: "Pair your Royal Bridal Lehenga with a matching Katan Silk Banarasi Saree and save ₹18,000 / $220.",
       ugcCaptions: ["Felt like royalty on my wedding day", "The zari handwork is breathtaking", "Custom tailored to perfection", "Heirloom piece to pass down"],
       storySub: "Artisan Heritage",
       storyTitle: "Preserving Ancient Weaving Traditions",
@@ -882,6 +1084,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "⭐", title: "4.95 Rating", desc: "From 20,000+ conscious buyers" },
       ],
       categories: ["Capsule Essentials", "Merino Knitwear", "Tailored Linen"],
+      offerBadge: "Capsule Starter Set",
+      offerTitle: "Build Your 5-Piece Capsule",
+      offerDesc: "Choose 2 Organic Tees, 1 Merino Knit, 1 Linen Trouser, and 1 Overshirt to save 30% automatically.",
+      offerCode: "CAPSULE30",
+      offerCta: "Build Capsule Now →",
+      specTitle: "The Scandinavian Quality Standard",
+      specs: [
+        { title: "GOTS 100% Organic Cotton", desc: "Grown without pesticides, using 91% less water, and dyed with closed-loop botanical pigments." },
+        { title: "RWS Extra-Fine Merino", desc: "Superfine 19.5-micron merino wool from certified non-mulesed ethical sheep farms." },
+        { title: "Zero Shrinkage Pre-Wash", desc: "Every garment is steam-relaxed and pre-shrunk to retain exact fit across 100+ wash cycles." },
+      ],
+      pressLogos: ["MONOCLE", "WALLPAPER*", "KINFORK", "DEZEEN", "MINIMALISSIMO"],
+      bundleTitle: "The Everyday Nordic Trio",
+      bundleDesc: "Bundle 3 Heavyweight Organic Cotton Tees and receive a complimentary canvas tote bag.",
       ugcCaptions: ["My 10-piece capsule wardrobe", "Softest organic cotton on earth", "Clean minimal silhouettes", "Zero-waste everyday look"],
       storySub: "Slow Living Design",
       storyTitle: "Simplicity Is The Ultimate Sophistication",
@@ -912,6 +1128,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "✨", title: "28-Day Glow", desc: "Clinically proven radiance" },
       ],
       categories: ["Barrier Serums", "Botanical Oils", "Balancing Toners"],
+      offerBadge: "Glow Routine Starter",
+      offerTitle: "3-Step Complete Glow Ritual",
+      offerDesc: "Get the Barrier Glow Serum + Centella Recovery Cream + Botanical Night Oil with a free quartz facial roller.",
+      offerCode: "GLOWKIT25",
+      offerCta: "Claim Glow Ritual →",
+      specTitle: "Pure Plant Bio-Active Standard",
+      specs: [
+        { title: "Zero Water Fillers", desc: "We replace water with 100% organic aloe leaf juice and rose flower hydrosols for pure potency." },
+        { title: "Cold-Pressed Extraction", desc: "Extracted below 40°C to preserve heat-sensitive antioxidants, polyphenols, and omega fatty acids." },
+        { title: "Biophotonic Glass Bottling", desc: "Stored in Swiss Miron violet glass that filters harmful light rays and protects active shelf life." },
+      ],
+      pressLogos: ["ALLURE", "VOGUE BEAUTY", "BYRDIE", "GLAMOUR", "INStyle"],
+      bundleTitle: "The Botanical Barrier Trio",
+      bundleDesc: "Bundle the Cleanser + Glow Serum + Face Oil and save $32 instantly.",
       ugcCaptions: ["My skin barrier has never been healthier", "That dewy morning glow ✨", "28-day before and after results", "Clean ingredients that work"],
       storySub: "From Farm to Bottle",
       storyTitle: "The Science of Pure Plant Bio-Actives",
@@ -942,6 +1172,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "🛡️", title: "Non-Irritating", desc: "Zero parabens or scents" },
       ],
       categories: ["Clinical Serums", "Peptide Complexes", "Barrier Repair"],
+      offerBadge: "Clinical Regimen Starter",
+      offerTitle: "The Complete Dermatologist Regimen",
+      offerDesc: "Get the 10% Niacinamide + Multi-Peptide Elixir + Ceramide Balm and receive a free 15ml Retinol Matrix mini.",
+      offerCode: "CLINICAL25",
+      offerCta: "Claim Regimen →",
+      specTitle: "Clinical Efficacy Benchmarks",
+      specs: [
+        { title: "Pharmaceutical Grade Actives", desc: "Formulated with USP-grade raw materials with molecular weight targeting for maximum transdermal absorption." },
+        { title: "Independent Double-Blind Trials", desc: "Tested across 120 patients over 6 weeks with quantifiable melanin index and sebum reductions." },
+        { title: "Airless Vacuum Dispensers", desc: "Encapsulated in medical-grade airless pump chambers to prevent active ingredient oxidation." },
+      ],
+      pressLogos: ["DERM WORLD", "NEW BEAUTY", "ELLE LABS", "COSMO SCIENCE", "HEALTHLINE"],
+      bundleTitle: "The Barrier Restoration Regimen",
+      bundleDesc: "Bundle the 3 clinical powerhouses together and save $38 plus free priority medical shipping.",
       ugcCaptions: ["Hyperpigmentation faded in 4 weeks!", "Doctor recommended clinical line", "Look at this pore refinement", "Science-backed daily routine"],
       storySub: "Clinical Formulation Science",
       storyTitle: "Transparency Over Marketing Hype",
@@ -972,6 +1216,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "👑", title: "VIP Exclusive", desc: "Private batch releases" },
       ],
       categories: ["Extrait de Parfum", "Velvet Couture Lips", "Luminous Complexion"],
+      offerBadge: "Haute Discovery Edit",
+      offerTitle: "The VIP Red Carpet Discovery Vault",
+      offerDesc: "Receive a complimentary 5-piece Extrait de Parfum discovery coffret ($65 value) with any 50ml flacon order today.",
+      offerCode: "VIPHAUTE",
+      offerCta: "Claim Discovery Vault →",
+      specTitle: "The Standards of French Haute Parfumerie",
+      specs: [
+        { title: "35% Extrait Concentration", desc: "Hand-macerated for 6 months in Grasse with 35% pure fragrance absolutes for 18+ hour sillage." },
+        { title: "24-Hour Transfer-Proof Lip Film", desc: "Proprietary polymer matrix locks pigment in place without drying, cracking, or feathering." },
+        { title: "Hand-Polished Crystal Flacons", desc: "Heavyweight artisan crystal flacons with custom magnetic gold zamak caps." },
+      ],
+      pressLogos: ["VOGUE PARIS", "HARPER'S BAZAAR", "ELLE INT", "VANITY FAIR", "L'OFFICIEL"],
+      bundleTitle: "The Haute Parfumerie & Lip Duo",
+      bundleDesc: "Pair your 50ml Velvet Rose Extrait with a matching Haute Matte Lip Elixir and save $45.",
       ugcCaptions: ["The most intoxicating fragrance I own", "Velvet lips that lasted all night", "Opening this luxury box felt magical", "Red carpet glam at home"],
       storySub: "Grasse Heritage",
       storyTitle: "The Art of Haute Fragrance & Color Artistry",
@@ -1002,6 +1260,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "🛡️", title: "Fully Insured", desc: "Armored door delivery" },
       ],
       categories: ["Bridal Chokers", "Polki Bangles", "Kundan Jhumkas"],
+      offerBadge: "Royal Heirloom Privilege",
+      offerTitle: "Private Royal Bridal Suite Consultation",
+      offerDesc: "Book an exclusive private video consultation with our Master Gemologists and receive a ₹25,000 making charge voucher.",
+      offerCode: "ROYALSUITE",
+      offerCta: "Book Royal Suite →",
+      specTitle: "Royal Trust & Hallmarking Seals",
+      specs: [
+        { title: "BIS 916 Laser Hallmarking", desc: "Every jewel is laser inscribed with the official government HUID for 100% verifiable purity." },
+        { title: "Natural Syndicate Polki Diamonds", desc: "Hand-selected uncut polki diamonds set in 24kt pure gold foil bezel jadau settings." },
+        { title: "100% Lifetime Buyback Guarantee", desc: "Guaranteed lifetime buyback and exchange value at all our flagship royal boutiques." },
+      ],
+      pressLogos: ["VOGUE BRIDAL", "TOWN & COUNTRY", "ROBB REPORT INDIA", "HELLO! JEWELLERY", "GRAZIA"],
+      bundleTitle: "The Grand Bridal Polki Set",
+      bundleDesc: "Pair your Bridal Polki Choker with matching Chandbalis and Maang Tikka and save ₹45,000 / $550.",
       ugcCaptions: ["Wearing our family heirloom choker", "The polki luster is unmatched", "Custom bridal jewelry journey", "Generations of royal craftsmanship"],
       storySub: "Jadau Heritage",
       storyTitle: "Crafting Heirlooms That Transcend Generations",
@@ -1032,6 +1304,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "🛡️", title: "Conflict Free", desc: "Ethically synthesized & mined" },
       ],
       categories: ["Solitaire Rings", "Tennis Bracelets", "Diamond Pendants"],
+      offerBadge: "Custom Ring Privilege",
+      offerTitle: "Design Your Custom Engagement Ring",
+      offerDesc: "Get $150 towards your custom ring setting when you select any certified 1.0ct+ center solitaire diamond.",
+      offerCode: "SOLITAIRE150",
+      offerCta: "Start Custom Ring →",
+      specTitle: "The Optical Precision Standard",
+      specs: [
+        { title: "Triple Excellent Cut Grades", desc: "Precision cut to maximize optical light refraction, fire, and brilliance with zero light leakage." },
+        { title: "IGI & GIA Individual Certificates", desc: "Every diamond comes with physical and digital laser-inscribed certificates." },
+        { title: "Recycled Solid Platinum & 18K", desc: "Cast in heavy-gauge 950 platinum or 18k solid gold with comfort-fit inner shank curves." },
+      ],
+      pressLogos: ["BRIDES", "THE KNOT", "FORBES LIFE", "ROBB REPORT", "ELLE"],
+      bundleTitle: "The Solitaire & Eternity Band Duo",
+      bundleDesc: "Match your Engagement Ring with an Eternity Lab Diamond Band and save $250 automatically.",
       ugcCaptions: ["She said YES! 💍✨", "The fire and sparkle is insane", "1.5ct Oval Solitaire perfection", "Stacking my eternity bands"],
       storySub: "Precision Cutters",
       storyTitle: "Engineered For Unrivaled Brilliance",
@@ -1062,6 +1348,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
         { icon: "🤝", title: "Fair-Wage Artisans", desc: "Supporting master smiths" },
       ],
       categories: ["Everyday Stacking Rings", "Hammered Cuffs", "Boho Statement Hoops"],
+      offerBadge: "Stack Builder Offer",
+      offerTitle: "Build Your 3-Piece Silver Stack",
+      offerDesc: "Pick any 3 stacking rings or cuffs and get 25% off + a complimentary silver polishing kit & leather pouch.",
+      offerCode: "STACK25",
+      offerCta: "Build Ring Stack →",
+      specTitle: "Artisan Craftsmanship & Durability",
+      specs: [
+        { title: "Solid 925 Sterling Silver", desc: "92.5% pure solid silver alloyed with copper for structural durability, stamped with 925 hallmark." },
+        { title: "Triple Rhodium Barrier", desc: "Shielded with electroplated rhodium to prevent oxidation, skin greening, and tarnishing." },
+        { title: "100% Nickel & Lead Free", desc: "Certified hypoallergenic and safe for sensitive ears and everyday skin contact." },
+      ],
+      pressLogos: ["CONDE NAST TRAVELER", "REFINERY29", "DAZED", "GLAMOUR", "NYLON"],
+      bundleTitle: "The Bohemian Everyday Trio",
+      bundleDesc: "Bundle the Hammered Cuff + Turquoise Ring + Twisted Hoops and save $45.",
       ugcCaptions: ["Worn every day for 6 months without tarnishing", "My everyday silver ring stack", "Hand-hammered texture is so unique", "Hypoallergenic and so comfortable"],
       storySub: "Village Silversmiths",
       storyTitle: "Hand-Hammered Textures With Modern Durability",
@@ -1092,6 +1392,20 @@ function getCopyForComp(id: string, niche: string, name: string) {
       { icon: "🛡️", title: "2-Year Warranty", desc: "Immediate replacement cover" },
     ],
     categories: ["Pro Wireless Cans", "True Wireless Buds", "Studio DAC Amps"],
+    offerBadge: "Studio Hardware Drop",
+    offerTitle: "The Complete Cyber Audiophile Bundle",
+    offerDesc: "Get the Spatial Pro Headphones + Magnetic 3-in-1 Dock + Lossless Studio DAC and save $85 with free expedited courier dispatch.",
+    offerCode: "CYBERAUDIO85",
+    offerCta: "Claim Audio Bundle →",
+    specTitle: "Audiophile-Grade Acoustic Hardware",
+    specs: [
+      { title: "40mm Beryllium Drivers", desc: "Ultra-rigid beryllium diaphragms deliver lightning-fast transient response with <0.02% harmonic distortion." },
+      { title: "Sony LDAC 990kbps Codec", desc: "Transmits 3x more data than standard Bluetooth for true lossless 24-bit/96kHz master audio." },
+      { title: "Aerospace Magnesium Chassis", desc: "Ultra-lightweight magnesium alloy frame with cooling memory foam magnetic ear pads." },
+    ],
+    pressLogos: ["WIRED", "THE VERGE", "SOUNDGUYS", "TECHCRUNCH", "ENGADGET"],
+    bundleTitle: "The Studio Master Setup Bundle",
+    bundleDesc: "Bundle the Spatial Pro Cans + Desktop Aluminum Stand + Braided Balanced Cable and save $65.",
     ugcCaptions: ["Soundstage on these is unbelievably wide", "My ultimate desk setup piece", "Noise cancellation silences the entire office", "Beryllium drivers hit so clean"],
     storySub: "Acoustic Engineering",
     storyTitle: "Tuned For Pure Acoustic Transparency",
