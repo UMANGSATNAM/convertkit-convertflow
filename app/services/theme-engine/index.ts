@@ -127,9 +127,13 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
           { themeId: themeGid, files: batch },
           false // Direct execution without Redis mutex bottlenecks
         );
+        const batchFiles = batch.map((f: any) => f.filename).join(', ');
+        console.log(`[FastUpload] Batch ${Math.floor(i/batchSize)+1}: ${batch.length} files uploaded [${batchFiles}]`);
         if (res?.themeFilesUpsert?.userErrors?.length > 0) {
           const userErrs = res.themeFilesUpsert.userErrors;
-          console.warn(`[FastUpload] User errors in batch upload:`, userErrs);
+          console.error(`[FastUpload] ❌ Shopify user errors in batch:`, JSON.stringify(userErrs));
+        } else {
+          console.log(`[FastUpload] ✅ Batch ${Math.floor(i/batchSize)+1} uploaded successfully`);
         }
         break;
       } catch (err: any) {

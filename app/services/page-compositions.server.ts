@@ -612,17 +612,41 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
 
   // ── Match the store's colours with Archetype Palette ─────────────────
+  // CRITICAL: The store's brandConfig may have undefined/null colors.
+  // If we pass those through, buildStorePalette falls back to WHITE,
+  // which overrides dark sections with white backgrounds → invisible text.
+  // Use the archetype palette as the base, only override with REAL store colors.
   let paletteApplied = 0;
-  const targetPalette = options.palette || ARCHETYPE_PALETTES[composition.id] || {
+
+  const archetypePalette = ARCHETYPE_PALETTES[composition.id] || {
     background: "#ffffff",
     text: "#0f172a",
     accent: composition.accentColor || "#38bdf8",
     surface: "#f8fafc",
   };
 
+  const storeBg = options.palette?.background;
+  const storeText = options.palette?.text;
+  const storeAccent = options.palette?.accent;
+  const storeAccentAlt = options.palette?.accentAlt;
+
+  const targetPalette = {
+    background: storeBg || archetypePalette.background,
+    text: storeText || archetypePalette.text,
+    accent: storeAccent || archetypePalette.accent,
+    surface: archetypePalette.surface,
+    accentAlt: storeAccentAlt,
+  };
+
+  console.log(`[ApplyComposition] Palette resolution: store bg=${storeBg || 'N/A'} text=${storeText || 'N/A'} accent=${storeAccent || 'N/A'} → using bg=${targetPalette.background} text=${targetPalette.text} accent=${targetPalette.accent}`);
+
   try {
     const stats = applyStorePalette(files, buildStorePalette(targetPalette));
     paletteApplied = stats.settingsWritten;
+    console.log(`[ApplyComposition] Palette applied: ${stats.settingsWritten} settings, ${stats.contrastRepairs} contrast repairs, ${stats.unresolved.length} unresolved`);
+    if (stats.unresolved.length > 0) {
+      console.warn(`[ApplyComposition] Unresolved sections for palette:`, stats.unresolved);
+    }
   } catch (err) {
     console.error("Store palette application non-fatal error:", err);
   }
@@ -630,6 +654,50 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   // Ensure utility stylesheet is always uploaded
   const utility = path.join(ENGINE, "base-theme/assets/utility.css");
   if (existsSync(utility)) files["assets/utility.css"] = await fs.readFile(utility, "utf-8");
+
+  // ── Deep diagnostic logging before upload ─────────────────────────────
+  console.log(`\n[ApplyComposition] ========================================`);
+  console.log(`[ApplyComposition] Composition: ${composition.id} (${composition.name})`);
+  console.log(`[ApplyComposition] Template file: ${templateFile}`);
+  console.log(`[ApplyComposition] Theme ID: ${themeId}`);
+  console.log(`[ApplyComposition] Total files to upload: ${Object.keys(files).length}`);
+  
+  // Log the exact contents of templates/index.json
+  try {
+    const indexDoc = JSON.parse(files[templateFile]);
+    console.log(`[ApplyComposition] Sections in ${templateFile}: ${indexDoc.order?.length || 0}`);
+    for (const key of (indexDoc.order || [])) {
+      const entry = indexDoc.sections?.[key];
+      const hasLiquid = !!files[`sections/${entry?.type}.liquid`];
+      console.log(`[ApplyComposition]   ${key} → type: "${entry?.type}" | liquid uploaded: ${hasLiquid} | settings keys: ${Object.keys(entry?.settings || {}).length}`);
+    }
+  } catch (e) {
+    console.error(`[ApplyComposition] ERROR parsing ${templateFile}:`, e);
+  }
+
+  // Log header-group and footer-group
+  if (files['sections/header-group.json']) {
+    try {
+      const hg = JSON.parse(files['sections/header-group.json']);
+      console.log(`[ApplyComposition] Header group sections: ${hg.order?.length || 0}`);
+    } catch {}
+  }
+  if (files['sections/footer-group.json']) {
+    try {
+      const fg = JSON.parse(files['sections/footer-group.json']);
+      console.log(`[ApplyComposition] Footer group sections: ${fg.order?.length || 0}`);
+    } catch {}
+  }
+
+  // List all file categories
+  const fileCats: Record<string, number> = {};
+  for (const fname of Object.keys(files)) {
+    const cat = fname.split('/')[0];
+    fileCats[cat] = (fileCats[cat] || 0) + 1;
+  }
+  console.log(`[ApplyComposition] File categories:`, fileCats);
+  console.log(`[ApplyComposition] Missing components: ${[...new Set(missingFiles)].join(', ') || 'NONE'}`);
+  console.log(`[ApplyComposition] ========================================\n`);
 
   await upsertThemeFilesBatched(shop, themeId, files);
 
