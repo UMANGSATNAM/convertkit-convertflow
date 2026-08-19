@@ -625,6 +625,8 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     surface: "#f8fafc",
   };
 
+  const storeBg = options.palette?.background;
+  const storeText = options.palette?.text;
   const storeAccent = options.palette?.accent;
   const storeAccentAlt = options.palette?.accentAlt;
 
