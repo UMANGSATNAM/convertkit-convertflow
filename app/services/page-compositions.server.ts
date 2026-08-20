@@ -63,6 +63,27 @@ export async function verifyCompositions(registryPath = path.join(ENGINE, "regis
     known.set("header-tech-v1", known.get("header-centered-v1")!);
   }
 
+  // Auto-scan theme engine components directory for any liquid files (including all bespoke-d2c subfolders)
+  const componentsDir = path.join(ENGINE, "components");
+  async function scanDir(dir: string, relBase = "components") {
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relPath = path.join(relBase, entry.name).replace(/\\/g, "/");
+        if (entry.isDirectory()) {
+          await scanDir(fullPath, relPath);
+        } else if (entry.isFile() && entry.name.endsWith(".liquid")) {
+          const compId = entry.name.replace(/\.liquid$/, "");
+          if (!known.has(compId)) {
+            known.set(compId, relPath);
+          }
+        }
+      }
+    } catch {}
+  }
+  await scanDir(componentsDir);
+
   const missing: Array<{ composition: string; componentId: string }> = [];
   for (const comp of COMPOSITIONS) {
     if (comp.announcement && !known.has(comp.announcement)) {
