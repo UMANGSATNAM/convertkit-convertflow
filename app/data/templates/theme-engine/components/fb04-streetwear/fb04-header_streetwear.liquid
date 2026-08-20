@@ -1,0 +1,350 @@
+{%- comment -%}
+  sections/fb04-header_streetwear.liquid
+
+  CONVERSION PSYCHOLOGY (Frameblox Landing 04 Replica):
+  1. STICKY GLASSMORPHISM -- Translucent header with backdrop-filter blur keeps navigation accessible.
+  2. RAWBLOX BRAND LOGO -- Big Shoulders Display logo with electric blue accent dot.
+  3. CART NOTIFICATION BADGE -- Gold badge on shopping bag icon.
+  4. MOBILE SLIDE DRAWER -- Smooth hamburger drawer for mobile screens.
+{%- endcomment -%}
+
+{%- liquid
+  assign section_id = 'fb04-hdr-' | append: section.id
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hdr-bg: rgba(255, 255, 255, 0.95);
+    --hdr-text: {{ section.settings.text_color | default: '#282A2F' }};
+    --hdr-muted: {{ section.settings.muted_color | default: '#7B818E' }};
+    --hdr-primary: {{ section.settings.primary_color | default: '#0066FF' }};
+    --hdr-border: {{ section.settings.border_color | default: '#DBDDE0' }};
+  }
+
+  .fb04-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--hdr-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--hdr-border);
+    transition: all 0.3s ease;
+  }
+  .fb04-header.scrolled {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  .fb04-header__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 3.75rem);
+  }
+
+  .fb04-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+  }
+
+  .fb04-header__logo {
+    font-family: 'Big Shoulders Display', var(--font-heading, sans-serif);
+    font-weight: 800;
+    font-size: 32px;
+    color: var(--hdr-text);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+
+  .fb04-header__logo-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--hdr-primary);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .fb04-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .fb04-header__nav a {
+    font-family: var(--font-body, sans-serif);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--hdr-muted);
+    transition: color 0.2s ease;
+    position: relative;
+    padding: 6px 0;
+    text-decoration: none;
+  }
+
+  .fb04-header__nav a:hover,
+  .fb04-header__nav a.active {
+    color: var(--hdr-text);
+  }
+
+  .fb04-header__nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--hdr-primary);
+    transition: width 0.25s ease;
+  }
+  .fb04-header__nav a:hover::after { width: 100%; }
+
+  .fb04-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fb04-header__cart-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #F3F4F5;
+    color: var(--hdr-text);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .fb04-header__cart-btn:hover {
+    background: #E8F1FF;
+    color: var(--hdr-primary);
+  }
+
+  .fb04-header__cart-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #ED9A1C;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fb04-header__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .fb04-header__hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--hdr-text);
+    border-radius: 2px;
+  }
+
+  /* Mobile Menu Drawer */
+  .fb04-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 76px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 999;
+    padding: 32px 24px;
+    flex-direction: column;
+    gap: 20px;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .fb04-mobile-menu.open {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .fb04-mobile-menu a {
+    font-family: 'Big Shoulders Display', var(--font-heading, sans-serif);
+    font-weight: 700;
+    font-size: 28px;
+    text-transform: uppercase;
+    color: var(--hdr-text);
+    letter-spacing: 1px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hdr-border);
+    text-decoration: none;
+  }
+
+  @media (max-width: 809px) {
+    .fb04-header__nav { display: none; }
+    .fb04-header__hamburger { display: flex; }
+  }
+</style>
+
+<header class="fb04-header" id="{{ section_id }}">
+  <div class="fb04-header__container">
+    <div class="fb04-header__inner">
+
+      <a href="{{ routes.root_url }}" class="fb04-header__logo">
+        {{ section.settings.brand_name | default: 'RAWBLOX' }}
+        <span class="fb04-header__logo-dot"></span>
+      </a>
+
+      <nav>
+        <ul class="fb04-header__nav">
+          {%- if section.settings.menu != blank -%}
+            {%- for link in linklists[section.settings.menu].links -%}
+              <li>
+                <a href="{{ link.url }}"{% if link.active %} class="active"{% endif %}>
+                  {{ link.title }}
+                </a>
+              </li>
+            {%- endfor -%}
+          {%- else -%}
+            <li><a href="#hero" class="active">Home</a></li>
+            <li><a href="#drops">New Drops</a></li>
+            <li><a href="#story">Our Story</a></li>
+            <li><a href="#featured">Featured</a></li>
+            <li><a href="#hoodie">Spotlight</a></li>
+            <li><a href="#trust">Why Us</a></li>
+            <li><a href="#categories">Collections</a></li>
+          {%- endif -%}
+        </ul>
+      </nav>
+
+      <div class="fb04-header__actions">
+        <a href="{{ routes.cart_url }}" class="fb04-header__cart-btn" aria-label="Shopping Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="fb04-header__cart-badge">{{ cart.item_count | default: 0 }}</span>
+        </a>
+        <button class="fb04-header__hamburger" id="fb04Hamburger" aria-label="Toggle Navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<div class="fb04-mobile-menu" id="fb04MobileMenu">
+  {%- if section.settings.menu != blank -%}
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="#hero">Home</a>
+    <a href="#drops">New Drops</a>
+    <a href="#story">Our Story</a>
+    <a href="#featured">Featured</a>
+    <a href="#hoodie">Spotlight</a>
+    <a href="#trust">Why Us</a>
+    <a href="#categories">Collections</a>
+  {%- endif -%}
+</div>
+
+<script>
+  (function() {
+    var hdr = document.getElementById('{{ section_id }}');
+    var btn = document.getElementById('fb04Hamburger');
+    var menu = document.getElementById('fb04MobileMenu');
+    if (!hdr) return;
+
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 15) hdr.classList.add('scrolled');
+      else hdr.classList.remove('scrolled');
+    });
+
+    if (btn && menu) {
+      btn.addEventListener('click', function() {
+        menu.classList.toggle('open');
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FB04 Header (Streetwear)",
+  "tag": "section",
+  "class": "section-fb04-header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "RAWBLOX"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary Accent",
+      "default": "#0066FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#282A2F"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted Text Color",
+      "default": "#7B818E"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#DBDDE0"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FB04 Header (Streetwear)",
+      "settings": {
+        "brand_name": "RAWBLOX"
+      }
+    }
+  ]
+}
+{% endschema %}
