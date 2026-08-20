@@ -1,0 +1,187 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#F4F4F0'
+  assign padding_top = section.settings.padding_top | default: 120
+  assign padding_bottom = section.settings.padding_bottom | default: 120
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --padding-top: {{ padding_top }}px;
+    --padding-bottom: {{ padding_bottom }}px;
+    
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .hp7-stats-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 4vw;
+  }
+  
+  .hp7-stats__header {
+    margin-bottom: 6rem;
+    text-align: left;
+  }
+  
+  .hp7-stats__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .hp7-stats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4vw;
+  }
+
+  .hp7-stats__item {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--text-color);
+    padding-left: 1.5rem;
+  }
+
+  .hp7-stats__number {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 6rem);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hp7-stats__text {
+    font-family: 'Inter', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    text-transform: uppercase;
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+  }
+
+  @media screen and (max-width: 990px) {
+    .hp7-stats__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp7-stats__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="hp7-stats-{{ section_id }}">
+  {%- if section.settings.title != blank -%}
+    <div class="hp7-stats__header">
+      <h2 class="hp7-stats__title">{{ section.settings.title }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hp7-stats__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp7-stats__item" {{ block.shopify_attributes }}>
+        <div class="hp7-stats__number">{{ block.settings.number | escape }}</div>
+        <div class="hp7-stats__text">{{ block.settings.text | escape }}</div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP7 Stats Counter",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aesthetic: Editorial Brutalism"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "BY THE NUMBERS"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 120
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number/Value",
+          "default": "1994"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "YEAR ESTABLISHED"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 Stats Counter",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "1994", "text": "FOUNDED IN ANTWERP" } },
+        { "type": "stat", "settings": { "number": "100%", "text": "ORGANIC COTTON" } },
+        { "type": "stat", "settings": { "number": "0", "text": "WASTE IN PRODUCTION" } },
+        { "type": "stat", "settings": { "number": "24", "text": "ARTISAN ATELIERS" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

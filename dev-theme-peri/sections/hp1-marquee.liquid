@@ -1,0 +1,125 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#f4ede6'
+  assign text_color = section.settings.text_color | default: '#8a7a6c'
+  assign speed = section.settings.speed | default: 20
+-%}
+
+<section class="hp1-beauty-marquee" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-marquee-{{ section.id }}">
+  <div class="hp1-marquee-wrapper">
+    <div class="hp1-marquee-track" style="animation-duration: {{ speed }}s;">
+      
+      {%- for i in (1..3) -%}
+        <div class="hp1-marquee-content">
+          {%- for block in section.blocks -%}
+            <div class="hp1-marquee-item" {{ block.shopify_attributes }}>
+              <span class="hp1-marquee-text">{{ block.settings.text }}</span>
+              <span class="hp1-marquee-separator">✦</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-marquee {
+    padding: 15px 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .hp1-marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .hp1-marquee-track {
+    display: flex;
+    animation: hp1Marquee linear infinite;
+  }
+  .hp1-marquee-content {
+    display: flex;
+    align-items: center;
+  }
+  .hp1-marquee-item {
+    display: flex;
+    align-items: center;
+  }
+  .hp1-marquee-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .hp1-marquee-separator {
+    margin: 0 40px;
+    font-size: 12px;
+    opacity: 0.5;
+  }
+
+  @keyframes hp1Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.3333%); }
+  }
+
+  @media (max-width: 767px) {
+    .hp1-marquee-separator { margin: 0 25px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Marquee",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4ede6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#8a7a6c"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "label": "Animation Speed (seconds)",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Marquee Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Cruelty-Free"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Cruelty-Free" } },
+        { "type": "text", "settings": { "text": "100% Organic" } },
+        { "type": "text", "settings": { "text": "Dermatologist Tested" } },
+        { "type": "text", "settings": { "text": "Sustainably Sourced" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

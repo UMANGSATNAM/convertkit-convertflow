@@ -1,0 +1,367 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    --play-btn-bg: {{ section.settings.play_btn_bg }};
+    --play-btn-color: {{ section.settings.play_btn_color }};
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-video-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp20-video__container {
+    position: relative;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    background: #000;
+    overflow: hidden;
+    aspect-ratio: {{ section.settings.desktop_aspect }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-video__container {
+      aspect-ratio: {{ section.settings.mobile_aspect }};
+    }
+  }
+
+  .hp20-video__media {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 | minus: 1 | abs }};
+    filter: {% if section.settings.image_grayscale %}grayscale(100%) contrast(120%){% else %}none{% endif %};
+  }
+  
+  .hp20-video__iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; /* Let play button catch clicks initially */
+  }
+
+  .hp20-video__play-btn {
+    position: relative;
+    z-index: 5;
+    width: {{ section.settings.play_size }}px;
+    height: {{ section.settings.play_size }}px;
+    background: var(--play-btn-bg);
+    border: var(--border-thickness) solid var(--border-color);
+    color: var(--play-btn-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--shadow-color);
+    transition: all 0.2s ease;
+  }
+  
+  .hp20-video__play-btn svg {
+    width: 40%;
+    height: 40%;
+    margin-left: 10%; /* optical alignment for play triangle */
+  }
+
+  .hp20-video__play-btn:hover {
+    transform: translate(2px, 2px) scale(1.05);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .hp20-video__text-overlay {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 4;
+    max-width: 500px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-video__text-overlay {
+      top: 24px;
+      left: 24px;
+      right: 24px;
+    }
+  }
+
+  .hp20-video__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    color: {{ section.settings.overlay_text_color }};
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-video-wrapper" id="HP20Video-{{ section.id }}">
+  <div class="hp20-video__container">
+    
+    {%- if section.settings.video_url != blank -%}
+      {%- if section.settings.video_url.type == 'youtube' -%}
+        <iframe class="hp20-video__iframe" src="https://www.youtube.com/embed/{{ section.settings.video_url.id }}?controls=0&mute=1&loop=1&playlist={{ section.settings.video_url.id }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      {%- elsif section.settings.video_url.type == 'vimeo' -%}
+        <iframe class="hp20-video__iframe" src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?background=1&autoplay=1&loop=1&byline=0&title=0" frameborder="0" allow="autoplay; fullscreen"></iframe>
+      {%- endif -%}
+    {%- elsif section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 2000 }}" alt="Video Poster" class="hp20-video__media" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hp20-video__media' }}
+    {%- endif -%}
+
+    {%- if section.settings.title != blank -%}
+      <div class="hp20-video__text-overlay">
+        <h2 class="hp20-video__title">{{ section.settings.title | escape }}</h2>
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_play_btn -%}
+      <div class="hp20-video__play-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Video",
+  "class": "section-hp20-video",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "Video URL",
+      "info": "Autoplays silently in background."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Cover Image / Fallback",
+      "info": "Used if no video URL is provided."
+    },
+    {
+      "type": "checkbox",
+      "id": "image_grayscale",
+      "label": "Apply Grayscale Filter to Media",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Darkness Overlay (if image)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Overlay Heading",
+      "default": "WATCH IT IN ACTION."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_btn",
+      "label": "Show Play Button (Decorative)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "desktop_aspect",
+      "label": "Desktop Aspect Ratio",
+      "options": [
+        { "value": "16/9", "label": "16:9 Widescreen" },
+        { "value": "21/9", "label": "21:9 Cinematic" },
+        { "value": "4/3", "label": "4:3 Standard" }
+      ],
+      "default": "21/9"
+    },
+    {
+      "type": "select",
+      "id": "mobile_aspect",
+      "label": "Mobile Aspect Ratio",
+      "options": [
+        { "value": "1/1", "label": "1:1 Square" },
+        { "value": "4/5", "label": "4:5 Vertical" },
+        { "value": "16/9", "label": "16:9 Widescreen" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "play_size",
+      "min": 60,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Play Button Size",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "overlay_text_color",
+      "label": "Overlay Text Color",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "play_btn_bg",
+      "label": "Play Button Background",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "play_btn_color",
+      "label": "Play Button Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Video"
+    }
+  ]
+}
+{% endschema %}

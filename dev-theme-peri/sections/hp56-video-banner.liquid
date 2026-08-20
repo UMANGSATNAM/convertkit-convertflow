@@ -1,0 +1,43 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#F0F9FF' }};
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+  .hp56-video__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp56-video__header { text-align: center; margin-bottom: 40px; }
+  .hp56-video__eyebrow { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #0284C7; margin: 0 0 12px; }
+  .hp56-video__heading { font-family: 'Syne', sans-serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; color: #082F49; margin: 0; }
+  .hp56-video__frame { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; background: #E0F2FE; border: 1px solid rgba(2, 132, 199, 0.2); }
+  .hp56-video__frame video, .hp56-video__frame iframe { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hp56-video__play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 76px; height: 76px; background: rgba(2, 132, 199, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 24px; cursor: pointer; transition: transform 0.3s ease; box-shadow: 0 8px 35px rgba(2, 132, 199, 0.4); }
+  .hp56-video__play:hover { transform: translate(-50%, -50%) scale(1.1); }
+{%- endstyle -%}
+<div class="hp56-video__container">
+  <div class="hp56-video__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp56-video__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp56-video__heading">{{ section.settings.heading | default: 'The Arctic Expedition' }}</h2>
+  </div>
+  <div class="hp56-video__frame">
+    {%- if section.settings.video_url != blank -%}<iframe src="{{ section.settings.video_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe>
+    {%- elsif section.settings.cover_image != blank -%}<img height="{{ section.settings.cover_image.height }}" width="{{ section.settings.cover_image.width }}" src="{{ section.settings.cover_image | image_url: width: 1280 }}" alt="{{ section.settings.heading }}" style="width:100%;height:100%;object-fit:cover;"><div class="hp56-video__play">▶</div>
+    {%- else -%}<span style="width:100%;height:100%;object-fit:cover;">{{ 'lifestyle-2' | placeholder_svg_tag }}</span><div class="hp56-video__play">▶</div>{%- endif -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP56 Video",
+  "class": "section-hp56-video",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F0F9FF" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "❄️ WATCH" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Arctic Expedition" },
+    { "type": "text", "id": "video_url", "label": "Video URL" },
+    { "type": "image_picker", "id": "cover_image", "label": "Cover Image" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "presets": [{ "name": "HP56 Video" }]
+}
+{% endschema %}

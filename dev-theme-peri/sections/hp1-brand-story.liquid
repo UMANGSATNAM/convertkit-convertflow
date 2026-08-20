@@ -1,0 +1,215 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+  assign image_position = section.settings.image_position
+-%}
+
+<section class="hp1-beauty-story" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-brand-story-{{ section.id }}">
+  <div class="hp1-story-inner">
+    
+    <div class="hp1-story-grid {% if image_position == 'right' %}hp1-story-reverse{% endif %}">
+      
+      <div class="hp1-story-image-col">
+        <div class="hp1-story-image-wrapper">
+          {%- if section.settings.image != blank -%}
+            <img src="{{ section.settings.image | image_url: width: 1000 }}" 
+                 alt="{{ section.settings.heading | escape }}" 
+                 width="800" height="1000" 
+                 class="hp1-story-img" loading="lazy">
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'hp1-story-img placeholder-svg' }}
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="hp1-story-text-col">
+        <div class="hp1-story-text-content">
+          {%- if section.settings.subheading != blank -%}
+            <span class="hp1-story-subheading">{{ section.settings.subheading }}</span>
+          {%- endif -%}
+          
+          {%- if section.settings.heading != blank -%}
+            <h2 class="hp1-story-heading">{{ section.settings.heading }}</h2>
+          {%- endif -%}
+          
+          {%- if section.settings.text != blank -%}
+            <div class="hp1-story-text">{{ section.settings.text }}</div>
+          {%- endif -%}
+          
+          {%- if section.settings.btn_label != blank and section.settings.btn_link != blank -%}
+            <a href="{{ section.settings.btn_link }}" class="hp1-story-btn">
+              {{ section.settings.btn_label }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+      
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-story {
+    padding: 100px 0;
+    font-family: 'Inter', sans-serif;
+  }
+  .hp1-story-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .hp1-story-grid {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+  .hp1-story-grid.hp1-story-reverse {
+    flex-direction: row-reverse;
+  }
+  .hp1-story-image-col {
+    flex: 1;
+  }
+  .hp1-story-image-wrapper {
+    position: relative;
+    border-radius: 20px 20px 0 20px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+  }
+  .hp1-story-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hp1-story-text-col {
+    flex: 1;
+  }
+  .hp1-story-text-content {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .hp1-story-subheading {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8a7a6c;
+    margin-bottom: 15px;
+  }
+  .hp1-story-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 25px;
+  }
+  .hp1-story-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 40px;
+  }
+  .hp1-story-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border: 1px solid {{ text_color }};
+    color: {{ text_color }};
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+  }
+  .hp1-story-btn:hover {
+    background: {{ text_color }};
+    color: {{ bg_color }};
+  }
+
+  @media (max-width: 991px) {
+    .hp1-beauty-story { padding: 60px 0; }
+    .hp1-story-grid { gap: 40px; }
+  }
+  @media (max-width: 767px) {
+    .hp1-story-grid, .hp1-story-grid.hp1-story-reverse {
+      flex-direction: column;
+    }
+    .hp1-story-text-content {
+      text-align: center;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Brand Story",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Our Philosophy"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Beauty Rooted in Nature"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We believe that true beauty comes from within, and your skincare should enhance your natural radiance. Every product we create is thoughtfully formulated using sustainable, organic ingredients.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Discover Our Story"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Brand Story"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,379 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --overlay-color: {{ section.settings.overlay_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp29-tiles__header {
+    text-align: center;
+    margin-bottom: 50px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hp29-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 15px;
+    line-height: 1.2;
+  }
+
+  .hp29-tiles__subtitle {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  .hp29-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp29-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp29-tiles__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp29-tiles__item {
+    position: relative;
+    display: block;
+    aspect-ratio: {{ section.settings.image_ratio }};
+    border-radius: 200px 200px 30px 30px; /* Distinct organic shape */
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    background: rgba(0,0,0,0.03);
+  }
+  
+  /* Create variation in shapes */
+  .hp29-tiles__item:nth-child(even) {
+    border-radius: 30px 30px 200px 200px;
+  }
+
+  .hp29-tiles__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .hp29-tiles__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 40px 20px;
+    transition: background 0.4s ease;
+  }
+  
+  .hp29-tiles__item:nth-child(even) .hp29-tiles__overlay {
+    align-items: flex-start;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0) 100%);
+  }
+
+  .hp29-tiles__content {
+    text-align: center;
+    transform: translateY(10px);
+    transition: transform 0.4s ease;
+  }
+  
+  .hp29-tiles__item:nth-child(even) .hp29-tiles__content {
+    transform: translateY(-10px);
+  }
+
+  .hp29-tiles__item:hover .hp29-tiles__image {
+    transform: scale(1.05);
+  }
+
+  .hp29-tiles__item:hover .hp29-tiles__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+  }
+  
+  .hp29-tiles__item:nth-child(even):hover .hp29-tiles__overlay {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+  }
+
+  .hp29-tiles__item:hover .hp29-tiles__content {
+    transform: translateY(0);
+  }
+
+  .hp29-tiles__cat-title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--overlay-color);
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .hp29-tiles__btn {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--overlay-color);
+    border-bottom: 1px solid var(--overlay-color);
+    padding-bottom: 3px;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.1s;
+  }
+
+  .hp29-tiles__item:hover .hp29-tiles__btn {
+    opacity: 1;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-tiles-wrapper" id="HP29Tiles-{{ section.id }}">
+  
+  {%- if section.settings.title != blank or section.settings.subtitle != blank -%}
+    <div class="hp29-tiles__header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp29-tiles__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="hp29-tiles__subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="hp29-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link_url | default: '#' }}" class="hp29-tiles__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp29-tiles__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp29-tiles__image' }}
+        {%- endif -%}
+        
+        <div class="hp29-tiles__overlay">
+          <div class="hp29-tiles__content">
+            <h3 class="hp29-tiles__cat-title">{{ block.settings.title }}</h3>
+            <span class="hp29-tiles__btn">{{ block.settings.btn_text }}</span>
+          </div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP29 Boho Cat Tiles",
+  "class": "section-hp29-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by <em>Silhouette</em>"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Curated collections for every aspect of your life."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image Ratio",
+      "options": [
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Vertical (4:5)" },
+        { "value": "1/1.5", "label": "Tall (1:1.5)" }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 42
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#3D405B"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Text (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Dresses"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Hover Button Text",
+          "default": "Explore"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 Boho Cat Tiles",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Dresses" } },
+        { "type": "category", "settings": { "title": "Knitwear" } },
+        { "type": "category", "settings": { "title": "Accessories" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

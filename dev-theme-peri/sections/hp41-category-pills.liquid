@@ -1,0 +1,138 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    
+    --font-heading: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 60px 20px;
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp41-cat-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .hp41-cat__item {
+    padding: 20px 40px;
+    background: #FFF;
+    border: 4px solid var(--border-color);
+    border-radius: 50px;
+    box-shadow: 6px 6px 0px var(--border-color);
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--border-color);
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+
+  /* Fun alternating colors */
+  .hp41-cat__item:nth-child(1) { background: #38C6F4; color: #000; }
+  .hp41-cat__item:nth-child(2) { background: #D7FF43; color: #000; }
+  .hp41-cat__item:nth-child(3) { background: #F0A8E3; color: #000; }
+  .hp41-cat__item:nth-child(4) { background: #FF4911; color: #FFF; }
+  .hp41-cat__item:nth-child(5) { background: #FFF; color: #000; }
+
+  .hp41-cat__item:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0px var(--border-color);
+  }
+  
+  .hp41-cat__item:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--border-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp41-cat-wrapper" id="HP41Categories-{{ section.id }}">
+  {%- for block in section.blocks -%}
+    <a href="{{ block.settings.link | default: '#' }}" class="hp41-cat__item" {{ block.shopify_attributes }}>
+      {{ block.settings.title }}
+    </a>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP41 - Neo Categories",
+  "class": "section-hp41-category-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Neo Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FDF0D5"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP41 - Neo Categories",
+      "blocks": [
+        { "type": "category", "settings": { "title": "APPAREL" } },
+        { "type": "category", "settings": { "title": "ACCESSORIES" } },
+        { "type": "category", "settings": { "title": "WEIRD STUFF" } },
+        { "type": "category", "settings": { "title": "SALE" } },
+        { "type": "category", "settings": { "title": "ALL ITEMS" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

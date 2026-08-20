@@ -1,0 +1,56 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background: radial-gradient(circle at 50% 50%, #3B1230 0%, #140510 100%);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp55-news__container { max-width: {{ section.settings.container_width | default: 700 }}px; margin: 0 auto; padding: 0 24px; text-align: center; }
+  .hp55-news__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#C084FC' }}; margin: 0 0 16px; }
+  .hp55-news__heading { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); color: #FFFFFF; margin: 0 0 16px; }
+  .hp55-news__desc { font-size: 15px; line-height: 1.7; color: #E9D5FF; margin: 0 0 32px; opacity: 0.9; }
+  .hp55-news__form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; }
+  .hp55-news__input {
+    flex: 1; padding: 16px 24px; background: #2A0E22; border: 1px solid rgba(233, 213, 255, 0.3);
+    border-radius: 50px; color: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+  }
+  .hp55-news__input::placeholder { color: rgba(233, 213, 255, 0.5); }
+  .hp55-news__btn {
+    padding: 16px 32px; background: {{ section.settings.btn_bg | default: '#C084FC' }};
+    color: #1F0B18; border: none; border-radius: 50px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+    box-shadow: 0 8px 30px rgba(192, 132, 252, 0.35);
+  }
+  .hp55-news__btn:hover { box-shadow: 0 12px 40px rgba(192, 132, 252, 0.55); transform: translateY(-2px); }
+  @media screen and (max-width: 480px) { .hp55-news__form { flex-direction: column; } }
+{%- endstyle -%}
+<div class="hp55-news__container">
+  {%- if section.settings.eyebrow != blank -%}<p class="hp55-news__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+  <h2 class="hp55-news__heading">{{ section.settings.heading | default: 'Join the Royal Court' }}</h2>
+  <p class="hp55-news__desc">{{ section.settings.description | default: 'Patrons receive private access to limited small-batch pearl extractions, bespoke formulations, and royal events.' }}</p>
+  {%- form 'customer', id: 'hp55-newsletter' -%}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    <div class="hp55-news__form">
+      <input type="email" name="contact[email]" class="hp55-news__input" placeholder="{{ section.settings.placeholder | default: 'Enter your email' }}" required>
+      <button type="submit" class="hp55-news__btn">{{ section.settings.btn_label | default: 'Join Court' }}</button>
+    </div>
+  {%- endform -%}
+</div>
+{% schema %}
+{
+  "name": "HP55 Newsletter",
+  "class": "section-hp55-news",
+  "settings": [
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#C084FC" },
+    { "type": "color", "id": "btn_bg", "label": "Button BG", "default": "#C084FC" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "✦ PRIVATE PRIVILEGE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Join the Royal Court" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Patrons receive private access to limited small-batch pearl extractions." },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "btn_label", "label": "Button Label", "default": "Join Court" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 500, "max": 900, "step": 20, "unit": "px", "label": "Container Width", "default": 700 }
+  ],
+  "presets": [{ "name": "HP55 Newsletter" }]
+}
+{% endschema %}

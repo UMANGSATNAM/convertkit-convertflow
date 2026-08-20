@@ -1,0 +1,190 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FF00FF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 4px solid #000;
+  }
+  
+  .hp16-test-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .hp16-test-header-{{ section_id }} {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hp16-test-title-{{ section_id }} {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    text-transform: uppercase;
+    color: #FFF;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 4px 4px 0 #00FFFF;
+    margin: 0;
+    transform: rotate(-1deg);
+  }
+  
+  .hp16-test-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .hp16-test-card-{{ section_id }} {
+    background: #FFF;
+    border: 4px solid #000;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 10px 10px 0 #000;
+    position: relative;
+    color: {{ text_color }};
+  }
+  
+  .hp16-test-card-{{ section_id }}:nth-child(2) {
+    background: #00FFFF;
+    transform: translateY(-20px);
+  }
+  .hp16-test-card-{{ section_id }}:nth-child(3) {
+    background: #FFFF00;
+  }
+  
+  .hp16-test-quote-{{ section_id }} {
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: #000;
+    color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 2rem;
+    line-height: 1;
+    border: 3px solid #FFF;
+  }
+  
+  .hp16-test-text-{{ section_id }} {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+  }
+  
+  .hp16-test-author-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding-top: 20px;
+    border-top: 3px dashed #000;
+  }
+  
+  .hp16-test-stars-{{ section_id }} {
+    color: #FF00FF;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  @media (max-width: 992px) {
+    .hp16-test-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+    .hp16-test-card-{{ section_id }}:nth-child(2) {
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp16-test-container-{{ section_id }}">
+  <div class="hp16-test-header-{{ section_id }}">
+    <h2 class="hp16-test-title-{{ section_id }}">{{ section.settings.title | default: 'BESTIES SAY' }}</h2>
+  </div>
+  
+  <div class="hp16-test-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 3 %}
+      <div class="hp16-test-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp16-test-quote-{{ section_id }}">"</div>
+        <div class="hp16-test-stars-{{ section_id }}">★★★★★</div>
+        <p class="hp16-test-text-{{ section_id }}">{{ block.settings.text }}</p>
+        <div class="hp16-test-author-{{ section_id }}">{{ block.settings.author }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP16 Testimonials",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FF00FF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "BESTIES SAY"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Literally the cutest top I've ever owned. Fits perfect and gives major early 2000s vibes."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "@BRITNEYFAN99"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP16 Testimonials",
+      "blocks": [
+        { "type": "testimonial", "settings": { "text": "Literally the cutest top I've ever owned. Fits perfect and gives major early 2000s vibes.", "author": "@BRITNEYFAN99" } },
+        { "type": "testimonial", "settings": { "text": "Shipping was so fast I couldn't even believe it. The packaging is everything!!", "author": "@PARIS.H" } },
+        { "type": "testimonial", "settings": { "text": "I get so many compliments when I wear these pants. I need them in every color rn.", "author": "@Y2KQUEEN" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

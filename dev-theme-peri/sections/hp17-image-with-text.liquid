@@ -1,0 +1,207 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign layout = section.settings.layout | default: 'image_left'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+  }
+  
+  .hp17-iwt-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    {% if layout == 'image_right' %}
+      flex-direction: row-reverse;
+    {% endif %}
+  }
+  
+  .hp17-iwt-image-wrap-{{ section_id }} {
+    flex: 1;
+    position: relative;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    padding: 15px;
+  }
+  
+  .hp17-iwt-image-wrap-{{ section_id }}::before {
+    content: '';
+    position: absolute;
+    top: -5px; left: -5px;
+    width: 20px; height: 20px;
+    border-top: 2px solid #00FF41; border-left: 2px solid #00FF41;
+  }
+  .hp17-iwt-image-wrap-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; right: -5px;
+    width: 20px; height: 20px;
+    border-bottom: 2px solid #00FF41; border-right: 2px solid #00FF41;
+  }
+  
+  .hp17-iwt-image-{{ section_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(100%) contrast(1.2);
+    transition: filter 0.5s ease;
+  }
+  
+  .hp17-iwt-image-wrap-{{ section_id }}:hover .hp17-iwt-image-{{ section_id }} {
+    filter: grayscale(0%) contrast(1.2);
+  }
+  
+  .hp17-iwt-content-{{ section_id }} {
+    flex: 1;
+  }
+  
+  .hp17-iwt-subtitle-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: #B800FF;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hp17-iwt-subtitle-{{ section_id }}::before {
+    content: "> ";
+  }
+  
+  .hp17-iwt-title-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    text-transform: uppercase;
+    color: #FFF;
+    margin: 0 0 30px 0;
+    line-height: 1;
+  }
+  
+  .hp17-iwt-text-{{ section_id }} {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 40px 0;
+  }
+  
+  .hp17-iwt-btn-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #00FF41;
+    background: transparent;
+    border: 1px solid #00FF41;
+    text-decoration: none;
+    padding: 12px 30px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+  }
+  
+  .hp17-iwt-btn-{{ section_id }}:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+  }
+
+  @media (max-width: 992px) {
+    .hp17-iwt-container-{{ section_id }} {
+      flex-direction: column;
+      gap: 40px;
+    }
+    .hp17-iwt-image-wrap-{{ section_id }}, .hp17-iwt-content-{{ section_id }} {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp17-iwt-container-{{ section_id }}">
+  <div class="hp17-iwt-image-wrap-{{ section_id }}">
+    {% if section.settings.image != blank %}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1000 }}" class="hp17-iwt-image-{{ section_id }}" loading="lazy" alt="Image">
+    {% else %}
+      <div class="hp17-iwt-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px); height: 500px;"></div>
+    {% endif %}
+  </div>
+  
+  <div class="hp17-iwt-content-{{ section_id }}">
+    <div class="hp17-iwt-subtitle-{{ section_id }}">{{ section.settings.subtitle | default: 'MATERIAL_SCIENCE' }}</div>
+    <h2 class="hp17-iwt-title-{{ section_id }}">{{ section.settings.title | default: 'ENGINEERED FOR THE SPRAWL' }}</h2>
+    <div class="hp17-iwt-text-{{ section_id }}">{{ section.settings.text | default: '<p>Our garments combine advanced ballistic nylon with breathable smart-fabrics. Designed to withstand the elements of the concrete jungle while maintaining maximum mobility and stealth.</p>' }}</div>
+    <a href="{{ section.settings.btn_link | default: '#' }}" class="hp17-iwt-btn-{{ section_id }}">{{ section.settings.btn_text | default: '[ VIEW SPECS ]' }}</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP17 Image with Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Image Alignment",
+      "options": [
+        { "value": "image_left", "label": "Left" },
+        { "value": "image_right", "label": "Right" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "MATERIAL_SCIENCE"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "ENGINEERED FOR THE SPRAWL"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Our garments combine advanced ballistic nylon with breathable smart-fabrics. Designed to withstand the elements of the concrete jungle while maintaining maximum mobility and stealth.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "[ VIEW SPECS ]"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP17 Image with Text"
+    }
+  ]
+}
+{% endschema %}

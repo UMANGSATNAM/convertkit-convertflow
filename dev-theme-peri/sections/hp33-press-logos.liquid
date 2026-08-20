@@ -1,0 +1,227 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --gold-color: {{ section.settings.gold_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp33-press-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp33-press__container {
+    border-top: 1px solid var(--gold-color);
+    border-bottom: 1px solid var(--gold-color);
+    padding: 40px 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hp33-press__container::before,
+  .hp33-press__container::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(212, 175, 55, 0.3);
+  }
+
+  .hp33-press__container::before { top: 3px; }
+  .hp33-press__container::after { bottom: 3px; }
+
+  .hp33-press__title {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gold-color);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .hp33-press__title::before,
+  .hp33-press__title::after {
+    content: '';
+    height: 1px;
+    width: 20px;
+    background: var(--gold-color);
+  }
+
+  .hp33-press__logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 60px;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-press__logos {
+      gap: 40px;
+    }
+  }
+
+  .hp33-press__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    filter: sepia(100%) opacity(0.5);
+    transition: filter 0.4s ease, transform 0.4s ease;
+  }
+
+  .hp33-press__logo:hover {
+    filter: sepia(0%) opacity(1);
+    transform: translateY(-2px);
+  }
+
+  .hp33-press__logo img,
+  .hp33-press__logo svg {
+    max-height: 100%;
+    width: auto;
+    fill: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp33-press-wrapper" id="HP33Press-{{ section.id }}">
+  <div class="hp33-press__container">
+    {%- if section.settings.title != blank -%}
+      <div class="hp33-press__title">{{ section.settings.title }}</div>
+    {%- endif -%}
+    
+    <div class="hp33-press__logos">
+      {%- for block in section.blocks -%}
+        <div class="hp33-press__logo" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 250 }}" alt="Press Logo" loading="lazy">
+          {%- else -%}
+            <svg viewBox="0 0 150 40" width="150" height="40">
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Playfair Display', serif" font-size="24" fill="currentColor">
+                Journal {{ forloop.index }}
+              </text>
+            </svg>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP33 - Deco Press",
+  "class": "section-hp33-press-logos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "DISTINGUISHED PUBLICATIONS"
+    },
+    {
+      "type": "header",
+      "content": "Deco Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#0e1a14"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gold_color",
+      "label": "Gold Accent",
+      "default": "#d4af37"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP33 - Deco Press",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

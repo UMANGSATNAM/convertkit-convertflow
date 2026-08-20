@@ -1,0 +1,319 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --grid-color: rgba(255, 255, 255, 0.1);
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--grid-color);
+  }
+
+  .hp34-ig-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-ig-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp34-ig__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--grid-color);
+    padding-bottom: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-ig__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+  }
+
+  .hp34-ig__subtitle {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .hp34-ig__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp34-ig__link {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-color);
+    text-decoration: none;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hp34-ig__link:hover {
+    color: var(--accent-color);
+  }
+
+  .hp34-ig__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 1px;
+    background: var(--grid-color);
+    border: 1px solid var(--grid-color);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp34-ig__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp34-ig__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .hp34-ig__item {
+    position: relative;
+    aspect-ratio: 1/1;
+    background: var(--bg-color);
+    display: block;
+    overflow: hidden;
+    group: card;
+  }
+
+  .hp34-ig__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  .hp34-ig__item:hover .hp34-ig__image {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .hp34-ig__overlay {
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px dashed transparent;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hp34-ig__item:hover .hp34-ig__overlay {
+    border-color: var(--accent-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-ig-wrapper" id="HP34Ig-{{ section.id }}">
+  <div class="hp34-ig__header">
+    <div>
+      {%- if section.settings.subtitle != blank -%}
+        <div class="hp34-ig__subtitle">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+      <h2 class="hp34-ig__title">{{ section.settings.title }}</h2>
+    </div>
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp34-ig__link">
+        {{ section.settings.btn_label }} [↗]
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp34-ig__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp34-ig__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="Instagram Image" class="hp34-ig__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp34-ig__image' }}
+        {%- endif -%}
+        <div class="hp34-ig__overlay"></div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP34 - Tech Instagram",
+  "class": "section-hp34-instagram",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "DATA_STREAM"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Visual Logs"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "@BRAND_HANDLE"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech Instagram",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

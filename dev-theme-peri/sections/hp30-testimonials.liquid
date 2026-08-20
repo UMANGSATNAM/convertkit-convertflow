@@ -1,0 +1,315 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-testi-wrapper {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+  }
+
+  .hp30-testi__header {
+    padding: 40px;
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-testi__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hp30-testi__slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .hp30-testi__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp30-testi__item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 80px 60px;
+    border-right: 4px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    background: var(--bg-color);
+  }
+
+  @media screen and (min-width: 993px) {
+    .hp30-testi__item {
+      flex: 0 0 50%;
+    }
+    .hp30-testi__item:nth-child(even) {
+      border-right: none;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp30-testi__item {
+      padding: 60px 20px;
+      border-right: none;
+    }
+  }
+
+  .hp30-testi__mark {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 180px;
+    line-height: 0;
+    color: var(--accent-color);
+    position: absolute;
+    top: 100px;
+    left: 40px;
+    opacity: 0.1;
+  }
+
+  .hp30-testi__quote {
+    font-family: var(--font-heading);
+    font-size: clamp(30px, 5vw, 60px);
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hp30-testi__author {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-color);
+    border-top: 4px solid var(--border-color);
+    padding-top: 20px;
+    display: inline-block;
+  }
+
+  .hp30-testi__nav {
+    display: flex;
+    border-top: 4px solid var(--border-color);
+  }
+
+  .hp30-testi__nav-btn {
+    flex: 1;
+    padding: 20px;
+    background: var(--bg-color);
+    border: none;
+    border-right: 4px solid var(--border-color);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0s, color 0s;
+  }
+
+  .hp30-testi__nav-btn:last-child {
+    border-right: none;
+  }
+
+  .hp30-testi__nav-btn:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-testi-wrapper" id="HP30Testimonials-{{ section.id }}">
+  <div class="hp30-testi__header">
+    <h2 class="hp30-testi__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp30-testi__slider" id="hp30-testi-slider-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="hp30-testi__item" {{ block.shopify_attributes }}>
+        <div class="hp30-testi__mark">"</div>
+        <div class="hp30-testi__quote">
+          {{ block.settings.quote }}
+        </div>
+        <div class="hp30-testi__author">
+          {{ block.settings.author }}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="hp30-testi__nav">
+    <button class="hp30-testi__nav-btn" id="hp30-t-prev-{{ section.id }}">&lt; PREV</button>
+    <button class="hp30-testi__nav-btn" id="hp30-t-next-{{ section.id }}">NEXT &gt;</button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('hp30-testi-slider-{{ section.id }}');
+    const prevBtn = document.getElementById('hp30-t-prev-{{ section.id }}');
+    const nextBtn = document.getElementById('hp30-t-next-{{ section.id }}');
+
+    if (slider && prevBtn && nextBtn) {
+      prevBtn.addEventListener('click', () => {
+        const itemWidth = slider.offsetWidth / (window.innerWidth > 992 ? 2 : 1);
+        slider.scrollBy({ left: -itemWidth, behavior: 'auto' }); // Brutalist 'auto' snapping, no smooth scroll
+      });
+
+      nextBtn.addEventListener('click', () => {
+        const itemWidth = slider.offsetWidth / (window.innerWidth > 992 ? 2 : 1);
+        slider.scrollBy({ left: itemWidth, behavior: 'auto' });
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Quotes",
+  "class": "section-hp30-testimonials",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "TRANSMISSIONS"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "UNYIELDING QUALITY. A MASTERCLASS IN MODERN DESIGN."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "GQ MAGAZINE"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Quotes",
+      "blocks": [
+        { "type": "quote" },
+        { "type": "quote", "settings": { "quote": "THE NEW STANDARD FOR UTILITARIAN AESTHETICS.", "author": "HYPEBEAST" } },
+        { "type": "quote", "settings": { "quote": "RAW, UNFILTERED, AND PERFECTLY EXECUTED.", "author": "VOGUE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

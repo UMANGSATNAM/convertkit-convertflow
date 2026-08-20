@@ -1,0 +1,80 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FEF3C7' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp59-feat__container { max-width: {{ section.settings.container_width | default: 1280 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp59-feat__header { text-align: center; margin-bottom: 50px; }
+  .hp59-feat__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#F97316' }}; margin: 0 0 12px; }
+  .hp59-feat__heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #042F2E; margin: 0; }
+  .hp59-feat__grid { display: grid; grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: 24px; }
+  .hp59-feat__card {
+    background: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 16px; padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hp59-feat__card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15); }
+  .hp59-feat__card-icon {
+    width: 48px; height: 48px; background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #F97316; margin-bottom: 18px;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+  }
+  .hp59-feat__card-title { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 700; color: #042F2E; margin: 0 0 8px; }
+  .hp59-feat__card-desc { font-size: 13px; line-height: 1.6; color: #475569; margin: 0; }
+  @media screen and (max-width: 992px) { .hp59-feat__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media screen and (max-width: 480px) { .hp59-feat__grid { grid-template-columns: 1fr; } }
+{%- endstyle -%}
+<div class="hp59-feat__container">
+  <div class="hp59-feat__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp59-feat__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp59-feat__heading">{{ section.settings.heading | default: 'Marine Bio-Active Matrix' }}</h2>
+  </div>
+  <div class="hp59-feat__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp59-feat__card" {{ block.shopify_attributes }}>
+        <div class="hp59-feat__card-icon">{{ block.settings.icon | default: '🪸' }}</div>
+        <h3 class="hp59-feat__card-title">{{ block.settings.title | default: 'Marine Coral' }}</h3>
+        <p class="hp59-feat__card-desc">{{ block.settings.description | default: 'Pure ocean bio-nutrients.' }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP59 Features",
+  "class": "section-hp59-feat",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FEF3C7" },
+    { "type": "color", "id": "card_bg", "label": "Card BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#F97316" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🪸 BIO-ACTIVE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Marine Bio-Active Matrix" },
+    { "type": "range", "id": "columns", "min": 2, "max": 4, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [{
+    "type": "feature", "name": "Feature",
+    "settings": [
+      { "type": "text", "id": "icon", "label": "Icon", "default": "🪸" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Marine Coral" },
+      { "type": "textarea", "id": "description", "label": "Description", "default": "Pure ocean bio-nutrients." }
+    ]
+  }],
+  "presets": [{
+    "name": "HP59 Features",
+    "blocks": [
+      { "type": "feature", "settings": { "icon": "🪸", "title": "Micro-Algae Astaxanthin", "description": "Unmatched red carotenoid neutralizing solar reactive oxygen species." } },
+      { "type": "feature", "settings": { "icon": "🌊", "title": "Atlantic Fucoidan Kelp", "description": "Accelerates fibroblast cellular renewal and restores deep dermal moisture." } },
+      { "type": "feature", "settings": { "icon": "🌅", "title": "Omega-7 Sea Buckthorn", "description": "Super-lipid promoting intense skin barrier repair and supple elasticity." } },
+      { "type": "feature", "settings": { "icon": "🦪", "title": "South Sea Conchiolin", "description": "Natural pearlescent amino acid chains illuminating tired hyperpigmentation." } },
+      { "type": "feature", "settings": { "icon": "🐬", "title": "100% Coral Reef Safe", "description": "Formulated strictly without oxybenzone, octinoxate, or harmful polymers." } },
+      { "type": "feature", "settings": { "icon": "💧", "title": "Lipid-Soluble Golden Hour", "description": "Ultra-silky non-greasy dry touch finish that leaves an instant sun-kissed sheen." } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,247 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Syncopate', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid rgba(226, 226, 226, 0.1);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp27-press-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp27-press__header {
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  /* Technical brackets around the title */
+  .hp27-press__header::before,
+  .hp27-press__header::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 100%;
+    border: 2px solid var(--accent-color);
+  }
+  .hp27-press__header::before {
+    left: 0;
+    border-right: none;
+  }
+  .hp27-press__header::after {
+    right: 0;
+    border-left: none;
+  }
+
+  .hp27-press__title {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    opacity: 0.7;
+  }
+
+  .hp27-press__grid {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 60px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp27-press__grid {
+      gap: 30px 40px;
+    }
+  }
+
+  .hp27-press__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+  }
+
+  .hp27-press__item:hover {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(255, 42, 42, 0.4));
+  }
+
+  .hp27-press__item img,
+  .hp27-press__item svg {
+    max-width: 120px;
+    height: auto;
+    max-height: 40px;
+    /* Force to white/light */
+    filter: brightness(0) invert(1);
+    transition: all 0.3s ease;
+  }
+
+  /* If we want them to turn red on hover */
+  /* .hp27-press__item:hover img {
+    filter: brightness(0) invert(26%) sepia(91%) saturate(7181%) hue-rotate(352deg) brightness(101%) contrast(108%);
+  } */
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp27-press-wrapper" id="HP27Press-{{ section.id }}">
+  <div class="hp27-press__header">
+    <h2 class="hp27-press__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp27-press__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp27-press__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 300 }}" alt="{{ block.settings.image.alt | default: 'Press Logo' }}" loading="lazy">
+        {%- else -%}
+          <div style="font-family:var(--font-heading); font-size:16px; font-weight:700; color:var(--text-color);">PUBLICATION</div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP27 - Eng Press Logos",
+  "class": "section-hp27-press-logos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYSTEM RECOGNITION"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Dark Engineered Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#E2E2E2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF2A2A"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP27 - Eng Press Logos",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

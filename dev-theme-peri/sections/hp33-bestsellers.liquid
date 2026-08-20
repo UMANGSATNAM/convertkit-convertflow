@@ -1,0 +1,347 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --gold-color: {{ section.settings.gold_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    overflow: hidden;
+  }
+
+  .hp33-best-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-best-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp33-best__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    border-bottom: 1px solid var(--gold-color);
+    padding-bottom: 20px;
+    position: relative;
+  }
+
+  .hp33-best__header::after {
+    content: '';
+    position: absolute;
+    bottom: 2px; left: 0; right: 0;
+    height: 1px;
+    background: rgba(212, 175, 55, 0.3);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-best__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  .hp33-best__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .hp33-best__nav {
+    display: flex;
+    gap: 15px;
+  }
+
+  .hp33-best__nav-btn {
+    background: transparent;
+    border: 1px solid var(--gold-color);
+    color: var(--gold-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hp33-best__nav-btn:hover {
+    background: var(--gold-color);
+    color: #000;
+  }
+
+  .hp33-best__slider {
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 20px;
+  }
+
+  .hp33-best__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp33-best__item {
+    flex: 0 0 calc(100% / {{ section.settings.columns_desktop }} - 40px + (40px / {{ section.settings.columns_desktop }}));
+    scroll-snap-align: start;
+    text-decoration: none;
+    position: relative;
+    group: card;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp33-best__item {
+      flex: 0 0 calc(50% - 20px);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp33-best__item {
+      flex: 0 0 85%;
+    }
+  }
+
+  .hp33-best__image-wrap {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 25px;
+  }
+
+  .hp33-best__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .hp33-best__item:hover .hp33-best__image {
+    transform: scale(1.05);
+  }
+
+  .hp33-best__rank {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--gold-color);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gold-color);
+    z-index: 2;
+  }
+
+  .hp33-best__info {
+    text-align: center;
+  }
+
+  .hp33-best__product-title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--text-color);
+    margin: 0 0 8px;
+    font-weight: 400;
+  }
+
+  .hp33-best__product-price {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--gold-color);
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp33-best-wrapper" id="HP33Best-{{ section.id }}">
+  <div class="hp33-best__header">
+    <h2 class="hp33-best__title">{{ section.settings.title }}</h2>
+    <div class="hp33-best__nav">
+      <button class="hp33-best__nav-btn" onclick="document.getElementById('hp33-s-{{ section.id }}').scrollBy({left: -300, behavior: 'smooth'})">←</button>
+      <button class="hp33-best__nav-btn" onclick="document.getElementById('hp33-s-{{ section.id }}').scrollBy({left: 300, behavior: 'smooth'})">→</button>
+    </div>
+  </div>
+
+  <div class="hp33-best__slider" id="hp33-s-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_link | default: '#' }}" class="hp33-best__item" {{ block.shopify_attributes }}>
+        <div class="hp33-best__image-wrap">
+          <div class="hp33-best__rank">{{ forloop.index }}</div>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp33-best__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'product-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp33-best__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp33-best__info">
+          <h3 class="hp33-best__product-title">{{ block.settings.title }}</h3>
+          <div class="hp33-best__product-price">{{ block.settings.price }}</div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP33 - Deco Bestsellers",
+  "class": "section-hp33-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Most Admired"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Deco Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Deep Emerald)",
+      "default": "#0e1a14"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gold_color",
+      "label": "Gold Accent",
+      "default": "#d4af37"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The Vanguard"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$1,450"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP33 - Deco Bestsellers",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

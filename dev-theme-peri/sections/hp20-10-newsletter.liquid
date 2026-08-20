@@ -1,0 +1,209 @@
+{%- liquid
+  assign sec_id = section.id
+-%}
+
+<style>
+  #shopify-section-{{ sec_id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px 0;
+    border-top: 1px solid rgba({{ section.settings.text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.1 }});
+  }
+
+  .hp20-newsletter-{{ sec_id }} {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .hp20-newsletter-{{ sec_id }}__icon {
+    font-size: 32px;
+    margin-bottom: 24px;
+    opacity: 0.8;
+  }
+
+  .hp20-newsletter-{{ sec_id }}__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 300;
+    color: {{ section.settings.text_color }};
+    margin: 0 0 16px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .hp20-newsletter-{{ sec_id }}__text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.7;
+    margin: 0 0 40px 0;
+  }
+
+  .hp20-newsletter-form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 1px solid {{ section.settings.text_color }};
+  }
+
+  .hp20-newsletter-form__input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 16px 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: {{ section.settings.text_color }};
+    outline: none;
+  }
+
+  .hp20-newsletter-form__input::placeholder {
+    color: {{ section.settings.text_color }};
+    opacity: 0.4;
+  }
+
+  .hp20-newsletter-form__btn {
+    background: transparent;
+    border: none;
+    padding: 16px;
+    color: {{ section.settings.text_color }};
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp20-newsletter-form__btn:hover {
+    opacity: 0.6;
+  }
+
+  .hp20-newsletter-success {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #10B981;
+  }
+  
+  .hp20-newsletter-error {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #EF4444;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ sec_id }} {
+      padding: {{ section.settings.padding_top_mobile }}px 0 {{ section.settings.padding_bottom_mobile }}px 0;
+    }
+  }
+</style>
+
+<section class="hp20-newsletter-{{ sec_id }}">
+  <div class="hp20-newsletter-{{ sec_id }}__icon">✉️</div>
+  
+  {% if section.settings.title != blank %}
+    <h2 class="hp20-newsletter-{{ sec_id }}__title">{{ section.settings.title }}</h2>
+  {% endif %}
+  
+  {% if section.settings.text != blank %}
+    <p class="hp20-newsletter-{{ sec_id }}__text">{{ section.settings.text }}</p>
+  {% endif %}
+
+  {% form 'customer', class: 'hp20-newsletter-form' %}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    
+    <input type="email" 
+           name="contact[email]" 
+           class="hp20-newsletter-form__input" 
+           value="{{ form.email }}" 
+           placeholder="{{ section.settings.placeholder }}" 
+           required>
+           
+    <button type="submit" class="hp20-newsletter-form__btn">
+      {{ section.settings.btn_label }}
+    </button>
+  {% endform %}
+  
+  {%- if form.posted_successfully? -%}
+    <div class="hp20-newsletter-success">Thank you for subscribing!</div>
+  {%- elsif form.errors -%}
+    <div class="hp20-newsletter-error">{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}</div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "HP20 Newsletter",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the Inner Circle"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Subscribe to receive early access to new collections and editorial content."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 160, "step": 10, "unit": "px",
+      "label": "Desktop Top Padding", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 160, "step": 10, "unit": "px",
+      "label": "Desktop Bottom Padding", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 10, "unit": "px",
+      "label": "Mobile Top Padding", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 10, "unit": "px",
+      "label": "Mobile Bottom Padding", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 Newsletter"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,126 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00ff88'
+  assign text = section.settings.text | default: 'NEXT-GEN GEAR IS HERE // FREE SHIPPING OVER $100'
+  assign link = section.settings.link
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    padding: 12px 0;
+    position: relative;
+    z-index: 100;
+    text-align: center;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+  }
+  
+  .hp9-announcement-container-{{ section_id }} {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .hp9-announcement-content-{{ section_id }} {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .hp9-announcement-indicator-{{ section_id }} {
+    width: 6px;
+    height: 6px;
+    background-color: {{ text_color }};
+    border-radius: 50%;
+    box-shadow: 0 0 8px {{ text_color }};
+    animation: hp9-pulse-{{ section_id }} 2s infinite;
+  }
+  
+  @keyframes hp9-pulse-{{ section_id }} {
+    0% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+    70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
+    100% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+  }
+  
+  .hp9-announcement-text-{{ section_id }} {
+    margin: 0;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+  }
+  
+  .hp9-announcement-link-{{ section_id }} {
+    color: {{ text_color }};
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .hp9-announcement-link-{{ section_id }}:hover {
+    text-shadow: 0 0 10px {{ text_color }};
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      font-size: 0.65rem;
+      padding: 10px 0;
+    }
+  }
+</style>
+
+<div class="hp9-announcement-container-{{ section_id }}">
+  <div class="hp9-announcement-content-{{ section_id }}">
+    <div class="hp9-announcement-indicator-{{ section_id }}"></div>
+    {% if link != blank %}
+      <a href="{{ link }}" class="hp9-announcement-link-{{ section_id }}">
+        <p class="hp9-announcement-text-{{ section_id }}">{{ text }}</p>
+      </a>
+    {% else %}
+      <p class="hp9-announcement-text-{{ section_id }}">{{ text }}</p>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP9 Announcement Bar",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#00ff88"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Announcement Text",
+      "default": "NEXT-GEN GEAR IS HERE // FREE SHIPPING OVER $100"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Announcement Bar"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,212 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    
+    --font-heading: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 0;
+    border-bottom: 4px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .hp41-ugc-wrapper {
+    width: 100%;
+  }
+
+  .hp41-ugc__header {
+    text-align: center;
+    margin-bottom: 60px;
+    padding: 0 20px;
+  }
+
+  .hp41-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--border-color);
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .hp41-ugc__track {
+    display: flex;
+    gap: 40px;
+    padding: 20px 5vw 80px; /* Extra padding for massive shadows */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hp41-ugc__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp41-ugc-card {
+    flex: 0 0 320px;
+    scroll-snap-align: center;
+    background: #FFF;
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px 15px 60px; /* Polaroid style bottom space */
+    box-shadow: 10px 10px 0px var(--border-color);
+    text-decoration: none;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp41-ugc-card {
+      flex: 0 0 280px;
+    }
+  }
+
+  /* Random tilts */
+  .hp41-ugc-card:nth-child(odd) { transform: rotate(-3deg); }
+  .hp41-ugc-card:nth-child(even) { transform: rotate(3deg); }
+  .hp41-ugc-card:nth-child(3n) { transform: rotate(-1deg); }
+
+  .hp41-ugc-card:hover {
+    transform: rotate(0) translate(-5px, -5px) !important;
+    box-shadow: 15px 15px 0px var(--border-color);
+    z-index: 2;
+  }
+
+  .hp41-ugc-card__image-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 4px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #F0A8E3;
+  }
+
+  .hp41-ugc-card:nth-child(even) .hp41-ugc-card__image-wrap { background: #38C6F4; }
+
+  .hp41-ugc-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp41-ugc-card__handle {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--border-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp41-ugc-wrapper" id="HP41UGC-{{ section.id }}">
+  <div class="hp41-ugc__header">
+    <h2 class="hp41-ugc__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp41-ugc__track">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp41-ugc-card" {{ block.shopify_attributes }}>
+        <div class="hp41-ugc-card__image-wrap">
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp41-ugc-card__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'collection-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp41-ugc-card__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp41-ugc-card__handle">{{ block.settings.handle }}</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP41 - Neo UGC",
+  "class": "section-hp41-ugc-reels",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SPOTTED URL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Neo Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FDF0D5"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ugc",
+      "name": "UGC Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "@COOL_KID"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP41 - Neo UGC",
+      "blocks": [
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,358 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-ugc-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp29-ugc__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp29-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 15px;
+    letter-spacing: -0.01em;
+  }
+
+  .hp29-ugc__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp29-ugc__subtitle {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  /* Slider container */
+  .hp29-ugc__slider {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 20px;
+  }
+  .hp29-ugc__slider::-webkit-scrollbar { display: none; }
+
+  .hp29-ugc__item {
+    flex: 0 0 calc(100% / {{ section.settings.columns_desktop }} - 15px);
+    scroll-snap-align: center;
+    position: relative;
+    aspect-ratio: 9/16;
+    border-radius: 60px; /* Pill shape for videos */
+    overflow: hidden;
+    background: rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.4s ease;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp29-ugc__item { flex: 0 0 calc(100% / 3 - 15px); }
+  }
+  @media screen and (max-width: 768px) {
+    .hp29-ugc__item { flex: 0 0 calc(100% / 2 - 10px); }
+  }
+  @media screen and (max-width: 480px) {
+    .hp29-ugc__item { flex: 0 0 75%; }
+  }
+
+  .hp29-ugc__item:hover {
+    transform: translateY(-5px);
+  }
+
+  .hp29-ugc__media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp29-ugc__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp29-ugc__item:hover .hp29-ugc__overlay {
+    opacity: 1;
+  }
+
+  .hp29-ugc__btn {
+    align-self: center;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 12px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .hp29-ugc__btn:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  .hp29-ugc__play-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+  .hp29-ugc__play-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    margin-left: 2px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-ugc-wrapper" id="HP29UGC-{{ section.id }}">
+  <div class="hp29-ugc__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp29-ugc__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp29-ugc__subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="hp29-ugc__slider">
+    {%- for block in section.blocks -%}
+      <div class="hp29-ugc__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.video_url != blank -%}
+          <video class="hp29-ugc__media" autoplay muted loop playsinline>
+            <source src="{{ block.settings.video_url }}" type="video/mp4">
+          </video>
+        {%- elsif block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="UGC" class="hp29-ugc__media" loading="lazy">
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'hp29-ugc__media' }}
+        {%- endif -%}
+        
+        <div class="hp29-ugc__play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+
+        <div class="hp29-ugc__overlay">
+          {%- if block.settings.product_url != blank -%}
+            <a href="{{ block.settings.product_url }}" class="hp29-ugc__btn">Shop the Look</a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP29 - Boho UGC Reels",
+  "class": "section-hp29-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Spotted in the <em>Wild</em>"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "How you wear our pieces in your daily life."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#3D405B"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Terracotta)",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "UGC Reel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Fallback Image"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "MP4 Video URL"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 - Boho UGC Reels",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

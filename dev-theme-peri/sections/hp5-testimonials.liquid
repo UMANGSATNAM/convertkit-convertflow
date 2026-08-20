@@ -1,0 +1,298 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#1a2a3a'
+  assign accent_color = section.settings.accent_color | default: '#0066cc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp5-test-bg: {{ bg_color }};
+    --hp5-test-text: {{ text_color }};
+    --hp5-test-accent: {{ accent_color }};
+    
+    --hp5-test-pt-desk: {{ padding_top_desktop }}px;
+    --hp5-test-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp5-test-pt-mob: {{ padding_top_mobile }}px;
+    --hp5-test-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp5-health-test-{{ section.id }} {
+    padding-top: var(--hp5-test-pt-desk);
+    padding-bottom: var(--hp5-test-pb-desk);
+    background-color: var(--hp5-test-bg);
+    color: var(--hp5-test-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp5-test-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp5-test-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp5-test-title {
+    font-size: clamp(32px, 4vw, 40px);
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -1px;
+  }
+
+  .hp5-test-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
+  .hp5-test-card {
+    background: #f4f7f9;
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(26,42,58,0.05);
+  }
+
+  .hp5-test-stars {
+    display: flex;
+    gap: 2px;
+    color: #FFB800;
+    margin-bottom: 20px;
+  }
+  .hp5-test-stars svg { width: 18px; height: 18px; fill: currentColor; }
+
+  .hp5-test-quote {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 30px 0;
+    flex: 1;
+    font-style: italic;
+    color: rgba(26,42,58,0.8);
+  }
+
+  .hp5-test-author-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid rgba(26,42,58,0.1);
+    padding-top: 20px;
+  }
+
+  .hp5-test-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #e6eff6;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    color: var(--hp5-test-accent);
+    overflow: hidden;
+  }
+  .hp5-test-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .hp5-test-info h4 {
+    margin: 0 0 3px 0;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .hp5-test-info p {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(26,42,58,0.6);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .hp5-test-verified {
+    color: #4CAF50;
+  }
+  .hp5-test-verified svg { width: 14px; height: 14px; }
+
+  @media screen and (max-width: 1024px) {
+    .hp5-test-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp5-health-test-{{ section.id }} {
+      padding-top: var(--hp5-test-pt-mob);
+      padding-bottom: var(--hp5-test-pb-mob);
+    }
+    .hp5-test-inner {
+      padding: 0 20px;
+    }
+    .hp5-test-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .hp5-test-card {
+      padding: 30px;
+    }
+  }
+</style>
+
+<section class="hp5-health-test-{{ section.id }}" aria-label="Testimonials">
+  <div class="hp5-test-inner">
+    
+    <div class="hp5-test-header">
+      <h2 class="hp5-test-title">{{ section.settings.title }}</h2>
+    </div>
+
+    <div class="hp5-test-grid">
+      {%- for block in section.blocks -%}
+        <div class="hp5-test-card" {{ block.shopify_attributes }}>
+          <div class="hp5-test-stars">
+            {%- for i in (1..5) -%}<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>{%- endfor -%}
+          </div>
+          
+          <p class="hp5-test-quote">"{{ block.settings.quote }}"</p>
+          
+          <div class="hp5-test-author-box">
+            <div class="hp5-test-avatar">
+              {%- if block.settings.image != blank -%}
+                <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 100 }}" loading="lazy" alt="{{ block.settings.author }}">
+              {%- else -%}
+                {{ block.settings.author | slice: 0, 1 | upcase }}
+              {%- endif -%}
+            </div>
+            <div class="hp5-test-info">
+              <h4>{{ block.settings.author }}</h4>
+              <p>
+                <span class="hp5-test-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                Verified Buyer
+              </p>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..3) -%}
+          <div class="hp5-test-card">
+            <div class="hp5-test-stars">{%- for s in (1..5) -%}<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>{%- endfor -%}</div>
+            <p class="hp5-test-quote">"I've tried countless supplements, but this is the first time I've actually felt a measurable difference in my energy and focus within just two weeks."</p>
+            <div class="hp5-test-author-box">
+              <div class="hp5-test-avatar">S</div>
+              <div class="hp5-test-info">
+                <h4>Sarah Jenkins</h4>
+                <p><span class="hp5-test-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Verified Buyer</p>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP5 Health Testimonials",
+  "tag": "section",
+  "class": "section-hp5-testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Don't just take our word for it."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a2a3a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Avatar (Optional)"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "I've tried countless supplements, but this is the first time I've actually felt a measurable difference."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Sarah Jenkins"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP5 Health Testimonials",
+      "category": "Trust",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,191 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign font_size = section.settings.font_size
+  assign fade_duration = section.settings.fade_duration
+-%}
+
+<style>
+  .hp19-announcement-{{ sec_id }} {
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    text-align: center;
+    position: relative;
+    z-index: 100;
+    overflow: hidden;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid rgba({{ text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.1 }});
+  }
+
+  .hp19-announcement-{{ sec_id }}__list {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hp19-announcement-{{ sec_id }}__item {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: {{ font_size }}px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .hp19-announcement-{{ sec_id }}__item.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .hp19-announcement-{{ sec_id }}__link {
+    color: {{ text_color }};
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .hp19-announcement-{{ sec_id }}__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: {{ text_color }};
+    transition: width 0.4s ease;
+  }
+
+  .hp19-announcement-{{ sec_id }}__link:hover::after {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-announcement-{{ sec_id }}__item {
+      font-size: {{ font_size | minus: 2 }}px;
+      letter-spacing: 0.5px;
+      padding: 0 10px;
+    }
+  }
+</style>
+
+<section class="hp19-announcement-{{ sec_id }}">
+  <div class="hp19-announcement-{{ sec_id }}__list js-hp19-announcement-{{ sec_id }}" data-duration="{{ fade_duration | times: 1000 }}">
+    {% for block in section.blocks %}
+      <div class="hp19-announcement-{{ sec_id }}__item {% if forloop.first %}is-active{% endif %}" {{ block.shopify_attributes }}>
+        {% if block.settings.link != blank %}
+          <a href="{{ block.settings.link }}" class="hp19-announcement-{{ sec_id }}__link">
+            {{ block.settings.text }}
+          </a>
+        {% else %}
+          <span>{{ block.settings.text }}</span>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="hp19-announcement-{{ sec_id }}__item is-active">
+        <span>COMPLIMENTARY SHIPPING ON ORDERS OVER $500</span>
+      </div>
+      <div class="hp19-announcement-{{ sec_id }}__item">
+        <a href="#" class="hp19-announcement-{{ sec_id }}__link">DISCOVER THE NEW SPRING COLLECTION</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.js-hp19-announcement-{{ sec_id }}');
+    if (!container) return;
+
+    const items = container.querySelectorAll('.hp19-announcement-{{ sec_id }}__item');
+    if (items.length <= 1) return;
+
+    const duration = parseInt(container.getAttribute('data-duration')) || 4000;
+    let currentIndex = 0;
+
+    setInterval(() => {
+      items[currentIndex].classList.remove('is-active');
+      currentIndex = (currentIndex + 1) % items.length;
+      items[currentIndex].classList.add('is-active');
+    }, duration);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP19 Luxury Announce",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "fade_duration",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Time between slides",
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "COMPLIMENTARY SHIPPING ON ORDERS OVER $500"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 Luxury Announcement",
+      "blocks": [
+        { "type": "announcement", "settings": { "text": "COMPLIMENTARY SHIPPING ON ORDERS OVER $500" } },
+        { "type": "announcement", "settings": { "text": "DISCOVER THE NEW SPRING COLLECTION", "link": "/collections/all" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

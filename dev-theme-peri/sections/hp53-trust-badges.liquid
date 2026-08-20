@@ -1,0 +1,112 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#F5EDE3' }};
+    color: {{ section.settings.text_color | default: '#5C3D2E' }};
+    padding-top: {{ section.settings.padding_top | default: 50 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 50 }}px;
+  }
+
+  .hp53-trust__container {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp53-trust__grid {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+  }
+
+  .hp53-trust__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hp53-trust__icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #E8D5C0, #C2703E);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #FFFFFF;
+    flex-shrink: 0;
+  }
+
+  .hp53-trust__label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: {{ section.settings.text_color | default: '#5C3D2E' }};
+    margin: 0;
+  }
+
+  .hp53-trust__sub {
+    font-size: 11px;
+    color: {{ section.settings.accent_color | default: '#C2703E' }};
+    margin: 2px 0 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp53-trust__grid { gap: 24px; }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp53-trust__grid { flex-direction: column; align-items: center; text-align: center; }
+    .hp53-trust__item { flex-direction: column; }
+  }
+{%- endstyle -%}
+
+<div class="hp53-trust__container">
+  <div class="hp53-trust__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp53-trust__item" {{ block.shopify_attributes }}>
+        <div class="hp53-trust__icon">{{ block.settings.icon | default: '✦' }}</div>
+        <div>
+          <p class="hp53-trust__label">{{ block.settings.title | default: 'Free Shipping' }}</p>
+          <p class="hp53-trust__sub">{{ block.settings.subtitle | default: 'On orders $50+' }}</p>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP53 - Dune Trust",
+  "class": "section-hp53-trust",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#F5EDE3" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#5C3D2E" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#C2703E" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 100, "step": 10, "unit": "px", "label": "Padding Top", "default": 50 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 100, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 50 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "default": "✦" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Free Shipping" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "On orders $50+" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "HP53 - Dune Trust",
+    "blocks": [
+      { "type": "badge", "settings": { "icon": "🚚", "title": "Free Shipping", "subtitle": "On orders $50+" } },
+      { "type": "badge", "settings": { "icon": "🔒", "title": "Secure Payment", "subtitle": "256-bit SSL" } },
+      { "type": "badge", "settings": { "icon": "↩️", "title": "Easy Returns", "subtitle": "30-day guarantee" } },
+      { "type": "badge", "settings": { "icon": "💬", "title": "24/7 Support", "subtitle": "Always here" } }
+    ]
+  }]
+}
+{% endschema %}

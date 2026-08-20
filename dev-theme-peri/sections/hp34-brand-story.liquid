@@ -1,0 +1,293 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --grid-color: rgba(255, 255, 255, 0.1);
+    
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--grid-color);
+  }
+
+  .hp34-story-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    gap: 80px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp34-story-wrapper {
+      flex-direction: column;
+      gap: 40px;
+      padding: 0 20px;
+    }
+  }
+
+  .hp34-story__cli-col {
+    flex: 1;
+    border: 1px solid var(--grid-color);
+    background: #050505;
+    padding: 30px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--accent-color);
+    position: relative;
+  }
+
+  .hp34-story__cli-col::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--accent-color);
+  }
+
+  .hp34-story__log {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .hp34-story__log--dim {
+    color: var(--text-color);
+    opacity: 0.5;
+  }
+
+  .hp34-story__content-col {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hp34-story__subtitle {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hp34-story__subtitle::before {
+    content: '>';
+    font-weight: 700;
+  }
+
+  .hp34-story__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 6vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0 0 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .hp34-story__text {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0 0 30px;
+    font-weight: 400;
+    opacity: 0.9;
+  }
+
+  .hp34-story__btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 30px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    align-self: flex-start;
+    transition: all 0.3s ease;
+  }
+
+  .hp34-story__btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(255, 69, 0, 0.1); /* fallback */
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-story-wrapper" id="HP34Story-{{ section.id }}">
+  <div class="hp34-story__cli-col">
+    <span class="hp34-story__log hp34-story__log--dim">Initialization sequence started...</span>
+    <span class="hp34-story__log hp34-story__log--dim">Loading dependencies [OK]</span>
+    <span class="hp34-story__log hp34-story__log--dim">Mounting origin_story.vol [OK]</span>
+    <span class="hp34-story__log">> root@sys: cat /core/mission_statement.txt</span>
+    <br>
+    <span class="hp34-story__log" style="color: var(--text-color);">
+      We engineer apparel for the modern interface.<br>
+      Eliminating friction.<br>
+      Maximizing utility.<br>
+      Aesthetic precision above all else.
+    </span>
+    <br>
+    <span class="hp34-story__log">> root@sys: status</span>
+    <span class="hp34-story__log hp34-story__log--dim">SYSTEM OPTIMAL</span>
+    <span class="hp34-story__log" style="animation: blink 1s infinite;">_</span>
+  </div>
+
+  <div class="hp34-story__content-col">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp34-story__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    
+    <h2 class="hp34-story__title">{{ section.settings.title }}</h2>
+    
+    <div class="hp34-story__text">
+      {{ section.settings.text }}
+    </div>
+
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp34-story__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+
+{% schema %}
+{
+  "name": "HP34 - Tech Story",
+  "class": "section-hp34-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "SYSTEM.ORIGIN"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Engineered for Reality"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Born from a necessity to strip away the superfluous. We construct garments that act as interfaces between the human body and the urban environment. Utilitarian, modular, and uncompromisingly technical.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "READ LOGS"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech Story"
+    }
+  ]
+}
+{% endschema %}

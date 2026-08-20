@@ -1,0 +1,285 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    --shadow-offset: 8px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp23-video-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-video-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp23-video__container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000000;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-video__container {
+      aspect-ratio: 4/5;
+    }
+  }
+
+  .hp23-video__media {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8; /* Slight darkening */
+  }
+
+  .hp23-video__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1;
+  }
+
+  .hp23-video__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hp23-video__title {
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 30px;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0 #000000;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .hp23-video__play-btn {
+    width: 80px;
+    height: 80px;
+    background: var(--accent-color);
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0 #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    /* Brutalist sharp square instead of circle */
+  }
+
+  .hp23-video__play-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000000;
+    background: #ffffff;
+  }
+
+  .hp23-video__play-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 #000000;
+  }
+
+  .hp23-video__play-btn svg {
+    width: 32px;
+    height: 32px;
+    fill: #000000;
+    margin-left: 6px; /* visually center the play triangle */
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp23-video-wrapper" id="HP23Video-{{ section.id }}">
+  <div class="hp23-video__container">
+    {%- if section.settings.video_url != blank -%}
+      <!-- Assuming standard HTML5 video or iframe depending on setup. Using placeholder for structure. -->
+      <video class="hp23-video__media" autoplay muted loop playsinline>
+        <source src="{{ section.settings.video_url }}" type="video/mp4">
+      </video>
+    {%- elsif section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 2000 }}" alt="" class="hp23-video__media" loading="lazy">
+    {%- else -%}
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:#333;"></div>
+    {%- endif -%}
+
+    <div class="hp23-video__overlay"></div>
+
+    <div class="hp23-video__content">
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp23-video__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      <div class="hp23-video__play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist Video",
+  "class": "section-hp23-video-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Direct link to mp4 file"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback Image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SEE IT IN ACTION"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Video Border Radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Play Button Color",
+      "default": "#FFEB3B"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist Video"
+    }
+  ]
+}
+{% endschema %}

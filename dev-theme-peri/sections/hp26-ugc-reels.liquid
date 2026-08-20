@@ -1,0 +1,465 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp26-ugc-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp26-ugc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp26-ugc__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp26-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+
+  .hp26-ugc__title em {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .hp26-ugc__subtitle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  .hp26-ugc__slider {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+  }
+
+  .hp26-ugc__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp26-ugc__item {
+    flex: 0 0 calc(100% / {{ section.settings.columns_desktop }} - (20px * ({{ section.settings.columns_desktop }} - 1) / {{ section.settings.columns_desktop }}));
+    scroll-snap-align: center;
+    position: relative;
+    aspect-ratio: 9/16;
+    border-radius: 8px; /* Slightly softer for Japandi */
+    overflow: hidden;
+    background-color: #EAE6DF;
+    cursor: pointer;
+    group;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp26-ugc__item {
+      flex: 0 0 calc(50% - 10px);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp26-ugc__item {
+      flex: 0 0 70%;
+    }
+  }
+
+  .hp26-ugc__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .hp26-ugc__item:hover .hp26-ugc__image {
+    transform: scale(1.05);
+  }
+
+  .hp26-ugc__overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    opacity: 1; /* Keep bottom shadow visible for handle */
+  }
+
+  .hp26-ugc__play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(2px);
+    transition: all 0.3s ease;
+  }
+
+  .hp26-ugc__play-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+    margin-left: 2px;
+  }
+
+  .hp26-ugc__item:hover .hp26-ugc__play-icon {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  .hp26-ugc__item:hover .hp26-ugc__play-icon svg {
+    fill: var(--text-color);
+  }
+
+  .hp26-ugc__handle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hp26-ugc__handle svg {
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+  }
+
+  /* Simple Modal */
+  .hp26-ugc__modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(44,42,40,0.9);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .hp26-ugc__modal.is-active {
+    display: flex;
+  }
+
+  .hp26-ugc__modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 9/16;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .hp26-ugc__modal-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp26-ugc__modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    opacity: 0.8;
+  }
+
+  .hp26-ugc__modal-close:hover {
+    opacity: 1;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp26-ugc-wrapper" id="HP26UGC-{{ section.id }}">
+  <div class="hp26-ugc__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp26-ugc__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp26-ugc__subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="hp26-ugc__slider">
+    {%- for block in section.blocks -%}
+      <div class="hp26-ugc__item" {{ block.shopify_attributes }} data-video="{{ block.settings.video_url }}">
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp26-ugc__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-color);font-family:var(--font-body);opacity:0.3;">THUMBNAIL</div>
+        {%- endif -%}
+        
+        <div class="hp26-ugc__overlay">
+          <div class="hp26-ugc__play-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5V19L19 12L8 5Z"/></svg>
+          </div>
+          {%- if block.settings.handle != blank -%}
+            <div class="hp26-ugc__handle">
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              {{ block.settings.handle }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<div class="hp26-ugc__modal" id="HP26UGC-Modal-{{ section.id }}">
+  <div class="hp26-ugc__modal-content">
+    <button class="hp26-ugc__modal-close">&times;</button>
+    <video class="hp26-ugc__modal-video" controls playsinline></video>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.querySelector('#HP26UGC-Modal-{{ section.id }}');
+    const modalVideo = modal?.querySelector('.hp26-ugc__modal-video');
+    const closeBtn = modal?.querySelector('.hp26-ugc__modal-close');
+    const items = document.querySelectorAll('#HP26UGC-{{ section.id }} .hp26-ugc__item');
+
+    if(!modal || !modalVideo) return;
+
+    items.forEach(item => {
+      item.addEventListener('click', function() {
+        const vidUrl = this.getAttribute('data-video');
+        if(vidUrl) {
+          modalVideo.src = vidUrl;
+          modal.classList.add('is-active');
+          modalVideo.play();
+        }
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('is-active');
+      modalVideo.pause();
+      modalVideo.src = '';
+    });
+
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) {
+        modal.classList.remove('is-active');
+        modalVideo.pause();
+        modalVideo.src = '';
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP26 - Japandi Reels",
+  "class": "section-hp26-ugc",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "In the <em>Wild</em>"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Tag @yourbrand to be featured."
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 42
+    },
+    {
+      "type": "header",
+      "content": "Japandi Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8B9582"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail Image (9:16)"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL (MP4)",
+          "info": "Used in modal"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Instagram Handle",
+          "default": "@minimalist"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP26 - Japandi Reels",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

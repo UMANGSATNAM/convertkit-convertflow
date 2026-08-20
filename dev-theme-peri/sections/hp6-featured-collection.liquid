@@ -1,0 +1,442 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#0a0a0a'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#ff4500'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+  
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit | default: 8
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp6-fc-bg: {{ bg_color }};
+    --hp6-fc-text: {{ text_color }};
+    --hp6-fc-accent: {{ accent_color }};
+    
+    --hp6-fc-pt-desk: {{ padding_top_desktop }}px;
+    --hp6-fc-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp6-fc-pt-mob: {{ padding_top_mobile }}px;
+    --hp6-fc-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp6-sports-fc-{{ section.id }} {
+    padding-top: var(--hp6-fc-pt-desk);
+    padding-bottom: var(--hp6-fc-pb-desk);
+    background-color: var(--hp6-fc-bg);
+    color: var(--hp6-fc-text);
+  }
+
+  .hp6-fc-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp6-fc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 20px;
+  }
+
+  .hp6-fc-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0;
+    letter-spacing: -1px;
+  }
+
+  .hp6-fc-title span {
+    color: var(--hp6-fc-accent);
+  }
+
+  .hp6-fc-viewall {
+    display: inline-flex;
+    align-items: center;
+    color: var(--hp6-fc-text);
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    gap: 10px;
+    transition: color 0.3s ease;
+  }
+  .hp6-fc-viewall:hover {
+    color: var(--hp6-fc-accent);
+  }
+  .hp6-fc-viewall svg {
+    width: 20px; height: 20px; fill: currentColor;
+    transition: transform 0.3s ease;
+  }
+  .hp6-fc-viewall:hover svg {
+    transform: translateX(5px);
+  }
+
+  /* Grid Setup */
+  .hp6-fc-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.cols_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  /* Product Card */
+  .hp6-fc-card {
+    display: flex;
+    flex-direction: column;
+    group: card;
+  }
+
+  .hp6-fc-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #1a1a1a;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .hp6-fc-img-wrapper img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .hp6-fc-img-hover {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    z-index: 2;
+  }
+  .hp6-fc-card:hover .hp6-fc-img-primary {
+    opacity: 0;
+  }
+  .hp6-fc-card:hover .hp6-fc-img-hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .hp6-fc-badge {
+    position: absolute;
+    top: 15px; left: 15px;
+    background: var(--hp6-fc-accent);
+    color: #fff;
+    padding: 4px 10px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 3;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+  }
+
+  .hp6-fc-add {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    background: var(--hp6-fc-text);
+    color: var(--hp6-fc-bg);
+    border: none;
+    padding: 15px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 4;
+  }
+  .hp6-fc-card:hover .hp6-fc-add {
+    transform: translateY(0);
+  }
+  .hp6-fc-add:hover {
+    background: var(--hp6-fc-accent);
+    color: #fff;
+  }
+
+  .hp6-fc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hp6-fc-vendor {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hp6-fc-product-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--hp6-fc-text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hp6-fc-product-title:hover {
+    color: var(--hp6-fc-accent);
+  }
+
+  .hp6-fc-price-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .hp6-fc-price-compare {
+    color: rgba(255,255,255,0.4);
+    text-decoration: line-through;
+    font-size: 14px;
+  }
+  .hp6-fc-price-regular {
+    color: var(--hp6-fc-text);
+  }
+
+  /* Responsive Grid */
+  @media screen and (max-width: 1024px) {
+    .hp6-fc-grid {
+      grid-template-columns: repeat({{ section.settings.cols_desktop | minus: 1 | at_least: 2 }}, 1fr);
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .hp6-sports-fc-{{ section.id }} {
+      padding-top: var(--hp6-fc-pt-mob);
+      padding-bottom: var(--hp6-fc-pb-mob);
+    }
+    .hp6-fc-inner { padding: 0 20px; }
+    .hp6-fc-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    /* Determine mobile columns based on select */
+    {% if section.settings.cols_mobile == '1' %}
+      .hp6-fc-grid { grid-template-columns: 1fr; gap: 30px; }
+    {% else %}
+      .hp6-fc-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    {% endif %}
+
+    .hp6-fc-add {
+      transform: translateY(0);
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      color: var(--hp6-fc-text);
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .hp6-fc-add:hover { background: var(--hp6-fc-accent); }
+  }
+</style>
+
+<section class="hp6-sports-fc-{{ section.id }}" aria-label="Featured Products">
+  <div class="hp6-fc-inner">
+    
+    <div class="hp6-fc-header">
+      <h2 class="hp6-fc-title">
+        {{ section.settings.heading | replace: 'HIGHLIGHT WORD', '<span>HIGHLIGHT WORD</span>' }}
+      </h2>
+      {%- if section.settings.show_view_all and collection != blank -%}
+        <a href="{{ collection.url }}" class="hp6-fc-viewall">
+          View All Gear
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="square" fill="none"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="hp6-fc-grid">
+      {%- if collection != blank and collection.products_count > 0 -%}
+        {%- for product in collection.products limit: product_limit -%}
+          <div class="hp6-fc-card">
+            <div class="hp6-fc-img-wrapper">
+              <a href="{{ product.url }}" aria-label="{{ product.title }}">
+                <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" class="hp6-fc-img-primary" loading="lazy" alt="{{ product.title }}">
+                {%- if product.images.size > 1 -%}
+                  <img height="{{ product.images[1].height }}" width="{{ product.images[1].width }}" src="{{ product.images[1] | image_url: width: 600 }}" class="hp6-fc-img-hover" loading="lazy" alt="{{ product.title }}">
+                {%- endif -%}
+              </a>
+              {%- if product.compare_at_price > product.price -%}
+                <span class="hp6-fc-badge">SALE</span>
+              {%- elsif product.tags contains 'New' or product.tags contains 'new' -%}
+                <span class="hp6-fc-badge">NEW</span>
+              {%- endif -%}
+              
+              <button type="button" class="hp6-fc-add" onclick="window.location.href='{{ product.url }}'">
+                Quick View
+              </button>
+            </div>
+            <div class="hp6-fc-info">
+              {%- if section.settings.show_vendor -%}
+                <span class="hp6-fc-vendor">{{ product.vendor }}</span>
+              {%- endif -%}
+              <a href="{{ product.url }}" class="hp6-fc-product-title">{{ product.title }}</a>
+              <div class="hp6-fc-price-row">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="hp6-fc-price-compare">{{ product.compare_at_price | money }}</span>
+                  <span class="hp6-fc-price-regular" style="color: var(--hp6-fc-accent)">{{ product.price | money }}</span>
+                {%- else -%}
+                  <span class="hp6-fc-price-regular">{{ product.price | money }}</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..product_limit) -%}
+          <div class="hp6-fc-card">
+            <div class="hp6-fc-img-wrapper">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg hp6-fc-img-primary' }}
+              <span class="hp6-fc-badge">NEW</span>
+              <button class="hp6-fc-add">Quick View</button>
+            </div>
+            <div class="hp6-fc-info">
+              <span class="hp6-fc-vendor">Brand Name</span>
+              <a href="#" class="hp6-fc-product-title">Pro Performance Trainer</a>
+              <div class="hp6-fc-price-row">
+                <span class="hp6-fc-price-regular">$120.00</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP6 Sports Featured",
+  "tag": "section",
+  "class": "section-hp6-featured-collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "PRO LEVEL <span>GEAR</span>",
+      "info": "Use <span> to apply the accent color to a word."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4, "max": 16, "step": 4,
+      "label": "Product Limit",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "cols_desktop",
+      "min": 2, "max": 5, "step": 1,
+      "label": "Columns on Desktop",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "cols_mobile",
+      "label": "Columns on Mobile",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' Link",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#ff4500"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP6 Sports Featured",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

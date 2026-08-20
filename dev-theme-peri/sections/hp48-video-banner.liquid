@@ -1,0 +1,94 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp48-vid-bg: {{ section.settings.bg_color | default: '#FAF8F5' }};
+    --hp48-gold: {{ section.settings.accent_gold | default: '#C59B27' }};
+    
+    background-color: var(--hp48-vid-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp48-video__box {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp48-video__media {
+    width: 100%;
+    height: {{ section.settings.video_height | default: 480 }}px;
+    background: #1A1715;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(197, 155, 39, 0.4);
+    box-shadow: 0 20px 50px rgba(26, 23, 21, 0.12);
+  }
+
+  .hp48-video__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hp48-video__play-btn {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(26, 23, 21, 0.9);
+    border: 1px solid var(--hp48-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hp48-gold);
+    font-size: 26px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(197, 155, 39, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .hp48-video__play-btn:hover {
+    transform: scale(1.1);
+    background: var(--hp48-gold);
+    color: #1A1715;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp48-video__media { height: 320px; }
+  }
+{%- endstyle -%}
+
+<div class="hp48-video__box">
+  <div class="hp48-video__media">
+    {%- if section.settings.poster_image != blank -%}
+      <img height="{{ section.settings.poster_image.height }}" width="{{ section.settings.poster_image.width }}" src="{{ section.settings.poster_image | image_url: width: 1400 }}" class="hp48-video__poster" alt="Video" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hp48-video__poster' }}
+    {%- endif -%}
+    <div class="hp48-video__play-btn" onclick="alert('Streaming Royal Gold Alchemy Cinema');">▶</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP48 - Royal Video",
+  "class": "section-hp48-video",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#FAF8F5" },
+    { "type": "color", "id": "accent_gold", "label": "Gold Accent", "default": "#C59B27" },
+    { "type": "image_picker", "id": "poster_image", "label": "Poster Image" },
+    { "type": "range", "id": "video_height", "min": 300, "max": 700, "step": 20, "unit": "px", "label": "Video Height", "default": 480 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "presets": [
+    { "name": "HP48 - Royal Video" }
+  ]
+}
+{% endschema %}

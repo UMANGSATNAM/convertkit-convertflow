@@ -1,0 +1,342 @@
+{%- liquid
+  assign sec_id = section.id
+  assign collection = collections[section.settings.collection]
+  assign limit = section.settings.product_limit
+  assign grid_cols = section.settings.grid_cols
+-%}
+
+<style>
+  #shopify-section-{{ sec_id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px 0;
+  }
+
+  .hp20-fc-{{ sec_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp20-fc-{{ sec_id }}__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+    border-bottom: 1px solid rgba({{ section.settings.text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.2 }});
+    padding-bottom: 24px;
+  }
+
+  .hp20-fc-{{ sec_id }}__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 300;
+    color: {{ section.settings.text_color }};
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hp20-fc-{{ sec_id }}__view-all {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp20-fc-{{ sec_id }}__view-all:hover {
+    opacity: 1;
+  }
+
+  .hp20-fc-{{ sec_id }}__grid {
+    display: grid;
+    grid-template-columns: repeat({{ grid_cols }}, 1fr);
+    gap: 40px 24px;
+  }
+
+  .hp20-fc-card {
+    display: flex;
+    flex-direction: column;
+    group: product;
+  }
+
+  .hp20-fc-card__media {
+    position: relative;
+    padding-top: 125%; /* 4:5 aspect ratio */
+    background-color: #f8f8f8;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .hp20-fc-card__img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .hp20-fc-card__media:hover .hp20-fc-card__img {
+    transform: scale(1.05);
+  }
+
+  .hp20-fc-card__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .hp20-fc-card__vendor {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: {{ section.settings.text_color }};
+    opacity: 0.5;
+    margin: 0 0 4px 0;
+  }
+
+  .hp20-fc-card__title {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: {{ section.settings.text_color }};
+    margin: 0;
+    text-decoration: none;
+  }
+
+  .hp20-fc-card__price {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: {{ section.settings.text_color }};
+  }
+
+  .hp20-fc-card__add {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    border: 1px solid {{ section.settings.text_color }};
+    color: {{ section.settings.text_color }};
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .hp20-fc-card__add:hover {
+    background-color: {{ section.settings.text_color }};
+    color: {{ section.settings.bg_color }};
+  }
+
+  @media screen and (max-width: 990px) {
+    .hp20-fc-{{ sec_id }}__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ sec_id }} {
+      padding: {{ section.settings.padding_top_mobile }}px 0 {{ section.settings.padding_bottom_mobile }}px 0;
+    }
+    .hp20-fc-{{ sec_id }}__grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .hp20-fc-{{ sec_id }}__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+  }
+</style>
+
+<section class="hp20-fc-{{ sec_id }}">
+  <div class="hp20-fc-{{ sec_id }}__header">
+    <h2 class="hp20-fc-{{ sec_id }}__title">{{ section.settings.title }}</h2>
+    {% if collection != blank and section.settings.show_view_all %}
+      <a href="{{ collection.url }}" class="hp20-fc-{{ sec_id }}__view-all">
+        {{ section.settings.view_all_text }} &rarr;
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="hp20-fc-{{ sec_id }}__grid">
+    {% if collection != blank %}
+      {% for product in collection.products limit: limit %}
+        <div class="hp20-fc-card">
+          <a href="{{ product.url }}" class="hp20-fc-card__media">
+            {% if product.featured_image %}
+              <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title | escape }}" class="hp20-fc-card__img" loading="lazy">
+            {% else %}
+              {{ 'product-1' | placeholder_svg_tag: 'hp20-fc-card__img' }}
+            {% endif %}
+          </a>
+          <div class="hp20-fc-card__info">
+            <div>
+              <p class="hp20-fc-card__vendor">{{ product.vendor | default: shop.name }}</p>
+              <a href="{{ product.url }}" class="hp20-fc-card__title">{{ product.title }}</a>
+            </div>
+            <div class="hp20-fc-card__price">
+              {{ product.price | money }}
+            </div>
+          </div>
+          {% if section.settings.show_add_to_cart %}
+            <form method="post" action="/cart/add">
+              <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+              <button type="submit" class="hp20-fc-card__add">Add to Cart</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..limit) %}
+        <div class="hp20-fc-card">
+          <div class="hp20-fc-card__media">
+            {{ 'product-' | append: i | placeholder_svg_tag: 'hp20-fc-card__img' }}
+          </div>
+          <div class="hp20-fc-card__info">
+            <div>
+              <p class="hp20-fc-card__vendor">Designer Brand</p>
+              <h3 class="hp20-fc-card__title">Minimalist Piece {{ i }}</h3>
+            </div>
+            <div class="hp20-fc-card__price">$195.00</div>
+          </div>
+          {% if section.settings.show_add_to_cart %}
+            <button type="button" class="hp20-fc-card__add">Add to Cart</button>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP20 Featured Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Selected Pieces"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Number of products to show",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_cols",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View all' link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Text",
+      "default": "Explore All"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "label": "Show Add to Cart Button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "Desktop Top Padding",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "Desktop Bottom Padding",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile Bottom Padding",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 Featured Collection"
+    }
+  ]
+}
+{% endschema %}

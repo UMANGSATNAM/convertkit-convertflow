@@ -1,0 +1,221 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-founder-wrapper {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp38-founder-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Left Header/Meta area */
+  .hp38-founder__sidebar {
+    background: var(--bg-color);
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp38-founder__sidebar {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-founder__meta {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    color: var(--text-color);
+    margin-bottom: 40px;
+  }
+
+  .hp38-founder__meta p {
+    margin: 0 0 5px;
+    opacity: 0.5;
+  }
+  .hp38-founder__meta p span {
+    font-weight: 700;
+    opacity: 1;
+  }
+
+  .hp38-founder__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, 48px);
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  /* Right Content area */
+  .hp38-founder__content-col {
+    background: var(--bg-color);
+    padding: 60px 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-founder__content-col {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-founder__text {
+    font-family: var(--font-heading); /* Monospace body for memo feel */
+    font-size: clamp(14px, 1.5vw, {{ section.settings.text_size }}px);
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 60px;
+  }
+
+  .hp38-founder__text p {
+    margin: 0 0 20px;
+  }
+
+  .hp38-founder__footer {
+    border-top: 2px dashed var(--text-color);
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hp38-founder__name {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+  }
+
+  .hp38-founder__signature {
+    max-width: 150px;
+    filter: grayscale(100%);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-founder-wrapper" id="HP38Founder-{{ section.id }}">
+  <div class="hp38-founder__sidebar">
+    <div class="hp38-founder__meta">
+      <p>TO: <span>ALL PERSONNEL</span></p>
+      <p>FROM: <span>HQ</span></p>
+      <p>SUBJECT: <span>MISSION UPDATE</span></p>
+      <p>DATE: <span>{{ 'now' | date: '%Y.%m.%d' }}</span></p>
+    </div>
+    
+    <h2 class="hp38-founder__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp38-founder__content-col">
+    <div class="hp38-founder__text">
+      {{ section.settings.text }}
+    </div>
+    
+    <div class="hp38-founder__footer">
+      <div class="hp38-founder__name">AUTH: {{ section.settings.name }}</div>
+      {%- if section.settings.signature != blank -%}
+        <img height="{{ section.settings.signature.height }}" width="{{ section.settings.signature.width }}" src="{{ section.settings.signature | image_url: width: 300 }}" alt="{{ section.settings.name }}" class="hp38-founder__signature" loading="lazy">
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Memo",
+  "class": "section-hp38-founder-note",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "INTERNAL MEMO"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>System initialization complete. We created this protocol because existing solutions were compromised by excess. Our directive is simple: eliminate waste, optimize utility, and deploy equipment that works unconditionally. End of transmission.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature",
+      "label": "Signature Image"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "default": "ADMIN"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Grid Lines",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Memo"
+    }
+  ]
+}
+{% endschema %}

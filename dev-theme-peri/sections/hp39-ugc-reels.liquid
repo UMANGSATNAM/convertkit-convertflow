@@ -1,0 +1,219 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 0; /* Full bleed track */
+    overflow: hidden;
+  }
+
+  .hp39-ugc-wrapper {
+    width: 100%;
+  }
+
+  .hp39-ugc__header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 0 20px;
+  }
+
+  .hp39-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  .hp39-ugc__track {
+    display: flex;
+    gap: 30px;
+    padding: 20px 5vw 60px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hp39-ugc__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp39-ugc-card {
+    flex: 0 0 300px;
+    scroll-snap-align: center;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 40px;
+    padding: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    text-decoration: none;
+    transition: transform 0.4s ease;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp39-ugc-card {
+      flex: 0 0 260px;
+    }
+  }
+
+  .hp39-ugc-card:nth-child(even) {
+    transform: translateY(20px);
+  }
+  .hp39-ugc-card:hover {
+    transform: translateY(-5px) scale(1.02) !important;
+  }
+
+  .hp39-ugc-card__image-wrap {
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 30px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    background: #f0f0f0;
+  }
+
+  .hp39-ugc-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp39-ugc-card__handle {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 10px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp39-ugc-wrapper" id="HP39UGC-{{ section.id }}">
+  <div class="hp39-ugc__header">
+    <h2 class="hp39-ugc__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp39-ugc__track">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp39-ugc-card" {{ block.shopify_attributes }}>
+        <div class="hp39-ugc-card__image-wrap">
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp39-ugc-card__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'collection-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp39-ugc-card__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp39-ugc-card__handle">{{ block.settings.handle }}</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP39 - Aura UGC",
+  "class": "section-hp39-ugc-reels",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Spotted in the Wild."
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Aura Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#faf9f8"
+    },
+    {
+      "type": "color_background",
+      "id": "card_bg",
+      "label": "Card Glass Background",
+      "default": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ugc",
+      "name": "UGC Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "@aurafan"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP39 - Aura UGC",
+      "blocks": [
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" }
+      ]
+    }
+  ]
+}
+{% endschema %}

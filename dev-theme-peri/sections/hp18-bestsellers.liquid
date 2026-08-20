@@ -1,0 +1,401 @@
+{%- liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign accent_color = section.settings.accent_color
+  assign card_bg_color = section.settings.card_bg_color
+  assign border_color = section.settings.border_color
+  assign border_width = section.settings.border_width
+  assign shadow_color = section.settings.shadow_color
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign title = section.settings.title
+  assign btn_text = section.settings.btn_text
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit
+-%}
+
+<style>
+  .hp18-bestsellers-{{ sec_id }} {
+    background-color: {{ bg_color }};
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    border-bottom: {{ border_width }}px solid {{ border_color }};
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__container {
+    max-width: var(--page-width, 1440px);
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__title {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    color: {{ text_color }};
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -2px;
+    text-shadow: 4px 4px 0px {{ shadow_color }};
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__link {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: {{ text_color }};
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: {{ border_width }}px solid {{ border_color }};
+    background-color: {{ bg_color }};
+    box-shadow: 4px 4px 0px {{ shadow_color }};
+    transition: all 0.2s ease;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__link:hover {
+    background-color: {{ text_color }};
+    color: {{ bg_color }};
+    box-shadow: 6px 6px 0px {{ shadow_color }};
+    transform: translate(-2px, -2px);
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__card {
+    border: {{ border_width }}px solid {{ border_color }};
+    background-color: {{ card_bg_color }};
+    box-shadow: 8px 8px 0px {{ shadow_color }};
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0px {{ accent_color }};
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__image-wrapper {
+    aspect-ratio: 3/4;
+    border-bottom: {{ border_width }}px solid {{ border_color }};
+    background-color: #eeeeee;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__image,
+  .hp18-bestsellers-{{ sec_id }}__image-hover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__image-hover {
+    opacity: 0;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__card:hover .hp18-bestsellers-{{ sec_id }}__image-hover {
+    opacity: 1;
+  }
+  .hp18-bestsellers-{{ sec_id }}__card:hover .hp18-bestsellers-{{ sec_id }}__image {
+    opacity: 0;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__badge {
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    background-color: {{ accent_color }};
+    color: {{ border_color }};
+    border: 2px solid {{ border_color }};
+    padding: 5px 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 0px {{ border_color }};
+    z-index: 2;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__name {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 18px;
+    color: {{ text_color }};
+    margin: 0;
+    text-transform: uppercase;
+    text-decoration: none;
+    line-height: 1.2;
+  }
+  
+  .hp18-bestsellers-{{ sec_id }}__name:hover {
+    color: {{ accent_color }};
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__price {
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    font-weight: bold;
+    color: {{ accent_color }};
+    margin: 0;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__price-compare {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: {{ text_color }};
+    text-decoration: line-through;
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__add {
+    background-color: {{ text_color }};
+    color: {{ bg_color }};
+    border: none;
+    border-top: {{ border_width }}px solid {{ border_color }};
+    padding: 15px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    width: 100%;
+    display: block;
+  }
+
+  .hp18-bestsellers-{{ sec_id }}__add:hover {
+    background-color: {{ accent_color }};
+    color: {{ text_color }};
+  }
+
+  @media screen and (max-width: 1024px) { 
+    .hp18-bestsellers-{{ sec_id }}__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp18-bestsellers-{{ sec_id }}__container { padding: 0 20px; }
+    .hp18-bestsellers-{{ sec_id }}__header { 
+      flex-direction: column; 
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp18-bestsellers-{{ sec_id }}__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section class="hp18-bestsellers-{{ sec_id }}">
+  <div class="hp18-bestsellers-{{ sec_id }}__container">
+    
+    <div class="hp18-bestsellers-{{ sec_id }}__header">
+      <h2 class="hp18-bestsellers-{{ sec_id }}__title">{{ title }}</h2>
+      {% if collection != blank %}
+        <a href="{{ collection.url }}" class="hp18-bestsellers-{{ sec_id }}__link">View All Drop</a>
+      {% endif %}
+    </div>
+
+    <div class="hp18-bestsellers-{{ sec_id }}__grid">
+      {% if collection != blank and collection.products_count > 0 %}
+        {% for product in collection.products limit: product_limit %}
+          <div class="hp18-bestsellers-{{ sec_id }}__card">
+            <a href="{{ product.url }}" class="hp18-bestsellers-{{ sec_id }}__image-wrapper">
+              {% if product.compare_at_price > product.price %}
+                <div class="hp18-bestsellers-{{ sec_id }}__badge">SALE</div>
+              {% endif %}
+              
+              <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" class="hp18-bestsellers-{{ sec_id }}__image" loading="lazy">
+              
+              {% if product.images[1] %}
+                <img height="{{ product.images[1].height }}" width="{{ product.images[1].width }}" src="{{ product.images[1] | image_url: width: 600 }}" alt="{{ product.title }}" class="hp18-bestsellers-{{ sec_id }}__image-hover" loading="lazy">
+              {% endif %}
+            </a>
+            
+            <div class="hp18-bestsellers-{{ sec_id }}__info">
+              <a href="{{ product.url }}" class="hp18-bestsellers-{{ sec_id }}__name">{{ product.title }}</a>
+              <div class="hp18-bestsellers-{{ sec_id }}__price-wrapper">
+                <p class="hp18-bestsellers-{{ sec_id }}__price">{{ product.price | money }}</p>
+                {% if product.compare_at_price > product.price %}
+                  <p class="hp18-bestsellers-{{ sec_id }}__price-compare">{{ product.compare_at_price | money }}</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <form method="post" action="/cart/add" class="hp18-bestsellers-{{ sec_id }}__form">
+              <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+              <button type="submit" class="hp18-bestsellers-{{ sec_id }}__add">
+                {{ btn_text }}
+              </button>
+            </form>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..product_limit) %}
+          <div class="hp18-bestsellers-{{ sec_id }}__card">
+            <div class="hp18-bestsellers-{{ sec_id }}__image-wrapper">
+              <div class="hp18-bestsellers-{{ sec_id }}__badge">HOT</div>
+              {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+            <div class="hp18-bestsellers-{{ sec_id }}__info">
+              <a href="#" class="hp18-bestsellers-{{ sec_id }}__name">Core Heavyweight Hoodie 0{{ i }}</a>
+              <div class="hp18-bestsellers-{{ sec_id }}__price-wrapper">
+                <p class="hp18-bestsellers-{{ sec_id }}__price">$85.00</p>
+              </div>
+            </div>
+            <button class="hp18-bestsellers-{{ sec_id }}__add">{{ btn_text }}</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP18 Adv Bestsellers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f4f4f0"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF3366"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Shadow Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "MOST WANTED"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Number of products to show",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Add to Cart Text",
+      "default": "ADD TO CART +"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Width",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP18 Advanced Bestsellers"
+    }
+  ]
+}
+{% endschema %}

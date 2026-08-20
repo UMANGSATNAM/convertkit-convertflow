@@ -1,0 +1,180 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --grid-color: rgba(255, 255, 255, 0.1);
+    
+    --font-body: 'JetBrains Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--grid-color);
+  }
+
+  .hp34-press-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp34-press__subtitle {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hp34-press__grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp34-press__grid {
+      gap: 30px;
+    }
+  }
+
+  .hp34-press__logo {
+    width: 120px;
+    height: auto;
+    opacity: 0.3;
+    filter: grayscale(100%) brightness(200%);
+    transition: all 0.3s ease;
+  }
+
+  .hp34-press__logo:hover {
+    opacity: 1;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp34-press-wrapper" id="HP34Press-{{ section.id }}">
+  {%- if section.settings.subtitle != blank -%}
+    <div class="hp34-press__subtitle">{{ section.settings.subtitle }}</div>
+  {%- endif -%}
+
+  <div class="hp34-press__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp34-press__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.logo != blank -%}
+          <img height="{{ block.settings.logo.height }}" width="{{ block.settings.logo.width }}" src="{{ block.settings.logo | image_url: width: 300 }}" alt="Press Logo" class="hp34-press__logo" loading="lazy">
+        {%- else -%}
+          <div style="font-family: var(--font-body); font-size: 14px; color: var(--text-color); opacity: 0.3;">[LOGO]</div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP34 - Tech Press",
+  "class": "section-hp34-press-logos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "SYSTEM_ENDORSEMENTS"
+    },
+    {
+      "type": "header",
+      "content": "Tech Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF4500"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP34 - Tech Press",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

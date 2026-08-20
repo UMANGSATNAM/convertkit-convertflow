@@ -1,0 +1,336 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    color: {{ text_color }};
+    padding: 100px 20px 40px 20px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .hp8-footer-container-{{ section_id }} {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .hp8-footer-top-{{ section_id }} {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 100px;
+  }
+  
+  .hp8-footer-newsletter-{{ section_id }} h4 {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin: 0 0 30px 0;
+  }
+  
+  .hp8-footer-form-{{ section_id }} {
+    display: flex;
+    border-bottom: 1px solid {{ text_color }};
+    padding-bottom: 10px;
+    max-width: 500px;
+  }
+  
+  .hp8-footer-input-{{ section_id }} {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: {{ text_color }};
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    outline: none;
+    padding: 5px 0;
+  }
+  
+  .hp8-footer-input-{{ section_id }}::placeholder {
+    color: rgba({{ text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.5 }});
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+  }
+  
+  .hp8-footer-btn-{{ section_id }} {
+    background: transparent;
+    color: {{ text_color }};
+    border: none;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 5px 10px;
+  }
+  
+  .hp8-footer-menu-{{ section_id }} h4 {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 30px 0;
+    color: rgba({{ text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.5 }});
+  }
+  
+  .hp8-footer-links-{{ section_id }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .hp8-footer-links-{{ section_id }} a {
+    color: {{ text_color }};
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hp8-footer-links-{{ section_id }} a:hover {
+    opacity: 0.5;
+  }
+  
+  .hp8-footer-massive-logo-{{ section_id }} {
+    font-family: 'Bodoni MT', 'Didot', 'Playfair Display', serif;
+    font-size: 15vw; /* Massive typography */
+    font-weight: 400;
+    line-height: 0.8;
+    margin: 0;
+    text-align: center;
+    letter-spacing: -2px;
+    opacity: 0.05; /* Barely visible */
+    pointer-events: none;
+  }
+  
+  .hp8-footer-bottom-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba({{ text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.5 }});
+  }
+
+  @media (max-width: 992px) {
+    .hp8-footer-top-{{ section_id }} {
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+    }
+    .hp8-footer-newsletter-{{ section_id }} {
+      grid-column: span 2;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hp8-footer-top-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hp8-footer-newsletter-{{ section_id }} {
+      grid-column: span 1;
+    }
+    .hp8-footer-bottom-{{ section_id }} {
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="hp8-footer-container-{{ section_id }}">
+  <div class="hp8-footer-top-{{ section_id }}">
+    
+    <div class="hp8-footer-newsletter-{{ section_id }}">
+      <h4>Sign up for updates from the Maison.</h4>
+      {% form 'customer', class: 'hp8-footer-form-' | append: section_id %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <input type="email" name="contact[email]" class="hp8-footer-input-{{ section_id }}" placeholder="EMAIL ADDRESS" required>
+        <button type="submit" class="hp8-footer-btn-{{ section_id }}">SUBMIT</button>
+      {% endform %}
+    </div>
+    
+    <div class="hp8-footer-menu-{{ section_id }}">
+      <h4>{{ section.settings.menu_1_title | default: 'CLIENT SERVICES' }}</h4>
+      <ul class="hp8-footer-links-{{ section_id }}">
+        {% if linklists[section.settings.menu_1].links != blank %}
+          {% for link in linklists[section.settings.menu_1].links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% endfor %}
+        {% else %}
+          {%- assign cf_menu = section.settings.menu | default: linklists['footer'] -%}
+
+          {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+          {%- for link in cf_menu.links -%}
+
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+
+          {%- endfor -%}
+        {% endif %}
+      </ul>
+    </div>
+    
+    <div class="hp8-footer-menu-{{ section_id }}">
+      <h4>{{ section.settings.menu_2_title | default: 'THE MAISON' }}</h4>
+      <ul class="hp8-footer-links-{{ section_id }}">
+        {% if linklists[section.settings.menu_2].links != blank %}
+          {% for link in linklists[section.settings.menu_2].links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% endfor %}
+        {% else %}
+          {%- assign cf_menu = section.settings.menu | default: linklists['footer'] -%}
+
+          {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+          {%- for link in cf_menu.links -%}
+
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+
+          {%- endfor -%}
+        {% endif %}
+      </ul>
+    </div>
+    
+  </div>
+  
+  <h2 class="hp8-footer-massive-logo-{{ section_id }}">{{ shop.name | upcase }}</h2>
+  
+  <div class="hp8-footer-bottom-{{ section_id }}">
+    <div>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.</div>
+    <div>ALL RIGHTS RESERVED.</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP8 Footer",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "menu_1_title",
+      "label": "Menu 1 Title",
+      "default": "CLIENT SERVICES"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_1",
+      "label": "Menu 1"
+    },
+    {
+      "type": "text",
+      "id": "menu_2_title",
+      "label": "Menu 2 Title",
+      "default": "THE MAISON"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_2",
+      "label": "Menu 2"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "info": "Leave empty to use the store's main menu.",
+      "default": "footer"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border colour",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright_note",
+      "label": "Copyright line",
+      "info": "The year and store name are added automatically.",
+      "default": "All rights reserved."
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP8 Footer"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,159 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign pill_bg = section.settings.pill_bg | default: '#f4ede6'
+  assign pill_text = section.settings.pill_text | default: '#5c5044'
+-%}
+
+<section class="hp1-beauty-pills" style="background-color: {{ bg_color }};" id="hp1-pills-{{ section.id }}">
+  <div class="hp1-pills-inner">
+    <div class="hp1-pills-scroll-wrapper">
+      <ul class="hp1-pills-list">
+        {%- for block in section.blocks -%}
+          <li class="hp1-pill-item" {{ block.shopify_attributes }}>
+            <a href="{{ block.settings.link | default: '#' }}" 
+               class="hp1-pill-link" 
+               style="background-color: {{ pill_bg }}; color: {{ pill_text }};">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 60 }}" 
+                     alt="{{ block.settings.title | escape }}" 
+                     width="30" height="30" 
+                     class="hp1-pill-img" loading="lazy">
+              {%- endif -%}
+              <span class="hp1-pill-text">{{ block.settings.title }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-pills {
+    padding: 20px 0;
+    overflow: hidden;
+  }
+  .hp1-pills-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .hp1-pills-scroll-wrapper {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding-bottom: 10px; /* Safe area for scroll */
+  }
+  .hp1-pills-scroll-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+  .hp1-pills-list {
+    display: flex;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: center;
+  }
+  .hp1-pill-item {
+    flex-shrink: 0;
+  }
+  .hp1-pill-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+  .hp1-pill-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    filter: brightness(0.95);
+  }
+  .hp1-pill-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  @media (max-width: 768px) {
+    .hp1-pills-inner {
+      padding: 0 15px;
+    }
+    .hp1-pill-link {
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Category Pills",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "pill_bg",
+      "label": "Pill Background",
+      "default": "#f4ede6"
+    },
+    {
+      "type": "color",
+      "id": "pill_text",
+      "label": "Pill Text",
+      "default": "#5c5044"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Small Icon/Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Name",
+          "default": "Skincare"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Category Pills",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Cleansers" } },
+        { "type": "category", "settings": { "title": "Serums" } },
+        { "type": "category", "settings": { "title": "Moisturizers" } },
+        { "type": "category", "settings": { "title": "Masks" } },
+        { "type": "category", "settings": { "title": "Sun Care" } },
+        { "type": "category", "settings": { "title": "Body Care" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

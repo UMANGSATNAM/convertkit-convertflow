@@ -1,0 +1,163 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --font-heading: 'Lora', serif;
+    
+    background-color: var(--bg-color);
+    padding: {{ section.settings.padding_y }}px 0;
+    overflow: hidden;
+    position: relative;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .hp35-marquee-container {
+    display: flex;
+    white-space: nowrap;
+    width: 100vw;
+  }
+
+  .hp35-marquee-track {
+    display: flex;
+    align-items: center;
+    animation: marquee-scroll {{ section.settings.speed }}s linear infinite;
+  }
+  
+  .hp35-marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .hp35-marquee-item {
+    font-family: var(--font-heading);
+    font-size: {{ section.settings.text_size }}px;
+    color: var(--text-color);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 30px;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .hp35-marquee-icon {
+    margin-left: 60px;
+    font-size: {{ section.settings.text_size | times: 0.6 }}px;
+    color: var(--text-color);
+    opacity: 0.5;
+    font-style: normal;
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp35-marquee-container" id="HP35Marquee-{{ section.id }}">
+  <div class="hp35-marquee-track">
+    {%- for i in (1..8) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp35-marquee-item" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+          <span class="hp35-marquee-icon">✧</span>
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP35 - Organic Marquee",
+  "class": "section-hp35-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "sec",
+      "label": "Scroll Speed",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Organic Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Soft Beige)",
+      "default": "#FDFBF7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C422F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Mindfully Crafted"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP35 - Organic Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Mindfully Crafted" } },
+        { "type": "text", "settings": { "text": "Sustainable Materials" } },
+        { "type": "text", "settings": { "text": "Slow Fashion" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

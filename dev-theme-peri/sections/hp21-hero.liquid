@@ -1,0 +1,541 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --overlay-color: {{ section.settings.overlay_color }};
+    --btn-bg: {{ section.settings.btn_bg }};
+    --btn-text: {{ section.settings.btn_text }};
+    --font-heading: 'Playfair Display', serif; /* Luxury Serif */
+    --font-body: 'Jost', sans-serif; /* Clean geometric sans for contrast */
+    
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp21-hero-wrapper {
+    height: {{ section.settings.desktop_height }}vh;
+    min-height: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-hero-wrapper {
+      height: {{ section.settings.mobile_height }}vh;
+      min-height: 500px;
+    }
+  }
+
+  .hp21-hero__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hp21-hero__media img,
+  .hp21-hero__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    animation: hp21SlowZoom 20s ease infinite alternate;
+  }
+  
+  @keyframes hp21SlowZoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+
+  .hp21-hero__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--overlay-color);
+    opacity: var(--overlay-opacity);
+    z-index: 2;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, var(--overlay-color) 100%);
+  }
+
+  .hp21-hero__content {
+    position: relative;
+    z-index: 3;
+    max-width: {{ section.settings.content_width }}px;
+    text-align: {{ section.settings.text_alignment }};
+    padding: 0 40px;
+    width: 100%;
+    {% if section.settings.glass_effect %}
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 60px 40px;
+    border-radius: 4px;
+    {% endif %}
+    transform: translateY(30px);
+    opacity: 0;
+    animation: hp21FadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.2s;
+  }
+
+  @keyframes hp21FadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-hero__content {
+      padding: {% if section.settings.glass_effect %}40px 20px{% else %}0 20px{% endif %};
+    }
+  }
+
+  .hp21-hero__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+    opacity: 0.9;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-hero__subtitle {
+      font-size: {{ section.settings.subtitle_size | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp21-hero__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    font-weight: 400; /* Serif feels more elegant at lighter weights */
+    color: var(--text-color);
+    line-height: 1.1;
+    margin: 0 0 24px;
+    letter-spacing: -0.5px;
+  }
+  
+  .hp21-hero__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp21-hero__text {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 300;
+    color: var(--text-color);
+    opacity: 0.8;
+    max-width: 80%;
+    margin: 0 {% if section.settings.text_alignment == 'center' %}auto{% else %}0{% endif %} 40px;
+    line-height: 1.6;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-hero__text {
+      max-width: 100%;
+    }
+  }
+
+  .hp21-hero__buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: {% if section.settings.text_alignment == 'center' %}center{% elsif section.settings.text_alignment == 'right' %}flex-end{% else %}flex-start{% endif %};
+  }
+
+  .hp21-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp21-hero__btn--primary {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: 1px solid var(--btn-bg);
+  }
+
+  .hp21-hero__btn--primary:hover {
+    background: transparent;
+    color: var(--btn-bg); /* when bg is accent, text becomes accent */
+  }
+  
+  /* A glowing line effect on hover */
+  .hp21-hero__btn--primary::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--btn-bg);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease;
+  }
+  .hp21-hero__btn--primary:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .hp21-hero__btn--secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .hp21-hero__btn--secondary:hover {
+    border-color: var(--text-color);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Scroll indicator */
+  .hp21-hero__scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    text-decoration: none;
+  }
+
+  .hp21-hero__scroll:hover {
+    opacity: 1;
+  }
+
+  .hp21-hero__scroll-text {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-color);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .hp21-hero__scroll-line {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hp21-hero__scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 50%;
+    background: var(--text-color);
+    animation: hp21ScrollDrop 2s ease infinite;
+  }
+  
+  @keyframes hp21ScrollDrop {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-hero-wrapper" id="HP21Hero-{{ section.id }}">
+  
+  <div class="hp21-hero__media">
+    {%- if section.settings.video != blank -%}
+      {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, class: 'hp21-hero__video' }}
+    {%- elsif section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" loading="eager">
+    {%- else -%}
+      <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;color:#333;">LUXURY MEDIA PLACEHOLDER</div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp21-hero__overlay"></div>
+
+  <div class="hp21-hero__content">
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp21-hero__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.title != blank -%}
+      <h1 class="hp21-hero__title">{{ section.settings.title }}</h1>
+    {%- endif -%}
+    
+    {%- if section.settings.text != blank -%}
+      <p class="hp21-hero__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.btn_1_text != blank or section.settings.btn_2_text != blank -%}
+      <div class="hp21-hero__buttons">
+        {%- if section.settings.btn_1_text != blank -%}
+          <a href="{{ section.settings.btn_1_link | default: '#' }}" class="hp21-hero__btn hp21-hero__btn--primary">
+            {{ section.settings.btn_1_text | escape }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.btn_2_text != blank -%}
+          <a href="{{ section.settings.btn_2_link | default: '#' }}" class="hp21-hero__btn hp21-hero__btn--secondary">
+            {{ section.settings.btn_2_text | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+  
+  {%- if section.settings.show_scroll -%}
+    <a href="#scroll-down" class="hp21-hero__scroll">
+      <span class="hp21-hero__scroll-text">DISCOVER</span>
+      <div class="hp21-hero__scroll-line"></div>
+    </a>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Hero",
+  "class": "section-hp21-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Background Video",
+      "info": "Overrides image if provided"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "ELEVATE YOUR RITUAL"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>The Art of <em>Refinement</em></p>"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Discover a collection crafted for those who demand excellence in every detail. Uncompromising quality meets timeless design."
+    },
+    {
+      "type": "text",
+      "id": "btn_1_text",
+      "label": "Primary Button Text",
+      "default": "SHOP THE COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "btn_1_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "btn_2_text",
+      "label": "Secondary Button Text",
+      "default": "OUR STORY"
+    },
+    {
+      "type": "url",
+      "id": "btn_2_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Desktop Height",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Mobile Height",
+      "default": 90
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Content Width",
+      "default": 800
+    },
+    {
+      "type": "checkbox",
+      "id": "glass_effect",
+      "label": "Apply Glassmorphism Box",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll",
+      "label": "Show Scroll Indicator",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography Settings"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Body Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Luxury Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color (Fallback)",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Primary Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Gold/Bronze)",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Background",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Hero"
+    }
+  ]
+}
+{% endschema %}

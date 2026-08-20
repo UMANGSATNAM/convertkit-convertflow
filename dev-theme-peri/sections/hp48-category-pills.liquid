@@ -1,0 +1,90 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp48-pills-bg: {{ section.settings.bg_color | default: '#FAF8F5' }};
+    --hp48-gold: {{ section.settings.accent_gold | default: '#C59B27' }};
+    
+    background-color: var(--hp48-pills-bg);
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+
+  .hp48-pills__wrap {
+    max-width: {{ section.settings.container_width | default: 1100 }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hp48-pill {
+    padding: 10px 24px;
+    background: #FFFFFF;
+    border: 1px solid rgba(197, 155, 39, 0.35);
+    border-radius: 4px;
+    color: #1A1715;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(26, 23, 21, 0.03);
+  }
+
+  .hp48-pill:hover, .hp48-pill--active {
+    background: #1A1715;
+    color: var(--hp48-gold);
+    border-color: var(--hp48-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(197, 155, 39, 0.2);
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp48-pills__wrap { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+    .hp48-pill { flex-shrink: 0; }
+  }
+{%- endstyle -%}
+
+<div class="hp48-pills__wrap">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '/collections/all' }}" class="hp48-pill {% if forloop.first %}hp48-pill--active{% endif %}" {{ block.shopify_attributes }}>
+        {{ block.settings.title }}
+      </a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="/collections/all" class="hp48-pill hp48-pill--active">👑 All Royal Suites</a>
+    <a href="/collections/gold" class="hp48-pill">✨ 24K Colloidal Gold</a>
+    <a href="/collections/truffle" class="hp48-pill">🦪 White Truffle Crèmes</a>
+    <a href="/collections/pearl" class="hp48-pill">💎 Imperial Pearl Oils</a>
+    <a href="/collections/masks" class="hp48-pill">👑 24K Gold Foil Masks</a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP48 - Royal Pills",
+  "class": "section-hp48-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#FAF8F5" },
+    { "type": "color", "id": "accent_gold", "label": "Gold Accent", "default": "#C59B27" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 70, "step": 5, "unit": "px", "label": "Vertical Padding", "default": 35 },
+    { "type": "range", "id": "container_width", "min": 800, "max": 1400, "step": 20, "unit": "px", "label": "Container Width", "default": 1100 }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "👑 All Royal Suites" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP48 - Royal Pills" }
+  ]
+}
+{% endschema %}

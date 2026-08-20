@@ -1,0 +1,269 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#2c2c2c'
+  assign text_color = section.settings.text_color | default: '#f9f6f0'
+  assign speed = section.settings.animation_speed | default: 20
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp4-mq-bg: {{ bg_color }};
+    --hp4-mq-text: {{ text_color }};
+    --hp4-mq-speed: {{ speed }}s;
+    
+    --hp4-mq-pt-desk: {{ padding_top_desktop }}px;
+    --hp4-mq-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp4-mq-pt-mob: {{ padding_top_mobile }}px;
+    --hp4-mq-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp4-decor-marquee-{{ section.id }} {
+    padding-top: var(--hp4-mq-pt-desk);
+    padding-bottom: var(--hp4-mq-pb-desk);
+    background-color: var(--hp4-mq-bg);
+    color: var(--hp4-mq-text);
+    font-family: 'Playfair Display', serif;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .hp4-mq-track-wrapper {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hp4-mq-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    will-change: transform;
+    animation: hp4Marquee var(--hp4-mq-speed) linear infinite;
+  }
+
+  .hp4-mq-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+    flex-shrink: 0;
+    gap: 40px;
+  }
+
+  .hp4-mq-text {
+    font-size: clamp(20px, 3vw, 28px);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin: 0;
+  }
+
+  .hp4-mq-separator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+  }
+  
+  .hp4-mq-separator svg {
+    width: 20px;
+    height: 20px;
+    color: var(--hp4-mq-text);
+    fill: currentColor;
+  }
+
+  @keyframes hp4Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } 
+  }
+  
+  {% if section.settings.pause_on_hover %}
+    .hp4-decor-marquee-{{ section.id }}:hover .hp4-mq-track {
+      animation-play-state: paused;
+    }
+  {% endif %}
+
+  @media screen and (max-width: 768px) {
+    .hp4-decor-marquee-{{ section.id }} {
+      padding-top: var(--hp4-mq-pt-mob);
+      padding-bottom: var(--hp4-mq-pb-mob);
+    }
+    .hp4-mq-item {
+      padding: 0 20px;
+      gap: 20px;
+    }
+    .hp4-mq-separator svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hp4-mq-track {
+      animation: none !important;
+      transform: none !important;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hp4-mq-item {
+      padding: 10px;
+    }
+    .hp4-mq-track .hp4-mq-item:nth-child(n+{{ section.blocks.size | plus: 1 }}) {
+      display: none;
+    }
+  }
+</style>
+
+<section class="hp4-decor-marquee-{{ section.id }}" aria-label="Announcement">
+  <div class="hp4-mq-track-wrapper">
+    <div class="hp4-mq-track">
+      
+      {%- capture marquee_content -%}
+        {%- for block in section.blocks -%}
+          <div class="hp4-mq-item" {{ block.shopify_attributes }}>
+            <span class="hp4-mq-text">{{ block.settings.text }}</span>
+            <span class="hp4-mq-separator">
+              {%- if block.settings.icon == 'leaf' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+              {%- elsif block.settings.icon == 'star' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              {%- elsif block.settings.icon == 'circle' -%}
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"></circle></svg>
+              {%- else -%}
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.5l7.5 14.5h-15L12 5.5z"/></svg>
+              {%- endif -%}
+            </span>
+          </div>
+        {%- endfor -%}
+        
+        {%- if section.blocks.size == 0 -%}
+          {%- for i in (1..3) -%}
+            <div class="hp4-mq-item">
+              <span class="hp4-mq-text">Ethically Sourced Materials</span>
+              <span class="hp4-mq-separator"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle></svg></span>
+            </div>
+            <div class="hp4-mq-item">
+              <span class="hp4-mq-text">Complimentary Design Consultation</span>
+              <span class="hp4-mq-separator"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle></svg></span>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {{ marquee_content }}
+      {{ marquee_content }}
+      {{ marquee_content }}
+      
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP4 Decor Marquee",
+  "tag": "section",
+  "class": "section-hp4-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "animation_speed",
+      "min": 5, "max": 50, "step": 1, "unit": "sec",
+      "label": "Scroll Speed",
+      "info": "Lower is faster.",
+      "default": 25
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#f9f6f0"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 15
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Sustainable Living"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Separator Icon",
+          "options": [
+            { "value": "circle", "label": "Circle" },
+            { "value": "star", "label": "Star" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "triangle", "label": "Triangle" }
+          ],
+          "default": "circle"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP4 Decor Marquee (Adv)",
+      "category": "Text",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Ethically Sourced", "icon": "circle" } },
+        { "type": "text", "settings": { "text": "Free Shipping over $200", "icon": "circle" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

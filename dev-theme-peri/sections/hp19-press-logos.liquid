@@ -1,0 +1,333 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp19-press-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hp19-press__title {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.title_size }}px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin: 0 0 40px;
+  }
+
+  /* Scrolling Marquee Logic */
+  .hp19-press__track-container {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+  }
+
+  /* Gradient fades on edges */
+  {% if section.settings.enable_fades %}
+  .hp19-press__track-container::before,
+  .hp19-press__track-container::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 15%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .hp19-press__track-container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-color), transparent);
+  }
+  .hp19-press__track-container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-color), transparent);
+  }
+  {% endif %}
+
+  .hp19-press__track {
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.logo_gap }}px;
+    animation: hp19PressScroll {{ section.settings.speed }}s linear infinite;
+    padding: 0 {{ section.settings.logo_gap | divided_by: 2 }}px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp19-press__track {
+      gap: {{ section.settings.mobile_gap }}px;
+      padding: 0 {{ section.settings.mobile_gap | divided_by: 2 }}px;
+    }
+  }
+
+  @keyframes hp19PressScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - {{ section.settings.logo_gap }}px)); }
+  }
+
+  .hp19-press__logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hp19-press__logo img {
+    height: {{ section.settings.logo_height }}px;
+    width: auto;
+    object-fit: contain;
+    {% if section.settings.grayscale %}
+    filter: grayscale(100%) opacity(0.6);
+    transition: all 0.3s ease;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-press__logo img {
+      height: {{ section.settings.mobile_height }}px;
+    }
+  }
+
+  {% if section.settings.grayscale %}
+  .hp19-press__logo img:hover {
+    filter: grayscale(0%) opacity(1);
+  }
+  {% endif %}
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp19-press-wrapper" id="HP19Press-{{ section.id }}">
+  {%- if section.settings.title != blank -%}
+    <h2 class="hp19-press__title">{{ section.settings.title | escape }}</h2>
+  {%- endif -%}
+
+  <div class="hp19-press__track-container">
+    {%- for i in (1..2) -%}
+      <div class="hp19-press__track" aria-hidden="{% if i == 2 %}true{% else %}false{% endif %}">
+        {%- for block in section.blocks -%}
+          <div class="hp19-press__logo" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" target="_blank">
+            {%- endif -%}
+            
+            {%- if block.settings.image != blank -%}
+              <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: height: 100 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">
+            {%- else -%}
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:24px;color:var(--text-color);opacity:0.4;">LOGO</div>
+            {%- endif -%}
+            
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP19 - Press Logos Pro",
+  "class": "section-hp19-press",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured In"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1600
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo Height (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo Height (Mobile)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "logo_gap",
+      "min": 20,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between logos (Desktop)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between logos (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "info": "Lower is faster",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fades",
+      "label": "Enable Gradient Edge Fades",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale",
+      "label": "Grayscale logos until hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FEF3C7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - Press Logos Pro",
+      "category": "Image",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,311 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  .hp32-best-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp32-best-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp32-best__header-banner {
+    background: var(--border-color);
+    color: var(--accent-color);
+    padding: 15px 0;
+    margin-bottom: 40px;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 4px solid var(--border-color);
+    transform: rotate(-1deg);
+  }
+
+  .hp32-best__header-text {
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    animation: hp32-scroll-fast 10s linear infinite;
+    display: inline-block;
+    padding-right: 40px;
+  }
+
+  @keyframes hp32-scroll-fast {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .hp32-best__slider {
+    display: flex;
+    gap: 30px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
+  .hp32-best__slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp32-best__item {
+    flex: 0 0 calc(100% / {{ section.settings.columns_desktop }} - 30px + (30px / {{ section.settings.columns_desktop }}));
+    scroll-snap-align: start;
+    background: #fff;
+    border: 4px solid var(--border-color);
+    box-shadow: 8px 8px 0 var(--border-color);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: #000;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp32-best__item {
+      flex: 0 0 calc(50% - 15px);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp32-best__item {
+      flex: 0 0 85%;
+    }
+  }
+
+  .hp32-best__item:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0 var(--border-color);
+  }
+
+  .hp32-best__image-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-bottom: 4px solid var(--border-color);
+    background: #f4f4f4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp32-best__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .hp32-best__item:hover .hp32-best__image {
+    transform: scale(1.05);
+  }
+
+  .hp32-best__rank {
+    position: absolute;
+    top: 0; left: 0;
+    background: var(--accent-color);
+    color: #000;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    padding: 10px 15px;
+    border-right: 4px solid var(--border-color);
+    border-bottom: 4px solid var(--border-color);
+    line-height: 1;
+    z-index: 2;
+  }
+
+  .hp32-best__info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .hp32-best__title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    line-height: 1.1;
+  }
+
+  .hp32-best__price {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: auto;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp32-best-wrapper" id="HP32Best-{{ section.id }}">
+  <div class="hp32-best__header-banner">
+    <div class="hp32-best__header-text">
+      {%- for i in (1..6) -%}
+        {{ section.settings.title }} // 
+      {%- endfor -%}
+    </div>
+    <div class="hp32-best__header-text" aria-hidden="true">
+      {%- for i in (1..6) -%}
+        {{ section.settings.title }} // 
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="hp32-best__slider">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_link | default: '#' }}" class="hp32-best__item" {{ block.shopify_attributes }}>
+        <div class="hp32-best__image-wrap">
+          <div class="hp32-best__rank">#{{ forloop.index }}</div>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp32-best__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'product-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp32-best__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp32-best__info">
+          <h3 class="hp32-best__title">{{ block.settings.title }}</h3>
+          <span class="hp32-best__price">{{ block.settings.price }}</span>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP32 - Brutalist Best",
+  "class": "section-hp32-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Marquee Text",
+      "default": "TOP TIER PROTOCOLS"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (e.g. Light Grey)",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (e.g. Lime)",
+      "default": "#ccff00"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Product Title",
+          "default": "STEALTH HOODIE V2"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$180.00"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP32 - Brutalist Best",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

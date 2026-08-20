@@ -1,0 +1,190 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+  }
+  
+  .hp17-test-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp17-test-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+  }
+  
+  .hp17-test-heading-{{ section_id }} {
+    font-family: 'Arial Black', sans-serif;
+    font-size: clamp(2rem, 4vw, 4rem);
+    text-transform: uppercase;
+    color: #FFF;
+    margin: 0;
+    line-height: 1;
+  }
+  
+  .hp17-test-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .hp17-test-card-{{ section_id }} {
+    background: #0A0A0A;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    padding: 40px 30px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .hp17-test-card-{{ section_id }}:hover {
+    border-color: #00FF41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+    transform: translateY(-5px);
+  }
+  
+  .hp17-test-card-{{ section_id }}::before {
+    content: '"';
+    position: absolute;
+    top: 10px; right: 20px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 5rem;
+    color: rgba(0, 255, 65, 0.1);
+    line-height: 1;
+  }
+  
+  .hp17-test-rating-{{ section_id }} {
+    color: #00FF41;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  
+  .hp17-test-text-{{ section_id }} {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #FFF;
+    margin: 0 0 30px 0;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .hp17-test-author-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px dashed rgba(255,255,255,0.2);
+    padding-top: 20px;
+  }
+  
+  .hp17-test-avatar-{{ section_id }} {
+    width: 40px; height: 40px;
+    background: #222;
+    border: 1px solid #00FF41;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #00FF41;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+  }
+  
+  .hp17-test-name-{{ section_id }} {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #B800FF;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 992px) {
+    .hp17-test-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+  }
+</style>
+
+<div class="hp17-test-container-{{ section_id }}">
+  <div class="hp17-test-header-{{ section_id }}">
+    <h2 class="hp17-test-heading-{{ section_id }}">{{ section.settings.title | default: 'FIELD_REPORTS' }}</h2>
+  </div>
+  
+  <div class="hp17-test-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 3 %}
+      <div class="hp17-test-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp17-test-rating-{{ section_id }}">
+          {% for i in (1..5) %}★{% endfor %}
+        </div>
+        <p class="hp17-test-text-{{ section_id }}">{{ block.settings.text }}</p>
+        <div class="hp17-test-author-{{ section_id }}">
+          <div class="hp17-test-avatar-{{ section_id }}">{{ block.settings.author | slice: 0, 1 }}</div>
+          <div class="hp17-test-name-{{ section_id }}">{{ block.settings.author }} // VERIFIED</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP17 Testimonials",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "FIELD_REPORTS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Gear survived a level 3 acid rain storm in sector 7. Unmatched durability."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "AGENT_K"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP17 Testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial", "settings": { "text": "Mobility is incredible. You don't feel the armor plates at all. Worth every credit.", "author": "ZERO_COOL" } },
+        { "type": "testimonial", "settings": { "text": "Arrived in 2 cycles. Just in time for the neon run. The stealth fabric actually works.", "author": "NEON_RIDER" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

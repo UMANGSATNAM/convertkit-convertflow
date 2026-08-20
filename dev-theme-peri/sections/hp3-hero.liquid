@@ -1,0 +1,460 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#0a0a0a'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ffcc'
+  
+  assign hero_height_desktop = section.settings.hero_height_desktop
+  assign hero_height_mobile = section.settings.hero_height_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp3-hero-bg: {{ bg_color }};
+    --hp3-hero-text: {{ text_color }};
+    --hp3-hero-accent: {{ accent_color }};
+    
+    --hp3-hero-h-desk: {{ hero_height_desktop }}vh;
+    --hp3-hero-h-mob: {{ hero_height_mobile }}vh;
+  }
+
+  .hp3-tech-hero-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: var(--hp3-hero-h-desk);
+    min-height: 500px;
+    background-color: var(--hp3-hero-bg);
+    color: var(--hp3-hero-text);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* Media Background */
+  .hp3-hero-bg-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .hp3-hero-bg-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.8) 100%);
+    z-index: 2;
+  }
+  
+  /* Overlay grid effect */
+  .hp3-hero-bg-media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .hp3-hero-img, .hp3-hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.05);
+    transition: transform 10s ease-out;
+  }
+  .hp3-tech-hero-{{ section.id }}.is-loaded .hp3-hero-img {
+    transform: scale(1);
+  }
+
+  /* Content */
+  .hp3-hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: {{ section.settings.content_alignment }};
+    text-align: {{ section.settings.text_alignment }};
+  }
+
+  /* Badge */
+  .hp3-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: var(--hp3-hero-accent);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: hp3HeroFadeUp 0.8s forwards 0.2s;
+  }
+  
+  .hp3-hero-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--hp3-hero-accent);
+    box-shadow: 0 0 10px var(--hp3-hero-accent);
+    animation: hp3HeroPulse 2s infinite;
+  }
+
+  /* Typography */
+  .hp3-hero-title {
+    font-size: clamp(40px, 8vw, 90px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 20px 0;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: hp3HeroFadeUp 0.8s forwards 0.4s;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  
+  .hp3-hero-title span {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--hp3-hero-text);
+  }
+
+  .hp3-hero-desc {
+    font-size: clamp(16px, 2vw, 22px);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 0 40px 0;
+    font-weight: 400;
+    color: rgba(255,255,255,0.8);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: hp3HeroFadeUp 0.8s forwards 0.6s;
+  }
+
+  /* CTA Button */
+  .hp3-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    background: var(--hp3-hero-accent);
+    color: #000;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: hp3HeroFadeUp 0.8s forwards 0.8s;
+    box-shadow: 0 10px 30px rgba(0, 255, 204, 0.2);
+  }
+
+  .hp3-hero-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    transition: all 0.5s ease;
+  }
+
+  .hp3-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 255, 204, 0.4);
+  }
+  .hp3-hero-btn:hover::before {
+    left: 100%;
+  }
+
+  /* Animations */
+  @keyframes hp3HeroFadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes hp3HeroPulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 255, 204, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 204, 0); }
+  }
+
+  /* Floating UI Elements for Tech Vibe */
+  .hp3-hero-specs {
+    position: absolute;
+    bottom: 40px;
+    right: 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: hp3HeroFadeUp 0.8s forwards 1s;
+  }
+  
+  .hp3-hero-spec-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-left: 2px solid var(--hp3-hero-accent);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .hp3-hero-spec-item strong {
+    font-size: 16px;
+    color: var(--hp3-hero-accent);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp3-tech-hero-{{ section.id }} {
+      height: var(--hp3-hero-h-mob);
+    }
+    .hp3-hero-content {
+      align-items: center !important;
+      text-align: center !important;
+    }
+    .hp3-hero-specs {
+      display: none; /* Hide complex specs on mobile to save space */
+    }
+  }
+</style>
+
+<section class="hp3-tech-hero-{{ section.id }}" aria-label="Hero Banner">
+  <div class="hp3-hero-bg-media">
+    {%- if section.settings.video != blank -%}
+      {{ section.settings.video | video_tag: class: 'hp3-hero-video', autoplay: true, loop: true, muted: true, playsinline: true }}
+    {%- elsif section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 2000 }}" 
+           srcset="{{ section.settings.image | image_url: width: 800 }} 800w, 
+                   {{ section.settings.image | image_url: width: 1400 }} 1400w, 
+                   {{ section.settings.image | image_url: width: 2000 }} 2000w"
+           sizes="100vw"
+           class="hp3-hero-img" 
+           loading="eager" 
+           alt="{{ section.settings.heading | escape }}">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp3-hero-img placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp3-hero-content">
+    {%- if section.settings.badge != blank -%}
+      <div class="hp3-hero-badge">{{ section.settings.badge }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.heading != blank -%}
+      <h1 class="hp3-hero-title">{{ section.settings.heading }}</h1>
+    {%- endif -%}
+    
+    {%- if section.settings.description != blank -%}
+      <div class="hp3-hero-desc">{{ section.settings.description }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+      <a href="{{ section.settings.btn_link }}" class="hp3-hero-btn">{{ section.settings.btn_text }}</a>
+    {%- endif -%}
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="hp3-hero-specs">
+      {%- for block in section.blocks -%}
+        <div class="hp3-hero-spec-item" {{ block.shopify_attributes }}>
+          <span>{{ block.settings.label }}</span>
+          <strong>{{ block.settings.value }}</strong>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hero = document.querySelector('.hp3-tech-hero-{{ section.id }}');
+    if(hero) {
+      setTimeout(() => {
+        hero.classList.add('is-loaded');
+      }, 100);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP3 Tech Hero",
+  "tag": "section",
+  "class": "section-hp3-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Background Video",
+      "info": "Overrides image if selected"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge Text",
+      "default": "NEW ARRIVAL"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "NEXT-GEN <br><span>PERFORMANCE.</span>",
+      "info": "Use <span> for outlined text effect."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Experience uncompromised power with the all-new series. Engineered for professionals.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "DISCOVER NOW"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Box Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "hero_height_desktop",
+      "min": 50, "max": 100, "step": 5, "unit": "vh",
+      "label": "Desktop Height", "default": 90
+    },
+    {
+      "type": "range",
+      "id": "hero_height_mobile",
+      "min": 50, "max": 100, "step": 5, "unit": "vh",
+      "label": "Mobile Height", "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Fallback",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ffcc"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Floating Spec",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "CPU"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "M3 MAX"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP3 Tech Hero (Advanced)",
+      "category": "Hero",
+      "blocks": [
+        { "type": "spec", "settings": { "label": "CHIPSET", "value": "A15 BIONIC" } },
+        { "type": "spec", "settings": { "label": "BATTERY", "value": "24 HRS" } },
+        { "type": "spec", "settings": { "label": "DISPLAY", "value": "120HZ OLED" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,174 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 20px;
+  }
+
+  .hp39-pills-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hp39-pills__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    letter-spacing: -0.5px;
+  }
+
+  .hp39-pills__grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .hp39-pill-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 15px 40px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 100px; /* Pill shape */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .hp39-pill-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.06);
+  }
+
+  .hp39-pill__image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    background: #f0f0f0;
+  }
+
+  .hp39-pill__title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp39-pills-wrapper" id="HP39Pills-{{ section.id }}">
+  <h2 class="hp39-pills__title">{{ section.settings.title }}</h2>
+
+  <div class="hp39-pills__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp39-pill-item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 100 }}" alt="{{ block.settings.title | escape }}" class="hp39-pill__image" loading="lazy">
+        {%- endif -%}
+        <span class="hp39-pill__title">{{ block.settings.title }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP39 - Aura Categories",
+  "class": "section-hp39-category-pills",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Aura Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#faf9f8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Small Image (Icon)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Lounge"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP39 - Aura Category Pills",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Tops" } },
+        { "type": "category", "settings": { "title": "Bottoms" } },
+        { "type": "category", "settings": { "title": "Outerwear" } },
+        { "type": "category", "settings": { "title": "Accessories" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

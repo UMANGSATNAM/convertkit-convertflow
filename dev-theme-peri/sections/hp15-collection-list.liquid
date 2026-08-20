@@ -1,0 +1,156 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 40px;
+  }
+  
+  .hp15-cl-container-{{ section_id }} {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .hp15-cl-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp15-cl-card-{{ section_id }} {
+    position: relative;
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+  }
+  
+  .hp15-cl-image-wrap-{{ section_id }} {
+    position: relative;
+    padding-top: 140%;
+    overflow: hidden;
+  }
+  
+  .hp15-cl-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.5s ease, transform 0.7s ease;
+  }
+  
+  .hp15-cl-card-{{ section_id }}:hover .hp15-cl-image-{{ section_id }} {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+  }
+  
+  .hp15-cl-content-{{ section_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    color: #fff;
+  }
+  
+  .hp15-cl-title-{{ section_id }} {
+    font-family: 'Didot', 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+  }
+
+  @media (max-width: 992px) {
+    .hp15-cl-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+    .hp15-cl-image-wrap-{{ section_id }} {
+      padding-top: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp15-cl-content-{{ section_id }} {
+      padding: 30px;
+    }
+  }
+</style>
+
+<div class="hp15-cl-container-{{ section_id }}">
+  <div class="hp15-cl-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 3 %}
+      {% assign collection = collections[block.settings.collection] %}
+      <a href="{{ collection.url | default: '#' }}" class="hp15-cl-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp15-cl-image-wrap-{{ section_id }}">
+          {% if block.settings.image != blank %}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 800 }}" class="hp15-cl-image-{{ section_id }}" loading="lazy" alt="Collection">
+          {% elsif collection.image != blank %}
+            <img height="{{ collection.image.height }}" width="{{ collection.image.width }}" src="{{ collection.image | image_url: width: 800 }}" class="hp15-cl-image-{{ section_id }}" loading="lazy" alt="{{ collection.title }}">
+          {% else %}
+            <div class="hp15-cl-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+          {% endif %}
+        </div>
+        <div class="hp15-cl-content-{{ section_id }}">
+          <h3 class="hp15-cl-title-{{ section_id }}">{{ block.settings.title | default: collection.title | default: 'COLLECTION' }}</h3>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP15 Collection List",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP15 Collection List",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

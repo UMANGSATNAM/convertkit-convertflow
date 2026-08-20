@@ -1,0 +1,428 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-reels-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    overflow: hidden; /* Prevent shadow bleed on mobile */
+  }
+
+  .hp20-reels__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    padding-bottom: 24px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp20-reels__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp20-reels__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .hp20-reels__follow {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--text-color);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: {{ section.settings.accent_color }};
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0px var(--shadow-color);
+    transition: all 0.2s;
+  }
+
+  .hp20-reels__follow:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .hp20-reels__grid {
+    display: flex;
+    gap: {{ section.settings.gap }}px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 32px; /* space for shadows */
+    margin-bottom: -32px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .hp20-reels__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hp20-reels__item {
+    flex: 0 0 {{ section.settings.card_width }}px;
+    scroll-snap-align: start;
+    position: relative;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    background: #000;
+    aspect-ratio: 9/16;
+    transition: transform 0.2s;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hp20-reels__item {
+      flex: 0 0 75vw;
+    }
+  }
+
+  .hp20-reels__item:hover {
+    transform: translate(-2px, -2px);
+  }
+
+  .hp20-reels__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: {% if section.settings.image_grayscale %}grayscale(100%) contrast(110%){% else %}none{% endif %};
+    transition: filter 0.3s;
+  }
+  
+  .hp20-reels__item:hover .hp20-reels__image {
+    filter: none;
+  }
+
+  .hp20-reels__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: {{ section.settings.accent_color }};
+    border: var(--border-thickness) solid var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    pointer-events: none;
+  }
+  
+  .hp20-reels__play svg {
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+  }
+
+  .hp20-reels__handle {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: var(--text-color);
+    color: {{ section.settings.accent_color }};
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 6px 12px;
+    border: var(--border-thickness) solid var(--border-color);
+    z-index: 3;
+    text-transform: uppercase;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-reels-wrapper" id="HP20UGCReels-{{ section.id }}">
+  
+  <div class="hp20-reels__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp20-reels__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.handle_text != blank and section.settings.handle_link != blank -%}
+      <a href="{{ section.settings.handle_link }}" class="hp20-reels__follow" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        {{ section.settings.handle_text | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp20-reels__grid">
+    {%- for block in section.blocks -%}
+      {%- assign link_url = block.settings.link | default: '#' -%}
+      
+      <a href="{{ link_url }}" class="hp20-reels__item" {{ block.shopify_attributes }} target="_blank" rel="noopener">
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp20-reels__image" loading="lazy">
+        {%- else -%}
+          {{ 'product-3' | placeholder_svg_tag: 'placeholder-svg hp20-reels__image' }}
+        {%- endif -%}
+        
+        <div class="hp20-reels__play">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        
+        {%- if block.settings.handle != blank -%}
+          <div class="hp20-reels__handle">@{{ block.settings.handle | escape }}</div>
+        {%- endif -%}
+      </a>
+      
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist UGC",
+  "class": "section-hp20-ugc-reels",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "IN THE WILD."
+    },
+    {
+      "type": "text",
+      "id": "handle_text",
+      "label": "Follow Button Text",
+      "default": "@BRANDNAME"
+    },
+    {
+      "type": "url",
+      "id": "handle_link",
+      "label": "Follow Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Card Width (Desktop)",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap Between Cards",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "image_grayscale",
+      "label": "Enable High-Contrast Grayscale (Hover reveals color)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Play Button)",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "UGC Reel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "User Handle",
+          "default": "user123"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Video Link (TikTok/IG)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist UGC",
+      "blocks": [
+        { "type": "reel", "settings": { "handle": "creator_one" } },
+        { "type": "reel", "settings": { "handle": "streetstyle" } },
+        { "type": "reel", "settings": { "handle": "hypebeast" } },
+        { "type": "reel", "settings": { "handle": "dailyfit" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

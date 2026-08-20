@@ -1,0 +1,357 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --input-bg: {{ section.settings.input_bg }};
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    
+    background-color: var(--bg-color);
+    position: relative;
+  }
+
+  .hp21-newsletter-wrapper {
+    position: relative;
+    padding: {{ section.settings.padding_top }}px 40px {{ section.settings.padding_bottom }}px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-newsletter-wrapper {
+      padding: {{ section.settings.padding_top | times: 0.75 | round }}px 20px {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+      min-height: 400px;
+    }
+  }
+
+  .hp21-newsletter__bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+  }
+
+  .hp21-newsletter__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: {{ section.settings.bg_opacity | divided_by: 100.0 }};
+  }
+
+  .hp21-newsletter__bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, var(--bg-color) 100%);
+  }
+
+  .hp21-newsletter__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 60px 40px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-newsletter__content {
+      padding: 40px 24px;
+    }
+  }
+
+  .hp21-newsletter__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 300;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0 0 16px;
+  }
+
+  .hp21-newsletter__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 24px;
+    line-height: 1.2;
+  }
+  
+  .hp21-newsletter__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp21-newsletter__text {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 300;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+    max-width: 500px;
+  }
+
+  .hp21-newsletter__form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 8px;
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp21-newsletter__form {
+      flex-direction: column;
+      border-bottom: none;
+      gap: 16px;
+    }
+  }
+
+  .hp21-newsletter__input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 16px 12px 0;
+    color: var(--text-color);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 300;
+    outline: none;
+  }
+
+  .hp21-newsletter__input::placeholder {
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp21-newsletter__input {
+      border-bottom: 1px solid var(--accent-color);
+      padding: 12px 0;
+    }
+  }
+
+  .hp21-newsletter__btn {
+    background: transparent;
+    border: none;
+    color: var(--accent-color);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 0 12px 20px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .hp21-newsletter__btn:hover {
+    opacity: 0.7;
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp21-newsletter__btn {
+      padding: 12px;
+      background: var(--accent-color);
+      color: #000;
+    }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-newsletter-wrapper" id="HP21Newsletter-{{ section.id }}">
+  
+  <div class="hp21-newsletter__bg">
+    {%- if section.settings.bg_image != blank -%}
+      <img height="{{ section.settings.bg_image.height }}" width="{{ section.settings.bg_image.width }}" src="{{ section.settings.bg_image | image_url: width: 2000 }}" alt="Background" loading="lazy">
+    {%- endif -%}
+  </div>
+
+  <div class="hp21-newsletter__content">
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp21-newsletter__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp21-newsletter__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.text != blank -%}
+      <p class="hp21-newsletter__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+
+    {%- form 'customer', class: 'hp21-newsletter__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" name="contact[email]" class="hp21-newsletter__input" placeholder="{{ section.settings.placeholder | escape }}" required>
+      <button type="submit" class="hp21-newsletter__btn">{{ section.settings.btn_text | escape }}</button>
+    {%- endform -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Newsletter",
+  "class": "section-hp21-newsletter",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "bg_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Image Opacity",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "PRIVATE ACCESS"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>An Invitation to <em>Exclusivity</em></p>"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Join our inner circle to receive early access to private collections, exclusive events, and bespoke editorial content."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Enter your email address"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "SUBSCRIBE"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Luxury Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Newsletter"
+    }
+  ]
+}
+{% endschema %}

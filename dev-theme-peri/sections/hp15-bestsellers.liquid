@@ -1,0 +1,220 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 120px 40px;
+  }
+  
+  .hp15-bestsellers-container-{{ section_id }} {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .hp15-bestsellers-header-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+  
+  .hp15-bestsellers-heading-{{ section_id }} {
+    font-family: 'Didot', 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: {{ text_color }};
+    margin: 0;
+  }
+  
+  .hp15-bestsellers-link-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: {{ text_color }};
+    text-decoration: none;
+    border-bottom: 1px solid {{ text_color }};
+    padding-bottom: 2px;
+  }
+  
+  .hp15-bestsellers-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  
+  .hp15-product-card-{{ section_id }} {
+    background: {{ bg_color }};
+    position: relative;
+    text-decoration: none;
+    color: {{ text_color }};
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hp15-product-image-wrap-{{ section_id }} {
+    position: relative;
+    padding-top: 130%;
+    overflow: hidden;
+  }
+  
+  .hp15-product-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.5s ease, transform 0.5s ease;
+  }
+  
+  .hp15-product-card-{{ section_id }}:hover .hp15-product-image-{{ section_id }} {
+    filter: grayscale(0%);
+  }
+  
+  .hp15-product-info-{{ section_id }} {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .hp15-product-title-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 10px 0;
+  }
+  
+  .hp15-product-price-{{ section_id }} {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .hp15-product-add-{{ section_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+  
+  .hp15-product-card-{{ section_id }}:hover .hp15-product-add-{{ section_id }} {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 992px) {
+    .hp15-bestsellers-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp15-bestsellers-header-{{ section_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .hp15-product-add-{{ section_id }} {
+      opacity: 1;
+      transform: translateY(0);
+      position: relative;
+    }
+  }
+</style>
+
+<div class="hp15-bestsellers-container-{{ section_id }}">
+  <div class="hp15-bestsellers-header-{{ section_id }}">
+    <h2 class="hp15-bestsellers-heading-{{ section_id }}">{{ section.settings.title | default: 'CURATED SELECTION' }}</h2>
+    <a href="{{ collections[section.settings.collection].url | default: '#' }}" class="hp15-bestsellers-link-{{ section_id }}">VIEW ALL</a>
+  </div>
+  
+  <div class="hp15-bestsellers-grid-{{ section_id }}">
+    {% assign collection = collections[section.settings.collection] %}
+    {% if collection != blank and collection.products_count > 0 %}
+      {% for product in collection.products limit: 4 %}
+        <a href="{{ product.url }}" class="hp15-product-card-{{ section_id }}">
+          <div class="hp15-product-image-wrap-{{ section_id }}">
+            <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" class="hp15-product-image-{{ section_id }}" loading="lazy" alt="{{ product.title }}">
+          </div>
+          <div class="hp15-product-info-{{ section_id }}">
+            <h3 class="hp15-product-title-{{ section_id }}">{{ product.title }}</h3>
+            <div class="hp15-product-price-{{ section_id }}">{{ product.price | money }}</div>
+          </div>
+          <button class="hp15-product-add-{{ section_id }}">Quick Add</button>
+        </a>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..4) %}
+        <a href="#" class="hp15-product-card-{{ section_id }}">
+          <div class="hp15-product-image-wrap-{{ section_id }}">
+            <div class="hp15-product-image-{{ section_id }}" style="background: repeating-linear-gradient(45deg, #EFEFEF, #EFEFEF 12px, #E6E6E6 12px, #E6E6E6 24px);"></div>
+          </div>
+          <div class="hp15-product-info-{{ section_id }}">
+            <h3 class="hp15-product-title-{{ section_id }}">STRUCTURED BLAZER</h3>
+            <div class="hp15-product-price-{{ section_id }}">$895.00</div>
+          </div>
+          <button class="hp15-product-add-{{ section_id }}">Quick Add</button>
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP15 Bestsellers",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "CURATED SELECTION"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP15 Bestsellers"
+    }
+  ]
+}
+{% endschema %}

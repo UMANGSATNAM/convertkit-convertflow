@@ -1,0 +1,169 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg: {{ section.settings.bg_color }};
+    --text: {{ section.settings.text_color }};
+    --gold: {{ section.settings.accent_color }};
+    --serif: 'Playfair Display', serif;
+    --sans: 'Inter', sans-serif;
+    background: var(--bg);
+    padding: 100px 20px;
+  }
+
+  .hp42-fc {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .hp42-fc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+    border-bottom: 1px solid rgba(201,169,110,0.2);
+    padding-bottom: 30px;
+  }
+
+  @media (max-width: 768px) {
+    .hp42-fc__header { flex-direction: column; align-items: flex-start; gap: 20px; }
+  }
+
+  .hp42-fc__title {
+    font-family: var(--serif);
+    font-size: clamp(36px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    font-style: italic;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .hp42-fc__btn {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 3px;
+    transition: opacity 0.3s;
+  }
+  .hp42-fc__btn:hover { opacity: 0.6; }
+
+  .hp42-fc__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+
+  .hp42-fc-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hp42-fc-card__img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+
+  .hp42-fc-card__img img, .hp42-fc-card__img svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.6s ease;
+    filter: brightness(0.8);
+  }
+
+  .hp42-fc-card:hover .hp42-fc-card__img img,
+  .hp42-fc-card:hover .hp42-fc-card__img svg {
+    transform: scale(1.05);
+    filter: brightness(1);
+  }
+
+  .hp42-fc-card__info {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .hp42-fc-card__name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .hp42-fc-card__price {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp42-fc" id="HP42FC-{{ section.id }}">
+  <div class="hp42-fc__header">
+    <h2 class="hp42-fc__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: collections[section.settings.collection].url | default: '#' }}" class="hp42-fc__btn">{{ section.settings.btn_label }}</a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp42-fc__grid">
+    {%- assign collection = collections[section.settings.collection] -%}
+    {%- if collection != blank and collection.products_count > 0 -%}
+      {%- for product in collection.products limit: section.settings.limit -%}
+        <a href="{{ product.url }}" class="hp42-fc-card">
+          <div class="hp42-fc-card__img">
+            <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}" loading="lazy">
+          </div>
+          <div class="hp42-fc-card__info">
+            <h3 class="hp42-fc-card__name">{{ product.title }}</h3>
+            <span class="hp42-fc-card__price">{{ product.price | money }}</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..section.settings.limit) -%}
+        <a href="#" class="hp42-fc-card">
+          <div class="hp42-fc-card__img">{{ 'product-' | append: i | placeholder_svg_tag }}</div>
+          <div class="hp42-fc-card__info">
+            <h3 class="hp42-fc-card__name">Noir Piece {{ i }}</h3>
+            <span class="hp42-fc-card__price">$295.00</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP42 - Noir Collection",
+  "class": "section-hp42-featured-collection",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "The Edit" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "min": 2, "max": 8, "step": 1, "label": "Limit", "default": 4 },
+    { "type": "text", "id": "btn_label", "label": "Button", "default": "View All" },
+    { "type": "url", "id": "btn_link", "label": "Link" },
+    { "type": "range", "id": "title_size", "min": 36, "max": 120, "step": 4, "unit": "px", "label": "Heading Size", "default": 64 },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0A0A0A" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#F5F0EB" },
+    { "type": "color", "id": "accent_color", "label": "Gold", "default": "#C9A96E" },
+    { "type": "html", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "presets": [{ "name": "HP42 - Noir Collection" }]
+}
+{% endschema %}

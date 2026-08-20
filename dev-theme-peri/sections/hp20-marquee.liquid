@@ -1,0 +1,312 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --marquee-speed: {{ section.settings.speed }}s;
+    
+    background-color: var(--bg-color);
+    border-top: var(--border-thickness) solid var(--border-color);
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    padding-top: {{ section.settings.padding_y }}px;
+    padding-bottom: {{ section.settings.padding_y }}px;
+    overflow: hidden;
+  }
+
+  .hp20-marquee-container {
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+  }
+
+  .hp20-marquee__track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    will-change: transform;
+    animation: hp20Marquee var(--marquee-speed) linear infinite;
+    {% if section.settings.direction == 'right' %}
+    animation-direction: reverse;
+    {% endif %}
+  }
+
+  @keyframes hp20Marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  {% if section.settings.pause_on_hover %}
+  .hp20-marquee-container:hover .hp20-marquee__track {
+    animation-play-state: paused;
+  }
+  {% endif %}
+
+  .hp20-marquee__item {
+    display: flex;
+    align-items: center;
+    padding: 0 {{ section.settings.item_gap | divided_by: 2 }}px;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+
+  .hp20-marquee__text {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(24px, 4vw, {{ section.settings.text_size }}px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    -webkit-text-stroke: {% if section.settings.outline_text %}1px var(--text-color){% else %}0{% endif %};
+    color: {% if section.settings.outline_text %}transparent{% else %}var(--text-color){% endif %};
+    transition: all 0.3s ease;
+  }
+  
+  {% if section.settings.outline_text %}
+  .hp20-marquee__item:hover .hp20-marquee__text {
+    color: var(--text-color);
+  }
+  {% endif %}
+
+  .hp20-marquee__separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 {{ section.settings.item_gap | divided_by: 2 }}px;
+    color: var(--text-color);
+  }
+  
+  .hp20-marquee__separator svg {
+    width: {{ section.settings.icon_size }}px;
+    height: {{ section.settings.icon_size }}px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-marquee-container" id="HP20Marquee-{{ section.id }}">
+  <!-- First Track -->
+  <div class="hp20-marquee__track">
+    {%- for i in (1..6) -%}
+      {%- for block in section.blocks -%}
+        
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="hp20-marquee__item" {{ block.shopify_attributes }}>
+        {%- else -%}
+          <div class="hp20-marquee__item" {{ block.shopify_attributes }}>
+        {%- endif -%}
+        
+          <span class="hp20-marquee__text">{{ block.settings.text | escape }}</span>
+          
+        {%- if block.settings.link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_separator -%}
+          <div class="hp20-marquee__separator">
+            {%- case section.settings.separator_style -%}
+              {%- when 'star' -%}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+              {%- when 'circle' -%}
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+              {%- when 'square' -%}
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>
+              {%- when 'plus' -%}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H13V5C13 4.45 12.55 4 12 4C11.45 4 11 4.45 11 5V11H5C4.45 11 4 11.45 4 12C4 12.55 4.45 13 5 13H11V19C11 19.55 11.45 20 12 20C12.55 20 13 19.55 13 19V13H19C19.55 13 20 12.55 20 12C20 11.45 19.55 11 19 11Z"/></svg>
+            {%- endcase -%}
+          </div>
+        {%- endif -%}
+        
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Marquee",
+  "class": "section-hp20-marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 20,
+      "info": "Lower number = faster speed"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options": [
+        { "value": "left", "label": "Right to Left" },
+        { "value": "right", "label": "Left to Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 48
+    },
+    {
+      "type": "checkbox",
+      "id": "outline_text",
+      "label": "Use Outline Text Style",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between items",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separator",
+      "label": "Show Separator Icon",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "separator_style",
+      "label": "Separator Style",
+      "options": [
+        { "value": "star", "label": "Star" },
+        { "value": "circle", "label": "Circle" },
+        { "value": "square", "label": "Square" },
+        { "value": "plus", "label": "Plus" }
+      ],
+      "default": "plus"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Top/Bottom Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_block",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "LATEST DROPS"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Marquee",
+      "blocks": [
+        { "type": "text_block", "settings": { "text": "NEW SEASON" } },
+        { "type": "text_block", "settings": { "text": "LIMITED EDITION" } },
+        { "type": "text_block", "settings": { "text": "FREE SHIPPING" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

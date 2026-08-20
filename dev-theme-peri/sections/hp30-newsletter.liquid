@@ -1,0 +1,317 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-newsletter-wrapper {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+    padding: 100px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp30-newsletter-wrapper {
+      padding: 60px 20px;
+    }
+  }
+
+  .hp30-newsletter__bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-heading);
+    font-size: 300px;
+    line-height: 0.8;
+    color: var(--text-color);
+    opacity: 0.03;
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hp30-newsletter__header {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 60px;
+  }
+
+  .hp30-newsletter__title {
+    font-family: var(--font-heading);
+    font-size: clamp(50px, 10vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    letter-spacing: -0.02em;
+  }
+
+  .hp30-newsletter__text {
+    font-family: var(--font-body);
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    max-width: 600px;
+  }
+
+  .hp30-newsletter__form-wrap {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .hp30-newsletter__form {
+    display: flex;
+    border: 4px solid var(--border-color);
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-newsletter__form {
+      flex-direction: column;
+      border: none;
+    }
+  }
+
+  .hp30-newsletter__input {
+    flex: 1;
+    background: var(--bg-color);
+    border: none;
+    padding: 30px 40px;
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    outline: none;
+    min-width: 0;
+  }
+
+  .hp30-newsletter__input::placeholder {
+    color: var(--text-color);
+    opacity: 0.3;
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-newsletter__input {
+      border: 4px solid var(--border-color);
+      margin-bottom: 10px;
+      padding: 20px;
+      font-size: 18px;
+    }
+  }
+
+  .hp30-newsletter__btn {
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: none;
+    border-left: 4px solid var(--border-color);
+    padding: 0 50px;
+    font-family: var(--font-heading);
+    font-size: 30px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0s, color 0s;
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-newsletter__btn {
+      border: 4px solid var(--border-color);
+      padding: 20px;
+      width: 100%;
+    }
+  }
+
+  .hp30-newsletter__btn:hover {
+    background: var(--accent-color);
+    color: #fff;
+  }
+
+  .hp30-newsletter__footer {
+    margin-top: 20px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-color);
+    opacity: 0.5;
+    position: relative;
+    z-index: 2;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-newsletter-wrapper" id="HP30Newsletter-{{ section.id }}">
+  <div class="hp30-newsletter__bg-text">{{ section.settings.bg_text }}</div>
+
+  <div class="hp30-newsletter__header">
+    <h2 class="hp30-newsletter__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.text != blank -%}
+      <p class="hp30-newsletter__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="hp30-newsletter__form-wrap">
+    {% form 'customer', class: 'hp30-newsletter__form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input 
+        type="email" 
+        name="contact[email]" 
+        class="hp30-newsletter__input" 
+        placeholder="{{ section.settings.placeholder }}" 
+        required
+      >
+      <button type="submit" class="hp30-newsletter__btn">
+        {{ section.settings.btn_text }}
+      </button>
+    {% endform %}
+    <div class="hp30-newsletter__footer">NO SPAM. ONLY ESSENTIAL TRANSMISSIONS.</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Email",
+  "class": "section-hp30-newsletter",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "bg_text",
+      "label": "Background Watermark",
+      "default": "SYSTEM.ACCESS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "JOIN THE REGISTRY"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "ENTER YOUR CLEARANCE CODE (EMAIL) TO RECEIVE CLASSIFIED DROPS AND ARCHIVE ACCESS."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "ENTER EMAIL_"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "SUBMIT"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 60,
+      "max": 180,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Red Hover)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Email"
+    }
+  ]
+}
+{% endschema %}

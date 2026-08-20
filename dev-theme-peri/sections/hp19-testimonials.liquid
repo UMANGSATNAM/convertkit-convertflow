@@ -1,0 +1,508 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --star-color: {{ section.settings.star_color }};
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp19-testi-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    text-align: {{ section.settings.header_alignment }};
+  }
+
+  .hp19-testi__title {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    margin: 0 0 {{ section.settings.header_margin }}px;
+    font-style: italic;
+  }
+
+  .hp19-testi__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+    gap: {{ section.settings.grid_gap }}px;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp19-testi__grid {
+      grid-template-columns: repeat({{ section.settings.tablet_columns }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-testi__grid {
+      {% if section.settings.mobile_layout == 'swipe' %}
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-left: -24px;
+      margin-right: -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+      {% else %}
+      grid-template-columns: 1fr;
+      gap: {{ section.settings.mobile_grid_gap }}px;
+      {% endif %}
+    }
+    
+    {% if section.settings.mobile_layout == 'swipe' %}
+    .hp19-testi__grid::-webkit-scrollbar {
+      display: none;
+    }
+    .hp19-testi__item {
+      flex: 0 0 85%;
+      scroll-snap-align: center;
+    }
+    {% endif %}
+  }
+
+  .hp19-testi__card {
+    background: var(--card-bg);
+    border-radius: {{ section.settings.card_radius }}px;
+    padding: {{ section.settings.card_padding }}px;
+    text-align: {{ section.settings.card_alignment }};
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: transform 0.3s ease;
+  }
+  
+  .hp19-testi__card:hover {
+    transform: translateY(-4px);
+  }
+
+  .hp19-testi__stars {
+    color: var(--star-color);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: {% if section.settings.card_alignment == 'center' %}center{% elsif section.settings.card_alignment == 'left' %}flex-start{% else %}flex-end{% endif %};
+    gap: 4px;
+  }
+  
+  .hp19-testi__stars svg {
+    width: 20px; height: 20px;
+  }
+
+  .hp19-testi__quote {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: {{ section.settings.quote_size }}px;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0 0 32px;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+  }
+  
+  {% if section.settings.show_quote_icon %}
+  .hp19-testi__quote::before {
+    content: '"';
+    font-family: 'Baskerville', serif;
+    font-size: 80px;
+    position: absolute;
+    top: -30px;
+    {% if section.settings.card_alignment == 'left' %}left: -10px;{% else %}left: 50%; transform: translateX(-50%);{% endif %}
+    color: var(--text-color);
+    opacity: 0.1;
+    z-index: -1;
+  }
+  {% endif %}
+
+  .hp19-testi__author-block {
+    display: flex;
+    align-items: center;
+    justify-content: {% if section.settings.card_alignment == 'center' %}center{% elsif section.settings.card_alignment == 'left' %}flex-start{% else %}flex-end{% endif %};
+    gap: 16px;
+    margin-top: auto;
+  }
+
+  .hp19-testi__avatar {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f0f0f0;
+  }
+
+  .hp19-testi__author-info {
+    text-align: left;
+  }
+
+  .hp19-testi__name {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .hp19-testi__verify {
+    color: #4CAF50;
+    width: 14px; height: 14px;
+  }
+
+  .hp19-testi__title-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp19-testi-wrapper" id="HP19Testimonials-{{ section.id }}">
+  {%- if section.settings.title != blank -%}
+    <h2 class="hp19-testi__title">{{ section.settings.title | escape }}</h2>
+  {%- endif -%}
+
+  <div class="hp19-testi__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp19-testi__item" {{ block.shopify_attributes }}>
+        <div class="hp19-testi__card">
+          
+          <div class="hp19-testi__stars">
+            {%- for i in (1..5) -%}
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+          
+          <blockquote class="hp19-testi__quote">
+            "{{ block.settings.quote | escape }}"
+          </blockquote>
+          
+          <div class="hp19-testi__author-block">
+            {%- if block.settings.image != blank -%}
+              <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 100 }}" alt="{{ block.settings.author | escape }}" class="hp19-testi__avatar" loading="lazy">
+            {%- elsif section.settings.show_placeholder_avatar -%}
+              <div class="hp19-testi__avatar" style="display:flex;align-items:center;justify-content:center;background:var(--text-color);color:var(--card-bg);font-family:'Inter',sans-serif;font-weight:700;">
+                {{ block.settings.author | slice: 0 | upcase }}
+              </div>
+            {%- endif -%}
+            
+            <div class="hp19-testi__author-info">
+              <div class="hp19-testi__name">
+                {{ block.settings.author | escape }}
+                {%- if block.settings.verified -%}
+                  <svg class="hp19-testi__verify" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                {%- endif -%}
+              </div>
+              {%- if block.settings.role != blank -%}
+                <div class="hp19-testi__title-role">{{ block.settings.role | escape }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP19 - Testimonials Pro",
+  "class": "section-hp19-testimonials",
+  "max_blocks": 9,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Word on the Street"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Spacing Below Header",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Tablet Columns",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile Layout",
+      "options": [
+        { "value": "stack", "label": "Stacked Grid" },
+        { "value": "swipe", "label": "Horizontal Swipe" }
+      ],
+      "default": "swipe"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid Gap (Desktop)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "mobile_grid_gap",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid Gap (Mobile, if stacked)",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Card Styling"
+    },
+    {
+      "type": "select",
+      "id": "card_alignment",
+      "label": "Card Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Quote Text Size",
+      "default": 18
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_icon",
+      "label": "Show large quote icon background",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_placeholder_avatar",
+      "label": "Show initial letter if no image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FFFBEB"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star Color",
+      "default": "#D97706"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Review Text",
+          "default": "Absolutely love their seasonal blend. The best start to my morning, hands down."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name",
+          "default": "Jane Doe"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Subtitle / Role",
+          "default": "Verified Buyer"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Author Avatar (Optional)"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Show verified icon",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - Testimonials Pro",
+      "category": "Text",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,82 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00FFA3'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    border-bottom: 1px solid {{ text_color }};
+    padding: 8px 0;
+  }
+
+  .hp13-announcement-{{ section_id }} {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: {{ text_color }};
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: hp13-glitch-{{ section_id }} 4s infinite;
+  }
+  
+  .hp13-announcement-link-{{ section_id }} {
+    color: {{ text_color }};
+    text-decoration: none;
+  }
+  
+  .hp13-announcement-link-{{ section_id }}:hover {
+    text-decoration: underline;
+    text-shadow: 0 0 8px {{ text_color }};
+  }
+
+  @keyframes hp13-glitch-{{ section_id }} {
+    0%, 96%, 98%, 100% { opacity: 1; transform: translateX(0); }
+    97% { opacity: 0.8; transform: translateX(-2px); }
+    99% { opacity: 0.5; transform: translateX(2px); }
+  }
+</style>
+
+<div class="hp13-announcement-{{ section_id }}">
+  <a href="{{ section.settings.link | default: '#' }}" class="hp13-announcement-link-{{ section_id }}">
+    [{{ section.settings.text | default: 'SYSTEM.UPDATE: FREE_SHIPPING_ACTIVATED' }}]
+  </a>
+</div>
+
+{% schema %}
+{
+  "name": "HP13 Announcement Bar",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#00FFA3"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "SYSTEM.UPDATE: FREE_SHIPPING_ACTIVATED"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP13 Announcement Bar"
+    }
+  ]
+}
+{% endschema %}

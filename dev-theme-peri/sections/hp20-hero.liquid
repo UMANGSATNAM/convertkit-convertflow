@@ -1,0 +1,479 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    --btn-bg: {{ section.settings.btn_bg_color }};
+    --btn-text: {{ section.settings.btn_text_color }};
+    --btn-hover-bg: {{ section.settings.btn_hover_bg }};
+    --btn-hover-text: {{ section.settings.btn_hover_text }};
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-hero-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: {% if section.settings.layout == 'image_right' %}row{% else %}row-reverse{% endif %};
+    align-items: stretch;
+    gap: {{ section.settings.gap }}px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-hero-wrapper {
+      flex-direction: column-reverse;
+      gap: 32px;
+    }
+  }
+
+  .hp20-hero__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px;
+    background: {{ section.settings.content_bg }};
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  {% if section.settings.enable_hover_fx %}
+  .hp20-hero__content:hover {
+    transform: translate(calc(var(--shadow-offset) * -0.5), calc(var(--shadow-offset) * -0.5));
+    box-shadow: calc(var(--shadow-offset) * 1.5) calc(var(--shadow-offset) * 1.5) 0px var(--shadow-color);
+  }
+  {% endif %}
+
+  @media screen and (max-width: 768px) {
+    .hp20-hero__content {
+      padding: 32px 24px;
+    }
+  }
+
+  .hp20-hero__badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: var(--border-thickness) solid var(--border-color);
+    margin-bottom: 24px;
+    box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0px var(--shadow-color);
+  }
+
+  .hp20-hero__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    letter-spacing: -1px;
+  }
+
+  .hp20-hero__text {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    max-width: 600px;
+  }
+
+  .hp20-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .hp20-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0px var(--shadow-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp20-hero__btn:hover {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+    transform: translate(2px, 2px);
+    box-shadow: calc(calc(var(--shadow-offset) / 2) - 2px) calc(calc(var(--shadow-offset) / 2) - 2px) 0px var(--shadow-color);
+  }
+  
+  .hp20-hero__btn:active {
+    transform: translate(calc(var(--shadow-offset) / 2), calc(var(--shadow-offset) / 2));
+    box-shadow: 0px 0px 0px var(--shadow-color);
+  }
+
+  .hp20-hero__btn--secondary {
+    background: transparent;
+    color: var(--text-color);
+  }
+  
+  .hp20-hero__btn--secondary:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hp20-hero__image-wrapper {
+    flex: 1.2;
+    position: relative;
+    min-height: 400px;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    overflow: hidden;
+    background: var(--accent-color);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-hero__image-wrapper {
+      min-height: 300px;
+      aspect-ratio: 4/3;
+    }
+  }
+
+  .hp20-hero__image-wrapper img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: {% if section.settings.image_grayscale %}grayscale(100%) contrast(120%){% else %}none{% endif %};
+    transition: filter 0.3s;
+  }
+  
+  .hp20-hero__image-wrapper:hover img {
+    filter: {% if section.settings.image_grayscale %}grayscale(0%) contrast(100%){% else %}none{% endif %};
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-hero-wrapper" id="HP20Hero-{{ section.id }}">
+  <div class="hp20-hero__content">
+    {%- if section.settings.badge_text != blank -%}
+      <div class="hp20-hero__badge">{{ section.settings.badge_text | escape }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.title != blank -%}
+      <h1 class="hp20-hero__title">{{ section.settings.title | escape }}</h1>
+    {%- endif -%}
+    
+    {%- if section.settings.text != blank -%}
+      <div class="hp20-hero__text">{{ section.settings.text | escape }}</div>
+    {%- endif -%}
+    
+    <div class="hp20-hero__actions">
+      {%- if section.settings.btn1_text != blank and section.settings.btn1_link != blank -%}
+        <a href="{{ section.settings.btn1_link }}" class="hp20-hero__btn">
+          {{ section.settings.btn1_text | escape }}
+        </a>
+      {%- endif -%}
+      
+      {%- if section.settings.btn2_text != blank and section.settings.btn2_link != blank -%}
+        <a href="{{ section.settings.btn2_link }}" class="hp20-hero__btn hp20-hero__btn--secondary">
+          {{ section.settings.btn2_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+  
+  <div class="hp20-hero__image-wrapper">
+    {%- if section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1400 }}" alt="{{ section.settings.image.alt | default: 'Hero Image' }}" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist Hero",
+  "class": "section-hp20-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Desktop Layout",
+      "options": [
+        { "value": "image_right", "label": "Text Left, Image Right" },
+        { "value": "image_left", "label": "Image Left, Text Right" }
+      ],
+      "default": "image_right"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Gap Between Columns",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "NEW ARRIVAL"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "DISRUPT THE NORM."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Bold gear designed for those who don't compromise. Shop the latest drop now."
+    },
+    {
+      "type": "text",
+      "id": "btn1_text",
+      "label": "Primary Button Text",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "btn2_text",
+      "label": "Secondary Button Text",
+      "default": "LEARN MORE"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_grayscale",
+      "label": "Enable High-Contrast Grayscale",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Outer Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "content_bg",
+      "label": "Content Box Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Badge)",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Global Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Hard Shadow Offset",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_hover_fx",
+      "label": "Enable Box Hover Jump",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Button Colors"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Primary Button Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Primary Button Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_bg",
+      "label": "Primary Hover Background",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_text",
+      "label": "Primary Hover Text",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist Hero"
+    }
+  ]
+}
+{% endschema %}

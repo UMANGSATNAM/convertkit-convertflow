@@ -1,0 +1,304 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-ig-wrapper {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+  }
+
+  .hp30-ig__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 4px solid var(--border-color);
+    background: var(--text-color);
+    color: var(--bg-color);
+    text-decoration: none;
+    transition: background-color 0s, color 0s;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp30-ig__header {
+      padding: 15px 20px;
+    }
+  }
+
+  .hp30-ig__header:hover {
+    background: var(--accent-color);
+  }
+
+  .hp30-ig__title {
+    font-family: var(--font-heading);
+    font-size: clamp(30px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: currentColor;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hp30-ig__icon {
+    font-family: var(--font-body);
+    font-size: 30px;
+    font-weight: 700;
+    color: currentColor;
+    line-height: 1;
+  }
+
+  .hp30-ig__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-ig__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-ig__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .hp30-ig__item {
+    position: relative;
+    aspect-ratio: 1/1;
+    background: #000;
+    overflow: hidden;
+    border-right: 4px solid var(--border-color);
+    border-bottom: 4px solid var(--border-color);
+    display: block;
+  }
+
+  /* Handle grid borders */
+  .hp30-ig__item:nth-child({{ section.settings.columns_desktop }}n) {
+    border-right: none;
+  }
+  .hp30-ig__item:nth-last-child(-n+{{ section.settings.columns_desktop }}) {
+    border-bottom: none;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-ig__item:nth-child(n) {
+      border-right: 4px solid var(--border-color);
+      border-bottom: 4px solid var(--border-color);
+    }
+    .hp30-ig__item:nth-child(3n) {
+      border-right: none;
+    }
+    .hp30-ig__item:nth-last-child(-n+3) {
+      border-bottom: none;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-ig__item:nth-child(n) {
+      border-right: 4px solid var(--border-color);
+      border-bottom: 4px solid var(--border-color);
+    }
+    .hp30-ig__item:nth-child(2n) {
+      border-right: none;
+    }
+    .hp30-ig__item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+  }
+
+  .hp30-ig__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(150%);
+    transition: filter 0s;
+  }
+
+  .hp30-ig__item:hover .hp30-ig__image {
+    filter: grayscale(0%) contrast(100%);
+  }
+
+  .hp30-ig__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0s;
+  }
+
+  .hp30-ig__item:hover .hp30-ig__overlay {
+    opacity: 1;
+  }
+
+  .hp30-ig__overlay-icon {
+    font-family: var(--font-body);
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-ig-wrapper" id="HP30IG-{{ section.id }}">
+  <a href="{{ section.settings.link | default: '#' }}" class="hp30-ig__header" target="_blank">
+    <h2 class="hp30-ig__title">{{ section.settings.title }}</h2>
+    <div class="hp30-ig__icon">&#x2197;</div>
+  </a>
+
+  <div class="hp30-ig__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp30-ig__item" target="_blank" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="Instagram Post" class="hp30-ig__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp30-ig__image' }}
+        {%- endif -%}
+        
+        <div class="hp30-ig__overlay">
+          <div class="hp30-ig__overlay-icon">+</div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist IG",
+  "class": "section-hp30-instagram",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "@SYSTEM_NETWORK"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 4,
+      "max": 8,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Instagram Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist IG",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

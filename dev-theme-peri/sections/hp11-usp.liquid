@@ -1,0 +1,155 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FFFFFF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 80px 20px;
+    color: {{ text_color }};
+    border-bottom: 3px solid #000;
+  }
+  
+  .hp11-usp-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .hp11-usp-item-{{ section_id }} {
+    background: #FFF;
+    border: 3px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    padding: 30px;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  
+  .hp11-usp-item-{{ section_id }}:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 #000;
+  }
+  
+  .hp11-usp-icon-{{ section_id }} {
+    width: 60px;
+    height: 60px;
+    background: #CCFF00;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: absolute;
+    top: -30px;
+    left: 30px;
+  }
+  
+  .hp11-usp-icon-{{ section_id }} svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: #000;
+    stroke-width: 2;
+  }
+  
+  .hp11-usp-title-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 20px 0 10px 0;
+    letter-spacing: -0.5px;
+  }
+  
+  .hp11-usp-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media (max-width: 992px) {
+    .hp11-usp-container-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 60px;
+      padding-top: 30px;
+    }
+  }
+</style>
+
+<div class="hp11-usp-container-{{ section_id }}">
+  {% for block in section.blocks limit: 3 %}
+    <div class="hp11-usp-item-{{ section_id }}" {{ block.shopify_attributes }}>
+      <div class="hp11-usp-icon-{{ section_id }}">
+        {% if block.settings.icon_svg != blank %}
+          {{ block.settings.icon_svg }}
+        {% else %}
+          <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% endif %}
+      </div>
+      <h3 class="hp11-usp-title-{{ section_id }}">{{ block.settings.title | default: 'WORLDWIDE SHIPPING' }}</h3>
+      <p class="hp11-usp-text-{{ section_id }}">{{ block.settings.text | default: 'We ship across the globe. Secure tracking provided.' }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP11 USP",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon_svg",
+          "label": "Icon SVG"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "WORLDWIDE SHIPPING"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "We ship across the globe. Secure tracking provided."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP11 USP",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "WORLDWIDE SHIPPING" } },
+        { "type": "usp", "settings": { "title": "EASY RETURNS" } },
+        { "type": "usp", "settings": { "title": "SECURE CHECKOUT" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

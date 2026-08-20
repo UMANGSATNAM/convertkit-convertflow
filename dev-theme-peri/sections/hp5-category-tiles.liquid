@@ -1,0 +1,302 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#1a2a3a'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp5-ct-bg: {{ bg_color }};
+    --hp5-ct-text: {{ text_color }};
+    
+    --hp5-ct-pt-desk: {{ padding_top_desktop }}px;
+    --hp5-ct-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp5-ct-pt-mob: {{ padding_top_mobile }}px;
+    --hp5-ct-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp5-health-ct-{{ section.id }} {
+    padding-top: var(--hp5-ct-pt-desk);
+    padding-bottom: var(--hp5-ct-pb-desk);
+    background-color: var(--hp5-ct-bg);
+    color: var(--hp5-ct-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp5-ct-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp5-ct-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp5-ct-title {
+    font-size: clamp(32px, 4vw, 40px);
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -1px;
+  }
+
+  .hp5-ct-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .hp5-ct-item {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 4/5;
+    background: #e6eff6;
+    display: flex;
+    align-items: flex-end;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+  
+  .hp5-ct-item:hover {
+    transform: translateY(-5px);
+  }
+
+  .hp5-ct-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .hp5-ct-item:hover .hp5-ct-img {
+    transform: scale(1.05);
+  }
+
+  .hp5-ct-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,42,58,0.8) 0%, transparent 60%);
+    z-index: 1;
+  }
+
+  .hp5-ct-content {
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+    width: 100%;
+    color: #ffffff;
+  }
+
+  .hp5-ct-item-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+  }
+  
+  .hp5-ct-link {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.8);
+    transition: color 0.3s ease;
+  }
+  .hp5-ct-link svg {
+    width: 16px; height: 16px;
+    transition: transform 0.3s ease;
+  }
+  .hp5-ct-item:hover .hp5-ct-link {
+    color: #ffffff;
+  }
+  .hp5-ct-item:hover .hp5-ct-link svg {
+    transform: translateX(4px);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp5-ct-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp5-health-ct-{{ section.id }} {
+      padding-top: var(--hp5-ct-pt-mob);
+      padding-bottom: var(--hp5-ct-pb-mob);
+    }
+    .hp5-ct-inner {
+      padding: 0 20px;
+    }
+    .hp5-ct-grid {
+      grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+      gap: 10px;
+    }
+    {% if section.settings.mobile_columns == '2' %}
+      .hp5-ct-content { padding: 15px; }
+      .hp5-ct-item-title { font-size: 18px; }
+      .hp5-ct-link { font-size: 12px; }
+    {% endif %}
+  }
+</style>
+
+<section class="hp5-health-ct-{{ section.id }}" aria-label="Category Tiles">
+  <div class="hp5-ct-inner">
+    
+    {%- if section.settings.title != blank -%}
+      <div class="hp5-ct-header">
+        <h2 class="hp5-ct-title">{{ section.settings.title }}</h2>
+      </div>
+    {%- endif -%}
+
+    <div class="hp5-ct-grid">
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.link | default: '#' }}" class="hp5-ct-item" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp5-ct-img" loading="lazy" alt="{{ block.settings.title }}">
+          {%- else -%}
+            {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'hp5-ct-img placeholder-svg' }}
+          {%- endif -%}
+          
+          <div class="hp5-ct-overlay"></div>
+          <div class="hp5-ct-content">
+            <h3 class="hp5-ct-item-title">{{ block.settings.title }}</h3>
+            <span class="hp5-ct-link">
+              Shop Now 
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </span>
+          </div>
+        </a>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..4) -%}
+          <a href="#" class="hp5-ct-item">
+            {{ 'collection-' | append: i | placeholder_svg_tag: 'hp5-ct-img placeholder-svg' }}
+            <div class="hp5-ct-overlay"></div>
+            <div class="hp5-ct-content">
+              <h3 class="hp5-ct-item-title">Category {{ i }}</h3>
+              <span class="hp5-ct-link">Shop Now <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></span>
+            </div>
+          </a>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP5 Health Category Tiles",
+  "tag": "section",
+  "class": "section-hp5-category-tiles",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Explore Systems"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile Columns",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a2a3a"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Immunity"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP5 Health Category Tiles",
+      "category": "Collection",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

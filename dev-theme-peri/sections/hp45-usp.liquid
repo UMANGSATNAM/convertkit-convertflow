@@ -1,0 +1,129 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp45-usp-bg: {{ section.settings.bg_color | default: '#F5F5F0' }};
+    --hp45-card-bg: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    --hp45-border: {{ section.settings.border_color | default: '#0A0A0A' }};
+    --hp45-title: {{ section.settings.title_color | default: '#0A0A0A' }};
+    
+    background-color: var(--hp45-usp-bg);
+    padding-top: {{ section.settings.padding_top | default: 70 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 70 }}px;
+  }
+
+  .hp45-usp__grid {
+    max-width: {{ section.settings.container_width | default: 1300 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp45-usp__card {
+    background: var(--hp45-card-bg);
+    border: 2px solid var(--hp45-border);
+    box-shadow: 4px 4px 0 var(--hp45-border);
+    padding: 32px 24px;
+    transition: all 0.2s ease;
+  }
+
+  .hp45-usp__card:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--hp45-border);
+  }
+
+  .hp45-usp__index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #888888;
+    margin-bottom: 16px;
+  }
+
+  .hp45-usp__title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--hp45-title);
+    margin: 0 0 10px;
+  }
+
+  .hp45-usp__desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #4A4A4A;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp45-usp__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media screen and (max-width: 576px) {
+    .hp45-usp__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp45-usp__grid">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <div class="hp45-usp__card" {{ block.shopify_attributes }}>
+        <div class="hp45-usp__index">[SPEC 0{{ forloop.index }}]</div>
+        <h3 class="hp45-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp45-usp__desc">{{ block.settings.description }}</p>
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div class="hp45-usp__card">
+      <div class="hp45-usp__index">[SPEC 01]</div>
+      <h3 class="hp45-usp__title">CLINICAL STOICISM</h3>
+      <p class="hp45-usp__desc">Formulated strictly with verified active molecular compounds without fragrance.</p>
+    </div>
+    <div class="hp45-usp__card">
+      <div class="hp45-usp__index">[SPEC 02]</div>
+      <h3 class="hp45-usp__title">MICRON-LEVEL DOSING</h3>
+      <p class="hp45-usp__desc">Precision pipetting vessels with graduated scale lines for exact dosage.</p>
+    </div>
+    <div class="hp45-usp__card">
+      <div class="hp45-usp__index">[SPEC 03]</div>
+      <h3 class="hp45-usp__title">GLOBAL DDP CARRIER</h3>
+      <p class="hp45-usp__desc">Fully insured priority air delivery with customs pre-cleared across 180 nations.</p>
+    </div>
+    <div class="hp45-usp__card">
+      <div class="hp45-usp__index">[SPEC 04]</div>
+      <h3 class="hp45-usp__title">HEAVY BOROSILICATE</h3>
+      <p class="hp45-usp__desc">UV-absorbing architectural glass engineered to prevent photon degradation.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP45 - Brutal Pillars",
+  "class": "section-hp45-usp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F5F0" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FFFFFF" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#0A0A0A" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#0A0A0A" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 70 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 70 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1300 }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Spec Card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Spec Title", "default": "CLINICAL STOICISM" },
+        { "type": "textarea", "id": "description", "label": "Spec Description", "default": "Formulated strictly with verified active molecular compounds." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP45 - Brutal Pillars" }
+  ]
+}
+{% endschema %}

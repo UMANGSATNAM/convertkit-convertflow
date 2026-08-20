@@ -1,0 +1,203 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#0a0a0d'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ff88'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp9-contact-container-{{ section_id }} {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 50px;
+    border-radius: 4px;
+    position: relative;
+  }
+  
+  .hp9-contact-container-{{ section_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: {{ accent_color }};
+  }
+  
+  .hp9-contact-header-{{ section_id }} {
+    margin-bottom: 40px;
+  }
+  
+  .hp9-contact-heading-{{ section_id }} {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .hp9-contact-subheading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+  
+  .hp9-contact-form-{{ section_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  .hp9-contact-field-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .hp9-contact-field-{{ section_id }}.full {
+    grid-column: 1 / -1;
+  }
+  
+  .hp9-contact-label-{{ section_id }} {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: {{ accent_color }};
+    text-transform: uppercase;
+  }
+  
+  .hp9-contact-input-{{ section_id }},
+  .hp9-contact-textarea-{{ section_id }} {
+    background: #050505;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    padding: 15px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .hp9-contact-input-{{ section_id }}:focus,
+  .hp9-contact-textarea-{{ section_id }}:focus {
+    border-color: {{ accent_color }};
+  }
+  
+  .hp9-contact-textarea-{{ section_id }} {
+    resize: vertical;
+    min-height: 150px;
+  }
+  
+  .hp9-contact-submit-{{ section_id }} {
+    grid-column: 1 / -1;
+    background-color: {{ accent_color }};
+    color: #000;
+    border: none;
+    padding: 15px;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .hp9-contact-submit-{{ section_id }}:hover {
+    background-color: #fff;
+  }
+
+  @media (max-width: 600px) {
+    .hp9-contact-container-{{ section_id }} {
+      padding: 30px 20px;
+    }
+    .hp9-contact-form-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="hp9-contact-container-{{ section_id }}">
+  <div class="hp9-contact-header-{{ section_id }}">
+    <h2 class="hp9-contact-heading-{{ section_id }}">{{ section.settings.heading | default: 'INITIATE_CONTACT' }}</h2>
+    <p class="hp9-contact-subheading-{{ section_id }}">{{ section.settings.subheading | default: 'Transmit your message to our secure servers.' }}</p>
+  </div>
+  
+  {% form 'contact', class: 'hp9-contact-form-' | append: section_id %}
+    {% if form.posted_successfully? %}
+      <div class="hp9-contact-field-{{ section_id }} full" style="color: {{ accent_color }}; padding: 15px; border: 1px solid {{ accent_color }}; margin-bottom: 20px;">
+        > TRANSMISSION SUCCESSFUL
+      </div>
+    {% endif %}
+    
+    <div class="hp9-contact-field-{{ section_id }}">
+      <label class="hp9-contact-label-{{ section_id }}" for="ContactForm-name-{{ section_id }}">ID_NAME</label>
+      <input type="text" id="ContactForm-name-{{ section_id }}" name="contact[name]" class="hp9-contact-input-{{ section_id }}">
+    </div>
+    
+    <div class="hp9-contact-field-{{ section_id }}">
+      <label class="hp9-contact-label-{{ section_id }}" for="ContactForm-email-{{ section_id }}">ID_EMAIL</label>
+      <input type="email" id="ContactForm-email-{{ section_id }}" name="contact[email]" class="hp9-contact-input-{{ section_id }}" required>
+    </div>
+    
+    <div class="hp9-contact-field-{{ section_id }} full">
+      <label class="hp9-contact-label-{{ section_id }}" for="ContactForm-body-{{ section_id }}">DATA_PAYLOAD</label>
+      <textarea id="ContactForm-body-{{ section_id }}" name="contact[body]" class="hp9-contact-textarea-{{ section_id }}" required></textarea>
+    </div>
+    
+    <button type="submit" class="hp9-contact-submit-{{ section_id }}">TRANSMIT_DATA</button>
+  {% endform %}
+</div>
+
+{% schema %}
+{
+  "name": "HP9 Contact Form",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0a0a0d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ff88"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "INITIATE_CONTACT"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Transmit your message to our secure servers."
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Contact Form"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,439 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    --shadow-offset: 6px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp23-ig-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-ig-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  /* Giant background text for the handle */
+  .hp23-ig__bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15vw;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(0,0,0,0.05);
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+
+  .hp23-ig__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: {{ section.settings.header_margin }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    padding-bottom: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-ig__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+
+  .hp23-ig__title {
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .hp23-ig__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--text-color);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    box-shadow: 4px 4px 0 var(--border-color);
+    transition: all 0.2s ease;
+  }
+
+  .hp23-ig__btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--border-color);
+    background: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .hp23-ig__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp23-ig__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp23-ig__grid {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hp23-ig__grid::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .hp23-ig__item {
+    position: relative;
+    background: #ffffff;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp23-ig__item {
+      flex: 0 0 75%;
+      scroll-snap-align: start;
+    }
+  }
+
+  .hp23-ig__item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+  }
+
+  /* Make some items slightly rotated for that messy brutalist look */
+  .hp23-ig__item:nth-child(2) { transform: rotate(2deg); }
+  .hp23-ig__item:nth-child(3) { transform: rotate(-2deg); }
+  .hp23-ig__item:nth-child(2):hover { transform: translate(2px,2px) rotate(2deg); }
+  .hp23-ig__item:nth-child(3):hover { transform: translate(2px,2px) rotate(-2deg); }
+
+  .hp23-ig__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.2) contrast(1.1);
+    transition: transform 0.4s ease;
+  }
+
+  .hp23-ig__item:hover .hp23-ig__image {
+    transform: scale(1.05);
+  }
+
+  .hp23-ig__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    mix-blend-mode: multiply;
+  }
+
+  .hp23-ig__item:hover .hp23-ig__overlay {
+    opacity: 0.8;
+  }
+
+  .hp23-ig__icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0 var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+  
+  .hp23-ig__item:hover .hp23-ig__icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .hp23-ig__icon svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+{%- if section.settings.handle != blank -%}
+  <div class="hp23-ig__bg-text">{{ section.settings.handle }}</div>
+{%- endif -%}
+
+<div class="hp23-ig-wrapper" id="HP23Ig-{{ section.id }}">
+  
+  <div class="hp23-ig__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp23-ig__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.btn_text != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp23-ig__btn">
+        {{ section.settings.btn_text | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp23-ig__grid">
+    {%- for block in section.blocks limit: section.settings.limit -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp23-ig__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="Instagram image" class="hp23-ig__image" loading="lazy">
+        {%- else -%}
+          <div style="width:100%;height:100%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-weight:bold;">IMG</div>
+        {%- endif -%}
+        
+        <div class="hp23-ig__overlay"></div>
+        <div class="hp23-ig__icon">
+          <svg viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2C22,19.4 19.4,22 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8C2,4.6 4.6,2 7.8,2M7.6,4C5.6,4 4,5.6 4,7.6V16.4C4,18.4 5.6,20 7.6,20H16.4C18.4,20 20,18.4 20,16.4V7.6C20,5.6 18.4,4 16.4,4H7.6M12,7.25A4.75,4.75 0 0,1 16.75,12A4.75,4.75 0 0,1 12,16.75A4.75,4.75 0 0,1 7.25,12A4.75,4.75 0 0,1 12,7.25M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5Z"/></svg>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist Insta",
+  "class": "section-hp23-instagram",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>JOIN THE <em>CULT</em></p>"
+    },
+    {
+      "type": "text",
+      "id": "handle",
+      "label": "Background Handle Text",
+      "default": "@BRUTALBEAUTY"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "FOLLOW US"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 8,
+      "step": 1,
+      "label": "Images to Show",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 0,
+      "info": "0 for strict squares"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Hover Overlay Color",
+      "default": "#FF3B30"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Instagram Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link to Post"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist Insta",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

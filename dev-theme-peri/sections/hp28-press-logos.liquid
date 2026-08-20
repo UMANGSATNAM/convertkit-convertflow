@@ -1,0 +1,275 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Press+Start+2P&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --cyan: {{ section.settings.cyan_color }};
+    --magenta: {{ section.settings.magenta_color }};
+    
+    --font-heading: 'Press Start 2P', cursive;
+    --font-body: 'Chakra Petch', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 2px dashed var(--magenta);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp28-press-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp28-press-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp28-press__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hp28-press__title {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: clamp(14px, 2vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    background: #000;
+    padding: 10px 20px;
+    border: 2px solid var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0 var(--cyan);
+  }
+
+  .hp28-press__marquee-container {
+    border-top: 2px dashed var(--text-color);
+    border-bottom: 2px dashed var(--text-color);
+    padding: 30px 0;
+    display: flex;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .hp28-press__marquee-content {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    padding-right: 80px;
+    animation: hp28PressScroll 20s linear infinite;
+  }
+
+  @keyframes hp28PressScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .hp28-press__item {
+    flex-shrink: 0;
+  }
+
+  .hp28-press__image {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+    /* Force logos to be a glowing cyan/magenta via filters depending on base */
+    filter: brightness(0) invert(1) sepia(1) hue-rotate(180deg) saturate(500%) contrast(1.5);
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+
+  .hp28-press__item:hover .hp28-press__image {
+    filter: brightness(0) invert(1) sepia(1) hue-rotate(280deg) saturate(500%) contrast(1.5);
+    transform: scale(1.1);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp28-press-wrapper" id="HP28Press-{{ section.id }}">
+  
+  {%- if section.settings.title != blank -%}
+    <div class="hp28-press__header">
+      <h2 class="hp28-press__title">{{ section.settings.title }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hp28-press__marquee-container">
+    {%- assign loop_count = 2 -%}
+    {%- for i in (1..loop_count) -%}
+      <div class="hp28-press__marquee-content" aria-hidden="{% if forloop.index > 1 %}true{% else %}false{% endif %}">
+        {%- if section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            <div class="hp28-press__item" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: height: 80 }}" alt="{{ block.settings.title | escape }}" class="hp28-press__image" loading="lazy">
+              {%- else -%}
+                <h3 style="font-family: var(--font-heading); color: var(--cyan); font-size: 16px; margin: 0;">{{ block.settings.title | default: 'LOGO' }}</h3>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for j in (1..6) -%}
+            <div class="hp28-press__item">
+              <h3 style="font-family: var(--font-heading); color: var(--cyan); font-size: 16px; margin: 0;">PRESS_{{ j }}</h3>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP28 - Y2K Press Logos",
+  "class": "section-hp28-press-logos",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYSTEM RECOGNITION"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Y2K Cyber Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Deep Purple)",
+      "default": "#1C0B2B"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Base Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cyan_color",
+      "label": "Cyan Accent",
+      "default": "#00FFFF"
+    },
+    {
+      "type": "color",
+      "id": "magenta_color",
+      "label": "Magenta Accent",
+      "default": "#FF00FF"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (Transparent PNG)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Alt Text / Fallback",
+          "default": "Tech Magazine"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP28 - Y2K Press Logos",
+      "blocks": [
+        { "type": "logo", "settings": { "title": "WIRED" } },
+        { "type": "logo", "settings": { "title": "TECH_CRUNCH" } },
+        { "type": "logo", "settings": { "title": "GIZMODO" } },
+        { "type": "logo", "settings": { "title": "THE_VERGE" } },
+        { "type": "logo", "settings": { "title": "ENGADGET" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

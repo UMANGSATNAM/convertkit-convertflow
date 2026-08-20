@@ -1,0 +1,389 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp31-fc-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp31-fc-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp31-fc__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp31-fc__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  .hp31-fc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 4vw, {{ section.settings.title_size }}px);
+    line-height: 1.2;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 400;
+  }
+  
+  .hp31-fc__title em {
+    font-style: italic;
+  }
+
+  .hp31-fc__link-view-all {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--text-color);
+    transition: opacity 0.3s ease;
+  }
+
+  .hp31-fc__link-view-all:hover {
+    opacity: 0.6;
+  }
+
+  .hp31-fc__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp31-fc__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp31-fc__grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none; /* Firefox */
+      margin-right: -20px;
+      padding-right: 20px;
+      gap: 20px;
+    }
+    .hp31-fc__grid::-webkit-scrollbar {
+      display: none; /* Safari/Chrome */
+    }
+  }
+
+  .hp31-fc__product {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    group;
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp31-fc__product {
+      flex: 0 0 80%;
+      scroll-snap-align: center;
+    }
+  }
+
+  .hp31-fc__image-wrapper {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    margin-bottom: 24px;
+    background: #E8E2D6;
+  }
+
+  .hp31-fc__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .hp31-fc__product:hover .hp31-fc__image {
+    transform: scale(1.05);
+  }
+
+  .hp31-fc__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 30px;
+    z-index: 2;
+  }
+
+  .hp31-fc__info {
+    text-align: center;
+  }
+
+  .hp31-fc__vendor {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .hp31-fc__product-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    color: var(--text-color);
+    margin: 0 0 8px;
+    font-weight: 400;
+  }
+
+  .hp31-fc__price-wrap {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  .hp31-fc__compare {
+    text-decoration: line-through;
+    opacity: 0.5;
+    margin-right: 8px;
+    font-size: 13px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp31-fc-wrapper" id="HP31Featured-{{ section.id }}">
+  <div class="hp31-fc__header">
+    <h2 class="hp31-fc__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp31-fc__link-view-all">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp31-fc__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_url | default: '#' }}" class="hp31-fc__product" {{ block.shopify_attributes }}>
+        <div class="hp31-fc__image-wrapper">
+          {%- if block.settings.badge != blank -%}
+            <div class="hp31-fc__badge">{{ block.settings.badge }}</div>
+          {%- endif -%}
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp31-fc__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'product-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp31-fc__image' }}
+          {%- endif -%}
+        </div>
+        <div class="hp31-fc__info">
+          {%- if block.settings.vendor != blank -%}
+            <span class="hp31-fc__vendor">{{ block.settings.vendor }}</span>
+          {%- endif -%}
+          <h3 class="hp31-fc__product-title">{{ block.settings.title }}</h3>
+          <div class="hp31-fc__price-wrap">
+            {%- if block.settings.compare_price != blank -%}
+              <span class="hp31-fc__compare">{{ block.settings.compare_price }}</span>
+            {%- endif -%}
+            <span class="hp31-fc__price">{{ block.settings.price }}</span>
+          </div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP31 - Zen Featured",
+  "class": "section-hp31-featured-collection",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Curated <em>Objects</em>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "View All Label",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "View All Link"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Zen Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Beige)",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Charcoal)",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge"
+        },
+        {
+          "type": "text",
+          "id": "vendor",
+          "label": "Vendor/Category",
+          "default": "Ceramics"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Product Title",
+          "default": "Minimalist Vessel"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$65"
+        },
+        {
+          "type": "text",
+          "id": "compare_price",
+          "label": "Compare at Price"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Product URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP31 - Zen Featured",
+      "blocks": [
+        { "type": "product", "settings": { "badge": "New" } },
+        { "type": "product" },
+        { "type": "product", "settings": { "compare_price": "$90", "price": "$75" } },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

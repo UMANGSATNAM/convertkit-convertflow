@@ -1,0 +1,357 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ffcc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp3-news-bg: {{ bg_color }};
+    --hp3-news-text: {{ text_color }};
+    --hp3-news-accent: {{ accent_color }};
+    
+    --hp3-news-pt-desk: {{ padding_top_desktop }}px;
+    --hp3-news-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp3-news-pt-mob: {{ padding_top_mobile }}px;
+    --hp3-news-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp3-tech-newsletter-{{ section.id }} {
+    padding-top: var(--hp3-news-pt-desk);
+    padding-bottom: var(--hp3-news-pb-desk);
+    background-color: var(--hp3-news-bg);
+    color: var(--hp3-news-text);
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative tech circles */
+  .hp3-tech-newsletter-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,204,0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .hp3-tech-newsletter-{{ section.id }}::after {
+    content: '';
+    position: absolute;
+    top: 50%; right: 0;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    transform: translate(50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hp3-news-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hp3-news-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.1);
+    color: var(--hp3-news-text);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .hp3-news-title {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin: 0 0 20px 0;
+    line-height: 1;
+  }
+  .hp3-news-title span {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--hp3-news-accent);
+  }
+
+  .hp3-news-desc {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 auto 40px;
+    color: rgba(255,255,255,0.7);
+    max-width: 500px;
+  }
+
+  /* Form */
+  .hp3-news-form {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hp3-news-input-group {
+    display: flex;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 5px;
+    transition: border-color 0.3s ease;
+  }
+  .hp3-news-input-group:focus-within {
+    border-color: var(--hp3-news-accent);
+    box-shadow: 0 0 15px rgba(0,255,204,0.2);
+  }
+
+  .hp3-news-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: var(--hp3-news-text);
+    padding: 15px 20px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+  }
+  .hp3-news-input::placeholder {
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hp3-news-submit {
+    background: var(--hp3-news-text);
+    color: #000;
+    border: none;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 0 30px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  .hp3-news-submit:hover {
+    background: var(--hp3-news-accent);
+  }
+
+  .hp3-news-success {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--hp3-news-accent);
+    background: rgba(0,255,204,0.1);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 700;
+    margin-top: 20px;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .hp3-news-error {
+    color: #ff3366;
+    font-size: 14px;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp3-tech-newsletter-{{ section.id }} {
+      padding-top: var(--hp3-news-pt-mob);
+      padding-bottom: var(--hp3-news-pb-mob);
+    }
+    .hp3-news-inner {
+      padding: 0 20px;
+    }
+    .hp3-news-input-group {
+      flex-direction: column;
+      background: transparent;
+      border: none;
+      padding: 0;
+      gap: 10px;
+    }
+    .hp3-news-input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+    }
+    .hp3-news-submit {
+      padding: 15px;
+      width: 100%;
+    }
+  }
+</style>
+
+<section class="hp3-tech-newsletter-{{ section.id }}" aria-label="Newsletter">
+  <div class="hp3-news-inner">
+    
+    {%- if section.settings.badge != blank -%}
+      <div class="hp3-news-badge">{{ section.settings.badge }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.heading != blank -%}
+      <h2 class="hp3-news-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.description != blank -%}
+      <p class="hp3-news-desc">{{ section.settings.description }}</p>
+    {%- endif -%}
+
+    {% form 'customer', class: 'hp3-news-form' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      
+      <div class="hp3-news-input-group">
+        <input 
+          id="NewsletterEmail-{{ section.id }}"
+          type="email"
+          name="contact[email]"
+          class="hp3-news-input"
+          value="{{ form.email }}"
+          aria-required="true"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="email"
+          placeholder="{{ section.settings.placeholder | default: 'ENTER TRANSMISSION EMAIL' }}"
+          required
+        >
+        <button type="submit" class="hp3-news-submit" name="commit" id="Subscribe-{{ section.id }}">
+          {{ section.settings.btn_text | default: 'INITIALIZE' }}
+        </button>
+      </div>
+
+      {%- if form.errors -%}
+        <div class="hp3-news-error" id="Newsletter-error--{{ section.id }}">
+          SYSTEM ERROR: {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+        </div>
+      {%- endif -%}
+
+      {%- if form.posted_successfully? -%}
+        <div class="hp3-news-success" id="Newsletter-success--{{ section.id }}" tabindex="-1" autofocus>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          {{ section.settings.success_text | default: 'TRANSMISSION RECEIVED. WELCOME.' }}
+        </div>
+      {%- endif -%}
+    {% endform %}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP3 Tech Newsletter",
+  "tag": "section",
+  "class": "section-hp3-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "INSIDER ACCESS"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "SYSTEM <span>UPDATE</span>",
+      "info": "Use <span> for outlined accent text."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Join the network to receive intel on upcoming hardware drops, beta testing opportunities, and exclusive discounts."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "ENTER EMAIL ADDRESS"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "INITIALIZE"
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Success Message",
+      "default": "TRANSMISSION RECEIVED. WELCOME."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ffcc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP3 Tech Newsletter (Adv)",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

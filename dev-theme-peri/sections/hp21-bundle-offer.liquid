@@ -1,0 +1,454 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: {{ section.settings.border_color }};
+    --btn-bg: {{ section.settings.btn_bg }};
+    --btn-text: {{ section.settings.btn_text_color }};
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp21-bundle-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-bundle-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp21-bundle__container {
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.gap }}px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-color);
+    padding: {{ section.settings.container_padding }}px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp21-bundle__container {
+      flex-direction: column;
+      padding: 40px 24px;
+    }
+  }
+
+  .hp21-bundle__visuals {
+    flex: 1.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp21-bundle__visuals {
+      gap: 12px;
+    }
+  }
+
+  .hp21-bundle__item-image {
+    flex: 1;
+    position: relative;
+    aspect-ratio: 1/1;
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .hp21-bundle__item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .hp21-bundle__item-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .hp21-bundle__plus {
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--accent-color);
+  }
+
+  .hp21-bundle__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp21-bundle__details {
+      text-align: center;
+      align-items: center;
+    }
+  }
+
+  .hp21-bundle__subtitle {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  .hp21-bundle__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 24px;
+    line-height: 1.2;
+  }
+  
+  .hp21-bundle__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp21-bundle__text {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0 0 32px;
+  }
+
+  .hp21-bundle__price-area {
+    margin-bottom: 32px;
+  }
+
+  .hp21-bundle__price {
+    font-family: var(--font-body);
+    font-size: {{ section.settings.price_size }}px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
+
+  .hp21-bundle__compare {
+    text-decoration: line-through;
+    opacity: 0.5;
+    margin-right: 12px;
+    font-weight: 300;
+  }
+
+  .hp21-bundle__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 40px;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--btn-bg);
+    transition: all 0.4s ease;
+    cursor: pointer;
+  }
+
+  .hp21-bundle__btn:hover {
+    background: transparent;
+    color: var(--btn-bg);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp21-bundle-wrapper" id="HP21Bundle-{{ section.id }}">
+  <div class="hp21-bundle__container">
+    
+    <div class="hp21-bundle__visuals">
+      {%- for block in section.blocks limit: 3 -%}
+        <div class="hp21-bundle__item-image" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 400 }}" alt="Bundle Item" loading="lazy">
+          {%- else -%}
+            {{ 'product-' | append: forloop.index | placeholder_svg_tag }}
+          {%- endif -%}
+        </div>
+        
+        {%- unless forloop.last -%}
+          <div class="hp21-bundle__plus">+</div>
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="hp21-bundle__details">
+      {%- if section.settings.subtitle != blank -%}
+        <p class="hp21-bundle__subtitle">{{ section.settings.subtitle | escape }}</p>
+      {%- endif -%}
+      
+      {%- if section.settings.title != blank -%}
+        <h2 class="hp21-bundle__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.text != blank -%}
+        <p class="hp21-bundle__text">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+
+      <div class="hp21-bundle__price-area">
+        {%- if section.settings.compare_price != blank -%}
+          <span class="hp21-bundle__compare">{{ section.settings.compare_price | escape }}</span>
+        {%- endif -%}
+        <span class="hp21-bundle__price">{{ section.settings.price | escape }}</span>
+      </div>
+
+      <button class="hp21-bundle__btn">
+        {{ section.settings.btn_text | escape }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP21 - Luxury Bundle",
+  "class": "section-hp21-bundle-offer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "THE CURATED SET"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>The Complete <em>Ritual</em></p>"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Experience the ultimate expression of luxury. This curated collection brings together our most defining pieces for a complete sensory journey."
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Bundle Price",
+      "default": "$450.00"
+    },
+    {
+      "type": "text",
+      "id": "compare_price",
+      "label": "Compare at Price",
+      "default": "$550.00"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "ADD SET TO CART"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "container_padding",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Inner Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between images and text",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Price Size",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Luxury Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Outer Background Color",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "rgba(255, 255, 255, 0.1)"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Background",
+      "default": "#D4AF37"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Bundle Product",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP21 - Luxury Bundle",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

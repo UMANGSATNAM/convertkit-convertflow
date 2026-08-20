@@ -1,0 +1,420 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#1a2a3a'
+  assign accent_color = section.settings.accent_color | default: '#0066cc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp5-fc-bg: {{ bg_color }};
+    --hp5-fc-text: {{ text_color }};
+    --hp5-fc-accent: {{ accent_color }};
+    
+    --hp5-fc-pt-desk: {{ padding_top_desktop }}px;
+    --hp5-fc-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp5-fc-pt-mob: {{ padding_top_mobile }}px;
+    --hp5-fc-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp5-health-fc-{{ section.id }} {
+    padding-top: var(--hp5-fc-pt-desk);
+    padding-bottom: var(--hp5-fc-pb-desk);
+    background-color: var(--hp5-fc-bg);
+    color: var(--hp5-fc-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp5-fc-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp5-fc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+
+  .hp5-fc-title-wrap {
+    max-width: 600px;
+  }
+
+  .hp5-fc-title {
+    font-size: clamp(32px, 4vw, 40px);
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    letter-spacing: -1px;
+  }
+  .hp5-fc-desc {
+    font-size: 16px;
+    color: rgba(26,42,58,0.7);
+    margin: 0;
+  }
+
+  .hp5-fc-viewall {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hp5-fc-accent);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: gap 0.3s ease;
+  }
+  .hp5-fc-viewall:hover {
+    gap: 12px;
+  }
+  .hp5-fc-viewall svg {
+    width: 20px; height: 20px;
+  }
+
+  /* Grid Setup */
+  .hp5-fc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+
+  /* Product Card */
+  .hp5-fc-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    text-decoration: none;
+    color: var(--hp5-fc-text);
+    position: relative;
+    border: 1px solid rgba(26,42,58,0.05);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .hp5-fc-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    border-color: rgba(26,42,58,0.1);
+  }
+
+  .hp5-fc-badge {
+    position: absolute;
+    top: 20px; left: 20px;
+    background: #ffffff;
+    color: var(--hp5-fc-accent);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .hp5-fc-img-wrap {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #ffffff;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hp5-fc-img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    transition: transform 0.5s ease;
+  }
+  .hp5-fc-card:hover .hp5-fc-img {
+    transform: scale(1.05);
+  }
+
+  .hp5-fc-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp5-fc-vendor {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(26,42,58,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .hp5-fc-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+  }
+
+  .hp5-fc-benefit {
+    font-size: 13px;
+    color: rgba(26,42,58,0.7);
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hp5-fc-price-row {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .hp5-fc-price {
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .hp5-fc-price-compare {
+    text-decoration: line-through;
+    color: rgba(26,42,58,0.4);
+    font-size: 14px;
+    margin-left: 5px;
+    font-weight: 400;
+  }
+
+  .hp5-fc-add {
+    background: var(--hp5-fc-accent);
+    color: #ffffff;
+    border: none;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+  .hp5-fc-add svg { width: 16px; height: 16px; }
+  .hp5-fc-add:hover {
+    transform: scale(1.1);
+    background: #004c99; /* Darken */
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp5-fc-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp5-health-fc-{{ section.id }} {
+      padding-top: var(--hp5-fc-pt-mob);
+      padding-bottom: var(--hp5-fc-pb-mob);
+    }
+    .hp5-fc-inner {
+      padding: 0 20px;
+    }
+    .hp5-fc-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .hp5-fc-grid {
+      grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+      gap: 15px;
+    }
+    {% if section.settings.mobile_columns == '2' %}
+      .hp5-fc-card { padding: 15px; }
+      .hp5-fc-img { padding: 10px; }
+      .hp5-fc-card-title { font-size: 14px; }
+      .hp5-fc-price { font-size: 15px; }
+    {% endif %}
+  }
+</style>
+
+<section class="hp5-health-fc-{{ section.id }}" aria-label="Featured Collection">
+  <div class="hp5-fc-inner">
+    
+    <div class="hp5-fc-header">
+      <div class="hp5-fc-title-wrap">
+        <h2 class="hp5-fc-title">{{ section.settings.title }}</h2>
+        {%- if section.settings.description != blank -%}
+          <p class="hp5-fc-desc">{{ section.settings.description }}</p>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.collection != blank -%}
+        <a href="{{ collections[section.settings.collection].url }}" class="hp5-fc-viewall">
+          View All Formulas 
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="hp5-fc-grid">
+      {%- assign col = collections[section.settings.collection] -%}
+      {%- if col != blank and col.products_count > 0 -%}
+        {%- for prod in col.products limit: section.settings.limit -%}
+          <a href="{{ prod.url }}" class="hp5-fc-card">
+            {%- if prod.tags contains 'Bestseller' or prod.tags contains 'New' -%}
+              <div class="hp5-fc-badge">
+                {% if prod.tags contains 'Bestseller' %}Bestseller{% else %}New{% endif %}
+              </div>
+            {%- endif -%}
+            <div class="hp5-fc-img-wrap">
+              <img height="{{ prod.featured_image.height }}" width="{{ prod.featured_image.width }}" src="{{ prod.featured_image | image_url: width: 600 }}" class="hp5-fc-img" loading="lazy" alt="{{ prod.title | escape }}">
+            </div>
+            <div class="hp5-fc-info">
+              <div class="hp5-fc-vendor">{{ prod.vendor | default: shop.name }}</div>
+              <h3 class="hp5-fc-card-title">{{ prod.title }}</h3>
+              
+              <!-- Extract meta tag for benefit if available, else snippet -->
+              <p class="hp5-fc-benefit">
+                {%- if prod.metafields.custom.key_benefit != blank -%}
+                  {{ prod.metafields.custom.key_benefit }}
+                {%- else -%}
+                  Clinically formulated to support your daily wellness.
+                {%- endif -%}
+              </p>
+              
+              <div class="hp5-fc-price-row">
+                <div class="hp5-fc-price">
+                  {{ prod.price | money }}
+                  {%- if prod.compare_at_price > prod.price -%}
+                    <span class="hp5-fc-price-compare">{{ prod.compare_at_price | money }}</span>
+                  {%- endif -%}
+                </div>
+                <!-- Fake Add to Cart for UI, normally a form -->
+                <button class="hp5-fc-add" aria-label="Add to cart" tabindex="-1">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                </button>
+              </div>
+            </div>
+          </a>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..section.settings.limit) -%}
+          <a href="#" class="hp5-fc-card">
+            <div class="hp5-fc-badge">Science-Backed</div>
+            <div class="hp5-fc-img-wrap">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'hp5-fc-img placeholder-svg' }}
+            </div>
+            <div class="hp5-fc-info">
+              <div class="hp5-fc-vendor">HealthCo</div>
+              <h3 class="hp5-fc-card-title">Advanced Formula {{ i }}</h3>
+              <p class="hp5-fc-benefit">Supports immunity, energy, and overall cellular health.</p>
+              <div class="hp5-fc-price-row">
+                <div class="hp5-fc-price">$49.99</div>
+                <button class="hp5-fc-add"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg></button>
+              </div>
+            </div>
+          </a>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP5 Health Featured",
+  "tag": "section",
+  "class": "section-hp5-featured-collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Targeted Nutrition"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover our top clinical-grade formulas tailored to your health goals."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4, "max": 12, "step": 4,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile Columns",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a2a3a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0066cc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP5 Health Featured",
+      "category": "Products"
+    }
+  ]
+}
+{% endschema %}

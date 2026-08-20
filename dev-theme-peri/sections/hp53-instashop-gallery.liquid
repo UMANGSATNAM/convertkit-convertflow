@@ -1,0 +1,144 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FAF5EF' }};
+    padding-top: {{ section.settings.padding_top | default: 70 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 70 }}px;
+  }
+
+  .hp53-insta__container {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp53-insta__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hp53-insta__eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: {{ section.settings.accent_color | default: '#C2703E' }};
+    margin: 0 0 12px;
+  }
+
+  .hp53-insta__heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 3vw, 38px);
+    font-weight: 700;
+    color: {{ section.settings.title_color | default: '#5C3D2E' }};
+    margin: 0;
+  }
+
+  .hp53-insta__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns | default: 5 }}, 1fr);
+    gap: 12px;
+  }
+
+  .hp53-insta__item {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: #E8D5C0;
+  }
+
+  .hp53-insta__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .hp53-insta__item:hover img {
+    transform: scale(1.08);
+  }
+
+  .hp53-insta__hover {
+    position: absolute;
+    inset: 0;
+    background: rgba(92, 61, 46, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #FAF5EF;
+    font-size: 24px;
+  }
+
+  .hp53-insta__item:hover .hp53-insta__hover {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp53-insta__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp53-insta__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+{%- endstyle -%}
+
+<div class="hp53-insta__container">
+  <div class="hp53-insta__header">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="hp53-insta__eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <h2 class="hp53-insta__heading">{{ section.settings.heading | default: 'Desert Lookbook' }}</h2>
+  </div>
+
+  <div class="hp53-insta__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '#' }}" class="hp53-insta__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 400 }}" alt="Lookbook" loading="lazy">
+        {%- endif -%}
+        <div class="hp53-insta__hover">♡</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP53 - Dune Lookbook",
+  "class": "section-hp53-insta",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FAF5EF" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#5C3D2E" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#C2703E" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "◈ LOOKBOOK" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Desert Lookbook" },
+    { "type": "range", "id": "columns", "min": 3, "max": 6, "step": 1, "label": "Columns", "default": 5 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 70 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 70 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "HP53 - Dune Lookbook",
+    "blocks": [
+      { "type": "photo" },
+      { "type": "photo" },
+      { "type": "photo" },
+      { "type": "photo" },
+      { "type": "photo" }
+    ]
+  }]
+}
+{% endschema %}

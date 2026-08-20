@@ -1,0 +1,341 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.8 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.8 | round }}px;
+    }
+  }
+
+  .hp29-story-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
+
+  {%- if section.settings.layout == 'image_right' -%}
+    .hp29-story-wrapper {
+      flex-direction: row-reverse;
+    }
+  {%- endif -%}
+
+  @media screen and (max-width: 992px) {
+    .hp29-story-wrapper,
+    .hp29-story-wrapper.image_right {
+      flex-direction: column;
+      gap: 50px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp29-story-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp29-story__image-col {
+    flex: 1;
+    position: relative;
+    padding: 20px;
+  }
+
+  /* Decorative organic frame */
+  .hp29-story__image-frame {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 1px solid var(--accent-color);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    transform: rotate(-5deg);
+    opacity: 0.5;
+  }
+
+  .hp29-story__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    overflow: hidden;
+    z-index: 2;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+
+  .hp29-story__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp29-story__content-col {
+    flex: 1;
+    max-width: 550px;
+  }
+
+  .hp29-story__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-color);
+    margin: 0 0 25px;
+  }
+
+  .hp29-story__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp29-story__text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--text-color);
+    opacity: 0.85;
+    margin: 0 0 40px;
+  }
+
+  .hp29-story__signature {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-style: italic;
+    color: var(--text-color);
+    margin-bottom: 30px;
+  }
+
+  .hp29-story__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--accent-color);
+    transition: all 0.3s ease;
+  }
+
+  .hp29-story__btn svg {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    transition: transform 0.3s ease;
+  }
+
+  .hp29-story__btn:hover {
+    color: var(--accent-color);
+  }
+  .hp29-story__btn:hover svg {
+    transform: translateX(5px);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp29-story-wrapper" id="HP29Story-{{ section.id }}">
+  
+  <div class="hp29-story__image-col">
+    <div class="hp29-story__image-frame"></div>
+    <div class="hp29-story__image-wrapper">
+      {%- if section.settings.image != blank -%}
+        <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.title | escape }}" class="hp29-story__image" loading="lazy">
+      {%- else -%}
+        {{ 'collection-1' | placeholder_svg_tag: 'hp29-story__image' }}
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="hp29-story__content-col">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp29-story__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.text != blank -%}
+      <div class="hp29-story__text">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.signature != blank -%}
+      <div class="hp29-story__signature">{{ section.settings.signature }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.btn_text != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp29-story__btn">
+        {{ section.settings.btn_text }}
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    {%- endif -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP29 - Boho Brand Story",
+  "class": "section-hp29-brand-story",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Image Placement",
+      "options": [
+        { "value": "image_left", "label": "Image Left" },
+        { "value": "image_right", "label": "Image Right" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Story Image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "Rooted in <em>Nature</em>"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We believe in objects that carry meaning. Every piece we create is designed to foster a sense of calm and connection to the natural world. Our materials are chosen not just for their beauty, but for their minimal impact on the earth.</p>"
+    },
+    {
+      "type": "text",
+      "id": "signature",
+      "label": "Signature Text",
+      "default": "With love, The Founders"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "Read Our Story"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Earthy Boho Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Sage Green)",
+      "default": "#81B29A"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Beige/Sand)",
+      "default": "#F4F1DE"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Terracotta)",
+      "default": "#E07A5F"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP29 - Boho Brand Story"
+    }
+  ]
+}
+{% endschema %}

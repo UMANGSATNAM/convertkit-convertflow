@@ -1,0 +1,431 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      --padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp19-faq-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 80px;
+    align-items: flex-start;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp19-faq-wrapper {
+      flex-direction: column;
+      gap: 40px;
+    }
+  }
+
+  .hp19-faq__header-col {
+    flex: 0 0 35%;
+    position: sticky;
+    top: 40px;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp19-faq__header-col {
+      position: static;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  .hp19-faq__title {
+    font-family: 'Baskerville', 'Georgia', serif;
+    font-size: clamp(36px, 5vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    margin: 0 0 24px;
+    font-style: italic;
+    line-height: 1.1;
+  }
+
+  .hp19-faq__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.subtitle_size }}px;
+    color: var(--text-color);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin: 0 0 32px;
+  }
+
+  .hp19-faq__contact-btn {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .hp19-faq__contact-btn:hover {
+    opacity: 0.7;
+    padding-right: 8px;
+  }
+
+  .hp19-faq__content-col {
+    flex: 1;
+    width: 100%;
+  }
+
+  .hp19-faq__accordion {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .hp19-faq__accordion-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    padding: 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.question_size }}px;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+  }
+
+  .hp19-faq__accordion-btn:hover {
+    color: var(--accent-color);
+  }
+
+  .hp19-faq__icon {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-left: 20px;
+  }
+  
+  .hp19-faq__icon::before,
+  .hp19-faq__icon::after {
+    content: '';
+    position: absolute;
+    background-color: currentColor;
+    transition: transform 0.3s ease;
+  }
+  
+  .hp19-faq__icon::before {
+    top: 6px; left: 0; width: 14px; height: 2px;
+  }
+  
+  .hp19-faq__icon::after {
+    top: 0; left: 6px; width: 2px; height: 14px;
+  }
+
+  .hp19-faq__accordion-btn[aria-expanded="true"] .hp19-faq__icon::after {
+    transform: rotate(90deg) scaleY(0);
+  }
+  
+  .hp19-faq__accordion-btn[aria-expanded="true"] {
+    color: var(--accent-color);
+  }
+
+  .hp19-faq__panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+  }
+
+  .hp19-faq__panel-inner {
+    padding: 0 0 32px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.answer_size }}px;
+    color: var(--text-color);
+    opacity: 0.8;
+    line-height: 1.7;
+  }
+
+  .hp19-faq__accordion.is-open .hp19-faq__panel {
+    max-height: 1000px;
+    transition: max-height 0.6s ease-in-out;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp19-faq-wrapper" id="HP19FAQ-{{ section.id }}">
+  <div class="hp19-faq__header-col">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp19-faq__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp19-faq__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+      <a href="{{ section.settings.btn_link }}" class="hp19-faq__contact-btn">
+        {{ section.settings.btn_text | escape }} &rarr;
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp19-faq__content-col">
+    {%- for block in section.blocks -%}
+      <div class="hp19-faq__accordion" {{ block.shopify_attributes }}>
+        <button class="hp19-faq__accordion-btn" aria-expanded="false">
+          <span>{{ block.settings.question | escape }}</span>
+          <span class="hp19-faq__icon"></span>
+        </button>
+        <div class="hp19-faq__panel">
+          <div class="hp19-faq__panel-inner">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const accordions = document.querySelectorAll('#HP19FAQ-{{ section.id }} .hp19-faq__accordion-btn');
+    
+    accordions.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        
+        // Optional: Close others
+        {% if section.settings.close_others %}
+        accordions.forEach(otherBtn => {
+          if (otherBtn !== btn) {
+            otherBtn.setAttribute('aria-expanded', 'false');
+            otherBtn.parentElement.classList.remove('is-open');
+          }
+        });
+        {% endif %}
+        
+        this.setAttribute('aria-expanded', !isExpanded);
+        
+        if (!isExpanded) {
+          this.parentElement.classList.add('is-open');
+        } else {
+          this.parentElement.classList.remove('is-open');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP19 - FAQ Pro",
+  "class": "section-hp19-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Frequently Asked"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Have a question? We've got answers. If you can't find what you're looking for, feel free to reach out."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Contact Button Text",
+      "default": "Contact Support"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Contact Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "question_size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Question Font Size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "answer_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Answer Font Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "checkbox",
+      "id": "close_others",
+      "label": "Close other panels when one opens",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FEF3C7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#451A03"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#D97706"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Hover)",
+      "default": "#D97706"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is your return policy?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer a 30-day money-back guarantee on all our products. If you are not completely satisfied, simply return the item in its original condition.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 - FAQ Pro",
+      "category": "Text",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

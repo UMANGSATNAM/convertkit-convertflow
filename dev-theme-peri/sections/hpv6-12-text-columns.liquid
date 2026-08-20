@@ -1,0 +1,449 @@
+{%- liquid
+  assign section_id = section.id
+  assign layout = section.settings.layout | default: 'boxed'
+  assign columns_desktop = section.settings.columns_desktop | default: 3
+  assign columns_mobile = section.settings.columns_mobile | default: '1'
+  assign text_alignment = section.settings.text_alignment | default: 'left'
+  
+  assign bg_color = section.settings.bg_color | default: '#F7FAFC'
+  assign text_color = section.settings.text_color | default: '#2D3748'
+  assign icon_color = section.settings.icon_color | default: '#2D3748'
+  assign card_bg = section.settings.card_bg | default: 'transparent'
+  
+  assign padding_top = section.settings.padding_top | default: 80
+  assign padding_bottom = section.settings.padding_bottom | default: 80
+  assign padding_top_mobile = section.settings.padding_top_mobile | default: 40
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile | default: 40
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --icon-color: {{ icon_color }};
+    --card-bg: {{ card_bg }};
+    --padding-top: {{ padding_top }}px;
+    --padding-bottom: {{ padding_bottom }}px;
+    --padding-top-mobile: {{ padding_top_mobile }}px;
+    --padding-bottom-mobile: {{ padding_bottom_mobile }}px;
+    --cols-desktop: {{ columns_desktop }};
+    
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .hpv6-text-cols-{{ section_id }} {
+    width: 100%;
+    margin: 0 auto;
+    {%- if layout == 'boxed' -%}
+      max-width: var(--page-width, 1440px);
+      padding-left: 5vw;
+      padding-right: 5vw;
+    {%- else -%}
+      padding-left: 20px;
+      padding-right: 20px;
+    {%- endif -%}
+  }
+
+  .hpv6-text-cols__header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .hpv6-text-cols__section-title {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: clamp(2.25rem, 4vw, 3.5rem);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .hpv6-text-cols__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-desktop), 1fr);
+    gap: 3rem;
+  }
+
+  .hpv6-text-col {
+    display: flex;
+    flex-direction: column;
+    text-align: {{ text_alignment }};
+    background-color: var(--card-bg);
+    {%- if card_bg != 'transparent' and card_bg != 'rgba(0,0,0,0)' -%}
+      padding: 32px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    {%- endif -%}
+    {%- if text_alignment == 'center' -%}
+      align-items: center;
+    {%- elsif text_alignment == 'right' -%}
+      align-items: flex-end;
+    {%- else -%}
+      align-items: flex-start;
+    {%- endif -%}
+  }
+
+  .hpv6-text-col__icon-wrap {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1.5rem;
+    color: var(--icon-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hpv6-text-col__icon-wrap svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+
+  .hpv6-text-col__image {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+  }
+
+  .hpv6-text-col__title {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+    line-height: 1.3;
+  }
+
+  .hpv6-text-col__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+
+  .hpv6-text-col__text p {
+    margin: 0 0 1rem 0;
+  }
+  .hpv6-text-col__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .hpv6-text-col__link {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-color);
+    text-decoration: none;
+    margin-top: auto;
+    position: relative;
+    padding-bottom: 4px;
+  }
+
+  .hpv6-text-col__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--text-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+
+  .hpv6-text-col__link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding-top: var(--padding-top-mobile);
+      padding-bottom: var(--padding-bottom-mobile);
+    }
+    
+    .hpv6-text-cols__header {
+      margin-bottom: 3rem;
+    }
+
+    {%- if columns_mobile == 'slider' -%}
+      .hpv6-text-cols__grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        gap: 1.5rem;
+        padding-bottom: 1rem;
+      }
+      .hpv6-text-cols__grid::-webkit-scrollbar {
+        display: none;
+      }
+      .hpv6-text-col {
+        flex: 0 0 85%;
+        scroll-snap-align: center;
+      }
+    {%- else -%}
+      .hpv6-text-cols__grid {
+        grid-template-columns: repeat({{ columns_mobile }}, 1fr);
+        gap: 2.5rem;
+      }
+    {%- endif -%}
+  }
+</style>
+
+<div class="hpv6-text-cols-{{ section_id }}">
+  
+  {%- if section.settings.title != blank -%}
+    <div class="hpv6-text-cols__header">
+      <h2 class="hpv6-text-cols__section-title">{{ section.settings.title | escape }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="hpv6-text-cols__grid" role="list">
+    {%- for block in section.blocks -%}
+      <div class="hpv6-text-col" role="listitem" {{ block.shopify_attributes }}>
+        
+        {%- if block.settings.image != blank -%}
+          {{ block.settings.image | image_url: width: 128 | image_tag: 
+             loading: 'lazy',
+             class: 'hpv6-text-col__image',
+             alt: block.settings.title | escape
+          }}
+        {%- elsif block.settings.icon != 'none' -%}
+          <div class="hpv6-text-col__icon-wrap" aria-hidden="true">
+            {%- case block.settings.icon -%}
+              {%- when 'truck' -%}
+                <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+              {%- when 'star' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              {%- when 'shield' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+              {%- when 'heart' -%}
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              {%- when 'globe' -%}
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c1.39-2.39 3.56-4.09 6.13-4.73-.59 1.48-1.04 3.06-1.39 4.73zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.34.16-2h4.68c.09.66.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+            {%- endcase -%}
+          </div>
+        {%- endif -%}
+
+        {%- if block.settings.title != blank -%}
+          <h3 class="hpv6-text-col__title">{{ block.settings.title | escape }}</h3>
+        {%- endif -%}
+
+        {%- if block.settings.text != blank -%}
+          <div class="hpv6-text-col__text">{{ block.settings.text }}</div>
+        {%- endif -%}
+
+        {%- if block.settings.link_label != blank and block.settings.link_url != blank -%}
+          <a href="{{ block.settings.link_url }}" class="hpv6-text-col__link" aria-label="{{ block.settings.link_label | escape }}">
+            {{ block.settings.link_label | escape }}
+          </a>
+        {%- endif -%}
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HPV6 Text Columns",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Heading"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Section Layout",
+      "options": [
+        { "value": "full", "label": "Full Width" },
+        { "value": "boxed", "label": "Boxed" }
+      ],
+      "default": "boxed"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Columns on Desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Mobile Layout",
+      "options": [
+        { "value": "slider", "label": "Horizontal Slider" },
+        { "value": "1", "label": "1 Column Stack" },
+        { "value": "2", "label": "2 Column Grid" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F7FAFC"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D3748"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#2D3748"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "transparent",
+      "info": "Set to transparent to remove card styling"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop Padding Top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop Padding Bottom",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile Padding Top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile Padding Bottom",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Text Column",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery Truck" },
+            { "value": "star", "label": "Star" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "globe", "label": "Globe" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image",
+          "info": "Overrides icon if selected"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Our Story"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>A few words about your brand, what makes it special, and why customers should choose you.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link Label",
+          "info": "Leave blank to hide link"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HPV6 Text Columns",
+      "blocks": [
+        { "type": "column", "settings": { "icon": "truck", "title": "Fast Shipping" } },
+        { "type": "column", "settings": { "icon": "shield", "title": "Secure Checkout" } },
+        { "type": "column", "settings": { "icon": "star", "title": "Premium Quality" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

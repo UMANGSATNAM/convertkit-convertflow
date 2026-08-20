@@ -1,0 +1,293 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-orange: {{ section.settings.accent_orange }};
+    --accent-yellow: {{ section.settings.accent_yellow }};
+    --font-heading: 'Fraunces', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    /* Subtle grainy texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp25-usp-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp25-usp-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp25-usp__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 40px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp25-usp__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp25-usp__grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+
+  .hp25-usp__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 3px solid var(--text-color);
+    border-radius: 20px;
+    box-shadow: 6px 6px 0 var(--accent-orange);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hp25-usp__item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0 var(--accent-orange);
+  }
+
+  .hp25-usp__icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background-color: var(--accent-yellow);
+    border: 3px solid var(--text-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 3px 3px 0 var(--text-color);
+  }
+
+  .hp25-usp__icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .hp25-usp__icon svg {
+    width: 40px;
+    height: 40px;
+    fill: var(--text-color);
+  }
+
+  .hp25-usp__title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--text-color);
+    margin: 0 0 10px;
+  }
+
+  .hp25-usp__text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp25-usp-wrapper" id="HP25USP-{{ section.id }}">
+  <div class="hp25-usp__grid">
+    {%- for block in section.blocks -%}
+      <div class="hp25-usp__item" {{ block.shopify_attributes }}>
+        
+        <div class="hp25-usp__icon-wrapper">
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 160 }}" alt="{{ block.settings.title | escape }}" class="hp25-usp__icon" loading="lazy">
+          {%- else -%}
+            {%- case block.settings.icon -%}
+              {%- when 'peace' -%}
+                <svg class="hp25-usp__icon" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,4.07C16.53,4.58 19.42,7.47 19.93,11H13V4.07M11,4.07V11H4.07C4.58,7.47 7.47,4.58 11,4.07M4.07,13H10.15L7.29,18.43C5.58,17.15 4.45,15.2 4.07,13M13,13H19.93C19.55,15.2 18.42,17.15 16.71,18.43L13.85,13M12,19.82V14.65L14.73,19.83C13.87,20 12.96,20 12,19.82Z"/></svg>
+              {%- when 'heart' -%}
+                <svg class="hp25-usp__icon" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
+              {%- when 'star' -%}
+                <svg class="hp25-usp__icon" viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
+              {%- else -%}
+                <svg class="hp25-usp__icon" viewBox="0 0 24 24"><path d="M12,2C14.76,2 17,4.24 17,7C17,8.38 16.44,9.63 15.54,10.54C16.45,11.44 17.71,12 19,12C21.76,12 24,14.24 24,17C24,19.76 21.76,22 19,22C17.62,22 16.37,21.44 15.46,20.54C14.56,21.45 13.3,22 12,22C9.24,22 7,19.76 7,17C7,15.62 7.56,14.37 8.46,13.46C7.55,12.56 6.29,12 5,12C2.24,12 0,9.76 0,7C0,4.24 2.24,2 5,2C6.38,2 7.63,2.56 8.54,3.46C9.44,2.55 10.7,2 12,2M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"/></svg>
+            {%- endcase -%}
+          {%- endif -%}
+        </div>
+
+        <h3 class="hp25-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp25-usp__text">{{ block.settings.text }}</p>
+
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP25 - Retro USP",
+  "class": "section-hp25-usp",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Retro 70s Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F5E6D3"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Border (Dark Brown)",
+      "default": "#3E2723"
+    },
+    {
+      "type": "color",
+      "id": "accent_orange",
+      "label": "Accent (Burnt Orange)",
+      "default": "#D15F3C"
+    },
+    {
+      "type": "color",
+      "id": "accent_yellow",
+      "label": "Accent (Mustard)",
+      "default": "#E2B144"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "Selling Point",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "peace", "label": "Peace Sign" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "star", "label": "Star" },
+            { "value": "flower", "label": "Flower" }
+          ],
+          "default": "peace"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Icon Image (Overrides select)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "PEACE & LOVE"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Ethically sourced materials spreading good vibes worldwide."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP25 - Retro USP",
+      "blocks": [
+        { "type": "usp", "settings": { "icon": "peace", "title": "PEACE & LOVE" } },
+        { "type": "usp", "settings": { "icon": "flower", "title": "EARTH FRIENDLY" } },
+        { "type": "usp", "settings": { "icon": "star", "title": "FAR OUT QUALITY" } },
+        { "type": "usp", "settings": { "icon": "heart", "title": "MADE WITH SOUL" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

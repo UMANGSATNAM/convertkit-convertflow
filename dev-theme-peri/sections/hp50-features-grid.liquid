@@ -1,0 +1,128 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp50-feat-bg: {{ section.settings.bg_color | default: '#000000' }};
+    
+    background-color: var(--hp50-feat-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp50-feat__wrap {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp50-feat__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px;
+  }
+
+  .hp50-feat__heading {
+    font-family: 'Italiana', serif;
+    font-size: clamp(34px, 4.5vw, 48px);
+    font-weight: 400;
+    color: #FFFFFF;
+    margin: 0 0 8px;
+    letter-spacing: 1px;
+  }
+
+  .hp50-feat__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp50-feat__card {
+    background: #111111;
+    border: 1px solid rgba(226, 232, 240, 0.2);
+    padding: 36px 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .hp50-feat__card:hover {
+    border-color: #FFFFFF;
+    transform: translateY(-4px);
+  }
+
+  .hp50-feat__title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    margin: 0 0 12px;
+  }
+
+  .hp50-feat__desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #94A3B8;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp50-feat__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp50-feat__wrap">
+  <div class="hp50-feat__header">
+    <h2 class="hp50-feat__heading">Editorial Performance Actives</h2>
+    <p style="font-size:12px; color:#94A3B8; letter-spacing:1.5px; text-transform:uppercase;">{{ section.settings.subheading | default: 'Breakthrough biochemical innovations engineered for runway lighting.' }}</p>
+  </div>
+
+  <div class="hp50-feat__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp50-feat__card" {{ block.shopify_attributes }}>
+          <h3 class="hp50-feat__title">{{ block.settings.title }}</h3>
+          <p class="hp50-feat__desc">{{ block.settings.description }}</p>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp50-feat__card">
+        <h3 class="hp50-feat__title">Colloidal Platinum Matrix</h3>
+        <p class="hp50-feat__desc">High-tensile peptide chains that sculpt and define facial jawline contours under high-tension studio lighting.</p>
+      </div>
+      <div class="hp50-feat__card">
+        <h3 class="hp50-feat__title">Obsidian Light Diffusion</h3>
+        <p class="hp50-feat__desc">Volcanic mineral crystals absorb harsh specular highlights, creating a soft-focus satin finish across all skin tones.</p>
+      </div>
+      <div class="hp50-feat__card">
+        <h3 class="hp50-feat__title">Sterling Micro-Mist Delivery</h3>
+        <p class="hp50-feat__desc">Ultra-fine 10-micron aerosolization sets makeup flawlessly without disrupting delicate pigment textures.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP50 - Runway Feat",
+  "class": "section-hp50-features",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#000000" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Colloidal Platinum Matrix" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "High-tensile peptide chains that sculpt facial contours." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP50 - Runway Feat" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,144 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp46-insta-bg: {{ section.settings.bg_color | default: '#0B0F19' }};
+    
+    background-color: var(--hp46-insta-bg);
+    padding-top: {{ section.settings.padding_top | default: 70 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 70 }}px;
+  }
+
+  .hp46-insta__wrap {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp46-insta__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hp46-insta__heading {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3.5vw, 36px);
+    font-weight: 800;
+    color: #FFFFFF;
+    margin: 0;
+  }
+
+  .hp46-insta__heading span {
+    background: linear-gradient(135deg, #38BDF8, #F472B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hp46-insta__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 18px;
+  }
+
+  .hp46-insta__item {
+    aspect-ratio: 1;
+    border-radius: 22px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    background: #0F172A;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .hp46-insta__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .hp46-insta__item:hover .hp46-insta__img {
+    transform: scale(1.06);
+  }
+
+  .hp46-insta__tag {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    background: rgba(11, 15, 25, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid #38BDF8;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 50px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp46-insta__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+{%- endstyle -%}
+
+<div class="hp46-insta__wrap">
+  <div class="hp46-insta__header">
+    <h2 class="hp46-insta__heading">TAG @PERI_CYBER <span>ON INSTAGRAM</span></h2>
+  </div>
+
+  <div class="hp46-insta__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp46-insta__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp46-insta__img" alt="{{ block.settings.tag }}" loading="lazy">
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'hp46-insta__img' }}
+          {%- endif -%}
+          <span class="hp46-insta__tag">{{ block.settings.tag | default: 'Shop Drop' }}</span>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp46-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp46-insta__img' }}
+        <span class="hp46-insta__tag">Shop Serum</span>
+      </div>
+      <div class="hp46-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp46-insta__img' }}
+        <span class="hp46-insta__tag">Shop Balm</span>
+      </div>
+      <div class="hp46-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp46-insta__img' }}
+        <span class="hp46-insta__tag">Shop Mist</span>
+      </div>
+      <div class="hp46-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp46-insta__img' }}
+        <span class="hp46-insta__tag">Shop Mask</span>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP46 - Cyber Lookbook",
+  "class": "section-hp46-lookbook",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#0B0F19" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 70 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 70 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_item",
+      "name": "Lookbook Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "Shop Drop" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP46 - Cyber Lookbook" }
+  ]
+}
+{% endschema %}

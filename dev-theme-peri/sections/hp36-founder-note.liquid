@@ -1,0 +1,234 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Oswald:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Oswald', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .hp36-founder-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp36-founder-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp36-founder__title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .hp36-founder__title::before,
+  .hp36-founder__title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-color);
+  }
+
+  .hp36-founder__content {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3vw, {{ section.settings.text_size }}px);
+    line-height: 1.6;
+    color: var(--text-color);
+    max-width: 800px;
+    margin: 0 auto 40px;
+  }
+  
+  .hp36-founder__content p {
+    margin: 0 0 20px;
+  }
+  
+  .hp36-founder__content strong {
+    font-weight: 600;
+  }
+  
+  .hp36-founder__content em {
+    font-style: italic;
+  }
+
+  .hp36-founder__signature {
+    margin-bottom: 20px;
+  }
+  
+  .hp36-founder__signature-img {
+    max-width: 150px;
+    height: auto;
+    filter: invert(0);
+  }
+
+  .hp36-founder__name {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin: 0 0 5px;
+  }
+
+  .hp36-founder__role {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--text-color);
+    font-style: italic;
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp36-founder-wrapper" id="HP36Founder-{{ section.id }}">
+  <h2 class="hp36-founder__title">{{ section.settings.title }}</h2>
+  
+  <div class="hp36-founder__content">
+    {{ section.settings.text }}
+  </div>
+  
+  {%- if section.settings.signature != blank -%}
+    <div class="hp36-founder__signature">
+      <img height="{{ section.settings.signature.height }}" width="{{ section.settings.signature.width }}" src="{{ section.settings.signature | image_url: width: 300 }}" alt="{{ section.settings.name }}" class="hp36-founder__signature-img" loading="lazy">
+    </div>
+  {%- endif -%}
+  
+  <div class="hp36-founder__name">{{ section.settings.name }}</div>
+  <div class="hp36-founder__role">{{ section.settings.role }}</div>
+</div>
+
+{% schema %}
+{
+  "name": "HP36 - Editorial Note",
+  "class": "section-hp36-founder-note",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "EDITOR'S LETTER"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We founded this house on a singular premise: that the most radical act in a world of fast fashion is to create something <em>enduring</em>. Every collection is an interrogation of form, stripping away the superfluous until only the essential structure remains. This is not minimalism for the sake of it; it is a search for purity.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature",
+      "label": "Signature Image"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "default": "AURELIEN VANCE"
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "Role",
+      "default": "Creative Director"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Editorial Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP36 - Editorial Note"
+    }
+  ]
+}
+{% endschema %}

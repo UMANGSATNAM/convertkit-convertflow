@@ -1,0 +1,352 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#000000'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp2-fn-bg: {{ bg_color }};
+    --hp2-fn-text: {{ text_color }};
+    
+    --hp2-fn-pt-desk: {{ padding_top_desktop }}px;
+    --hp2-fn-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp2-fn-pt-mob: {{ padding_top_mobile }}px;
+    --hp2-fn-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp2-fashion-founder-{{ section.id }} {
+    padding-top: var(--hp2-fn-pt-desk);
+    padding-bottom: var(--hp2-fn-pb-desk);
+    background-color: var(--hp2-fn-bg);
+    color: var(--hp2-fn-text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  .hp2-fn-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
+  
+  .hp2-fn-inner.image-right {
+    flex-direction: row-reverse;
+  }
+
+  /* Image Column */
+  .hp2-fn-img-col {
+    flex: 1;
+    position: relative;
+  }
+  
+  .hp2-fn-img-wrapper {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #e0e0e0;
+    overflow: hidden;
+    position: relative;
+    /* Soft shadow for premium feel */
+    box-shadow: -20px 20px 0px rgba(var(--hp2-fn-text-rgb), 0.05);
+  }
+  .hp2-fn-inner.image-right .hp2-fn-img-wrapper {
+    box-shadow: 20px 20px 0px rgba(var(--hp2-fn-text-rgb), 0.05);
+  }
+
+  .hp2-fn-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale({{ section.settings.grayscale }}%);
+  }
+
+  /* Signature overlay */
+  .hp2-fn-signature-overlay {
+    position: absolute;
+    bottom: -40px;
+    right: -20px;
+    width: 200px;
+    height: auto;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .hp2-fn-inner.image-right .hp2-fn-signature-overlay {
+    right: auto;
+    left: -20px;
+  }
+
+  /* Text Column */
+  .hp2-fn-txt-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hp2-fn-subtitle {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .hp2-fn-subtitle::after {
+    content: '';
+    height: 1px;
+    width: 60px;
+    background: var(--hp2-fn-text);
+  }
+
+  .hp2-fn-title {
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 30px 0;
+    letter-spacing: -1px;
+  }
+
+  .hp2-fn-desc {
+    font-size: 18px;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 40px;
+  }
+  .hp2-fn-desc p { margin-top: 0; }
+  .hp2-fn-desc p:last-child { margin-bottom: 0; }
+
+  .hp2-fn-name {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+  }
+
+  .hp2-fn-role {
+    font-size: 14px;
+    opacity: 0.6;
+    margin-top: 5px;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp2-fn-inner {
+      gap: 50px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp2-fashion-founder-{{ section.id }} {
+      padding-top: var(--hp2-fn-pt-mob);
+      padding-bottom: var(--hp2-fn-pb-mob);
+    }
+    .hp2-fn-inner, .hp2-fn-inner.image-right {
+      flex-direction: column;
+      gap: 40px;
+      padding: 0 20px;
+    }
+    .hp2-fn-img-col, .hp2-fn-txt-col {
+      width: 100%;
+    }
+    .hp2-fn-img-wrapper {
+      box-shadow: -15px 15px 0px rgba(0,0,0,0.05);
+    }
+    .hp2-fn-inner.image-right .hp2-fn-img-wrapper {
+      box-shadow: -15px 15px 0px rgba(0,0,0,0.05); /* Same on mobile */
+    }
+    .hp2-fn-desc {
+      font-size: 16px;
+    }
+    .hp2-fn-signature-overlay {
+      width: 150px;
+      bottom: -20px;
+      right: 0;
+    }
+    .hp2-fn-inner.image-right .hp2-fn-signature-overlay {
+      left: auto;
+      right: 0;
+    }
+  }
+</style>
+
+<section class="hp2-fashion-founder-{{ section.id }}" aria-label="A Note from the Founder">
+  <div class="hp2-fn-inner image-{{ section.settings.image_position }}">
+    
+    <div class="hp2-fn-img-col">
+      <div class="hp2-fn-img-wrapper">
+        {%- if section.settings.image != blank -%}
+          <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 800 }}" 
+               srcset="{{ section.settings.image | image_url: width: 400 }} 400w, 
+                       {{ section.settings.image | image_url: width: 800 }} 800w"
+               sizes="(max-width: 768px) 100vw, 50vw"
+               class="hp2-fn-img" 
+               loading="lazy" 
+               alt="{{ section.settings.image.alt | default: 'Founder Portrait' }}">
+        {%- else -%}
+          {{ 'portrait-1' | placeholder_svg_tag: 'hp2-fn-img placeholder-svg' }}
+        {%- endif -%}
+      </div>
+      
+      {%- if section.settings.signature_image != blank -%}
+        <img height="{{ section.settings.signature_image.height }}" width="{{ section.settings.signature_image.width }}" src="{{ section.settings.signature_image | image_url: width: 400 }}" 
+             class="hp2-fn-signature-overlay" 
+             loading="lazy" 
+             alt="Signature">
+      {%- endif -%}
+    </div>
+
+    <div class="hp2-fn-txt-col">
+      {%- if section.settings.subtitle != blank -%}
+        <div class="hp2-fn-subtitle">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+      
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hp2-fn-title">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.description != blank -%}
+        <div class="hp2-fn-desc">{{ section.settings.description }}</div>
+      {%- endif -%}
+      
+      <div>
+        <p class="hp2-fn-name">{{ section.settings.name | default: 'Jane Doe' }}</p>
+        <div class="hp2-fn-role">{{ section.settings.role | default: 'FOUNDER & CREATIVE DIRECTOR' }}</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP2 Founder Note",
+  "tag": "section",
+  "class": "section-hp2-founder",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Portrait Image"
+    },
+    {
+      "type": "range",
+      "id": "grayscale",
+      "min": 0, "max": 100, "step": 10, "unit": "%",
+      "label": "Image Grayscale",
+      "default": 100,
+      "info": "Set to 100% for an editorial B&W look."
+    },
+    {
+      "type": "image_picker",
+      "id": "signature_image",
+      "label": "Signature Image (Optional)",
+      "info": "Use a transparent PNG for the signature."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "A NOTE FROM"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "DESIGNED WITH PURPOSE."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Message",
+      "default": "<p>I started this brand because I couldn't find clothes that felt right. Everything was either too basic or too loud. We create the middle ground—garments that speak for themselves without shouting.</p>"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "default": "J.D."
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "Role",
+      "default": "FOUNDER / DESIGNER"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP2 Founder Note (Advanced)",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,253 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#00ff88'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 0;
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    min-height: 600px;
+    overflow: hidden;
+  }
+  
+  .hp9-video-container-{{ section_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  .hp9-video-container-{{ section_id }} video,
+  .hp9-video-container-{{ section_id }} iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    filter: sepia(100%) hue-rotate(90deg) saturate(300%) contrast(1.5) brightness(0.5); /* Cyberpunk green filter */
+  }
+  
+  /* Scanline effect */
+  .hp9-video-overlay-{{ section_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0) 50%,
+      rgba(0,0,0,0.2) 50%,
+      rgba(0,0,0,0.2)
+    );
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .hp9-video-ui-{{ section_id }} {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    z-index: 3;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* UI Corners */
+  .hp9-video-ui-{{ section_id }}::before,
+  .hp9-video-ui-{{ section_id }}::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid {{ text_color }};
+  }
+  .hp9-video-ui-{{ section_id }}::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .hp9-video-ui-{{ section_id }}::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  
+  .hp9-video-top-ui-{{ section_id }} {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: {{ text_color }};
+    letter-spacing: 2px;
+  }
+  
+  .hp9-video-rec-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .hp9-video-rec-dot-{{ section_id }} {
+    width: 10px;
+    height: 10px;
+    background-color: #ff0044;
+    border-radius: 50%;
+    animation: hp9-blink-{{ section_id }} 1s infinite;
+  }
+  
+  @keyframes hp9-blink-{{ section_id }} {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  .hp9-video-center-content-{{ section_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: auto;
+  }
+  
+  .hp9-video-play-btn-{{ section_id }} {
+    width: 80px;
+    height: 80px;
+    border: 1px solid {{ text_color }};
+    background: rgba(0, 255, 136, 0.1);
+    color: {{ text_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    margin: 0 auto 20px;
+  }
+  
+  .hp9-video-play-btn-{{ section_id }}:hover {
+    background: rgba(0, 255, 136, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  }
+  
+  .hp9-video-play-btn-{{ section_id }} svg {
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+    margin-left: 5px;
+  }
+  
+  .hp9-video-title-{{ section_id }} {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  
+  .hp9-video-bottom-ui-{{ section_id }} {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(0, 255, 136, 0.5);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      height: 60vh;
+      min-height: 400px;
+    }
+    .hp9-video-ui-{{ section_id }} {
+      top: 20px; left: 20px; right: 20px; bottom: 20px;
+    }
+    .hp9-video-top-ui-{{ section_id }} {
+      font-size: 0.6rem;
+      padding: 10px;
+    }
+    .hp9-video-title-{{ section_id }} {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="hp9-video-container-{{ section_id }}">
+  {% if section.settings.video_url != blank %}
+    <video autoplay loop muted playsinline>
+      <source src="{{ section.settings.video_url }}" type="video/mp4">
+    </video>
+  {% else %}
+    <div style="width:100%; height:100%; background:#111;"></div>
+  {% endif %}
+</div>
+
+<div class="hp9-video-overlay-{{ section_id }}"></div>
+
+<div class="hp9-video-ui-{{ section_id }}">
+  <div class="hp9-video-top-ui-{{ section_id }}">
+    <div class="hp9-video-rec-{{ section_id }}">
+      <div class="hp9-video-rec-dot-{{ section_id }}"></div>
+      <span>REC_MODE</span>
+    </div>
+    <div>SYS_OVERRIDE_ENABLED</div>
+  </div>
+  
+  <div class="hp9-video-center-content-{{ section_id }}">
+    <button class="hp9-video-play-btn-{{ section_id }}" aria-label="Play Video">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <h3 class="hp9-video-title-{{ section_id }}">{{ section.settings.title | default: 'INITIALIZATION SEQUENCE' }}</h3>
+  </div>
+  
+  <div class="hp9-video-bottom-ui-{{ section_id }}">
+    <span>COORD: 34.0522° N, 118.2437° W</span>
+    <span>MEM: 99.9%</span>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP9 Video",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "UI Text Color",
+      "default": "#00ff88"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4)"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "INITIALIZATION SEQUENCE"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Video"
+    }
+  ]
+}
+{% endschema %}

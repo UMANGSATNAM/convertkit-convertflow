@@ -1,0 +1,163 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp47-story-bg: {{ section.settings.bg_color | default: '#F5F0EB' }};
+    
+    background-color: var(--hp47-story-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp47-story__container {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 70px;
+    align-items: center;
+  }
+
+  .hp47-story__media-arch {
+    border-radius: 300px 300px 30px 30px;
+    overflow: hidden;
+    height: 480px;
+    background: #EAE3DA;
+    box-shadow: 0 20px 50px rgba(56, 46, 43, 0.08);
+  }
+
+  .hp47-story__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hp47-story__subhead {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8C6D58;
+    margin: 0 0 12px;
+  }
+
+  .hp47-story__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4.5vw, 48px);
+    font-weight: 600;
+    line-height: 1.15;
+    color: #382E2B;
+    margin: 0 0 20px;
+  }
+
+  .hp47-story__desc {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #6E5E58;
+    margin: 0 0 32px;
+  }
+
+  .hp47-story__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    border-top: 1px solid #EAE3DA;
+    padding-top: 24px;
+    margin-bottom: 36px;
+  }
+
+  .hp47-story__val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #382E2B;
+    margin: 0 0 4px;
+  }
+
+  .hp47-story__lbl {
+    font-size: 12px;
+    color: #8C6D58;
+    margin: 0;
+  }
+
+  .hp47-story__btn {
+    display: inline-flex;
+    padding: 16px 36px;
+    background: #382E2B;
+    color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+
+  .hp47-story__btn:hover {
+    background: #8C6D58;
+    transform: translateY(-2px);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp47-story__container { grid-template-columns: 1fr; text-align: center; }
+    .hp47-story__media-arch { height: 340px; }
+  }
+{%- endstyle -%}
+
+<div class="hp47-story__container">
+  <div class="hp47-story__media-arch">
+    {%- if section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1000 }}" class="hp47-story__img" alt="Scandinavian Oat Atelier" loading="lazy">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-story__img' }}
+    {%- endif -%}
+  </div>
+
+  <div>
+    <p class="hp47-story__subhead">HERITAGE ATELIER</p>
+    <h2 class="hp47-story__title">{{ section.settings.heading | default: 'Slow Nordic Craft, Pure Lipid Harmony' }}</h2>
+    <p class="hp47-story__desc">
+      {{ section.settings.description | default: 'We follow the slow rhythm of Scandinavian seasons. Every batch of golden oat lipid is fermented using traditional lacto-enzymes for 72 hours, concentrating ceramides without chemical solvents.' }}
+    </p>
+
+    <div class="hp47-story__stats">
+      <div>
+        <p class="hp47-story__val">99.1%</p>
+        <p class="hp47-story__lbl">ORGANIC HARVEST</p>
+      </div>
+      <div>
+        <p class="hp47-story__val">72 HRS</p>
+        <p class="hp47-story__lbl">SLOW FERMENTATION</p>
+      </div>
+      <div>
+        <p class="hp47-story__val">0%</p>
+        <p class="hp47-story__lbl">FRAGRANCE / DYE</p>
+      </div>
+    </div>
+
+    <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="hp47-story__btn">
+      {{ section.settings.btn_text | default: 'Read Our Harvest Journal &rarr;' }}
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP47 - Taupe Story",
+  "class": "section-hp47-story",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F0EB" },
+    { "type": "image_picker", "id": "image", "label": "Story Image" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Slow Nordic Craft, Pure Lipid Harmony" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "We follow the slow rhythm of Scandinavian seasons." },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Read Our Harvest Journal →" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "presets": [
+    { "name": "HP47 - Taupe Story" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,144 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp47-insta-bg: {{ section.settings.bg_color | default: '#F5F0EB' }};
+    
+    background-color: var(--hp47-insta-bg);
+    padding-top: {{ section.settings.padding_top | default: 70 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 70 }}px;
+  }
+
+  .hp47-insta__wrap {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp47-insta__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hp47-insta__sub {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8C6D58;
+    margin: 0 0 8px;
+  }
+
+  .hp47-insta__heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(30px, 4vw, 40px);
+    font-weight: 600;
+    color: #382E2B;
+    margin: 0;
+  }
+
+  .hp47-insta__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 18px;
+  }
+
+  .hp47-insta__item {
+    aspect-ratio: 1;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #EAE3DA;
+    box-shadow: 0 10px 30px rgba(56, 46, 43, 0.05);
+  }
+
+  .hp47-insta__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .hp47-insta__item:hover .hp47-insta__img { transform: scale(1.06); }
+
+  .hp47-insta__tag {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    background: rgba(56, 46, 43, 0.85);
+    backdrop-filter: blur(8px);
+    color: #FAF7F2;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 50px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp47-insta__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+{%- endstyle -%}
+
+<div class="hp47-insta__wrap">
+  <div class="hp47-insta__header">
+    <p class="hp47-insta__sub">{{ section.settings.subheading | default: '@PERI_LINEN' }}</p>
+    <h2 class="hp47-insta__heading">{{ section.settings.heading | default: 'Shop The Warm Linen Gallery' }}</h2>
+  </div>
+
+  <div class="hp47-insta__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp47-insta__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp47-insta__img" alt="{{ block.settings.tag }}" loading="lazy">
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-insta__img' }}
+          {%- endif -%}
+          <span class="hp47-insta__tag">{{ block.settings.tag | default: 'Shop Oat Balm' }}</span>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp47-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-insta__img' }}
+        <span class="hp47-insta__tag">Shop Oat Balm</span>
+      </div>
+      <div class="hp47-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-insta__img' }}
+        <span class="hp47-insta__tag">Shop Birch Sap</span>
+      </div>
+      <div class="hp47-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-insta__img' }}
+        <span class="hp47-insta__tag">Shop Velvet Cream</span>
+      </div>
+      <div class="hp47-insta__item">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp47-insta__img' }}
+        <span class="hp47-insta__tag">Shop Comfort Mask</span>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP47 - Taupe Lookbook",
+  "class": "section-hp47-lookbook",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F0EB" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 70 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 70 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_item",
+      "name": "Lookbook Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "Shop Oat Balm" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP47 - Taupe Lookbook" }
+  ]
+}
+{% endschema %}

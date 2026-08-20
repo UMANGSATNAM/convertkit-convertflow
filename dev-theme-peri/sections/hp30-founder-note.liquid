@@ -1,0 +1,238 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&family=Libre+Barcode+39+Text&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    --font-barcode: 'Libre Barcode 39 Text', cursive;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-founder-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-founder-wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp30-founder__image-col {
+    border-right: 4px solid var(--border-color);
+    background: #111;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-founder__image-col {
+      border-right: none;
+      border-bottom: 4px solid var(--border-color);
+    }
+  }
+
+  .hp30-founder__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(150%) grayscale(100%);
+    display: block;
+    min-height: 400px;
+  }
+
+  .hp30-founder__content {
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-founder__content {
+      padding: 60px 30px;
+    }
+  }
+
+  .hp30-founder__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 4px solid var(--text-color);
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+  }
+
+  .hp30-founder__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 6vw, 60px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  .hp30-founder__tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bg-color);
+    background: var(--text-color);
+    padding: 5px 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp30-founder__note {
+    font-family: var(--font-body);
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 40px;
+    max-width: 700px;
+  }
+
+  .hp30-founder__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .hp30-founder__name {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp30-founder__name span {
+    display: block;
+    color: var(--text-color);
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  .hp30-founder__barcode {
+    font-family: var(--font-barcode);
+    font-size: 60px;
+    line-height: 0.6;
+    color: var(--text-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-founder-wrapper" id="HP30Founder-{{ section.id }}">
+  <div class="hp30-founder__image-col">
+    {%- if section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.name | escape }}" class="hp30-founder__image" loading="lazy">
+    {%- else -%}
+      {{ 'image' | placeholder_svg_tag: 'hp30-founder__image' }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp30-founder__content">
+    <div class="hp30-founder__header">
+      <h2 class="hp30-founder__title">MANIFESTO</h2>
+      <div class="hp30-founder__tag">001</div>
+    </div>
+
+    <div class="hp30-founder__note">
+      {{ section.settings.note }}
+    </div>
+
+    <div class="hp30-founder__footer">
+      <div class="hp30-founder__name">
+        {{ section.settings.name }}
+        <span>CREATIVE DIRECTOR</span>
+      </div>
+      <div class="hp30-founder__barcode">{{ section.settings.name | replace: ' ', '' | upcase }}</div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Director",
+  "class": "section-hp30-founder-note",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Director Image"
+    },
+    {
+      "type": "textarea",
+      "id": "note",
+      "label": "Note",
+      "default": "WE ARE NOT INTERESTED IN TRENDS. WE ARE INTERESTED IN PERMANENCE. EVERY PIECE IS CONSTRUCTED WITH A RUTHLESS ATTENTION TO DETAIL AND FUNCTIONALITY."
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Director Name",
+      "default": "J. DOE"
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Director"
+    }
+  ]
+}
+{% endschema %}

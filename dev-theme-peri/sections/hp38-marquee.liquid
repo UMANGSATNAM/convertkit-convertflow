@@ -1,0 +1,180 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+    padding: {{ section.settings.padding_y }}px 0;
+    overflow: hidden;
+  }
+
+  .hp38-marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    position: relative;
+    /* Adding internal top/bottom borders to create a ticker tape feel */
+    border-top: 2px solid var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+    padding: 10px 0;
+    background: {{ section.settings.track_color }};
+  }
+
+  .hp38-marquee__track {
+    display: flex;
+    align-items: center;
+    animation: hp38-scroll {{ section.settings.speed }}s linear infinite;
+  }
+
+  .hp38-marquee__content {
+    display: flex;
+    align-items: center;
+    padding-right: 50px; /* spacing between repeat blocks */
+  }
+
+  .hp38-marquee__text {
+    font-family: var(--font-heading);
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .hp38-marquee__separator {
+    color: var(--text-color);
+    font-weight: 400;
+  }
+
+  @keyframes hp38-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-marquee-wrapper" id="HP38Marquee-{{ section.id }}">
+  <div class="hp38-marquee__track">
+    {%- for i in (1..6) -%}
+      <div class="hp38-marquee__content">
+        {%- for block in section.blocks -%}
+          <div class="hp38-marquee__text" {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+            <span class="hp38-marquee__separator">///</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Marquee",
+  "class": "section-hp38-marquee",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "track_color",
+      "label": "Ticker Background",
+      "default": "#00FF00"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top/Bottom Spacing",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "SYSTEM RUNNING"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Marquee",
+      "blocks": [
+        { "type": "text", "settings": { "text": "NO COMPROMISE" } },
+        { "type": "text", "settings": { "text": "MAXIMUM UTILITY" } },
+        { "type": "text", "settings": { "text": "GLOBAL SHIPPING" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

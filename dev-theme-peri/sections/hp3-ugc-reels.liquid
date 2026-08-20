@@ -1,0 +1,388 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#111111'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ffcc'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp3-ugc-bg: {{ bg_color }};
+    --hp3-ugc-text: {{ text_color }};
+    --hp3-ugc-accent: {{ accent_color }};
+    
+    --hp3-ugc-pt-desk: {{ padding_top_desktop }}px;
+    --hp3-ugc-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp3-ugc-pt-mob: {{ padding_top_mobile }}px;
+    --hp3-ugc-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp3-tech-ugc-{{ section.id }} {
+    padding-top: var(--hp3-ugc-pt-desk);
+    padding-bottom: var(--hp3-ugc-pb-desk);
+    background-color: var(--hp3-ugc-bg);
+    color: var(--hp3-ugc-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp3-ugc-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp3-ugc-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp3-ugc-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0 0 10px 0;
+  }
+
+  .hp3-ugc-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+
+  /* Grid for Reels */
+  .hp3-ugc-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 20px;
+  }
+
+  /* Reel Item */
+  .hp3-ugc-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 9/16;
+    display: block;
+    cursor: pointer;
+    group;
+  }
+
+  .hp3-ugc-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.5s ease;
+  }
+  .hp3-ugc-item:hover .hp3-ugc-media {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  /* Play button overlay */
+  .hp3-ugc-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+  .hp3-ugc-play svg {
+    width: 24px; height: 24px;
+    margin-left: 4px; /* optical center */
+    fill: currentColor;
+  }
+  .hp3-ugc-item:hover .hp3-ugc-play {
+    background: var(--hp3-ugc-accent);
+    border-color: var(--hp3-ugc-accent);
+    color: #000;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  /* Shoppable Product Info */
+  .hp3-ugc-product {
+    position: absolute;
+    bottom: 20px; left: 20px; right: 20px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  .hp3-ugc-item:hover .hp3-ugc-product {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .hp3-ugc-p-img {
+    width: 40px; height: 40px;
+    border-radius: 4px;
+    background: #fff;
+    object-fit: cover;
+  }
+  
+  .hp3-ugc-p-info {
+    flex: 1;
+  }
+  .hp3-ugc-p-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hp3-ugc-p-price {
+    font-size: 12px;
+    color: var(--hp3-ugc-accent);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp3-ugc-grid {
+      grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp3-tech-ugc-{{ section.id }} {
+      padding-top: var(--hp3-ugc-pt-mob);
+      padding-bottom: var(--hp3-ugc-pb-mob);
+    }
+    .hp3-ugc-inner {
+      padding: 0 20px;
+    }
+    .hp3-ugc-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      gap: 15px;
+      margin: 0 -20px;
+      padding: 0 20px;
+    }
+    .hp3-ugc-grid::-webkit-scrollbar { display: none; }
+    .hp3-ugc-item {
+      flex: 0 0 260px;
+      scroll-snap-align: start;
+    }
+    .hp3-ugc-product {
+      opacity: 1; /* Always show on mobile */
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<section class="hp3-tech-ugc-{{ section.id }}" aria-label="Community Reels">
+  <div class="hp3-ugc-inner">
+    
+    <div class="hp3-ugc-header">
+      <h2 class="hp3-ugc-title">{{ section.settings.heading }}</h2>
+      <p class="hp3-ugc-subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <div class="hp3-ugc-grid">
+      {%- for block in section.blocks -%}
+        {%- assign product = all_products[block.settings.product] -%}
+        <div class="hp3-ugc-item" {{ block.shopify_attributes }}>
+          
+          {%- if block.settings.video != blank -%}
+            {{ block.settings.video | video_tag: class: 'hp3-ugc-media', autoplay: true, loop: true, muted: true, playsinline: true }}
+          {%- elsif block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp3-ugc-media" loading="lazy" alt="User generated content">
+          {%- else -%}
+            {%- capture current -%}{% cycle 1, 2, 3, 4 %}{%- endcapture -%}
+            {{ 'collection-' | append: current | placeholder_svg_tag: 'hp3-ugc-media placeholder-svg' }}
+          {%- endif -%}
+          
+          <div class="hp3-ugc-play">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </div>
+          
+          {%- if product != blank -%}
+            <a href="{{ product.url }}" class="hp3-ugc-product">
+              <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 100 }}" class="hp3-ugc-p-img" alt="{{ product.title }}">
+              <div class="hp3-ugc-p-info">
+                <div class="hp3-ugc-p-title">{{ product.title }}</div>
+                <div class="hp3-ugc-p-price">{{ product.price | money }}</div>
+              </div>
+            </a>
+          {%- else -%}
+            <a href="#" class="hp3-ugc-product">
+              <div class="hp3-ugc-p-img" style="background:#333;"></div>
+              <div class="hp3-ugc-p-info">
+                <div class="hp3-ugc-p-title">Tech Gadget Pro</div>
+                <div class="hp3-ugc-p-price">$99.00</div>
+              </div>
+            </a>
+          {%- endif -%}
+          
+        </div>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..4) -%}
+          <div class="hp3-ugc-item">
+            {%- capture current -%}{% cycle 1, 2, 3, 4 %}{%- endcapture -%}
+            {{ 'collection-' | append: current | placeholder_svg_tag: 'hp3-ugc-media placeholder-svg' }}
+            <div class="hp3-ugc-play"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+            <a href="#" class="hp3-ugc-product">
+              <div class="hp3-ugc-p-img" style="background:#333;"></div>
+              <div class="hp3-ugc-p-info">
+                <div class="hp3-ugc-p-title">Tech Gadget Pro</div>
+                <div class="hp3-ugc-p-price">$99.00</div>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP3 Tech Shoppable Reels",
+  "tag": "section",
+  "class": "section-hp3-ugc",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "COMMUNITY SETUPS"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "See how creators use our gear."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3, "max": 6, "step": 1,
+      "label": "Columns (Desktop)", "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 2, "max": 4, "step": 1,
+      "label": "Columns (Tablet)", "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ffcc"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Shoppable Reel",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video (mp4)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Fallback Image"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Featured Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP3 Shoppable Reels (Adv)",
+      "category": "Social",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

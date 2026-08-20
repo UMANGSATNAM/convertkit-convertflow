@@ -1,0 +1,154 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#00ff88'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 60px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .hp9-pills-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .hp9-pill-{{ section_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 25px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 40px;
+    color: {{ text_color }};
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hp9-pill-{{ section_id }}:hover {
+    border-color: {{ accent_color }};
+    color: {{ bg_color }};
+    background-color: {{ accent_color }};
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+  
+  .hp9-pill-icon-{{ section_id }} {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+  }
+  
+  .hp9-pill-{{ section_id }}:hover .hp9-pill-icon-{{ section_id }} {
+    filter: grayscale(0%) contrast(1.2);
+  }
+
+  @media (max-width: 768px) {
+    .hp9-pills-container-{{ section_id }} {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 10px;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .hp9-pills-container-{{ section_id }}::-webkit-scrollbar {
+      display: none;
+    }
+    .hp9-pill-{{ section_id }} {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<div class="hp9-pills-container-{{ section_id }}">
+  {% for block in section.blocks %}
+    <a href="{{ block.settings.link | default: '#' }}" class="hp9-pill-{{ section_id }}" {{ block.shopify_attributes }}>
+      {% if block.settings.image != blank %}
+        <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 50 }}" alt="{{ block.settings.title }}" class="hp9-pill-icon-{{ section_id }}" loading="lazy">
+      {% endif %}
+      {{ block.settings.title | default: 'Category' }}
+    </a>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "HP9 Category Pills",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00ff88"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Category Pill",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Icon/Image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP9 Category Pills",
+      "blocks": [
+        { "type": "pill", "settings": { "title": "NEURAL_LINK" } },
+        { "type": "pill", "settings": { "title": "OPTICS" } },
+        { "type": "pill", "settings": { "title": "CYBER_ARMS" } },
+        { "type": "pill", "settings": { "title": "CORE_PROCESSORS" } },
+        { "type": "pill", "settings": { "title": "ACCESSORIES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,484 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --border-thickness: {{ section.settings.border_thickness }}px;
+    --shadow-color: {{ section.settings.shadow_color }};
+    --shadow-offset: {{ section.settings.shadow_offset }}px;
+    --accent-color: {{ section.settings.accent_color }};
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp20-faq-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: {% if section.settings.layout == 'side_by_side' %}row{% else %}column{% endif %};
+    gap: 40px;
+    align-items: {% if section.settings.layout == 'side_by_side' %}flex-start{% else %}center{% endif %};
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp20-faq-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .hp20-faq__header {
+    flex: 1;
+    max-width: {% if section.settings.layout == 'side_by_side' %}400px{% else %}100%{% endif %};
+    text-align: {% if section.settings.layout == 'side_by_side' %}left{% else %}center{% endif %};
+  }
+
+  .hp20-faq__title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 6vw, {{ section.settings.title_size }}px);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0 0 16px;
+    line-height: 1.1;
+  }
+
+  .hp20-faq__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.subtitle_size }}px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 0 0 32px;
+  }
+
+  .hp20-faq__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background: var(--text-color);
+    color: var(--bg-color); /* assuming contrast */
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: var(--border-thickness) solid var(--border-color);
+    box-shadow: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--shadow-color);
+    transition: all 0.1s ease;
+  }
+
+  .hp20-faq__btn:hover {
+    background: var(--accent-color);
+    color: var(--text-color);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .hp20-faq__content {
+    flex: 2;
+    width: 100%;
+  }
+
+  .hp20-faq__item {
+    background: #fff;
+    border: var(--border-thickness) solid var(--border-color);
+    margin-bottom: {{ section.settings.item_gap }}px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .hp20-faq__item:hover {
+    transform: translate(calc(var(--shadow-offset) * -0.2), calc(var(--shadow-offset) * -0.2));
+    box-shadow: calc(var(--shadow-offset) * 1.2) calc(var(--shadow-offset) * 1.2) 0px var(--shadow-color);
+  }
+
+  .hp20-faq__question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    cursor: pointer;
+  }
+
+  .hp20-faq__q-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: {{ section.settings.q_size }}px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0;
+    padding-right: 24px;
+  }
+
+  .hp20-faq__icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-color);
+    border: var(--border-thickness) solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--text-color);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .hp20-faq__item.is-open .hp20-faq__icon {
+    transform: rotate(45deg);
+    background: var(--text-color);
+    color: var(--accent-color);
+  }
+
+  .hp20-faq__answer {
+    display: none;
+    padding: 0 24px 24px 24px;
+    border-top: var(--border-thickness) dashed var(--border-color);
+    margin-top: -10px; /* pull up under dashed border */
+    padding-top: 24px;
+  }
+
+  .hp20-faq__item.is-open .hp20-faq__answer {
+    display: block;
+    animation: hp20SlideDown 0.3s ease forwards;
+  }
+  
+  @keyframes hp20SlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hp20-faq__a-text {
+    font-family: 'Inter', sans-serif;
+    font-size: {{ section.settings.a_size }}px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp20-faq-wrapper" id="HP20FAQ-{{ section.id }}">
+  
+  <div class="hp20-faq__header">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp20-faq__title">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+    
+    {%- if section.settings.subtitle != blank -%}
+      <p class="hp20-faq__subtitle">{{ section.settings.subtitle | escape }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_text != blank and section.settings.btn_link != blank -%}
+      <a href="{{ section.settings.btn_link }}" class="hp20-faq__btn">
+        {{ section.settings.btn_text | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="hp20-faq__content">
+    {%- for block in section.blocks -%}
+      <div class="hp20-faq__item {% if forloop.first and section.settings.open_first %}is-open{% endif %}" {{ block.shopify_attributes }}>
+        <div class="hp20-faq__question" onclick="this.parentElement.classList.toggle('is-open')">
+          <h3 class="hp20-faq__q-text">{{ block.settings.question | escape }}</h3>
+          <div class="hp20-faq__icon">+</div>
+        </div>
+        <div class="hp20-faq__answer">
+          <div class="hp20-faq__a-text">{{ block.settings.answer }}</div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.getElementById('HP20FAQ-{{ section.id }}');
+    if (!section) return;
+    
+    const questions = section.querySelectorAll('.hp20-faq__question');
+    
+    questions.forEach(q => {
+      q.addEventListener('click', () => {
+        {% if section.settings.accordion_mode %}
+        // Close others
+        const allItems = section.querySelectorAll('.hp20-faq__item');
+        allItems.forEach(item => {
+          if (item !== q.parentElement) {
+            item.classList.remove('is-open');
+          }
+        });
+        {% endif %}
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP20 - Brutalist FAQ",
+  "class": "section-hp20-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Desktop Layout",
+      "options": [
+        { "value": "side_by_side", "label": "Side by Side" },
+        { "value": "stacked", "label": "Stacked Centered" }
+      ],
+      "default": "side_by_side"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "FAQS. NO BS."
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Got questions? We've got straight answers."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "CONTACT SUPPORT"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open first item by default",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_mode",
+      "label": "Accordion Mode (Close others when opening one)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "q_size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Question Size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "a_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Answer Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between questions",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#E2FF00"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Border Thickness",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Hard Shadow Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Offset",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "DO YOU SHIP INTERNATIONALLY?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes, we ship worldwide. Customs and duties apply depending on your region.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP20 - Brutalist FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

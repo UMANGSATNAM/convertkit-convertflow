@@ -1,0 +1,230 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp40-ugc-wrapper {
+    /* Full width grid */
+  }
+
+  .hp40-ugc__header {
+    padding: 40px;
+    border-bottom: 2px solid var(--text-color);
+    text-align: center;
+  }
+
+  .hp40-ugc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+  }
+
+  .hp40-ugc__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp40-ugc__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .hp40-ugc__item {
+    aspect-ratio: 1;
+    position: relative;
+    border-right: 2px solid var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+    overflow: hidden;
+    display: block;
+    background: var(--accent-color);
+  }
+
+  /* Handle borders */
+  .hp40-ugc__item:nth-child(4n) {
+    border-right: none;
+  }
+  .hp40-ugc__item:nth-last-child(-n+4) {
+    border-bottom: none;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp40-ugc__item:nth-child(even) {
+      border-right: none;
+    }
+    .hp40-ugc__item:nth-child(odd) {
+      border-right: 2px solid var(--text-color);
+    }
+    .hp40-ugc__item {
+      border-bottom: 2px solid var(--text-color) !important;
+    }
+    .hp40-ugc__item:nth-last-child(-n+2) {
+      border-bottom: none !important;
+    }
+  }
+
+  .hp40-ugc__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease, mix-blend-mode 0.3s ease;
+  }
+
+  .hp40-ugc__item:hover .hp40-ugc__image {
+    filter: grayscale(0%);
+    mix-blend-mode: multiply;
+  }
+
+  .hp40-ugc__handle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--text-color);
+    color: var(--bg-color);
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px;
+    text-transform: uppercase;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .hp40-ugc__item:hover .hp40-ugc__handle {
+    transform: translateY(0);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp40-ugc-wrapper" id="HP40UGC-{{ section.id }}">
+  <div class="hp40-ugc__header">
+    <h2 class="hp40-ugc__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp40-ugc__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp40-ugc__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.handle | escape }}" class="hp40-ugc__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp40-ugc__image' }}
+        {%- endif -%}
+        <div class="hp40-ugc__handle">{{ block.settings.handle }}</div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP40 - Swiss UGC",
+  "class": "section-hp40-ugc-reels",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SOCIAL ARCHIVE"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Swiss Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Lines",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Hover Overlay Block",
+      "default": "#0055FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ugc",
+      "name": "UGC Post",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "@SWISSDESIGN"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP40 - Swiss UGC",
+      "blocks": [
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" },
+        { "type": "ugc" }
+      ]
+    }
+  ]
+}
+{% endschema %}

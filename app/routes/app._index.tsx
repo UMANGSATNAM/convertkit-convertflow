@@ -180,14 +180,14 @@ export default function Home() {
         <Card>
           <BlockStack gap="400">
             <BlockStack gap="150">
-              <Text as="h2" variant="headingLg">Add sections to your store</Text>
+              <Text as="h2" variant="headingLg">Build your store</Text>
               <Text as="p" tone="subdued">
-                Explore our high-converting 100X CRO Liquid section library and drop them directly into your active theme.
+                Select 100X CRO High-Converting Templates for Home, Product, Collection, Landing & Cart Pages.
               </Text>
             </BlockStack>
             <Box>
-              <Link to="/app/sections" style={{ textDecoration: "none" }}>
-                <Button variant="primary" size="large">Browse sections</Button>
+              <Link to="/app/build-store" style={{ textDecoration: "none" }}>
+                <Button variant="primary" size="large">Build your store</Button>
               </Link>
             </Box>
           </BlockStack>

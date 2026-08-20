@@ -1,0 +1,134 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp47-usp-bg: {{ section.settings.bg_color | default: '#F5F0EB' }};
+    --hp47-card-bg: {{ section.settings.card_bg | default: '#FAF7F2' }};
+    --hp47-border: {{ section.settings.border_color | default: '#EAE3DA' }};
+    --hp47-title: {{ section.settings.title_color | default: '#382E2B' }};
+    
+    background-color: var(--hp47-usp-bg);
+    padding-top: {{ section.settings.padding_top | default: 70 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 70 }}px;
+  }
+
+  .hp47-usp__grid {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 4 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp47-usp__card {
+    background: var(--hp47-card-bg);
+    border: 1px solid var(--hp47-border);
+    border-radius: 24px;
+    padding: 36px 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(56, 46, 43, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp47-usp__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(56, 46, 43, 0.08);
+  }
+
+  .hp47-usp__icon {
+    width: 56px;
+    height: 56px;
+    background: #EAE3DA;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+
+  .hp47-usp__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hp47-title);
+    margin: 0 0 10px;
+  }
+
+  .hp47-usp__desc {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #6E5E58;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp47-usp__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media screen and (max-width: 576px) {
+    .hp47-usp__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp47-usp__grid">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <div class="hp47-usp__card" {{ block.shopify_attributes }}>
+        <div class="hp47-usp__icon">{{ block.settings.icon | default: '🌾' }}</div>
+        <h3 class="hp47-usp__title">{{ block.settings.title }}</h3>
+        <p class="hp47-usp__desc">{{ block.settings.description }}</p>
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div class="hp47-usp__card">
+      <div class="hp47-usp__icon">🌾</div>
+      <h3 class="hp47-usp__title">Bio-Fermented Oat</h3>
+      <p class="hp47-usp__desc">Rich in beta-glucans to reinforce and soothe delicate lipid moisture barriers.</p>
+    </div>
+    <div class="hp47-usp__card">
+      <div class="hp47-usp__icon">💧</div>
+      <h3 class="hp47-usp__title">Nordic Birch Sap</h3>
+      <p class="hp47-usp__desc">Pristine sap packed with 17 amino acids, minerals, and natural enzymes.</p>
+    </div>
+    <div class="hp47-usp__card">
+      <div class="hp47-usp__icon">✈️</div>
+      <h3 class="hp47-usp__title">Pre-Paid Air DDP</h3>
+      <p class="hp47-usp__desc">Fast door-to-door delivery with customs cleared across 180+ countries.</p>
+    </div>
+    <div class="hp47-usp__card">
+      <div class="hp47-usp__icon">🛡️</div>
+      <h3 class="hp47-usp__title">Dermatologist Tested</h3>
+      <p class="hp47-usp__desc">Zero fragrances, non-irritating formulas certified for reactive skin.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP47 - Taupe Pillars",
+  "class": "section-hp47-usp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F0EB" },
+    { "type": "color", "id": "card_bg", "label": "Card Background", "default": "#FAF7F2" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#EAE3DA" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#382E2B" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 70 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 70 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pillar Card",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "default": "🌾" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Bio-Fermented Oat" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Rich in beta-glucans to reinforce delicate lipid moisture barriers." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP47 - Taupe Pillars" }
+  ]
+}
+{% endschema %}

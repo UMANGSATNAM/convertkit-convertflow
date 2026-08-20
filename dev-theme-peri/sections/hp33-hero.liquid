@@ -1,0 +1,295 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --gold-color: {{ section.settings.gold_color }};
+    
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+  }
+
+  .hp33-hero-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: {{ section.settings.hero_height }}vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp33-hero-wrapper {
+      min-height: {{ section.settings.hero_height_mobile }}vh;
+    }
+  }
+
+  .hp33-hero__bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+  }
+
+  .hp33-hero__bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+    z-index: 2;
+  }
+
+  /* Art Deco Frame */
+  .hp33-hero__frame {
+    position: absolute;
+    top: 20px; left: 20px; right: 20px; bottom: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.5); /* Gold */
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .hp33-hero__frame::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+  }
+
+  .hp33-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .hp33-hero__content {
+    position: relative;
+    z-index: 4;
+    text-align: center;
+    max-width: 800px;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hp33-hero__subtitle {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gold-color);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .hp33-hero__subtitle::before,
+  .hp33-hero__subtitle::after {
+    content: '';
+    height: 1px;
+    width: 40px;
+    background: var(--gold-color);
+  }
+
+  .hp33-hero__title {
+    font-family: var(--font-heading);
+    font-size: clamp(48px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0 0 25px;
+    font-weight: 400;
+  }
+
+  .hp33-hero__text {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin: 0 0 40px;
+    max-width: 600px;
+    font-weight: 300;
+  }
+
+  .hp33-hero__btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 16px 40px;
+    border: 1px solid var(--gold-color);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    background: transparent;
+  }
+
+  .hp33-hero__btn::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.4s ease;
+  }
+
+  .hp33-hero__btn:hover {
+    background: var(--gold-color);
+    color: #000;
+  }
+
+  .hp33-hero__btn:hover::before {
+    border-color: #000;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp33-hero-wrapper" id="HP33Hero-{{ section.id }}">
+  <div class="hp33-hero__bg">
+    {%- if section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 2000 }}" alt="{{ section.settings.title | escape }}" class="hp33-hero__image" loading="eager">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp33-hero__image' }}
+    {%- endif -%}
+  </div>
+
+  <div class="hp33-hero__frame"></div>
+
+  <div class="hp33-hero__content">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp33-hero__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    
+    <h1 class="hp33-hero__title">{{ section.settings.title }}</h1>
+    
+    {%- if section.settings.text != blank -%}
+      <p class="hp33-hero__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp33-hero__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP33 - Deco Hero",
+  "class": "section-hp33-hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "EST. 1920"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "A New Era of Elegance"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Discover our most curated collection of fine goods, where traditional craftsmanship meets timeless design."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "DISCOVER THE COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Sizing"
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Hero Height (Desktop)",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "hero_height_mobile",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Hero Height (Mobile)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 84
+    },
+    {
+      "type": "header",
+      "content": "Deco Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Fallback)",
+      "default": "#0e1a14"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gold_color",
+      "label": "Gold Accent",
+      "default": "#d4af37"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP33 - Deco Hero"
+    }
+  ]
+}
+{% endschema %}

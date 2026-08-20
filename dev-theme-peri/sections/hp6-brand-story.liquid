@@ -1,0 +1,260 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#000000'
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign accent_color = section.settings.accent_color | default: '#ff4500'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp6-story-bg: {{ bg_color }};
+    --hp6-story-text: {{ text_color }};
+    --hp6-story-accent: {{ accent_color }};
+    
+    --hp6-story-pt-desk: {{ padding_top_desktop }}px;
+    --hp6-story-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp6-story-pt-mob: {{ padding_top_mobile }}px;
+    --hp6-story-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp6-sports-story-{{ section.id }} {
+    padding-top: var(--hp6-story-pt-desk);
+    padding-bottom: var(--hp6-story-pb-desk);
+    background-color: var(--hp6-story-bg);
+  }
+
+  .hp6-story-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hp6-story-bg-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(80px, 15vw, 250px);
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.05);
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .hp6-story-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  .hp6-story-badge {
+    display: inline-block;
+    color: var(--hp6-story-accent);
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+  }
+
+  .hp6-story-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--hp6-story-text);
+    margin: 0 0 30px 0;
+    line-height: 1.1;
+  }
+
+  .hp6-story-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 40px 0;
+  }
+
+  .hp6-story-video-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #111;
+    position: relative;
+    z-index: 2;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hp6-story-video-wrap video, .hp6-story-video-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  
+  .hp6-story-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px; height: 80px;
+    background: var(--hp6-story-accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .hp6-story-play:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  .hp6-story-play svg { width: 30px; height: 30px; fill: currentColor; margin-left: 5px; }
+
+  @media screen and (max-width: 768px) {
+    .hp6-sports-story-{{ section.id }} {
+      padding-top: var(--hp6-story-pt-mob);
+      padding-bottom: var(--hp6-story-pb-mob);
+    }
+    .hp6-story-inner { padding: 0 20px; }
+    .hp6-story-play { width: 60px; height: 60px; }
+    .hp6-story-play svg { width: 20px; height: 20px; }
+  }
+</style>
+
+<section class="hp6-sports-story-{{ section.id }}" aria-label="Brand Story">
+  <div class="hp6-story-inner">
+    
+    <div class="hp6-story-bg-text">{{ section.settings.bg_text }}</div>
+
+    <div class="hp6-story-content">
+      <div class="hp6-story-badge">{{ section.settings.badge }}</div>
+      <h2 class="hp6-story-title">{{ section.settings.title }}</h2>
+      
+      <div class="hp6-story-video-wrap">
+        {%- if section.settings.video != blank -%}
+          {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true }}
+        {%- elsif section.settings.image != blank -%}
+          <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1200 }}" loading="lazy" alt="Brand Story">
+          <div class="hp6-story-play">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+
+      <p class="hp6-story-desc">{{ section.settings.description }}</p>
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP6 Sports Brand Story",
+  "tag": "section",
+  "class": "section-hp6-story",
+  "settings": [
+    {
+      "type": "text",
+      "id": "bg_text",
+      "label": "Background Large Text",
+      "default": "PUSH LIMITS"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "OUR MISSION"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "BORN FROM THE DESIRE TO BE BETTER."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "We don't just make activewear. We engineer tools for athletes who refuse to settle. Every seam, every fabric choice is tested by professionals to ensure maximum output."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Cover Image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Autoplay Video (Overrides Image)"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#ff4500"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP6 Sports Brand Story",
+      "category": "About"
+    }
+  ]
+}
+{% endschema %}

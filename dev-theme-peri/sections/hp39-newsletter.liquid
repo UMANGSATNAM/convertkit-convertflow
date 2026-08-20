@@ -1,0 +1,250 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 100px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative glowing orb */
+  .hp39-news__orb {
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    background: var(--accent-color);
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hp39-news-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 60px;
+    padding: 80px 40px;
+    text-align: center;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.05);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp39-news-wrapper {
+      padding: 50px 20px;
+      border-radius: 40px;
+    }
+  }
+
+  .hp39-news__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-color);
+    margin: 0 0 20px;
+    letter-spacing: -1px;
+  }
+
+  .hp39-news__text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0 auto 40px;
+    max-width: 500px;
+  }
+
+  .hp39-news__form {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    position: relative;
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp39-news__form {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+
+  .hp39-news__input {
+    flex: 1;
+    width: 100%;
+    padding: 20px 30px;
+    border: none;
+    background: #fff;
+    border-radius: 50px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-color);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+    outline: none;
+  }
+  
+  .hp39-news__input::placeholder {
+    color: #a0a0a0;
+  }
+
+  .hp39-news__btn {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
+    padding: 0 30px;
+    background: var(--text-color);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  @media screen and (max-width: 480px) {
+    .hp39-news__btn {
+      position: static;
+      padding: 15px 30px;
+      width: 100%;
+    }
+  }
+
+  .hp39-news__btn:hover {
+    transform: scale(1.05);
+    background: var(--accent-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp39-news-container" id="HP39News-{{ section.id }}">
+  <div class="hp39-news__orb"></div>
+  
+  <div class="hp39-news-wrapper">
+    <h2 class="hp39-news__title">{{ section.settings.title }}</h2>
+    {%- if section.settings.text != blank -%}
+      <p class="hp39-news__text">{{ section.settings.text }}</p>
+    {%- endif -%}
+
+    {%- form 'customer', class: 'hp39-news__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input type="email" 
+             name="contact[email]" 
+             class="hp39-news__input" 
+             placeholder="{{ section.settings.placeholder }}" 
+             required>
+      <button type="submit" class="hp39-news__btn">{{ section.settings.btn_label }}</button>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP39 - Aura Newsletter",
+  "class": "section-hp39-newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join the Aura."
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Subscribe for gentle reminders, new arrivals, and a soft touch in your inbox."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Your email address..."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Aura Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#faf9f8"
+    },
+    {
+      "type": "color_background",
+      "id": "card_bg",
+      "label": "Card Glass Background",
+      "default": "rgba(255, 255, 255, 0.6)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#fbc2eb"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP39 - Aura Newsletter"
+    }
+  ]
+}
+{% endschema %}

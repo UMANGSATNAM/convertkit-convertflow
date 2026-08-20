@@ -1,0 +1,335 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Lora', serif;
+    --font-body: 'Nunito', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp35-best-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp35-best-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp35-best__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .hp35-best__subtitle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  .hp35-best__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.2;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 400;
+  }
+  
+  .hp35-best__title em {
+    font-style: italic;
+    color: var(--accent-color);
+  }
+
+  .hp35-best__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp35-best__grid {
+      gap: 50px;
+    }
+  }
+
+  .hp35-best__item {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    text-decoration: none;
+    group: card;
+  }
+
+  /* Alternating layout */
+  .hp35-best__item:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp35-best__item,
+    .hp35-best__item:nth-child(even) {
+      flex-direction: column;
+      text-align: center;
+      gap: 30px;
+    }
+  }
+
+  .hp35-best__image-col {
+    flex: 1;
+    position: relative;
+  }
+
+  .hp35-best__image-wrap {
+    aspect-ratio: 4/3;
+    background: #e9e5de;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.5s ease;
+  }
+  
+  .hp35-best__item:nth-child(even) .hp35-best__image-wrap {
+    border-radius: 120px 12px 12px 12px;
+  }
+  .hp35-best__item:nth-child(odd) .hp35-best__image-wrap {
+    border-radius: 12px 120px 12px 12px;
+  }
+
+  .hp35-best__item:hover .hp35-best__image-wrap {
+    transform: scale(1.02);
+  }
+
+  .hp35-best__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hp35-best__content-col {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .hp35-best__product-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    color: var(--text-color);
+    margin: 0 0 15px;
+    font-weight: 500;
+  }
+
+  .hp35-best__price {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 25px;
+  }
+
+  .hp35-best__btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--accent-color);
+    display: inline-block;
+    position: relative;
+  }
+
+  .hp35-best__btn::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 0;
+    width: 100%; height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease;
+  }
+
+  .hp35-best__item:hover .hp35-best__btn::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp35-best-wrapper" id="HP35Best-{{ section.id }}">
+  <div class="hp35-best__header">
+    {%- if section.settings.subtitle != blank -%}
+      <div class="hp35-best__subtitle">{{ section.settings.subtitle }}</div>
+    {%- endif -%}
+    <h2 class="hp35-best__title">{{ section.settings.title | replace: 'Beloved', '<em>Beloved</em>' }}</h2>
+  </div>
+
+  <div class="hp35-best__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_link | default: '#' }}" class="hp35-best__item" {{ block.shopify_attributes }}>
+        <div class="hp35-best__image-col">
+          <div class="hp35-best__image-wrap">
+            {%- if block.settings.image != blank -%}
+              <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp35-best__image" loading="lazy">
+            {%- else -%}
+              {%- assign placeholder = 'product-' | append: forloop.index -%}
+              {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+              {{ placeholder | placeholder_svg_tag: 'hp35-best__image' }}
+            {%- endif -%}
+          </div>
+        </div>
+        
+        <div class="hp35-best__content-col">
+          <h3 class="hp35-best__product-title">{{ block.settings.title }}</h3>
+          <div class="hp35-best__price">{{ block.settings.price }}</div>
+          <div class="hp35-best__btn">Discover</div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP35 - Organic Bestseller",
+  "class": "section-hp35-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "SIGNATURE PIECES"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Beloved Classics"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Organic Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FDFBF7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2C422F"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#CC7B5E"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Earthen Vase"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$85.00"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP35 - Organic Bestseller",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

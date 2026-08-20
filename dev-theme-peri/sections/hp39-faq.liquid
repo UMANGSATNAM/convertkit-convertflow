@@ -1,0 +1,261 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --card-bg: {{ section.settings.card_bg }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding: 80px 20px;
+  }
+
+  .hp39-faq-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hp39-faq__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp39-faq__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  .hp39-faq__list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hp39-faq__item {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+  }
+
+  .hp39-faq__question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 25px 30px;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hp39-faq__icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .hp39-faq__icon svg {
+    width: 14px; height: 14px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+  }
+
+  .hp39-faq__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+  
+  .hp39-faq__answer-inner {
+    overflow: hidden;
+  }
+
+  .hp39-faq__answer-inner > div {
+    padding: 0 30px 30px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  .hp39-faq__item.is-active .hp39-faq__icon {
+    transform: rotate(180deg);
+  }
+  
+  .hp39-faq__item.is-active .hp39-faq__icon svg {
+    transform: rotate(45deg);
+  }
+
+  .hp39-faq__item.is-active .hp39-faq__answer {
+    grid-template-rows: 1fr;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp39-faq-wrapper" id="HP39Faq-{{ section.id }}">
+  <div class="hp39-faq__header">
+    <h2 class="hp39-faq__title">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="hp39-faq__list">
+    {%- for block in section.blocks -%}
+      <div class="hp39-faq__item {% if forloop.first %}is-active{% endif %}" {{ block.shopify_attributes }}>
+        <button class="hp39-faq__question">
+          {{ block.settings.question }}
+          <span class="hp39-faq__icon">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </span>
+        </button>
+        <div class="hp39-faq__answer">
+          <div class="hp39-faq__answer-inner">
+            <div>{{ block.settings.answer }}</div>
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('HP39Faq-{{ section.id }}');
+    const items = wrapper.querySelectorAll('.hp39-faq__item');
+    
+    items.forEach(item => {
+      const btn = item.querySelector('.hp39-faq__question');
+      
+      btn.addEventListener('click', () => {
+        const isActive = item.classList.contains('is-active');
+        
+        // Close all
+        items.forEach(i => i.classList.remove('is-active'));
+        
+        // Open clicked if it wasn't already open
+        if (!isActive) {
+          item.classList.add('is-active');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP39 - Aura FAQ",
+  "class": "section-hp39-faq",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Common Curiosities."
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Aura Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#faf9f8"
+    },
+    {
+      "type": "color_background",
+      "id": "card_bg",
+      "label": "Card Glass Background",
+      "default": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Icon Color",
+      "default": "#c7ceea"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "How soft is it really?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Imagine resting on a cloud. That's the feeling we aim for with every single piece we produce.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP39 - Aura FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq", "settings": { "question": "What about shipping?", "answer": "<p>We offer complimentary soft packaging and gentle shipping worldwide. Usually arrives within 3-5 days.</p>" } },
+        { "type": "faq", "settings": { "question": "Can I return items?", "answer": "<p>Of course. If it doesn't bring you peace, return it within 30 days, no questions asked.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,418 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-primary: {{ section.settings.accent_primary }};
+    --accent-secondary: {{ section.settings.accent_secondary }};
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Share Tech Mono', monospace;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp24-tiles-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp24-tiles-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp24-tiles__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_margin }}px;
+  }
+
+  .hp24-tiles__sys-text {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--accent-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .hp24-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  }
+
+  .hp24-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp24-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp24-tiles__grid {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .hp24-tiles__grid::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Cyber Tile (Angled) */
+  .hp24-tile {
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+    background: #111;
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+    border: 1px solid rgba(255,255,255,0.1); /* The clip-path usually hides the border on the clipped edges, but we can fake it with an inner element */
+    transition: all 0.3s ease;
+  }
+
+  @media screen and (max-width: 600px) {
+    .hp24-tile {
+      flex: 0 0 75%;
+      scroll-snap-align: start;
+    }
+  }
+
+  /* Fake border for clip-path */
+  .hp24-tile::before {
+    content: '';
+    position: absolute;
+    top: 1px; left: 1px; right: 1px; bottom: 1px;
+    background: var(--bg-color);
+    clip-path: polygon(19px 0, 100% 0, 100% calc(100% - 19px), calc(100% - 19px) 100%, 0 100%, 0 19px);
+    z-index: 1;
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+
+  .hp24-tile:hover {
+    background: var(--accent-primary); /* Shines through the 1px gap */
+    transform: translateY(-5px);
+  }
+
+  .hp24-tile:hover::before {
+    background: rgba(0,0,0,0.2);
+  }
+
+  .hp24-tile__inner {
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1/1;
+  }
+
+  .hp24-tile__bg-image {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.4;
+    filter: grayscale(1) contrast(1.2);
+    transition: all 0.5s ease;
+  }
+
+  .hp24-tile:hover .hp24-tile__bg-image {
+    opacity: 0.8;
+    filter: grayscale(0) contrast(1.1);
+    transform: scale(1.05);
+  }
+
+  .hp24-tile__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+    z-index: -1;
+  }
+
+  .hp24-tile:hover .hp24-tile__overlay {
+    background: radial-gradient(circle, rgba(0,243,255,0.1) 0%, rgba(0,0,0,0.8) 100%);
+  }
+
+  .hp24-tile__sys-id {
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--accent-secondary);
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    text-transform: uppercase;
+  }
+
+  .hp24-tile__title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 900;
+    color: var(--text-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .hp24-tile__btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-top: 15px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+
+  .hp24-tile:hover .hp24-tile__btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hp24-tile__btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp24-tiles-wrapper" id="HP24Tiles-{{ section.id }}">
+  <div class="hp24-tiles__header">
+    <div class="hp24-tiles__sys-text">DATA.QUERY: CATEGORIES</div>
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp24-tiles__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="hp24-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp24-tile" {{ block.shopify_attributes }}>
+        <div class="hp24-tile__inner">
+          <div class="hp24-tile__sys-id">DIR_{{ forloop.index | prepend: '00' }}</div>
+          
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp24-tile__bg-image" loading="lazy">
+          {%- else -%}
+            <div style="background:#222;width:100%;height:100%;position:absolute;top:0;left:0;z-index:-1;"></div>
+          {%- endif -%}
+          
+          <div class="hp24-tile__overlay"></div>
+
+          {%- if block.settings.title != blank -%}
+            <h3 class="hp24-tile__title">{{ block.settings.title }}</h3>
+          {%- endif -%}
+          
+          <div class="hp24-tile__btn">
+            EXPLORE
+            <svg viewBox="0 0 24 24"><path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"/></svg>
+          </div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP24 - Cyber Tiles",
+  "class": "section-hp24-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYSTEM DIRECTORIES"
+    },
+    {
+      "type": "range",
+      "id": "header_margin",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margin Below Header",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cyberpunk Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_primary",
+      "label": "Accent Primary (Neon Blue)",
+      "default": "#00F3FF"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary",
+      "label": "Accent Secondary (Neon Pink)",
+      "default": "#FF00E6"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP24 - Cyber Tiles",
+      "blocks": [
+        { "type": "category", "settings": { "title": "IMPLANTS" } },
+        { "type": "category", "settings": { "title": "OPTICS" } },
+        { "type": "category", "settings": { "title": "NEURAL" } },
+        { "type": "category", "settings": { "title": "SOFTWARE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

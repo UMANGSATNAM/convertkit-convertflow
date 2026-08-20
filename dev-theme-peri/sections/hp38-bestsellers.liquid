@@ -1,0 +1,314 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-best-wrapper {
+    /* No padding, full width grid */
+  }
+
+  .hp38-best__header {
+    padding: 60px 40px;
+    border-bottom: 2px solid var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-best__header {
+      padding: 40px 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  .hp38-best__title {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 5vw, {{ section.settings.title_size }}px);
+    line-height: 1.1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .hp38-best__meta {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 5px 10px;
+    text-transform: uppercase;
+  }
+
+  /* GRID AREA */
+  .hp38-best__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background-color: var(--text-color); /* Lines */
+    gap: 2px;
+  }
+
+  @media screen and (max-width: 1200px) {
+    .hp38-best__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media screen and (max-width: 900px) {
+    .hp38-best__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media screen and (max-width: 500px) {
+    .hp38-best__grid { grid-template-columns: 1fr; }
+  }
+
+  .hp38-product-card {
+    background: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    position: relative;
+    group: card;
+  }
+
+  .hp38-product-card__image-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f4f4f4;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+  }
+
+  .hp38-product-card:hover .hp38-product-card__image {
+    filter: grayscale(0%);
+  }
+
+  .hp38-product-card__badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    padding: 4px 8px;
+    text-transform: uppercase;
+  }
+
+  .hp38-product-card__info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+
+  .hp38-product-card__title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    color: var(--text-color);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+  }
+
+  .hp38-product-card__price {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  .hp38-product-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    border-top: 1px dashed var(--text-color);
+    padding-top: 15px;
+  }
+
+  .hp38-product-card__id {
+    font-family: var(--font-heading);
+    font-size: 10px;
+    color: var(--text-color);
+    opacity: 0.5;
+  }
+
+  .hp38-product-card__add {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp38-product-card:hover .hp38-product-card__add {
+    color: var(--accent-color);
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-best-wrapper" id="HP38Best-{{ section.id }}">
+  <div class="hp38-best__header">
+    <h2 class="hp38-best__title">{{ section.settings.title }}</h2>
+    <div class="hp38-best__meta">TOP.PERFORMERS</div>
+  </div>
+
+  <div class="hp38-best__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.product_link | default: '#' }}" class="hp38-product-card" {{ block.shopify_attributes }}>
+        <div class="hp38-product-card__image-wrap">
+          {%- if block.settings.badge_text != blank -%}
+            <div class="hp38-product-card__badge">{{ block.settings.badge_text }}</div>
+          {%- endif -%}
+          
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.title | escape }}" class="hp38-product-card__image" loading="lazy">
+          {%- else -%}
+            {%- assign placeholder = 'product-' | append: forloop.index -%}
+            {%- if forloop.index > 6 -%}{%- assign placeholder = 'product-1' -%}{%- endif -%}
+            {{ placeholder | placeholder_svg_tag: 'hp38-product-card__image' }}
+          {%- endif -%}
+        </div>
+        
+        <div class="hp38-product-card__info">
+          <div>
+            <h3 class="hp38-product-card__title">{{ block.settings.title }}</h3>
+            <div class="hp38-product-card__price">{{ block.settings.price }}</div>
+          </div>
+          
+          <div class="hp38-product-card__footer">
+            <span class="hp38-product-card__id">ID:{{ forloop.index }}00{{ section.id | slice: 0, 4 }}</span>
+            <span class="hp38-product-card__add">[ + ADD ]</span>
+          </div>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Best",
+  "class": "section-hp38-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "HIGH FREQUENCY"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Grid Lines",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "default": "HOT"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "STANDARD PANT"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$120.00"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Best",
+      "blocks": [
+        { "type": "product", "settings": { "badge_text": "HOT" } },
+        { "type": "product", "settings": { "badge_text": "" } },
+        { "type": "product", "settings": { "badge_text": "HOT" } },
+        { "type": "product", "settings": { "badge_text": "" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

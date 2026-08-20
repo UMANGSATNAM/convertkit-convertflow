@@ -1,0 +1,175 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: 4px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .hp30-press-wrapper {
+    display: flex;
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  .hp30-press__content {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    padding: 0 40px;
+    animation: hp30PressScroll 20s linear infinite;
+  }
+
+  .hp30-press__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    filter: grayscale(100%) contrast(200%);
+  }
+
+  .hp30-press__logo img,
+  .hp30-press__logo svg {
+    max-height: 100%;
+    width: auto;
+    fill: var(--text-color);
+    color: var(--text-color);
+  }
+
+  .hp30-press__divider {
+    color: var(--text-color);
+    font-family: var(--font-heading);
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  @keyframes hp30PressScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* Brutalist hover pause */
+  .hp30-press-wrapper:hover .hp30-press__content {
+    animation-play-state: paused;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-press-wrapper" id="HP30Press-{{ section.id }}">
+  {%- for i in (1..4) -%}
+    <div class="hp30-press__content">
+      {%- for block in section.blocks -%}
+        <div class="hp30-press__logo" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 300 }}" alt="Press Logo" loading="lazy">
+          {%- else -%}
+            <svg viewBox="0 0 150 40" width="150" height="40">
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Oswald', sans-serif" font-size="28" font-weight="bold" fill="currentColor" text-transform="uppercase">
+                PRESS LOGO
+              </text>
+            </svg>
+          {%- endif -%}
+        </div>
+        <div class="hp30-press__divider">+</div>
+      {%- endfor -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Press",
+  "class": "section-hp30-press-logos",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Logos (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Press",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

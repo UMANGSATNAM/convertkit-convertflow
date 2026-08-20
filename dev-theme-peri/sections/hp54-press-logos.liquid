@@ -1,0 +1,46 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#0A1628' }};
+    padding: {{ section.settings.padding_vertical | default: 30 }}px 0;
+  }
+  .hp54-press__container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .hp54-press__label {
+    text-align: center; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: {{ section.settings.label_color | default: '#60A5FA' }}; margin: 0 0 24px;
+  }
+  .hp54-press__logos { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; }
+  .hp54-press__logo {
+    height: {{ section.settings.logo_height | default: 26 }}px;
+    opacity: 0.35; filter: grayscale(100%) brightness(2.5);
+    transition: all 0.3s ease;
+  }
+  .hp54-press__logo:hover { opacity: 0.7; filter: grayscale(0%); }
+  @media screen and (max-width: 768px) { .hp54-press__logos { gap: 30px; } .hp54-press__logo { height: 20px; } }
+{%- endstyle -%}
+<div class="hp54-press__container">
+  {%- if section.settings.label != blank -%}<p class="hp54-press__label">{{ section.settings.label }}</p>{%- endif -%}
+  <div class="hp54-press__logos">
+    {%- for block in section.blocks -%}
+      {%- if block.settings.logo != blank -%}<img height="{{ block.settings.logo.height }}" width="{{ block.settings.logo.width }}" src="{{ block.settings.logo | image_url: height: 60 }}" class="hp54-press__logo" alt="{{ block.settings.alt | default: 'Press' }}" loading="lazy">{%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP54 - Sapphire Press",
+  "class": "section-hp54-press",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0A1628" },
+    { "type": "color", "id": "label_color", "label": "Label", "default": "#60A5FA" },
+    { "type": "text", "id": "label", "label": "Label", "default": "AS FEATURED IN" },
+    { "type": "range", "id": "logo_height", "min": 16, "max": 50, "step": 2, "unit": "px", "label": "Logo Height", "default": 26 },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Padding", "default": 30 }
+  ],
+  "blocks": [{ "type": "logo", "name": "Logo", "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "text", "id": "alt", "label": "Alt Text" }
+  ]}],
+  "presets": [{ "name": "HP54 - Sapphire Press" }]
+}
+{% endschema %}

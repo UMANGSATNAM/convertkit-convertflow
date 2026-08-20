@@ -1,0 +1,445 @@
+{%- liquid
+  assign section_id = section.id
+  assign layout = section.settings.layout | default: 'full'
+  assign desktop_image = section.settings.image
+  assign mobile_image = section.settings.image_mobile | default: desktop_image
+  assign pin_bg = section.settings.pin_bg | default: '#FFFFFF'
+  assign pin_inner = section.settings.pin_inner | default: '#2D3748'
+  assign tooltip_bg = section.settings.tooltip_bg | default: '#FFFFFF'
+  assign tooltip_text = section.settings.tooltip_text | default: '#2D3748'
+  assign padding_top = section.settings.padding_top | default: 0
+  assign padding_bottom = section.settings.padding_bottom | default: 0
+  assign padding_top_mobile = section.settings.padding_top_mobile | default: 0
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile | default: 0
+  assign desktop_height = section.settings.desktop_height | default: 'auto'
+  assign mobile_height = section.settings.mobile_height | default: 'auto'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --pin-bg: {{ pin_bg }};
+    --pin-inner: {{ pin_inner }};
+    --tooltip-bg: {{ tooltip_bg }};
+    --tooltip-text: {{ tooltip_text }};
+    --padding-top: {{ padding_top }}px;
+    --padding-bottom: {{ padding_bottom }}px;
+    --padding-top-mobile: {{ padding_top_mobile }}px;
+    --padding-bottom-mobile: {{ padding_bottom_mobile }}px;
+    
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .hpv6-shoppable-{{ section_id }} {
+    width: 100%;
+    margin: 0 auto;
+    {%- if layout == 'boxed' -%}
+      max-width: var(--page-width, 1440px);
+      padding-left: 5vw;
+      padding-right: 5vw;
+    {%- endif -%}
+  }
+
+  .hpv6-shoppable__container {
+    position: relative;
+    width: 100%;
+    background-color: #E2E8F0;
+    overflow: hidden;
+    {%- if layout == 'boxed' -%}
+      border-radius: 8px;
+    {%- endif -%}
+    
+    {%- if desktop_height == 'auto' -%}
+      padding-top: {% if desktop_image != blank %}{{ 100.0 | divided_by: desktop_image.aspect_ratio }}%{% else %}56.25%{% endif %};
+    {%- else -%}
+      height: {{ desktop_height }};
+    {%- endif -%}
+  }
+
+  .hpv6-shoppable__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hpv6-shoppable__image--mobile {
+    display: none;
+  }
+
+  /* Hotspot Pins */
+  .hpv6-shoppable__pin {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-color: var(--pin-bg);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    text-decoration: none;
+  }
+
+  .hpv6-shoppable__pin::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: var(--pin-inner);
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+  }
+
+  .hpv6-shoppable__pin:hover,
+  .hpv6-shoppable__pin:focus-visible {
+    transform: translate(-50%, -50%) scale(1.15);
+    outline: none;
+  }
+  
+  .hpv6-shoppable__pin:focus-visible {
+    box-shadow: 0 0 0 3px var(--pin-inner), 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .hpv6-shoppable__pin:hover::after {
+    transform: scale(1.2);
+  }
+
+  /* Ripple Effect */
+  .hpv6-shoppable__pin::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--pin-bg);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    animation: hpv6Ripple 2s infinite;
+  }
+
+  @keyframes hpv6Ripple {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+
+  /* Tooltip */
+  .hpv6-shoppable__tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    padding: 12px 16px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: max-content;
+  }
+
+  .hpv6-shoppable__tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--tooltip-bg) transparent transparent transparent;
+  }
+
+  .hpv6-shoppable__pin:hover .hpv6-shoppable__tooltip,
+  .hpv6-shoppable__pin:focus-visible .hpv6-shoppable__tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
+  .hpv6-shoppable__product-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .hpv6-shoppable__product-price {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  /* Mobile Adjustments */
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding-top: var(--padding-top-mobile);
+      padding-bottom: var(--padding-bottom-mobile);
+    }
+    
+    .hpv6-shoppable-{{ section_id }} {
+      {%- if layout == 'boxed' -%}
+        padding-left: 20px;
+        padding-right: 20px;
+      {%- endif -%}
+    }
+    
+    .hpv6-shoppable__container {
+      {%- if mobile_height == 'auto' -%}
+        height: auto;
+        padding-top: {% if mobile_image != blank %}{{ 100.0 | divided_by: mobile_image.aspect_ratio }}%{% else %}100%{% endif %};
+      {%- else -%}
+        height: {{ mobile_height }};
+        padding-top: 0;
+      {%- endif -%}
+    }
+
+    .hpv6-shoppable__image--desktop {
+      display: none;
+    }
+    
+    .hpv6-shoppable__image--mobile {
+      display: block;
+    }
+
+    .hpv6-shoppable__pin {
+      width: 28px;
+      height: 28px;
+    }
+  }
+</style>
+
+<div class="hpv6-shoppable-{{ section_id }}">
+  <div class="hpv6-shoppable__container">
+    
+    {%- if desktop_image != blank -%}
+      {{ desktop_image | image_url: width: 2400 | image_tag: 
+         class: 'hpv6-shoppable__image hpv6-shoppable__image--desktop',
+         loading: 'lazy',
+         sizes: '(min-width: 990px) 100vw, 100vw',
+         widths: '600, 800, 1200, 1600, 2000, 2400'
+      }}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hpv6-shoppable__image hpv6-shoppable__image--desktop placeholder-svg' }}
+    {%- endif -%}
+
+    {%- if mobile_image != blank -%}
+      {{ mobile_image | image_url: width: 1200 | image_tag: 
+         class: 'hpv6-shoppable__image hpv6-shoppable__image--mobile',
+         loading: 'lazy',
+         sizes: '100vw',
+         widths: '400, 600, 800, 1000, 1200'
+      }}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'hpv6-shoppable__image hpv6-shoppable__image--mobile placeholder-svg' }}
+    {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      {%- assign product = block.settings.product -%}
+      <a href="{{ product.url | default: '#' }}" 
+         class="hpv6-shoppable__pin" 
+         style="top: {{ block.settings.top_position }}%; left: {{ block.settings.left_position }}%;"
+         aria-label="View product: {{ product.title | default: 'Select a product' }}"
+         {{ block.shopify_attributes }}>
+        
+        <div class="hpv6-shoppable__tooltip" aria-hidden="true">
+          {%- if product != blank -%}
+            <span class="hpv6-shoppable__product-title">{{ product.title }}</span>
+            <span class="hpv6-shoppable__product-price">{{ product.price | money }}</span>
+          {%- else -%}
+            <span class="hpv6-shoppable__product-title">Select a product</span>
+          {%- endif -%}
+        </div>
+      </a>
+    {%- endfor -%}
+    
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HPV6 Shoppable Image",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Section Layout",
+      "options": [
+        { "value": "full", "label": "Full Width" },
+        { "value": "boxed", "label": "Boxed" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "desktop_height",
+      "label": "Desktop Height",
+      "options": [
+        { "value": "auto", "label": "Adapt to image" },
+        { "value": "60vh", "label": "60vh" },
+        { "value": "80vh", "label": "80vh" },
+        { "value": "100vh", "label": "100vh" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "mobile_height",
+      "label": "Mobile Height",
+      "options": [
+        { "value": "auto", "label": "Adapt to image" },
+        { "value": "60vh", "label": "60vh" },
+        { "value": "80vh", "label": "80vh" },
+        { "value": "100vh", "label": "100vh" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile Image",
+      "info": "Falls back to desktop image if left blank"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "pin_bg",
+      "label": "Pin Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "pin_inner",
+      "label": "Pin Inner Circle",
+      "default": "#2D3748"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_bg",
+      "label": "Tooltip Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "tooltip_text",
+      "label": "Tooltip Text",
+      "default": "#2D3748"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop Padding Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop Padding Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile Padding Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile Padding Bottom",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pin",
+      "name": "Product Pin",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "top_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Top Position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "left_position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Left Position",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HPV6 Shoppable Image",
+      "blocks": [
+        { "type": "pin", "settings": { "top_position": 40, "left_position": 30 } },
+        { "type": "pin", "settings": { "top_position": 60, "left_position": 70 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

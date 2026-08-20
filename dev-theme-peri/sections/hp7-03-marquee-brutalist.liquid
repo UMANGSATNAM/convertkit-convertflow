@@ -1,0 +1,171 @@
+{%- liquid
+  assign section_id = section.id
+  assign text = section.settings.text | default: 'AVANT-GARDE'
+  assign bg_color = section.settings.bg_color | default: '#050505'
+  assign text_color = section.settings.text_color | default: '#F4F4F0'
+  assign style = section.settings.style | default: 'outline'
+  assign speed = section.settings.speed | default: 40
+  assign padding_y = section.settings.padding_y | default: 80
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    --bg-color: {{ bg_color }};
+    --text-color: {{ text_color }};
+    --padding-y: {{ padding_y }}px;
+    --speed: {{ speed }}s;
+    
+    background-color: var(--bg-color);
+    overflow: hidden;
+    position: relative;
+    padding: var(--padding-y) 0;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .hp7-marquee-{{ section_id }} {
+    display: flex;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .hp7-marquee__content {
+    display: flex;
+    animation: hp7-marquee-scroll var(--speed) linear infinite;
+  }
+
+  .hp7-marquee__text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(6rem, 15vw, 15rem);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    padding: 0 4vw;
+    margin: 0;
+    letter-spacing: -0.02em;
+    
+    {%- if style == 'outline' -%}
+      color: transparent;
+      -webkit-text-stroke: 2px var(--text-color);
+      text-stroke: 2px var(--text-color);
+    {%- else -%}
+      color: var(--text-color);
+    {%- endif -%}
+  }
+  
+  .hp7-marquee__text em {
+    font-style: italic;
+    font-weight: 400;
+    {%- if style == 'outline' -%}
+      color: var(--text-color);
+      -webkit-text-stroke: 0;
+      text-stroke: 0;
+    {%- endif -%}
+  }
+
+  @keyframes hp7-marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      --padding-y: {{ padding_y | times: 0.6 }}px;
+    }
+    
+    .hp7-marquee__text {
+      padding: 0 8vw;
+      {%- if style == 'outline' -%}
+        -webkit-text-stroke: 1px var(--text-color);
+        text-stroke: 1px var(--text-color);
+      {%- endif -%}
+    }
+  }
+</style>
+
+<section class="hp7-marquee-{{ section_id }}" aria-hidden="true">
+  <div class="hp7-marquee__content">
+    {%- capture marquee_text -%}
+      <h2 class="hp7-marquee__text">{{ text }}</h2>
+    {%- endcapture -%}
+
+    {{ marquee_text }}
+    {{ marquee_text }}
+    {{ marquee_text }}
+    {{ marquee_text }}
+    {{ marquee_text }}
+    {{ marquee_text }}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP7 Brutalist Marquee",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aesthetic: Editorial Brutalism",
+      "info": "A massive, infinitely scrolling typography marquee for high visual impact."
+    },
+    {
+      "type": "html",
+      "id": "text",
+      "label": "Marquee Text",
+      "default": "AVANT-GARDE <em>FW26</em>",
+      "info": "Use <em> for italic/filled contrast text."
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Typography Style",
+      "options": [
+        { "value": "outline", "label": "Outline (Stroke)" },
+        { "value": "solid", "label": "Solid Fill" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text/Stroke Color",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "sec",
+      "label": "Scroll Speed",
+      "default": 40,
+      "info": "Lower is faster."
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 Brutalist Marquee"
+    }
+  ]
+}
+{% endschema %}

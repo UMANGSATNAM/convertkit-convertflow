@@ -1,0 +1,200 @@
+{%- liquid
+  assign sec_id = section.id
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign cover_image = section.settings.cover_image
+  assign video_url = section.settings.video_url
+-%}
+
+<style>
+  .hp19-video-{{ sec_id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    background-color: #ffffff;
+  }
+
+  .hp19-video-{{ sec_id }}__container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hp19-video-{{ sec_id }}__wrapper {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    min-height: 500px;
+    background-color: #f8f8f8;
+    overflow: hidden;
+  }
+
+  .hp19-video-{{ sec_id }}__cover {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    transition: opacity 0.8s ease, transform 1s ease;
+  }
+
+  .hp19-video-{{ sec_id }}__wrapper.is-playing .hp19-video-{{ sec_id }}__cover {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .hp19-video-{{ sec_id }}__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    z-index: 2;
+    backdrop-filter: blur(5px);
+  }
+
+  .hp19-video-{{ sec_id }}__wrapper.is-playing .hp19-video-{{ sec_id }}__play {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+
+  .hp19-video-{{ sec_id }}__play:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  .hp19-video-{{ sec_id }}__play::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid #000;
+    margin-left: 5px;
+  }
+
+  .hp19-video-{{ sec_id }}__iframe-wrapper {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  .hp19-video-{{ sec_id }}__iframe-wrapper iframe,
+  .hp19-video-{{ sec_id }}__iframe-wrapper video {
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp19-video-{{ sec_id }}__wrapper { height: 60vh; }
+    .hp19-video-{{ sec_id }}__play { width: 60px; height: 60px; }
+  }
+</style>
+
+<section class="hp19-video-{{ sec_id }}">
+  <div class="hp19-video-{{ sec_id }}__container">
+    <div class="hp19-video-{{ sec_id }}__wrapper js-video-wrapper-{{ sec_id }}">
+      
+      {% if cover_image != blank %}
+        <img height="{{ cover_image.height }}" width="{{ cover_image.width }}" src="{{ cover_image | image_url: width: 2048 }}" alt="Video Cover" class="hp19-video-{{ sec_id }}__cover">
+      {% else %}
+        {% capture tmp_class %}hp19-video-{{ sec_id }}__cover{% endcapture %}{{ 'lifestyle-2'  | placeholder_svg_tag: tmp_class }}
+      {% endif %}
+      
+      <div class="hp19-video-{{ sec_id }}__play js-play-btn-{{ sec_id }}"></div>
+
+      <div class="hp19-video-{{ sec_id }}__iframe-wrapper js-iframe-container-{{ sec_id }}">
+        <!-- Video injects here via JS -->
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.querySelector('.js-video-wrapper-{{ sec_id }}');
+    const playBtn = document.querySelector('.js-play-btn-{{ sec_id }}');
+    const iframeContainer = document.querySelector('.js-iframe-container-{{ sec_id }}');
+    const videoUrl = '{{ video_url | default: "https://www.youtube.com/watch?v=_9VUPq31cC8" }}';
+
+    if(playBtn && wrapper && iframeContainer) {
+      playBtn.addEventListener('click', function() {
+        wrapper.classList.add('is-playing');
+        
+        let iframeHtml = '';
+        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+          let videoId = videoUrl.split('v=')[1];
+          if(!videoId) videoId = videoUrl.split('/').pop();
+          const ampersandPosition = videoId.indexOf('&');
+          if(ampersandPosition != -1) {
+            videoId = videoId.substring(0, ampersandPosition);
+          }
+          iframeHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else if (videoUrl.includes('vimeo.com')) {
+          const videoId = videoUrl.split('/').pop();
+          iframeHtml = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+        } else if (videoUrl.endsWith('.mp4')) {
+          iframeHtml = `<video src="${videoUrl}" autoplay controls playsinline loop></video>`;
+        }
+        
+        iframeContainer.innerHTML = iframeHtml;
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP19 Luxury Video",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 100
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover Image"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL",
+      "info": "YouTube, Vimeo, or MP4",
+      "default": "https://www.youtube.com/watch?v=_9VUPq31cC8"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP19 Luxury Video"
+    }
+  ]
+}
+{% endschema %}

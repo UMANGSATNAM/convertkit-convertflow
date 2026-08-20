@@ -1,0 +1,254 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FFFFFF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    border-bottom: 3px solid #000;
+  }
+  
+  .hp11-bestsellers-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp11-bestsellers-header-{{ section_id }} {
+    text-align: left;
+    margin-bottom: 60px;
+    border-left: 10px solid #FF00FF;
+    padding-left: 20px;
+  }
+  
+  .hp11-bestsellers-heading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  
+  .hp11-bestsellers-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  
+  .hp11-product-card-{{ section_id }} {
+    background: #FFF;
+    border: 3px solid #000;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 6px 6px 0 #000;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hp11-product-card-{{ section_id }}:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0 #000;
+  }
+  
+  .hp11-product-image-wrap-{{ section_id }} {
+    position: relative;
+    border: 2px solid #000;
+    overflow: hidden;
+    padding-top: 100%; 
+    background: #CCC;
+    margin-bottom: 20px;
+  }
+  
+  .hp11-product-image-{{ section_id }} {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) contrast(110%);
+    transition: filter 0.3s ease;
+  }
+  
+  .hp11-product-card-{{ section_id }}:hover .hp11-product-image-{{ section_id }} {
+    filter: grayscale(0%) contrast(120%);
+  }
+  
+  .hp11-product-info-{{ section_id }} {
+    text-align: left;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hp11-product-title-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+    color: {{ text_color }};
+    letter-spacing: -0.5px;
+  }
+  
+  .hp11-product-price-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #FF00FF;
+    margin-bottom: 20px;
+  }
+  
+  .hp11-product-add-{{ section_id }} {
+    margin-top: auto;
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: #000;
+    color: #FFF;
+    border: 2px solid #000;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .hp11-product-add-{{ section_id }}:hover {
+    background: #CCFF00;
+    color: #000;
+  }
+  
+  .hp11-view-all-wrap-{{ section_id }} {
+    text-align: center;
+    margin-top: 60px;
+  }
+  
+  .hp11-view-all-btn-{{ section_id }} {
+    display: inline-block;
+    padding: 16px 40px;
+    background: #0000FF;
+    color: #fff;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 #000;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .hp11-view-all-btn-{{ section_id }}:hover {
+    background: #FF00FF;
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 #000;
+  }
+
+  @media (max-width: 1024px) {
+    .hp11-bestsellers-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #shopify-section-{{ section_id }} {
+      padding: 60px 20px;
+    }
+    .hp11-bestsellers-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+</style>
+
+<div class="hp11-bestsellers-container-{{ section_id }}">
+  <div class="hp11-bestsellers-header-{{ section_id }}">
+    <h2 class="hp11-bestsellers-heading-{{ section_id }}">{{ section.settings.heading | default: 'MOST WANTED' }}</h2>
+  </div>
+  
+  <div class="hp11-bestsellers-grid-{{ section_id }}">
+    {% assign collection = collections[section.settings.collection] %}
+    {% if collection != blank %}
+      {% for product in collection.products limit: section.settings.product_limit %}
+        <div class="hp11-product-card-{{ section_id }}">
+          <a href="{{ product.url }}" class="hp11-product-image-wrap-{{ section_id }}">
+            <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" class="hp11-product-image-{{ section_id }}" loading="lazy">
+          </a>
+          <div class="hp11-product-info-{{ section_id }}">
+            <h3 class="hp11-product-title-{{ section_id }}">{{ product.title }}</h3>
+            <div class="hp11-product-price-{{ section_id }}">{{ product.price | money }}</div>
+            <a href="{{ product.url }}" class="hp11-product-add-{{ section_id }}">ADD TO BAG</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      {% for i in (1..4) %}
+        <div class="hp11-product-card-{{ section_id }}">
+          <div class="hp11-product-image-wrap-{{ section_id }}">
+            <div class="hp11-product-image-{{ section_id }}" style="background: #EEE;"></div>
+          </div>
+          <div class="hp11-product-info-{{ section_id }}">
+            <h3 class="hp11-product-title-{{ section_id }}">OVERSIZED TEE</h3>
+            <div class="hp11-product-price-{{ section_id }}">$45.00</div>
+            <a href="#" class="hp11-product-add-{{ section_id }}">ADD TO BAG</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  
+  {% if section.settings.show_view_all %}
+    <div class="hp11-view-all-wrap-{{ section_id }}">
+      <a href="{{ collection.url | default: '#' }}" class="hp11-view-all-btn-{{ section_id }}">VIEW ALL SHIT</a>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "HP11 Bestsellers",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "MOST WANTED"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Product Limit",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All Button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP11 Bestsellers"
+    }
+  ]
+}
+{% endschema %}

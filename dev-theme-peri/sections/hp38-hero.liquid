@@ -1,0 +1,303 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-hero-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: max(700px, 80vh);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp38-hero-wrapper {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+  }
+
+  .hp38-hero__content {
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 2px solid var(--text-color);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp38-hero__content {
+      border-right: none;
+      border-bottom: 2px solid var(--text-color);
+      min-height: 50vh;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .hp38-hero__content {
+      padding: 40px 20px;
+    }
+  }
+
+  .hp38-hero__meta {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--text-color);
+    padding-bottom: 10px;
+  }
+
+  .hp38-hero__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin: 0 0 30px;
+    letter-spacing: -2px;
+    word-break: break-word;
+  }
+
+  .hp38-hero__text {
+    font-family: var(--font-body);
+    font-size: clamp(16px, 2vw, {{ section.settings.text_size }}px);
+    line-height: 1.5;
+    color: var(--text-color);
+    margin-bottom: 40px;
+    max-width: 500px;
+  }
+
+  .hp38-hero__actions {
+    display: flex;
+    gap: 20px;
+  }
+
+  @media screen and (max-width: 500px) {
+    .hp38-hero__actions {
+      flex-direction: column;
+    }
+  }
+
+  .hp38-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 40px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid var(--text-color);
+    background: transparent;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+  }
+
+  .hp38-hero__btn--primary {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff; /* Assuming accent is vibrant like blue/green, white text fits well */
+  }
+
+  .hp38-hero__btn--primary:hover {
+    background: var(--text-color);
+    border-color: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hp38-hero__btn--secondary:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  .hp38-hero__image-col {
+    position: relative;
+    background: #e9e9e9;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .hp38-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.2); /* Brutalist imagery often high contrast B&W */
+  }
+
+  .hp38-hero__image-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-color);
+    border: 2px solid var(--text-color);
+    padding: 10px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-hero-wrapper" id="HP38Hero-{{ section.id }}">
+  <div class="hp38-hero__content">
+    <div class="hp38-hero__meta">
+      <span>SEC:01 // HERO</span>
+      <span>SYS.ACTIVE</span>
+    </div>
+    
+    <div>
+      <h1 class="hp38-hero__title">{{ section.settings.title | newline_to_br }}</h1>
+      {%- if section.settings.text != blank -%}
+        <div class="hp38-hero__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+    
+    <div class="hp38-hero__actions">
+      {%- if section.settings.btn1_label != blank -%}
+        <a href="{{ section.settings.btn1_link | default: '#' }}" class="hp38-hero__btn hp38-hero__btn--primary">
+          {{ section.settings.btn1_label }}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.btn2_label != blank -%}
+        <a href="{{ section.settings.btn2_link | default: '#' }}" class="hp38-hero__btn hp38-hero__btn--secondary">
+          {{ section.settings.btn2_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="hp38-hero__image-col">
+    {%- if section.settings.image != blank -%}
+      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1400 }}" alt="{{ section.settings.title | escape }}" class="hp38-hero__image" loading="eager">
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp38-hero__image' }}
+    {%- endif -%}
+    
+    <div class="hp38-hero__image-overlay">
+      IMG_SRC: {{ section.settings.image.alt | default: 'ASSET_01' }}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Hero",
+  "class": "section-hp38-hero",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Heading",
+      "default": "SYSTEM\nUPDATE"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "High-performance essentials engineered for the modern utility."
+    },
+    {
+      "type": "text",
+      "id": "btn1_label",
+      "label": "Primary Button",
+      "default": "INITIALIZE"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "Primary Link"
+    },
+    {
+      "type": "text",
+      "id": "btn2_label",
+      "label": "Secondary Button",
+      "default": "DOCS"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "Secondary Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Grid Lines",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Hero"
+    }
+  ]
+}
+{% endschema %}

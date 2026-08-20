@@ -1,0 +1,238 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Space+Grotesk:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --border-color: {{ section.settings.border_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+  }
+
+  .hp30-cat-tiles-wrapper {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 4px solid var(--border-color);
+    border-right: 4px solid var(--border-color);
+  }
+
+  .hp30-cat-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp30-cat-tiles__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-cat-tiles__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hp30-cat-tiles__item {
+    position: relative;
+    aspect-ratio: 4/5;
+    border-right: 4px solid var(--border-color);
+    background: #111;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+  }
+
+  /* Handle borders for different screen sizes */
+  .hp30-cat-tiles__item:nth-child({{ section.settings.columns_desktop }}n) {
+    border-right: none;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .hp30-cat-tiles__item:nth-child(n) {
+      border-right: 4px solid var(--border-color);
+      border-bottom: 4px solid var(--border-color);
+    }
+    .hp30-cat-tiles__item:nth-child(2n) {
+      border-right: none;
+    }
+    .hp30-cat-tiles__item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .hp30-cat-tiles__item:nth-child(n) {
+      border-right: none;
+      border-bottom: 4px solid var(--border-color);
+    }
+    .hp30-cat-tiles__item:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .hp30-cat-tiles__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(120%) grayscale(80%);
+    transition: filter 0s, transform 0s;
+  }
+
+  .hp30-cat-tiles__item:hover .hp30-cat-tiles__image {
+    filter: contrast(100%) grayscale(0%);
+    transform: scale(1.05);
+  }
+
+  .hp30-cat-tiles__overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+
+  .hp30-cat-tiles__title {
+    font-family: var(--font-heading);
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0 0 10px;
+    transition: color 0s;
+  }
+
+  .hp30-cat-tiles__item:hover .hp30-cat-tiles__title {
+    color: var(--accent-color);
+  }
+
+  .hp30-cat-tiles__label {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #fff;
+    background: #000;
+    padding: 5px 10px;
+    border: 2px solid #fff;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp30-cat-tiles-wrapper" id="HP30CatTiles-{{ section.id }}">
+  <div class="hp30-cat-tiles__grid">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.link | default: '#' }}" class="hp30-cat-tiles__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title | escape }}" class="hp30-cat-tiles__image" loading="lazy">
+        {%- else -%}
+          {%- assign placeholder = 'collection-' | append: forloop.index -%}
+          {%- if forloop.index > 6 -%}{%- assign placeholder = 'collection-1' -%}{%- endif -%}
+          {{ placeholder | placeholder_svg_tag: 'hp30-cat-tiles__image' }}
+        {%- endif -%}
+
+        <div class="hp30-cat-tiles__overlay">
+          <h3 class="hp30-cat-tiles__title">{{ block.settings.title }}</h3>
+          <span class="hp30-cat-tiles__label">EXPLORE</span>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP30 - Brutalist Tiles",
+  "class": "section-hp30-category-tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Black)",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders (White)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (Red)",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP30 - Brutalist Tiles",
+      "blocks": [
+        { "type": "category", "settings": { "title": "OUTERWEAR" } },
+        { "type": "category", "settings": { "title": "BOTTOMS" } },
+        { "type": "category", "settings": { "title": "ACCESSORIES" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

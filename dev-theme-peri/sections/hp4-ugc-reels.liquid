@@ -1,0 +1,360 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp4-ugc-bg: {{ bg_color }};
+    --hp4-ugc-text: {{ text_color }};
+    
+    --hp4-ugc-pt-desk: {{ padding_top_desktop }}px;
+    --hp4-ugc-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp4-ugc-pt-mob: {{ padding_top_mobile }}px;
+    --hp4-ugc-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp4-decor-ugc-{{ section.id }} {
+    padding-top: var(--hp4-ugc-pt-desk);
+    padding-bottom: var(--hp4-ugc-pb-desk);
+    background-color: var(--hp4-ugc-bg);
+    color: var(--hp4-ugc-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp4-ugc-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp4-ugc-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp4-ugc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 15px 0;
+  }
+  .hp4-ugc-title em { font-style: italic; }
+
+  .hp4-ugc-subtitle {
+    font-size: 15px;
+    color: rgba(44,44,44,0.7);
+    margin: 0;
+  }
+
+  /* Grid Setup */
+  .hp4-ugc-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 20px;
+  }
+
+  /* UGC Video Card */
+  .hp4-ugc-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+    background: #e8e3d8;
+    cursor: pointer;
+    group;
+  }
+
+  .hp4-ugc-video, .hp4-ugc-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .hp4-ugc-card:hover .hp4-ugc-img {
+    transform: scale(1.05);
+  }
+
+  .hp4-ugc-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .hp4-ugc-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px; height: 50px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .hp4-ugc-card:hover .hp4-ugc-play {
+    background: rgba(255,255,255,0.4);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .hp4-ugc-info {
+    position: absolute;
+    bottom: 20px; left: 20px; right: 20px;
+    color: #fff;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .hp4-ugc-handle {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .hp4-ugc-product-thumb {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    overflow: hidden;
+    border: 2px solid #fff;
+    margin-left: auto;
+  }
+  .hp4-ugc-product-thumb img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp4-ugc-grid {
+      grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp4-decor-ugc-{{ section.id }} {
+      padding-top: var(--hp4-ugc-pt-mob);
+      padding-bottom: var(--hp4-ugc-pb-mob);
+    }
+    .hp4-ugc-inner {
+      padding: 0 20px;
+    }
+    /* Horizontal scroll */
+    .hp4-ugc-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin: 0 -20px;
+      padding: 0 20px;
+      gap: 15px;
+    }
+    .hp4-ugc-grid::-webkit-scrollbar { display: none; }
+    .hp4-ugc-card {
+      {%- if section.settings.columns_mobile == '1' -%}
+        flex: 0 0 calc(85% - 20px);
+      {%- else -%}
+        flex: 0 0 calc(50% - 10px);
+      {%- endif -%}
+      scroll-snap-align: center;
+    }
+  }
+</style>
+
+<section class="hp4-decor-ugc-{{ section.id }}" aria-label="Community Videos">
+  <div class="hp4-ugc-inner">
+    
+    <div class="hp4-ugc-header">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hp4-ugc-title">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="hp4-ugc-subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="hp4-ugc-grid">
+      {%- for block in section.blocks -%}
+        <div class="hp4-ugc-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.video_url != blank -%}
+            <!-- Placeholder for actual video integration, using image cover for now -->
+            <img src="https://img.youtube.com/vi/{{ block.settings.video_url.id }}/maxresdefault.jpg" class="hp4-ugc-img" loading="lazy" alt="Video cover">
+          {%- elsif block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp4-ugc-img" loading="lazy" alt="UGC content">
+          {%- else -%}
+            {%- capture current -%}{% cycle 1, 2, 3, 4 %}{%- endcapture -%}
+            {{ 'product-' | append: current | placeholder_svg_tag: 'hp4-ugc-img placeholder-svg' }}
+          {%- endif -%}
+
+          <div class="hp4-ugc-overlay"></div>
+          
+          <div class="hp4-ugc-play">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+
+          <div class="hp4-ugc-info">
+            <span class="hp4-ugc-handle">{{ block.settings.handle | default: '@creator' }}</span>
+            {%- if block.settings.product != blank -%}
+              {%- assign p = all_products[block.settings.product] -%}
+              <div class="hp4-ugc-product-thumb">
+                <img height="{{ p.featured_image.height }}" width="{{ p.featured_image.width }}" src="{{ p.featured_image | image_url: width: 100 }}" alt="{{ p.title }}">
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 -%}
+        {%- for i in (1..4) -%}
+          <div class="hp4-ugc-card">
+            {{ 'collection-' | append: i | placeholder_svg_tag: 'hp4-ugc-img placeholder-svg' }}
+            <div class="hp4-ugc-overlay"></div>
+            <div class="hp4-ugc-play">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="hp4-ugc-info">
+              <span class="hp4-ugc-handle">@interior.lover</span>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP4 Decor Shoppable Reels",
+  "tag": "section",
+  "class": "section-hp4-ugc",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "In Your <em>Homes</em>"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Tag @yourbrand to be featured."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2, "max": 6, "step": 1,
+      "label": "Columns (Desktop)", "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 2, "max": 4, "step": 1,
+      "label": "Columns (Tablet)", "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (Mobile)",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video/Post",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Cover Image"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "Video URL",
+          "accept": ["youtube", "vimeo"]
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Social Handle",
+          "default": "@creator_name"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Featured Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP4 Decor Shoppable Reels",
+      "category": "Social"
+    }
+  ]
+}
+{% endschema %}

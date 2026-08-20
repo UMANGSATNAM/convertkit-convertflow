@@ -1,0 +1,408 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#f9f6f0'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+  assign accent_color = section.settings.accent_color | default: '#d4af37'
+  
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit | default: 6
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp4-bs-bg: {{ bg_color }};
+    --hp4-bs-text: {{ text_color }};
+    --hp4-bs-accent: {{ accent_color }};
+    
+    --hp4-bs-pt-desk: {{ padding_top_desktop }}px;
+    --hp4-bs-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp4-bs-pt-mob: {{ padding_top_mobile }}px;
+    --hp4-bs-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp4-decor-bs-{{ section.id }} {
+    padding-top: var(--hp4-bs-pt-desk);
+    padding-bottom: var(--hp4-bs-pb-desk);
+    background-color: var(--hp4-bs-bg);
+    color: var(--hp4-bs-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp4-bs-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+
+  .hp4-bs-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hp4-bs-badge {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(44,44,44,0.6);
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .hp4-bs-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .hp4-bs-title em {
+    font-style: italic;
+    color: var(--hp4-bs-accent);
+  }
+
+  /* Carousel Setup */
+  .hp4-bs-carousel-wrap {
+    position: relative;
+  }
+
+  .hp4-bs-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 30px;
+    padding-bottom: 20px;
+  }
+  .hp4-bs-carousel::-webkit-scrollbar { display: none; }
+
+  /* Product Card - Minimalist */
+  .hp4-bs-card {
+    flex: 0 0 calc(25% - 22.5px);
+    scroll-snap-align: start;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .hp4-bs-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: #f4f1eb;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .hp4-bs-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  
+  .hp4-bs-image-hover {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .hp4-bs-card:hover .hp4-bs-image {
+    transform: scale(1.03);
+  }
+  .hp4-bs-card:hover .hp4-bs-image-hover {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  /* Info */
+  .hp4-bs-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .hp4-bs-details {
+    flex: 1;
+    padding-right: 15px;
+  }
+
+  .hp4-bs-vendor {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(44,44,44,0.5);
+    margin-bottom: 5px;
+  }
+
+  .hp4-bs-p-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .hp4-bs-price {
+    font-size: 14px;
+    color: rgba(44,44,44,0.8);
+    font-weight: 300;
+  }
+
+  /* Quick Add Button */
+  .hp4-bs-quick-add {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(44,44,44,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--hp4-bs-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .hp4-bs-quick-add:hover {
+    background: var(--hp4-bs-text);
+    color: var(--hp4-bs-bg);
+    border-color: var(--hp4-bs-text);
+  }
+
+  /* Carousel Controls */
+  .hp4-bs-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  .hp4-bs-nav-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgba(44,44,44,0.2);
+    background: transparent;
+    color: var(--hp4-bs-text);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .hp4-bs-nav-btn:hover {
+    background: var(--hp4-bs-text);
+    color: var(--hp4-bs-bg);
+  }
+  .hp4-bs-nav-btn svg {
+    width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.5;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp4-bs-card {
+      flex: 0 0 calc(33.333% - 20px);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp4-decor-bs-{{ section.id }} {
+      padding-top: var(--hp4-bs-pt-mob);
+      padding-bottom: var(--hp4-bs-pb-mob);
+    }
+    .hp4-bs-inner {
+      padding: 0 20px;
+    }
+    .hp4-bs-carousel {
+      margin: 0 -20px;
+      padding: 0 20px 20px 20px;
+      gap: 15px;
+    }
+    .hp4-bs-card {
+      flex: 0 0 calc(75% - 15px);
+    }
+    .hp4-bs-controls {
+      display: none;
+    }
+  }
+</style>
+
+<section class="hp4-decor-bs-{{ section.id }}" aria-label="Bestsellers">
+  <div class="hp4-bs-inner">
+    
+    <div class="hp4-bs-header">
+      {%- if section.settings.badge != blank -%}
+        <span class="hp4-bs-badge">{{ section.settings.badge }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hp4-bs-title">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="hp4-bs-carousel-wrap">
+      <div class="hp4-bs-carousel" id="hp4-bs-carousel-{{ section.id }}">
+        {%- if collection != blank and collection.products_count > 0 -%}
+          {%- for product in collection.products limit: product_limit -%}
+            <a href="{{ product.url }}" class="hp4-bs-card">
+              <div class="hp4-bs-image-wrapper">
+                <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" class="hp4-bs-image" loading="lazy" alt="{{ product.title }}">
+                {%- if product.images[1] != blank -%}
+                  <img height="{{ product.images[1].height }}" width="{{ product.images[1].width }}" src="{{ product.images[1] | image_url: width: 600 }}" class="hp4-bs-image-hover" loading="lazy" alt="{{ product.title }} alternate">
+                {%- endif -%}
+              </div>
+              <div class="hp4-bs-info">
+                <div class="hp4-bs-details">
+                  <div class="hp4-bs-vendor">{{ product.vendor }}</div>
+                  <h3 class="hp4-bs-p-title">{{ product.title }}</h3>
+                  <div class="hp4-bs-price">{{ product.price | money }}</div>
+                </div>
+                <button class="hp4-bs-quick-add" aria-label="Quick Add">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </a>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..product_limit) -%}
+            <div class="hp4-bs-card">
+              <div class="hp4-bs-image-wrapper">
+                {%- capture current -%}{% cycle 1, 2, 3, 4 %}{%- endcapture -%}
+                {{ 'product-' | append: current | placeholder_svg_tag: 'hp4-bs-image placeholder-svg' }}
+              </div>
+              <div class="hp4-bs-info">
+                <div class="hp4-bs-details">
+                  <div class="hp4-bs-vendor">Studio Brand</div>
+                  <h3 class="hp4-bs-p-title">Ceramic Vase</h3>
+                  <div class="hp4-bs-price">$85.00</div>
+                </div>
+                <button class="hp4-bs-quick-add" aria-label="Quick Add">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      <div class="hp4-bs-controls">
+        <button class="hp4-bs-nav-btn" id="hp4-bs-prev-{{ section.id }}" aria-label="Previous">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="hp4-bs-nav-btn" id="hp4-bs-next-{{ section.id }}" aria-label="Next">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('hp4-bs-carousel-{{ section.id }}');
+    const prevBtn = document.getElementById('hp4-bs-prev-{{ section.id }}');
+    const nextBtn = document.getElementById('hp4-bs-next-{{ section.id }}');
+
+    if(carousel && prevBtn && nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        const itemWidth = carousel.querySelector('.hp4-bs-card').offsetWidth + 30;
+        carousel.scrollBy({ left: itemWidth * 2, behavior: 'smooth' });
+      });
+      prevBtn.addEventListener('click', () => {
+        const itemWidth = carousel.querySelector('.hp4-bs-card').offsetWidth + 30;
+        carousel.scrollBy({ left: -(itemWidth * 2), behavior: 'smooth' });
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "HP4 Decor Bestsellers",
+  "tag": "section",
+  "class": "section-hp4-bestsellers",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "MOST LOVED"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our <em>Signature</em> Pieces"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 4, "max": 12, "step": 1,
+      "label": "Number of products",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f6f0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8c7b66"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP4 Decor Bestsellers",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

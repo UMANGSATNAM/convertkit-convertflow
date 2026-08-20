@@ -1,0 +1,229 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --border-color: #000000;
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-body: 'Space Mono', monospace;
+    
+    background-color: var(--bg-color);
+    border-bottom: 4px solid var(--border-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .hp32-press-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    padding: 20px 0;
+  }
+
+  .hp32-press__title {
+    position: absolute;
+    top: 50%; left: 40px;
+    transform: translateY(-50%);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-color);
+    background: #000;
+    padding: 8px 16px;
+    z-index: 10;
+    border: 2px solid var(--border-color);
+    box-shadow: 4px 4px 0 var(--border-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp32-press__title {
+      position: relative;
+      transform: none;
+      top: auto; left: auto;
+      margin: 0 auto 20px;
+      display: table;
+    }
+    .hp32-press-wrapper {
+      flex-direction: column;
+    }
+  }
+
+  .hp32-press__content {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 80px;
+    min-width: 100%;
+    animation: hp32-press-scroll {{ section.settings.scroll_speed }}s linear infinite;
+  }
+
+  .hp32-press__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    filter: grayscale(100%) contrast(200%);
+    opacity: 0.5;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  .hp32-press__logo:hover {
+    opacity: 1;
+    filter: grayscale(0%) contrast(100%);
+  }
+
+  .hp32-press__logo img,
+  .hp32-press__logo svg {
+    max-height: 100%;
+    width: auto;
+    fill: #000;
+  }
+
+  @keyframes hp32-press-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp32-press-wrapper" id="HP32Press-{{ section.id }}">
+  <div class="hp32-press__title">{{ section.settings.title }}</div>
+  
+  <div class="hp32-press__content">
+    {%- for i in (1..4) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp32-press__logo" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 250 }}" alt="Press Logo" loading="lazy">
+          {%- else -%}
+            <svg viewBox="0 0 150 40" width="150" height="40">
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Space Mono', monospace" font-size="20" font-weight="700" fill="currentColor">
+                LOGO_{{ forloop.index }}
+              </text>
+            </svg>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+  
+  <div class="hp32-press__content" aria-hidden="true">
+    {%- for i in (1..4) -%}
+      {%- for block in section.blocks -%}
+        <div class="hp32-press__logo" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 250 }}" alt="Press Logo" loading="lazy">
+          {%- else -%}
+            <svg viewBox="0 0 150 40" width="150" height="40">
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Space Mono', monospace" font-size="20" font-weight="700" fill="currentColor">
+                LOGO_{{ forloop.index }}
+              </text>
+            </svg>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP32 - Brutalist Press",
+  "class": "section-hp32-press-logos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "IDENTIFIED_IN"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "s",
+      "label": "Scroll Speed",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (e.g. Lime)",
+      "default": "#ccff00"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Press Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP32 - Brutalist Press",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

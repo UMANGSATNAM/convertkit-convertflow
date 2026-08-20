@@ -1,0 +1,426 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#2c2c2c'
+  assign accent_color = section.settings.accent_color | default: '#d4af37'
+  
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit | default: 4
+  
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hp4-fc-bg: {{ bg_color }};
+    --hp4-fc-text: {{ text_color }};
+    --hp4-fc-accent: {{ accent_color }};
+    
+    --hp4-fc-pt-desk: {{ padding_top_desktop }}px;
+    --hp4-fc-pb-desk: {{ padding_bottom_desktop }}px;
+    --hp4-fc-pt-mob: {{ padding_top_mobile }}px;
+    --hp4-fc-pb-mob: {{ padding_bottom_mobile }}px;
+  }
+
+  .hp4-decor-fc-{{ section.id }} {
+    padding-top: var(--hp4-fc-pt-desk);
+    padding-bottom: var(--hp4-fc-pb-desk);
+    background-color: var(--hp4-fc-bg);
+    color: var(--hp4-fc-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .hp4-fc-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hp4-fc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+  }
+
+  .hp4-fc-title-group {
+    max-width: 600px;
+  }
+
+  .hp4-fc-badge {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(44,44,44,0.6);
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .hp4-fc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .hp4-fc-title em {
+    font-style: italic;
+    color: var(--hp4-fc-accent);
+  }
+
+  .hp4-fc-view-all {
+    display: inline-block;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--hp4-fc-text);
+    color: var(--hp4-fc-text);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .hp4-fc-view-all:hover {
+    color: var(--hp4-fc-accent);
+    border-color: var(--hp4-fc-accent);
+  }
+
+  /* Grid Setup */
+  .hp4-fc-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 30px;
+  }
+
+  /* Product Card - Minimalist */
+  .hp4-fc-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    group;
+  }
+
+  .hp4-fc-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: #f4f1eb;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .hp4-fc-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  
+  .hp4-fc-image-hover {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .hp4-fc-card:hover .hp4-fc-image {
+    transform: scale(1.03);
+  }
+  .hp4-fc-card:hover .hp4-fc-image-hover {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  /* Add to Cart Overlay */
+  .hp4-fc-atc-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+    background: var(--hp4-fc-text);
+    color: var(--hp4-fc-bg);
+    border: none;
+    padding: 12px 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    width: calc(100% - 40px);
+    text-align: center;
+  }
+  .hp4-fc-card:hover .hp4-fc-atc-btn {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .hp4-fc-atc-btn:hover {
+    background: var(--hp4-fc-accent);
+    color: #fff;
+  }
+
+  .hp4-fc-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hp4-fc-vendor {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(44,44,44,0.5);
+    margin-bottom: 8px;
+  }
+
+  .hp4-fc-p-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+  }
+
+  .hp4-fc-price {
+    font-size: 14px;
+    color: rgba(44,44,44,0.8);
+    font-weight: 300;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .hp4-fc-grid {
+      grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+      gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp4-decor-fc-{{ section.id }} {
+      padding-top: var(--hp4-fc-pt-mob);
+      padding-bottom: var(--hp4-fc-pb-mob);
+    }
+    .hp4-fc-inner {
+      padding: 0 20px;
+    }
+    .hp4-fc-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    /* Native scrolling row on mobile */
+    .hp4-fc-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin: 0 -20px;
+      padding: 0 20px;
+      gap: 15px;
+    }
+    .hp4-fc-grid::-webkit-scrollbar { display: none; }
+    
+    .hp4-fc-card {
+      {%- if section.settings.columns_mobile == '1' -%}
+        flex: 0 0 calc(100% - 40px);
+      {%- else -%}
+        flex: 0 0 calc(65% - 20px);
+      {%- endif -%}
+      scroll-snap-align: start;
+    }
+    
+    .hp4-fc-atc-btn {
+      opacity: 1; /* Always visible or removed, let's keep it visible but restyled */
+      transform: translateX(-50%) translateY(0);
+      position: relative;
+      left: auto; bottom: auto; transform: none;
+      width: 100%;
+      margin-top: 15px;
+      background: rgba(44,44,44,0.05);
+      color: var(--hp4-fc-text);
+    }
+  }
+</style>
+
+<section class="hp4-decor-fc-{{ section.id }}" aria-label="Featured Collection">
+  <div class="hp4-fc-inner">
+    
+    <div class="hp4-fc-header">
+      <div class="hp4-fc-title-group">
+        {%- if section.settings.badge != blank -%}
+          <span class="hp4-fc-badge">{{ section.settings.badge }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="hp4-fc-title">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+      </div>
+      
+      {%- if section.settings.show_view_all and collection != blank -%}
+        <a href="{{ collection.url }}" class="hp4-fc-view-all">Discover All</a>
+      {%- endif -%}
+    </div>
+
+    <div class="hp4-fc-grid">
+      {%- if collection != blank and collection.products_count > 0 -%}
+        {%- for product in collection.products limit: product_limit -%}
+          <a href="{{ product.url }}" class="hp4-fc-card">
+            <div class="hp4-fc-image-wrapper">
+              <img height="{{ product.featured_image.height }}" width="{{ product.featured_image.width }}" src="{{ product.featured_image | image_url: width: 600 }}" class="hp4-fc-image" loading="lazy" alt="{{ product.title }}">
+              {%- if product.images[1] != blank -%}
+                <img height="{{ product.images[1].height }}" width="{{ product.images[1].width }}" src="{{ product.images[1] | image_url: width: 600 }}" class="hp4-fc-image-hover" loading="lazy" alt="{{ product.title }} alternate">
+              {%- endif -%}
+              <button class="hp4-fc-atc-btn">Add to Bag</button>
+            </div>
+            <div class="hp4-fc-info">
+              <div class="hp4-fc-vendor">{{ product.vendor }}</div>
+              <h3 class="hp4-fc-p-title">{{ product.title }}</h3>
+              <div class="hp4-fc-price">{{ product.price | money }}</div>
+            </div>
+          </a>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..product_limit) -%}
+          <div class="hp4-fc-card">
+            <div class="hp4-fc-image-wrapper">
+              {%- capture current -%}{% cycle 1, 2, 3, 4 %}{%- endcapture -%}
+              {{ 'product-' | append: current | placeholder_svg_tag: 'hp4-fc-image placeholder-svg' }}
+            </div>
+            <div class="hp4-fc-info">
+              <div class="hp4-fc-vendor">Studio Brand</div>
+              <h3 class="hp4-fc-p-title">Ceramic Vase</h3>
+              <div class="hp4-fc-price">$85.00</div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "HP4 Decor Featured Coll.",
+  "tag": "section",
+  "class": "section-hp4-featured",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "CURATED PIECES"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The <em>Autumn</em> Collection",
+      "info": "Use <em> for italicized accent."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2, "max": 12, "step": 1,
+      "label": "Number of products to show",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'Discover All' link",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2, "max": 5, "step": 1,
+      "label": "Columns (Desktop)", "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 2, "max": 4, "step": 1,
+      "label": "Columns (Tablet)", "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (Mobile)",
+      "options": [
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8c7b66"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Top (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0, "max": 150, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Desktop)", "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Top (Mobile)", "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0, "max": 100, "step": 5, "unit": "px",
+      "label": "Padding Bottom (Mobile)", "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP4 Decor Featured Coll.",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

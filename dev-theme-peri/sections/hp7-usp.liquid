@@ -1,0 +1,220 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#f7f4ed'
+  assign card_bg = section.settings.card_bg | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#2b302a'
+  assign accent_color = section.settings.accent_color | default: '#4a6741'
+  assign heading = section.settings.heading | default: 'Our Commitment'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+  }
+  
+  .hp7-usp-container-{{ section_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .hp7-usp-header-{{ section_id }} {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hp7-usp-header-{{ section_id }} h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-weight: 500;
+    color: {{ text_color }};
+    margin: 0;
+  }
+  
+  .hp7-usp-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .hp7-usp-card-{{ section_id }} {
+    background-color: {{ card_bg }};
+    border-radius: 40px; /* Soft organic corners */
+    padding: 50px 40px;
+    text-align: center;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    /* Soft diffuse shadow */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+  }
+  
+  .hp7-usp-card-{{ section_id }}:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(74, 103, 65, 0.08);
+  }
+  
+  .hp7-usp-icon-{{ section_id }} {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 30px auto;
+    background-color: {{ bg_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ accent_color }};
+    transition: background-color 0.4s ease;
+  }
+  
+  .hp7-usp-card-{{ section_id }}:hover .hp7-usp-icon-{{ section_id }} {
+    background-color: {{ accent_color }};
+    color: #fff;
+  }
+  
+  .hp7-usp-icon-{{ section_id }} svg {
+    width: 32px;
+    height: 32px;
+    fill: currentColor;
+  }
+  
+  .hp7-usp-title-{{ section_id }} {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+  }
+  
+  .hp7-usp-text-{{ section_id }} {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: rgba({{ text_color | color_to_rgb | remove: 'rgb(' | remove: ')' }}, {{ 0.7 }});
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 992px) {
+    .hp7-usp-grid-{{ section_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .hp7-usp-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+    .hp7-usp-card-{{ section_id }} {
+      padding: 40px 30px;
+      border-radius: 30px;
+    }
+  }
+</style>
+
+<div class="hp7-usp-container-{{ section_id }}">
+  {% if heading != blank %}
+    <div class="hp7-usp-header-{{ section_id }}">
+      <h2>{{ heading }}</h2>
+    </div>
+  {% endif %}
+  
+  <div class="hp7-usp-grid-{{ section_id }}">
+    {% for block in section.blocks %}
+      <div class="hp7-usp-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp7-usp-icon-{{ section_id }}">
+          {% case block.settings.icon %}
+            {% when 'leaf' %}
+              <svg viewBox="0 0 24 24"><path d="M17.5,3.34C15.82,2.37 13.91,2 12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,9.65 21.13,7.5 19.74,5.83C19.86,5.33 19.95,4.82 20,4.3C20.08,3.46 19.84,2.62 19.34,1.96C18.84,1.31 18.06,0.92 17.2,0.85C16.34,0.78 15.5,1.06 14.88,1.61C14.26,2.16 13.92,2.94 13.95,3.8L14.05,6.17C12.19,6.04 10.33,6.23 8.61,6.77L17.5,3.34M12,4C14.54,4 16.92,4.86 18.81,6.31L8.29,10.36C9.17,9.08 10.43,8.08 11.91,7.5C11.94,7.49 11.97,7.49 12,7.48V4M12,20C7.58,20 4,16.42 4,12C4,9.63 5.03,7.5 6.66,6.05L16.27,15.66C15.11,16.82 13.63,17.65 12,18.04V20Z" /></svg>
+            {% when 'recycle' %}
+              <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M15,16H9V14H15V16M13,12H9V10H13V12M17,8H9V6H17V8Z" /></svg>
+            {% when 'globe' %}
+              <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M19.92,13H15.82C15.88,14.05 15.8,15.1 15.61,16.14C17.47,15.53 19.1,14.43 19.92,13M14,13H10V11H14V13M12,4.04C13.25,5.1 14.19,6.5 14.77,8H9.23C9.81,6.5 10.75,5.1 12,4.04M15.74,9.5H19.78C19.5,8.12 18.84,6.9 17.9,5.88C17.38,6.96 16.65,7.9 15.74,9.5M8.26,9.5C7.35,7.9 6.62,6.96 6.1,5.88C5.16,6.9 4.5,8.12 4.22,9.5H8.26M4.08,13H8.18C8.12,14.05 8.2,15.1 8.39,16.14C6.53,15.53 4.9,14.43 4.08,13M12,19.96C10.75,18.9 9.81,17.5 9.23,16H14.77C14.19,17.5 13.25,18.9 12,19.96M8.26,14.5H4.22C4.5,15.88 5.16,17.1 6.1,18.12C6.62,17.04 7.35,16.1 8.26,14.5M15.74,14.5C16.65,16.1 17.38,17.04 17.9,18.12C18.84,17.1 19.5,15.88 19.78,14.5H15.74Z" /></svg>
+            {% when 'water' %}
+              <svg viewBox="0 0 24 24"><path d="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z" /></svg>
+          {% endcase %}
+        </div>
+        <h3 class="hp7-usp-title-{{ section_id }}">{{ block.settings.title }}</h3>
+        <p class="hp7-usp-text-{{ section_id }}">{{ block.settings.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP7 USP Grid",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f7f4ed"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2b302a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#4a6741"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Commitment"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "recycle", "label": "Recycle" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "water", "label": "Water Drop" }
+          ],
+          "default": "leaf"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "100% Organic"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "All our materials are sourced responsibly from organic farms without harmful chemicals."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP7 USP Grid",
+      "blocks": [
+        { "type": "usp", "settings": { "icon": "leaf", "title": "Organic Materials", "text": "All our materials are sourced responsibly from organic farms without harmful chemicals." } },
+        { "type": "usp", "settings": { "icon": "recycle", "title": "Zero Waste", "text": "Our packaging is 100% biodegradable, and our manufacturing process aims for zero waste." } },
+        { "type": "usp", "settings": { "icon": "globe", "title": "Carbon Neutral", "text": "We offset 100% of our carbon emissions for every single order shipped." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

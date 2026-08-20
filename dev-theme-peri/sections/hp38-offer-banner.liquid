@@ -1,0 +1,213 @@
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;600;800&display=swap');
+
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    
+    --font-heading: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+    
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--text-color);
+  }
+
+  .hp38-offer-wrapper {
+    display: flex;
+    background: var(--text-color);
+    color: var(--bg-color);
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-offer-wrapper {
+      flex-direction: column;
+    }
+  }
+
+  .hp38-offer__col {
+    flex: 1;
+    padding: 80px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 2px solid var(--bg-color);
+  }
+
+  .hp38-offer__col:last-child {
+    border-right: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp38-offer__col {
+      border-right: none;
+      border-bottom: 2px solid var(--bg-color);
+      padding: 60px 20px;
+    }
+    .hp38-offer__col:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .hp38-offer__col--accent {
+    background: var(--accent-color);
+    color: var(--text-color); /* Need contrast against accent */
+    border-right-color: var(--text-color);
+  }
+
+  .hp38-offer__title {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 8vw, {{ section.settings.title_size }}px);
+    line-height: 1;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+  }
+
+  .hp38-offer__subtitle {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    margin-bottom: 40px;
+  }
+
+  .hp38-offer__btn {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 15px 30px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid currentColor;
+    background: transparent;
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .hp38-offer__btn:hover {
+    background: currentColor;
+    color: var(--bg-color); /* For black bg col */
+  }
+
+  .hp38-offer__col--accent .hp38-offer__btn:hover {
+    color: var(--accent-color); /* For accent bg col */
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp38-offer-wrapper" id="HP38Offer-{{ section.id }}">
+  <div class="hp38-offer__col hp38-offer__col--accent">
+    <h2 class="hp38-offer__title">{{ section.settings.title1 }}</h2>
+    {%- if section.settings.subtitle1 != blank -%}
+      <div class="hp38-offer__subtitle">/// {{ section.settings.subtitle1 }}</div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp38-offer__col">
+    <h2 class="hp38-offer__title">{{ section.settings.title2 }}</h2>
+    {%- if section.settings.subtitle2 != blank -%}
+      <div class="hp38-offer__subtitle">/// {{ section.settings.subtitle2 }}</div>
+    {%- endif -%}
+    
+    {%- if section.settings.btn_label != blank -%}
+      <a href="{{ section.settings.btn_link | default: '#' }}" class="hp38-offer__btn">
+        {{ section.settings.btn_label }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP38 - Brutalist Offer",
+  "class": "section-hp38-offer-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title1",
+      "label": "Heading 1 (Accent)",
+      "default": "SYSTEM ALERT"
+    },
+    {
+      "type": "text",
+      "id": "subtitle1",
+      "label": "Subtitle 1",
+      "default": "CODE: OVERRIDE"
+    },
+    {
+      "type": "text",
+      "id": "title2",
+      "label": "Heading 2 (Dark)",
+      "default": "20% OFF ALL GEAR"
+    },
+    {
+      "type": "text",
+      "id": "subtitle2",
+      "label": "Subtitle 2",
+      "default": "VALID UNTIL 00:00"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "EXECUTE"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 40,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background (Global)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Dark Column & Borders",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Column Background",
+      "default": "#00FF00"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP38 - Brutalist Offer"
+    }
+  ]
+}
+{% endschema %}

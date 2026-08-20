@@ -1,0 +1,54 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FEF3C7' }};
+    padding: {{ section.settings.padding_vertical | default: 35 }}px 0;
+  }
+  .hp59-pills__container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .hp59-pills__scroll { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; justify-content: center; flex-wrap: wrap; }
+  .hp59-pills__scroll::-webkit-scrollbar { display: none; }
+  .hp59-pills__pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px;
+    background: {{ section.settings.pill_bg | default: '#FFFFFF' }};
+    border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: {{ section.settings.pill_text | default: '#042F2E' }};
+    text-decoration: none; white-space: nowrap; transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.06);
+  }
+  .hp59-pills__pill:hover { background: #F97316; color: #FFFFFF; border-color: #F97316; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+  @media screen and (max-width: 768px) { .hp59-pills__scroll { justify-content: flex-start; flex-wrap: nowrap; } }
+{%- endstyle -%}
+<div class="hp59-pills__container">
+  <div class="hp59-pills__scroll">
+    {%- for block in section.blocks -%}
+      <a href="{{ block.settings.url | default: '#' }}" class="hp59-pills__pill" {{ block.shopify_attributes }}>
+        {%- if block.settings.icon != blank -%}<span>{{ block.settings.icon }}</span>{%- endif -%}
+        <span>{{ block.settings.label | default: 'Category' }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "HP59 Categories",
+  "class": "section-hp59-pills",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FEF3C7" },
+    { "type": "color", "id": "pill_bg", "label": "Pill BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "pill_text", "label": "Pill Text", "default": "#042F2E" },
+    { "type": "range", "id": "padding_vertical", "min": 10, "max": 60, "step": 5, "unit": "px", "label": "Padding", "default": 35 }
+  ],
+  "blocks": [{ "type": "pill", "name": "Category", "settings": [
+    { "type": "text", "id": "icon", "label": "Icon", "default": "🪸" },
+    { "type": "text", "id": "label", "label": "Label", "default": "Astaxanthin Oils" },
+    { "type": "url", "id": "url", "label": "URL" }
+  ]}],
+  "presets": [{ "name": "HP59 Categories", "blocks": [
+    { "type": "pill", "settings": { "icon": "🪸", "label": "Astaxanthin Oils" } },
+    { "type": "pill", "settings": { "icon": "🌊", "label": "Marine Kelp Serums" } },
+    { "type": "pill", "settings": { "icon": "🌅", "label": "Golden Hour Balms" } },
+    { "type": "pill", "settings": { "icon": "🦪", "label": "Pearl Mists" } },
+    { "type": "pill", "settings": { "icon": "🐚", "label": "Coral Scrubs" } }
+  ]}]
+}
+{% endschema %}

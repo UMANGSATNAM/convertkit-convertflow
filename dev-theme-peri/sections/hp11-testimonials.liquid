@@ -1,0 +1,173 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#0000FF'
+  assign text_color = section.settings.text_color | default: '#FFFFFF'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    padding: 100px 20px;
+    color: {{ text_color }};
+    border-bottom: 3px solid #000;
+  }
+  
+  .hp11-testimonials-container-{{ section_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp11-testimonials-header-{{ section_id }} {
+    margin-bottom: 60px;
+    text-align: center;
+  }
+  
+  .hp11-testimonials-heading-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: #FFF;
+    text-shadow: 4px 4px 0 #000;
+  }
+  
+  .hp11-testimonials-grid-{{ section_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .hp11-testimonial-card-{{ section_id }} {
+    background: #CCFF00;
+    border: 4px solid #000;
+    padding: 40px;
+    position: relative;
+    box-shadow: 8px 8px 0 #000;
+    color: #000;
+    transition: transform 0.2s ease;
+  }
+  
+  .hp11-testimonial-card-{{ section_id }}:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 #000;
+  }
+  
+  .hp11-testimonial-quote-mark-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: #FF00FF;
+    line-height: 0;
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    opacity: 0.5;
+  }
+  
+  .hp11-testimonial-text-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 20px 0 30px 0;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hp11-testimonial-author-{{ section_id }} {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .hp11-testimonial-author-{{ section_id }}::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 4px;
+    background: #000;
+  }
+
+  @media (max-width: 992px) {
+    .hp11-testimonials-grid-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="hp11-testimonials-container-{{ section_id }}">
+  <div class="hp11-testimonials-header-{{ section_id }}">
+    <h2 class="hp11-testimonials-heading-{{ section_id }}">{{ section.settings.heading | default: 'THE STREETS ARE TALKING' }}</h2>
+  </div>
+  
+  <div class="hp11-testimonials-grid-{{ section_id }}">
+    {% for block in section.blocks limit: 3 %}
+      <div class="hp11-testimonial-card-{{ section_id }}" {{ block.shopify_attributes }}>
+        <div class="hp11-testimonial-quote-mark-{{ section_id }}">"</div>
+        <div class="hp11-testimonial-text-{{ section_id }}">
+          {{ block.settings.text | default: 'Best heavy tee I own. The fit is exactly what they promised.' }}
+        </div>
+        <div class="hp11-testimonial-author-{{ section_id }}">
+          {{ block.settings.author | default: 'USER_89' }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP11 Testimonials",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0000FF"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "THE STREETS ARE TALKING"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Best heavy tee I own. The fit is exactly what they promised."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "USER_89"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP11 Testimonials",
+      "blocks": [
+        { "type": "testimonial", "settings": { "author": "ALEX M." } },
+        { "type": "testimonial", "settings": { "author": "JAY T." } },
+        { "type": "testimonial", "settings": { "author": "SAM R." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

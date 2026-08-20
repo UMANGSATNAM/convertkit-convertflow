@@ -1,0 +1,132 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign text_color = section.settings.text_color | default: '#8a7a6c'
+-%}
+
+<section class="hp1-beauty-press" style="background-color: {{ bg_color }}; color: {{ text_color }};" id="hp1-press-{{ section.id }}">
+  <div class="hp1-press-inner">
+    
+    {%- if section.settings.heading != blank -%}
+      <div class="hp1-press-header">
+        <h4 class="hp1-press-heading">{{ section.settings.heading }}</h4>
+      </div>
+    {%- endif -%}
+
+    <div class="hp1-press-logos">
+      {%- for block in section.blocks -%}
+        <div class="hp1-press-logo" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ block.settings.image.alt }}" loading="lazy">
+          {%- else -%}
+            {{ 'logo' | placeholder_svg_tag: 'hp1-press-placeholder' }}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hp1-beauty-press {
+    padding: 60px 0;
+    font-family: 'Inter', sans-serif;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .hp1-press-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+  .hp1-press-heading {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 30px;
+    opacity: 0.8;
+  }
+  .hp1-press-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 40px 60px;
+  }
+  .hp1-press-logo {
+    flex: 0 1 120px;
+    opacity: 0.6;
+    filter: grayscale(100%);
+    transition: all 0.3s ease;
+  }
+  .hp1-press-logo:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+  }
+  .hp1-press-logo img, .hp1-press-placeholder {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .hp1-press-placeholder {
+    fill: currentColor;
+    background: transparent;
+  }
+
+  @media (max-width: 767px) {
+    .hp1-press-logos {
+      gap: 30px;
+    }
+    .hp1-press-logo {
+      flex: 0 1 100px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "HP1 Press Logos",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured In"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#8a7a6c"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo Image" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP1 Press Logos",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

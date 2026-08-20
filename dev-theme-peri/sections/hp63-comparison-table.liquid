@@ -1,0 +1,91 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#FEF3C7' }};
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+  .hp63-comp__container { max-width: {{ section.settings.container_width | default: 1000 }}px; margin: 0 auto; padding: 0 24px; }
+  .hp63-comp__header { text-align: center; margin-bottom: 50px; }
+  .hp63-comp__eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: {{ section.settings.accent_color | default: '#881337' }}; margin: 0 0 12px; }
+  .hp63-comp__heading { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: #1C1917; margin: 0; }
+  .hp63-comp__table {
+    width: 100%; border-collapse: collapse; background: {{ section.settings.card_bg | default: '#FFFFFF' }};
+    border-radius: 6px; overflow: hidden; border: 1px solid rgba(217, 119, 6, 0.25);
+    box-shadow: 0 4px 20px rgba(136, 19, 55, 0.05);
+  }
+  .hp63-comp__table th {
+    background: #FFFBEB; color: #881337; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 18px 20px; text-align: left; border-bottom: 1px solid rgba(217, 119, 6, 0.25);
+  }
+  .hp63-comp__table td {
+    padding: 16px 20px; font-size: 14px; color: #44403C;
+    border-bottom: 1px solid rgba(217, 119, 6, 0.1);
+  }
+  .hp63-comp__table tr:last-child td { border-bottom: none; }
+  .hp63-comp__check { color: #881337; font-weight: 700; }
+  @media screen and (max-width: 768px) {
+    .hp63-comp__table { font-size: 13px; }
+    .hp63-comp__table th, .hp63-comp__table td { padding: 12px 14px; }
+  }
+{%- endstyle -%}
+<div class="hp63-comp__container">
+  <div class="hp63-comp__header">
+    {%- if section.settings.eyebrow != blank -%}<p class="hp63-comp__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="hp63-comp__heading">{{ section.settings.heading | default: 'The Rose Distillation Standard' }}</h2>
+  </div>
+  <table class="hp63-comp__table">
+    <thead>
+      <tr>
+        <th>{{ section.settings.col1_head | default: 'Distillation Quality' }}</th>
+        <th>{{ section.settings.col2_head | default: 'Moroccan Damask Rose' }}</th>
+        <th>{{ section.settings.col3_head | default: 'Commercial Rose Water' }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for block in section.blocks -%}
+        <tr {{ block.shopify_attributes }}>
+          <td>{{ block.settings.feature | default: 'Petal Origin' }}</td>
+          <td class="hp63-comp__check">{{ block.settings.us | default: '🌹 100% Dades Valley Single Origin' }}</td>
+          <td style="color:#A8A29E;">{{ block.settings.them | default: 'Industrial Greenhouse Blends' }}</td>
+        </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+</div>
+{% schema %}
+{
+  "name": "HP63 Compare",
+  "class": "section-hp63-comp",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FEF3C7" },
+    { "type": "color", "id": "card_bg", "label": "Table BG", "default": "#FFFFFF" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#881337" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "🌹 DISTILLATION BENCHMARK" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Rose Distillation Standard" },
+    { "type": "text", "id": "col1_head", "label": "Column 1", "default": "Distillation Quality" },
+    { "type": "text", "id": "col2_head", "label": "Column 2", "default": "Moroccan Damask Rose" },
+    { "type": "text", "id": "col3_head", "label": "Column 3", "default": "Commercial Rose Water" },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 700, "max": 1200, "step": 20, "unit": "px", "label": "Container Width", "default": 1000 }
+  ],
+  "blocks": [{
+    "type": "row", "name": "Row",
+    "settings": [
+      { "type": "text", "id": "feature", "label": "Feature", "default": "Petal Origin" },
+      { "type": "text", "id": "us", "label": "Us", "default": "🌹 100% Dades Valley Single Origin" },
+      { "type": "text", "id": "them", "label": "Others", "default": "Industrial Greenhouse Blends" }
+    ]
+  }],
+  "presets": [{
+    "name": "HP63 Compare",
+    "blocks": [
+      { "type": "row", "settings": { "feature": "Harvest Timing", "us": "🌹 5:00 AM Dawn Hand Picked", "them": "Machine Harvested Anytime" } },
+      { "type": "row", "settings": { "feature": "Extraction Method", "us": "🌹 Copper Alembic Steam Distillation", "them": "Chemical Solvent Hexane Extraction" } },
+      { "type": "row", "settings": { "feature": "Aged Resin Infusion", "us": "🌹 45-Day Macerated Spiced Amber", "them": "Synthetic Fragrance Mimics" } },
+      { "type": "row", "settings": { "feature": "Base Carrier Oil", "us": "🌹 First Cold Pressed Desert Argan", "them": "Mineral Oil & Silicones" } }
+    ]
+  }]
+}
+{% endschema %}

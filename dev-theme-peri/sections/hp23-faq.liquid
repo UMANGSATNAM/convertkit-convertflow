@@ -1,0 +1,349 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bg-color: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --border-color: #000000;
+    --border-width: 3px;
+    --shadow-offset: 6px;
+    
+    background-color: var(--bg-color);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    border-bottom: var(--border-width) solid var(--border-color);
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    }
+  }
+
+  .hp23-faq-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    gap: 60px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp23-faq-wrapper {
+      flex-direction: column;
+      gap: 40px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hp23-faq-wrapper {
+      padding: 0 20px;
+    }
+  }
+
+  .hp23-faq__sidebar {
+    flex: 0 0 35%;
+  }
+
+  .hp23-faq__title {
+    font-size: clamp(40px, 6vw, {{ section.settings.title_size }}px);
+    font-weight: 900;
+    color: var(--text-color);
+    line-height: 1.1;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+  }
+  
+  .hp23-faq__title em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text-color);
+  }
+
+  .hp23-faq__text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0 0 30px;
+  }
+
+  .hp23-faq__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hp23-faq__item {
+    background: #ffffff;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: {{ section.settings.border_radius }}px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hp23-faq__item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+  }
+  
+  /* Give active accordion a distinct brutalist look */
+  .hp23-faq__item[open] {
+    background: var(--accent-color);
+  }
+
+  .hp23-faq__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 30px;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--text-color);
+    list-style: none;
+    text-transform: uppercase;
+  }
+
+  .hp23-faq__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .hp23-faq__icon {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border-color);
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--border-color);
+  }
+  
+  .hp23-faq__item[open] .hp23-faq__icon {
+    background: var(--text-color);
+  }
+
+  .hp23-faq__icon svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--text-color);
+  }
+
+  .hp23-faq__item[open] .hp23-faq__icon svg {
+    fill: var(--bg-color);
+  }
+  
+  .hp23-faq__icon-minus {
+    display: none;
+  }
+  
+  .hp23-faq__item[open] .hp23-faq__icon-plus {
+    display: none;
+  }
+  
+  .hp23-faq__item[open] .hp23-faq__icon-minus {
+    display: block;
+  }
+
+  .hp23-faq__answer {
+    padding: 0 30px 30px 30px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+    border-top: 2px solid transparent;
+  }
+  
+  .hp23-faq__item[open] .hp23-faq__answer {
+    border-top: 2px solid var(--border-color);
+    margin-top: -10px;
+    padding-top: 20px;
+  }
+
+  {{ section.settings.custom_css }}
+{%- endstyle -%}
+
+<div class="hp23-faq-wrapper" id="HP23Faq-{{ section.id }}">
+  
+  <div class="hp23-faq__sidebar">
+    {%- if section.settings.title != blank -%}
+      <h2 class="hp23-faq__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="hp23-faq__text">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+
+  <div class="hp23-faq__content">
+    {%- for block in section.blocks -%}
+      <details class="hp23-faq__item" {{ block.shopify_attributes }}>
+        <summary class="hp23-faq__summary">
+          <span>{{ block.settings.question | escape }}</span>
+          <div class="hp23-faq__icon">
+            <svg class="hp23-faq__icon-plus" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+            <svg class="hp23-faq__icon-minus" viewBox="0 0 24 24"><path d="M19,13H5V11H19V13Z"/></svg>
+          </div>
+        </summary>
+        <div class="hp23-faq__answer">
+          {{ block.settings.answer }}
+        </div>
+      </details>
+    {%- endfor -%}
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "HP23 - Brutalist FAQ",
+  "class": "section-hp23-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Sidebar"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "<p>NO BS <em>ANSWERS</em></p>"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Body Text",
+      "default": "<p>We get asked a lot of questions. Here are the brutal truths.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "label": "Max Width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Box Border Radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Brutalist Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#F4F4F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Active Item)",
+      "default": "#FFEB3B"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "IS THIS ACTUALLY GOING TO WORK?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes. We use clinical dosages of proven ingredients. If you follow the routine, you will see results. Period.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP23 - Brutalist FAQ",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq", "settings": { "question": "WHY IS IT PRICED LIKE THIS?", "answer": "<p>We don't cut corners on raw materials. You're paying for efficacy, not a celebrity endorsement or fancy glass bottles.</p>" } },
+        { "type": "faq", "settings": { "question": "DO YOU TEST ON ANIMALS?", "answer": "<p>Absolutely not. We test on ourselves, our friends, and our team. 100% cruelty-free.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

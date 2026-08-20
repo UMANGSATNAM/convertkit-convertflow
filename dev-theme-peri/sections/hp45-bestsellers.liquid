@@ -1,0 +1,174 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp45-bs-bg: {{ section.settings.bg_color | default: '#F5F5F0' }};
+    --hp45-border: {{ section.settings.border_color | default: '#0A0A0A' }};
+    
+    background-color: var(--hp45-bs-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp45-bs__wrap {
+    max-width: {{ section.settings.container_width | default: 1300 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp45-bs__title-block {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 50px;
+  }
+
+  .hp45-bs__heading {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0A0A0A;
+    margin: 0 0 8px;
+  }
+
+  .hp45-bs__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp45-bs__card {
+    background: #FFFFFF;
+    border: 2px solid var(--hp45-border);
+    box-shadow: 5px 5px 0 var(--hp45-border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+  }
+
+  .hp45-bs__card:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 var(--hp45-border);
+  }
+
+  .hp45-bs__img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 1.5px solid var(--hp45-border);
+    margin-bottom: 20px;
+    filter: grayscale(100%);
+  }
+
+  .hp45-bs__card:hover .hp45-bs__img { filter: grayscale(0%); }
+
+  .hp45-bs__name {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0A0A0A;
+    margin: 0 0 8px;
+  }
+
+  .hp45-bs__price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  .hp45-bs__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 13px;
+    background: #0A0A0A;
+    color: #FFFFFF;
+    border: 2px solid #0A0A0A;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .hp45-bs__btn:hover { background: #FFFFFF; color: #0A0A0A; }
+
+  @media screen and (max-width: 992px) {
+    .hp45-bs__grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+  }
+{%- endstyle -%}
+
+<div class="hp45-bs__wrap">
+  <div class="hp45-bs__title-block">
+    <h2 class="hp45-bs__heading">{{ section.settings.heading | default: 'TIER-1 CLINICAL DOSAGES' }}</h2>
+    <p style="font-family:'JetBrains Mono', monospace; font-size:13px; color:#555;">{{ section.settings.subheading | default: 'Highest replenishment volume among clinical accounts.' }}</p>
+  </div>
+
+  <div class="hp45-bs__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp45-bs__card" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp45-bs__img" alt="{{ block.settings.title }}" loading="lazy">
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'hp45-bs__img' }}
+          {%- endif -%}
+          <h3 class="hp45-bs__name">{{ block.settings.title }}</h3>
+          <div class="hp45-bs__price">{{ block.settings.price | default: '$74.00 USD' }}</div>
+          <button class="hp45-bs__btn">{{ block.settings.btn_text | default: 'ORDER COMPOUND' }}</button>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp45-bs__card">
+        {{ 'product-1' | placeholder_svg_tag: 'hp45-bs__img' }}
+        <h3 class="hp45-bs__name">CELLULAR MATRIX RECON</h3>
+        <div class="hp45-bs__price">$74.00 USD</div>
+        <button class="hp45-bs__btn">ORDER COMPOUND</button>
+      </div>
+      <div class="hp45-bs__card">
+        {{ 'product-1' | placeholder_svg_tag: 'hp45-bs__img' }}
+        <h3 class="hp45-bs__name">EPIDERMAL DEFENSE SHIELD</h3>
+        <div class="hp45-bs__price">$58.00 USD</div>
+        <button class="hp45-bs__btn">ORDER COMPOUND</button>
+      </div>
+      <div class="hp45-bs__card">
+        {{ 'product-1' | placeholder_svg_tag: 'hp45-bs__img' }}
+        <h3 class="hp45-bs__name">LIPID ARCHITECTURE BALM</h3>
+        <div class="hp45-bs__price">$62.00 USD</div>
+        <button class="hp45-bs__btn">ORDER COMPOUND</button>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP45 - Brutal Best",
+  "class": "section-hp45-bestsellers",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F5F0" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#0A0A0A" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "TIER-1 CLINICAL DOSAGES" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Highest replenishment volume among clinical accounts." },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1300 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Bestseller Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Name", "default": "CELLULAR MATRIX RECON" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$74.00 USD" },
+        { "type": "text", "id": "btn_text", "label": "Button Label", "default": "ORDER COMPOUND" },
+        { "type": "url", "id": "url", "label": "Product Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP45 - Brutal Best" }
+  ]
+}
+{% endschema %}

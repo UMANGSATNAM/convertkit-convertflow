@@ -1,0 +1,130 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp49-feat-bg: {{ section.settings.bg_color | default: '#F5F3FF' }};
+    --hp49-accent: {{ section.settings.accent_color | default: '#7C3AED' }};
+    
+    background-color: var(--hp49-feat-bg);
+    padding-top: {{ section.settings.padding_top | default: 80 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+  }
+
+  .hp49-feat__wrap {
+    max-width: {{ section.settings.container_width | default: 1240 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp49-feat__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px;
+  }
+
+  .hp49-feat__heading {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 800;
+    color: #2E1065;
+    margin: 0 0 8px;
+  }
+
+  .hp49-feat__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp49-feat__card {
+    background: #FFFFFF;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 28px;
+    padding: 36px 28px;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .hp49-feat__card:hover {
+    border-color: var(--hp49-accent);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(124, 58, 237, 0.15);
+  }
+
+  .hp49-feat__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--hp49-accent);
+    margin: 0 0 12px;
+  }
+
+  .hp49-feat__desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #5B21B6;
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .hp49-feat__grid { grid-template-columns: 1fr; }
+  }
+{%- endstyle -%}
+
+<div class="hp49-feat__wrap">
+  <div class="hp49-feat__header">
+    <h2 class="hp49-feat__heading">Botanical Sleep &amp; Calming Innovations</h2>
+    <p style="font-size:14px; color:#5B21B6; opacity:0.85;">{{ section.settings.subheading | default: 'Science-backed calming actives engineered to restore sensitive skin barriers.' }}</p>
+  </div>
+
+  <div class="hp49-feat__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp49-feat__card" {{ block.shopify_attributes }}>
+          <h3 class="hp49-feat__title">{{ block.settings.title }}</h3>
+          <p class="hp49-feat__desc">{{ block.settings.description }}</p>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp49-feat__card">
+        <h3 class="hp49-feat__title">Alpine Linalool Extraction</h3>
+        <p class="hp49-feat__desc">High-altitude micro-steam extraction isolates pure bio-calming linalool without degrading floral volatiles.</p>
+      </div>
+      <div class="hp49-feat__card">
+        <h3 class="hp49-feat__title">Cherry Blossom Peptides</h3>
+        <p class="hp49-feat__desc">Rich in sakura flavonoids that prevent glycation and maintain collagen elasticity against oxidative stress.</p>
+      </div>
+      <div class="hp49-feat__card">
+        <h3 class="hp49-feat__title">Velvet Pillow Cushion Tech</h3>
+        <p class="hp49-feat__desc">Time-release hyaluronic acid micro-sponges continuously deposit soothing moisture for 8 full sleep hours.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP49 - Lavender Feat",
+  "class": "section-hp49-features",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F3FF" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#7C3AED" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 80 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Alpine Linalool Extraction" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "High-altitude micro-steam extraction isolates pure bio-calming linalool." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP49 - Lavender Feat" }
+  ]
+}
+{% endschema %}

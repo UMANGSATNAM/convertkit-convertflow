@@ -1,0 +1,281 @@
+{%- liquid
+  assign section_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#00FFFF'
+  assign text_color = section.settings.text_color | default: '#000000'
+-%}
+
+<style>
+  #shopify-section-{{ section_id }} {
+    background-color: {{ bg_color }};
+    border-bottom: 4px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  
+  .hp16-header-container-{{ section_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .hp16-header-menu-{{ section_id }} {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+  }
+  
+  .hp16-header-menu-{{ section_id }} a {
+    font-family: 'Arial Black', Impact, sans-serif;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: {{ text_color }};
+    text-decoration: none;
+    padding: 5px 15px;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+  }
+  
+  .hp16-header-menu-{{ section_id }} a:hover {
+    background: #FF00FF;
+    color: #FFF;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    transform: translateY(-2px);
+  }
+  
+  .hp16-header-logo-{{ section_id }} {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #FFF;
+    text-shadow: 3px 3px 0 #FF00FF, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+    text-decoration: none;
+    text-align: center;
+    flex: 1;
+    transform: rotate(-2deg);
+    transition: transform 0.3s ease;
+  }
+  
+  .hp16-header-logo-{{ section_id }}:hover {
+    transform: rotate(2deg) scale(1.1);
+  }
+  
+  .hp16-header-icons-{{ section_id }} {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end;
+    flex: 1;
+  }
+  
+  .hp16-header-icon-{{ section_id }} {
+    color: {{ text_color }};
+    background: #FFF;
+    border: 3px solid #000;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0 #000;
+    transition: all 0.2s ease;
+  }
+  
+  .hp16-header-icon-{{ section_id }}:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+    background: #FFFF00;
+  }
+  
+  .hp16-header-icon-{{ section_id }} svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.5;
+  }
+  
+  .hp16-header-hamburger-{{ section_id }} {
+    display: none;
+    background: #FF00FF;
+    border: 3px solid #000;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    color: #FFF;
+    box-shadow: 3px 3px 0 #000;
+  }
+
+  @media (max-width: 992px) {
+    .hp16-header-menu-{{ section_id }} {
+      display: none;
+    }
+    .hp16-header-hamburger-{{ section_id }} {
+      display: block;
+    }
+    .hp16-header-container-{{ section_id }} {
+      padding: 15px 20px;
+    }
+    .hp16-header-logo-{{ section_id }} {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<div class="hp16-header-container-{{ section_id }}">
+  <div style="flex:1;">
+    <button class="hp16-header-hamburger-{{ section_id }}">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <ul class="hp16-header-menu-{{ section_id }}">
+      {%- assign cf_menu = section.settings.menu | default: linklists['main-menu'] -%}
+
+      {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+      {%- for link in cf_menu.links -%}
+
+        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+
+      {%- endfor -%}
+    </ul>
+  </div>
+  
+  <a href="/" class="hp16-header-logo-{{ section_id }}">{{ shop.name | default: 'Y2K GURL' }}</a>
+  
+  <div class="hp16-header-icons-{{ section_id }}">
+    <a href="/search" class="hp16-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </a>
+    {% render 'search-bar', compact: true %}
+    {% render 'wishlist-icon' %}
+    <a href="/cart" data-cart-open class="hp16-header-icon-{{ section_id }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP16 Header",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#00FFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "info": "Leave empty to use the store's main menu.",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border colour",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Falls back to the store name when empty."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 60,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to the top on scroll",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account link",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "HP16 Header"
+    }
+  ]
+}
+{% endschema %}
