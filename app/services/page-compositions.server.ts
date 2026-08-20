@@ -657,7 +657,11 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   const base = TEMPLATE_FILE[composition.pageType];
   const isIndexPage = composition.pageType === "index";
+  const templateFile = (options.variant && !isIndexPage)
+    ? base.replace(/\.json$/, `.${options.variant}.json`)
+    : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
+
 
   // Universal Theme Bridge: Write templates/index.liquid = "{{ content_for_layout }}"
   // This guarantees that legacy, hybrid, and OS 2.0 themes all render index.json without blank space!
