@@ -1868,5 +1868,35 @@ export const STORE_PAGE_TEMPLATES: StorePageTemplate[] = [
       { componentId: "hp50-newsletter" },
       { componentId: "hp50-trust-badges" }
     ],
+  },
+  {
+    id: "hp-v51-home",
+    name: "Home Page 51: RAWBLOX Urban Drop & Streetwear (HP-v51 Frameblox 04)",
+    category: "home",
+    pageType: "index",
+    niche: "streetwear",
+    family: "RAWBLOX Urban Drop & Streetwear",
+    styleTag: "⚡ Frameblox 04 Electric Blue & Deep Charcoal",
+    accentColor: "#0066FF",
+    description: "Frameblox Landing 04 replica: 5-tab hero switcher, gold badges, 50/50 story split, manifesto, infinite marquee, spotlight, dark banner, trust grid, and category visual tiles.",
+    heroImg: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80",
+    badge: "⚡ LIMITED DROP EDITION #04",
+    usageCount: "Used on 4200+ D2C stores",
+    announcement: "fb04-announcement_streetwear",
+    header: "fb04-header_streetwear",
+    footer: "fb04-footer_streetwear",
+    sections: [
+      { componentId: "fb04-hero-tabs_streetwear" },
+      { componentId: "fb04-new-drops_streetwear" },
+      { componentId: "fb04-brand-story_streetwear" },
+      { componentId: "fb04-manifesto_streetwear" },
+      { componentId: "fb04-marquee_streetwear" },
+      { componentId: "fb04-product-spotlight_streetwear" },
+      { componentId: "fb04-cta-banner_streetwear" },
+      { componentId: "fb04-trust-grid_streetwear" },
+      { componentId: "fb04-category-tiles_streetwear" },
+      { componentId: "fb04-newsletter_streetwear" }
+    ],
   }
 ];
+
