@@ -1,9 +1,7 @@
 import crypto from "crypto";
 import { uploadAsset } from "./index";
 
-// A simple in-memory cache for the MVP to prevent duplicate uploads.
-// Key format: `${shopDomain}_${themeId}_${assetKey}`
-// Value: MD5 checksum of the file content
+// In-memory asset checksum cache
 const localAssetCache = new Map<string, string>();
 
 export function calculateChecksum(content: string): string {
@@ -11,8 +9,9 @@ export function calculateChecksum(content: string): string {
 }
 
 /**
- * Uploads an asset only if it has changed.
- * This saves Shopify API limits and speeds up generation.
+ * Uploads an asset to Shopify.
+ * Critical files (templates/*.json, sections/*.json, sections/*.liquid) are ALWAYS uploaded
+ * so Shopify OS 2.0 theme editor never renders blank pages.
  */
 export async function uploadAssetWithCache(
   shop: any,
@@ -23,11 +22,16 @@ export async function uploadAssetWithCache(
   const cacheKey = `${shop.shopDomain}_${themeId}_${assetKey}`;
   const checksum = calculateChecksum(content);
   
+  const isCriticalFile =
+    assetKey.startsWith("templates/") ||
+    assetKey.startsWith("sections/") ||
+    assetKey.endsWith(".json");
+
   const existingChecksum = localAssetCache.get(cacheKey);
   
-  if (existingChecksum === checksum) {
-    console.log(`[Asset Cache Hit] Skipping upload for ${assetKey}`);
-    return false; // Did not upload
+  if (!isCriticalFile && existingChecksum === checksum) {
+    console.log(`[Asset Cache Hit] Skipping unchanged non-critical asset: ${assetKey}`);
+    return false;
   }
 
   // Upload to Shopify
@@ -40,12 +44,9 @@ export async function uploadAssetWithCache(
   // Update cache
   localAssetCache.set(cacheKey, checksum);
   
-  return true; // Uploaded
+  return true;
 }
 
-/**
- * Pre-populates the cache if we just fetched a theme or know its state.
- */
 export function seedAssetCache(
   shopDomain: string,
   themeId: string,
