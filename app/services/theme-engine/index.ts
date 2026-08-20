@@ -89,7 +89,8 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
     return;
   }
 
-  const themeGid = `gid://shopify/OnlineStoreTheme/${themeId}`;
+  const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
+  const themeGid = `gid://shopify/OnlineStoreTheme/${actualThemeId}`;
 
   const getSortWeight = (filename: string) => {
     if (filename.endsWith(".liquid")) {

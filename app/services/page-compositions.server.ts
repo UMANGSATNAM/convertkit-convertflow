@@ -502,6 +502,22 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     settings.btn_text = "CLAIM DISCOUNT";
   }
 
+  // Universal setting key normalization so all Liquid condition checks pass:
+  if (settings.title && !settings.heading) settings.heading = settings.title.replace(/<[^>]*>/g, '');
+  if (settings.heading && !settings.title) settings.title = settings.heading;
+
+  if (settings.subtitle && !settings.subheading) settings.subheading = settings.subtitle;
+  if (settings.subheading && !settings.subtitle) settings.subtitle = settings.subheading;
+
+  if (settings.btn_text && !settings.btn_label) settings.btn_label = settings.btn_text;
+  if (settings.btn_label && !settings.btn_text) settings.btn_text = settings.btn_label;
+
+  if (settings.btn_link && !settings.btn_url) settings.btn_url = settings.btn_link;
+  if (settings.btn_url && !settings.btn_link) settings.btn_link = settings.btn_url;
+
+  if (settings.text && !settings.description) settings.description = settings.text.replace(/<[^>]*>/g, '');
+  if (settings.description && !settings.text) settings.text = settings.description;
+
   const result: any = { type: componentId, settings };
   if (block_order.length > 0) {
     result.blocks = blocks;
