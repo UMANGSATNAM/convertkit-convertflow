@@ -224,6 +224,70 @@ const ARCHETYPE_PALETTES: Record<string, { background: string; text: string; acc
 };
 
 /**
+ * Sanitizes block types in section entries against the actual Liquid schema of the section.
+ * If a section schema has no blocks, deletes blocks completely.
+ * If block types do not match the schema, maps them to allowed block types so Shopify validation passes 100%.
+ */
+function sanitizeBlocksAgainstSchema(liquidContent: string, sectionEntry: any): void {
+  if (!sectionEntry || !sectionEntry.blocks) return;
+
+  const match = liquidContent.match(/{% schema %}([\s\S]*?){% endschema %}/);
+  if (!match) {
+    delete sectionEntry.blocks;
+    delete sectionEntry.block_order;
+    return;
+  }
+
+  try {
+    const schema = JSON.parse(match[1]);
+    const allowedBlocks: Array<{ type: string; name: string }> = schema.blocks || [];
+    if (allowedBlocks.length === 0) {
+      delete sectionEntry.blocks;
+      delete sectionEntry.block_order;
+      return;
+    }
+
+    const allowedTypes = allowedBlocks.map((b) => b.type);
+    const sanitizedBlocks: Record<string, any> = {};
+    const sanitizedOrder: string[] = [];
+
+    const currentBlocks = sectionEntry.blocks || {};
+    const currentOrder = sectionEntry.block_order || Object.keys(currentBlocks);
+
+    for (const bKey of currentOrder) {
+      const blockObj = currentBlocks[bKey];
+      if (!blockObj) continue;
+
+      let targetType = blockObj.type;
+
+      if (!allowedTypes.includes(targetType)) {
+        const fuzzy = allowedTypes.find(
+          (t) => targetType.includes(t) || t.includes(targetType)
+        );
+        targetType = fuzzy || allowedTypes[0];
+      }
+
+      sanitizedBlocks[bKey] = {
+        ...blockObj,
+        type: targetType,
+      };
+      sanitizedOrder.push(bKey);
+    }
+
+    if (sanitizedOrder.length > 0) {
+      sectionEntry.blocks = sanitizedBlocks;
+      sectionEntry.block_order = sanitizedOrder;
+    } else {
+      delete sectionEntry.blocks;
+      delete sectionEntry.block_order;
+    }
+  } catch (err) {
+    delete sectionEntry.blocks;
+    delete sectionEntry.block_order;
+  }
+}
+
+/**
  * Hydrates a section entry with rich archetype settings, text blocks, USPs, FAQs, reviews, etc.
  * so that when applied to Shopify, the store looks 100% complete and visually stunning without blank sections.
  */
@@ -467,7 +531,10 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
     // Numbered so the key order matches visual order in theme editor and satisfies Shopify OS 2.0 identifier rules
     const safeId = spec.componentId.replace(/[^a-zA-Z0-9]/g, "_");
     const key = `section_${String(sectionIndex).padStart(2, "0")}_${safeId}`;
-    sections[key] = hydrateSectionEntry(spec.componentId, composition, spec.settings || {});
+    const sectionEntry = hydrateSectionEntry(spec.componentId, composition, spec.settings || {});
+    const liquidCode = files[`sections/${spec.componentId}.liquid`] || "";
+    sanitizeBlocksAgainstSchema(liquidCode, sectionEntry);
+    sections[key] = sectionEntry;
     order.push(key);
     sectionIndex++;
   }
@@ -495,13 +562,15 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
       } else {
         missingFiles.push(annId);
       }
-      headerGroupSections["announcement"] = {
+      const annEntry = {
         type: annId,
         settings: {
           text: `🔥 FREE WORLDWIDE EXPRESS SHIPPING ON ORDERS OVER $99 • USE CODE WELCOME10`,
           link: "/collections/all",
         },
       };
+      sanitizeBlocksAgainstSchema(files[`sections/${annId}.liquid`] || "", annEntry);
+      headerGroupSections["announcement"] = annEntry;
       headerGroupOrder.push("announcement");
     }
 
@@ -516,7 +585,9 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
       } else {
         missingFiles.push(headId);
       }
-      headerGroupSections["header"] = { type: headId, settings: {} };
+      const headEntry = { type: headId, settings: {} };
+      sanitizeBlocksAgainstSchema(files[`sections/${headId}.liquid`] || "", headEntry);
+      headerGroupSections["header"] = headEntry;
       headerGroupOrder.push("header");
     }
 
@@ -597,6 +668,8 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
       };
       footerEntry.block_order = ["col_1", "col_2", "col_3"];
     }
+
+    sanitizeBlocksAgainstSchema(files[`sections/${footId}.liquid`] || "", footerEntry);
 
     files["sections/footer-group.json"] = JSON.stringify(
       {
