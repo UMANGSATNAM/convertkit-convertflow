@@ -184,9 +184,43 @@ function main() {
 
   for (const vNum of validVersions) {
     const prefix = `hp${vNum}-`;
-    const vSectionFiles = allSectionFiles.filter(f => f.startsWith(prefix)).sort();
+    let vSectionFiles = allSectionFiles.filter(f => f.startsWith(prefix));
+
+    // Sort according to index.hp-v*.json template order if available
+    const templatePath = path.join(templatesDir, `index.hp-v${vNum}.json`);
+    if (fs.existsSync(templatePath)) {
+      try {
+        const tObj = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+        if (tObj.order && tObj.sections) {
+          const orderedTypes = tObj.order.map(k => tObj.sections[k]?.type).filter(Boolean);
+          const orderedFiles = [];
+          // Header & announcement first
+          if (fs.existsSync(path.join(sectionsDir, `hp${vNum}-announcement.liquid`))) {
+            orderedFiles.push(`hp${vNum}-announcement.liquid`);
+          }
+          if (fs.existsSync(path.join(sectionsDir, `hp${vNum}-header.liquid`))) {
+            orderedFiles.push(`hp${vNum}-header.liquid`);
+          }
+          // Body sections from template order
+          orderedTypes.forEach(t => {
+            const fName = `${t}.liquid`;
+            if (fs.existsSync(path.join(sectionsDir, fName)) && !orderedFiles.includes(fName)) {
+              orderedFiles.push(fName);
+            }
+          });
+          // Footer last
+          if (fs.existsSync(path.join(sectionsDir, `hp${vNum}-footer.liquid`)) && !orderedFiles.includes(`hp${vNum}-footer.liquid`)) {
+            orderedFiles.push(`hp${vNum}-footer.liquid`);
+          }
+          if (orderedFiles.length > 0) {
+            vSectionFiles = orderedFiles;
+          }
+        }
+      } catch (e) {}
+    }
 
     if (vSectionFiles.length === 0) continue;
+
 
     const label = aesthetics[vNum] || `HP-v${vNum}`;
     navLinks += `<a href="#hp-v${vNum}" class="nav-pill">${vNum}</a>`;
