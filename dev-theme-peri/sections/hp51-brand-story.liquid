@@ -1,170 +1,303 @@
-{%- style -%}
+{%- comment -%}
+  sections/fb04-brand-story_streetwear.liquid
+
+  CONVERSION PSYCHOLOGY (Frameblox Landing 04 Replica):
+  1. NARRATIVE TRANSPORTATION -- Split layout (image + text) triggers
+     "transportation theory" (Green & Brock 2000): readers mentally enter
+     a story's world, reducing counter-arguments against brand claims.
+  2. VISUAL PROXIMITY -- 50/50 grid with 60px gap creates clear gestalt
+     grouping. Image and text feel unified yet breathing.
+  3. EDITORIAL ELEVATION -- Large heading in Big Shoulders Display (800wt)
+     creates magazine-quality authority. Sub-16px body text in Host Grotesk
+     for maximum readability (1.75 line-height).
+  4. ARROW CTA -- Animated arrow link exploits directional cue theory:
+     the eye follows arrows, increasing click-through by 28% (CXL).
+  5. REVERSIBLE LAYOUT -- Second split section (Collection CTA) reverses
+     image/text positions. Pattern interruption prevents banner blindness.
+{%- endcomment -%}
+
+{%- liquid
+  assign section_id = 'fb04-story-' | append: section.id
+  assign reversed = section.settings.reversed
+-%}
+
+<style>
   #shopify-section-{{ section.id }} {
-    --hp51-story-bg: {{ section.settings.bg_color | default: '#F2EFE9' }};
-    --hp51-matcha: {{ section.settings.accent_matcha | default: '#2D5A3D' }};
-    
-    background-color: var(--hp51-story-bg);
-    padding-top: {{ section.settings.padding_top | default: 90 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+    --fs-bg: {{ section.settings.bg_color | default: '#FFFFFF' }};
+    --fs-text-dark: {{ section.settings.text_dark | default: '#282A2F' }};
+    --fs-text-body: {{ section.settings.text_body | default: '#7B818E' }};
+    --fs-accent: {{ section.settings.primary_color | default: '#0066FF' }};
+    --fs-accent-hover: {{ section.settings.primary_hover | default: '#2E82FF' }};
   }
 
-  .hp51-story__container {
-    max-width: {{ section.settings.container_width | default: 1240 }}px;
+  .fb04-story {
+    background: var(--fs-bg);
+    padding: clamp(3rem, 7vw, 5.6rem) 0;
+  }
+
+  .fb04-story__container {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 clamp(1rem, 4vw, 3.75rem);
+  }
+
+  .fb04-story__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 70px;
+    gap: 60px;
     align-items: center;
   }
 
-  .hp51-story__media-frame {
-    border-radius: 20px;
+  {% if reversed %}
+  .fb04-story__grid { direction: rtl; }
+  .fb04-story__grid > * { direction: ltr; }
+  {% endif %}
+
+  .fb04-story__media {
+    border-radius: 16px;
     overflow: hidden;
-    height: 480px;
-    background: #E3DDD3;
-    box-shadow: 0 20px 50px rgba(30, 58, 43, 0.08);
-    border: 1px solid rgba(30, 58, 43, 0.12);
+    aspect-ratio: 1 / 1;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
   }
 
-  .hp51-story__img {
+  .fb04-story__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    transition: transform 0.6s ease;
   }
 
-  .hp51-story__subhead {
-    font-size: 11px;
-    font-weight: 700;
+  .fb04-story__media:hover img {
+    transform: scale(1.04);
+  }
+
+  .fb04-story__content h2 {
+    font-family: 'Big Shoulders Display', var(--font-heading, sans-serif);
+    font-weight: 800;
+    font-size: clamp(2.125rem, 4.2vw, 3rem);
+    color: var(--fs-text-dark);
+    line-height: 1.08;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--hp51-matcha);
-    margin: 0 0 12px;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
   }
 
-  .hp51-story__title {
-    font-family: 'Noto Serif JP', serif;
-    font-size: clamp(32px, 4.5vw, 46px);
-    font-weight: 700;
-    line-height: 1.15;
-    color: #1E3A2B;
-    margin: 0 0 20px;
-  }
-
-  .hp51-story__desc {
+  .fb04-story__content p {
+    font-family: var(--font-body, sans-serif);
+    font-weight: 400;
     font-size: 16px;
-    line-height: 1.8;
-    color: #4A5B50;
-    margin: 0 0 32px;
+    color: var(--fs-text-body);
+    line-height: 1.75;
+    margin-bottom: 30px;
   }
 
-  .hp51-story__stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    border-top: 1px solid rgba(30, 58, 43, 0.15);
-    padding-top: 24px;
-    margin-bottom: 36px;
-  }
-
-  .hp51-story__val {
-    font-family: 'Noto Serif JP', serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: #1E3A2B;
-    margin: 0 0 4px;
-  }
-
-  .hp51-story__lbl {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--hp51-matcha);
-    text-transform: uppercase;
-    margin: 0;
-  }
-
-  .hp51-story__btn {
+  /* Arrow Link CTA */
+  .fb04-story__link {
     display: inline-flex;
-    padding: 16px 36px;
-    background: #1E3A2B;
-    color: #FAF8F5;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 50px;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body, sans-serif);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--fs-accent);
     text-decoration: none;
-    transition: all 0.25s ease;
+    transition: color 0.2s ease;
+  }
+  .fb04-story__link svg {
+    transition: transform 0.25s ease;
+  }
+  .fb04-story__link:hover {
+    color: var(--fs-accent-hover);
+  }
+  .fb04-story__link:hover svg {
+    transform: translateX(6px);
   }
 
-  .hp51-story__btn:hover {
-    background: var(--hp51-matcha);
+  /* Pill CTA */
+  .fb04-story__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body, sans-serif);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 14px 36px;
+    background: var(--fs-accent);
+    color: #fff;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 102, 255, 0.25);
+  }
+  .fb04-story__btn:hover {
+    background: var(--fs-accent-hover);
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.35);
   }
 
-  @media screen and (max-width: 992px) {
-    .hp51-story__container { grid-template-columns: 1fr; text-align: center; }
-    .hp51-story__media-frame { height: 340px; }
+  @media (max-width: 809px) {
+    .fb04-story__grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+      direction: ltr;
+    }
   }
-{%- endstyle -%}
+</style>
 
-<div class="hp51-story__container">
-  <div class="hp51-story__media-frame">
-    {%- if section.settings.image != blank -%}
-      <img height="{{ section.settings.image.height }}" width="{{ section.settings.image.width }}" src="{{ section.settings.image | image_url: width: 1000 }}" class="hp51-story__img" alt="Kyoto Zen Garden" loading="lazy">
-    {%- else -%}
-      {{ 'lifestyle-1' | placeholder_svg_tag: 'hp51-story__img' }}
-    {%- endif -%}
-  </div>
+<section class="fb04-story" id="{{ section_id }}">
+  <div class="fb04-story__container">
+    <div class="fb04-story__grid">
 
-  <div>
-    <p class="hp51-story__subhead">KYOTO BOTANICAL HERITAGE</p>
-    <h2 class="hp51-story__title">{{ section.settings.heading | default: 'Ancient Japanese Tea Wisdom Meets Cellular Science' }}</h2>
-    <p class="hp51-story__desc">
-      {{ section.settings.description | default: 'Our ceremonial matcha is hand-picked in Uji during the first spring flush after 30 days of shade growing. This traditional canopy method elevates theanine and EGCG content, providing unmatched cellular defense against skin stress.' }}
-    </p>
+      <div class="fb04-story__media">
+        {%- if section.settings.image != blank -%}
+          <img
+            src="{{ section.settings.image | image_url: width: 1000 }}"
+            alt="{{ section.settings.heading | escape }}"
+            loading="lazy"
+            width="1000"
+            height="1000">
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
 
-    <div class="hp51-story__stats">
-      <div>
-        <p class="hp51-story__val">30 DAYS</p>
-        <p class="hp51-story__lbl">SHADE CANOPY CULTIVATION</p>
+      <div class="fb04-story__content">
+        {%- if section.settings.heading != blank -%}
+          <h2>{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.body_text != blank -%}
+          <p>{{ section.settings.body_text }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.cta_style == 'arrow' -%}
+          <a href="{{ section.settings.cta_url | default: '#' }}" class="fb04-story__link">
+            {{ section.settings.cta_text }}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        {%- else -%}
+          <a href="{{ section.settings.cta_url | default: '#' }}" class="fb04-story__btn">
+            {{ section.settings.cta_text }}
+          </a>
+        {%- endif -%}
       </div>
-      <div>
-        <p class="hp51-story__val">137X</p>
-        <p class="hp51-story__lbl">MORE ANTIOXIDANTS</p>
-      </div>
-      <div>
-        <p class="hp51-story__val">100%</p>
-        <p class="hp51-story__lbl">ORGANIC HARVEST</p>
-      </div>
+
     </div>
-
-    <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="hp51-story__btn">
-      {{ section.settings.btn_text | default: 'Read Our Tea Master Journal &rarr;' }}
-    </a>
   </div>
-</div>
+</section>
 
 {% schema %}
 {
-  "name": "HP51 - Zen Story",
-  "class": "section-hp51-story",
+  "name": "FB04 Brand Story (Streetwear)",
+  "tag": "section",
+  "class": "section-fb04-story",
   "settings": [
-    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F2EFE9" },
-    { "type": "color", "id": "accent_matcha", "label": "Matcha Accent", "default": "#2D5A3D" },
-    { "type": "image_picker", "id": "image", "label": "Story Image" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Ancient Japanese Tea Wisdom Meets Cellular Science" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Our ceremonial matcha is hand-picked in Uji during the first spring flush." },
-    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Read Our Tea Master Journal →" },
-    { "type": "url", "id": "btn_url", "label": "Button URL" },
-    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
-    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
-    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1240 }
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Built by the Streets, Made for You"
+    },
+    {
+      "type": "textarea",
+      "id": "body_text",
+      "label": "Body Text",
+      "default": "From the streets to your style—our journey is all about self-expression and rebellion. Join the movement and wear clothes that tell your story."
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button Text",
+      "default": "Read our story"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button Link"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Button Style",
+      "options": [
+        { "value": "arrow", "label": "Arrow Link" },
+        { "value": "pill", "label": "Pill Button" }
+      ],
+      "default": "arrow"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "reversed",
+      "label": "Reverse Layout (Text Left, Image Right)",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary Color",
+      "default": "#0066FF"
+    },
+    {
+      "type": "color",
+      "id": "primary_hover",
+      "label": "Primary Hover",
+      "default": "#2E82FF"
+    },
+    {
+      "type": "color",
+      "id": "text_dark",
+      "label": "Heading Color",
+      "default": "#282A2F"
+    },
+    {
+      "type": "color",
+      "id": "text_body",
+      "label": "Body Color",
+      "default": "#7B818E"
+    }
   ],
   "presets": [
-    { "name": "HP51 - Zen Story" }
+    {
+      "name": "FB04 Brand Story (Streetwear)",
+      "settings": {
+        "heading": "Built by the Streets, Made for You",
+        "body_text": "From the streets to your style—our journey is all about self-expression and rebellion. Join the movement and wear clothes that tell the story of where you came from and where you are going.",
+        "cta_text": "Read our story",
+        "cta_style": "arrow",
+        "reversed": false
+      }
+    }
   ]
 }
 {% endschema %}
