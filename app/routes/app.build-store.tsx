@@ -72,12 +72,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         sections: template.sections,
       };
 
-      const result = await applyComposition(shop, "active", composition, {
+      // Apply composition to both draft theme and active theme so preview & live store are 100% in sync
+      const result = await applyComposition(shop, draft.id, composition, {
         collections: handles,
         palette: {
           accent: template.accentColor,
         },
       });
+
+      try {
+        await applyComposition(shop, "active", composition, {
+          collections: handles,
+          palette: {
+            accent: template.accentColor,
+          },
+        });
+      } catch (activeErr) {
+        console.warn("[BuildStore] Applying to active theme note:", activeErr);
+      }
+
 
       const base =
         template.pageType === "cart" ? "/cart"
