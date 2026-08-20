@@ -180,15 +180,14 @@ export default function Home() {
         <Card>
           <BlockStack gap="400">
             <BlockStack gap="150">
-              <Text as="h2" variant="headingLg">Make your store</Text>
+              <Text as="h2" variant="headingLg">Add sections to your store</Text>
               <Text as="p" tone="subdued">
-                Start from our base theme, or keep the theme you are running and just
-                swap the sections you want to change.
+                Explore our high-converting 100X CRO Liquid section library and drop them directly into your active theme.
               </Text>
             </BlockStack>
             <Box>
-              <Link to="/app/build" style={{ textDecoration: "none" }}>
-                <Button variant="primary" size="large">Get started</Button>
+              <Link to="/app/sections" style={{ textDecoration: "none" }}>
+                <Button variant="primary" size="large">Browse sections</Button>
               </Link>
             </Box>
           </BlockStack>
