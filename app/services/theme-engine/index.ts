@@ -44,13 +44,41 @@ export async function deleteAsset(shop: any, themeId: string, key: string) {
     return;
   }
   const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
+  const themeGid = `gid://shopify/OnlineStoreTheme/${actualThemeId}`;
+
+  // 1. Try GraphQL themeFilesDelete mutation (official Shopify 2024-10 API method)
+  try {
+    const res = await graphqlRequest(
+      shop.shopDomain,
+      shop.accessToken,
+      `mutation themeFilesDelete($themeId: ID!, $files: [String!]!) {
+        themeFilesDelete(themeId: $themeId, files: $files) {
+          deletedThemeFiles { filename }
+          userErrors { field message }
+        }
+      }`,
+      { themeId: themeGid, files: [key] },
+      false
+    );
+    const errs = res?.themeFilesDelete?.userErrors || [];
+    if (errs.length === 0) {
+      console.log(`[DeleteAsset] GraphQL deleted obsolete file: ${key} from theme ${actualThemeId}`);
+      return;
+    }
+    console.warn(`[DeleteAsset] GraphQL themeFilesDelete note for ${key}:`, errs.map((e: any) => e.message).join("; "));
+  } catch (gqlErr: any) {
+    console.warn(`[DeleteAsset] GraphQL delete note (${key}):`, gqlErr.message);
+  }
+
+  // 2. REST API Fallback
   try {
     await restRequest(shop.shopDomain, shop.accessToken, "DELETE", `themes/${actualThemeId}/assets.json?asset[key]=${encodeURIComponent(key)}`);
-    console.log(`[DeleteAsset] Deleted obsolete template file: ${key} from theme ${actualThemeId}`);
+    console.log(`[DeleteAsset] REST deleted obsolete file: ${key} from theme ${actualThemeId}`);
   } catch (e: any) {
-    console.warn(`[DeleteAsset] Could not delete ${key}: ${e.message}`);
+    console.warn(`[DeleteAsset] REST delete note for ${key}: ${e.message}`);
   }
 }
+
 
 export async function installTheme(shop: any, themeName: string, sourceUrl: string): Promise<{ themeId: string }> {
   console.log(`Installing blank theme shell: ${themeName}`);
