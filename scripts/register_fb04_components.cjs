@@ -6,8 +6,15 @@ const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
 
 const fb04Components = [
   {
+    componentId: 'fb04-announcement_streetwear',
+    name: 'FB04 Announcement Bar',
+    category: 'announcement',
+    liquidPath: 'components/fb04-streetwear/fb04-announcement_streetwear.liquid'
+  },
+  {
     componentId: 'fb04-header_streetwear',
     name: 'FB04 Header (Streetwear)',
+
     category: 'header',
     liquidPath: 'components/fb04-streetwear/fb04-header_streetwear.liquid',
     presets: { brand_name: 'RAWBLOX' }

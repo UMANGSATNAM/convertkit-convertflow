@@ -13,7 +13,9 @@ existingFiles.forEach(f => {
 
 // 2. Copy Frameblox Landing 04 sections as hp51-*.liquid
 const sectionMap = {
+  'fb04-announcement_streetwear.liquid': 'hp51-announcement.liquid',
   'fb04-header_streetwear.liquid': 'hp51-header.liquid',
+
   'fb04-hero-tabs_streetwear.liquid': 'hp51-hero-tabs.liquid',
   'fb04-new-drops_streetwear.liquid': 'hp51-new-drops.liquid',
   'fb04-brand-story_streetwear.liquid': 'hp51-brand-story.liquid',
