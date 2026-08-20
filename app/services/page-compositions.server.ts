@@ -304,8 +304,8 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   const lowerId = componentId.toLowerCase();
 
-  // ── FB04 STREETWEAR SECTIONS ─────────────────────────────────────────────
-  if (lowerId.startsWith("fb04-")) {
+  // ── FB04 / HP51 STREETWEAR SECTIONS ──────────────────────────────────────
+  if (lowerId.startsWith("fb04-") || lowerId.startsWith("hp51-")) {
     if (lowerId.includes("hero-tabs")) {
       const tabs = [
         { tab_label: "Limited Drops, Maximum Impact", heading: "Limited Drops, Maximum Impact", subheading: "We release exclusive, small-batch collections to keep your style fresh and unique—once it's gone, it's gone.", cta_text: "Shop now", image_tag: "Drop #04 — Edition Limited to 300 Pcs" },

@@ -55,21 +55,23 @@ export const COMPOSITIONS: PageComposition[] = [
     accentColor: "#0066FF",
     description:
       "Frameblox Landing 04 replica: 5-tab hero switcher, gold badges, 50/50 story split, manifesto, infinite marquee, spotlight, dark banner, trust grid, and category visual tiles.",
-    header: "fb04-header_streetwear",
-    footer: "fb04-footer_streetwear",
+    announcement: "hp51-announcement",
+    header: "hp51-header",
+    footer: "hp51-footer",
     sections: [
-      { componentId: "fb04-hero-tabs_streetwear" },
-      { componentId: "fb04-new-drops_streetwear" },
-      { componentId: "fb04-brand-story_streetwear" },
-      { componentId: "fb04-manifesto_streetwear" },
-      { componentId: "fb04-marquee_streetwear" },
-      { componentId: "fb04-product-spotlight_streetwear" },
-      { componentId: "fb04-cta-banner_streetwear" },
-      { componentId: "fb04-trust-grid_streetwear" },
-      { componentId: "fb04-category-tiles_streetwear" },
-      { componentId: "fb04-newsletter_streetwear" },
+      { componentId: "hp51-hero-tabs" },
+      { componentId: "hp51-new-drops" },
+      { componentId: "hp51-brand-story" },
+      { componentId: "hp51-manifesto" },
+      { componentId: "hp51-marquee" },
+      { componentId: "hp51-product-spotlight" },
+      { componentId: "hp51-cta-banner" },
+      { componentId: "hp51-trust-grid" },
+      { componentId: "hp51-category-tiles" },
+      { componentId: "hp51-newsletter" },
     ],
   },
+
 
   // ── 1. CLOTHING (3 D2C Archetypes) ───────────────────────────────────────
   {

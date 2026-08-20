@@ -1,0 +1,62 @@
+{%- comment -%} sections/fb04-category-tiles_streetwear.liquid {%- endcomment -%}
+{%- liquid assign section_prefix = 'fb04-tiles-' | append: section.id -%}
+<style>
+  #shopify-section-{{ section.id }} {
+    --fb-bg: {{ section.settings.bg_color | default: '#FFFFFF' }};
+  }
+  .fb04-tiles { padding: clamp(2rem, 5vw, 4rem) 0; background: var(--fb-bg); }
+  .fb04-tiles__container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3.75rem); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2rem); }
+  @media (max-width: 650px) { .fb04-tiles__container { grid-template-columns: 1fr; } }
+  .fb04-tile { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; background: #000; text-decoration: none; display: block; box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
+  .fb04-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; opacity: 0.85; }
+  .fb04-tile:hover img { transform: scale(1.05); opacity: 0.95; }
+  .fb04-tile__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%); display: flex; align-items: flex-end; padding: clamp(1.5rem, 3vw, 2.5rem); }
+  .fb04-tile__title { font-family: 'Big Shoulders Display', var(--font-heading, sans-serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0; display: flex; align-items: center; gap: 8px; }
+</style>
+<section class="fb04-tiles" id="{{ section_prefix }}">
+  <div class="fb04-tiles__container">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.url | default: '/collections/all' }}" class="fb04-tile" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.title | escape }}" loading="lazy" width="1000" height="560">
+          {%- else -%}
+            <img src="{% if forloop.first %}https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80{% else %}https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1000&q=80{% endif %}" alt="Category" loading="lazy" width="1000" height="560">
+          {%- endif -%}
+          <div class="fb04-tile__overlay">
+            <h3 class="fb04-tile__title">{{ block.settings.title | default: 'Collection' }} &rarr;</h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <a href="/collections/all" class="fb04-tile">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80" alt="Women Collection" loading="lazy" width="1000" height="560">
+        <div class="fb04-tile__overlay"><h3 class="fb04-tile__title">Women &rarr;</h3></div>
+      </a>
+      <a href="/collections/all" class="fb04-tile">
+        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1000&q=80" alt="Men Collection" loading="lazy" width="1000" height="560">
+        <div class="fb04-tile__overlay"><h3 class="fb04-tile__title">Men &rarr;</h3></div>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "FB04 Category Tiles",
+  "tag": "section",
+  "class": "section-fb04-category-tiles",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category Tile",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Women" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Image" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "FB04 Category Tiles" }]
+}
+{% endschema %}

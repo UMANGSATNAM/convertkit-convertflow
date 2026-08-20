@@ -1882,21 +1882,22 @@ export const STORE_PAGE_TEMPLATES: StorePageTemplate[] = [
     heroImg: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80",
     badge: "⚡ LIMITED DROP EDITION #04",
     usageCount: "Used on 4200+ D2C stores",
-    announcement: "fb04-announcement_streetwear",
-    header: "fb04-header_streetwear",
-    footer: "fb04-footer_streetwear",
+    announcement: "hp51-announcement",
+    header: "hp51-header",
+    footer: "hp51-footer",
     sections: [
-      { componentId: "fb04-hero-tabs_streetwear" },
-      { componentId: "fb04-new-drops_streetwear" },
-      { componentId: "fb04-brand-story_streetwear" },
-      { componentId: "fb04-manifesto_streetwear" },
-      { componentId: "fb04-marquee_streetwear" },
-      { componentId: "fb04-product-spotlight_streetwear" },
-      { componentId: "fb04-cta-banner_streetwear" },
-      { componentId: "fb04-trust-grid_streetwear" },
-      { componentId: "fb04-category-tiles_streetwear" },
-      { componentId: "fb04-newsletter_streetwear" }
+      { componentId: "hp51-hero-tabs" },
+      { componentId: "hp51-new-drops" },
+      { componentId: "hp51-brand-story" },
+      { componentId: "hp51-manifesto" },
+      { componentId: "hp51-marquee" },
+      { componentId: "hp51-product-spotlight" },
+      { componentId: "hp51-cta-banner" },
+      { componentId: "hp51-trust-grid" },
+      { componentId: "hp51-category-tiles" },
+      { componentId: "hp51-newsletter" }
     ],
   }
 ];
+
 
