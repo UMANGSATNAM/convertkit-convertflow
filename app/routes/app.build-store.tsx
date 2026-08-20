@@ -72,19 +72,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         sections: template.sections,
       };
 
-      const result = await applyComposition(shop, draft.id, composition, {
+      const result = await applyComposition(shop, "active", composition, {
         collections: handles,
         palette: {
           accent: template.accentColor,
         },
       });
-
-      // Auto-publish draft theme so the live store receives the full OS 2.0 template immediately
-      try {
-        await publishDraft(shop, draft.id);
-      } catch (pubErr: any) {
-        console.warn(`[BuildStore] Auto-publish notice: ${pubErr.message}`);
-      }
 
       const base =
         template.pageType === "cart" ? "/cart"

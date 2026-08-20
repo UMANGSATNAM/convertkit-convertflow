@@ -217,6 +217,7 @@ const ARCHETYPE_PALETTES: Record<string, { background: string; text: string; acc
   "beauty-organic-home": { background: "#fcfaf6", text: "#1f2937", accent: "#2e5a44", surface: "#ffffff" },
   "beauty-clinical-home": { background: "#f0f9ff", text: "#0f172a", accent: "#0284c7", surface: "#ffffff" },
   "beauty-glamour-home": { background: "#0d0814", text: "#fdf4ff", accent: "#e879f9", surface: "#261138" },
+  "beauty-rose-gradient-home": { background: "#fff5f7", text: "#1f2937", accent: "#db2777", surface: "#ffffff" },
   "jewellery-heritage-home": { background: "#06150e", text: "#fef9c3", accent: "#eab308", surface: "#0e3324" },
   "jewellery-diamond-home": { background: "#0f172a", text: "#ffffff", accent: "#d4af37", surface: "#1e293b" },
   "jewellery-silver-home": { background: "#fafaf9", text: "#1c1917", accent: "#78716c", surface: "#ffffff" },
@@ -340,13 +341,13 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   // 3. FAQ ACCORDION (4 curated questions)
   else if (lowerId.includes("faq")) {
-    settings.subtitle = settings.subtitle || "KNOWLEDGE BASE";
+    settings.subtitle = settings.subtitle || "<p>KNOWLEDGE BASE</p>";
     settings.title = settings.title || `<p>Frequently Asked <em>Questions</em></p>`;
     const faqs = [
-      { question: "How long does shipping take?", answer: "Orders are dispatched within 24-48 business hours with express tracked delivery taking 3-5 business days." },
-      { question: "Are all items authentic and certified?", answer: "Every single piece comes with a certificate of authenticity, hallmark verification, and batch identification." },
-      { question: "What is your return & exchange policy?", answer: "We offer a hassle-free 30-day return policy. Unused items in original condition receive full refunds." },
-      { question: "How do I care for my purchase?", answer: "Each order includes a bespoke care guide and protective storage pouch to maintain peak quality for decades." },
+      { question: "How long does shipping take?", answer: "<p>Orders are dispatched within 24-48 business hours with express tracked delivery taking 3-5 business days.</p>" },
+      { question: "Are all items authentic and certified?", answer: "<p>Every single piece comes with a certificate of authenticity, hallmark verification, and batch identification.</p>" },
+      { question: "What is your return & exchange policy?", answer: "<p>We offer a hassle-free 30-day return policy. Unused items in original condition receive full refunds.</p>" },
+      { question: "How do I care for my purchase?", answer: "<p>Each order includes a bespoke care guide and protective storage pouch to maintain peak quality for decades.</p>" },
     ];
     faqs.forEach((item, idx) => {
       const bKey = `faq_${idx + 1}`;
@@ -357,12 +358,12 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   // 4. TESTIMONIALS / REVIEWS (3-4 verified reviews)
   else if (lowerId.includes("testimonial") || lowerId.includes("review")) {
-    settings.subtitle = settings.subtitle || "COMMUNITY VOICES";
+    settings.subtitle = settings.subtitle || "<p>COMMUNITY VOICES</p>";
     settings.title = settings.title || `<p>Loved by <em>50,000+ Clients</em></p>`;
     const reviews = [
-      { author: "Aarav M.", location: "Mumbai", quote: "The quality and craftsmanship exceeded my expectations. Outstanding finish and lightning-fast delivery!", rating: 5 },
-      { author: "Priya S.", location: "Delhi", quote: "The packaging alone felt like a luxury unwrapping experience. Definitely ordering again!", rating: 5 },
-      { author: "Elena R.", location: "London", quote: "Pure perfection. The attention to detail is unmatched in this category.", rating: 5 },
+      { author: "Aarav M.", location: "Mumbai", quote: "<p>The quality and craftsmanship exceeded my expectations. Outstanding finish and lightning-fast delivery!</p>", rating: 5 },
+      { author: "Priya S.", location: "Delhi", quote: "<p>The packaging alone felt like a luxury unwrapping experience. Definitely ordering again!</p>", rating: 5 },
+      { author: "Elena R.", location: "London", quote: "<p>Pure perfection. The attention to detail is unmatched in this category.</p>", rating: 5 },
     ];
     reviews.forEach((item, idx) => {
       const bKey = `testimonial_${idx + 1}`;
@@ -813,21 +814,9 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   // Clean up obsolete OS 1.0 .liquid templates so Shopify OS 2.0 JSON templates render 100%
   const obsoleteLiquidTemplate = templateFile.replace(/\.json$/, ".liquid");
   await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
-  try {
-    await deleteAsset(shop, "active", obsoleteLiquidTemplate);
-  } catch {}
 
-  // Upload to target theme (draft or specified)
+  // Upload to target theme (active or specified draft)
   await upsertThemeFilesBatched(shop, themeId, files);
-
-  // Also upload directly to active live theme so main store updates instantly
-  try {
-    if (themeId !== "active") {
-      await upsertThemeFilesBatched(shop, "active", files);
-    }
-  } catch (liveErr: any) {
-    console.warn(`[ApplyComposition] Live theme direct update notice: ${liveErr.message}`);
-  }
 
   return {
     compositionId: composition.id,
