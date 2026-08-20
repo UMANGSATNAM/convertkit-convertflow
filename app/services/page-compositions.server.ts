@@ -304,8 +304,107 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   const lowerId = componentId.toLowerCase();
 
+  // ── FB04 STREETWEAR SECTIONS ─────────────────────────────────────────────
+  if (lowerId.startsWith("fb04-")) {
+    if (lowerId.includes("hero-tabs")) {
+      const tabs = [
+        { tab_label: "Limited Drops, Maximum Impact", heading: "Limited Drops, Maximum Impact", subheading: "We release exclusive, small-batch collections to keep your style fresh and unique—once it's gone, it's gone.", cta_text: "Shop now", image_tag: "Drop #04 — Edition Limited to 300 Pcs" },
+        { tab_label: "Built for the Streets", heading: "Built for the Streets", subheading: "Every piece is designed with the raw energy of city life—graffiti, underground music, and late-night skate sessions.", cta_text: "Explore drop", image_tag: "Heavyweight Urban Cotton" },
+        { tab_label: "Art Meets Attitude", heading: "Art Meets Attitude", subheading: "Bold graphics, oversized silhouettes, and urban edge—our designs are wearable art for the culture.", cta_text: "View art pieces", image_tag: "Screen-Printed Graphic Series" },
+        { tab_label: "Future-Ready Fashion", heading: "Future-Ready Fashion", subheading: "Premium materials meet cutting-edge design. Streetwear that's built to last and made to turn heads.", cta_text: "Discover techwear", image_tag: "Reinforced Stitching Tech" },
+        { tab_label: "Community-Driven Culture", heading: "Community-Driven Culture", subheading: "More than clothing—we're a movement. Join the community of rebels and dreamers shaping the culture.", cta_text: "Join the crew", image_tag: "Global Creator Network" }
+      ];
+      tabs.forEach((tab, idx) => {
+        const bKey = `tab_${idx + 1}`;
+        blocks[bKey] = { type: "tab", settings: tab };
+        block_order.push(bKey);
+      });
+    } else if (lowerId.includes("new-drops")) {
+      settings.eyebrow = settings.eyebrow || "new drops";
+      settings.description = settings.description || "Stand out with our latest collection—bold designs, premium fabrics, and street-ready fits. Once they're gone, they're gone.";
+      settings.show_badge = true;
+      settings.badge_text = "New";
+      const cards = [
+        { title: "Shadow Drip", description: "A sleek, minimalist hoodie with dark tones and subtle reflective accents for an effortless street vibe.", price: "$89", compare_price: "$129" },
+        { title: "Urban Phantom", description: "A bold, oversized hoodie with edgy graphics and a stealthy aesthetic inspired by city nights.", price: "$89", compare_price: "$129" },
+        { title: "Neon Rebellion", description: "A statement piece with vibrant neon details and rebellious street art influences for a standout look.", price: "$89", compare_price: "$129" }
+      ];
+      cards.forEach((card, idx) => {
+        const bKey = `card_${idx + 1}`;
+        blocks[bKey] = { type: "product_card", settings: card };
+        block_order.push(bKey);
+      });
+    } else if (lowerId.includes("marquee")) {
+      settings.heading = settings.heading || "Featured Drops: Stand Out, Stay Ahead";
+      settings.description = settings.description || "Exclusive designs, premium materials, and street-ready vibes—these must-have pieces are setting the trend.";
+      settings.speed = 40;
+      const items = [
+        { title: "Sleek iPhone Case", description: "Durable and slim, the SleekGuard iPhone Case offers stylish protection." },
+        { title: "Spring Jacket", description: "Lightweight and versatile, combines comfort and modern street utility." },
+        { title: "Summer Cap", description: "Stay cool with breathable cotton and custom embroidery." },
+        { title: "White Summer Tee", description: "Lightweight and breathable, keeps you cool and fresh all day long." },
+        { title: "Black Summer Tee", description: "Stay stylish in the CoolCore Black Summer Tee, crafted from 280GSM organic cotton." }
+      ];
+      items.forEach((item, idx) => {
+        const bKey = `item_${idx + 1}`;
+        blocks[bKey] = { type: "item", settings: item };
+        block_order.push(bKey);
+      });
+    } else if (lowerId.includes("trust-grid")) {
+      settings.heading = settings.heading || "Why Shop With Us?";
+      settings.description = settings.description || "We've got you covered with hassle-free shopping, top-tier service, and guarantees that keep you confident.";
+      const trusts = [
+        { icon: "truck", title: "Free Delivery", description: "Get your streetwear fast and free, with no extra shipping costs on all orders worldwide." },
+        { icon: "lock", title: "100% Secure Payment", description: "Shop with confidence using encrypted, safe, and trusted payment methods & fraud shield." },
+        { icon: "rotate", title: "30 Days Return", description: "Not the perfect fit? No worries. Return or exchange hassle-free within 30 days of arrival." },
+        { icon: "support", title: "24/7 Support", description: "Got questions about sizing or orders? Our street team is here for you anytime, anywhere." }
+      ];
+      trusts.forEach((t, idx) => {
+        const bKey = `card_${idx + 1}`;
+        blocks[bKey] = { type: "trust_card", settings: t };
+        block_order.push(bKey);
+      });
+    } else if (lowerId.includes("category-tiles")) {
+      const tiles = [
+        { title: "Women" },
+        { title: "Men" }
+      ];
+      tiles.forEach((t, idx) => {
+        const bKey = `tile_${idx + 1}`;
+        blocks[bKey] = { type: "tile", settings: t };
+        block_order.push(bKey);
+      });
+    } else if (lowerId.includes("brand-story")) {
+      settings.heading = settings.heading || "Built by the Streets, Made for You";
+      settings.body_text = settings.body_text || "From the streets to your style—our journey is all about self-expression and rebellion. Join the movement and wear clothes that tell the story of where you came from and where you are going.";
+      settings.cta_text = settings.cta_text || "Read our story";
+      settings.cta_style = "arrow";
+    } else if (lowerId.includes("manifesto")) {
+      settings.heading = settings.heading || "Streetwear with a Story";
+      settings.subtitle = settings.subtitle || "Wear the Movement, Break the Mold.";
+      settings.body_text = settings.body_text || "Born from the pulse of the streets, our brand is a tribute to the rebels, the dreamers, and the rule-breakers who shape the culture. Inspired by the raw energy of city life—graffiti-covered alleys, underground music scenes, and late-night skate sessions—we craft streetwear that speaks to individuality and self-expression.";
+      settings.cta_text = settings.cta_text || "Get it now";
+    } else if (lowerId.includes("product-spotlight")) {
+      settings.title = settings.title || "Nightfall Oversized Hoodie";
+      settings.description = settings.description || "A heavyweight, ultra-soft hoodie designed for comfort and style. Featuring a relaxed fit, subtle embroidered detailing, and a faded wash for that perfect worn-in look. Street-ready and built to stand out in every crowd.";
+      settings.price = "$89";
+      settings.compare_price = "$129";
+      settings.cta_text = "Shop now";
+    } else if (lowerId.includes("cta-banner")) {
+      settings.heading = settings.heading || "Join the Movement. Wear the Future.";
+      settings.description = settings.description || "Streetwear designed for those who break the mold. Limited drops, bold designs, and premium quality—don't miss out.";
+      settings.cta_text = "Shop now";
+    } else if (lowerId.includes("newsletter")) {
+      settings.heading = settings.heading || "Subscribe to our newsletter now!";
+      settings.description = settings.description || "Get secret drop passwords, early access notifications, and exclusive rebel discounts delivered straight to your inbox.";
+      settings.btn_text = "Subscribe";
+      settings.subtext = "Weekly drop newsletter. Unsubscribe anytime.";
+    }
+  }
+
   // 1. MARQUEE / TICKER (4-6 rotating text badges)
-  if (lowerId.includes("marquee") || lowerId.includes("ticker")) {
+  else if (lowerId.includes("marquee") || lowerId.includes("ticker")) {
+
     settings.speed = settings.speed || 30;
     settings.direction = settings.direction || "left";
     const messages = [
