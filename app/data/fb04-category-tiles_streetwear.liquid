@@ -1,203 +1,62 @@
-{%- comment -%}
-  sections/fb04-category-tiles_streetwear.liquid
-
-  CONVERSION PSYCHOLOGY (Frameblox Landing 04 Replica):
-  1. DUAL GENDER SPLIT -- High-impact 2-column image tile layout for Women & Men collections.
-  2. DARK GRADIENT OVERLAY -- Linear black gradient overlay guarantees high text contrast on imagery.
-  3. CIRCULAR ARROW INDICATOR -- Hover animation slides arrow right, driving visual feedback.
-{%- endcomment -%}
-
-{%- liquid
-  assign section_id = 'fb04-cats-' | append: section.id
--%}
-
+{%- comment -%} sections/fb04-category-tiles_streetwear.liquid {%- endcomment -%}
+{%- liquid assign section_prefix = 'fb04-tiles-' | append: section.id -%}
 <style>
   #shopify-section-{{ section.id }} {
-    --ct-bg: {{ section.settings.bg_color | default: '#FFFFFF' }};
-    --ct-primary: {{ section.settings.primary_color | default: '#0066FF' }};
+    --fb-bg: {{ section.settings.bg_color | default: '#FFFFFF' }};
   }
-
-  .fb04-categories {
-    background: var(--ct-bg);
-    padding: clamp(2rem, 5vw, 4rem) 0;
-  }
-
-  .fb04-categories__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 clamp(1rem, 4vw, 3.75rem);
-  }
-
-  .fb04-categories__grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-
-  .fb04-cat-tile {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 4 / 5;
-    cursor: pointer;
-    display: block;
-    text-decoration: none;
-  }
-
-  .fb04-cat-tile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .fb04-cat-tile:hover img {
-    transform: scale(1.06);
-  }
-
-  .fb04-cat-tile__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.1) 60%, transparent 100%);
-    display: flex;
-    align-items: flex-end;
-    padding: 36px 32px;
-    transition: background 0.3s ease;
-  }
-
-  .fb04-cat-tile:hover .fb04-cat-tile__overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
-  }
-
-  .fb04-cat-tile__title {
-    font-family: 'Big Shoulders Display', var(--font-heading, sans-serif);
-    font-weight: 800;
-    font-size: 36px;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .fb04-cat-tile__arrow {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .fb04-cat-tile:hover .fb04-cat-tile__arrow {
-    background: var(--ct-primary);
-    transform: translateX(6px);
-  }
-
-  @media (max-width: 809px) {
-    .fb04-categories__grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  .fb04-tiles { padding: clamp(2rem, 5vw, 4rem) 0; background: var(--fb-bg); }
+  .fb04-tiles__container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3.75rem); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2rem); }
+  @media (max-width: 650px) { .fb04-tiles__container { grid-template-columns: 1fr; } }
+  .fb04-tile { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; background: #000; text-decoration: none; display: block; box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
+  .fb04-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; opacity: 0.85; }
+  .fb04-tile:hover img { transform: scale(1.05); opacity: 0.95; }
+  .fb04-tile__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%); display: flex; align-items: flex-end; padding: clamp(1.5rem, 3vw, 2.5rem); }
+  .fb04-tile__title { font-family: 'Big Shoulders Display', var(--font-heading, sans-serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0; display: flex; align-items: center; gap: 8px; }
 </style>
-
-<section class="fb04-categories" id="{{ section_id }}">
-  <div class="fb04-categories__container">
-    <div class="fb04-categories__grid">
+<section class="fb04-tiles" id="{{ section_prefix }}">
+  <div class="fb04-tiles__container">
+    {%- if section.blocks.size > 0 -%}
       {%- for block in section.blocks -%}
-        <a href="{{ block.settings.link | default: '#' }}" class="fb04-cat-tile" {{ block.shopify_attributes }}>
+        <a href="{{ block.settings.url | default: '/collections/all' }}" class="fb04-tile" {{ block.shopify_attributes }}>
           {%- if block.settings.image != blank -%}
-            <img
-              src="{{ block.settings.image | image_url: width: 1000 }}"
-              alt="{{ block.settings.title | escape }}"
-              loading="lazy"
-              width="1000"
-              height="1250">
+            <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.title | escape }}" loading="lazy" width="1000" height="560">
           {%- else -%}
-            {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            <img src="{% if forloop.first %}https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80{% else %}https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1000&q=80{% endif %}" alt="Category" loading="lazy" width="1000" height="560">
           {%- endif -%}
-
-          <div class="fb04-cat-tile__overlay">
-            <div class="fb04-cat-tile__title">
-              {{ block.settings.title }}
-              <span class="fb04-cat-tile__arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </span>
-            </div>
+          <div class="fb04-tile__overlay">
+            <h3 class="fb04-tile__title">{{ block.settings.title | default: 'Collection' }} &rarr;</h3>
           </div>
         </a>
       {%- endfor -%}
-    </div>
+    {%- else -%}
+      <a href="/collections/all" class="fb04-tile">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80" alt="Women Collection" loading="lazy" width="1000" height="560">
+        <div class="fb04-tile__overlay"><h3 class="fb04-tile__title">Women &rarr;</h3></div>
+      </a>
+      <a href="/collections/all" class="fb04-tile">
+        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1000&q=80" alt="Men Collection" loading="lazy" width="1000" height="560">
+        <div class="fb04-tile__overlay"><h3 class="fb04-tile__title">Men &rarr;</h3></div>
+      </a>
+    {%- endif -%}
   </div>
 </section>
-
 {% schema %}
 {
   "name": "FB04 Category Tiles",
   "tag": "section",
-  "class": "section-fb04-categories",
-  "settings": [
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "primary_color",
-      "label": "Primary Accent",
-      "default": "#0066FF"
-    }
-  ],
+  "class": "section-fb04-category-tiles",
+  "settings": [],
   "blocks": [
     {
       "type": "tile",
       "name": "Category Tile",
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Tile Image"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Category Title",
-          "default": "Women"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Category Link"
-        }
+        { "type": "text", "id": "title", "label": "Title", "default": "Women" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Image" }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "FB04 Category Tiles",
-      "blocks": [
-        {
-          "type": "tile",
-          "settings": {
-            "title": "Women"
-          }
-        },
-        {
-          "type": "tile",
-          "settings": {
-            "title": "Men"
-          }
-        }
-      ]
-    }
-  ]
+  "presets": [{ "name": "FB04 Category Tiles" }]
 }
 {% endschema %}
