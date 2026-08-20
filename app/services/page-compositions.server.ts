@@ -657,10 +657,14 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
 
   const base = TEMPLATE_FILE[composition.pageType];
   const isIndexPage = composition.pageType === "index";
-  const templateFile = (options.variant && !isIndexPage)
-    ? base.replace(/\.json$/, `.${options.variant}.json`)
-    : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
+
+  // Universal Theme Bridge: Write templates/index.liquid = "{{ content_for_layout }}"
+  // This guarantees that legacy, hybrid, and OS 2.0 themes all render index.json without blank space!
+  if (isIndexPage) {
+    files["templates/index.liquid"] = "{{ content_for_layout }}";
+  }
+
 
   // ── Header Group: Total Clean Replacement (Zero old theme elements) ─────
   if ((!options.variant || isIndexPage) && (composition.header || composition.announcement)) {
@@ -910,9 +914,12 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
   console.log(`[ApplyComposition] File categories:`, fileCats);
   console.log(`[ApplyComposition] Missing components: ${[...new Set(missingFiles)].join(', ') || 'NONE'}`);
-  // Clean up obsolete OS 1.0 .liquid templates so Shopify OS 2.0 JSON templates render 100%
+  // Clean up obsolete OS 1.0 .liquid templates (except index.liquid which acts as universal bridge)
   const obsoleteLiquidTemplate = templateFile.replace(/\.json$/, ".liquid");
-  await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
+  if (obsoleteLiquidTemplate !== "templates/index.liquid") {
+    await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
+  }
+
 
   // Upload to target theme (active or specified draft)
   await upsertThemeFilesBatched(shop, themeId, files);
