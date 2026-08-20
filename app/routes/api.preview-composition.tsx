@@ -8,12 +8,29 @@ let compMapCache: Map<string, string> | null = null;
 
 function getCompMap(): Map<string, string> {
   if (!compMapCache) {
+    compMapCache = new Map();
     try {
       const reg = JSON.parse(fs.readFileSync(regPath, "utf8"));
-      compMapCache = new Map(reg.components.map((c: any) => [c.componentId, c.liquidPath]));
-    } catch {
-      compMapCache = new Map();
+      reg.components.forEach((c: any) => compMapCache!.set(c.componentId, c.liquidPath));
+    } catch {}
+
+    // Auto-scan components directory recursively for bespoke components
+    const compDir = path.resolve(process.cwd(), "app/data/templates/theme-engine/components");
+    function scan(dir: string) {
+      if (!fs.existsSync(dir)) return;
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      for (const item of items) {
+        const full = path.join(dir, item.name);
+        if (item.isDirectory()) {
+          scan(full);
+        } else if (item.isFile() && item.name.endsWith(".liquid")) {
+          const compId = item.name.replace(".liquid", "");
+          const rel = path.relative(path.resolve(process.cwd(), "app/data/templates/theme-engine"), full).replace(/\\/g, "/");
+          compMapCache!.set(compId, rel);
+        }
+      }
     }
+    scan(compDir);
   }
   return compMapCache;
 }
@@ -169,7 +186,7 @@ function renderRealCompositionHTML(comp: PageComposition, isThumbnail: boolean =
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const id = url.searchParams.get("id") || "streetwear-cyber-home";
+  const id = url.searchParams.get("id") || "jewellery-diamond-home";
   const thumb = url.searchParams.get("thumb") === "1";
   const comp = COMPOSITIONS.find(c => c.id === id) || COMPOSITIONS[0];
 

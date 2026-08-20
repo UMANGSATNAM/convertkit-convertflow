@@ -218,7 +218,7 @@ const ARCHETYPE_PALETTES: Record<string, { background: string; text: string; acc
   "beauty-clinical-home": { background: "#f0f9ff", text: "#0f172a", accent: "#0284c7", surface: "#ffffff" },
   "beauty-glamour-home": { background: "#0d0814", text: "#fdf4ff", accent: "#e879f9", surface: "#261138" },
   "jewellery-heritage-home": { background: "#06150e", text: "#fef9c3", accent: "#eab308", surface: "#0e3324" },
-  "jewellery-diamond-home": { background: "#f8fafc", text: "#0f172a", accent: "#0ea5e9", surface: "#ffffff" },
+  "jewellery-diamond-home": { background: "#0f172a", text: "#ffffff", accent: "#d4af37", surface: "#1e293b" },
   "jewellery-silver-home": { background: "#fafaf9", text: "#1c1917", accent: "#78716c", surface: "#ffffff" },
   "tech-audio-home": { background: "#030712", text: "#f9fafb", accent: "#22c55e", surface: "#111827" },
 };
