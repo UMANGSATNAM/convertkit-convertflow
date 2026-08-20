@@ -79,12 +79,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         },
       });
 
+      // Auto-publish draft theme so the live store receives the full OS 2.0 template immediately
+      try {
+        await publishDraft(shop, draft.id);
+      } catch (pubErr: any) {
+        console.warn(`[BuildStore] Auto-publish notice: ${pubErr.message}`);
+      }
+
       const base =
         template.pageType === "cart" ? "/cart"
         : template.pageType === "collection" || template.pageType === "product" ? "/collections/all"
         : "/";
 
-      const directUrl = `https://${shop.shopDomain}${base}?preview_theme_id=${draft.id}`;
+      const directUrl = `https://${shop.shopDomain}${base}`;
 
       return json({
         ok: true,

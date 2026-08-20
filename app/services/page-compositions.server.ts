@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { upsertThemeFilesBatched, readFile } from "./theme-engine/index";
+import { upsertThemeFilesBatched, readFile, deleteAsset } from "./theme-engine/index";
 import { graphqlRequest } from "./shopify-api.server";
 import { buildStorePalette, applyStorePalette } from "./theme-engine/palette.server";
 import { resolveSectionBundle } from "./section-install.server";
@@ -721,7 +721,9 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
   console.log(`[ApplyComposition] File categories:`, fileCats);
   console.log(`[ApplyComposition] Missing components: ${[...new Set(missingFiles)].join(', ') || 'NONE'}`);
-  console.log(`[ApplyComposition] ========================================\n`);
+  // Clean up obsolete OS 1.0 .liquid templates so Shopify OS 2.0 JSON templates render 100%
+  const obsoleteLiquidTemplate = templateFile.replace(/\.json$/, ".liquid");
+  await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
 
   await upsertThemeFilesBatched(shop, themeId, files);
 

@@ -38,6 +38,20 @@ export async function uploadAsset(shop: any, themeId: string, key: string, value
   }, true); // serialize mutations
 }
 
+export async function deleteAsset(shop: any, themeId: string, key: string) {
+  if (process.env.MOCK_SHOPIFY === "true") {
+    console.log(`[Mock Delete Asset] Skipping deletion for ${key}`);
+    return;
+  }
+  const actualThemeId = themeId === "active" ? await getActiveThemeId(shop.shopDomain, shop.accessToken) : themeId;
+  try {
+    await restRequest(shop.shopDomain, shop.accessToken, "DELETE", `themes/${actualThemeId}/assets.json?asset[key]=${encodeURIComponent(key)}`);
+    console.log(`[DeleteAsset] Deleted obsolete template file: ${key} from theme ${actualThemeId}`);
+  } catch (e: any) {
+    console.warn(`[DeleteAsset] Could not delete ${key}: ${e.message}`);
+  }
+}
+
 export async function installTheme(shop: any, themeName: string, sourceUrl: string): Promise<{ themeId: string }> {
   console.log(`Installing blank theme shell: ${themeName}`);
   
