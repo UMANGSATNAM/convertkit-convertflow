@@ -724,8 +724,21 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   // Clean up obsolete OS 1.0 .liquid templates so Shopify OS 2.0 JSON templates render 100%
   const obsoleteLiquidTemplate = templateFile.replace(/\.json$/, ".liquid");
   await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
+  try {
+    await deleteAsset(shop, "active", obsoleteLiquidTemplate);
+  } catch {}
 
+  // Upload to target theme (draft or specified)
   await upsertThemeFilesBatched(shop, themeId, files);
+
+  // Also upload directly to active live theme so main store updates instantly
+  try {
+    if (themeId !== "active") {
+      await upsertThemeFilesBatched(shop, "active", files);
+    }
+  } catch (liveErr: any) {
+    console.warn(`[ApplyComposition] Live theme direct update notice: ${liveErr.message}`);
+  }
 
   return {
     compositionId: composition.id,
