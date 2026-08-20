@@ -299,6 +299,34 @@ export const COMPOSITIONS: PageComposition[] = [
       { componentId: "hp64-video-banner" },
     ],
   },
+  {
+    id: "clothing-streetwear-home",
+    name: "Fear of God / Kith Luxury Heavyweight Streetwear (Home Page 3)",
+    pageType: "index",
+    niche: "clothing",
+    family: "Luxury Streetwear",
+    archetype: "streetwear-cyber-home",
+    styleBadge: "🔥 Dark Obsidian & Electric Orange",
+    accentColor: "#ff5500",
+    description:
+      "10X Fear of God & Kith benchmark: 450GSM French Terry fabric specs matrix, interactive outfit lookbook hotspots, size selector quick-add, and VIP drop access.",
+    announcement: "caratlane-announcement",
+    header: "caratlane-header",
+    footer: "caratlane-footer",
+    sections: [
+      { componentId: "hp-clothing-hero" },
+      { componentId: "hp-clothing-marquee" },
+      { componentId: "hp-clothing-categories" },
+      { componentId: "hp-clothing-bestsellers" },
+      { componentId: "hp-clothing-lookbook" },
+      { componentId: "hp-clothing-fabric-specs" },
+      { componentId: "hp-clothing-bundle" },
+      { componentId: "hp-clothing-trust-badges" },
+      { componentId: "hp-clothing-testimonials" },
+      { componentId: "hp-clothing-faq" },
+      { componentId: "hp-clothing-newsletter" },
+    ],
+  },
 
   // ── 3. JEWELLERY (3 D2C Archetypes) ─────────────────────────────────────
   {
