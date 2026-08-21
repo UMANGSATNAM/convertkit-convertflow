@@ -26,6 +26,8 @@ export interface PageDefinition {
   niche: string;
   /** Top to bottom. */
   sections: string[];
+  /** Sits in the header group, above the header. */
+  announcement?: string;
   /**
    * Section groups are shared by every template in a theme, so these are
    * applied only on a real apply, never on a preview variant — otherwise
@@ -441,12 +443,49 @@ export const PAGES: PageDefinition[] = [
   },
 ];
 
+// ── The designs that already existed ─────────────────────────────────────
+
+import { STORE_PAGE_TEMPLATES } from "../data/page-templates";
+
+/**
+ * Adapts the 51 designs from the old builder into page definitions.
+ *
+ * They are adapted rather than copied so there is one list, not two that drift.
+ * The old screen offered these with a stock photo for a thumbnail and an apply
+ * path that wrote the live home page during preview; the designs themselves are
+ * fine, and every one of them passes `pagekit:check`.
+ *
+ * `pageType` is narrowed here because the old list also carries types PageKit
+ * does not apply, and silently mapping those to "index" would put a cart design
+ * on someone's home page.
+ */
+const ADAPTED: PageDefinition[] = (STORE_PAGE_TEMPLATES as any[])
+  .filter(t => ["index", "product", "collection", "cart"].includes(t?.pageType))
+  .map(t => ({
+    id: t.id,
+    name: t.name,
+    pageType: t.pageType as PageType,
+    niche: t.niche || "General retail",
+    description: t.description || "",
+    sections: (t.sections || []).map((s: any) => s.componentId).filter(Boolean),
+    announcement: t.announcement || undefined,
+    header: t.header || undefined,
+    footer: t.footer || undefined,
+  }))
+  .filter(p => p.sections.length > 0);
+
+/** Hand-authored first, then the adapted ones. Ids are unique across both. */
+export const ALL_PAGES: PageDefinition[] = [
+  ...PAGES,
+  ...ADAPTED.filter(a => !PAGES.some(p => p.id === a.id)),
+];
+
 export function pagesFor(pageType: PageType): PageDefinition[] {
-  return PAGES.filter(p => p.pageType === pageType);
+  return ALL_PAGES.filter(p => p.pageType === pageType);
 }
 
 export function pageById(id: string): PageDefinition | undefined {
-  return PAGES.find(p => p.id === id);
+  return ALL_PAGES.find(p => p.id === id);
 }
 
 /** Tabs, in the order they are shown. Only types that have designs appear. */

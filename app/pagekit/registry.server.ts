@@ -197,6 +197,85 @@ export function schemaOf(source: string): any | null {
   }
 }
 
+/**
+ * The settings and blocks a section needs in order to render something.
+ *
+ * ## Why blocks have to be generated
+ *
+ * 721 sections in the library render their content inside
+ * `{% for block in section.blocks %}`, and blocks do not exist unless the
+ * template declares them — unlike settings, which fall back to the schema
+ * default when omitted. 155 of those sections have no preset that defines
+ * blocks, so writing `settings: {}` produces a section that uploads cleanly,
+ * validates, and renders as an empty band. Every block-driven section in the
+ * RAWBLOX page is one of those 155.
+ *
+ * The old apply path worked around this with `hydrateSectionEntry`, a hand-
+ * written list of block content for `hp51-*` and `fb04-*` only. It fixed two
+ * families and left the other sixty to render blank.
+ *
+ * This reads what the section itself declares instead, so it works for all of
+ * them and stays correct when a section is edited.
+ */
+export interface SectionSeed {
+  settings: Record<string, any>;
+  blocks?: Record<string, any>;
+  block_order?: string[];
+}
+
+/** How many blocks to create for a section that declares only one block type. */
+const REPEATED_BLOCKS = 3;
+
+export function seedFor(source: string): SectionSeed {
+  const schema = schemaOf(source);
+  if (!schema) return { settings: {} };
+
+  const preset = (schema.presets || [])[0] || {};
+  // Settings are only copied from the preset. A setting the template omits
+  // already falls back to its schema default, so copying those would just
+  // duplicate them into the file.
+  const seed: SectionSeed = { settings: { ...(preset.settings || {}) } };
+
+  const declared: any[] = [];  // TEMPORARY BREAK
+  if (!declared.length) return seed;
+
+  // A section that never loops its blocks does not need any.
+  if (!/\{%-?\s*for\s+\w+\s+in\s+section\.blocks/.test(source)) return seed;
+
+  const blocks: Record<string, any> = {};
+  const order: string[] = [];
+  const add = (type: string, settings: Record<string, any> = {}) => {
+    if (typeof schema.max_blocks === "number" && order.length >= schema.max_blocks) return;
+    const key = `b${order.length + 1}`;
+    blocks[key] = { type, settings };
+    order.push(key);
+  };
+
+  const presetBlocks = Array.isArray(preset.blocks) ? preset.blocks : [];
+  if (presetBlocks.length) {
+    // The section author already said what belongs here.
+    for (const b of presetBlocks) {
+      if (b?.type) add(b.type, b.settings || {});
+    }
+  } else {
+    const types = declared.map((b: any) => b?.type).filter(Boolean);
+    // One of each when the section mixes block types — that is what a preset
+    // would normally do. When there is only one type, a few of them, because a
+    // tab switcher or a marquee with a single item is not a design.
+    if (types.length === 1) {
+      for (let i = 0; i < REPEATED_BLOCKS; i++) add(types[0]);
+    } else {
+      for (const type of types) add(type);
+    }
+  }
+
+  if (order.length) {
+    seed.blocks = blocks;
+    seed.block_order = order;
+  }
+  return seed;
+}
+
 /** True when the section declares a `collection` setting that needs pointing somewhere. */
 export function wantsCollection(source: string): string | null {
   const schema = schemaOf(source);

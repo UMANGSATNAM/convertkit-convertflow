@@ -1,7 +1,7 @@
-import { readFile } from "../services/theme-engine/index";
+import { readFile, deleteAsset } from "../services/theme-engine/index";
 import { writeThemeFiles, ThemeWriteError } from "./upload.server";
 import { graphqlRequest } from "../services/shopify-api.server";
-import { resolveSections, bundleFor, wantsCollection } from "./registry.server";
+import { resolveSections, bundleFor, wantsCollection, seedFor } from "./registry.server";
 import type { PageDefinition } from "./pages";
 
 /**
@@ -67,7 +67,7 @@ export async function applyPage(
   page: PageDefinition,
   options: ApplyOptions = {}
 ): Promise<ApplyResult> {
-  const wanted = [...page.sections, page.header, page.footer].filter(Boolean) as string[];
+  const wanted = [...page.sections, page.announcement, page.header, page.footer].filter(Boolean) as string[];
   const resolution = await resolveSections(wanted);
 
   // Refuse rather than write a partial page.
@@ -107,18 +107,27 @@ export async function applyPage(
 
   pageSections.forEach((s, i) => {
     const key = keyFor(i, s.id);
-    const settings: Record<string, any> = {};
+
+    // Blocks and preset settings, read from the section's own schema. Without
+    // this, any section that renders inside `{% for block in section.blocks %}`
+    // comes out as an empty band — it uploads and validates, it just has
+    // nothing to loop over.
+    const seed = seedFor(s.source);
 
     // Point product-showing sections at a real collection. Without this they
     // fall through to their placeholder branch, which is what puts empty cards
     // or invented product names on a freshly applied page.
     const collectionSetting = wantsCollection(s.source);
     if (collectionSetting) {
-      settings[collectionSetting] = handles[collectionsWired % handles.length];
+      seed.settings[collectionSetting] = handles[collectionsWired % handles.length];
       collectionsWired++;
     }
 
-    sections[key] = { type: s.id, settings };
+    sections[key] = {
+      type: s.id,
+      settings: seed.settings,
+      ...(seed.blocks ? { blocks: seed.blocks, block_order: seed.block_order } : {}),
+    };
     order.push(key);
   });
 
@@ -131,20 +140,71 @@ export async function applyPage(
   // preview must not touch them — otherwise previewing one design changes the
   // header for all of them.
   if (!options.variant) {
-    for (const [slot, id] of [["header", page.header], ["footer", page.footer]] as const) {
-      if (!id) continue;
-      const groupFile = `sections/${slot}-group.json`;
-      const group = await readJson(shop, themeId, groupFile);
-      if (!group.sections || typeof group.sections !== "object") group.sections = {};
-      if (!Array.isArray(group.order)) group.order = [];
-      if (!group.type) group.type = slot;
+    const groups: Array<{ file: string; type: string; entries: Array<[string, string]> }> = [
+      {
+        file: "sections/header-group.json",
+        type: "header",
+        // The announcement bar lives in the header group, above the header. Its
+        // order in the array is its order on the page.
+        entries: [
+          ...(page.announcement ? [["announcement", page.announcement] as [string, string]] : []),
+          ...(page.header ? [["header", page.header] as [string, string]] : []),
+        ],
+      },
+      {
+        file: "sections/footer-group.json",
+        type: "footer",
+        entries: page.footer ? [["footer", page.footer] as [string, string]] : [],
+      },
+    ];
 
-      // Replace the existing entry. A store with two headers is not a design.
-      const previous = group.sections[slot]?.settings || {};
-      group.sections[slot] = { type: id, settings: previous };
-      if (!group.order.includes(slot)) group.order.push(slot);
+    for (const group of groups) {
+      if (!group.entries.length) continue;
 
-      files[groupFile] = JSON.stringify(group, null, 2);
+      const doc = await readJson(shop, themeId, group.file);
+      if (!doc.sections || typeof doc.sections !== "object") doc.sections = {};
+      if (!Array.isArray(doc.order)) doc.order = [];
+      if (!doc.type) doc.type = group.type;
+
+      for (const [slot, id] of group.entries) {
+        const seed = seedFor(bySectionId.get(id)?.source || "");
+        // Existing settings win over the seed so a merchant's logo, menu choice
+        // and announcement text survive a design change. Replacing the entry
+        // outright is still right — a store with two headers is not a design.
+        const previous = doc.sections[slot]?.settings || {};
+        doc.sections[slot] = {
+          type: id,
+          settings: { ...seed.settings, ...previous },
+          ...(seed.blocks ? { blocks: seed.blocks, block_order: seed.block_order } : {}),
+        };
+        if (!doc.order.includes(slot)) doc.order.push(slot);
+      }
+
+      // Announcement before header, whatever order they were already in.
+      const rank = (k: string) => (k === "announcement" ? 0 : k === "header" ? 1 : 2);
+      doc.order.sort((a: string, b: string) => rank(a) - rank(b));
+
+      files[group.file] = JSON.stringify(doc, null, 2);
+    }
+  }
+
+  // A Liquid template of the same type shadows the JSON one this writes.
+  //
+  // The older tool wrote `templates/index.liquid` containing
+  // `{{ content_for_layout }}` on every home-page apply and deliberately never
+  // removed it. Any theme it touched still carries that file, and PageKit
+  // writing a correct `templates/index.json` next to it would not necessarily be
+  // what renders. Shopify's guidance is that with a JSON template all markup
+  // belongs in a section the template references — a theme should not hold both.
+  //
+  // Removing it is safe: nothing here or in the current apply path creates one,
+  // and a page's real content lives in the JSON template either way.
+  if (!options.variant) {
+    try {
+      await deleteAsset(shop, themeId, (TEMPLATE_FILE[page.pageType] || TEMPLATE_FILE.index).replace(/\.json$/, ".liquid"));
+    } catch {
+      // Absent is the expected case on a clean theme, and `deleteAsset` treats a
+      // 404 as an error. Nothing to report either way.
     }
   }
 

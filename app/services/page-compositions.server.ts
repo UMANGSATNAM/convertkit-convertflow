@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 import { upsertThemeFilesBatched, readFile, deleteAsset } from "./theme-engine/index";
+import { writeThemeFiles } from "../pagekit/upload.server";
 import { graphqlRequest } from "./shopify-api.server";
 import { buildStorePalette, applyStorePalette } from "./theme-engine/palette.server";
 import { resolveSectionBundle } from "./section-install.server";
@@ -656,22 +657,24 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
 
   const base = TEMPLATE_FILE[composition.pageType];
-  const isIndexPage = composition.pageType === "index";
-  const templateFile = (options.variant && !isIndexPage)
+
+  // A variant is an alternate template, staged so a design can be looked at
+  // without replacing the live page. The index page used to be excluded from
+  // that — `options.variant && !isIndexPage` — so previewing a home page wrote
+  // the real `templates/index.json`. Browsing the grid silently rewrote the
+  // merchant's actual home page, and the last design previewed won, not the one
+  // they applied.
+  const templateFile = options.variant
     ? base.replace(/\.json$/, `.${options.variant}.json`)
     : base;
   files[templateFile] = JSON.stringify({ sections, order }, null, 2);
 
 
-  // Universal Theme Bridge: Write templates/index.liquid = "{{ content_for_layout }}"
-  // This guarantees that legacy, hybrid, and OS 2.0 themes all render index.json without blank space!
-  if (isIndexPage) {
-    files["templates/index.liquid"] = "{{ content_for_layout }}";
-  }
-
-
   // ── Header Group: Total Clean Replacement (Zero old theme elements) ─────
-  if ((!options.variant || isIndexPage) && (composition.header || composition.announcement)) {
+  // Section groups are shared by every template in the theme, so a preview must
+  // never touch them. `|| isIndexPage` meant previewing a home page replaced the
+  // live header and footer too.
+  if (!options.variant && (composition.header || composition.announcement)) {
     const headerGroupSections: Record<string, any> = {};
     const headerGroupOrder: string[] = [];
 
@@ -730,7 +733,9 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
 
   // ── Footer Group: Total Clean Replacement (Zero old theme elements) ─────
-  if ((!options.variant || isIndexPage) && composition.footer) {
+  // Same reason as the header group above: shared across templates, so a
+  // preview leaves it alone.
+  if (!options.variant && composition.footer) {
     const footId = composition.footer;
     const liquidPath = known.get(footId);
     if (liquidPath) {
@@ -918,15 +923,32 @@ function hydrateSectionEntry(componentId: string, composition: PageComposition, 
   }
   console.log(`[ApplyComposition] File categories:`, fileCats);
   console.log(`[ApplyComposition] Missing components: ${[...new Set(missingFiles)].join(', ') || 'NONE'}`);
-  // Clean up obsolete OS 1.0 .liquid templates (except index.liquid which acts as universal bridge)
-  const obsoleteLiquidTemplate = templateFile.replace(/\.json$/, ".liquid");
-  if (obsoleteLiquidTemplate !== "templates/index.liquid") {
-    await deleteAsset(shop, themeId, obsoleteLiquidTemplate);
+  // Clean up obsolete OS 1.0 .liquid templates.
+  //
+  // This used to skip `templates/index.liquid`, and a few lines above it wrote
+  // that file containing `{{ content_for_layout }}`, described as a "universal
+  // bridge". It is not one. `content_for_layout` is what a *layout* uses to
+  // output the rendered template; inside a template it means nothing. And
+  // Shopify's own guidance is that with a JSON template, "any HTML or Liquid
+  // code needs to be included in a section that's referenced by the template" —
+  // a theme is not meant to carry both `index.liquid` and `index.json`.
+  //
+  // So the file is removed rather than written, and the exception that kept it
+  // is gone. A previously applied theme still has it, which is why the delete
+  // runs even when this apply never created one.
+  if (!options.variant) {
+    await deleteAsset(shop, themeId, templateFile.replace(/\.json$/, ".liquid"));
   }
 
 
-  // Upload to target theme (active or specified draft)
-  await upsertThemeFilesBatched(shop, themeId, files);
+  // Upload to target theme (active or specified draft).
+  //
+  // `upsertThemeFilesBatched` prints Shopify's userErrors and then returns
+  // normally, so a rejected template was indistinguishable from an accepted one
+  // — an apply reported success while the page it wrote was never stored. This
+  // writer throws instead, so a refusal reaches the merchant with the file name
+  // and Shopify's reason.
+  await writeThemeFiles(shop, themeId, files);
 
   return {
     compositionId: composition.id,

@@ -46,6 +46,9 @@ function readPages(file, shape) {
   const src = fs.readFileSync(file, "utf-8");
   const pages = [];
 
+  // page-templates.ts is read directly below as the legacy shape. PageKit now
+  // adapts that same list, so validating both files covers every design offered
+  // in the UI without parsing the adapter.
   if (shape === "pagekit") {
     // { id: "...", name: "...", ... sections: ["a", "b"] }
     for (const m of src.matchAll(/id:\s*"([^"]+)"[\s\S]*?name:\s*"([^"]+)"[\s\S]*?sections:\s*\[([\s\S]*?)\]/g)) {
@@ -212,13 +215,64 @@ if (report.length) {
   }
 }
 
+// ── Would any block-driven section render empty? ────────────────────────
+//
+// 721 sections in the library render inside `{% for block in section.blocks %}`
+// and blocks do not exist unless the template declares them — unlike settings,
+// which fall back to their schema default. A section like that with no blocks
+// uploads, validates, and renders as an empty band.
+//
+// `seedFor` generates them from the section's own schema. This runs the real
+// function rather than a copy of its rules, so the check cannot drift from the
+// behaviour it is checking.
+const blankSections = new Map();
+{
+  const ts = require(path.join(ROOT, "node_modules/typescript/lib/typescript.js"));
+  require.extensions[".ts"] = function (mod, filename) {
+    mod._compile(
+      ts.transpileModule(fs.readFileSync(filename, "utf8"), {
+        compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
+        fileName: filename,
+      }).outputText,
+      filename
+    );
+  };
+
+  const { seedFor } = require(path.join(ROOT, "app/pagekit/registry.server.ts"));
+
+  for (const page of pages) {
+    for (const id of [...page.sections, page.header].filter(Boolean)) {
+      const where = resolveOne(registry, id);
+      if (where === "unknown" || where === "no-file") continue;
+
+      const file = where === "authoring"
+        ? path.join(AUTHORING, "sections", `${id}.liquid`)
+        : path.join(ENGINE, registry.get(id));
+      const src = fs.readFileSync(file, "utf-8");
+
+      if (!/\{%-?\s*for\s+\w+\s+in\s+section\.blocks/.test(src)) continue;
+      if ((seedFor(src).block_order || []).length > 0) continue;
+
+      blankSections.set(id, (blankSections.get(id) || 0) + 1);
+    }
+  }
+}
+
+if (blankSections.size) {
+  console.log("");
+  console.log(`  ${blankSections.size} section(s) would render as an empty band:`);
+  for (const [id, n] of [...blankSections].sort((a, b) => b[1] - a[1])) {
+    console.log(`     ${id}  (on ${n} page${n === 1 ? "" : "s"}) — loops section.blocks, and none get created`);
+  }
+}
+
 if (schemaIssues.size) {
   console.log("");
   console.log(`  ${schemaIssues.size} schema problem(s) Shopify will reject at upload:`);
   for (const issue of [...schemaIssues].sort()) console.log(`     ${issue}`);
 }
 
-if (report.length || schemaIssues.size) {
+if (report.length || schemaIssues.size || blankSections.size) {
   console.error(
     "\nFix the above. A section Shopify refuses uploads as a userError, and the " +
     "shared uploader logs those and returns success — which is how a design " +

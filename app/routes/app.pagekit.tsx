@@ -6,7 +6,7 @@ import {
 } from "@shopify/polaris";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
-import { PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
+import { ALL_PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
 import {
   applyToLiveTheme, stagePreview, restoreBackup, liveThemeId,
 } from "../pagekit/apply.server";
@@ -61,7 +61,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   return json({
-    pages: PAGES,
+    pages: ALL_PAGES,
     pageTypes: PAGE_TYPES,
     shopDomain: session.shop,
     connected: Boolean(shop),
