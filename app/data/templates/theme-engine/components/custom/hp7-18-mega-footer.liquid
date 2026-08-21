@@ -184,10 +184,15 @@
             </ul>
           {%- else -%}
             <ul class="hp7-footer__menu">
-              <li class="hp7-footer__menu-item"><a href="#" class="hp7-footer__menu-link">SHOP COLLECTION</a></li>
-              <li class="hp7-footer__menu-item"><a href="#" class="hp7-footer__menu-link">ARCHIVE</a></li>
-              <li class="hp7-footer__menu-item"><a href="#" class="hp7-footer__menu-link">JOURNAL</a></li>
-              <li class="hp7-footer__menu-item"><a href="#" class="hp7-footer__menu-link">ATELIER</a></li>
+              {%- assign cf_menu = section.settings.menu | default: linklists['footer'] -%}
+
+              {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+              {%- for link in cf_menu.links -%}
+
+                <li class="hp7-footer__menu-item"><a href="{{ link.url }}" class="hp7-footer__menu-link">{{ link.title }}</a></li>
+
+              {%- endfor -%}
             </ul>
           {%- endif -%}
         </div>
@@ -266,6 +271,71 @@
       "unit": "px",
       "label": "Padding Top",
       "default": 120
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "info": "Leave empty to use the store's main menu.",
+      "default": "footer"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border colour",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright_note",
+      "label": "Copyright line",
+      "info": "The year and store name are added automatically.",
+      "default": "All rights reserved."
     }
   ],
   "blocks": [
@@ -291,8 +361,18 @@
     {
       "name": "HP7 Brutalist Footer",
       "blocks": [
-        { "type": "menu", "settings": { "title": "COLLECTIONS" } },
-        { "type": "menu", "settings": { "title": "SUPPORT" } }
+        {
+          "type": "menu",
+          "settings": {
+            "title": "COLLECTIONS"
+          }
+        },
+        {
+          "type": "menu",
+          "settings": {
+            "title": "SUPPORT"
+          }
+        }
       ]
     }
   ]

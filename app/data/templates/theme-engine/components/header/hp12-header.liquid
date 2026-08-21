@@ -120,9 +120,15 @@
     {% for link in linklists.main-menu.links limit: 3 %}
       <a href="{{ link.url }}" class="hp12-header-nav-link-{{ section_id }}">{{ link.title }}</a>
     {% else %}
-      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Collection</a>
-      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Objects</a>
-      <a href="#" class="hp12-header-nav-link-{{ section_id }}">Spaces</a>
+      {%- assign cf_menu = section.settings.menu | default: linklists['main-menu'] -%}
+
+      {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+      {%- for link in cf_menu.links -%}
+
+        <a href="{{ link.url }}" class="hp12-header-nav-link-{{ section_id }}">{{ link.title }}</a>
+
+      {%- endfor -%}
     {% endfor %}
   </nav>
   
@@ -160,6 +166,101 @@
       "id": "text_color",
       "label": "Text Color",
       "default": "#333333"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "info": "Leave empty to use the store's main menu.",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border colour",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Falls back to the store name when empty."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 60,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to the top on scroll",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account link",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
     }
   ],
   "presets": [

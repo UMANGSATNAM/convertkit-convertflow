@@ -1,249 +1,12 @@
-{%- comment -%}
-  Search results.
-
-  The previous version was a stub: it listed result titles as bare links, with no
-  image, no price, no pagination and no empty state — and its three settings
-  (`products_per_page`, `enable_filtering`, `enable_sorting`) were declared in the
-  schema but never read, so changing them in the theme editor did nothing.
-
-  Search is where a shopper goes when they already know what they want, so it is
-  the highest-intent page on the store after the product page.
-{%- endcomment -%}
-
-{%- liquid
-  assign per_page = section.settings.products_per_page | default: 16 | at_least: 4 | at_most: 50
-  assign terms = search.terms
--%}
-
-<style>
-  #shopify-section-{{ section.id }} {
-    --srch-pad-top: {{ section.settings.padding_top | default: 40 }}px;
-    --srch-pad-bottom: {{ section.settings.padding_bottom | default: 72 }}px;
-    --srch-cols: {{ section.settings.columns | default: 4 }};
-  }
-  .cf-search {
-    max-width: var(--page-width, 1280px);
-    margin: 0 auto;
-    padding: var(--srch-pad-top) 20px var(--srch-pad-bottom);
-    color: var(--color-text, #1a1a1a);
-  }
-  .cf-search__head { margin-bottom: 28px; }
-  .cf-search__title {
-    font-family: var(--font-heading-family, inherit);
-    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
-    font-weight: 600; margin: 0 0 6px;
-  }
-  .cf-search__count { color: var(--color-text-muted, #64748b); font-size: 0.9375rem; margin: 0; }
-
-  .cf-search__form { display: flex; gap: 8px; margin: 20px 0 0; max-width: 520px; }
-  .cf-search__input {
-    flex: 1; min-height: 46px; padding: 0 14px;
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: var(--button-radius, 6px);
-    background: var(--color-background, #fff); color: inherit; font-size: 0.9375rem;
-  }
-  .cf-search__input:focus-visible { outline: 2px solid var(--color-accent, #1a1a1a); outline-offset: 1px; }
-  .cf-search__submit {
-    min-height: 46px; padding: 0 22px; border: 0; cursor: pointer;
-    border-radius: var(--button-radius, 6px);
-    background: var(--color-accent, #1a1a1a); color: var(--color-button-text, #fff);
-    font-size: 0.9375rem; font-weight: 600;
-  }
-
-  .cf-search__sort { margin-left: auto; }
-  .cf-search__toolbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-  .cf-search__select {
-    min-height: 40px; padding: 0 10px;
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: var(--button-radius, 6px);
-    background: var(--color-background, #fff); color: inherit; font-size: 0.875rem;
-  }
-
-  .cf-search__grid {
-    display: grid;
-    grid-template-columns: repeat(var(--srch-cols), minmax(0, 1fr));
-    gap: 28px 20px;
-    list-style: none; margin: 0; padding: 0;
-  }
-  .cf-search__card { display: flex; flex-direction: column; }
-  .cf-search__media {
-    display: block; aspect-ratio: 3 / 4; overflow: hidden;
-    background: var(--color-surface, #f8fafc);
-    border-radius: var(--card-radius, 8px); margin-bottom: 10px;
-  }
-  .cf-search__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cf-search__name {
-    color: inherit; text-decoration: none;
-    font-size: 0.9375rem; line-height: 1.4; margin-bottom: 4px;
-  }
-  .cf-search__name:hover { color: var(--color-accent, #1a1a1a); }
-  .cf-search__price { font-size: 0.9375rem; font-weight: 600; }
-  .cf-search__was {
-    margin-left: 6px; font-weight: 400;
-    color: var(--color-text-muted, #64748b); text-decoration: line-through;
-  }
-  .cf-search__kind {
-    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--color-text-muted, #64748b); margin-bottom: 4px;
-  }
-
-  .cf-search__empty { padding: 48px 0; max-width: 46ch; }
-  .cf-search__empty p { color: var(--color-text-muted, #64748b); font-size: 1rem; line-height: 1.6; }
-
-  .cf-search__pagination { margin-top: 44px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-  .cf-search__page {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 44px; min-height: 44px; padding: 0 12px;
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: var(--button-radius, 6px);
-    color: inherit; text-decoration: none; font-size: 0.9375rem;
-  }
-  .cf-search__page:hover { border-color: var(--color-accent, #1a1a1a); }
-  .cf-search__page[aria-current="page"] {
-    background: var(--color-accent, #1a1a1a);
-    border-color: var(--color-accent, #1a1a1a);
-    color: var(--color-button-text, #fff); font-weight: 600;
-  }
-
-  @media (max-width: 989px) { #shopify-section-{{ section.id }} { --srch-cols: 3; } }
-  @media (max-width: 749px) {
-    #shopify-section-{{ section.id }} { --srch-cols: 2; }
-    .cf-search { padding: 28px 16px 56px; }
-    .cf-search__grid { gap: 24px 14px; }
-    .cf-search__sort { margin-left: 0; width: 100%; }
-  }
-</style>
-
-<div class="cf-search">
-  <div class="cf-search__head">
-    <h1 class="cf-search__title">
-      {%- if terms != blank -%}
-        {{ 'general.search.results_for' | t: terms: terms, default: 'Results for' }} “{{ terms | escape }}”
-      {%- else -%}
-        {{ 'general.search.title' | t, default: 'Search' }}
-      {%- endif -%}
-    </h1>
-
-    {%- if terms != blank -%}
-      <p class="cf-search__count">
-        {{ search.results_count }} {% if search.results_count == 1 %}result{% else %}results{% endif %}
-      </p>
-    {%- endif -%}
-
-    {%- comment -%}
-      The form is always shown. A shopper who mistyped has no other way to
-      correct it from this page, which is exactly when they leave.
-    {%- endcomment -%}
-    <form action="{{ routes.search_url }}" method="get" role="search" class="cf-search__form">
-      <label class="visually-hidden" for="cf-search-{{ section.id }}">
-        {{ 'general.search.search' | t, default: 'Search' }}
-      </label>
-      <input
-        id="cf-search-{{ section.id }}"
-        class="cf-search__input"
-        type="search"
-        name="q"
-        value="{{ terms | escape }}"
-        placeholder="{{ 'general.search.placeholder' | t, default: 'Search products' }}"
-        autocomplete="off">
-      <button type="submit" class="cf-search__submit">
-        {{ 'general.search.submit' | t, default: 'Search' }}
-      </button>
-    </form>
-  </div>
-
-  {%- if search.performed and search.results_count > 0 -%}
-
-    {%- if section.settings.enable_sorting -%}
-      <div class="cf-search__toolbar">
-        <form method="get" action="{{ routes.search_url }}" class="cf-search__sort">
-          <input type="hidden" name="q" value="{{ terms | escape }}">
-          <label class="visually-hidden" for="cf-sort-{{ section.id }}">Sort by</label>
-          <select id="cf-sort-{{ section.id }}" name="sort_by" class="cf-search__select" onchange="this.form.submit()">
-            {%- assign current = search.sort_by | default: search.default_sort_by -%}
-            {%- for option in search.sort_options -%}
-              <option value="{{ option.value }}"{% if option.value == current %} selected{% endif %}>{{ option.name }}</option>
-            {%- endfor -%}
-          </select>
-          <noscript><button type="submit" class="cf-search__page">Sort</button></noscript>
-        </form>
+<div class="main-search">
+  <h2>Search Results</h2>
+  <div class="search-grid">
+    {% for item in search.results %}
+      <div class="search-item">
+        <a href="{{ item.url }}">{{ item.title }}</a>
       </div>
-    {%- endif -%}
-
-    {%- paginate search.results by per_page -%}
-      <ul class="cf-search__grid" role="list">
-        {%- for item in search.results -%}
-          <li class="cf-search__card">
-            <a href="{{ item.url }}" class="cf-search__media" tabindex="-1" aria-hidden="true">
-              {%- if item.featured_image -%}
-                <img src="{{ item.featured_image | image_url: width: 600 }}"
-                     alt=""
-                     width="{{ item.featured_image.width }}"
-                     height="{{ item.featured_image.height }}"
-                     loading="lazy">
-              {%- elsif item.image -%}
-                <img src="{{ item.image | image_url: width: 600 }}"
-                     alt=""
-                     width="{{ item.image.width }}"
-                     height="{{ item.image.height }}"
-                     loading="lazy">
-              {%- else -%}
-                {{ 'product-1' | placeholder_svg_tag: 'cf-search__placeholder' }}
-              {%- endif -%}
-            </a>
-
-            {%- comment -%}
-              Search returns pages and articles as well as products, and a page
-              result with a price next to it is confusing.
-            {%- endcomment -%}
-            {%- unless item.object_type == 'product' -%}
-              <span class="cf-search__kind">{{ item.object_type }}</span>
-            {%- endunless -%}
-
-            <a href="{{ item.url }}" class="cf-search__name">{{ item.title }}</a>
-
-            {%- if item.object_type == 'product' -%}
-              <span class="cf-search__price">
-                {{ item.price | money }}
-                {%- if item.compare_at_price > item.price -%}
-                  <span class="cf-search__was">{{ item.compare_at_price | money }}</span>
-                {%- endif -%}
-              </span>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
-      </ul>
-
-      {%- if paginate.pages > 1 -%}
-        <nav class="cf-search__pagination" role="navigation" aria-label="Pagination">
-          {%- if paginate.previous -%}
-            <a href="{{ paginate.previous.url }}" class="cf-search__page" rel="prev" aria-label="Previous page">&larr;</a>
-          {%- endif -%}
-          {%- for part in paginate.parts -%}
-            {%- if part.is_link -%}
-              <a href="{{ part.url }}" class="cf-search__page" aria-label="Page {{ part.title }}">{{ part.title }}</a>
-            {%- else -%}
-              <span class="cf-search__page" aria-current="page">{{ part.title }}</span>
-            {%- endif -%}
-          {%- endfor -%}
-          {%- if paginate.next -%}
-            <a href="{{ paginate.next.url }}" class="cf-search__page" rel="next" aria-label="Next page">&rarr;</a>
-          {%- endif -%}
-        </nav>
-      {%- endif -%}
-    {%- endpaginate -%}
-
-  {%- elsif search.performed -%}
-    <div class="cf-search__empty">
-      <p>
-        Nothing matched “{{ terms | escape }}”. Try a shorter word, check the
-        spelling, or browse everything below.
-      </p>
-      <p>
-        <a href="{{ routes.all_products_collection_url }}" class="cf-search__page">Browse all products</a>
-      </p>
-    </div>
-  {%- endif -%}
+    {% endfor %}
+  </div>
 </div>
 
 {% schema %}
@@ -255,30 +18,23 @@
       "type": "range",
       "id": "products_per_page",
       "min": 8,
-      "max": 48,
+      "max": 24,
       "step": 4,
       "default": 16,
-      "label": "Results per page"
+      "label": "Products per page"
     },
     {
-      "type": "range",
-      "id": "columns",
-      "min": 2,
-      "max": 5,
-      "step": 1,
-      "default": 4,
-      "label": "Columns on desktop",
-      "info": "Drops to 3 on tablet and 2 on mobile."
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "default": false,
+      "label": "Enable filtering"
     },
     {
       "type": "checkbox",
       "id": "enable_sorting",
       "default": true,
-      "label": "Let shoppers sort results"
-    },
-    { "type": "header", "content": "Spacing" },
-    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 96, "step": 4, "unit": "px", "default": 40 },
-    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 128, "step": 4, "unit": "px", "default": 72 }
+      "label": "Enable sorting"
+    }
   ]
 }
 {% endschema %}

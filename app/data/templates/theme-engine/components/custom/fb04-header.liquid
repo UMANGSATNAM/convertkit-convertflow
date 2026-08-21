@@ -1,0 +1,232 @@
+{% comment %}
+  FB04 Header — RAWBLOX Streetwear Navigation
+  Sticky top bar with logo, nav links, and mobile hamburger
+{% endcomment %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;400;600;700&family=Host+Grotesk:wght@400;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+  .fb04-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #fff;
+    border-bottom: 1px solid #DBDDE0;
+    padding: 0 60px;
+    transition: box-shadow 0.3s ease;
+  }
+  .fb04-header.scrolled {
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .fb04-header__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .fb04-header__logo {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    text-transform: uppercase;
+    color: #282A2F;
+    text-decoration: none;
+    letter-spacing: 2px;
+  }
+  .fb04-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fb04-header__nav a {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #7B818E;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+  }
+  .fb04-header__nav a:hover {
+    color: #282A2F;
+  }
+  .fb04-header__hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .fb04-header__hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #282A2F;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .fb04-header__hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .fb04-header__hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .fb04-header__hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+  .fb04-header__mobile-menu {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 999;
+    padding: 40px 24px;
+  }
+  .fb04-header__mobile-menu.open {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .fb04-header__mobile-menu a {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    text-transform: uppercase;
+    color: #282A2F;
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 809px) {
+    .fb04-header {
+      padding: 0 24px;
+    }
+    .fb04-header__nav {
+      display: none;
+    }
+    .fb04-header__hamburger {
+      display: flex;
+    }
+  }
+  @media (min-width: 810px) and (max-width: 1199px) {
+    .fb04-header {
+      padding: 0 40px;
+    }
+  }
+</style>
+
+<header class="fb04-header" id="fb04-header">
+  <div class="fb04-header__inner">
+    <a href="{{ section.settings.logo_link | default: '/' }}" class="fb04-header__logo">
+      {{ section.settings.logo_text | default: 'RAWBLOX' }}
+    </a>
+
+    <nav>
+      <ul class="fb04-header__nav">
+        {% for block in section.blocks %}
+          <li>
+            <a href="{{ block.settings.link | default: '#' }}">
+              {{ block.settings.label }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <button class="fb04-header__hamburger" id="fb04-hamburger" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<div class="fb04-header__mobile-menu" id="fb04-mobile-menu">
+  {% for block in section.blocks %}
+    <a href="{{ block.settings.link | default: '#' }}">
+      {{ block.settings.label }}
+    </a>
+  {% endfor %}
+</div>
+
+<script>
+  (function() {
+    var header = document.getElementById('fb04-header');
+    var hamburger = document.getElementById('fb04-hamburger');
+    var mobileMenu = document.getElementById('fb04-mobile-menu');
+
+    window.addEventListener('scroll', function() {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    if (hamburger) {
+      hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('open');
+        document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FB04 Header",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "default": "RAWBLOX"
+    },
+    {
+      "type": "url",
+      "id": "logo_link",
+      "label": "Logo Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Nav Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shop"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FB04 Header",
+      "blocks": [
+        { "type": "nav_link", "settings": { "label": "Shop" } },
+        { "type": "nav_link", "settings": { "label": "Collections" } },
+        { "type": "nav_link", "settings": { "label": "Our Story" } },
+        { "type": "nav_link", "settings": { "label": "Contact" } },
+        { "type": "nav_link", "settings": { "label": "FAQ" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

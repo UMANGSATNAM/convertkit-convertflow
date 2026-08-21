@@ -185,7 +185,7 @@
 
     <a href="/" class="hp19-header-{{ sec_id }}__logo-wrap">
       {% if section.settings.logo != blank %}
-        <img src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name }}" style="height: {{ section.settings.logo_height }}px;">
+        <img height="{{ section.settings.logo.height }}" width="{{ section.settings.logo.width }}" src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name }}" style="height: {{ section.settings.logo_height }}px;">
       {% else %}
         <h1 class="hp19-header-{{ sec_id }}__logo-text">{{ shop.name }}</h1>
       {% endif %}
@@ -216,10 +216,15 @@
         <a href="{{ link.url }}" class="hp19-drawer-{{ sec_id }}__link">{{ link.title }}</a>
       {% endfor %}
     {% else %}
-      <a href="#" class="hp19-drawer-{{ sec_id }}__link">New In</a>
-      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Ready-to-Wear</a>
-      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Accessories</a>
-      <a href="#" class="hp19-drawer-{{ sec_id }}__link">Maison</a>
+      {%- assign cf_menu = section.settings.menu | default: linklists['main-menu'] -%}
+
+      {%- if cf_menu == blank -%}{%- assign cf_menu = linklists['main-menu'] -%}{%- endif -%}
+
+      {%- for link in cf_menu.links -%}
+
+        <a href="{{ link.url }}" class="hp19-drawer-{{ sec_id }}__link">{{ link.title }}</a>
+
+      {%- endfor -%}
     {% endif %}
   </nav>
 </div>
@@ -313,6 +318,88 @@
       "type": "link_list",
       "id": "menu",
       "label": "Drawer Menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border colour",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 60,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to the top on scroll",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account link",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
     }
   ],
   "presets": [

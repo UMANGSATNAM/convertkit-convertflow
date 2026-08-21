@@ -1,0 +1,158 @@
+{% comment %}
+  FB04 Product Spotlight — Single product feature, full-width
+{% endcomment %}
+
+<style>
+  .fb04-spotlight {
+    padding: 100px 60px;
+    background: #F3F4F5;
+  }
+  .fb04-spotlight__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .fb04-spotlight__image {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+  }
+  .fb04-spotlight__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fb04-spotlight__image .placeholder-spot {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #282A2F, #3D4047);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.08);
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+  }
+  .fb04-spotlight__text h2 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: #282A2F;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .fb04-spotlight__text p {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7B818E;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .fb04-spotlight__price {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .fb04-spotlight__price-current {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #282A2F;
+  }
+  .fb04-spotlight__price-original {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #7B818E;
+    text-decoration: line-through;
+  }
+  .fb04-spotlight__btn {
+    display: inline-block;
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 36px;
+    background: #0066FF;
+    color: #fff;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .fb04-spotlight__btn:hover {
+    background: #2E82FF;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 809px) {
+    .fb04-spotlight {
+      padding: 60px 24px;
+    }
+    .fb04-spotlight__inner {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .fb04-spotlight__text h2 {
+      font-size: 28px;
+    }
+  }
+  @media (min-width: 810px) and (max-width: 1199px) {
+    .fb04-spotlight {
+      padding: 80px 40px;
+    }
+    .fb04-spotlight__inner {
+      gap: 40px;
+    }
+  }
+</style>
+
+<section class="fb04-spotlight">
+  <div class="fb04-spotlight__inner">
+    <div class="fb04-spotlight__image">
+      {% if section.settings.image != blank %}
+        <img src="{{ section.settings.image | image_url: width: 900 }}"
+             alt="{{ section.settings.title }}" loading="lazy" width="900" height="1125">
+      {% else %}
+        <div class="placeholder-spot">{{ section.settings.title | default: 'Product' }}</div>
+      {% endif %}
+    </div>
+    <div class="fb04-spotlight__text">
+      <h2>{{ section.settings.title | default: 'Nightfall Oversized Hoodie' }}</h2>
+      <p>{{ section.settings.body | default: "A heavyweight, ultra-soft hoodie designed for comfort and style. Featuring a relaxed fit, subtle embroidered detailing, and a faded wash for that perfect worn-in look. Street-ready and built to stand out." }}</p>
+      <div class="fb04-spotlight__price">
+        <span class="fb04-spotlight__price-current">{{ section.settings.price_current | default: '$89' }}</span>
+        {% if section.settings.price_original != blank %}
+          <span class="fb04-spotlight__price-original">{{ section.settings.price_original }}</span>
+        {% endif %}
+      </div>
+      <a href="{{ section.settings.cta_link | default: '#' }}" class="fb04-spotlight__btn">
+        {{ section.settings.cta_text | default: 'Shop now' }}
+      </a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FB04 Product Spotlight",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Product Image" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Nightfall Oversized Hoodie" },
+    { "type": "textarea", "id": "body", "label": "Description", "default": "A heavyweight, ultra-soft hoodie designed for comfort and style. Featuring a relaxed fit, subtle embroidered detailing, and a faded wash for that perfect worn-in look. Street-ready and built to stand out." },
+    { "type": "text", "id": "price_current", "label": "Current Price", "default": "$89" },
+    { "type": "text", "id": "price_original", "label": "Original Price", "default": "$129" },
+    { "type": "text", "id": "cta_text", "label": "CTA Text", "default": "Shop now" },
+    { "type": "url", "id": "cta_link", "label": "CTA Link" }
+  ],
+  "presets": [{ "name": "FB04 Product Spotlight" }]
+}
+{% endschema %}

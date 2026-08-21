@@ -1,0 +1,270 @@
+{%- comment -%}
+  sections/fb04-product-spotlight_streetwear.liquid
+
+  CONVERSION PSYCHOLOGY (Frameblox Landing 04 Replica):
+  1. SINGLE-PRODUCT FOCUS -- Eliminates choice overload by isolating a flagship hero product.
+  2. PRICE ANCHORING -- Current price ($89) next to strike-through original price ($129) anchors value perception.
+  3. F-PATTERN READABILITY -- Image left, headline + price + CTA right aligns with natural scanning behavior.
+  4. SOFT BACKGROUND TINT -- #F3F4F5 gray background creates a subtle break from pure white sections.
+{%- endcomment -%}
+
+{%- liquid
+  assign section_id = 'fb04-spotlight-' | append: section.id
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --ps-bg: {{ section.settings.bg_color | default: '#F3F4F5' }};
+    --ps-text-dark: {{ section.settings.text_dark | default: '#282A2F' }};
+    --ps-text-body: {{ section.settings.text_body | default: '#7B818E' }};
+    --ps-accent: {{ section.settings.primary_color | default: '#0066FF' }};
+    --ps-accent-hover: {{ section.settings.primary_hover | default: '#2E82FF' }};
+  }
+
+  .fb04-spotlight {
+    background: var(--ps-bg);
+    padding: clamp(3.5rem, 7vw, 5.6rem) 0;
+  }
+
+  .fb04-spotlight__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 3.75rem);
+  }
+
+  .fb04-spotlight__grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .fb04-spotlight__media {
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 4.8;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+    background: #e6e8eb;
+  }
+
+  .fb04-spotlight__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fb04-spotlight__info h2 {
+    font-family: 'Big Shoulders Display', var(--font-heading, sans-serif);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--ps-text-dark);
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .fb04-spotlight__info p {
+    font-family: var(--font-body, sans-serif);
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--ps-text-body);
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+
+  .fb04-spotlight__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .fb04-spotlight__price-curr {
+    font-family: var(--font-body, sans-serif);
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--ps-text-dark);
+  }
+
+  .fb04-spotlight__price-orig {
+    font-family: var(--font-body, sans-serif);
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--ps-text-body);
+    text-decoration: line-through;
+  }
+
+  .fb04-spotlight__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body, sans-serif);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 14px 36px;
+    background: var(--ps-accent);
+    color: #fff;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 102, 255, 0.25);
+  }
+
+  .fb04-spotlight__btn:hover {
+    background: var(--ps-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.35);
+  }
+
+  @media (max-width: 809px) {
+    .fb04-spotlight__grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+  }
+</style>
+
+<section class="fb04-spotlight" id="{{ section_id }}">
+  <div class="fb04-spotlight__container">
+    <div class="fb04-spotlight__grid">
+      
+      <div class="fb04-spotlight__media">
+        {%- if section.settings.image != blank -%}
+          <img
+            src="{{ section.settings.image | image_url: width: 1000 }}"
+            alt="{{ section.settings.title | escape }}"
+            loading="lazy"
+            width="1000"
+            height="1200">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+
+      <div class="fb04-spotlight__info">
+        {%- if section.settings.title != blank -%}
+          <h2>{{ section.settings.title }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.description != blank -%}
+          <p>{{ section.settings.description }}</p>
+        {%- endif -%}
+
+        <div class="fb04-spotlight__pricing">
+          <span class="fb04-spotlight__price-curr">{{ section.settings.price | default: '$89' }}</span>
+          {%- if section.settings.compare_price != blank -%}
+            <span class="fb04-spotlight__price-orig">{{ section.settings.compare_price }}</span>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.cta_text != blank -%}
+          <a href="{{ section.settings.cta_url | default: '#' }}" class="fb04-spotlight__btn">
+            {{ section.settings.cta_text }}
+          </a>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FB04 Spotlight",
+  "tag": "section",
+  "class": "section-fb04-spotlight",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Product Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Product Title",
+      "default": "Nightfall Oversized Hoodie"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "A heavyweight, ultra-soft hoodie designed for comfort and style. Featuring a relaxed fit, subtle embroidered detailing, and a faded wash for that perfect worn-in look."
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Current Price",
+      "default": "$89"
+    },
+    {
+      "type": "text",
+      "id": "compare_price",
+      "label": "Compare Price",
+      "default": "$129"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button Text",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#F3F4F5"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary Color",
+      "default": "#0066FF"
+    },
+    {
+      "type": "color",
+      "id": "primary_hover",
+      "label": "Primary Hover",
+      "default": "#2E82FF"
+    },
+    {
+      "type": "color",
+      "id": "text_dark",
+      "label": "Heading Color",
+      "default": "#282A2F"
+    },
+    {
+      "type": "color",
+      "id": "text_body",
+      "label": "Body Color",
+      "default": "#7B818E"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FB04 Spotlight (Streetwear)",
+      "settings": {
+        "title": "Nightfall Oversized Hoodie",
+        "description": "A heavyweight, ultra-soft hoodie designed for comfort and style. Featuring a relaxed fit, subtle embroidered detailing, and a faded wash for that perfect worn-in look. Street-ready and built to stand out in every crowd.",
+        "price": "$89",
+        "compare_price": "$129",
+        "cta_text": "Shop now"
+      }
+    }
+  ]
+}
+{% endschema %}
