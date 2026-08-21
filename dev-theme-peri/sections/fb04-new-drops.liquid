@@ -1,0 +1,218 @@
+{% comment %}
+  FB04 New Drops — 3-column product cards with "New" gold badges
+{% endcomment %}
+
+<style>
+  .fb04-drops {
+    padding: 100px 60px;
+    background: #fff;
+  }
+  .fb04-drops__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .fb04-drops__label {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #7B818E;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .fb04-drops__desc {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7B818E;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+  .fb04-drops__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .fb04-drops__card {
+    background: #F3F4F5;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .fb04-drops__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .fb04-drops__card-img {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+  }
+  .fb04-drops__card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .fb04-drops__card:hover .fb04-drops__card-img img {
+    transform: scale(1.05);
+  }
+  .fb04-drops__card-img .placeholder-card {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #282A2F 0%, #3D4047 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.12);
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+  }
+  .fb04-drops__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #ED9A1C;
+    color: #fff;
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 100px;
+  }
+  .fb04-drops__card-body {
+    padding: 20px 24px 24px;
+  }
+  .fb04-drops__card-title {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #282A2F;
+    margin-bottom: 8px;
+  }
+  .fb04-drops__card-desc {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7B818E;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .fb04-drops__card-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fb04-drops__price-current {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #282A2F;
+  }
+  .fb04-drops__price-original {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7B818E;
+    text-decoration: line-through;
+  }
+
+  @media (max-width: 809px) {
+    .fb04-drops {
+      padding: 60px 24px;
+    }
+    .fb04-drops__grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+  @media (min-width: 810px) and (max-width: 1199px) {
+    .fb04-drops {
+      padding: 80px 40px;
+    }
+    .fb04-drops__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<section class="fb04-drops">
+  <div class="fb04-drops__inner">
+    <p class="fb04-drops__label">{{ section.settings.label | default: 'new drops' }}</p>
+    <p class="fb04-drops__desc">{{ section.settings.description | default: "Stand out with our latest collection—bold designs, premium fabrics, and street-ready fits. Once they're gone, they're gone. Don't miss out!" }}</p>
+
+    <div class="fb04-drops__grid">
+      {% for block in section.blocks %}
+        <div class="fb04-drops__card" {{ block.shopify_attributes }}>
+          <div class="fb04-drops__card-img">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | image_url: width: 600 }}"
+                   alt="{{ block.settings.title }}"
+                   loading="lazy" width="600" height="750">
+            {% else %}
+              <div class="placeholder-card">{{ block.settings.title | default: 'Product' }}</div>
+            {% endif %}
+            {% if block.settings.badge != blank %}
+              <span class="fb04-drops__badge">{{ block.settings.badge }}</span>
+            {% endif %}
+          </div>
+          <div class="fb04-drops__card-body">
+            <h3 class="fb04-drops__card-title">{{ block.settings.title }}</h3>
+            <p class="fb04-drops__card-desc">{{ block.settings.description }}</p>
+            <div class="fb04-drops__card-price">
+              <span class="fb04-drops__price-current">{{ block.settings.price_current | default: '$89' }}</span>
+              {% if block.settings.price_original != blank %}
+                <span class="fb04-drops__price-original">{{ block.settings.price_original }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FB04 New Drops",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Section Label", "default": "new drops" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Stand out with our latest collection—bold designs, premium fabrics, and street-ready fits. Once they're gone, they're gone. Don't miss out!" }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Product Image" },
+        { "type": "text", "id": "badge", "label": "Badge Text", "default": "New" },
+        { "type": "text", "id": "title", "label": "Product Title", "default": "Shadow Drip" },
+        { "type": "textarea", "id": "description", "label": "Product Description", "default": "A sleek, minimalist hoodie with dark tones and subtle reflective accents for an effortless street vibe." },
+        { "type": "text", "id": "price_current", "label": "Current Price", "default": "$89" },
+        { "type": "text", "id": "price_original", "label": "Original Price", "default": "$129" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FB04 New Drops",
+      "blocks": [
+        { "type": "product_card", "settings": { "badge": "New", "title": "Shadow Drip", "description": "A sleek, minimalist hoodie with dark tones and subtle reflective accents for an effortless street vibe.", "price_current": "$89", "price_original": "$129" } },
+        { "type": "product_card", "settings": { "badge": "New", "title": "Urban Phantom", "description": "A bold, oversized hoodie with edgy graphics and a stealthy aesthetic inspired by city nights.", "price_current": "$89", "price_original": "$129" } },
+        { "type": "product_card", "settings": { "badge": "New", "title": "Neon Rebellion", "description": "A statement piece with vibrant neon details and rebellious street art influences for a standout look.", "price_current": "$89", "price_original": "$129" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,175 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --hp51-bs-bg: {{ section.settings.bg_color | default: '#F2EFE9' }};
+    --hp51-matcha: {{ section.settings.accent_matcha | default: '#2D5A3D' }};
+    
+    background-color: var(--hp51-bs-bg);
+    padding-top: {{ section.settings.padding_top | default: 90 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 90 }}px;
+  }
+
+  .hp51-bs__wrap {
+    max-width: {{ section.settings.container_width | default: 1280 }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .hp51-bs__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px;
+  }
+
+  .hp51-bs__heading {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(32px, 4.5vw, 44px);
+    font-weight: 700;
+    color: #1E3A2B;
+    margin: 0 0 8px;
+  }
+
+  .hp51-bs__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop | default: 3 }}, 1fr);
+    gap: 24px;
+  }
+
+  .hp51-bs__card {
+    background: #FAF8F5;
+    border: 1px solid rgba(30, 58, 43, 0.12);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(30, 58, 43, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .hp51-bs__card:hover {
+    border-color: var(--hp51-matcha);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(30, 58, 43, 0.1);
+  }
+
+  .hp51-bs__img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .hp51-bs__title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1E3A2B;
+    margin: 0 0 8px;
+  }
+
+  .hp51-bs__price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hp51-matcha);
+    margin-bottom: 18px;
+  }
+
+  .hp51-bs__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 13px;
+    background: #1E3A2B;
+    color: #FAF8F5;
+    border: none;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .hp51-bs__btn:hover { background: var(--hp51-matcha); }
+
+  @media screen and (max-width: 992px) {
+    .hp51-bs__grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  }
+{%- endstyle -%}
+
+<div class="hp51-bs__wrap">
+  <div class="hp51-bs__header">
+    <h2 class="hp51-bs__heading">{{ section.settings.heading | default: 'Our Most Coveted Zen Rituals' }}</h2>
+    <p style="font-size:14px; color:#4A5B50;">{{ section.settings.subheading | default: 'Beloved for calming redness and infusing deep botanical radiance.' }}</p>
+  </div>
+
+  <div class="hp51-bs__grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hp51-bs__card" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img height="{{ block.settings.image.height }}" width="{{ block.settings.image.width }}" src="{{ block.settings.image | image_url: width: 600 }}" class="hp51-bs__img" alt="{{ block.settings.title }}" loading="lazy">
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'hp51-bs__img' }}
+          {%- endif -%}
+          <h3 class="hp51-bs__title">{{ block.settings.title }}</h3>
+          <div class="hp51-bs__price">{{ block.settings.price | default: '$62.00 USD' }}</div>
+          <button class="hp51-bs__btn">{{ block.settings.btn_text | default: 'Acquire Ritual' }}</button>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hp51-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp51-bs__img' }}
+        <h3 class="hp51-bs__title">Ceremonial Matcha Antioxidant Serum</h3>
+        <div class="hp51-bs__price">$62.00 USD</div>
+        <button class="hp51-bs__btn">Acquire Ritual</button>
+      </div>
+      <div class="hp51-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp51-bs__img' }}
+        <h3 class="hp51-bs__title">Kyoto Bamboo Sap Essence</h3>
+        <div class="hp51-bs__price">$48.00 USD</div>
+        <button class="hp51-bs__btn">Acquire Ritual</button>
+      </div>
+      <div class="hp51-bs__card">
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'hp51-bs__img' }}
+        <h3 class="hp51-bs__title">Zen Matcha Silk Moisture Crème</h3>
+        <div class="hp51-bs__price">$68.00 USD</div>
+        <button class="hp51-bs__btn">Acquire Ritual</button>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "HP51 - Zen Best",
+  "class": "section-hp51-bestsellers",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F2EFE9" },
+    { "type": "color", "id": "accent_matcha", "label": "Matcha Accent", "default": "#2D5A3D" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Most Coveted Zen Rituals" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Beloved for calming redness and infusing deep botanical radiance." },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 4, "step": 1, "label": "Desktop Columns", "default": 3 },
+    { "type": "range", "id": "padding_top", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Top", "default": 90 },
+    { "type": "range", "id": "padding_bottom", "min": 20, "max": 140, "step": 10, "unit": "px", "label": "Padding Bottom", "default": 90 },
+    { "type": "range", "id": "container_width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "label": "Container Width", "default": 1280 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Ceremonial Matcha Antioxidant Serum" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$62.00 USD" },
+        { "type": "text", "id": "btn_text", "label": "Button Text", "default": "Acquire Ritual" },
+        { "type": "url", "id": "url", "label": "Link URL" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "HP51 - Zen Best" }
+  ]
+}
+{% endschema %}

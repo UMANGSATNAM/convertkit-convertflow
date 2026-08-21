@@ -1,0 +1,187 @@
+{% comment %}
+  FB04 Featured Marquee — Infinite auto-scrolling product carousel
+{% endcomment %}
+
+<style>
+  .fb04-marquee-section {
+    padding: 100px 60px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .fb04-marquee-section__inner {
+    max-width: 1200px;
+    margin: 0 auto 48px;
+  }
+  .fb04-marquee-section__heading {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    color: #282A2F;
+    margin-bottom: 12px;
+  }
+  .fb04-marquee-section__desc {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7B818E;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .fb04-marquee__track-wrapper {
+    overflow: hidden;
+    width: 100%;
+  }
+  .fb04-marquee__track {
+    display: flex;
+    gap: 24px;
+    animation: fb04MarqueeScroll 35s linear infinite;
+    width: max-content;
+  }
+  .fb04-marquee__track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes fb04MarqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.333%); }
+  }
+  .fb04-marquee__card {
+    flex-shrink: 0;
+    width: 280px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .fb04-marquee__card:hover {
+    transform: scale(1.03);
+  }
+  .fb04-marquee__card-img {
+    width: 280px;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: #F3F4F5;
+  }
+  .fb04-marquee__card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fb04-marquee__card-img .placeholder-mq {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #282A2F, #3D4047);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.1);
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  .fb04-marquee__card-title {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #282A2F;
+    margin-bottom: 6px;
+  }
+  .fb04-marquee__card-desc {
+    font-family: 'Host Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7B818E;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (max-width: 809px) {
+    .fb04-marquee-section {
+      padding: 60px 24px;
+    }
+    .fb04-marquee-section__heading {
+      font-size: 28px;
+    }
+    .fb04-marquee__card {
+      width: 220px;
+    }
+    .fb04-marquee__card-img {
+      width: 220px;
+      height: 220px;
+    }
+  }
+  @media (min-width: 810px) and (max-width: 1199px) {
+    .fb04-marquee-section {
+      padding: 80px 40px;
+    }
+    .fb04-marquee-section__heading {
+      font-size: 36px;
+    }
+  }
+</style>
+
+<section class="fb04-marquee-section">
+  <div class="fb04-marquee-section__inner">
+    <h2 class="fb04-marquee-section__heading">{{ section.settings.heading | default: 'Featured Drops: Stand Out, Stay Ahead' }}</h2>
+    <p class="fb04-marquee-section__desc">{{ section.settings.description | default: "Exclusive designs, premium materials, and street-ready vibes—these must-have pieces are setting the trend. Get yours before they're gone!" }}</p>
+  </div>
+
+  <div class="fb04-marquee__track-wrapper">
+    <div class="fb04-marquee__track">
+      {% comment %} Repeat 3x for seamless infinite loop {% endcomment %}
+      {% for repeat in (1..3) %}
+        {% for block in section.blocks %}
+          <div class="fb04-marquee__card" {{ block.shopify_attributes }}>
+            <div class="fb04-marquee__card-img">
+              {% if block.settings.image != blank %}
+                <img src="{{ block.settings.image | image_url: width: 560 }}"
+                     alt="{{ block.settings.title }}" loading="lazy" width="280" height="280">
+              {% else %}
+                <div class="placeholder-mq">{{ block.settings.title | default: 'Product' }}</div>
+              {% endif %}
+            </div>
+            <p class="fb04-marquee__card-title">{{ block.settings.title }}</p>
+            <p class="fb04-marquee__card-desc">{{ block.settings.description }}</p>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FB04 Featured Marquee",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Featured Drops: Stand Out, Stay Ahead" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Exclusive designs, premium materials, and street-ready vibes—these must-have pieces are setting the trend. Get yours before they're gone!" }
+  ],
+  "blocks": [
+    {
+      "type": "marquee_card",
+      "name": "Product Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Sleek iPhone Case" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Durable and slim, the SleekGuard iPhone Case offers stylish protection against drops and scratches." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FB04 Featured Marquee",
+      "blocks": [
+        { "type": "marquee_card", "settings": { "title": "Sleek iPhone Case", "description": "Durable and slim, the SleekGuard iPhone Case offers stylish protection against drops and scratches." } },
+        { "type": "marquee_card", "settings": { "title": "Spring Jacket", "description": "Lightweight and versatile, the BreezeLite Spring Jacket combines comfort and style." } },
+        { "type": "marquee_card", "settings": { "title": "Summer Cap", "description": "Stay cool and protected with the SunShade Summer Cap, featuring breathable fabric and UV protection." } },
+        { "type": "marquee_card", "settings": { "title": "White Summer Tee", "description": "Lightweight and breathable, the BreezeFit White Summer Tee keeps you cool and fresh all summer long." } },
+        { "type": "marquee_card", "settings": { "title": "Black Summer Tee", "description": "Stay stylish and comfortable in the CoolCore Black Summer Tee, crafted from breathable fabric." } }
+      ]
+    }
+  ]
+}
+{% endschema %}
