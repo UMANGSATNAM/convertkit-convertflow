@@ -186,9 +186,12 @@ export default function Home() {
               </Text>
             </BlockStack>
             <Box>
-              <Link to="/app/build-store" style={{ textDecoration: "none" }}>
-                <Button variant="primary" size="large">Build your store</Button>
-              </Link>
+              {/* Polaris renders its own anchor from `url`. Wrapping a Button in
+                  a Link nests a <button> inside an <a>, which browsers reparent
+                  — the click landed on nothing and the tab never opened. */}
+              <Button url="/app/pagekit" variant="primary" size="large">
+                Build your store
+              </Button>
             </Box>
           </BlockStack>
         </Card>

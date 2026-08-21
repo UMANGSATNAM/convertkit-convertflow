@@ -1,0 +1,457 @@
+/**
+ * The page catalogue.
+ *
+ * One object per design. `sections` is the page top to bottom. Every id is
+ * resolved before anything is written — first from the engine registry, then
+ * from `dev-theme-peri/sections`, so a section authored a minute ago works
+ * without a sync step. `npm run pagekit:check` runs the same resolution over
+ * every page here and fails the build if any id resolves nowhere.
+ *
+ * That check is the point. `hp-v1-home` listed nine sections that existed in no
+ * registry, applied "successfully", and rendered as a header and a footer with
+ * nothing between them — no error on screen, none in the log.
+ *
+ * Adding a design means adding an object here. Nothing else.
+ */
+
+export type PageType = "index" | "product" | "collection" | "cart";
+
+export interface PageDefinition {
+  id: string;
+  name: string;
+  pageType: PageType;
+  /** One line a merchant can judge it by before applying. */
+  description: string;
+  /** What it was designed for, shown as a tag. */
+  niche: string;
+  /** Top to bottom. */
+  sections: string[];
+  /**
+   * Section groups are shared by every template in a theme, so these are
+   * applied only on a real apply, never on a preview variant — otherwise
+   * previewing one design would change the header on all of them.
+   */
+  header?: string;
+  footer?: string;
+}
+
+export const PAGES: PageDefinition[] = [
+  // ── Home ───────────────────────────────────────────────────────────────
+  {
+    id: "peri-beauty",
+    name: "Peri Beauty",
+    pageType: "index",
+    niche: "Beauty & skincare",
+    description:
+      "Soft hero, ingredient story, then bestsellers and reviews. Built for skincare and cosmetics.",
+    header: "header-natural-v1",
+    footer: "footer-natural-v1",
+    sections: [
+      "hp1-marquee",
+      "hp1-hero",
+      "hp1-usp",
+      "hp1-category-tiles",
+      "hp1-featured-collection",
+      "hp1-founder-note",
+      "hp1-brand-story",
+      "hp1-bestsellers",
+      "hp1-offer-banner",
+      "hp1-testimonials",
+      "hp1-ugc-reels",
+      "hp1-press-logos",
+      "hp1-faq",
+      "hp1-newsletter",
+    ],
+  },
+  {
+    id: "rawblox-streetwear",
+    name: "RAWBLOX — Urban Drop",
+    pageType: "index",
+    niche: "Streetwear",
+    description:
+      "Tabbed hero into a drop grid, manifesto, then proof. Built for streetwear releases.",
+    header: "hp51-header",
+    footer: "hp51-footer",
+    sections: [
+      "hp51-marquee",
+      "hp51-hero-tabs",
+      "hp51-new-drops",
+      "hp51-category-tiles",
+      "hp51-brand-story",
+      "hp51-product-spotlight",
+      "hp51-manifesto",
+      "hp51-trust-grid",
+      "hp51-cta-banner",
+      "hp51-newsletter",
+    ],
+  },
+  {
+    id: "d2c-archetype",
+    name: "D2C Archetype",
+    pageType: "index",
+    niche: "Direct to consumer",
+    description:
+      "The full conversion stack: proof above the fold, two product bands, comparison, reviews, FAQ.",
+    header: "header-bold-v1",
+    footer: "footer-bold-v1",
+    sections: [
+      "hp50-marquee",
+      "hp50-hero",
+      "hp50-press-logos",
+      "hp50-category-pills",
+      "hp50-usp",
+      "hp50-featured-collection",
+      "hp50-brand-story",
+      "hp50-bestsellers",
+      "hp50-offer-banner",
+      "hp50-comparison-table",
+      "hp50-testimonials",
+      "hp50-ugc-reels",
+      "hp50-faq",
+      "hp50-newsletter",
+    ],
+  },
+  {
+    id: "atelier-luxury",
+    name: "Atelier",
+    pageType: "index",
+    niche: "Luxury & fashion",
+    description:
+      "Editorial and unhurried. Announcement, marquee, hero, categories, story, reviews, signup.",
+    header: "hp19-header",
+    footer: "footer-luxury-mega-v1",
+    sections: [
+      "hp19-announcement-bar",
+      "hp19-marquee",
+      "hp19-hero",
+      "hp19-usp",
+      "hp19-category-tiles",
+      "hp19-featured-collection",
+      "hp19-offer-banner",
+      "hp19-brand-story",
+      "hp19-bestsellers",
+      "hp19-founder-note",
+      "hp19-instagram",
+      "hp19-testimonials",
+      "hp19-press-logos",
+      "hp19-faq",
+      "hp19-newsletter",
+    ],
+  },
+  {
+    id: "caratlane-jewellery",
+    name: "Carat — Fine Jewellery",
+    pageType: "index",
+    niche: "Jewellery",
+    description:
+      "Gift finder, solitaire feature and try-at-home. Built around considered, high-value purchases.",
+    header: "caratlane-header",
+    footer: "caratlane-footer",
+    sections: [
+      "caratlane-announcement",
+      "caratlane-marquee",
+      "caratlane-hero",
+      "caratlane-categories",
+      "caratlane-featured-solitaire",
+      "caratlane-bestsellers-tabs",
+      "caratlane-gift-finder",
+      "caratlane-try-at-home",
+      "caratlane-trust-badges",
+      "caratlane-reviews",
+      "caratlane-reels",
+      "caratlane-faq",
+      "caratlane-newsletter",
+    ],
+  },
+  {
+    id: "editorial-brutalist",
+    name: "Editorial Brutalist",
+    pageType: "index",
+    niche: "Design-led brands",
+    description:
+      "Type-first and deliberately loud. Parallax, mosaic, lookbook and a stats counter.",
+    header: "hp7-header",
+    footer: "hp7-18-mega-footer",
+    sections: [
+      "hp7-01-announcement-bar",
+      "hp7-02-hero-editorial",
+      "hp7-03-marquee-brutalist",
+      "hp7-04-editorial-columns",
+      "hp7-05-product-spotlight",
+      "hp7-06-parallax-image",
+      "hp7-07-collection-mosaic",
+      "hp7-09-shoppable-lookbook",
+      "hp7-10-stats-counter",
+      "hp7-08-testimonial-cards",
+      "hp7-12-logo-ticker",
+      "hp7-15-instagram-grid",
+      "hp7-13-faq-accordion",
+      "hp7-16-newsletter-editorial",
+    ],
+  },
+  {
+    id: "bento-modern",
+    name: "Bento Modern",
+    pageType: "index",
+    niche: "Lifestyle & homeware",
+    description:
+      "A bento tile grid does the merchandising, with video and social proof underneath.",
+    header: "hp8-header",
+    footer: "hp8-footer",
+    sections: [
+      "hp8-announcement-bar",
+      "hp8-hero",
+      "hp8-marquee",
+      "hp8-bento-tiles",
+      "hp8-usp",
+      "hp8-featured-products",
+      "hp8-video-section",
+      "hp8-brand-story",
+      "hp8-bestsellers",
+      "hp8-offer-banner",
+      "hp8-testimonials",
+      "hp8-instagram",
+      "hp8-press-logos",
+      "hp8-faq",
+    ],
+  },
+  {
+    id: "tech-flagship",
+    name: "Tech Flagship",
+    pageType: "index",
+    niche: "Electronics & gadgets",
+    description:
+      "Spec-led. Image banner, comparison table, blog and a contact form for pre-sales questions.",
+    header: "hp9-header",
+    footer: "hp9-footer",
+    sections: [
+      "hp9-announcement-bar",
+      "hp9-hero",
+      "hp9-scrolling-text",
+      "hp9-usp",
+      "hp9-featured-products",
+      "hp9-image-banner",
+      "hp9-image-with-text",
+      "hp9-comparison-table",
+      "hp9-video",
+      "hp9-bestsellers",
+      "hp9-testimonials",
+      "hp9-press-logos",
+      "hp9-featured-blog",
+      "hp9-faq",
+      "hp9-newsletter",
+    ],
+  },
+  {
+    id: "lookbook-lifestyle",
+    name: "Lookbook",
+    pageType: "index",
+    niche: "Apparel",
+    description:
+      "Shot-driven. Lookbook and guarantee bands framing the product grid, blog at the foot.",
+    header: "hp12-header",
+    footer: "hp12-footer",
+    sections: [
+      "hp12-announcement-bar",
+      "hp12-hero",
+      "hp12-marquee",
+      "hp12-category-pills",
+      "hp12-featured-products",
+      "hp12-lookbook",
+      "hp12-image-with-text",
+      "hp12-guarantee",
+      "hp12-bestsellers",
+      "hp12-comparison-table",
+      "hp12-testimonial",
+      "hp12-instagram",
+      "hp12-blog-posts",
+      "hp12-faq",
+      "hp12-newsletter",
+    ],
+  },
+  {
+    id: "organic-botanica",
+    name: "Organic Botanica",
+    pageType: "index",
+    niche: "Food, wellness & naturals",
+    description:
+      "Warm and unhurried, with a countdown, gallery and map for brands that sell somewhere real.",
+    header: "header-natural-v1",
+    footer: "hp20-18-footer-promo",
+    sections: [
+      "hp20-01-hero",
+      "hp20-02-marquee",
+      "hp20-03-featured-collection",
+      "hp20-04-image-with-text",
+      "hp20-05-logo-list",
+      "hp20-17-countdown",
+      "hp20-06-rich-text",
+      "hp20-07-video-banner",
+      "hp20-09-collection-list",
+      "hp20-08-testimonials",
+      "hp20-16-gallery",
+      "hp20-12-blog-posts",
+      "hp20-13-faq",
+      "hp20-15-map",
+      "hp20-10-newsletter",
+    ],
+  },
+  {
+    id: "wellness-clinical",
+    name: "Clinical Wellness",
+    pageType: "index",
+    niche: "Supplements & health",
+    description:
+      "Evidence-forward: features grid, comparison, trust badges and reviews before the signup.",
+    header: "header-minimal-v1",
+    footer: "footer-minimal-v1",
+    sections: [
+      "hp45-marquee",
+      "hp45-hero",
+      "hp45-usp",
+      "hp45-press-logos",
+      "hp45-featured-collection",
+      "hp45-features-grid",
+      "hp45-brand-story",
+      "hp45-video-banner",
+      "hp45-comparison-table",
+      "hp45-bestsellers",
+      "hp45-trust-badges",
+      "hp45-testimonials",
+      "hp45-instashop-gallery",
+      "hp45-offer-banner",
+      "hp45-faq",
+      "hp45-newsletter",
+    ],
+  },
+  {
+    id: "hpv6-conversion",
+    name: "Conversion Six",
+    pageType: "index",
+    niche: "General retail",
+    description:
+      "A safe, complete default: logos, value props, shoppable image, video, reviews, blog, signup.",
+    header: "header-commerce-v2",
+    footer: "hpv6-18-footer",
+    sections: [
+      "hpv6-01-announcement",
+      "hpv6-02-hero",
+      "hpv6-03-logo-list",
+      "hpv6-04-value-props",
+      "hpv6-05-featured-collection",
+      "hpv6-06-image-with-text",
+      "hpv6-07-marquee",
+      "hpv6-09-shoppable-image",
+      "hpv6-10-video-banner",
+      "hpv6-13-product-highlight",
+      "hpv6-11-collection-list",
+      "hpv6-08-testimonial-slider",
+      "hpv6-12-text-columns",
+      "hpv6-15-blog-posts",
+      "hpv6-16-instagram-feed",
+      "hpv6-14-accordion-faq",
+      "hpv6-17-newsletter",
+    ],
+  },
+
+  // ── Product ────────────────────────────────────────────────────────────
+  // These are single full-page sections rather than stacks: each one is a
+  // complete product page including gallery, buy box and the bands below it.
+  {
+    id: "product-skincare",
+    name: "Skincare PDP",
+    pageType: "product",
+    niche: "Beauty & skincare",
+    description: "Ingredient list, routine steps and reviews under a soft gallery.",
+    sections: ["pdp-v1"],
+  },
+  {
+    id: "product-apparel",
+    name: "Apparel PDP",
+    pageType: "product",
+    niche: "Apparel",
+    description: "Size guidance and fit notes beside a large gallery. Built for clothing.",
+    sections: ["pdp-v5"],
+  },
+  {
+    id: "product-activewear",
+    name: "Activewear PDP",
+    pageType: "product",
+    niche: "Activewear",
+    description: "Performance claims and material breakdown, with a sticky buy bar on mobile.",
+    sections: ["pdp-v12"],
+  },
+  {
+    id: "product-funnel",
+    name: "Mega Funnel PDP",
+    pageType: "product",
+    niche: "Direct to consumer",
+    description: "The long-form page: bundles, comparison, guarantee and reviews stacked.",
+    sections: ["pdp-v20"],
+  },
+  {
+    id: "product-tactical",
+    name: "Tactical PDP",
+    pageType: "product",
+    niche: "Gear & outdoors",
+    description: "Dark, spec-heavy layout for tools, gear and equipment.",
+    sections: ["pdp-v33"],
+  },
+  {
+    id: "product-jewellery",
+    name: "Jewellery PDP",
+    pageType: "product",
+    niche: "Jewellery",
+    description: "Certification, sizing and try-at-home, with recommendations below.",
+    sections: ["caratlane-pdp-main", "caratlane-pdp-reviews", "caratlane-pdp-recommendations"],
+  },
+
+  // ── Collection ─────────────────────────────────────────────────────────
+  {
+    id: "collection-clean",
+    name: "Clean Grid",
+    pageType: "collection",
+    niche: "Beauty & skincare",
+    description: "Light, roomy product grid with filters in a sidebar.",
+    sections: ["cp-v1"],
+  },
+  {
+    id: "collection-nordic",
+    name: "Nordic Minimal",
+    pageType: "collection",
+    niche: "Lifestyle & homeware",
+    description: "Restrained typography, generous whitespace, two columns on mobile.",
+    sections: ["cp-v6"],
+  },
+  {
+    id: "collection-artisanal",
+    name: "Artisanal",
+    pageType: "collection",
+    niche: "Food & drink",
+    description: "Warm, textured grid for makers and small-batch catalogues.",
+    sections: ["cp-v14"],
+  },
+  {
+    id: "collection-performance",
+    name: "Performance",
+    pageType: "collection",
+    niche: "Activewear",
+    description: "Dense grid with quick-add and colour swatches on the card.",
+    sections: ["cp-v55"],
+  },
+];
+
+export function pagesFor(pageType: PageType): PageDefinition[] {
+  return PAGES.filter(p => p.pageType === pageType);
+}
+
+export function pageById(id: string): PageDefinition | undefined {
+  return PAGES.find(p => p.id === id);
+}
+
+/** Tabs, in the order they are shown. Only types that have designs appear. */
+export const PAGE_TYPES: Array<{ id: PageType; label: string }> = [
+  { id: "index", label: "Home" },
+  { id: "product", label: "Product" },
+  { id: "collection", label: "Collection" },
+];
