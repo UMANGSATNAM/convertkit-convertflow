@@ -236,7 +236,7 @@ export function seedFor(source: string): SectionSeed {
   // duplicate them into the file.
   const seed: SectionSeed = { settings: { ...(preset.settings || {}) } };
 
-  const declared: any[] = [];  // TEMPORARY BREAK
+  const declared: any[] = Array.isArray(schema.blocks) ? schema.blocks : [];
   if (!declared.length) return seed;
 
   // A section that never loops its blocks does not need any.
