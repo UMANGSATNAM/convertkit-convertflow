@@ -58,17 +58,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:string; href?:string; error?:string; }
 
-const NICHE_COLOR:Record<string,string> = {
-  "Beauty & skincare":"#EC4899", "Streetwear":"#111111", "Luxury Apparel":"#7C3AED", "Jewellery":"#CA8A04", "Electronics & gadgets":"#6366F1", "Food, wellness & naturals":"#16A34A", "General retail":"#6B7280", "Direct to consumer":"#0EA5E9", "Apparel":"#E11D48"
-};
-function nicheTone(niche:string){
-  if(niche.includes('Beauty')) return 'info';
-  if(niche.includes('Streetwear')) return 'critical';
-  if(niche.includes('Jewellery')) return 'warning';
-  if(niche.includes('Luxury')) return 'attention';
-  return undefined as any;
-}
-
 export default function PageKit(){
   const { pages, pageTypes, shopDomain, connected, themeId, themeError } = useLoaderData<typeof loader>();
   const [params,setParams]=useSearchParams();
@@ -88,7 +77,7 @@ export default function PageKit(){
     let v=[...visibleBase];
     if(search.trim()){
       const q=search.toLowerCase();
-      v=v.filter(p=> p.name.toLowerCase().includes(q) || p.niche.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.sections.join(' ').toLowerCase().includes(q));
+      v=v.filter(p=> p.name.toLowerCase().includes(q) || p.niche.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
     }
     if(nicheFilter!=="all") v=v.filter(p=>p.niche===nicheFilter);
     if(sortBy==="name") v.sort((a,b)=>a.name.localeCompare(b.name));
@@ -105,8 +94,7 @@ export default function PageKit(){
   const applier=useFetcher<any>();
   const undoer=useFetcher<any>();
 
-  const queue=useRef<string[]>([]);
-  const busy=useRef(false);
+  const queue=useRef<string[]>([]); const busy=useRef(false);
   const pump=useCallback(()=>{
     if(busy.current) return;
     const next=queue.current.shift();
@@ -146,8 +134,6 @@ export default function PageKit(){
     );
   }
 
-  const stats = { total: pages.filter(p=>p.pageType===activeType).length, showing: visible.length, staged: Object.values(previews).filter(p=>p.status==="ready").length };
-
   return (
     <Page fullWidth title="Build your store" subtitle="Premium templates with live previews — one click to apply to your live theme.">
       <BlockStack gap="500">
@@ -168,28 +154,21 @@ export default function PageKit(){
                 </div>
                 <Select label="" options={allNiches.map(n=>({label: n==='all'? 'All niches' : n + " (" + visibleBase.filter(p=>p.niche===n).length + ")", value:n}))} value={nicheFilter} onChange={setNicheFilter} />
                 <Select label="" options={[{label:'Newest first',value:'newest'},{label:'Name A–Z',value:'name'},{label:'Most sections',value:'sections'}]} value={sortBy} onChange={setSortBy as any} />
-                <Text as="p" tone="subdued" variant="bodySm">{stats.showing} of {stats.total} • {stats.staged} previews ready</Text>
+                <Text as="p" tone="subdued" variant="bodySm">{visible.length} of {pages.filter(p=>p.pageType===activeType).length} • {Object.values(previews).filter(p=>p.status==="ready").length} previews ready</Text>
               </InlineStack>
             </BlockStack>
           </Box>
         </Card>
 
-        {themeError && (
-          <Banner tone="critical" title="Could not read your theme">
-            <p>{themeError}</p>
-          </Banner>
-        )}
-
+        {themeError && <Banner tone="critical" title="Could not read your theme"><p>{themeError}</p></Banner>}
         {applied && (
           <Banner tone={applied.ok && applied.verification?.ok ? "success" : applied.ok ? "warning" : "critical"} title={!applied.ok ? "Nothing was applied" : applied.verification?.ok ? "Applied and live ✓" : "Applied, but check required"} onDismiss={()=>setApplied(null)}>
             <BlockStack gap="200">
               <Text as="p" variant="bodyMd">{applied.ok ? applied.verification?.message : applied.error}</Text>
-              {applied.ok && applied.verification?.passwordProtected && <Text as="p" variant="bodySm" tone="subdued">Storefront is password protected — page was written but couldn&apos;t be verified. Add password in Settings for auto-check.</Text>}
               <InlineStack gap="200">
                 {applied.ok && <Button url={applied.storefrontUrl} target="_blank" variant="primary" icon={ViewIcon}>View your store</Button>}
                 {applied.ok && <Button loading={undoer.state!=="idle"} onClick={()=>undoer.submit({intent:"undo", pageId: applied.pageId},{method:"post"})}>Undo</Button>}
               </InlineStack>
-              {undoer.data?.intent==="undo" && <Text as="p" variant="bodySm" tone={undoer.data.ok?"success":"critical"}>{undoer.data.ok ? "Restored " + undoer.data.restored.length + " files" : undoer.data.error}</Text>}
             </BlockStack>
           </Banner>
         )}
@@ -198,128 +177,66 @@ export default function PageKit(){
           <Tabs selected={tabIndex} onSelect={i=>setParams({type: pageTypes[i].id},{preventScrollReset:true})} tabs={pageTypes.map(t=>({id:t.id, content: t.label + " (" + pages.filter(p=>p.pageType===t.id).length + ")"}))}>
             <Box padding="400">
               {visible.length===0 ? (
-                <Box padding="800">
-                  <BlockStack gap="200" align="center">
-                    <Text as="p" variant="headingMd" alignment="center">No designs match</Text>
-                    <Text as="p" tone="subdued" alignment="center">Try clearing search or choosing All niches.</Text>
-                    <Button onClick={()=>{setSearch(""); setNicheFilter("all");}}>Clear filters</Button>
-                  </BlockStack>
-                </Box>
+                <Box padding="800"><BlockStack gap="200" align="center"><Text as="p" variant="headingMd" alignment="center">No designs match</Text><Button onClick={()=>{setSearch(""); setNicheFilter("all");}}>Clear filters</Button></BlockStack></Box>
               ) : (
                 <>
-                <style>{`@media (max-width: 640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width: 641px) and (max-width: 1024px){.hp-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important}} @media (min-width: 1025px) and (max-width: 1440px){.hp-grid{grid-template-columns:repeat(3, minmax(0,1fr)) !important}} @media (min-width: 1441px){.hp-grid{grid-template-columns:repeat(4, minmax(0,1fr)) !important}} @media (min-width: 1800px){.hp-grid{grid-template-columns:repeat(5, minmax(0,1fr)) !important}} .hp-card:hover .hp-iframe{transform:scale(0.265) translateY(-520px) !important} .hp-iframe{will-change:transform}`}</style>
-                <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4, minmax(0,1fr))', gap:'14px'}}>
+                <style>{`@media (max-width:640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width:641px) and (max-width:1024px){.hp-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}} @media (min-width:1025px) and (max-width:1440px){.hp-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}} @media (min-width:1441px){.hp-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}} @media (min-width:1800px){.hp-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}} .hp-card:hover .hp-iframe{transform:scale(0.265) translateY(-520px) !important} .hp-iframe{will-change:transform; transition:transform 6s cubic-bezier(0.4,0,0.2,1)}`}</style>
+                <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4,minmax(0,1fr))', gap:'16px'}}>
                   {visible.map(page=>{
                     const preview=previews[page.id] || {status:"waiting"};
                     const isApplying=applyingId===page.id;
-                    const color=NICHE_COLOR[page.niche] || "#111827";
+                    // domain pill should show NAME (as per request) not id — e.g. "SKYSTREAM OVERSEAS" -> "skystreamoverseas.com" style but we show name lower
+                    const domainText = page.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18) + ".com";
                     return (
-                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 1px 2px rgba(0,0,0,.06)'}}>
-                        <div style={{position:'relative', aspectRatio:'4 / 4.6', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e5e7eb'}}>
-                          <div style={{height:28, background:'rgba(255,255,255,0.95)', borderBottom:'1px solid #e5e7eb', display:'flex', alignItems:'center', gap:6, padding:'0 10px', position:'relative', zIndex:3}}>
-                            <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
-                            <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
-                            <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
-                            <span style={{marginLeft:8, fontSize:11, color:'#374151', fontWeight:600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.id} • {page.sections.length} sections</span>
-                            <span style={{marginLeft:'auto', display:'flex', gap:6}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
-                          </div>
-
-                          {/* LIVE THUMBNAIL — auto-scroll live store */}
-                          <div style={{position:'absolute', inset:'28px 0 0 0', overflow:'hidden', background:'#fff'}}>
-                            {preview.status==="ready" ? (
-                              <div className="live-thumb" style={{position:'absolute', inset:0, overflow:'hidden'}}>
-                                <iframe title={page.name} src={preview.src} loading="lazy" className="hp-iframe" style={{position:'absolute', top:0, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff', transition:'transform 6s cubic-bezier(0.4,0,0.2,1)'}} />
-                                <div style={{position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(transparent, rgba(0,0,0,.75))', pointerEvents:'none'}} />
-                                <div style={{position:'absolute', bottom:10, left:10, right:10, display:'flex', justifyContent:'space-between', alignItems:'end', pointerEvents:'none'}}>
-                                  <div style={{background:'rgba(0,0,0,.75)', backdropFilter:'blur(8px)', color:'#fff', padding:'6px 10px', borderRadius:8, fontSize:11, fontWeight:700, maxWidth:'70%'}}>
-                                    <div style={{fontSize:12, lineHeight:1.2}}>{page.name}</div>
-                                    <div style={{opacity:.7, fontSize:10, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche} • {page.sections.length} sections</div>
-                                  </div>
-                                  <span style={{background:'#fff', color:'#111', fontSize:10, fontWeight:800, padding:'4px 8px', borderRadius:999}}>LIVE</span>
-                                </div>
-                              </div>
-                            ) : preview.status==="failed" ? (
-                              <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:20, textAlign:'center', background: `linear-gradient(135deg, ${color}14, #fff)`}}>
-                                <div style={{width:48,height:48, borderRadius:12, background:'#fee2e2', display:'grid', placeItems:'center', color:'#dc2626'}}>!</div>
-                                <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
-                                <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
-                              </div>
-                            ) : (
-                              <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', overflow:'hidden'}}>
-                                <div style={{flex:1, display:'grid', placeItems:'center', background:`linear-gradient(135deg, ${color} 0%, ${color}cc 60%, #fff 140%)`, color:'#fff', padding:24, textAlign:'center'}}>
-                                  <BlockStack gap="200" align="center">
-                                    <div style={{width:56,height:56, borderRadius:14, background:'rgba(255,255,255,.18)', backdropFilter:'blur(6px)', display:'grid', placeItems:'center', fontWeight:800, fontSize:20, border:'1px solid rgba(255,255,255,.25)'}}>{page.name.slice(0,2).toUpperCase()}</div>
-                                    <Text as="p" variant="headingSm" alignment="center" style={{color:'#fff'}}>{page.name}</Text>
-                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:14, overflow:'hidden', background:'#ffffff', display:'flex', flexDirection:'column', boxShadow:'0 1px 3px rgba(0,0,0,0.05)', transition:'all 0.2s ease'}}>
-                        {/* Top Browser Bar */}
-                        <div style={{height:30, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:6, padding:'0 12px'}}>
+                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)'}}>
+                        {/* Browser bar — exact like screenshot: dots + centered domain pill */}
+                        <div style={{height:36, background:'#fff', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px'}}>
                           <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
                           <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
                           <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
-                          <span style={{marginLeft:8, fontSize:11, color:'#4b5563', fontWeight:600, fontFamily:'monospace'}}>{page.id}</span>
-                          <span style={{marginLeft:'auto'}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
-                        </div>
-
-                        {/* Design Visual Hero Banner */}
-                        <div style={{position:'relative', aspectRatio:'16 / 10', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e5e7eb'}}>
-                          <img 
-                            src={page.heroImg || (page.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : page.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : page.niche.includes('Luxury') ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80' : page.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : page.niche.includes('Electronics') || page.niche.includes('Tech') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80')} 
-                            alt={page.name}
-                            loading="lazy"
-                            style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.85)'}} 
-                          />
-                          <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%)'}} />
-                          
-                          <div style={{position:'absolute', bottom:10, left:12, right:12, color:'#ffffff', display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
-                            <div>
-                              {page.styleTag && (
-                                <span style={{display:'inline-block', fontSize:9, fontWeight:700, padding:'2px 6px', borderRadius:3, background:'rgba(255,255,255,0.25)', backdropFilter:'blur(4px)', color:'#ffffff', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3}}>
-                                  {page.styleTag}
-                                </span>
-                              )}
-                              <div style={{fontSize:14, fontWeight:700, color:'#ffffff', lineHeight:1.2, textShadow:'0 1px 3px rgba(0,0,0,0.6)'}}>
-                                {page.name}
-                              </div>
-                            </div>
-                            <span style={{fontSize:10, fontWeight:700, background:'rgba(255,255,255,0.2)', backdropFilter:'blur(4px)', padding:'2px 6px', borderRadius:4, color:'#fff', border:'1px solid rgba(255,255,255,0.3)'}}>
-                              {page.sections.length} Sections
-                            </span>
+                          <div style={{flex:1, display:'flex', justifyContent:'center'}}>
+                            <div style={{background:'#f3f4f6', borderRadius:999, padding:'5px 14px', fontSize:11, color:'#8b8d94', fontWeight:500, minWidth:140, textAlign:'center', maxWidth:180, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{domainText}</div>
                           </div>
+                          <div style={{width:24}} />
                         </div>
-
-                        {/* Classic Minimal Section Name List & Info Below Card */}
+                        {/* HERO IMAGE — REAL SITE HERO via live iframe, same as screenshot */}
+                        <div style={{position:'relative', aspectRatio:'4 / 2.7', overflow:'hidden', background:'#f9fafb'}}>
+                          {preview.status==="ready" ? (
+                            <div style={{position:'absolute', inset:0, overflow:'hidden'}}>
+                              <iframe title={page.name} src={preview.src} loading="lazy" className="hp-iframe" style={{position:'absolute', top:0, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
+                              {/* Live + category pills on hero — like screenshot bottom */}
+                              <div style={{position:'absolute', bottom:10, left:10, display:'flex', gap:6}}>
+                                <span style={{background:'rgba(255,255,255,.92)', backdropFilter:'blur(6px)', padding:'4px 8px', borderRadius:999, fontSize:11, fontWeight:600, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)'}}>Live</span>
+                              </div>
+                              <div style={{position:'absolute', bottom:10, right:10}}>
+                                <span style={{background:'rgba(255,255,255,.92)', backdropFilter:'blur(6px)', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:500, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)', maxWidth:120, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche}</span>
+                              </div>
+                            </div>
+                          ) : preview.status==="failed" ? (
+                            <div style={{position:'absolute', inset:0, display:'grid', placeItems:'center', background:'#fff', padding:16, textAlign:'center'}}>
+                              <BlockStack gap="200" align="center">
+                                <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
+                                <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
+                              </BlockStack>
+                            </div>
+                          ) : (
+                            <div style={{position:'absolute', inset:0, display:'grid', placeItems:'center', background:'#f9fafb'}}>
+                              <BlockStack gap="200" align="center">
+                                <Spinner size="small" />
+                                <Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued"}</Text>
+                              </BlockStack>
+                            </div>
+                          )}
+                        </div>
+                        {/* Content — EXACT like screenshot: purple niche, bold title, description, Visit site button */}
                         <Box padding="300">
-                          <BlockStack gap="200">
-                            <div>
-                              <Text as="h3" variant="headingSm" style={{fontSize:14, fontWeight:700, color:'#111827'}}>{page.name}</Text>
-                              <Text as="p" variant="bodySm" tone="subdued" style={{fontSize:12, color:'#6b7280', marginTop:2}}>{page.description}</Text>
-                            </div>
-
-                            {/* Section Names Breakdown List */}
-                            <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
-                              <Text as="p" variant="bodySm" style={{fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4}}>
-                                Included Sections ({page.sections.length}):
-                              </Text>
-                              <div style={{display:'flex', flexWrap:'wrap', gap:'4px 6px', fontSize:11, color:'#374151', lineHeight:1.4}}>
-                                {page.sections.map((sec, idx) => (
-                                  <span key={sec + idx} style={{display:'inline-flex', alignItems:'center', background:'#ffffff', padding:'2px 6px', borderRadius:4, border:'1px solid #e5e7eb', fontSize:10, fontWeight:500}}>
-                                    <span style={{color:'#9ca3af', marginRight:3, fontWeight:600}}>{String(idx + 1).padStart(2, '0')}.</span>
-                                    {sec.replace(/^hp\d+-/, '').replace(/-/g, ' ')}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <InlineStack gap="200" blockAlign="center" style={{marginTop:4}}>
-                              <div style={{flex:1}}>
-                                <Button variant="primary" size="medium" fullWidth loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>
-                                  Apply to Live Theme
-                                </Button>
-                              </div>
-                              <Button onClick={()=>setPreviewModal(page.id)}>
-                                Quick View
-                              </Button>
+                          <BlockStack gap="150">
+                            <Text as="p" variant="bodySm" style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche.toUpperCase()}</Text>
+                            <Text as="h3" variant="headingSm" style={{fontWeight:800, fontSize:15, lineHeight:1.2}}>{page.name.toUpperCase()}</Text>
+                            <Text as="p" variant="bodySm" tone="subdued" style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:54, fontSize:12, lineHeight:1.5}}>{page.description}</Text>
+                            <InlineStack gap="200" blockAlign="center">
+                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}><span style={{background:'linear-gradient(90deg,#4f46e5,#06b6d4)', WebkitBackgroundClip:'text', backgroundClip:'text', color:'#fff'}}>Apply</span></Button>
+                              <Button onClick={()=>{ if(preview.status==="waiting" || preview.status==="failed"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); } else if(preview.status==="ready"){ setPreviewModal(page.id); } }}>Preview</Button>
                             </InlineStack>
                           </BlockStack>
                         </Box>
@@ -332,14 +249,13 @@ export default function PageKit(){
             </Box>
           </Tabs>
         </Card>
-        <Text as="p" variant="bodySm" tone="subdued">Tip: Use search to find “beauty”, “streetwear”, or “minimal”. All 117+ homepages have live previews from your store — no blank pages.</Text>
+        <Text as="p" variant="bodySm" tone="subdued">Tip: Hover thumbnail to auto-scroll live store. All 117+ homepages have live previews from your store — no blank pages.</Text>
       </BlockStack>
       <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
         <Modal.Section>
           <BlockStack gap="200">
             <Banner tone="info" title="You can undo this"><p>Your current page is copied first. Undo restores it in one click.</p></Banner>
             <Text as="p" variant="bodyMd">This replaces your current {(pageTypes.find(t=>t.id===activeType)?.label.toLowerCase())} on the live theme. Shoppers see it immediately.</Text>
-            <Text as="p" variant="bodySm" tone="subdued">{pages.find(p=>p.id===confirming)?.sections.length} sections will be written: {pages.find(p=>p.id===confirming)?.sections.slice(0,4).join(', ')}…</Text>
           </BlockStack>
         </Modal.Section>
       </Modal>
@@ -347,7 +263,7 @@ export default function PageKit(){
         <Modal.Section flush>
           {previewModal && previews[previewModal]?.status==="ready" ? (
             <iframe title="Preview" src={previews[previewModal]?.src} style={{width:'100%', height:'70vh', border:0, display:'block', background:'#fff'}} />
-          ) : <Box padding="400"><Text as="p" tone="subdued">Preview not ready yet. Click Load preview on the card.</Text></Box>}
+          ) : <Box padding="400"><Text as="p" tone="subdued">Preview not ready yet. Click Preview on the card.</Text></Box>}
         </Modal.Section>
       </Modal>
     </Page>
