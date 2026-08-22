@@ -33,6 +33,7 @@ export default function App() {
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">Home</Link>
+        <Link to="/app/homepages">All Homepages</Link>
         <Link to="/app/pagekit">Build your store</Link>
         <Link to="/app/sections">Add sections</Link>
         <Link to="/app/theme">My theme</Link>
