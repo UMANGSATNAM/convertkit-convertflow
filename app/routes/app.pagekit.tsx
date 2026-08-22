@@ -199,34 +199,21 @@ export default function PageKit(){
                           </div>
                           <div style={{width:24}} />
                         </div>
-                        {/* HERO IMAGE — REAL SITE HERO via live iframe, same as screenshot */}
-                        <div style={{position:'relative', aspectRatio:'4 / 2.7', overflow:'hidden', background:'#f9fafb'}}>
-                          {preview.status==="ready" ? (
-                            <div style={{position:'absolute', inset:0, overflow:'hidden'}}>
-                              <iframe title={page.name} src={preview.src} loading="lazy" className="hp-iframe" style={{position:'absolute', top:0, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
-                              {/* Live + category pills on hero — like screenshot bottom */}
-                              <div style={{position:'absolute', bottom:10, left:10, display:'flex', gap:6}}>
-                                <span style={{background:'rgba(255,255,255,.92)', backdropFilter:'blur(6px)', padding:'4px 8px', borderRadius:999, fontSize:11, fontWeight:600, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)'}}>Live</span>
-                              </div>
-                              <div style={{position:'absolute', bottom:10, right:10}}>
-                                <span style={{background:'rgba(255,255,255,.92)', backdropFilter:'blur(6px)', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:500, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)', maxWidth:120, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche}</span>
-                              </div>
-                            </div>
-                          ) : preview.status==="failed" ? (
-                            <div style={{position:'absolute', inset:0, display:'grid', placeItems:'center', background:'#fff', padding:16, textAlign:'center'}}>
-                              <BlockStack gap="200" align="center">
-                                <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
-                                <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
-                              </BlockStack>
-                            </div>
-                          ) : (
-                            <div style={{position:'absolute', inset:0, display:'grid', placeItems:'center', background:'#f9fafb'}}>
-                              <BlockStack gap="200" align="center">
-                                <Spinner size="small" />
-                                <Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued"}</Text>
-                              </BlockStack>
-                            </div>
-                          )}
+                        {/* HERO — STATIC SCREENSHOT (SS) CHIPKAVO — distinct per page, Preview opens full page */}
+                        <div style={{position:'relative', aspectRatio:'4 / 2.7', overflow:'hidden', background:'#f9fafb', cursor:'pointer'}} onClick={()=>{
+                          if(preview.status==="ready" && preview.href){ window.open(preview.href,'_blank'); }
+                          else if(preview.status!=="staging"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }
+                        }}>
+                          <img src={`/thumbnails/${page.id}.jpg`} alt={page.name} loading="lazy" style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'top'}} onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; }} />
+                          {/* Fallback gradient if image not loaded — hidden when img loads */}
+                          <div style={{position:'absolute', inset:0, background:`linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)`, pointerEvents:'none'}} />
+                          <div style={{position:'absolute', bottom:10, left:10, display:'flex', gap:6}}>
+                            <span style={{background:'rgba(255,255,255,.95)', backdropFilter:'blur(6px)', padding:'4px 8px', borderRadius:999, fontSize:11, fontWeight:700, color:'#16a34a', border:'1px solid rgba(0,0,0,.06)'}}>Live</span>
+                          </div>
+                          <div style={{position:'absolute', bottom:10, right:10}}>
+                            <span style={{background:'rgba(255,255,255,.95)', backdropFilter:'blur(6px)', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:500, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)', maxWidth:120, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche}</span>
+                          </div>
+                          {preview.status==="staging" && <div style={{position:'absolute', inset:0, background:'rgba(255,255,255,.75)', display:'grid', placeItems:'center'}}><Spinner size="small"/><Text as="p" variant="bodySm">Preparing live preview…</Text></div>}
                         </div>
                         {/* Content — EXACT like screenshot: purple niche, bold title, description, Visit site button */}
                         <Box padding="300">
@@ -235,8 +222,17 @@ export default function PageKit(){
                             <Text as="h3" variant="headingSm" style={{fontWeight:800, fontSize:15, lineHeight:1.2}}>{page.name.toUpperCase()}</Text>
                             <Text as="p" variant="bodySm" tone="subdued" style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:54, fontSize:12, lineHeight:1.5}}>{page.description}</Text>
                             <InlineStack gap="200" blockAlign="center">
-                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}><span style={{background:'linear-gradient(90deg,#4f46e5,#06b6d4)', WebkitBackgroundClip:'text', backgroundClip:'text', color:'#fff'}}>Apply</span></Button>
-                              <Button onClick={()=>{ if(preview.status==="waiting" || preview.status==="failed"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); } else if(preview.status==="ready"){ setPreviewModal(page.id); } }}>Preview</Button>
+                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply</Button>
+                              <Button onClick={()=>{
+                                if(preview.status==="ready" && preview.href){ window.open(preview.href,'_blank'); }
+                                else if(preview.status==="waiting" || preview.status==="failed"){
+                                  setPreviews(p=>({...p,[page.id]:{status:"staging"}}));
+                                  stager.submit({intent:"stage", pageId:page.id},{method:"post"});
+                                  // after staging, preview.href will be ready — user can click again to open full page
+                                } else {
+                                  // staging in progress
+                                }
+                              }}>Preview</Button>
                             </InlineStack>
                           </BlockStack>
                         </Box>

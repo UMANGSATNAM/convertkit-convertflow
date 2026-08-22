@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage();
+await page.goto('https://peri-beauty-bcuauhsj.myshopify.com/',{waitUntil:'networkidle'});
+console.log('title', await page.title());
+console.log('url', page.url());
+const html=await page.content();
+console.log(html.slice(0,1200));
+await page.screenshot({path:'public/thumbnails/check_store.jpg', fullPage:true});
+console.log('screenshot saved');
+await browser.close();

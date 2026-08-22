@@ -34,6 +34,28 @@ const NICHE_IMG={
   "Supplements & health":"https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80&auto=format&fit=crop",
   "Design-led brands":"https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&auto=format&fit=crop",
 };
+const HERO_POOL=[
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1523381210434-f59b9f52bc13?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1507680434567-71d70ed310cf?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1556228453-efd6c1ff04bf?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80&auto=format&fit=crop"
+];
 const PRODUCT_IMGS=[
   "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80&auto=format&fit=crop",
@@ -47,8 +69,9 @@ const PRODUCT_IMGS=[
 
 function esc(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0; return h; }
 function generateHTML(page){
-  const heroImg = NICHE_IMG[page.niche] || NICHE_IMG["General retail"];
+  const heroImg = HERO_POOL[ hashStr(page.id) % HERO_POOL.length ];
   const accent = page.niche.includes('Beauty')? '#EC4899' : page.niche.includes('Streetwear')? '#111' : page.niche.includes('Jewellery')? '#CA8A04' : page.niche.includes('Electronics')? '#6366F1' : page.niche.includes('Luxury')? '#7C3AED' : '#111827';
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>

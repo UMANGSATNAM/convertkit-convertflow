@@ -1,0 +1,851 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;padding:0;background:#fff}</style>
+</head><body>
+﻿
+  PDP V1: Skincare / Premium Edition (Liquid Glass & Gold)
+  Features: Variant Cards, USP pricing, Ingredient Highlights, Urgency Math
+
+
+
+
+
+ Liquid Math for Urgency based on inventory 
+
+
+
+
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+  :root {
+    --v1-gold: #CA8A04;
+    --v1-gold-light: #FEF08A;
+    --v1-gold-hover: #A16207;
+    --v1-bg: #FAFAF9;
+    --v1-surface: rgba(255, 255, 255, 0.7);
+    --v1-surface-solid: #FFFFFF;
+    --v1-border: #E7E5E4;
+    --v1-border-glass: rgba(255, 255, 255, 0.5);
+    --v1-text: #0C0A09;
+    --v1-text-muted: #57534E;
+    
+    --v1-font-heading: 'Playfair Display', serif;
+    --v1-font-body: 'Inter', sans-serif;
+    
+    --v1-radius-sm: 4px;
+    --v1-radius-md: 8px;
+    --v1-radius-lg: 16px;
+    --v1-radius-full: 9999px;
+    
+    --v1-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --v1-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --v1-shadow-glass: 0 8px 32px 0 rgba(12, 10, 9, 0.04);
+    
+    --v1-transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Reset & Base */
+  .pdp-v1-wrapper {
+    background-color: var(--v1-bg);
+    color: var(--v1-text);
+    font-family: var(--v1-font-body);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    padding: 32px 16px;
+  }
+  
+  .pdp-v1-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  
+  @media (min-width: 992px) {
+    .pdp-v1-container {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 64px;
+      padding: 48px 24px;
+    }
+  }
+
+  /* Typography */
+  .pdp-v1-heading {
+    font-family: var(--v1-font-heading);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 16px 0;
+    color: var(--v1-text);
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 768px) {
+    .pdp-v1-heading {
+      font-size: 40px;
+    }
+  }
+
+  /* Gallery */
+  .pdp-v1-gallery {
+    position: relative;
+  }
+  
+  @media (min-width: 992px) {
+    .pdp-v1-gallery {
+      position: sticky;
+      top: 32px;
+      height: max-content;
+    }
+  }
+
+  .pdp-v1-gallery__main {
+    width: 100%;
+    border-radius: var(--v1-radius-lg);
+    overflow: hidden;
+    background: var(--v1-surface-solid);
+    box-shadow: var(--v1-shadow-sm);
+    margin-bottom: 16px;
+    position: relative;
+    border: 1px solid var(--v1-border);
+  }
+
+  .pdp-v1-gallery__main img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4/5;
+  }
+
+  .pdp-v1-gallery__thumbs {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  
+  .pdp-v1-gallery__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pdp-v1-gallery__thumb {
+    width: 80px;
+    height: 100px;
+    border-radius: var(--v1-radius-md);
+    border: 1px solid var(--v1-border);
+    cursor: pointer;
+    object-fit: cover;
+    transition: var(--v1-transition);
+    opacity: 0.7;
+  }
+
+  .pdp-v1-gallery__thumb:hover,
+  .pdp-v1-gallery__thumb.is-active {
+    opacity: 1;
+    border-color: var(--v1-gold);
+    box-shadow: 0 0 0 1px var(--v1-gold);
+  }
+
+  /* Badges & Meta */
+  .pdp-v1-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  .pdp-v1-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--v1-text);
+    font-weight: 500;
+  }
+
+  .pdp-v1-rating svg {
+    width: 16px;
+    height: 16px;
+    color: var(--v1-gold);
+    fill: var(--v1-gold);
+  }
+
+  .pdp-v1-reviews-link {
+    color: var(--v1-text-muted);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: var(--v1-transition);
+  }
+
+  .pdp-v1-reviews-link:hover {
+    color: var(--v1-text);
+  }
+
+  .pdp-v1-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .pdp-v1-benefit-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--v1-surface-solid);
+    border: 1px solid var(--v1-border);
+    color: var(--v1-text);
+    padding: 6px 12px;
+    border-radius: var(--v1-radius-full);
+    font-size: 13px;
+    font-weight: 400;
+    box-shadow: var(--v1-shadow-sm);
+  }
+
+  .pdp-v1-benefit-pill svg {
+    width: 14px;
+    height: 14px;
+    color: var(--v1-gold);
+  }
+
+  /* Price */
+  .pdp-v1-price-block {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--v1-border);
+  }
+
+  .pdp-v1-price-current {
+    font-family: var(--v1-font-heading);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--v1-text);
+  }
+
+  .pdp-v1-price-compare {
+    font-size: 16px;
+    color: var(--v1-text-muted);
+    text-decoration: line-through;
+    margin-left: 12px;
+    font-weight: 400;
+  }
+
+  .pdp-v1-price-discount {
+    display: inline-block;
+    background: var(--v1-gold-light);
+    color: var(--v1-gold-hover);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--v1-radius-sm);
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  .pdp-v1-taxes {
+    font-size: 13px;
+    color: var(--v1-text-muted);
+    margin-top: 8px;
+  }
+
+  /* Variant Cards - Liquid Glass Style */
+  .pdp-v1-variants-wrap {
+    margin-bottom: 32px;
+  }
+
+  .pdp-v1-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--v1-text-muted);
+    margin-bottom: 16px;
+  }
+
+  .pdp-v1-variants {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 16px;
+  }
+
+  .pdp-v1-variant-input {
+    display: none;
+  }
+
+  .pdp-v1-variant-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 12px;
+    background: var(--v1-surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--v1-border);
+    border-radius: var(--v1-radius-lg);
+    cursor: pointer;
+    transition: var(--v1-transition);
+    position: relative;
+    box-shadow: var(--v1-shadow-glass);
+  }
+
+  .pdp-v1-variant-label:hover {
+    transform: translateY(-2px);
+    border-color: #D6D3D1;
+    box-shadow: var(--v1-shadow-md);
+  }
+
+  .pdp-v1-variant-input:checked + .pdp-v1-variant-label {
+    border-color: var(--v1-gold);
+    background: var(--v1-surface-solid);
+    box-shadow: 0 4px 12px rgba(202, 138, 4, 0.1);
+  }
+
+  .pdp-v1-variant-badge {
+    position: absolute;
+    top: -10px;
+    background: var(--v1-text);
+    color: #FFF;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 10px;
+    border-radius: var(--v1-radius-full);
+    letter-spacing: 0.02em;
+  }
+
+  .pdp-v1-variant-input:checked + .pdp-v1-variant-label .pdp-v1-variant-badge {
+    background: var(--v1-gold);
+  }
+
+  .pdp-v1-variant-check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    background: var(--v1-gold);
+    color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: var(--v1-transition);
+  }
+
+  .pdp-v1-variant-input:checked + .pdp-v1-variant-label .pdp-v1-variant-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .pdp-v1-variant-check svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 3px;
+  }
+
+  .pdp-v1-variant-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--v1-text);
+    margin-bottom: 4px;
+  }
+
+  .pdp-v1-variant-price {
+    font-family: var(--v1-font-heading);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--v1-text);
+  }
+
+  .pdp-v1-variant-usp {
+    font-size: 12px;
+    color: var(--v1-text-muted);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--v1-border);
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Ingredients / Highlights */
+  .pdp-v1-ingredients-wrap {
+    background: var(--v1-surface-solid);
+    border: 1px solid var(--v1-border);
+    border-radius: var(--v1-radius-lg);
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: var(--v1-shadow-sm);
+  }
+
+  .pdp-v1-ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .pdp-v1-ingredient-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .pdp-v1-ingredient-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--v1-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--v1-border);
+    padding: 8px;
+    transition: var(--v1-transition);
+  }
+  
+  .pdp-v1-ingredient-item:hover .pdp-v1-ingredient-img {
+    border-color: var(--v1-gold);
+    transform: scale(1.05);
+  }
+
+  .pdp-v1-ingredient-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .pdp-v1-ingredient-img svg {
+    width: 32px;
+    height: 32px;
+    color: var(--v1-gold);
+    stroke-width: 1.5;
+  }
+
+  .pdp-v1-ingredient-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--v1-text);
+  }
+
+  /* Liquid Glass Urgency Box */
+  .pdp-v1-urgency-box {
+    background: var(--v1-surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--v1-border-glass);
+    border-radius: var(--v1-radius-lg);
+    padding: 20px;
+    margin-bottom: 32px;
+    box-shadow: var(--v1-shadow-glass);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Subtle animated glow behind urgency box */
+  .pdp-v1-urgency-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(202,138,4,0.03) 0%, rgba(255,255,255,0) 70%);
+    animation: rotate 15s linear infinite;
+    z-index: -1;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .pdp-v1-urgency-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--v1-text);
+    margin-bottom: 12px;
+  }
+
+  .pdp-v1-urgency-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .pdp-v1-urgency-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--v1-gold);
+    stroke-width: 1.5;
+    flex-shrink: 0;
+  }
+
+  .pdp-v1-urgency-pulse {
+    width: 8px;
+    height: 8px;
+    background: #DC2626;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    animation: pulse-red 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    margin: 0 6px;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse-red {
+    to {
+      box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+    }
+  }
+
+  /* Add to Cart Button */
+  .pdp-v1-atc-btn {
+    width: 100%;
+    background: var(--v1-text);
+    color: #FFF;
+    border: 1px solid var(--v1-text);
+    padding: 18px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: var(--v1-radius-lg);
+    cursor: pointer;
+    transition: var(--v1-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .pdp-v1-atc-btn:hover {
+    background: var(--v1-gold);
+    border-color: var(--v1-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(202, 138, 4, 0.2);
+  }
+  
+  .pdp-v1-atc-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+<div class="pdp-v1-wrapper" data-section="">
+  <div class="pdp-v1-container">
+    
+    <!-- Left: Gallery -->
+    <div class="pdp-v1-gallery">
+      <div class="pdp-v1-gallery__main">
+        
+          <img height="" width="" src="" alt="">
+        
+          <div style="width:100%;height:100%;background:#f3f4f6;display:grid;place-items:center;color:#9ca3af">Image</div>
+        
+      </div>
+      <div class="pdp-v1-gallery__thumbs">
+        
+          <img src="" alt="" width="200" height="200" loading="lazy" class="pdp-v1-gallery__thumb is-active">
+        
+      </div>
+    </div>
+
+    <!-- Right: Info -->
+    <div class="pdp-v1-info">
+      
+      <!-- Meta: Rating & Reviews -->
+      <div class="pdp-v1-meta">
+        
+          <div class="pdp-v1-rating">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>4.9</span>
+          </div>
+          <span style="color: var(--v1-border);">|</span>
+          <a href="#reviews" class="pdp-v1-reviews-link">1,248 Reviews</a>
+        
+      </div>
+
+      <!-- Title -->
+      <h1 class="pdp-v1-heading"></h1>
+
+      <!-- Benefit Pills -->
+      
+        <div class="pdp-v1-benefits">
+          
+            <span class="pdp-v1-benefit-pill">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Dermatologically Tested
+            </span>
+          
+          
+            <span class="pdp-v1-benefit-pill">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Cruelty-Free
+            </span>
+          
+          
+            <span class="pdp-v1-benefit-pill">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Sulphate Free
+            </span>
+          
+        </div>
+      
+
+      <!-- Price -->
+      <div class="pdp-v1-price-block">
+        <span class="pdp-v1-price-current"></span>
+        
+          <span class="pdp-v1-price-compare"></span>
+          
+          <span class="pdp-v1-price-discount">Save %</span>
+        
+        <div class="pdp-v1-taxes">Inclusive of all taxes</div>
+      </div>
+
+      <!-- Variant Cards -->
+      
+        <div class="pdp-v1-variants-wrap">
+          <div class="pdp-v1-section-title">Select Size</div>
+          <div class="pdp-v1-variants">
+            
+              <div class="pdp-v1-variant-item">
+                <input type="radio" name="id" value="" id="variant-" class="pdp-v1-variant-input" checked>
+                <label for="variant-" class="pdp-v1-variant-label">
+                  
+                  
+                    <div class="pdp-v1-variant-badge">Most Popular</div>
+                  
+                    <div class="pdp-v1-variant-badge" style="background:var(--v1-gold); color:#000;">Best Value</div>
+                  
+                  
+                  <div class="pdp-v1-variant-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+  
+                  <div class="pdp-v1-variant-name"></div>
+                  <div class="pdp-v1-variant-price"></div>
+                  
+                  <div class="pdp-v1-variant-usp">
+                    
+                    /ml
+                  </div>
+                </label>
+              </div>
+            
+          </div>
+        </div>
+      
+
+      <!-- Liquid Glass Urgency Math -->
+      
+        <div class="pdp-v1-urgency-box">
+          <div class="pdp-v1-urgency-row">
+            <span class="pdp-v1-urgency-pulse"></span>
+            <span><strong> people</strong> are viewing this right now</span>
+          </div>
+          <div class="pdp-v1-urgency-row">
+            <svg class="pdp-v1-urgency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span><strong> units</strong> sold in the last 24 hours</span>
+          </div>
+          <div class="pdp-v1-urgency-row">
+            <svg class="pdp-v1-urgency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Hurry! Only <strong> items</strong> left in stock</span>
+          </div>
+        </div>
+      
+
+      <!-- Ingredients / Features -->
+      
+        <div class="pdp-v1-ingredients-wrap">
+          <div class="pdp-v1-section-title">KEY INGREDIENTS</div>
+          <div class="pdp-v1-ingredients-grid">
+            <div class="pdp-v1-ingredient-item">
+              <div class="pdp-v1-ingredient-img">
+                
+                  <img height="" width="" src="" alt="Vitamin C">
+                
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                
+              </div>
+              <span class="pdp-v1-ingredient-name">Vitamin C</span>
+            </div>
+            
+            <div class="pdp-v1-ingredient-item">
+              <div class="pdp-v1-ingredient-img">
+                
+                  <img height="" width="" src="" alt="Hyaluronic Acid">
+                
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                
+              </div>
+              <span class="pdp-v1-ingredient-name">Hyaluronic Acid</span>
+            </div>
+            
+            <div class="pdp-v1-ingredient-item">
+              <div class="pdp-v1-ingredient-img">
+                
+                  <img height="" width="" src="" alt="Aloe Vera">
+                
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                
+              </div>
+              <span class="pdp-v1-ingredient-name">Aloe Vera</span>
+            </div>
+          </div>
+        </div>
+      
+
+      <!-- ATC -->
+      <button type="button" class="pdp-v1-atc-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Add to Cart — 
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- STICKY ATC -->
+<style>
+  .sticky-atc- {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: bottom 0.3s ease-in-out;
+    border-top: 1px solid #eee;
+  }
+  .sticky-atc-.visible {
+    bottom: 0;
+  }
+  .sticky-atc-__info { display: flex; align-items: center; gap: 10px; }
+  .sticky-atc-__img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+  .sticky-atc-__title { font-weight: 600; font-size: 14px; color: #000; }
+  .sticky-atc-__price { font-weight: 700; color: #D32F2F; font-size: 14px; }
+  .sticky-atc-__btn { background: #000; color: #FFF; border: none; padding: 12px 24px; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+  .sticky-atc-__btn:hover { opacity: 0.8; }
+  @media (max-width: 768px) {
+    .sticky-atc-__info { display: none; }
+    .sticky-atc-__btn { width: 100%; padding: 14px; font-size: 16px; }
+  }
+</style>
+
+<div class="sticky-atc-" id="sticky-atc-">
+  <div class="sticky-atc-__info">
+    
+      <img src="" alt="" width="100" height="100" loading="lazy" class="sticky-atc-__img">
+    
+    <div>
+      <div class="sticky-atc-__title"></div>
+      <div class="sticky-atc-__price"></div>
+    </div>
+  </div>
+  
+      <!-- D2C SCARCITY & NOTIFY -->
+      
+        <div style="background:#FFF3E0; border:1px solid #FFCC80; padding:10px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:12px;">
+          <svg style="width:24px; height:24px; color:#E65100; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div style="font-size:13px; color:#E65100;">
+            <div style="font-weight:700;">Limited Time Offer Ends In:</div>
+            <div style="font-size:16px; font-weight:700; margin-top:2px;"><b></b></div>
+          </div>
+        </div>
+      
+
+      
+
+      
+      <button class="sticky-atc-__btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ADD TO CART</button>
+      
+      <button class="sticky-atc-__btn" disabled style="opacity:0.5; cursor:not-allowed;">SOLD OUT</button>
+      
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stickyBar = document.getElementById('sticky-atc-');
+    if(stickyBar) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          stickyBar.classList.add('visible');
+        } else {
+          stickyBar.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+
+
+{
+  "name": "PDP V1 - Skincare",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Rating & Reviews"
+    },
+    { "type": "checkbox", "id": "show_rating", "label": "Show Rating", "default": true },
+    { "type": "text", "id": "rating_value", "label": "Rating Value", "default": "4.9" },
+    { "type": "text", "id": "review_count", "label": "Review Count", "default": "1,248" },
+
+    {
+      "type": "header",
+      "content": "Benefit Badges"
+    },
+    { "type": "checkbox", "id": "show_benefits", "label": "Show Benefit Pills", "default": true },
+    { "type": "text", "id": "benefit_1", "label": "Benefit 1", "default": "Dermatologically Tested" },
+    { "type": "text", "id": "benefit_2", "label": "Benefit 2", "default": "Cruelty-Free" },
+    { "type": "text", "id": "benefit_3", "label": "Benefit 3", "default": "Sulphate Free" },
+
+    {
+      "type": "header",
+      "content": "Variants"
+    },
+    { "type": "checkbox", "id": "show_variant_cards", "label": "Show Skincare Variant Cards", "default": true },
+
+    {
+      "type": "header",
+      "content": "Urgency Creators"
+    },
+    { "type": "checkbox", "id": "show_urgency", "label": "Show Dynamic Urgency (Liquid Math)", "default": true },
+
+    {
+      "type": "header",
+      "content": "Ingredients / Highlights"
+    },
+    { "type": "checkbox", "id": "show_ingredients", "label": "Show Ingredients Section", "default": true },
+    { "type": "text", "id": "ingredients_title", "label": "Title", "default": "KEY INGREDIENTS" },
+    { "type": "image_picker", "id": "ing_1_img", "label": "Ingredient 1 Image" },
+    { "type": "text", "id": "ing_1_text", "label": "Ingredient 1 Name", "default": "Vitamin C" },
+    { "type": "image_picker", "id": "ing_2_img", "label": "Ingredient 2 Image" },
+    { "type": "text", "id": "ing_2_text", "label": "Ingredient 2 Name", "default": "Hyaluronic Acid" },
+    { "type": "image_picker", "id": "ing_3_img", "label": "Ingredient 3 Image" },
+    { "type": "text", "id": "ing_3_text", "label": "Ingredient 3 Name", "default": "Aloe Vera" }
+  ],
+  "presets": [
+    {
+      "name": "PDP V1 - Skincare"
+    }
+  ]
+}
+
+
+</body></html>

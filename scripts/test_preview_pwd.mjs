@@ -1,0 +1,34 @@
+import { chromium } from 'playwright';
+import { PrismaClient } from '@prisma/client';
+import { stagePreview } from '../app/pagekit/apply.server.ts';
+const prisma=new PrismaClient();
+const shop=await prisma.shop.findFirst({where:{shopDomain:{contains:'peri-beauty'}}});
+const { ALL_PAGES } = await import('../app/pagekit/pages.ts');
+const p=ALL_PAGES.find(x=>x.id==='peri-beauty');
+console.log('staging',p.id);
+const result=await stagePreview(shop,p);
+console.log('previewPath',result.previewPath, 'theme',result.themeId);
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage();
+const url=`https://${shop.shopDomain}${result.previewPath}`;
+console.log('goto',url);
+await page.goto(url,{waitUntil:'domcontentloaded'});
+console.log('before title',await page.title(), 'url',page.url());
+let html=await page.content();
+console.log('has password',html.includes('storefront_password'));
+console.log('has shopify-section',html.includes('shopify-section'));
+if(html.includes('storefront_password')){
+  console.log('filling 1234');
+  await page.fill('input[type="password"]','1234');
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
+  console.log('after title',await page.title(), 'url',page.url());
+  html=await page.content();
+  console.log('after has shopify-section',html.includes('shopify-section'));
+  console.log('after has password',html.includes('storefront_password'));
+  console.log(html.slice(0,800));
+  await page.screenshot({path:'public/thumbnails/test_preview.jpg', fullPage:false});
+  console.log('screenshot saved');
+}
+await browser.close();
+await prisma.$disconnect();

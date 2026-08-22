@@ -73,9 +73,15 @@ async function getStorefrontCookie(shopDomain: string, password: string): Promis
       body: new URLSearchParams({ form_type: "storefront_password", utf8: "✓", password }),
       redirect: "manual",
     });
-    const setCookie = res.headers.get("set-cookie") || "";
-    const match = setCookie.match(/storefront_digest=([^;]+)/);
-    return match ? `storefront_digest=${match[1]}` : null;
+    const raw = res.headers.get("set-cookie") || "";
+    // Shopify now uses _shopify_essential, older stores use storefront_digest — handle both plus full cookie string
+    const digest = raw.match(/storefront_digest=([^;]+)/);
+    if (digest) return `storefront_digest=${digest[1]}`;
+    const essential = raw.match(/_shopify_essential=([^;]+)/);
+    if (essential) return `_shopify_essential=${essential[1]}`;
+    // Fallback: return first cookie if any
+    const first = raw.split(',')[0]?.split(';')[0]?.trim();
+    return first || null;
   } catch {
     return null;
   }
