@@ -149,7 +149,7 @@ export default function PageKit(){
   const stats = { total: pages.filter(p=>p.pageType===activeType).length, showing: visible.length, staged: Object.values(previews).filter(p=>p.status==="ready").length };
 
   return (
-    <Page title="Build your store" subtitle="Premium templates with live previews — one click to apply to your live theme.">
+    <Page fullWidth title="Build your store" subtitle="Premium templates with live previews — one click to apply to your live theme.">
       <BlockStack gap="500">
         <Card>
           <Box padding="400">
@@ -206,7 +206,9 @@ export default function PageKit(){
                   </BlockStack>
                 </Box>
               ) : (
-                <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(340px, 1fr))', gap:'18px'}}>
+                <>
+                <style>{`@media (max-width: 640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width: 641px) and (max-width: 1024px){.hp-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important}} @media (min-width: 1025px) and (max-width: 1440px){.hp-grid{grid-template-columns:repeat(3, minmax(0,1fr)) !important}} @media (min-width: 1441px){.hp-grid{grid-template-columns:repeat(4, minmax(0,1fr)) !important}} @media (min-width: 1800px){.hp-grid{grid-template-columns:repeat(5, minmax(0,1fr)) !important}}`}</style>
+                <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4, minmax(0,1fr))', gap:'14px'}}>
                   {visible.map(page=>{
                     const preview=previews[page.id] || {status:"waiting"};
                     const isApplying=applyingId===page.id;
@@ -222,7 +224,7 @@ export default function PageKit(){
                             <span style={{marginLeft:'auto', display:'flex', gap:6}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
                           </div>
                           {preview.status==="ready" ? (
-                            <iframe title={page.name} src={preview.src} loading="lazy" style={{position:'absolute', top:28, left:0, width:'1280px', height:'1620px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
+                            <iframe title={page.name} src={preview.src} loading="lazy" style={{position:'absolute', top:28, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
                           ) : preview.status==="failed" ? (
                             <div style={{position:'absolute', inset:'28px 0 0 0', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:20, textAlign:'center', background: "linear-gradient(135deg, " + color + "08, #fff)"}}>
                               <div style={{width:48,height:48, borderRadius:12, background:'#fee2e2', display:'grid', placeItems:'center', color:'#dc2626'}}>!</div>
@@ -278,6 +280,7 @@ export default function PageKit(){
                     );
                   })}
                 </div>
+                </>
               )}
             </Box>
           </Tabs>
