@@ -207,14 +207,14 @@ export default function PageKit(){
                 </Box>
               ) : (
                 <>
-                <style>{`@media (max-width: 640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width: 641px) and (max-width: 1024px){.hp-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important}} @media (min-width: 1025px) and (max-width: 1440px){.hp-grid{grid-template-columns:repeat(3, minmax(0,1fr)) !important}} @media (min-width: 1441px){.hp-grid{grid-template-columns:repeat(4, minmax(0,1fr)) !important}} @media (min-width: 1800px){.hp-grid{grid-template-columns:repeat(5, minmax(0,1fr)) !important}}`}</style>
+                <style>{`@media (max-width: 640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width: 641px) and (max-width: 1024px){.hp-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important}} @media (min-width: 1025px) and (max-width: 1440px){.hp-grid{grid-template-columns:repeat(3, minmax(0,1fr)) !important}} @media (min-width: 1441px){.hp-grid{grid-template-columns:repeat(4, minmax(0,1fr)) !important}} @media (min-width: 1800px){.hp-grid{grid-template-columns:repeat(5, minmax(0,1fr)) !important}} .hp-card:hover .hp-iframe{transform:scale(0.265) translateY(-520px) !important} .hp-iframe{will-change:transform}`}</style>
                 <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4, minmax(0,1fr))', gap:'14px'}}>
                   {visible.map(page=>{
                     const preview=previews[page.id] || {status:"waiting"};
                     const isApplying=applyingId===page.id;
                     const color=NICHE_COLOR[page.niche] || "#111827";
                     return (
-                      <div key={page.id} style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 1px 2px rgba(0,0,0,.06)'}}>
+                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 1px 2px rgba(0,0,0,.06)'}}>
                         <div style={{position:'relative', aspectRatio:'4 / 4.6', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e5e7eb'}}>
                           <div style={{height:28, background:'rgba(255,255,255,0.95)', borderBottom:'1px solid #e5e7eb', display:'flex', alignItems:'center', gap:6, padding:'0 10px', position:'relative', zIndex:3}}>
                             <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
@@ -224,29 +224,40 @@ export default function PageKit(){
                             <span style={{marginLeft:'auto', display:'flex', gap:6}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
                           </div>
 
-                          {/* Visual Design Hero Thumbnail */}
-                          <div style={{position:'absolute', inset:'28px 0 0 0', overflow:'hidden'}}>
-                            <img 
-                              src={page.heroImg || (page.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : page.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : page.niche.includes('Luxury') ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80' : page.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : page.niche.includes('Electronics') || page.niche.includes('Tech') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80')} 
-                              alt={page.name}
-                              loading="lazy"
-                              style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.88)'}} 
-                            />
-                            <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%)'}} />
-
-                            <div style={{position:'absolute', bottom:42, left:14, right:14, color:'#ffffff'}}>
-                              {page.styleTag && (
-                                <span style={{display:'inline-block', fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:4, background:'rgba(255,255,255,0.25)', backdropFilter:'blur(4px)', color:'#ffffff', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.5px'}}>
-                                  {page.styleTag}
-                                </span>
-                              )}
-                              <div style={{fontSize:15, fontWeight:800, lineHeight:1.2, color:'#ffffff', marginBottom:4, textShadow:'0 2px 4px rgba(0,0,0,0.5)'}}>
-                                {page.name}
+                          {/* LIVE THUMBNAIL — auto-scroll live store */}
+                          <div style={{position:'absolute', inset:'28px 0 0 0', overflow:'hidden', background:'#fff'}}>
+                            {preview.status==="ready" ? (
+                              <div className="live-thumb" style={{position:'absolute', inset:0, overflow:'hidden'}}>
+                                <iframe title={page.name} src={preview.src} loading="lazy" className="hp-iframe" style={{position:'absolute', top:0, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff', transition:'transform 6s cubic-bezier(0.4,0,0.2,1)'}} />
+                                <div style={{position:'absolute', bottom:0, left:0, right:0, height:80, background:'linear-gradient(transparent, rgba(0,0,0,.75))', pointerEvents:'none'}} />
+                                <div style={{position:'absolute', bottom:10, left:10, right:10, display:'flex', justifyContent:'space-between', alignItems:'end', pointerEvents:'none'}}>
+                                  <div style={{background:'rgba(0,0,0,.75)', backdropFilter:'blur(8px)', color:'#fff', padding:'6px 10px', borderRadius:8, fontSize:11, fontWeight:700, maxWidth:'70%'}}>
+                                    <div style={{fontSize:12, lineHeight:1.2}}>{page.name}</div>
+                                    <div style={{opacity:.7, fontSize:10, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche} • {page.sections.length} sections</div>
+                                  </div>
+                                  <span style={{background:'#fff', color:'#111', fontSize:10, fontWeight:800, padding:'4px 8px', borderRadius:999}}>LIVE</span>
+                                </div>
                               </div>
-                              <div style={{fontSize:11, color:'rgba(255,255,255,0.85)', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', lineHeight:1.35}}>
-                                {page.description}
+                            ) : preview.status==="failed" ? (
+                              <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:20, textAlign:'center', background: `linear-gradient(135deg, ${color}14, #fff)`}}>
+                                <div style={{width:48,height:48, borderRadius:12, background:'#fee2e2', display:'grid', placeItems:'center', color:'#dc2626'}}>!</div>
+                                <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
+                                <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
                               </div>
-                            </div>
+                            ) : (
+                              <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', overflow:'hidden'}}>
+                                <div style={{flex:1, display:'grid', placeItems:'center', background:`linear-gradient(135deg, ${color} 0%, ${color}cc 60%, #fff 140%)`, color:'#fff', padding:24, textAlign:'center'}}>
+                                  <BlockStack gap="200" align="center">
+                                    <div style={{width:56,height:56, borderRadius:14, background:'rgba(255,255,255,.18)', backdropFilter:'blur(6px)', display:'grid', placeItems:'center', fontWeight:800, fontSize:20, border:'1px solid rgba(255,255,255,.25)'}}>{page.name.slice(0,2).toUpperCase()}</div>
+                                    <Text as="p" variant="headingSm" alignment="center" style={{color:'#fff'}}>{page.name}</Text>
+                                    <Badge tone="info">{page.niche}</Badge>
+                                  </BlockStack>
+                                </div>
+                                <div style={{height:48, background:'#fff', borderTop:'1px solid #e5e7eb', display:'flex', alignItems:'center', justifyContent:'center', gap:8}}>
+                                  <Spinner size="small"/><Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued"}</Text>
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           {/* Action Overlay Buttons */}
