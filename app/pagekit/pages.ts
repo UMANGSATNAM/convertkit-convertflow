@@ -35,6 +35,8 @@ export interface PageDefinition {
    */
   header?: string;
   footer?: string;
+  heroImg?: string;
+  styleTag?: string;
 }
 
 export const PAGES: PageDefinition[] = [
@@ -603,6 +605,8 @@ const ADAPTED: PageDefinition[] = (STORE_PAGE_TEMPLATES as any[])
     announcement: t.announcement || undefined,
     header: t.header || undefined,
     footer: t.footer || undefined,
+    heroImg: t.heroImg || undefined,
+    styleTag: t.styleTag || undefined,
   }))
   .filter(p => p.sections.length > 0);
 

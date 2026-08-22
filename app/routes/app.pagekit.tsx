@@ -215,44 +215,45 @@ export default function PageKit(){
                     const color=NICHE_COLOR[page.niche] || "#111827";
                     return (
                       <div key={page.id} style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 1px 2px rgba(0,0,0,.06)'}}>
-                        <div style={{position:'relative', aspectRatio:'4 / 5.2', overflow:'hidden', background:'#f8f9fb', borderBottom:'1px solid #e5e7eb'}}>
-                          <div style={{height:28, background:'#fff', borderBottom:'1px solid #e5e7eb', display:'flex', alignItems:'center', gap:6, padding:'0 10px'}}>
+                        <div style={{position:'relative', aspectRatio:'4 / 4.6', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e5e7eb'}}>
+                          <div style={{height:28, background:'rgba(255,255,255,0.95)', borderBottom:'1px solid #e5e7eb', display:'flex', alignItems:'center', gap:6, padding:'0 10px', position:'relative', zIndex:3}}>
                             <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
                             <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
                             <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
-                            <span style={{marginLeft:8, fontSize:11, color:'#6b7280', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.id} • {page.sections.length} sections</span>
+                            <span style={{marginLeft:8, fontSize:11, color:'#374151', fontWeight:600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.id} • {page.sections.length} sections</span>
                             <span style={{marginLeft:'auto', display:'flex', gap:6}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
                           </div>
-                          {preview.status==="ready" ? (
-                            <iframe title={page.name} src={preview.src} loading="lazy" style={{position:'absolute', top:28, left:0, width:'1280px', height:'2200px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
-                          ) : preview.status==="failed" ? (
-                            <div style={{position:'absolute', inset:'28px 0 0 0', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:20, textAlign:'center', background: "linear-gradient(135deg, " + color + "08, #fff)"}}>
-                              <div style={{width:48,height:48, borderRadius:12, background:'#fee2e2', display:'grid', placeItems:'center', color:'#dc2626'}}>!</div>
-                              <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
-                              <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
-                              <Text as="p" variant="bodySm" tone="subdued">Will apply without preview if needed — sections are verified before writing.</Text>
-                            </div>
-                          ) : (
-                            <div style={{position:'absolute', inset:'28px 0 0 0', display:'flex', flexDirection:'column', overflow:'hidden'}}>
-                              <div style={{flex:1, display:'grid', placeItems:'center', background:"linear-gradient(135deg, " + color + " 0%, " + color + "cc 55%, #ffffff 140%)", color:'#fff', padding:24, textAlign:'center'}}>
-                                <BlockStack gap="200" align="center">
-                                  <div style={{width:64,height:64, borderRadius:16, background:'rgba(255,255,255,.18)', backdropFilter:'blur(6px)', display:'grid', placeItems:'center', fontWeight:800, fontSize:22, border:'1px solid rgba(255,255,255,.25)'}}>{page.name.slice(0,2).toUpperCase()}</div>
-                                  <Text as="p" variant="headingMd" alignment="center" style={{color:'#fff'}}>{page.name}</Text>
-                                  <Text as="p" variant="bodySm" alignment="center" style={{color:'rgba(255,255,255,.85)'}}>{page.description.slice(0,96)}</Text>
-                                  <Badge tone="info">{page.sections.length} sections</Badge>
-                                </BlockStack>
+
+                          {/* Visual Design Hero Thumbnail */}
+                          <div style={{position:'absolute', inset:'28px 0 0 0', overflow:'hidden'}}>
+                            <img 
+                              src={page.heroImg || (page.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : page.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : page.niche.includes('Luxury') ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80' : page.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : page.niche.includes('Electronics') || page.niche.includes('Tech') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80')} 
+                              alt={page.name}
+                              loading="lazy"
+                              style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.88)'}} 
+                            />
+                            <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%)'}} />
+
+                            <div style={{position:'absolute', bottom:42, left:14, right:14, color:'#ffffff'}}>
+                              {page.styleTag && (
+                                <span style={{display:'inline-block', fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:4, background:'rgba(255,255,255,0.25)', backdropFilter:'blur(4px)', color:'#ffffff', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.5px'}}>
+                                  {page.styleTag}
+                                </span>
+                              )}
+                              <div style={{fontSize:15, fontWeight:800, lineHeight:1.2, color:'#ffffff', marginBottom:4, textShadow:'0 2px 4px rgba(0,0,0,0.5)'}}>
+                                {page.name}
                               </div>
-                              <div style={{height:56, background:'#fff', borderTop:'1px solid #e5e7eb', display:'flex', alignItems:'center', justifyContent:'center', gap:8}}>
-                                <Spinner size="small"/><Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued — preparing"}</Text>
+                              <div style={{fontSize:11, color:'rgba(255,255,255,0.85)', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', lineHeight:1.35}}>
+                                {page.description}
                               </div>
                             </div>
-                          )}
-                          {preview.status==="ready" && (
-                            <div style={{position:'absolute', bottom:10, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, background:'rgba(17,24,39,.9)', padding:'6px 8px', borderRadius:999, backdropFilter:'blur(8px)'}}>
-                              <Button size="micro" variant="primary" onClick={()=>setPreviewModal(page.id)}>Quick view</Button>
-                              <Button size="micro" onClick={()=>{ if(preview.href) window.open(preview.href,'_blank'); }}>Full size</Button>
-                            </div>
-                          )}
+                          </div>
+
+                          {/* Action Overlay Buttons */}
+                          <div style={{position:'absolute', bottom:10, left:'50%', transform:'translateX(-50%)', display:'flex', gap:6, background:'rgba(17,24,39,0.92)', padding:'5px 10px', borderRadius:999, backdropFilter:'blur(8px)', zIndex:10}}>
+                            <Button size="micro" variant="primary" onClick={()=>setPreviewModal(page.id)}>Quick view</Button>
+                            <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); if(preview.href) window.open(preview.href,'_blank'); }}>Live Store</Button>
+                          </div>
                         </div>
                         <Box padding="300">
                           <BlockStack gap="200">
