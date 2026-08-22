@@ -143,30 +143,59 @@ export default function HomepagesGallery(){
             return (
               <Card key={hp.id} padding="0">
                 <BlockStack gap="0">
-                  <div style={{position:'relative', aspectRatio:'3/4', overflow:'hidden', background:'#f6f6f7', borderBottom:'1px solid #e3e3e3'}}>
-                    {pv.status==='ready' ? (
-                      <iframe title={hp.name} src={pv.src} loading="lazy" style={{position:'absolute', top:0,left:0,width:'1280px',height:'1707px',border:0, transform:'scale(0.25)', transformOrigin:'top left', pointerEvents:'none'}} />
-                    ):(
-                      <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:16, textAlign:'center'}}>
-                        {pv.status==='failed' ? <Text as="p" tone="critical" variant="bodySm">{pv.error}</Text> : <><Spinner size="small"/><Text as="p" tone="subdued" variant="bodySm">{pv.status==='staging'?'Building preview…':'Queued • will auto-stage'}</Text><Button size="micro" onClick={()=>{ if(pv.status==='waiting'){ setPreviews(p=>({...p,[hp.id]:{status:'staging'}})); fetcher.submit({intent:'stage', hpId:hp.id},{method:'post'}); }}}>Stage now</Button></>}
-                      </div>
-                    )}
-                    <Badge tone={hp.version>=65 && hp.version<=100 ? 'success' : 'info'}>v{hp.version}</Badge>
+                  {/* Minimal Top Browser Bar */}
+                  <div style={{height:28, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:6, padding:'0 10px'}}>
+                    <span style={{width:7,height:7,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
+                    <span style={{width:7,height:7,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
+                    <span style={{width:7,height:7,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
+                    <span style={{marginLeft:6, fontSize:11, color:'#6b7280', fontWeight:600, fontFamily:'monospace'}}>hp-v{hp.version}</span>
+                    <span style={{marginLeft:'auto'}}><Badge tone={hp.version>=65 && hp.version<=100 ? 'success' : 'info'}>{hp.niche}</Badge></span>
                   </div>
+
+                  {/* Design Hero Visual Banner */}
+                  <div style={{position:'relative', aspectRatio:'16/9', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e3e3e3'}}>
+                    <img 
+                      src={hp.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : hp.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : hp.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : hp.niche.includes('Electronics') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
+                      alt={hp.name} 
+                      loading="lazy" 
+                      style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.85)'}} 
+                    />
+                    <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%)'}} />
+                    <div style={{position:'absolute', bottom:8, left:10, right:10, color:'#ffffff', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                      <span style={{fontSize:13, fontWeight:700, textShadow:'0 1px 3px rgba(0,0,0,0.6)'}}>{hp.name}</span>
+                      <span style={{fontSize:10, background:'rgba(255,255,255,0.25)', backdropFilter:'blur(4px)', padding:'2px 6px', borderRadius:4}}>{hp.sections.length} Sec</span>
+                    </div>
+                  </div>
+
+                  {/* Section Breakdown List Below Card */}
                   <Box padding="300">
                     <BlockStack gap="200">
-                      <InlineStack align="space-between"><Text as="h3" variant="headingSm">{hp.name}</Text><Badge>{hp.niche}</Badge></InlineStack>
-                      <Text as="p" variant="bodySm" tone="subdued">{hp.sections.length} sections • {hp.sections.slice(0,3).join(', ')}</Text>
-                      <InlineStack gap="200">
-                        <Button variant="primary" onClick={()=>setActiveApply(hp.id)} disabled={fetcher.state!=='idle'}>Apply</Button>
-                        {pv.status==='ready' && pv.href && <Button url={pv.href} target="_blank">Open full</Button>}
-                        <Button onClick={()=>{
-                          if(pv.status!=='ready'){
-                            setPreviews(p=>({...p,[hp.id]:{status:'staging'}}));
-                            fetcher.submit({intent:'stage', hpId:hp.id},{method:'post'});
-                          }
-                        }}>Preview</Button>
+                      <InlineStack align="space-between" blockAlign="center">
+                        <Text as="h3" variant="headingSm">{hp.name}</Text>
+                        <Badge tone="attention">{hp.niche}</Badge>
                       </InlineStack>
+
+                      {/* Clean Minimal Section List */}
+                      <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
+                        <Text as="p" variant="bodySm" style={{fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4}}>
+                          Sections Included ({hp.sections.length}):
+                        </Text>
+                        <div style={{display:'flex', flexWrap:'wrap', gap:'4px 6px', fontSize:10, color:'#374151'}}>
+                          {hp.sections.map((sec, idx) => (
+                            <span key={sec + idx} style={{display:'inline-flex', alignItems:'center', background:'#ffffff', padding:'2px 6px', borderRadius:4, border:'1px solid #e5e7eb', fontWeight:500}}>
+                              <span style={{color:'#9ca3af', marginRight:3, fontWeight:600}}>{String(idx + 1).padStart(2, '0')}.</span>
+                              {sec.replace(/^hp\d+-/, '').replace(/-/g, ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <InlineStack gap="200" style={{marginTop:4}}>
+                        <Button variant="primary" onClick={()=>setActiveApply(hp.id)} disabled={fetcher.state!=='idle'}>Apply to Live Theme</Button>
+                        {pv.status==='ready' && pv.href && <Button url={pv.href} target="_blank">Open Full</Button>}
+                      </InlineStack>
+
                       {activeApply===hp.id && (
                         <Card padding="200">
                           <BlockStack gap="200">

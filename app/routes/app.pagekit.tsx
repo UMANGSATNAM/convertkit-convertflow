@@ -250,42 +250,77 @@ export default function PageKit(){
                                   <BlockStack gap="200" align="center">
                                     <div style={{width:56,height:56, borderRadius:14, background:'rgba(255,255,255,.18)', backdropFilter:'blur(6px)', display:'grid', placeItems:'center', fontWeight:800, fontSize:20, border:'1px solid rgba(255,255,255,.25)'}}>{page.name.slice(0,2).toUpperCase()}</div>
                                     <Text as="p" variant="headingSm" alignment="center" style={{color:'#fff'}}>{page.name}</Text>
-                                    <Badge tone="info">{page.niche}</Badge>
-                                  </BlockStack>
-                                </div>
-                                <div style={{height:48, background:'#fff', borderTop:'1px solid #e5e7eb', display:'flex', alignItems:'center', justifyContent:'center', gap:8}}>
-                                  <Spinner size="small"/><Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued"}</Text>
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:14, overflow:'hidden', background:'#ffffff', display:'flex', flexDirection:'column', boxShadow:'0 1px 3px rgba(0,0,0,0.05)', transition:'all 0.2s ease'}}>
+                        {/* Top Browser Bar */}
+                        <div style={{height:30, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:6, padding:'0 12px'}}>
+                          <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
+                          <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
+                          <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
+                          <span style={{marginLeft:8, fontSize:11, color:'#4b5563', fontWeight:600, fontFamily:'monospace'}}>{page.id}</span>
+                          <span style={{marginLeft:'auto'}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
+                        </div>
 
-                          {/* Action Overlay Buttons */}
-                          <div style={{position:'absolute', bottom:10, left:'50%', transform:'translateX(-50%)', display:'flex', gap:6, background:'rgba(17,24,39,0.92)', padding:'5px 10px', borderRadius:999, backdropFilter:'blur(8px)', zIndex:10}}>
-                            <Button size="micro" variant="primary" onClick={()=>setPreviewModal(page.id)}>Quick view</Button>
-                            <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); if(preview.href) window.open(preview.href,'_blank'); }}>Live Store</Button>
+                        {/* Design Visual Hero Banner */}
+                        <div style={{position:'relative', aspectRatio:'16 / 10', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e5e7eb'}}>
+                          <img 
+                            src={page.heroImg || (page.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : page.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : page.niche.includes('Luxury') ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80' : page.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : page.niche.includes('Electronics') || page.niche.includes('Tech') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80')} 
+                            alt={page.name}
+                            loading="lazy"
+                            style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.85)'}} 
+                          />
+                          <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%)'}} />
+                          
+                          <div style={{position:'absolute', bottom:10, left:12, right:12, color:'#ffffff', display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
+                            <div>
+                              {page.styleTag && (
+                                <span style={{display:'inline-block', fontSize:9, fontWeight:700, padding:'2px 6px', borderRadius:3, background:'rgba(255,255,255,0.25)', backdropFilter:'blur(4px)', color:'#ffffff', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3}}>
+                                  {page.styleTag}
+                                </span>
+                              )}
+                              <div style={{fontSize:14, fontWeight:700, color:'#ffffff', lineHeight:1.2, textShadow:'0 1px 3px rgba(0,0,0,0.6)'}}>
+                                {page.name}
+                              </div>
+                            </div>
+                            <span style={{fontSize:10, fontWeight:700, background:'rgba(255,255,255,0.2)', backdropFilter:'blur(4px)', padding:'2px 6px', borderRadius:4, color:'#fff', border:'1px solid rgba(255,255,255,0.3)'}}>
+                              {page.sections.length} Sections
+                            </span>
                           </div>
                         </div>
+
+                        {/* Classic Minimal Section Name List & Info Below Card */}
                         <Box padding="300">
                           <BlockStack gap="200">
-                            <InlineStack align="space-between" blockAlign="start" gap="200">
-                              <Text as="h3" variant="headingSm" truncate>{page.name}</Text>
-                              <Icon source={CheckIcon} tone="success" />
-                            </InlineStack>
-                            <Text as="p" variant="bodySm" tone="subdued" style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:36}}>{page.description}</Text>
-                            <InlineStack gap="150" wrap>
-                              <Badge>{page.niche}</Badge>
-                              <Text as="p" variant="bodySm" tone="subdued">{page.sections.length} sections</Text>
-                              <Text as="p" variant="bodySm" tone="subdued">•</Text>
-                              <Text as="p" variant="bodySm" tone="subdued">{page.sections.slice(0,2).join(' + ')}</Text>
-                            </InlineStack>
-                            <InlineStack gap="200" blockAlign="center">
-                              <div style={{flex:1}}>
-                                <Button variant="primary" size="large" fullWidth loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply to live theme</Button>
+                            <div>
+                              <Text as="h3" variant="headingSm" style={{fontSize:14, fontWeight:700, color:'#111827'}}>{page.name}</Text>
+                              <Text as="p" variant="bodySm" tone="subdued" style={{fontSize:12, color:'#6b7280', marginTop:2}}>{page.description}</Text>
+                            </div>
+
+                            {/* Section Names Breakdown List */}
+                            <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
+                              <Text as="p" variant="bodySm" style={{fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4}}>
+                                Included Sections ({page.sections.length}):
+                              </Text>
+                              <div style={{display:'flex', flexWrap:'wrap', gap:'4px 6px', fontSize:11, color:'#374151', lineHeight:1.4}}>
+                                {page.sections.map((sec, idx) => (
+                                  <span key={sec + idx} style={{display:'inline-flex', alignItems:'center', background:'#ffffff', padding:'2px 6px', borderRadius:4, border:'1px solid #e5e7eb', fontSize:10, fontWeight:500}}>
+                                    <span style={{color:'#9ca3af', marginRight:3, fontWeight:600}}>{String(idx + 1).padStart(2, '0')}.</span>
+                                    {sec.replace(/^hp\d+-/, '').replace(/-/g, ' ')}
+                                  </span>
+                                ))}
                               </div>
-                              <Button onClick={()=>{ if(preview.status==="waiting" || preview.status==="failed"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); } else if(preview.status==="ready"){ setPreviewModal(page.id); } }}>{preview.status==="ready" ? "Preview" : "Load preview"}</Button>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <InlineStack gap="200" blockAlign="center" style={{marginTop:4}}>
+                              <div style={{flex:1}}>
+                                <Button variant="primary" size="medium" fullWidth loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>
+                                  Apply to Live Theme
+                                </Button>
+                              </div>
+                              <Button onClick={()=>setPreviewModal(page.id)}>
+                                Quick View
+                              </Button>
                             </InlineStack>
-                            <Text as="p" variant="bodySm" tone="subdued">Writes to {themeId ? "theme " + themeId.slice(0,6) + "…" : 'live theme'} • Undo available after apply</Text>
                           </BlockStack>
                         </Box>
                       </div>
