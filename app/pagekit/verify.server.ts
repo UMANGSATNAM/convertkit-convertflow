@@ -89,6 +89,8 @@ async function storefrontCookie(shopDomain: string, password: string): Promise<s
   } catch {
     return null;
   }
+}
+
 function findInnerFor(key: string, type: string, slices: Array<{ key: string; inner: string }>, fullHtml: string): { inner: string; rendered: boolean } {
   // 1. Exact key match
   let found = slices.find(s => s.key === key);
