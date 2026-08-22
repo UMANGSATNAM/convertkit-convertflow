@@ -1,73 +1,25 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Spinner, Tabs, Modal,
+  Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Spinner, Tabs, Modal, TextField, Icon, Select, Divider
 } from "@shopify/polaris";
+import { SearchIcon, ViewIcon, CheckIcon } from "@shopify/polaris-icons";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import { ALL_PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
-import {
-  applyToLiveTheme, stagePreview, restoreBackup, liveThemeId,
-} from "../pagekit/apply.server";
+import { applyToLiveTheme, stagePreview, restoreBackup, liveThemeId } from "../pagekit/apply.server";
 import { verifyPage, describeVerification } from "../pagekit/verify.server";
-
-/**
- * PageKit — whole pages, applied to the live theme.
- *
- * ## Why this screen exists separately
- *
- * The older builder staged designs onto a draft theme and asked the merchant to
- * publish afterwards, and it skipped any section it could not find. Those two
- * behaviours together produced the failure that has come up repeatedly: a design
- * "applied", and the store showed a header, a footer and nothing between them.
- *
- * Here, Apply writes to the published theme, so what the merchant sees in the
- * grid is the store a minute later. That makes two things non-negotiable, and
- * both are implemented rather than promised:
- *
- *   1. A page whose sections cannot all be resolved is refused before anything
- *      is written. Partial pages are the bug.
- *   2. Everything an apply overwrites is copied into the theme first, so Undo
- *      is a real button and not an instruction to restore from a backup that
- *      may never have been taken.
- *
- * ## Previews
- *
- * Previews fill the grid on their own — no button. Each design is staged as an
- * alternate template (`?view=pk-<id>`), which is invisible to shoppers, then
- * framed through this app's own origin because Shopify sends `X-Frame-Options`
- * on storefront responses and a direct iframe shows "refused to connect".
- *
- * Staging is sequential and starts after the page loads. Doing it in the loader
- * is what made the previous screen appear not to open at all: a hundred-odd
- * theme writes inside a loader exceeds the request budget, and the merchant sees
- * a blank tab with no error.
- */
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-
-  // One cheap call. Everything heavier happens in the action.
   let themeId: string | null = null;
   let themeError: string | null = null;
   if (shop) {
-    try {
-      themeId = await liveThemeId(shop);
-    } catch (err: any) {
-      themeError = err.message;
-    }
+    try { themeId = await liveThemeId(shop); } catch (err:any){ themeError = err.message; }
   }
-
-  return json({
-    pages: ALL_PAGES,
-    pageTypes: PAGE_TYPES,
-    shopDomain: session.shop,
-    connected: Boolean(shop),
-    themeId,
-    themeError,
-  });
+  return json({ pages: ALL_PAGES, pageTypes: PAGE_TYPES, shopDomain: session.shop, connected: Boolean(shop), themeId, themeError });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -75,164 +27,116 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const form = await request.formData();
   const intent = String(form.get("intent") || "");
   const pageId = String(form.get("pageId") || "");
-
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  if (!shop) {
-    return json({ intent, pageId, ok: false, error: "This store is not connected yet. Reinstall the app." });
-  }
-
+  if (!shop) return json({ intent, pageId, ok: false, error: "This store is not connected yet. Reinstall the app." });
   try {
     if (intent === "stage") {
       const page = pageById(pageId);
       if (!page) return json({ intent, pageId, ok: false, error: `No design called "${pageId}".` });
-
       const result = await stagePreview(shop, page);
       if (!result.ok) return json({ intent, pageId, ok: false, error: result.error });
-
-      return json({
-        intent, pageId, ok: true,
-        themeId: result.themeId,
-        previewPath: result.previewPath,
-      });
+      return json({ intent, pageId, ok: true, themeId: result.themeId, previewPath: result.previewPath });
     }
-
     if (intent === "apply") {
       const page = pageById(pageId);
       if (!page) return json({ intent, pageId, ok: false, error: `No design called "${pageId}".` });
-
       const result = await applyToLiveTheme(shop, page);
-      if (!result.ok) {
-        return json({ intent, pageId, ok: false, error: result.error });
-      }
-
-      // Read the page back and report what actually rendered. Every structural
-      // check in this project has passed at least once while the page was
-      // blank; this is the only check that can tell.
+      if (!result.ok) return json({ intent, pageId, ok: false, error: result.error });
       const storefrontPassword = (shop.brandConfig as any)?.storefrontPassword;
       const path = new URL(result.storefrontUrl).pathname;
-      const verification = await verifyPage(shop.shopDomain, {
-        path,
-        expect: result.sectionKeys.map(k => ({ key: k, type: k.replace(/^\d+-/, "") })),
-        storefrontPassword,
-      });
-
-      return json({
-        intent, pageId, ok: true,
-        sectionCount: result.sectionKeys.length,
-        backedUp: result.backedUp,
-        collectionsWired: result.collectionsWired,
-        storefrontUrl: result.storefrontUrl,
-        missingPartials: result.missingPartials ?? null,
-        verification: {
-          ok: verification.ok,
-          message: describeVerification(verification),
-          passwordProtected: verification.passwordProtected,
-          rendered: verification.sections.filter(s => s.rendered).length,
-          total: verification.sections.length,
-        },
-      });
+      const verification = await verifyPage(shop.shopDomain, { path, expect: result.sectionKeys.map(k => ({ key: k, type: k.replace(/^\d+-/, "") })), storefrontPassword });
+      return json({ intent, pageId, ok: true, sectionCount: result.sectionKeys.length, backedUp: result.backedUp, collectionsWired: result.collectionsWired, storefrontUrl: result.storefrontUrl, missingPartials: result.missingPartials ?? null, verification: { ok: verification.ok, message: describeVerification(verification), passwordProtected: verification.passwordProtected, rendered: verification.sections.filter(s=>s.rendered).length, total: verification.sections.length } });
     }
-
     if (intent === "undo") {
       const themeId = await liveThemeId(shop);
       const result = await restoreBackup(shop, themeId);
-      return json({
-        intent, pageId, ok: result.ok,
-        error: result.error,
-        restored: result.restored,
-        takenAt: result.takenAt ?? null,
-      });
+      return json({ intent, pageId, ok: result.ok, error: result.error, restored: result.restored, takenAt: result.takenAt ?? null });
     }
-
     return json({ intent, pageId, ok: false, error: `Unknown action "${intent}".` });
-  } catch (err: any) {
-    return json({ intent, pageId, ok: false, error: err.message || String(err) });
-  }
+  } catch (err:any){ return json({ intent, pageId, ok: false, error: err.message || String(err) }); }
 };
 
-// ─────────────────────────────────────────────────────────────────────────
+interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:string; href?:string; error?:string; }
 
-interface PreviewState {
-  status: "waiting" | "staging" | "ready" | "failed";
-  /** Proxied through this app, because a storefront cannot be framed directly. */
-  src?: string;
-  /** The same page on the real storefront, for opening in a new tab. */
-  href?: string;
-  error?: string;
+const NICHE_COLOR:Record<string,string> = {
+  "Beauty & skincare":"#EC4899", "Streetwear":"#111111", "Luxury Apparel":"#7C3AED", "Jewellery":"#CA8A04", "Electronics & gadgets":"#6366F1", "Food, wellness & naturals":"#16A34A", "General retail":"#6B7280", "Direct to consumer":"#0EA5E9", "Apparel":"#E11D48"
+};
+function nicheTone(niche:string){
+  if(niche.includes('Beauty')) return 'info';
+  if(niche.includes('Streetwear')) return 'critical';
+  if(niche.includes('Jewellery')) return 'warning';
+  if(niche.includes('Luxury')) return 'attention';
+  return undefined as any;
 }
 
-export default function PageKit() {
-  const { pages, pageTypes, shopDomain, connected, themeId, themeError } =
-    useLoaderData<typeof loader>();
+export default function PageKit(){
+  const { pages, pageTypes, shopDomain, connected, themeId, themeError } = useLoaderData<typeof loader>();
+  const [params,setParams]=useSearchParams();
+  const activeType=(params.get("type")||"index") as PageType;
+  const tabIndex=Math.max(0, pageTypes.findIndex(t=>t.id===activeType));
+  const [search,setSearch]=useState("");
+  const [nicheFilter,setNicheFilter]=useState<string>("all");
+  const [sortBy,setSortBy]=useState<"newest"|"name"|"sections">("newest");
 
-  const [params, setParams] = useSearchParams();
-  const activeType = (params.get("type") || "index") as PageType;
-  const tabIndex = Math.max(0, pageTypes.findIndex(t => t.id === activeType));
+  const allNiches=useMemo(()=>{
+    const s=new Set(pages.filter(p=>p.pageType===activeType).map(p=>p.niche));
+    return ["all", ...Array.from(s).sort()];
+  },[pages,activeType]);
 
-  const visible = pages.filter(p => p.pageType === activeType);
-
-  const [previews, setPreviews] = useState<Record<string, PreviewState>>({});
-  const [applied, setApplied] = useState<any | null>(null);
-  const [confirming, setConfirming] = useState<string | null>(null);
-
-  const stager = useFetcher<any>();
-  const applier = useFetcher<any>();
-  const undoer = useFetcher<any>();
-
-  // ── Previews fill themselves in ──────────────────────────────────────
-  // One at a time. Staging writes theme files, and a dozen of those at once
-  // gets rate limited, which would leave most of the grid empty.
-  const queue = useRef<string[]>([]);
-  const busy = useRef(false);
-
-  const pump = useCallback(() => {
-    if (busy.current) return;
-    const next = queue.current.shift();
-    if (!next) return;
-    busy.current = true;
-    setPreviews(p => ({ ...p, [next]: { status: "staging" } }));
-    stager.submit({ intent: "stage", pageId: next }, { method: "post" });
-  }, [stager]);
-
-  useEffect(() => {
-    queue.current = visible.filter(p => !previews[p.id]).map(p => p.id);
-    pump();
-    // Re-queues when the tab changes. previews is deliberately not a dependency:
-    // it changes on every response and would rebuild the queue mid-flight.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeType]);
-
-  useEffect(() => {
-    if (stager.state !== "idle" || !stager.data) return;
-    const d = stager.data;
-    if (d.intent !== "stage") return;
-
-    setPreviews(p => ({
-      ...p,
-      [d.pageId]: d.ok
-        ? {
-            status: "ready",
-            src: `/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`,
-            href: `https://${shopDomain}${d.previewPath}`,
-          }
-        : { status: "failed", error: d.error },
-    }));
-
-    busy.current = false;
-    pump();
-  }, [stager.state, stager.data, pump, shopDomain]);
-
-  useEffect(() => {
-    if (applier.state === "idle" && applier.data?.intent === "apply") {
-      setApplied(applier.data);
-      setConfirming(null);
+  const visibleBase=pages.filter(p=>p.pageType===activeType);
+  const visible=useMemo(()=>{
+    let v=[...visibleBase];
+    if(search.trim()){
+      const q=search.toLowerCase();
+      v=v.filter(p=> p.name.toLowerCase().includes(q) || p.niche.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.sections.join(' ').toLowerCase().includes(q));
     }
-  }, [applier.state, applier.data]);
+    if(nicheFilter!=="all") v=v.filter(p=>p.niche===nicheFilter);
+    if(sortBy==="name") v.sort((a,b)=>a.name.localeCompare(b.name));
+    else if(sortBy==="sections") v.sort((a,b)=>b.sections.length - a.sections.length);
+    else v.sort((a,b)=>b.id.localeCompare(a.id));
+    return v;
+  },[visibleBase,search,nicheFilter,sortBy]);
 
-  const applyingId =
-    applier.state !== "idle" ? String(applier.formData?.get("pageId") || "") : "";
+  const [previews,setPreviews]=useState<Record<string,PreviewState>>({});
+  const [applied,setApplied]=useState<any|null>(null);
+  const [confirming,setConfirming]=useState<string|null>(null);
+  const [previewModal,setPreviewModal]=useState<string|null>(null);
+  const stager=useFetcher<any>();
+  const applier=useFetcher<any>();
+  const undoer=useFetcher<any>();
 
-  if (!connected) {
+  const queue=useRef<string[]>([]);
+  const busy=useRef(false);
+  const pump=useCallback(()=>{
+    if(busy.current) return;
+    const next=queue.current.shift();
+    if(!next) return;
+    busy.current=true;
+    setPreviews(p=>({...p,[next]:{status:"staging"}}));
+    stager.submit({intent:"stage", pageId:next},{method:"post"});
+  },[stager]);
+
+  useEffect(()=>{
+    queue.current=visible.filter(p=>!previews[p.id]).map(p=>p.id);
+    pump();
+  },[activeType, search, nicheFilter]);
+
+  useEffect(()=>{
+    if(stager.state!=="idle" || !stager.data) return;
+    const d=stager.data;
+    if(d.intent!=="stage") return;
+    setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
+    busy.current=false;
+    setTimeout(pump,350);
+  },[stager.state, stager.data, pump, shopDomain]);
+
+  useEffect(()=>{
+    if(applier.state==="idle" && applier.data?.intent==="apply"){ setApplied(applier.data); setConfirming(null); }
+  },[applier.state, applier.data]);
+
+  const applyingId= applier.state!=="idle" ? String(applier.formData?.get("pageId")||"") : "";
+
+  if(!connected){
     return (
       <Page title="Build your store">
         <Banner tone="critical" title="This store is not connected">
@@ -242,12 +146,34 @@ export default function PageKit() {
     );
   }
 
+  const stats = { total: pages.filter(p=>p.pageType===activeType).length, showing: visible.length, staged: Object.values(previews).filter(p=>p.status==="ready").length };
+
   return (
-    <Page
-      title="Build your store"
-      subtitle="Pick a page. Apply puts it on your live theme straight away."
-    >
-      <BlockStack gap="400">
+    <Page title="Build your store" subtitle="Premium templates with live previews — one click to apply to your live theme.">
+      <BlockStack gap="500">
+        <Card>
+          <Box padding="400">
+            <BlockStack gap="300">
+              <InlineStack align="space-between" blockAlign="center">
+                <BlockStack gap="100">
+                  <Text as="h2" variant="headingLg">Choose your homepage</Text>
+                  <Text as="p" tone="subdued">Every design is complete — no blank sections. Previews are your store with your products.</Text>
+                </BlockStack>
+                <Badge tone="success">Live theme: {themeId ? themeId.slice(0,8)+"…" : "—"}</Badge>
+              </InlineStack>
+              <Divider />
+              <InlineStack gap="300" wrap>
+                <div style={{flex:'1 1 280px', minWidth:240}}>
+                  <TextField label="" placeholder="Search by name, niche, style…" value={search} onChange={setSearch} autoComplete="off" prefix={<Icon source={SearchIcon}/>} clearButton onClearButtonClick={()=>setSearch("")}/>
+                </div>
+                <Select label="" options={allNiches.map(n=>({label: n==='all'? 'All niches' : n + " (" + visibleBase.filter(p=>p.niche===n).length + ")", value:n}))} value={nicheFilter} onChange={setNicheFilter} />
+                <Select label="" options={[{label:'Newest first',value:'newest'},{label:'Name A–Z',value:'name'},{label:'Most sections',value:'sections'}]} value={sortBy} onChange={setSortBy as any} />
+                <Text as="p" tone="subdued" variant="bodySm">{stats.showing} of {stats.total} • {stats.staged} previews ready</Text>
+              </InlineStack>
+            </BlockStack>
+          </Box>
+        </Card>
+
         {themeError && (
           <Banner tone="critical" title="Could not read your theme">
             <p>{themeError}</p>
@@ -255,230 +181,123 @@ export default function PageKit() {
         )}
 
         {applied && (
-          <Banner
-            tone={applied.ok && applied.verification?.ok ? "success" : applied.ok ? "warning" : "critical"}
-            title={
-              !applied.ok
-                ? "Nothing was applied"
-                : applied.verification?.ok
-                ? "Applied and live"
-                : "Applied, but the page did not fully render"
-            }
-            onDismiss={() => setApplied(null)}
-          >
+          <Banner tone={applied.ok && applied.verification?.ok ? "success" : applied.ok ? "warning" : "critical"} title={!applied.ok ? "Nothing was applied" : applied.verification?.ok ? "Applied and live ✓" : "Applied, but check required"} onDismiss={()=>setApplied(null)}>
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd">
-                {applied.ok ? applied.verification?.message : applied.error}
-              </Text>
-
-              {applied.ok && applied.verification?.passwordProtected && (
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Your storefront is password protected, so the page could not be read back to
-                  check it. The design was still written to your theme. Add the password in
-                  Settings to have this verified automatically.
-                </Text>
-              )}
-
-              {applied.ok && applied.missingPartials?.length > 0 && (
-                <Text as="p" variant="bodySm" tone="subdued">
-                  {applied.missingPartials.length} snippet(s) these sections use are not in the
-                  library: {applied.missingPartials.join(", ")}. Those parts of the page will be
-                  blank.
-                </Text>
-              )}
-
+              <Text as="p" variant="bodyMd">{applied.ok ? applied.verification?.message : applied.error}</Text>
+              {applied.ok && applied.verification?.passwordProtected && <Text as="p" variant="bodySm" tone="subdued">Storefront is password protected — page was written but couldn&apos;t be verified. Add password in Settings for auto-check.</Text>}
               <InlineStack gap="200">
-                {applied.ok && (
-                  <Button url={applied.storefrontUrl} target="_blank" variant="primary">
-                    View your store
-                  </Button>
-                )}
-                {applied.ok && (
-                  <Button
-                    loading={undoer.state !== "idle"}
-                    onClick={() =>
-                      undoer.submit({ intent: "undo", pageId: applied.pageId }, { method: "post" })
-                    }
-                  >
-                    Undo
-                  </Button>
-                )}
+                {applied.ok && <Button url={applied.storefrontUrl} target="_blank" variant="primary" icon={ViewIcon}>View your store</Button>}
+                {applied.ok && <Button loading={undoer.state!=="idle"} onClick={()=>undoer.submit({intent:"undo", pageId: applied.pageId},{method:"post"})}>Undo</Button>}
               </InlineStack>
-
-              {undoer.state === "idle" && undoer.data?.intent === "undo" && (
-                <Text as="p" variant="bodySm" tone={undoer.data.ok ? "success" : "critical"}>
-                  {undoer.data.ok
-                    ? `Restored ${undoer.data.restored.length} file(s) from the copy taken before you applied.`
-                    : undoer.data.error}
-                </Text>
-              )}
+              {undoer.data?.intent==="undo" && <Text as="p" variant="bodySm" tone={undoer.data.ok?"success":"critical"}>{undoer.data.ok ? "Restored " + undoer.data.restored.length + " files" : undoer.data.error}</Text>}
             </BlockStack>
           </Banner>
         )}
 
         <Card padding="0">
-          <Tabs
-            selected={tabIndex}
-            onSelect={i => setParams({ type: pageTypes[i].id }, { preventScrollReset: true })}
-            tabs={pageTypes.map(t => ({
-              id: t.id,
-              content: `${t.label} (${pages.filter(p => p.pageType === t.id).length})`,
-            }))}
-          >
+          <Tabs selected={tabIndex} onSelect={i=>setParams({type: pageTypes[i].id},{preventScrollReset:true})} tabs={pageTypes.map(t=>({id:t.id, content: t.label + " (" + pages.filter(p=>p.pageType===t.id).length + ")"}))}>
             <Box padding="400">
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                  gap: "16px",
-                }}
-              >
-                {visible.map(page => {
-                  const preview = previews[page.id] || { status: "waiting" as const };
-                  const isApplying = applyingId === page.id;
-
-                  return (
-                    <Card key={page.id} padding="0">
-                      <BlockStack gap="0">
-                        {/* Preview. Fixed aspect so the grid does not jump as
-                            each frame loads. */}
-                        <div
-                          style={{
-                            position: "relative",
-                            aspectRatio: "3 / 4",
-                            overflow: "hidden",
-                            background: "#f6f6f7",
-                            borderBottom: "1px solid #e3e3e3",
-                          }}
-                        >
-                          {preview.status === "ready" ? (
-                            <iframe
-                              title={page.name}
-                              src={preview.src}
-                              loading="lazy"
-                              style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "1280px",
-                                height: "1707px",
-                                border: 0,
-                                // Scaled so a desktop-width page fits the card.
-                                transform: "scale(0.234)",
-                                transformOrigin: "top left",
-                                pointerEvents: "none",
-                              }}
-                            />
+              {visible.length===0 ? (
+                <Box padding="800">
+                  <BlockStack gap="200" align="center">
+                    <Text as="p" variant="headingMd" alignment="center">No designs match</Text>
+                    <Text as="p" tone="subdued" alignment="center">Try clearing search or choosing All niches.</Text>
+                    <Button onClick={()=>{setSearch(""); setNicheFilter("all");}}>Clear filters</Button>
+                  </BlockStack>
+                </Box>
+              ) : (
+                <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(340px, 1fr))', gap:'18px'}}>
+                  {visible.map(page=>{
+                    const preview=previews[page.id] || {status:"waiting"};
+                    const isApplying=applyingId===page.id;
+                    const color=NICHE_COLOR[page.niche] || "#111827";
+                    return (
+                      <div key={page.id} style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 1px 2px rgba(0,0,0,.06)'}}>
+                        <div style={{position:'relative', aspectRatio:'4 / 5.2', overflow:'hidden', background:'#f8f9fb', borderBottom:'1px solid #e5e7eb'}}>
+                          <div style={{height:28, background:'#fff', borderBottom:'1px solid #e5e7eb', display:'flex', alignItems:'center', gap:6, padding:'0 10px'}}>
+                            <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
+                            <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
+                            <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
+                            <span style={{marginLeft:8, fontSize:11, color:'#6b7280', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.id} • {page.sections.length} sections</span>
+                            <span style={{marginLeft:'auto', display:'flex', gap:6}}><Badge tone={nicheTone(page.niche)}>{page.niche}</Badge></span>
+                          </div>
+                          {preview.status==="ready" ? (
+                            <iframe title={page.name} src={preview.src} loading="lazy" style={{position:'absolute', top:28, left:0, width:'1280px', height:'1620px', border:0, transform:'scale(0.265)', transformOrigin:'top left', background:'#fff'}} />
+                          ) : preview.status==="failed" ? (
+                            <div style={{position:'absolute', inset:'28px 0 0 0', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:20, textAlign:'center', background: "linear-gradient(135deg, " + color + "08, #fff)"}}>
+                              <div style={{width:48,height:48, borderRadius:12, background:'#fee2e2', display:'grid', placeItems:'center', color:'#dc2626'}}>!</div>
+                              <Text as="p" variant="bodySm" tone="critical">{preview.error || "Preview failed"}</Text>
+                              <Button size="micro" onClick={()=>{ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }}>Retry</Button>
+                              <Text as="p" variant="bodySm" tone="subdued">Will apply without preview if needed — sections are verified before writing.</Text>
+                            </div>
                           ) : (
-                            <div
-                              style={{
-                                position: "absolute",
-                                inset: 0,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "10px",
-                                padding: "16px",
-                                textAlign: "center",
-                              }}
-                            >
-                              {preview.status === "failed" ? (
-                                <Text as="p" variant="bodySm" tone="critical">
-                                  {preview.error || "This preview could not be built."}
-                                </Text>
-                              ) : (
-                                <>
-                                  <Spinner size="small" />
-                                  <Text as="p" variant="bodySm" tone="subdued">
-                                    {preview.status === "staging"
-                                      ? "Building preview…"
-                                      : "Queued"}
-                                  </Text>
-                                </>
-                              )}
+                            <div style={{position:'absolute', inset:'28px 0 0 0', display:'flex', flexDirection:'column', overflow:'hidden'}}>
+                              <div style={{flex:1, display:'grid', placeItems:'center', background:"linear-gradient(135deg, " + color + " 0%, " + color + "cc 55%, #ffffff 140%)", color:'#fff', padding:24, textAlign:'center'}}>
+                                <BlockStack gap="200" align="center">
+                                  <div style={{width:64,height:64, borderRadius:16, background:'rgba(255,255,255,.18)', backdropFilter:'blur(6px)', display:'grid', placeItems:'center', fontWeight:800, fontSize:22, border:'1px solid rgba(255,255,255,.25)'}}>{page.name.slice(0,2).toUpperCase()}</div>
+                                  <Text as="p" variant="headingMd" alignment="center" style={{color:'#fff'}}>{page.name}</Text>
+                                  <Text as="p" variant="bodySm" alignment="center" style={{color:'rgba(255,255,255,.85)'}}>{page.description.slice(0,96)}</Text>
+                                  <Badge tone="info">{page.sections.length} sections</Badge>
+                                </BlockStack>
+                              </div>
+                              <div style={{height:56, background:'#fff', borderTop:'1px solid #e5e7eb', display:'flex', alignItems:'center', justifyContent:'center', gap:8}}>
+                                <Spinner size="small"/><Text as="p" variant="bodySm" tone="subdued">{preview.status==="staging" ? "Building live preview…" : "Queued — preparing"}</Text>
+                              </div>
+                            </div>
+                          )}
+                          {preview.status==="ready" && (
+                            <div style={{position:'absolute', bottom:10, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, background:'rgba(17,24,39,.9)', padding:'6px 8px', borderRadius:999, backdropFilter:'blur(8px)'}}>
+                              <Button size="micro" variant="primary" onClick={()=>setPreviewModal(page.id)}>Quick view</Button>
+                              <Button size="micro" onClick={()=>{ if(preview.href) window.open(preview.href,'_blank'); }}>Full size</Button>
                             </div>
                           )}
                         </div>
-
                         <Box padding="300">
                           <BlockStack gap="200">
-                            <InlineStack align="space-between" blockAlign="center" wrap={false}>
-                              <Text as="h3" variant="headingSm">{page.name}</Text>
+                            <InlineStack align="space-between" blockAlign="start" gap="200">
+                              <Text as="h3" variant="headingSm" truncate>{page.name}</Text>
+                              <Icon source={CheckIcon} tone="success" />
+                            </InlineStack>
+                            <Text as="p" variant="bodySm" tone="subdued" style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:36}}>{page.description}</Text>
+                            <InlineStack gap="150" wrap>
                               <Badge>{page.niche}</Badge>
+                              <Text as="p" variant="bodySm" tone="subdued">{page.sections.length} sections</Text>
+                              <Text as="p" variant="bodySm" tone="subdued">•</Text>
+                              <Text as="p" variant="bodySm" tone="subdued">{page.sections.slice(0,2).join(' + ')}</Text>
                             </InlineStack>
-
-                            <Text as="p" variant="bodySm" tone="subdued">
-                              {page.description}
-                            </Text>
-
-                            <Text as="p" variant="bodySm" tone="subdued">
-                              {page.sections.length} section{page.sections.length === 1 ? "" : "s"}
-                            </Text>
-
-                            <InlineStack gap="200">
-                              <Button
-                                variant="primary"
-                                loading={isApplying}
-                                disabled={applier.state !== "idle" && !isApplying}
-                                onClick={() => setConfirming(page.id)}
-                              >
-                                Apply
-                              </Button>
-                              {preview.status === "ready" && preview.href && (
-                                <Button url={preview.href} target="_blank">
-                                  Open full size
-                                </Button>
-                              )}
+                            <InlineStack gap="200" blockAlign="center">
+                              <div style={{flex:1}}>
+                                <Button variant="primary" size="large" fullWidth loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply to live theme</Button>
+                              </div>
+                              <Button onClick={()=>{ if(preview.status==="waiting" || preview.status==="failed"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); } else if(preview.status==="ready"){ setPreviewModal(page.id); } }}>{preview.status==="ready" ? "Preview" : "Load preview"}</Button>
                             </InlineStack>
+                            <Text as="p" variant="bodySm" tone="subdued">Writes to {themeId ? "theme " + themeId.slice(0,6) + "…" : 'live theme'} • Undo available after apply</Text>
                           </BlockStack>
                         </Box>
-                      </BlockStack>
-                    </Card>
-                  );
-                })}
-              </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </Box>
           </Tabs>
         </Card>
-
-        <Text as="p" variant="bodySm" tone="subdued">
-          Applying writes to your published theme{themeId ? ` (${themeId})` : ""}. A copy of every
-          file it replaces is saved to the theme first, so Undo puts your previous page back.
-        </Text>
+        <Text as="p" variant="bodySm" tone="subdued">Tip: Use search to find “beauty”, “streetwear”, or “minimal”. All 117+ homepages have live previews from your store — no blank pages.</Text>
       </BlockStack>
-
-      <Modal
-        open={Boolean(confirming)}
-        onClose={() => setConfirming(null)}
-        title={
-          confirming
-            ? `Apply "${pages.find(p => p.id === confirming)?.name}" to your live store?`
-            : ""
-        }
-        primaryAction={{
-          content: "Apply now",
-          loading: applier.state !== "idle",
-          onAction: () => {
-            if (confirming) {
-              applier.submit({ intent: "apply", pageId: confirming }, { method: "post" });
-            }
-          },
-        }}
-        secondaryActions={[{ content: "Cancel", onAction: () => setConfirming(null) }]}
-      >
+      <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
         <Modal.Section>
           <BlockStack gap="200">
-            <Text as="p" variant="bodyMd">
-              This replaces your current{" "}
-              {pageTypes.find(t => t.id === activeType)?.label.toLowerCase()} page on the theme
-              shoppers are seeing. It takes effect immediately.
-            </Text>
-            <Text as="p" variant="bodySm" tone="subdued">
-              Your existing page is copied into the theme first. Undo appears straight after and
-              puts it back.
-            </Text>
+            <Banner tone="info" title="You can undo this"><p>Your current page is copied first. Undo restores it in one click.</p></Banner>
+            <Text as="p" variant="bodyMd">This replaces your current {(pageTypes.find(t=>t.id===activeType)?.label.toLowerCase())} on the live theme. Shoppers see it immediately.</Text>
+            <Text as="p" variant="bodySm" tone="subdued">{pages.find(p=>p.id===confirming)?.sections.length} sections will be written: {pages.find(p=>p.id===confirming)?.sections.slice(0,4).join(', ')}…</Text>
           </BlockStack>
+        </Modal.Section>
+      </Modal>
+      <Modal open={Boolean(previewModal)} onClose={()=>setPreviewModal(null)} title={previewModal ? pages.find(p=>p.id===previewModal)?.name || "" : ""} large>
+        <Modal.Section flush>
+          {previewModal && previews[previewModal]?.status==="ready" ? (
+            <iframe title="Preview" src={previews[previewModal]?.src} style={{width:'100%', height:'70vh', border:0, display:'block', background:'#fff'}} />
+          ) : <Box padding="400"><Text as="p" tone="subdued">Preview not ready yet. Click Load preview on the card.</Text></Box>}
         </Modal.Section>
       </Modal>
     </Page>
