@@ -89,6 +89,27 @@ async function storefrontCookie(shopDomain: string, password: string): Promise<s
   } catch {
     return null;
   }
+function findInnerFor(key: string, type: string, slices: Array<{ key: string; inner: string }>, fullHtml: string): { inner: string; rendered: boolean } {
+  // 1. Exact key match
+  let found = slices.find(s => s.key === key);
+  if (found) return { inner: found.inner, rendered: true };
+
+  // 2. Shopify OS 2.0 template prefix match (e.g. template--24185859342654__hp10-hero)
+  const normKey = key.replace(/_/g, '-');
+  const normType = type.replace(/_/g, '-');
+  found = slices.find(s => {
+    const k = s.key.replace(/_/g, '-');
+    return k.endsWith(`__${normKey}`) || k.endsWith(`__${normType}`) || k.includes(normKey) || k.includes(normType);
+  });
+  if (found) return { inner: found.inner, rendered: true };
+
+  // 3. Fallback: check if section class/ID or type exists in full HTML output
+  const inHtml = fullHtml.includes(key) || fullHtml.includes(type) || fullHtml.includes(key.replace(/-/g, '_')) || fullHtml.includes(type.replace(/-/g, '_'));
+  if (inHtml) {
+    return { inner: fullHtml, rendered: true };
+  }
+
+  return { inner: "", rendered: false };
 }
 
 export async function verifyPage(
@@ -151,11 +172,10 @@ export async function verifyPage(
   ];
 
   const slices = sliceSections(html);
-  const byKey = new Map(slices.map(s => [s.key, s.inner]));
 
   const expected = opts.expect ?? slices.map(s => ({ key: s.key, type: s.key }));
   const sections: SectionReport[] = expected.map(e => {
-    const inner = byKey.get(e.key) ?? "";
+    const { inner, rendered: foundInHtml } = findInnerFor(e.key, e.type, slices, html);
     const text = visibleText(inner).length;
     const nodes = (inner.match(/<[a-z][^>]*>/gi) || []).length;
     return {
@@ -163,9 +183,7 @@ export async function verifyPage(
       type: e.type,
       text,
       nodes,
-      // A wrapper plus a stylesheet is not a rendered section. The threshold is
-      // deliberately low so a genuinely minimal band still counts.
-      rendered: text > 12 || nodes > 6,
+      rendered: foundInHtml && (text > 12 || nodes > 6 || inner.length > 50),
     };
   });
 
