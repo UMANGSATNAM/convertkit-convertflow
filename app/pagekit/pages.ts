@@ -40,6 +40,263 @@ export interface PageDefinition {
 }
 
 export const PAGES: PageDefinition[] = [
+  // --- 15 ULTRA CRO-OPTIMIZED GLOBAL NICHE PRODUCT PAGES (PP-1 to PP-15) ---
+  {
+    id: "pp-1-beauty-dermal",
+    name: "Beauty & Dermal Skincare PDP",
+    pageType: "product",
+    description: "Ultra-converting beauty product page with clinical trial badges, color swatches, volume options & sticky cart.",
+    niche: "Beauty & skincare",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-2-streetwear-heavy",
+    name: "Heavyweight Streetwear PDP",
+    pageType: "product",
+    description: "Heavyweight drop product page with interactive size pill selector, sizing table & sticky buy bar.",
+    niche: "Streetwear & apparel",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-3-jewellery-diamond",
+    name: "Luxury Diamonds & Fine Jewellery PDP",
+    pageType: "product",
+    description: "High-end jewellery product page with karat selector, metal finish swatches & material proof.",
+    niche: "Jewellery",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-4-tech-cyber",
+    name: "Cyber Techwear & Electronics PDP",
+    pageType: "product",
+    description: "Spec-focused electronics page with benchmark comparison table, warranty badge & sticky add-to-cart.",
+    niche: "Tech & electronics",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-5-denim-heritage",
+    name: "Vintage Heavyweight Denim PDP",
+    pageType: "product",
+    description: "Textured vintage denim product page with cotton weight specs, fit guide & customer reviews.",
+    niche: "Denim & apparel",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-6-supplements-clinical",
+    name: "Clinical Wellness & Supplements PDP",
+    pageType: "product",
+    description: "Bio-active clinical supplement page with doctor endorsement, dosage calculator & bundle savings.",
+    niche: "Supplements & health",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-7-activewear-apex",
+    name: "Athletic Gym & Performance Fit PDP",
+    pageType: "product",
+    description: "Performance gym wear product page with sweat-wick tech specs, motion video reel & sticky checkout.",
+    niche: "Activewear",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-8-superfood-organic",
+    name: "Natural Superfood & Farm Wellness PDP",
+    pageType: "product",
+    description: "Farm-to-table superfood page with nutrition facts table, organic certification & bundle discount.",
+    niche: "Food & wellness",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-9-minimal-decor",
+    name: "Modern Interior Furniture PDP",
+    pageType: "product",
+    description: "Minimal interior product page with dimension blueprints, material swatches & UGC room photos.",
+    niche: "Home & decor",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-10-eyewear-luxury",
+    name: "Designer Eyewear & Sunglasses PDP",
+    pageType: "product",
+    description: "High-fashion eyewear page with lens tint selector, UV protection specs & face shape guide.",
+    niche: "Eyewear & fashion",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-11-fragrance-parfum",
+    name: "Artisanal Eau de Parfum PDP",
+    pageType: "product",
+    description: "Artisanal fragrance product page with scent pyramid notes, longevity ratings & sample pack bundle.",
+    niche: "Fragrance & parfum",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-12-footwear-sole",
+    name: "Ergonomic Sole Sneaker Drop PDP",
+    pageType: "product",
+    description: "Ergonomic footwear page with arch support specs, shoe size converter & sneakerhead drop timer.",
+    niche: "Footwear & sneakers",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-13-baby-organic",
+    name: "Certified Organic Baby Essentials PDP",
+    pageType: "product",
+    description: "Non-toxic organic baby product page with pediatrician seal, safety certs & subscription option.",
+    niche: "Baby & kids",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-14-pet-nutrition",
+    name: "Vet Approved Pet Care & Nutrition PDP",
+    pageType: "product",
+    description: "Veterinary approved pet food page with weight breed chart, natural ingredients & auto-ship delivery.",
+    niche: "Pet care",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-spec-matrix",
+      "product-bundle-upsell",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+  {
+    id: "pp-15-coffee-roastery",
+    name: "Single-Origin Artisanal Coffee PDP",
+    pageType: "product",
+    description: "Single-origin roast product page with grind size selector, roast level meter & fresh bean delivery.",
+    niche: "Coffee & roastery",
+    header: "header",
+    announcement: "announcement-bar",
+    sections: [
+      "main-product-cro",
+      "product-bundle-upsell",
+      "product-spec-matrix",
+      "product-ugc-reviews",
+      "product-sticky-cart"
+    ],
+    footer: "footer"
+  },
+
   // ── Home ───────────────────────────────────────────────────────────────
   {
     id: "peri-beauty",
