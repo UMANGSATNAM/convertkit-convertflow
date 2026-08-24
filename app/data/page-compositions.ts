@@ -1,3 +1,4 @@
+import { PRODUCT_PAGES_CATALOG } from "./product-pages-catalog";
 export type PageType = "index" | "product" | "collection" | "cart" | "cart-drawer";
 
 export interface CompositionSection {
@@ -44,6 +45,7 @@ export const PAGE_TABS: Array<{ id: PageType; label: string }> = [
  * - 1 Tech Archetype (boAt/Noise Cyber Dark Audio & Electronics)
  */
 export const COMPOSITIONS: PageComposition[] = [
+  ...PRODUCT_PAGES_CATALOG,
   {
     id: "hp-v51-home",
     name: "RAWBLOX Urban Drop & Streetwear (Frameblox 04)",

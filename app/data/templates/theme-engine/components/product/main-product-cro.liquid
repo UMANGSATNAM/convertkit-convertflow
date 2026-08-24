@@ -1,0 +1,162 @@
+{% comment %}
+  Universal CRO-Optimized Main Product Section
+  Supports Color Swatches, Size Pills, Bundle Discounts, Delivery Estimator & Accordions
+{% endcomment %}
+
+<div class="product-cro-section" style="padding: 40px 0; background: {{ section.settings.bg_color | default: '#ffffff' }}; color: {{ section.settings.text_color | default: '#0f172a' }};">
+  <div class="product-cro-container" style="max-width: 1280px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;">
+    
+    <!-- Left Column: Product Gallery -->
+    <div class="product-gallery-wrapper" style="position: sticky; top: 20px;">
+      <div class="main-image-container" style="position: relative; border-radius: 16px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0; aspect-ratio: 1 / 1;">
+        {% if section.settings.badge_text != blank %}
+          <span style="position: absolute; top: 16px; left: 16px; z-index: 10; background: {{ section.settings.badge_bg | default: '#10b981' }}; color: #ffffff; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
+            {{ section.settings.badge_text }}
+          </span>
+        {% endif %}
+        <img id="main-product-img-{{ section.id }}" src="{{ product.featured_image | default: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1000&q=80' }}" alt="{{ product.title }}" style="width: 100%; height: 100%; object-fit: cover;" />
+      </div>
+
+      <!-- Thumbnail Thumb Strip -->
+      <div class="thumbs-strip" style="display: flex; gap: 12px; margin-top: 16px; overflow-x: auto; padding-bottom: 8px;">
+        <div onclick="document.getElementById('main-product-img-{{ section.id }}').src='https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1000&q=80'" style="width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 2px solid #3b82f6; cursor: pointer; flex-shrink: 0;">
+          <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&q=80" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div onclick="document.getElementById('main-product-img-{{ section.id }}').src='https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1000&q=80'" style="width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; flex-shrink: 0;">
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div onclick="document.getElementById('main-product-img-{{ section.id }}').src='https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=1000&q=80'" style="width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; flex-shrink: 0;">
+          <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=200&q=80" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Info & Form -->
+    <div class="product-info-wrapper">
+      
+      <!-- Review Star Summary -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <div style="color: #f59e0b; font-size: 16px;">★★★★★</div>
+        <span style="font-size: 13px; font-weight: 700; color: #475569;">4.92 / 5.0</span>
+        <span style="font-size: 13px; color: #94a3b8;">({{ section.settings.reviews_count | default: '1,428 verified reviews' }})</span>
+      </div>
+
+      <!-- Title & Subtitle -->
+      <h1 style="font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.02em;">
+        {{ section.settings.title | default: product.title | default: 'PREMIUM ULTRA-FORMULA CLINICAL CARE' }}
+      </h1>
+      <p style="font-size: 15px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">
+        {{ section.settings.subtitle | default: 'Engineered with 100% bio-active ingredients for instant 24H hydration and visible barrier restoration.' }}
+      </p>
+
+      <!-- Price Box & Discount Pill -->
+      <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
+        <span style="font-size: 32px; font-weight: 900; color: #0f172a;">{{ section.settings.price | default: '$48.00' }}</span>
+        <span style="font-size: 18px; text-decoration: line-through; color: #94a3b8;">{{ section.settings.compare_at_price | default: '$75.00' }}</span>
+        <span style="background: #ef4444; color: #ffffff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;">
+          SAVE {{ section.settings.discount_percent | default: '36%' }}
+        </span>
+      </div>
+
+      <!-- Live Stock Scarcity Counter -->
+      {% if section.settings.show_stock_timer != false %}
+        <div style="margin-bottom: 24px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; display: flex; align-items: center; gap: 10px;">
+          <span style="width: 10px; height: 10px; border-radius: 999px; background: #ef4444; animation: blink 1.5s infinite; display: inline-block;"></span>
+          <span style="font-size: 13px; font-weight: 700; color: #991b1b;">
+            🔥 {{ section.settings.stock_text | default: 'High Demand: Only 7 items left in stock — 24 shoppers have this in cart.' }}
+          </span>
+        </div>
+      {% endif %}
+
+      <!-- Option 1: Color Swatches -->
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 8px;">
+          Color Option: <span id="selected-color" style="color: #0f172a;">Midnight Obsidian</span>
+        </label>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="document.getElementById('selected-color').innerText='Midnight Obsidian'" style="width: 36px; height: 36px; border-radius: 999px; background: #0f172a; border: 2px solid #3b82f6; cursor: pointer;"></button>
+          <button onclick="document.getElementById('selected-color').innerText='Arctic Pearl'" style="width: 36px; height: 36px; border-radius: 999px; background: #f8fafc; border: 1px solid #cbd5e1; cursor: pointer;"></button>
+          <button onclick="document.getElementById('selected-color').innerText='Rose Gold Rose'" style="width: 36px; height: 36px; border-radius: 999px; background: #fb7185; border: 1px solid #cbd5e1; cursor: pointer;"></button>
+        </div>
+      </div>
+
+      <!-- Option 2: Size Pills -->
+      <div style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569;">
+            Size / Volume:
+          </label>
+          <a href="#size-modal" style="font-size: 12px; font-weight: 700; color: #2563eb; text-decoration: underline;">📏 Size & Fit Guide</a>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button style="padding: 10px 18px; border-radius: 8px; border: 2px solid #2563eb; background: #eff6ff; font-weight: 800; font-size: 14px; color: #1e40af; cursor: pointer;">50ml / Standard</button>
+          <button style="padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; font-weight: 600; font-size: 14px; color: #475569; cursor: pointer;">100ml / Jumbo (Best Value)</button>
+        </div>
+      </div>
+
+      <!-- Quantity & Buy Button -->
+      <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; background: #ffffff;">
+          <button style="padding: 14px 16px; border: 0; background: transparent; font-weight: 800; font-size: 16px; cursor: pointer;">-</button>
+          <span style="padding: 0 12px; font-weight: 800; font-size: 15px;">1</span>
+          <button style="padding: 14px 16px; border: 0; background: transparent; font-weight: 800; font-size: 16px; cursor: pointer;">+</button>
+        </div>
+        <button style="flex: 1; padding: 16px 24px; background: {{ section.settings.btn_bg | default: '#0f172a' }}; color: #ffffff; border: 0; border-radius: 12px; font-size: 16px; font-weight: 800; letter-spacing: 0.02em; cursor: pointer; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3); transition: transform 0.2s;">
+          🛒 {{ section.settings.btn_text | default: 'ADD TO CART — $48.00' }}
+        </button>
+      </div>
+
+      <!-- Pincode Delivery Estimator -->
+      <div style="margin-bottom: 24px; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-weight: 700; color: #1e293b;">
+          <span>🚚 Estimated Delivery Calculator</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" placeholder="Enter Pincode / Zip Code" value="90210" style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 160px;" />
+          <button style="padding: 8px 14px; background: #2563eb; color: #ffffff; border: 0; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">Check</button>
+        </div>
+        <p style="margin-top: 6px; font-size: 12px; color: #16a34a; font-weight: 600;">✓ In Stock: Ships tomorrow. Estimated arrival Thursday, Aug 27.</p>
+      </div>
+
+      <!-- Guarantee Badges Strip -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; text-align: center;">
+        <div>
+          <span style="font-size: 20px; display: block; margin-bottom: 4px;">🛡️</span>
+          <span style="font-size: 11px; font-weight: 700; color: #334155;">30-Day Guarantee</span>
+        </div>
+        <div>
+          <span style="font-size: 20px; display: block; margin-bottom: 4px;">🌿</span>
+          <span style="font-size: 11px; font-weight: 700; color: #334155;">100% Bio-Active</span>
+        </div>
+        <div>
+          <span style="font-size: 20px; display: block; margin-bottom: 4px;">⚡</span>
+          <span style="font-size: 11px; font-weight: 700; color: #334155;">Express Shipping</span>
+        </div>
+      </div>
+
+      <!-- Accordion Details -->
+      <div class="product-accordions" style="display: flex; flex-direction: column; gap: 10px;">
+        <details open style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; background: #ffffff;">
+          <summary style="font-size: 14px; font-weight: 700; cursor: pointer; color: #0f172a;">✨ Key Benefits & Formula Highlights</summary>
+          <p style="font-size: 13px; color: #64748b; margin-top: 8px; line-height: 1.6;">
+            Formulated with multi-molecular hyaluronic acid, niacinamide, and cold-pressed botanical extracts to restore youthful skin elasticity and protect against environmental pollutants.
+          </p>
+        </details>
+        <details style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; background: #ffffff;">
+          <summary style="font-size: 14px; font-weight: 700; cursor: pointer; color: #0f172a;">📋 Full Ingredients & Directions</summary>
+          <p style="font-size: 13px; color: #64748b; margin-top: 8px; line-height: 1.6;">
+            Aqua/Water, Niacinamide (5%), Glycerin, Sodium Hyaluronate, Squalane, Tocopherol (Vitamin E), Centella Asiatica Extract. Apply 3-4 drops morning and evening to clean skin.
+          </p>
+        </details>
+        <details style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; background: #ffffff;">
+          <summary style="font-size: 14px; font-weight: 700; cursor: pointer; color: #0f172a;">📦 Free Returns & Global Shipping</summary>
+          <p style="font-size: 13px; color: #64748b; margin-top: 8px; line-height: 1.6;">
+            We offer free worldwide shipping on orders over $50. All purchases come with a 30-day money-back guarantee with zero hassle returns.
+          </p>
+        </details>
+      </div>
+
+    </div>
+
+  </div>
+</div>
