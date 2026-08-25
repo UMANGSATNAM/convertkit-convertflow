@@ -25,6 +25,7 @@ import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server
  */
 
 const BROWSABLE_TYPES = [
+  { label: "Product Pages (PDP)", value: "product-page", page: "/products" },
   { label: "Headers", value: "header", page: "/" },
   { label: "Announcement bars", value: "announcement", page: "/" },
   { label: "Heroes", value: "hero", page: "/" },

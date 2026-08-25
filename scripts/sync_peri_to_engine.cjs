@@ -146,7 +146,7 @@ const FAMILY_OF = {
 };
 
 function roleOf(name) {
-  let m = name.match(/^(pdp|pc|cl|cp|ab|cdr|popup)-v\d+$/);
+  let m = name.match(/^(pdp|pc|cl|cp|ab|cdr|popup)(?:-[a-z0-9-]+)?$/);
   if (m) return m[1];
   m = name.match(/^hp\d+-(?:\d+-)?(.+)$/);
   if (m) return m[1];
