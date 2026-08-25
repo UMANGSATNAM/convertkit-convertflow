@@ -155,10 +155,14 @@ export default function HomepagesGallery(){
                   {/* Design Hero Visual Banner */}
                   <div style={{position:'relative', aspectRatio:'16/9', overflow:'hidden', background:'#111827', borderBottom:'1px solid #e3e3e3'}}>
                     <img 
-                      src={hp.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : hp.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : hp.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : hp.niche.includes('Electronics') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
+                      src={`/thumbnails/hp-v${hp.version}.jpg`}
                       alt={hp.name} 
                       loading="lazy" 
-                      style={{width:'100%', height:'100%', objectFit:'cover', filter:'brightness(0.85)'}} 
+                      style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'top'}}
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = hp.niche.includes('Beauty') ? 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80' : hp.niche.includes('Streetwear') ? 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80' : hp.niche.includes('Jewellery') ? 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80' : hp.niche.includes('Electronics') ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80' : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80';
+                      }}
                     />
                     <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%)'}} />
                     <div style={{position:'absolute', bottom:8, left:10, right:10, color:'#ffffff', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
@@ -193,7 +197,15 @@ export default function HomepagesGallery(){
                       {/* Action Buttons */}
                       <InlineStack gap="200" style={{marginTop:4}}>
                         <Button variant="primary" onClick={()=>setActiveApply(hp.id)} disabled={fetcher.state!=='idle'}>Apply to Live Theme</Button>
-                        {pv.status==='ready' && pv.href && <Button url={pv.href} target="_blank">Open Full</Button>}
+                        <Button onClick={() => {
+                          if(pv.status==='ready' && pv.href) {
+                            window.open(pv.href, '_blank');
+                          } else {
+                            fetcher.submit({ intent:'stage', hpId: hp.id }, {method:'post'});
+                          }
+                        }}>
+                          {pv.status==='staging' ? 'Staging...' : pv.status==='ready' ? 'Open Preview' : 'Preview'}
+                        </Button>
                       </InlineStack>
 
                       {activeApply===hp.id && (

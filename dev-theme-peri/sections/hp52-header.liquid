@@ -1,0 +1,240 @@
+{%- comment -%}
+  sections/hp52-header.liquid
+  Dedicated Header for Homepage 52
+{%- endcomment -%}
+
+{%- liquid
+  assign section_id = 'hp52-hdr-' | append: section.id
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --hdr-bg: {{ section.settings.bg_color | default: '#ffffff' }};
+    --hdr-text: {{ section.settings.text_color | default: '#111827' }};
+    --hdr-accent: {{ section.settings.primary_color | default: '#2563eb' }};
+  }
+
+  .hp52-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--hdr-bg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+  }
+  .hp52-header.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  .hp52-header__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .hp52-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .hp52-header__logo {
+    font-family: var(--font-heading, sans-serif);
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--hdr-text);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hp52-header__logo-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--hdr-accent);
+    border-radius: 50%;
+  }
+  .hp52-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hp52-header__nav a {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hdr-text);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+  .hp52-header__nav a:hover {
+    opacity: 1;
+    color: var(--hdr-accent);
+  }
+  .hp52-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hp52-header__cart {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--hdr-text);
+    text-decoration: none;
+  }
+  .hp52-header__cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--hdr-accent);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hp52-header__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hp52-header__toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--hdr-text);
+    border-radius: 2px;
+  }
+  .hp52-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--hdr-bg);
+    padding: 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .hp52-mobile-menu.open {
+    display: flex;
+  }
+  .hp52-mobile-menu a {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--hdr-text);
+    text-decoration: none;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  @media (max-width: 768px) {
+    .hp52-header__nav { display: none; }
+    .hp52-header__toggle { display: flex; }
+  }
+</style>
+
+<header class="hp52-header" id="{{ section_id }}">
+  <div class="hp52-header__container">
+    <div class="hp52-header__inner">
+      <a href="{{ routes.root_url }}" class="hp52-header__logo">
+        {{ section.settings.brand_name | default: 'STORE' }}
+        <span class="hp52-header__logo-dot"></span>
+      </a>
+      <nav>
+        <ul class="hp52-header__nav">
+          {%- if section.settings.menu != blank -%}
+            {%- for link in linklists[section.settings.menu].links -%}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {%- endfor -%}
+          {%- else -%}
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#featured">Products</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#testimonials">Reviews</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          {%- endif -%}
+        </ul>
+      </nav>
+      <div class="hp52-header__actions">
+        <a href="{{ routes.cart_url }}" class="hp52-header__cart" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="hp52-header__cart-badge">{{ cart.item_count | default: 0 }}</span>
+        </a>
+        <button class="hp52-header__toggle" id="hp52Toggle" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="hp52-mobile-menu" id="hp52Menu">
+  {%- if section.settings.menu != blank -%}
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="#hero">Home</a>
+    <a href="#featured">Products</a>
+    <a href="#categories">Categories</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="#faq">FAQ</a>
+  {%- endif -%}
+</div>
+
+<script>
+  (function() {
+    var hdr = document.getElementById('{{ section_id }}');
+    var btn = document.getElementById('hp52Toggle');
+    var menu = document.getElementById('hp52Menu');
+    if (hdr) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 15) hdr.classList.add('scrolled');
+        else hdr.classList.remove('scrolled');
+      });
+    }
+    if (btn && menu) {
+      btn.addEventListener('click', function() {
+        menu.classList.toggle('open');
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "HP52 Header",
+  "tag": "section",
+  "class": "section-hp52-header",
+  "settings": [
+    { "type": "text", "id": "brand_name", "label": "Brand Name", "default": "STORE" },
+    { "type": "link_list", "id": "menu", "label": "Header Menu" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#111827" },
+    { "type": "color", "id": "primary_color", "label": "Accent Color", "default": "#2563eb" }
+  ],
+  "presets": [{ "name": "HP52 Header" }]
+}
+{% endschema %}

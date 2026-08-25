@@ -204,7 +204,25 @@ export default function PageKit(){
                           if(preview.status==="ready" && preview.href){ window.open(preview.href,'_blank'); }
                           else if(preview.status!=="staging"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }
                         }}>
-                          <img src={`/thumbnails/${page.id}.jpg`} alt={page.name} loading="lazy" style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'top'}} onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; }} />
+                          <img 
+                            src={`/thumbnails/${page.id}.jpg`} 
+                            alt={page.name} 
+                            loading="lazy" 
+                            style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'top', display:'block'}} 
+                            onError={(e)=>{ 
+                              const img = e.target as HTMLImageElement;
+                              if (page.id.endsWith('-home') && !img.dataset.retry1) {
+                                img.dataset.retry1 = 'true';
+                                img.src = `/thumbnails/${page.id.replace(/-home$/, '')}.jpg`;
+                              } else if (page.id.includes('hp-v') && !img.dataset.retry2) {
+                                img.dataset.retry2 = 'true';
+                                const m = page.id.match(/hp-v(\d+)/);
+                                if (m) img.src = `/thumbnails/hp-v${m[1]}.jpg`;
+                              } else {
+                                img.style.opacity = '0.3';
+                              }
+                            }} 
+                          />
                           {/* Fallback gradient if image not loaded — hidden when img loads */}
                           <div style={{position:'absolute', inset:0, background:`linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)`, pointerEvents:'none'}} />
                           <div style={{position:'absolute', bottom:10, left:10, display:'flex', gap:6}}>

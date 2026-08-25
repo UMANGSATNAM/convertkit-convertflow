@@ -40,263 +40,6 @@ export interface PageDefinition {
 }
 
 export const PAGES: PageDefinition[] = [
-  // --- 15 ULTRA CRO-OPTIMIZED GLOBAL NICHE PRODUCT PAGES (PP-1 to PP-15) ---
-  {
-    id: "pp-1-beauty-dermal",
-    name: "Beauty & Dermal Skincare PDP",
-    pageType: "product",
-    description: "Ultra-converting beauty product page with clinical trial badges, color swatches, volume options & sticky cart.",
-    niche: "Beauty & skincare",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-2-streetwear-heavy",
-    name: "Heavyweight Streetwear PDP",
-    pageType: "product",
-    description: "Heavyweight drop product page with interactive size pill selector, sizing table & sticky buy bar.",
-    niche: "Streetwear & apparel",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-3-jewellery-diamond",
-    name: "Luxury Diamonds & Fine Jewellery PDP",
-    pageType: "product",
-    description: "High-end jewellery product page with karat selector, metal finish swatches & material proof.",
-    niche: "Jewellery",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-4-tech-cyber",
-    name: "Cyber Techwear & Electronics PDP",
-    pageType: "product",
-    description: "Spec-focused electronics page with benchmark comparison table, warranty badge & sticky add-to-cart.",
-    niche: "Tech & electronics",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-5-denim-heritage",
-    name: "Vintage Heavyweight Denim PDP",
-    pageType: "product",
-    description: "Textured vintage denim product page with cotton weight specs, fit guide & customer reviews.",
-    niche: "Denim & apparel",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-6-supplements-clinical",
-    name: "Clinical Wellness & Supplements PDP",
-    pageType: "product",
-    description: "Bio-active clinical supplement page with doctor endorsement, dosage calculator & bundle savings.",
-    niche: "Supplements & health",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-7-activewear-apex",
-    name: "Athletic Gym & Performance Fit PDP",
-    pageType: "product",
-    description: "Performance gym wear product page with sweat-wick tech specs, motion video reel & sticky checkout.",
-    niche: "Activewear",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-8-superfood-organic",
-    name: "Natural Superfood & Farm Wellness PDP",
-    pageType: "product",
-    description: "Farm-to-table superfood page with nutrition facts table, organic certification & bundle discount.",
-    niche: "Food & wellness",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-9-minimal-decor",
-    name: "Modern Interior Furniture PDP",
-    pageType: "product",
-    description: "Minimal interior product page with dimension blueprints, material swatches & UGC room photos.",
-    niche: "Home & decor",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-10-eyewear-luxury",
-    name: "Designer Eyewear & Sunglasses PDP",
-    pageType: "product",
-    description: "High-fashion eyewear page with lens tint selector, UV protection specs & face shape guide.",
-    niche: "Eyewear & fashion",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-11-fragrance-parfum",
-    name: "Artisanal Eau de Parfum PDP",
-    pageType: "product",
-    description: "Artisanal fragrance product page with scent pyramid notes, longevity ratings & sample pack bundle.",
-    niche: "Fragrance & parfum",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-12-footwear-sole",
-    name: "Ergonomic Sole Sneaker Drop PDP",
-    pageType: "product",
-    description: "Ergonomic footwear page with arch support specs, shoe size converter & sneakerhead drop timer.",
-    niche: "Footwear & sneakers",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-13-baby-organic",
-    name: "Certified Organic Baby Essentials PDP",
-    pageType: "product",
-    description: "Non-toxic organic baby product page with pediatrician seal, safety certs & subscription option.",
-    niche: "Baby & kids",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-14-pet-nutrition",
-    name: "Vet Approved Pet Care & Nutrition PDP",
-    pageType: "product",
-    description: "Veterinary approved pet food page with weight breed chart, natural ingredients & auto-ship delivery.",
-    niche: "Pet care",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-spec-matrix",
-      "product-bundle-upsell",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-  {
-    id: "pp-15-coffee-roastery",
-    name: "Single-Origin Artisanal Coffee PDP",
-    pageType: "product",
-    description: "Single-origin roast product page with grind size selector, roast level meter & fresh bean delivery.",
-    niche: "Coffee & roastery",
-    header: "header",
-    announcement: "announcement-bar",
-    sections: [
-      "main-product-cro",
-      "product-bundle-upsell",
-      "product-spec-matrix",
-      "product-ugc-reviews",
-      "product-sticky-cart"
-    ],
-    footer: "footer"
-  },
-
   // ── Home ───────────────────────────────────────────────────────────────
   {
     id: "peri-beauty",
@@ -305,8 +48,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Beauty & skincare",
     description:
       "Soft hero, ingredient story, then bestsellers and reviews. Built for skincare and cosmetics.",
-    header: "header-natural-v1",
-    footer: "footer-natural-v1",
+    header: "header-peri-beauty",
+    footer: "footer-peri-beauty",
     sections: [
       "hp1-marquee",
       "hp1-hero",
@@ -331,8 +74,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Streetwear",
     description:
       "Tabbed hero into a drop grid, manifesto, then proof. Built for streetwear releases.",
-    header: "hp51-header",
-    footer: "hp51-footer",
+    header: "header-rawblox-streetwear",
+    footer: "footer-rawblox-streetwear",
     sections: [
       "hp51-marquee",
       "hp51-hero-tabs",
@@ -353,8 +96,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Streetwear & Activewear",
     description:
       "450GSM cotton drop grid, marquee ticker, video reels, and heavy typography. Built for urban streetwear brands.",
-    header: "hp51-header",
-    footer: "hp51-footer",
+    header: "header-volt-streetwear-active",
+    footer: "footer-volt-streetwear-active",
     sections: [
       "hp2-hero",
       "hp2-usp",
@@ -382,8 +125,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Luxury Apparel",
     description:
       "High fashion aesthetic, transparent header, large lookbook, and gold accent styling for couture brands.",
-    header: "header-luxury-v1",
-    footer: "footer-luxury-v1",
+    header: "header-maison-couture",
+    footer: "footer-maison-couture",
     sections: [
       "hp4-hero",
       "hp4-marquee",
@@ -410,8 +153,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Minimal Apparel",
     description:
       "Clean, airy layout with generous whitespace, subtle category pills, and sustainable brand storytelling.",
-    header: "header-minimal-v1",
-    footer: "footer-minimal-v1",
+    header: "header-nordic-minimal-apparel",
+    footer: "footer-nordic-minimal-apparel",
     sections: [
       "hp6-hero",
       "hp6-marquee",
@@ -435,8 +178,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Denim & Apparel",
     description:
       "Textured vintage look with craft storytelling, fit guide tiles, customer UGC gallery, and heritage footer.",
-    header: "hp10-header",
-    footer: "hp10-footer",
+    header: "header-vintage-denim-co",
+    footer: "footer-vintage-denim-co",
     sections: [
       "hp10-announcement-bar",
       "hp10-hero",
@@ -460,8 +203,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Urban Clothing",
     description:
       "Monochrome dark aesthetic, scrolling text ticker, oversized collection grid, and social proof reels.",
-    header: "hp18-header",
-    footer: "hp18-footer",
+    header: "header-urban-monochrome-drop",
+    footer: "footer-urban-monochrome-drop",
     sections: [
       "hp18-announcement-bar",
       "hp18-hero",
@@ -485,8 +228,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Direct to consumer",
     description:
       "The full conversion stack: proof above the fold, two product bands, comparison, reviews, FAQ.",
-    header: "header-bold-v1",
-    footer: "footer-bold-v1",
+    header: "header-d2c-archetype",
+    footer: "footer-d2c-archetype",
     sections: [
       "hp50-marquee",
       "hp50-hero",
@@ -511,8 +254,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Luxury & fashion",
     description:
       "Editorial and unhurried. Announcement, marquee, hero, categories, story, reviews, signup.",
-    header: "hp19-header",
-    footer: "footer-luxury-mega-v1",
+    header: "header-atelier-luxury",
+    footer: "footer-atelier-luxury",
     sections: [
       "hp19-announcement-bar",
       "hp19-marquee",
@@ -538,8 +281,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Jewellery",
     description:
       "Gift finder, solitaire feature and try-at-home. Built around considered, high-value purchases.",
-    header: "caratlane-header",
-    footer: "caratlane-footer",
+    header: "header-caratlane-jewellery",
+    footer: "footer-caratlane-jewellery",
     sections: [
       "caratlane-announcement",
       "caratlane-marquee",
@@ -563,8 +306,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Design-led brands",
     description:
       "Type-first and deliberately loud. Parallax, mosaic, lookbook and a stats counter.",
-    header: "hp7-header",
-    footer: "hp7-18-mega-footer",
+    header: "header-editorial-brutalist",
+    footer: "footer-editorial-brutalist",
     sections: [
       "hp7-01-announcement-bar",
       "hp7-02-hero-editorial",
@@ -589,8 +332,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Lifestyle & homeware",
     description:
       "A bento tile grid does the merchandising, with video and social proof underneath.",
-    header: "hp8-header",
-    footer: "hp8-footer",
+    header: "header-bento-modern",
+    footer: "footer-bento-modern",
     sections: [
       "hp8-announcement-bar",
       "hp8-hero",
@@ -615,8 +358,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Electronics & gadgets",
     description:
       "Spec-led. Image banner, comparison table, blog and a contact form for pre-sales questions.",
-    header: "hp9-header",
-    footer: "hp9-footer",
+    header: "header-tech-flagship",
+    footer: "footer-tech-flagship",
     sections: [
       "hp9-announcement-bar",
       "hp9-hero",
@@ -642,8 +385,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Apparel",
     description:
       "Shot-driven. Lookbook and guarantee bands framing the product grid, blog at the foot.",
-    header: "hp12-header",
-    footer: "hp12-footer",
+    header: "header-lookbook-lifestyle",
+    footer: "footer-lookbook-lifestyle",
     sections: [
       "hp12-announcement-bar",
       "hp12-hero",
@@ -669,8 +412,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Food, wellness & naturals",
     description:
       "Warm and unhurried, with a countdown, gallery and map for brands that sell somewhere real.",
-    header: "header-natural-v1",
-    footer: "hp20-18-footer-promo",
+    header: "header-organic-botanica",
+    footer: "footer-organic-botanica",
     sections: [
       "hp20-01-hero",
       "hp20-02-marquee",
@@ -696,8 +439,8 @@ export const PAGES: PageDefinition[] = [
     niche: "Supplements & health",
     description:
       "Evidence-forward: features grid, comparison, trust badges and reviews before the signup.",
-    header: "header-minimal-v1",
-    footer: "footer-minimal-v1",
+    header: "header-wellness-clinical",
+    footer: "footer-wellness-clinical",
     sections: [
       "hp45-marquee",
       "hp45-hero",
@@ -724,8 +467,8 @@ export const PAGES: PageDefinition[] = [
     niche: "General retail",
     description:
       "A safe, complete default: logos, value props, shoppable image, video, reviews, blog, signup.",
-    header: "header-commerce-v2",
-    footer: "hpv6-18-footer",
+    header: "header-hpv6-conversion",
+    footer: "footer-hpv6-conversion",
     sections: [
       "hpv6-01-announcement",
       "hpv6-02-hero",
@@ -860,8 +603,8 @@ const ADAPTED: PageDefinition[] = (STORE_PAGE_TEMPLATES as any[])
     description: t.description || "",
     sections: (t.sections || []).map((s: any) => s.componentId).filter(Boolean),
     announcement: t.announcement || undefined,
-    header: t.header || undefined,
-    footer: t.footer || undefined,
+    header: `header-${t.id}`,
+    footer: `footer-${t.id}`,
     heroImg: t.heroImg || undefined,
     styleTag: t.styleTag || undefined,
   }))
