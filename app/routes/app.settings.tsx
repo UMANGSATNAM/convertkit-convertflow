@@ -1,8 +1,8 @@
-import { Page, Layout, Card, Text, BlockStack, Button, FormLayout, TextField, DataTable, InlineStack } from "@shopify/polaris";
-import { useSubmit, useLoaderData } from "@remix-run/react";
+import { Page, Layout, Card, Text, BlockStack, Button, FormLayout, TextField, DataTable, InlineStack, Banner } from "@shopify/polaris";
+import { useSubmit, useLoaderData, useActionData } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 
@@ -10,14 +10,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
   
-  if (!shop) return json({ pincodes: [] });
+  if (!shop) return json({ pincodes: [], storefrontPassword: "" });
 
   const pincodes = await prisma.pincodeZone.findMany({
     where: { shopId: shop.id },
     take: 100 // Just load the first 100 for this UI
   });
 
-  return json({ pincodes });
+  const storefrontPassword = (shop.brandConfig as any)?.storefrontPassword ?? "";
+
+  return json({ pincodes, storefrontPassword });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -27,6 +29,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData();
   const intent = formData.get("intent");
+
+  if (intent === "save-password") {
+    const password = (formData.get("storefrontPassword") as string) ?? "";
+    const existing = (shop.brandConfig as Record<string, any>) ?? {};
+    await prisma.shop.update({
+      where: { id: shop.id },
+      data: { brandConfig: { ...existing, storefrontPassword: password } },
+    });
+    return json({ success: true, intent: "save-password" });
+  }
 
   if (intent === "add") {
     const pincode = formData.get("pincode") as string;
@@ -51,12 +63,30 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function PincodeSettings() {
-  const { pincodes } = useLoaderData<typeof loader>();
+  const { pincodes, storefrontPassword: savedPassword } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const submit = useSubmit();
 
+  const [sfPassword, setSfPassword] = useState(savedPassword || "");
+  const [passwordSaved, setPasswordSaved] = useState(false);
   const [newPincode, setNewPincode] = useState("");
   const [etaDays, setEtaDays] = useState("3");
   const [codEnabled, setCodEnabled] = useState(true);
+
+  useEffect(() => {
+    if ((actionData as any)?.intent === "save-password" && (actionData as any)?.success) {
+      setPasswordSaved(true);
+      const t = setTimeout(() => setPasswordSaved(false), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [actionData]);
+
+  const handleSavePassword = () => {
+    const formData = new FormData();
+    formData.append("intent", "save-password");
+    formData.append("storefrontPassword", sfPassword);
+    submit(formData, { method: "post" });
+  };
 
   const handleAdd = () => {
     const formData = new FormData();
@@ -83,8 +113,36 @@ export default function PincodeSettings() {
   ]);
 
   return (
-    <Page title="Pincode & Delivery Settings" fullWidth>
+    <Page title="Settings" fullWidth>
       <Layout>
+        {/* ── Storefront Password ── */}
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="400">
+              <Text as="h2" variant="headingMd">Storefront Password</Text>
+              <Text as="p" variant="bodyMd" tone="subdued">
+                If your store is password-protected (development stores), enter the password here
+                so that page previews can load correctly.
+              </Text>
+              {passwordSaved && (
+                <Banner tone="success" onDismiss={() => setPasswordSaved(false)}>
+                  Password saved! Previews will now work.
+                </Banner>
+              )}
+              <FormLayout>
+                <TextField
+                  label="Store Password"
+                  value={sfPassword}
+                  onChange={setSfPassword}
+                  autoComplete="off"
+                  placeholder="Enter your storefront password"
+                />
+                <Button variant="primary" onClick={handleSavePassword}>Save Password</Button>
+              </FormLayout>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+        {/* ── Add Pincode ── */}
         <Layout.Section variant="oneThird">
           <Card>
             <BlockStack gap="400">

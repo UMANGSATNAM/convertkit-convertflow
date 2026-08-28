@@ -37,6 +37,7 @@ export default function App() {
         <Link to="/app/pagekit">Build your store</Link>
         <Link to="/app/sections">Add sections</Link>
         <Link to="/app/theme">My theme</Link>
+        <Link to="/app/youtube">YouTube Shorts</Link>
         <Link to="/app/settings">Settings</Link>
       </NavMenu>
       <Outlet />

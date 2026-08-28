@@ -18,7 +18,13 @@ export const webhookQueue = new Queue("webhooks", {
   connection: redis as any,
 });
 
+export const youtubeQueue = new Queue("youtube", {
+  connection: redis as any,
+});
+
 // We will implement workers inside their respective domain folders,
 // e.g. services/generator/pipeline.server.ts will instantiate the generator worker.
 import "./generator/pipeline.server";
 import "./webhook-worker.server";
+import "./youtube/monitor-worker.server";
+import "./youtube/process-worker.server";

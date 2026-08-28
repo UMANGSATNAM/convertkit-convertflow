@@ -57,6 +57,7 @@ model Shop {
   usage             UsageCounter[]
   integrations      Integration[]
   storeBlueprints   StoreBlueprint[]
+  youtubeChannels   YouTubeChannel[]
 }
 
 model StoreGeneration {
@@ -458,5 +459,128 @@ model RegistryMeta {
   id           String   @id @default("singleton")
   registryHash String
   seededAt     DateTime @default(now())
+}
+
+model YouTubeChannel {
+  id                String   @id @default(cuid())
+  shopId            String
+  shop              Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  channelId         String   @unique
+  channelName       String
+  channelHandle     String?
+  accessToken       String   @db.Text
+  refreshToken      String   @db.Text
+  tokenExpiry       DateTime
+  isMonitoring      Boolean  @default(false)
+  lastCheckedAt     DateTime?
+  lastVideoId       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  videos            YouTubeVideo[]
+  shorts            YouTubeShort[]
+  processingJobs    ProcessingJob[]
+
+  @@index([shopId])
+  @@index([channelId])
+}
+
+model YouTubeVideo {
+  id              String   @id @default(cuid())
+  channelId       String
+  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  videoId         String   @unique
+  title           String
+  description     String?  @db.Text
+  duration        Int
+  publishedAt     DateTime
+  thumbnailUrl    String?
+  isProcessed     Boolean  @default(false)
+  processedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shorts          YouTubeShort[]
+  processingJobs  ProcessingJob[]
+
+  @@index([channelId])
+  @@index([videoId])
+  @@index([publishedAt])
+}
+
+model YouTubeShort {
+  id              String   @id @default(cuid())
+  channelId       String
+  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sourceVideoId   String
+  sourceVideo     YouTubeVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Cascade)
+  shortVideoId    String?  @unique
+  title           String
+  description     String?  @db.Text
+  startTime       Int
+  endTime         Int
+  status          ShortStatus @default(PENDING)
+  localPath       String?
+  uploadedAt      DateTime?
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  processingJobs  ProcessingJob[]
+
+  @@index([channelId])
+  @@index([sourceVideoId])
+  @@index([status])
+  @@index([shortVideoId])
+}
+
+model ProcessingJob {
+  id              String   @id @default(cuid())
+  channelId       String
+  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  videoId         String?
+  video           YouTubeVideo? @relation(fields: [videoId], references: [id], onDelete: SetNull)
+  shortId         String?
+  short           YouTubeShort? @relation(fields: [shortId], references: [id], onDelete: SetNull)
+  type            JobType
+  status          JobStatus @default(QUEUED)
+  progress        Int      @default(0)
+  currentStep     String?
+  errorMessage    String?
+  result          Json?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([channelId])
+  @@index([videoId])
+  @@index([shortId])
+  @@index([status])
+  @@index([type])
+}
+
+enum ShortStatus {
+  PENDING
+  PROCESSING
+  READY
+  UPLOADING
+  UPLOADED
+  FAILED
+}
+
+enum JobType {
+  FETCH_VIDEOS
+  CREATE_SHORT
+  UPLOAD_SHORT
+  MONITOR_CHANNEL
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
