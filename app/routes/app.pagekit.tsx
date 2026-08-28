@@ -8,8 +8,36 @@ import { SearchIcon, ViewIcon, CheckIcon } from "@shopify/polaris-icons";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import { ALL_PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
-import { applyToLiveTheme, stagePreview, restoreBackup, liveThemeId } from "../pagekit/apply.server";
+import { applyToLiveTheme, stagePreview, stagePreviewBatch, restoreBackup, liveThemeId } from "../pagekit/apply.server";
 import { verifyPage, describeVerification } from "../pagekit/verify.server";
+
+/**
+ * Is the storefront behind a password, and do we have it?
+ *
+ * A password-protected storefront returns the login form for every page, with a
+ * 200 status. The preview proxy already detects that and renders an explanation
+ * — but the explanation is drawn inside the preview frame, which is scaled to
+ * 23% so a desktop page fits the card, so it comes out as unreadable specks.
+ * The merchant sees twelve blank cards and no reason.
+ *
+ * Shopify does not expose the storefront password through the Admin API, so it
+ * cannot be read; it has to be typed once in Settings. Detecting it here means
+ * the screen can say that plainly instead of showing nothing.
+ */
+async function passwordState(shopDomain: string, saved: string | undefined) {
+  try {
+    const res = await fetch(`https://${shopDomain}/`, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "text/html" },
+      redirect: "follow",
+    });
+    const html = await res.text();
+    const locked = /name=["']password["']/.test(html) && /storefront_password|form_type/.test(html);
+    return { locked, havePassword: Boolean(saved) };
+  } catch {
+    // A probe that cannot run is not evidence either way, so it claims nothing.
+    return { locked: false, havePassword: Boolean(saved) };
+  }
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -19,7 +47,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (shop) {
     try { themeId = await liveThemeId(shop); } catch (err:any){ themeError = err.message; }
   }
-  return json({ pages: ALL_PAGES, pageTypes: PAGE_TYPES, shopDomain: session.shop, connected: Boolean(shop), themeId, themeError });
+
+  const saved = (shop?.brandConfig as any)?.storefrontPassword as string | undefined;
+  const { locked, havePassword } = await passwordState(session.shop, saved);
+
+  return json({
+    pages: ALL_PAGES, pageTypes: PAGE_TYPES, shopDomain: session.shop,
+    connected: Boolean(shop), themeId, themeError,
+    // Locked and no password saved means every preview will be blank.
+    previewsBlocked: locked && !havePassword,
+  });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -36,6 +73,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const result = await stagePreview(shop, page);
       if (!result.ok) return json({ intent, pageId, ok: false, error: result.error });
       return json({ intent, pageId, ok: true, themeId: result.themeId, previewPath: result.previewPath });
+    }
+
+    // Several cards at once, in a single upload. Designs mostly do not share
+    // files, so this saves little bandwidth — what it saves is waiting: one
+    // round trip instead of one per card.
+    if (intent === "stage-batch") {
+      const ids = String(form.get("pageIds") || "").split(",").filter(Boolean);
+      const wanted = ids.map(pageById).filter(Boolean) as any[];
+      if (!wanted.length) return json({ intent, ok: false, error: "No designs to stage.", results: [] });
+
+      const { themeId, results } = await stagePreviewBatch(shop, wanted);
+      return json({ intent, ok: true, themeId, results });
     }
     if (intent === "apply") {
       const page = pageById(pageId);
@@ -58,8 +107,135 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:string; href?:string; error?:string; }
 
+/**
+ * A card's preview: the real storefront, rendered.
+ *
+ * The stored JPG is kept, but only as a placeholder while the live frame loads.
+ * On its own it is the wrong thing to show — it is a snapshot of someone else's
+ * store, so it cannot show the merchant their own products, prices or branding,
+ * which is the only reason to look at a preview before applying.
+ *
+ * The frame is the storefront proxied through this app. Pointing an iframe
+ * straight at the shop does not work: Shopify sends `X-Frame-Options` on
+ * storefront responses and the browser refuses to render it.
+ *
+ * A desktop page is rendered at 1280px and scaled down to the card, so the
+ * layout is the real one rather than the mobile breakpoint. The scale is
+ * measured rather than assumed, because the grid columns are fluid.
+ */
+function LivePreview({
+  pageId, poster, alt, status, src, error, niche, onVisible, onOpen,
+}: {
+  pageId: string;
+  poster: string;
+  alt: string;
+  status: PreviewState["status"];
+  src?: string;
+  error?: string;
+  niche: string;
+  onVisible: (id: string) => void;
+  onOpen: () => void;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.25);
+  const [loaded, setLoaded] = useState(false);
+
+  const WIDTH = 1280;
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / WIDTH));
+    ro.observe(el);
+    setScale(el.clientWidth / WIDTH);
+
+    // Ask for this preview only when the card is near the viewport. Staging
+    // every design up front is minutes of uploads the merchant never sees.
+    const io = new IntersectionObserver(
+      entries => { if (entries.some(e => e.isIntersecting)) onVisible(pageId); },
+      { rootMargin: "400px" }
+    );
+    io.observe(el);
+
+    return () => { ro.disconnect(); io.disconnect(); };
+  }, [pageId, onVisible]);
+
+  const height = Math.round(WIDTH * 2.7 / 4);
+
+  return (
+    <div
+      ref={box}
+      onClick={onOpen}
+      style={{ position: "relative", aspectRatio: "4 / 2.7", overflow: "hidden", background: "#f9fafb", cursor: "pointer" }}
+    >
+      <img
+        src={poster}
+        alt={alt}
+        loading="lazy"
+        style={{
+          width: "100%", height: "100%", objectFit: "cover", objectPosition: "top",
+          display: "block",
+          // Kept underneath so the card never flashes empty, and dropped once
+          // the real page is up.
+          opacity: loaded ? 0 : 1,
+          transition: "opacity .25s ease",
+        }}
+        onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+      />
+
+      {status === "ready" && src && (
+        <iframe
+          title={alt}
+          src={src}
+          loading="lazy"
+          scrolling="no"
+          onLoad={() => setLoaded(true)}
+          style={{
+            position: "absolute", top: 0, left: 0,
+            width: WIDTH, height,
+            border: 0,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+            // The card is for looking at; clicks open the full preview.
+            pointerEvents: "none",
+            opacity: loaded ? 1 : 0,
+            transition: "opacity .25s ease",
+          }}
+        />
+      )}
+
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)", pointerEvents: "none" }} />
+
+      <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 6 }}>
+        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: loaded ? "#16a34a" : "#6b7280", border: "1px solid rgba(0,0,0,.06)" }}>
+          {loaded ? "Live" : status === "failed" ? "Preview failed" : "Loading…"}
+        </span>
+      </div>
+
+      <div style={{ position: "absolute", bottom: 10, right: 10 }}>
+        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 10px", borderRadius: 999, fontSize: 11, color: "#6b7280", border: "1px solid rgba(0,0,0,.06)", maxWidth: 120, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "inline-block" }}>
+          {niche}
+        </span>
+      </div>
+
+      {status === "staging" && !loaded && (
+        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,.6)", display: "grid", placeItems: "center", gap: 6 }}>
+          <Spinner size="small" />
+        </div>
+      )}
+
+      {status === "failed" && (
+        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,.92)", display: "grid", placeItems: "center", padding: 16, textAlign: "center" }}>
+          <Text as="p" variant="bodySm" tone="critical">{error || "This preview could not be built."}</Text>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PageKit(){
-  const { pages, pageTypes, shopDomain, connected, themeId, themeError } = useLoaderData<typeof loader>();
+  const { pages, pageTypes, shopDomain, connected, themeId, themeError, previewsBlocked } = useLoaderData<typeof loader>();
   const [params,setParams]=useSearchParams();
   const activeType=(params.get("type")||"index") as PageType;
   const tabIndex=Math.max(0, pageTypes.findIndex(t=>t.id===activeType));
@@ -94,29 +270,81 @@ export default function PageKit(){
   const applier=useFetcher<any>();
   const undoer=useFetcher<any>();
 
-  const queue=useRef<string[]>([]); const busy=useRef(false);
-  const pump=useCallback(()=>{
-    if(busy.current) return;
-    const next=queue.current.shift();
-    if(!next) return;
-    busy.current=true;
-    setPreviews(p=>({...p,[next]:{status:"staging"}}));
-    stager.submit({intent:"stage", pageId:next},{method:"post"});
+  // ── Previews fill in as you scroll ───────────────────────────────────
+  //
+  // Cards ask to be staged when they come near the viewport, and the requests
+  // are grouped. Staging every design up front is not an option: the Home tab
+  // holds sixty-three, and one upload each takes minutes, so the grid the
+  // merchant is actually looking at stays empty while work happens far below.
+  //
+  // Six is a compromise: large enough that the grid fills in a few round trips
+  // rather than sixty-three, small enough that the first cards appear quickly
+  // instead of after one long request.
+  const BATCH = 6;
+
+  const pending = useRef<Set<string>>(new Set());
+  const inFlight = useRef(false);
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
+
+  const flush = useCallback(()=>{
+    if(inFlight.current) return;
+    const ids=[...pending.current].slice(0,BATCH);
+    if(!ids.length) return;
+    for(const id of ids) pending.current.delete(id);
+    inFlight.current=true;
+    setPreviews(p=>{ const n={...p}; for(const id of ids) n[id]={status:"staging"}; return n; });
+    stager.submit({intent:"stage-batch", pageIds:ids.join(",")},{method:"post"});
   },[stager]);
 
+  /** Called by each card when it scrolls into view. */
+  const requestPreview=useCallback((id:string)=>{
+    setVisibleIds(v=> v.has(id) ? v : new Set(v).add(id));
+  },[]);
+
   useEffect(()=>{
-    queue.current=visible.filter(p=>!previews[p.id]).map(p=>p.id);
-    pump();
-  },[activeType, search, nicheFilter]);
+    let queued=false;
+    for(const p of visible){
+      if(previews[p.id] || pending.current.has(p.id)) continue;
+      if(!visibleIds.has(p.id)) continue;
+      pending.current.add(p.id); queued=true;
+    }
+    if(queued) flush();
+  },[visible, visibleIds, previews, flush]);
+
+  // Anything filtered out mid-flight is no longer wanted.
+  useEffect(()=>{
+    const shown=new Set(visible.map(p=>p.id));
+    for(const id of [...pending.current]) if(!shown.has(id)) pending.current.delete(id);
+  },[visible]);
 
   useEffect(()=>{
     if(stager.state!=="idle" || !stager.data) return;
     const d=stager.data;
-    if(d.intent!=="stage") return;
-    setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
-    busy.current=false;
-    setTimeout(pump,350);
-  },[stager.state, stager.data, pump, shopDomain]);
+
+    if(d.intent==="stage-batch"){
+      setPreviews(p=>{
+        const n={...p};
+        for(const r of (d.results||[])){
+          n[r.pageId]= r.ok
+            ? { status:"ready",
+                src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(r.previewPath)}`,
+                href:`https://${shopDomain}${r.previewPath}` }
+            : { status:"failed", error:r.error };
+        }
+        return n;
+      });
+      inFlight.current=false;
+      // Straight on to the next batch — the merchant is watching the grid fill.
+      setTimeout(flush,120);
+      return;
+    }
+
+    if(d.intent==="stage"){
+      setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
+      inFlight.current=false;
+      setTimeout(flush,120);
+    }
+  },[stager.state, stager.data, flush, shopDomain]);
 
   useEffect(()=>{
     if(applier.state==="idle" && applier.data?.intent==="apply"){ setApplied(applier.data); setConfirming(null); }
@@ -145,7 +373,7 @@ export default function PageKit(){
                   <Text as="h2" variant="headingLg">Choose your homepage</Text>
                   <Text as="p" tone="subdued">Every design is complete — no blank sections. Previews are your store with your products.</Text>
                 </BlockStack>
-                <Badge tone="success">Live theme: {themeId ? themeId.slice(0,8)+"…" : "—"}</Badge>
+                <Badge tone="success">{`Live theme: ${themeId ? themeId.slice(0,8)+"…" : "—"}`}</Badge>
               </InlineStack>
               <Divider />
               <InlineStack gap="300" wrap>
@@ -161,6 +389,25 @@ export default function PageKit(){
         </Card>
 
         {themeError && <Banner tone="critical" title="Could not read your theme"><p>{themeError}</p></Banner>}
+
+        {previewsBlocked && (
+          <Banner tone="warning" title="Previews are blank because your storefront is password protected">
+            <BlockStack gap="200">
+              <Text as="p" variant="bodyMd">
+                Shopify returns the password page to anything that asks for your store, including
+                this app, so there is nothing to show in the cards. Shopify does not share that
+                password with apps — enter it once in Settings and every preview here starts
+                working. Applying a design works either way.
+              </Text>
+              <InlineStack gap="200">
+                <Button url="/app/settings" variant="primary">Enter storefront password</Button>
+                <Button url={`https://${shopDomain}/admin/online_store/preferences`} target="_blank">
+                  Or remove the password in Shopify
+                </Button>
+              </InlineStack>
+            </BlockStack>
+          </Banner>
+        )}
         {applied && (
           <Banner tone={applied.ok && applied.verification?.ok ? "success" : applied.ok ? "warning" : "critical"} title={!applied.ok ? "Nothing was applied" : applied.verification?.ok ? "Applied and live ✓" : "Applied, but check required"} onDismiss={()=>setApplied(null)}>
             <BlockStack gap="200">
@@ -200,57 +447,33 @@ export default function PageKit(){
                           <div style={{width:24}} />
                         </div>
                         {/* HERO — STATIC SCREENSHOT (SS) CHIPKAVO — distinct per page, Preview opens full page */}
-                        <div style={{position:'relative', aspectRatio:'4 / 2.7', overflow:'hidden', background:'#f9fafb', cursor:'pointer'}} onClick={()=>{
-                          if(preview.status==="ready" && preview.href){ window.open(preview.href,'_blank'); }
-                          else if(preview.status!=="staging"){ setPreviews(p=>({...p,[page.id]:{status:"staging"}})); stager.submit({intent:"stage", pageId:page.id},{method:"post"}); }
-                        }}>
-                          <img 
-                            src={`/thumbnails/${page.id}.jpg`} 
-                            alt={page.name} 
-                            loading="lazy" 
-                            style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'top', display:'block'}} 
-                            onError={(e)=>{ 
-                              const img = e.target as HTMLImageElement;
-                              if (page.id.endsWith('-home') && !img.dataset.retry1) {
-                                img.dataset.retry1 = 'true';
-                                img.src = `/thumbnails/${page.id.replace(/-home$/, '')}.jpg`;
-                              } else if (page.id.includes('hp-v') && !img.dataset.retry2) {
-                                img.dataset.retry2 = 'true';
-                                const m = page.id.match(/hp-v(\d+)/);
-                                if (m) img.src = `/thumbnails/hp-v${m[1]}.jpg`;
-                              } else {
-                                img.style.opacity = '0.3';
-                              }
-                            }} 
-                          />
-                          {/* Fallback gradient if image not loaded — hidden when img loads */}
-                          <div style={{position:'absolute', inset:0, background:`linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)`, pointerEvents:'none'}} />
-                          <div style={{position:'absolute', bottom:10, left:10, display:'flex', gap:6}}>
-                            <span style={{background:'rgba(255,255,255,.95)', backdropFilter:'blur(6px)', padding:'4px 8px', borderRadius:999, fontSize:11, fontWeight:700, color:'#16a34a', border:'1px solid rgba(0,0,0,.06)'}}>Live</span>
-                          </div>
-                          <div style={{position:'absolute', bottom:10, right:10}}>
-                            <span style={{background:'rgba(255,255,255,.95)', backdropFilter:'blur(6px)', padding:'4px 10px', borderRadius:999, fontSize:11, fontWeight:500, color:'#6b7280', border:'1px solid rgba(0,0,0,.06)', maxWidth:120, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{page.niche}</span>
-                          </div>
-                          {preview.status==="staging" && <div style={{position:'absolute', inset:0, background:'rgba(255,255,255,.75)', display:'grid', placeItems:'center'}}><Spinner size="small"/><Text as="p" variant="bodySm">Preparing live preview…</Text></div>}
-                        </div>
+                        <LivePreview
+                          pageId={page.id}
+                          poster={`/thumbnails/${page.id}.jpg`}
+                          alt={page.name}
+                          status={preview.status}
+                          src={preview.src}
+                          error={preview.error}
+                          niche={page.niche}
+                          onVisible={requestPreview}
+                          onOpen={()=>setPreviewModal(page.id)}
+                        />
                         {/* Content — EXACT like screenshot: purple niche, bold title, description, Visit site button */}
                         <Box padding="300">
                           <BlockStack gap="150">
-                            <Text as="p" variant="bodySm" style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche.toUpperCase()}</Text>
-                            <Text as="h3" variant="headingSm" style={{fontWeight:800, fontSize:15, lineHeight:1.2}}>{page.name.toUpperCase()}</Text>
-                            <Text as="p" variant="bodySm" tone="subdued" style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:54, fontSize:12, lineHeight:1.5}}>{page.description}</Text>
+                            <span style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche.toUpperCase()}</span>
+                            <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0}}>{page.name.toUpperCase()}</h3>
+                            <p style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:54, fontSize:12, lineHeight:1.5, color:'#616161', margin:0}}>{page.description}</p>
                             <InlineStack gap="200" blockAlign="center">
                               <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply</Button>
-                              <Button onClick={()=>{
-                                if(preview.status==="ready" && preview.href){ window.open(preview.href,'_blank'); }
-                                else if(preview.status==="waiting" || preview.status==="failed"){
-                                  setPreviews(p=>({...p,[page.id]:{status:"staging"}}));
-                                  stager.submit({intent:"stage", pageId:page.id},{method:"post"});
-                                  // after staging, preview.href will be ready — user can click again to open full page
-                                } else {
-                                  // staging in progress
-                                }
-                              }}>Preview</Button>
+                              {/* Opens the big preview. It deliberately does not
+                                  submit its own stage request: that shares the
+                                  `stager` fetcher with the batch, and a second
+                                  submission replaces the first one's response —
+                                  the cards waiting on that batch would sit on
+                                  "Loading…" for ever. Cards stage themselves
+                                  when they scroll into view. */}
+                              <Button onClick={()=>setPreviewModal(page.id)}>Preview</Button>
                             </InlineStack>
                           </BlockStack>
                         </Box>
@@ -273,11 +496,29 @@ export default function PageKit(){
           </BlockStack>
         </Modal.Section>
       </Modal>
-      <Modal open={Boolean(previewModal)} onClose={()=>setPreviewModal(null)} title={previewModal ? pages.find(p=>p.id===previewModal)?.name || "" : ""} large>
+      <Modal open={Boolean(previewModal)} onClose={()=>setPreviewModal(null)} title={previewModal ? pages.find(p=>p.id===previewModal)?.name || "" : ""} size="large">
         <Modal.Section flush>
           {previewModal && previews[previewModal]?.status==="ready" ? (
-            <iframe title="Preview" src={previews[previewModal]?.src} style={{width:'100%', height:'70vh', border:0, display:'block', background:'#fff'}} />
-          ) : <Box padding="400"><Text as="p" tone="subdued">Preview not ready yet. Click Preview on the card.</Text></Box>}
+            <BlockStack gap="0">
+              <iframe title="Preview" src={previews[previewModal]?.src} style={{width:'100%', height:'70vh', border:0, display:'block', background:'#fff'}} />
+              <Box padding="300">
+                <InlineStack gap="200">
+                  <Button url={previews[previewModal]?.href} target="_blank">Open on your storefront</Button>
+                  <Button variant="primary" onClick={()=>{ const id=previewModal; setPreviewModal(null); setConfirming(id); }}>
+                    Apply this page
+                  </Button>
+                </InlineStack>
+              </Box>
+            </BlockStack>
+          ) : (
+            <Box padding="400">
+              <InlineStack gap="200" blockAlign="center">
+                {previews[previewModal||""]?.status==="failed"
+                  ? <Text as="p" tone="critical">{previews[previewModal||""]?.error || "This preview could not be built."}</Text>
+                  : <><Spinner size="small" /><Text as="p" tone="subdued">Building this preview…</Text></>}
+              </InlineStack>
+            </Box>
+          )}
         </Modal.Section>
       </Modal>
     </Page>

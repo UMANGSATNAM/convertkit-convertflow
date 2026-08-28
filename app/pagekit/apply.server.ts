@@ -61,6 +61,112 @@ async function readJson(shop: any, themeId: string, file: string): Promise<any> 
   }
 }
 
+/**
+ * Everything a page needs, built but not written.
+ *
+ * Split out of `applyPage` so several pages can be staged in one upload.
+ *
+ * The win is round trips, not bytes. Six home designs measured at 109 files
+ * uploaded separately versus 104 merged — only 5% fewer, because neighbouring
+ * designs in the grid usually come from different families and share little
+ * beyond the utility stylesheet. What changes is that those files go up in one
+ * request instead of six, and a tab holding sixty-three designs is bound by how
+ * many times it has to wait for Shopify, not by how many files it sends.
+ */
+interface BuiltPage {
+  ok: boolean;
+  error?: string;
+  unknownSections?: string[];
+  missingFiles?: string[];
+  files: Record<string, string>;
+  templateFile: string;
+  order: string[];
+  collectionsWired: number;
+  missingPartials: string[];
+  bySectionId: Map<string, { id: string; source: string }>;
+}
+
+async function buildPage(
+  page: PageDefinition,
+  options: ApplyOptions = {}
+): Promise<BuiltPage> {
+  const empty = {
+    files: {}, templateFile: "", order: [], collectionsWired: 0,
+    missingPartials: [], bySectionId: new Map(),
+  };
+
+  const wanted = [...page.sections, page.announcement, page.header, page.footer].filter(Boolean) as string[];
+  const resolution = await resolveSections(wanted);
+
+  if (!resolution.ok) {
+    const parts: string[] = [];
+    if (resolution.unknown.length) {
+      parts.push(`${resolution.unknown.length} section(s) are not in the registry: ${resolution.unknown.join(", ")}`);
+    }
+    if (resolution.fileMissing.length) {
+      parts.push(`${resolution.fileMissing.length} section(s) have no Liquid on disk: ${resolution.fileMissing.join(", ")}`);
+    }
+    return {
+      ...empty,
+      ok: false,
+      error: `"${page.name}" cannot be applied. ${parts.join(". ")}. Nothing was written.`,
+      unknownSections: resolution.unknown,
+      missingFiles: resolution.fileMissing,
+    };
+  }
+
+  const bySectionId = new Map(resolution.resolved.map(r => [r.id, r]));
+  const pageSections = page.sections.map(id => bySectionId.get(id)!);
+
+  const bundle = await bundleFor(resolution.resolved);
+  const files: Record<string, string> = { ...bundle.files };
+
+  const sections: Record<string, any> = {};
+  const order: string[] = [];
+  let collectionsWired = 0;
+  const handles = options.collections?.length ? options.collections : ["all"];
+
+  pageSections.forEach((s, i) => {
+    const key = keyFor(i, s.id);
+
+    // Blocks and preset settings, read from the section's own schema. Without
+    // this, any section that renders inside `{% for block in section.blocks %}`
+    // comes out as an empty band — it uploads and validates, it just has
+    // nothing to loop over.
+    const seed = seedFor(s.source);
+
+    // Point product-showing sections at a real collection. Without this they
+    // fall through to their placeholder branch, which is what puts empty cards
+    // or invented product names on a freshly applied page.
+    const collectionSetting = wantsCollection(s.source);
+    if (collectionSetting) {
+      seed.settings[collectionSetting] = handles[collectionsWired % handles.length];
+      collectionsWired++;
+    }
+
+    sections[key] = {
+      type: s.id,
+      settings: seed.settings,
+      ...(seed.blocks ? { blocks: seed.blocks, block_order: seed.block_order } : {}),
+    };
+    order.push(key);
+  });
+
+  const base = TEMPLATE_FILE[page.pageType] || TEMPLATE_FILE.index;
+  const templateFile = options.variant ? base.replace(/\.json$/, `.${options.variant}.json`) : base;
+  files[templateFile] = JSON.stringify({ sections, order }, null, 2);
+
+  return {
+    ok: true,
+    files,
+    templateFile,
+    order,
+    collectionsWired,
+    missingPartials: [...new Set(bundle.missing)],
+    bySectionId,
+  };
+}
+
 export async function applyPage(
   shop: any,
   themeId: string,
@@ -459,4 +565,89 @@ export async function stagePreview(
   }
 
   return { ...result, themeId, previewPath: `${base}?view=${variant}` };
+}
+
+export interface StagedPreview {
+  pageId: string;
+  ok: boolean;
+  previewPath?: string;
+  error?: string;
+}
+
+/**
+ * Stages several designs in a single upload.
+ *
+ * One design per request does not scale: the Home tab alone holds sixty-three,
+ * and staging them one at a time is sixty-three round trips of about twenty
+ * files each, so the grid fills over minutes rather than seconds. Designs in the
+ * same family share nearly every file, and merging them into one record
+ * deduplicates by path before anything is sent.
+ *
+ * A design that cannot be resolved is reported against its own card and does not
+ * stop the others — unlike an apply, a failed preview harms nothing, so
+ * refusing the whole batch would only hide the designs that are fine.
+ *
+ * Collections and the sample product handle are looked up once for the batch
+ * rather than once per design.
+ */
+export async function stagePreviewBatch(
+  shop: any,
+  pages: PageDefinition[],
+  opts: { collections?: string[] } = {}
+): Promise<{ themeId: string; results: StagedPreview[] }> {
+  const themeId = await liveThemeId(shop);
+  const handles = opts.collections?.length ? opts.collections : await collectionHandles(shop);
+
+  const needsProduct = pages.some(p => p.pageType === "product");
+  const productHandle = needsProduct ? await sampleProductHandle(shop) : null;
+
+  const files: Record<string, string> = {};
+  const results: StagedPreview[] = [];
+  const staged: Array<{ pageId: string; path: string }> = [];
+
+  for (const page of pages) {
+    if (page.pageType === "product" && !productHandle) {
+      results.push({
+        pageId: page.id,
+        ok: false,
+        error: "This store has no active products, so a product page cannot be previewed.",
+      });
+      continue;
+    }
+
+    const variant = `pk-${page.id}`.slice(0, 45);
+    const built = await buildPage(page, { collections: handles, variant });
+
+    if (!built.ok) {
+      results.push({ pageId: page.id, ok: false, error: built.error });
+      continue;
+    }
+
+    Object.assign(files, built.files);
+
+    const base =
+      page.pageType === "collection" ? "/collections/all" :
+      page.pageType === "product" ? `/products/${productHandle}` : "/";
+
+    staged.push({ pageId: page.id, path: `${base}?view=${variant}` });
+  }
+
+  if (Object.keys(files).length) {
+    try {
+      await writeThemeFiles(shop, themeId, files);
+    } catch (err: any) {
+      // The upload is shared, so a refusal belongs to every design in it. Saying
+      // which file Shopify refused is more use than a generic failure on each
+      // card.
+      const message =
+        err instanceof ThemeWriteError
+          ? err.message
+          : `The preview files could not be written: ${err.message}`;
+      for (const s of staged) results.push({ pageId: s.pageId, ok: false, error: message });
+      return { themeId, results };
+    }
+  }
+
+  for (const s of staged) results.push({ pageId: s.pageId, ok: true, previewPath: s.path });
+  return { themeId, results };
 }

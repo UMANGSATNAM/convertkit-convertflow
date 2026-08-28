@@ -99,6 +99,30 @@ function schemaProblems(id, src) {
   if (error) return [`${id}: ${error}`];
   if (!schema) return out;
 
+  // Shopify caps section and block names at 25 characters and refuses the file
+  // outright past that — "Invalid schema: name is too long (max 25 characters)".
+  // Fourteen generated header/footer sections were named after their page id
+  // ("Header nordic-minimal-apparel", 29 chars) and every page using one failed
+  // to apply.
+  if (typeof schema.name === "string" && schema.name.length > 25) {
+    out.push(`${id}: section name is ${schema.name.length} characters (max 25) — ${JSON.stringify(schema.name)}`);
+  }
+  for (const b of schema.blocks || []) {
+    if (b && typeof b.name === "string" && b.name.length > 25) {
+      out.push(`${id}: block name is ${b.name.length} characters (max 25) — ${JSON.stringify(b.name)}`);
+    }
+  }
+
+  // A setting whose type holds text must have a string default. Shopify reports
+  // this as "default must be a string or datasource access path" and names the
+  // setting id but not the file, which makes it slow to track down by hand.
+  const STRING_TYPED = new Set([
+    "text", "textarea", "url", "html", "liquid", "richtext", "inline_richtext",
+    "video_url", "image_picker", "article", "blog", "page", "product",
+    "collection", "collection_list", "product_list", "link_list", "font_picker",
+    "color", "color_background",
+  ]);
+
   const groups = [{ where: "settings", list: schema.settings || [] }];
   for (const b of schema.blocks || []) {
     groups.push({ where: `block "${b.type}"`, list: b.settings || [] });
@@ -112,6 +136,13 @@ function schemaProblems(id, src) {
       if (s.id) {
         if (seen.has(s.id)) out.push(`${id}: duplicate setting id "${s.id}" in ${g.where}`);
         seen.add(s.id);
+      }
+
+      if (STRING_TYPED.has(s.type) && "default" in s && typeof s.default !== "string") {
+        out.push(
+          `${id}: ${g.where} setting "${s.id}" (${s.type}) has a ${typeof s.default} default ` +
+          `${JSON.stringify(s.default)} — it must be a string`
+        );
       }
 
       if (s.type === "range") {
