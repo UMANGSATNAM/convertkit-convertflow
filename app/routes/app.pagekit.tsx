@@ -139,6 +139,8 @@ function LivePreview({
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
   const [loaded, setLoaded] = useState(false);
+  const [isPassword, setIsPassword] = useState(false);
+  const [imgSrc, setImgSrc] = useState(poster);
 
   const WIDTH = 1280;
 
@@ -150,8 +152,6 @@ function LivePreview({
     ro.observe(el);
     setScale(el.clientWidth / WIDTH);
 
-    // Ask for this preview only when the card is near the viewport. Staging
-    // every design up front is minutes of uploads the merchant never sees.
     const io = new IntersectionObserver(
       entries => { if (entries.some(e => e.isIntersecting)) onVisible(pageId); },
       { rootMargin: "400px" }
@@ -170,18 +170,26 @@ function LivePreview({
       style={{ position: "relative", aspectRatio: "4 / 2.7", overflow: "hidden", background: "#f9fafb", cursor: "pointer" }}
     >
       <img
-        src={poster}
+        src={imgSrc}
         alt={alt}
         loading="lazy"
         style={{
           width: "100%", height: "100%", objectFit: "cover", objectPosition: "top",
           display: "block",
-          // Kept underneath so the card never flashes empty, and dropped once
-          // the real page is up.
-          opacity: loaded ? 0 : 1,
+          position: "absolute", inset: 0,
+          opacity: loaded && !isPassword ? 0 : 1,
           transition: "opacity .25s ease",
+          zIndex: 1,
         }}
-        onError={e => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+        onError={() => {
+          // Fallback thumbnail matching
+          const num = pageId.match(/\d+/)?.[0];
+          if (num && !imgSrc.includes(`hp-v${num}.jpg`)) {
+            setImgSrc(`/thumbnails/hp-v${num}.jpg`);
+          } else if (num && !imgSrc.includes(`hp${num}.jpg`)) {
+            setImgSrc(`/thumbnails/hp${num}.jpg`);
+          }
+        }}
       />
 
       {status === "ready" && src && (
@@ -190,26 +198,40 @@ function LivePreview({
           src={src}
           loading="lazy"
           scrolling="no"
-          onLoad={() => setLoaded(true)}
+          onLoad={(e) => {
+            try {
+              const doc = (e.target as HTMLIFrameElement).contentDocument;
+              if (doc && doc.body) {
+                const html = doc.body.innerHTML || "";
+                if (html.includes("storefront_password") || html.includes("Enter store password") || html.includes("password protected")) {
+                  setIsPassword(true);
+                  setLoaded(false);
+                  return;
+                }
+              }
+            } catch {}
+            setIsPassword(false);
+            setLoaded(true);
+          }}
           style={{
             position: "absolute", top: 0, left: 0,
             width: WIDTH, height,
             border: 0,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
-            // The card is for looking at; clicks open the full preview.
             pointerEvents: "none",
-            opacity: loaded ? 1 : 0,
+            opacity: loaded && !isPassword ? 1 : 0,
             transition: "opacity .25s ease",
+            zIndex: 2,
           }}
         />
       )}
 
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)", pointerEvents: "none", zIndex: 3 }} />
 
-      <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 6 }}>
-        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: loaded ? "#16a34a" : "#6b7280", border: "1px solid rgba(0,0,0,.06)" }}>
-          {loaded ? "Live" : status === "failed" ? "Preview failed" : "Loading…"}
+      <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 6, zIndex: 4 }}>
+        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: loaded && !isPassword ? "#16a34a" : "#4b5563", border: "1px solid rgba(0,0,0,.06)" }}>
+          {loaded && !isPassword ? "Live" : "Preview"}
         </span>
       </div>
 
