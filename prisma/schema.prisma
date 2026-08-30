@@ -46,37 +46,14 @@ model Shop {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  generations       StoreGeneration[]
   installedSections InstalledSection[]
   toolkitFeatures   ToolkitFeature[]
-  pincodeZones      PincodeZone[]
-  campaigns         CampaignPage[]
-  healthReports     HealthReport[]
   snapshots         ThemeSnapshot[]
-  aiActions         AiActionLog[]
   usage             UsageCounter[]
   integrations      Integration[]
   storeBlueprints   StoreBlueprint[]
-  youtubeChannels   YouTubeChannel[]
 }
 
-model StoreGeneration {
-  id          String    @id @default(cuid())
-  shopId      String
-  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  nicheId     String
-  catalogMode CatalogMode 
-  status      GenStatus @default(QUEUED)
-  currentStep String?
-  themeId     String?
-  log         Json      @default("[]")
-  stepState   Json      @default("{}")
-  aiPayload   Json?
-  error       Json?
-  createdAt   DateTime  @default(now())
-  completedAt DateTime?
-
-  @@index([shopId, createdAt])
 }
 
 model Niche {
@@ -135,51 +112,6 @@ model ToolkitFeature {
   @@unique([shopId, feature])
 }
 
-model PincodeZone {
-  shopId  String
-  pincode String
-  cod     Boolean @default(true)
-  etaDays Int?
-  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
-
-  @@id([shopId, pincode])
-}
-
-model CampaignPage {
-  id            String   @id @default(cuid())
-  shopId        String
-  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  templateKey   String   
-  title         String
-  handle        String
-  pageId        String?
-  themeTemplate String? 
-  productIds    Json     
-  collectionIds Json?
-  offer         Json     
-  status        CampaignStatus @default(DRAFT)
-  autoArchive   Boolean  @default(true)
-  startDate     DateTime?
-  endDate       DateTime?
-  publishedAt   DateTime?
-  archivedAt    DateTime?
-  createdAt     DateTime @default(now())
-
-  @@unique([shopId, handle])
-}
-
-model HealthReport {
-  id        String   @id @default(cuid())
-  shopId    String
-  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  score     Int
-  issues    Json     
-  trigger   ScanTrigger
-  createdAt DateTime @default(now())
-
-  @@index([shopId, createdAt])
-}
-
 model ThemeSnapshot {
   id        String   @id @default(cuid())
   shopId    String
@@ -196,20 +128,8 @@ model ThemeSnapshot {
   @@index([shopId, createdAt])
 }
 
-model AiActionLog {
-  id        String   @id @default(cuid())
-  shopId    String
-  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  prompt    String   @db.Text
-  toolCalls Json     
-  applied   Boolean  @default(false)
-  result    Json?
-  tokensIn  Int      @default(0)
-  tokensOut Int      @default(0)
-  createdAt DateTime @default(now())
 
-  @@index([shopId, createdAt])
-}
+
 
 model UsageCounter {
   shopId  String
@@ -316,77 +236,6 @@ enum Actor {
   SYSTEM 
 }
 
-model ComponentPerformance {
-  id              String   @id @default(cuid())
-  componentId     String   @unique
-  industry        String
-  storesUsed      Int      @default(0)
-  avgConversion   Float    @default(0.0)
-  avgTimeOnPage   Float    @default(0.0)
-  bounceRate      Float    @default(0.0)
-  updatedAt       DateTime @updatedAt
-}
-
-model IndustryPattern {
-  id                String   @id @default(cuid())
-  industry          String   @unique
-  bestHero          String
-  bestNavigation    String
-  bestTrustSection  String
-  bestFooter        String
-  confidence        Float    @default(100.0)
-}
-
-model BlueprintSnapshot {
-  id              String   @id @default(cuid())
-  storeId         String
-  businessJson    Json
-  brandJson       Json
-  croJson         Json
-  storeJson       Json
-  version         String
-  createdAt       DateTime @default(now())
-}
-
-model GenerationCost {
-  id                String   @id @default(cuid())
-  generationId      String
-  aiTokens          Int      @default(0)
-  aiCostUsd         Float    @default(0.0)
-  shopifyCalls      Int      @default(0)
-  componentUploads  Int      @default(0)
-  totalCostUsd      Float    @default(0.0)
-  createdAt         DateTime @default(now())
-}
-
-model MerchantFeedback {
-  id            String   @id @default(cuid())
-  generationId  String
-  rating        Int
-  notes         String?  @db.Text
-  createdAt     DateTime @default(now())
-}
-
-/// Internal validation research tool — Merchant Reality Test Protocol
-model ValidationInterview {
-  id              String   @id @default(cuid())
-  name            String   @default("")
-  segment         String   // fashion | beauty | d2c | freelancer | agency
-  screenshotStyle String   // luxury | minimal | modern | bold
-  perceivedStyle  String   @default("")
-  publishIntent   String   // yes | maybe | no
-  pricingIntent   String   // 999 | 2999 | 4999 | never
-  customFeel      String   // custom | maybe | template
-  weaknessArea    String   @default("none") // hero | grid | typography | trust | overall | none
-  dealBreaker     String   @default("no")   // yes | depends | no
-  // Agency-specific fields
-  agencyWouldSell String   @default("na")   // yes | maybe | no | na (na for non-agency)
-  agencyPricing   String   @default("")     // what agency would charge clients e.g. "15000"
-  notes           String?  @db.Text
-  score           Int      @default(0)
-  createdAt       DateTime @default(now())
-}
-
 model ComponentRegistry {
   id                String   @id @default(cuid())
   componentId       String   @unique   // e.g. "hero-editorial-beauty-v1"
@@ -442,145 +291,11 @@ model StoreBlueprint {
   @@index([shopId, createdAt])
 }
 
-model PromptVersion {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  version       String
-  promptText    String   @db.Text
-  promptType    String
-  temperature   Float?   @default(0.3)
-  modelName     String?
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
 model RegistryMeta {
   id           String   @id @default("singleton")
   registryHash String
   seededAt     DateTime @default(now())
 }
 
-model YouTubeChannel {
-  id                String   @id @default(cuid())
-  shopId            String
-  shop              Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  channelId         String   @unique
-  channelName       String
-  channelHandle     String?
-  accessToken       String   @db.Text
-  refreshToken      String   @db.Text
-  tokenExpiry       DateTime
-  isMonitoring      Boolean  @default(false)
-  lastCheckedAt     DateTime?
-  lastVideoId       String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 
-  videos            YouTubeVideo[]
-  shorts            YouTubeShort[]
-  processingJobs    ProcessingJob[]
-
-  @@index([shopId])
-  @@index([channelId])
-}
-
-model YouTubeVideo {
-  id              String   @id @default(cuid())
-  channelId       String
-  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  videoId         String   @unique
-  title           String
-  description     String?  @db.Text
-  duration        Int
-  publishedAt     DateTime
-  thumbnailUrl    String?
-  isProcessed     Boolean  @default(false)
-  processedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  shorts          YouTubeShort[]
-  processingJobs  ProcessingJob[]
-
-  @@index([channelId])
-  @@index([videoId])
-  @@index([publishedAt])
-}
-
-model YouTubeShort {
-  id              String   @id @default(cuid())
-  channelId       String
-  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  sourceVideoId   String
-  sourceVideo     YouTubeVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Cascade)
-  shortVideoId    String?  @unique
-  title           String
-  description     String?  @db.Text
-  startTime       Int
-  endTime         Int
-  status          ShortStatus @default(PENDING)
-  localPath       String?
-  uploadedAt      DateTime?
-  errorMessage    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  processingJobs  ProcessingJob[]
-
-  @@index([channelId])
-  @@index([sourceVideoId])
-  @@index([status])
-  @@index([shortVideoId])
-}
-
-model ProcessingJob {
-  id              String   @id @default(cuid())
-  channelId       String
-  channel         YouTubeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  videoId         String?
-  video           YouTubeVideo? @relation(fields: [videoId], references: [id], onDelete: SetNull)
-  shortId         String?
-  short           YouTubeShort? @relation(fields: [shortId], references: [id], onDelete: SetNull)
-  type            JobType
-  status          JobStatus @default(QUEUED)
-  progress        Int      @default(0)
-  currentStep     String?
-  errorMessage    String?
-  result          Json?
-  startedAt       DateTime?
-  completedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([channelId])
-  @@index([videoId])
-  @@index([shortId])
-  @@index([status])
-  @@index([type])
-}
-
-enum ShortStatus {
-  PENDING
-  PROCESSING
-  READY
-  UPLOADING
-  UPLOADED
-  FAILED
-}
-
-enum JobType {
-  FETCH_VIDEOS
-  CREATE_SHORT
-  UPLOAD_SHORT
-  MONITOR_CHANNEL
-}
-
-enum JobStatus {
-  QUEUED
-  RUNNING
-  COMPLETED
-  FAILED
-  CANCELLED
-}
 
