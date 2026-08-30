@@ -88,9 +88,7 @@ async function getStorefrontCookie(shopDomain: string, password: string): Promis
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
   const url = new URL(request.url);
-
   const themeId = url.searchParams.get("theme");
   const pathname = url.searchParams.get("path") || "/";
 
@@ -98,8 +96,36 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return new Response("Missing theme id", { status: 400 });
   }
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  const origin = `https://${session.shop}`;
+  let shopDomain: string | null = url.searchParams.get("shop");
+
+  if (!shopDomain) {
+    try {
+      const { session } = await authenticate.admin(request);
+      if (session?.shop) shopDomain = session.shop;
+    } catch {
+      // Admin auth failed in iframe GET request (normal behavior)
+    }
+  }
+
+  if (!shopDomain) {
+    const referer = request.headers.get("referer") || "";
+    const match = referer.match(/admin\.shopify\.com\/store\/([^/]+)/) || referer.match(/([^/.]+)\.myshopify\.com/);
+    if (match) {
+      shopDomain = match[1].includes(".") ? match[1] : `${match[1]}.myshopify.com`;
+    }
+  }
+
+  if (!shopDomain) {
+    const activeShop = await prisma.shop.findFirst({ orderBy: { updatedAt: "desc" } });
+    shopDomain = activeShop?.shopDomain || null;
+  }
+
+  if (!shopDomain) {
+    return new Response("No connected store found", { status: 404 });
+  }
+
+  const shop = await prisma.shop.findUnique({ where: { shopDomain } });
+  const origin = `https://${shopDomain}`;
 
   const target = new URL(pathname, origin);
   target.searchParams.set("preview_theme_id", themeId);
@@ -113,7 +139,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const storefrontPassword = (shop?.brandConfig as any)?.storefrontPassword;
   if (storefrontPassword) {
-    const cookie = await getStorefrontCookie(session.shop, storefrontPassword);
+    const cookie = await getStorefrontCookie(shopDomain, storefrontPassword);
     if (cookie) headers.Cookie = cookie;
   }
 

@@ -327,7 +327,7 @@ export default function PageKit(){
         for(const r of (d.results||[])){
           n[r.pageId]= r.ok
             ? { status:"ready",
-                src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(r.previewPath)}`,
+                src:`/app/preview?shop=${encodeURIComponent(shopDomain)}&theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(r.previewPath)}`,
                 href:`https://${shopDomain}${r.previewPath}` }
             : { status:"failed", error:r.error };
         }
@@ -340,7 +340,7 @@ export default function PageKit(){
     }
 
     if(d.intent==="stage"){
-      setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
+      setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?shop=${encodeURIComponent(shopDomain)}&theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
       inFlight.current=false;
       setTimeout(flush,120);
     }
