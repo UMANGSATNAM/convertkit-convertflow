@@ -132,16 +132,12 @@ function getThumbnailUrl(pageId: string): string {
 }
 
 function LivePreview({
-  pageId, poster, alt, niche, onOpen,
+  pageId, poster, alt, onOpen,
 }: {
   pageId: string;
   poster: string;
   alt: string;
-  status?: PreviewState["status"];
-  src?: string;
-  error?: string;
-  niche: string;
-  onVisible?: (id: string) => void;
+  niche?: string;
   onOpen: () => void;
 }) {
   const [imgSrc, setImgSrc] = useState(poster);
@@ -149,7 +145,16 @@ function LivePreview({
   return (
     <div
       onClick={onOpen}
-      style={{ position: "relative", aspectRatio: "4 / 2.7", overflow: "hidden", background: "#f9fafb", cursor: "pointer" }}
+      style={{
+        position: "relative",
+        aspectRatio: "16 / 9",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
       <img
         src={imgSrc}
@@ -159,7 +164,7 @@ function LivePreview({
           width: "100%", height: "100%", objectFit: "cover", objectPosition: "top",
           display: "block",
           position: "absolute", inset: 0,
-          opacity: 1,
+          opacity: 0.85,
           zIndex: 1,
         }}
         onError={() => {
@@ -172,17 +177,12 @@ function LivePreview({
         }}
       />
 
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)", pointerEvents: "none", zIndex: 3 }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%)", pointerEvents: "none", zIndex: 2 }} />
 
-      <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 6, zIndex: 4 }}>
-        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: "#16a34a", border: "1px solid rgba(0,0,0,.06)" }}>
-          Live
-        </span>
-      </div>
-
-      <div style={{ position: "absolute", bottom: 10, right: 10, zIndex: 4 }}>
-        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 10px", borderRadius: 999, fontSize: 11, color: "#6b7280", border: "1px solid rgba(0,0,0,.06)", maxWidth: 120, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "inline-block" }}>
-          {niche}
+      {/* Clean Home Page Name Only */}
+      <div style={{ position: "relative", zIndex: 3, textAlign: "center", width: "100%", padding: "12px 16px" }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: "#ffffff", textShadow: "0 2px 4px rgba(0,0,0,0.9)", letterSpacing: "0.01em", display: "block" }}>
+          {alt}
         </span>
       </div>
     </div>
@@ -221,85 +221,8 @@ export default function PageKit(){
   const [applied,setApplied]=useState<any|null>(null);
   const [confirming,setConfirming]=useState<string|null>(null);
   const [previewModal,setPreviewModal]=useState<string|null>(null);
-  const stager=useFetcher<any>();
   const applier=useFetcher<any>();
   const undoer=useFetcher<any>();
-
-  // ── Previews fill in as you scroll ───────────────────────────────────
-  //
-  // Cards ask to be staged when they come near the viewport, and the requests
-  // are grouped. Staging every design up front is not an option: the Home tab
-  // holds sixty-three, and one upload each takes minutes, so the grid the
-  // merchant is actually looking at stays empty while work happens far below.
-  //
-  // Six is a compromise: large enough that the grid fills in a few round trips
-  // rather than sixty-three, small enough that the first cards appear quickly
-  // instead of after one long request.
-  const BATCH = 6;
-
-  const pending = useRef<Set<string>>(new Set());
-  const inFlight = useRef(false);
-  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
-
-  const flush = useCallback(()=>{
-    if(inFlight.current) return;
-    const ids=[...pending.current].slice(0,BATCH);
-    if(!ids.length) return;
-    for(const id of ids) pending.current.delete(id);
-    inFlight.current=true;
-    setPreviews(p=>{ const n={...p}; for(const id of ids) n[id]={status:"staging"}; return n; });
-    stager.submit({intent:"stage-batch", pageIds:ids.join(",")},{method:"post"});
-  },[stager]);
-
-  /** Called by each card when it scrolls into view. */
-  const requestPreview=useCallback((id:string)=>{
-    setVisibleIds(v=> v.has(id) ? v : new Set(v).add(id));
-  },[]);
-
-  useEffect(()=>{
-    let queued=false;
-    for(const p of visible){
-      if(previews[p.id] || pending.current.has(p.id)) continue;
-      if(!visibleIds.has(p.id)) continue;
-      pending.current.add(p.id); queued=true;
-    }
-    if(queued) flush();
-  },[visible, visibleIds, previews, flush]);
-
-  // Anything filtered out mid-flight is no longer wanted.
-  useEffect(()=>{
-    const shown=new Set(visible.map(p=>p.id));
-    for(const id of [...pending.current]) if(!shown.has(id)) pending.current.delete(id);
-  },[visible]);
-
-  useEffect(()=>{
-    if(stager.state!=="idle" || !stager.data) return;
-    const d=stager.data;
-
-    if(d.intent==="stage-batch"){
-      setPreviews(p=>{
-        const n={...p};
-        for(const r of (d.results||[])){
-          n[r.pageId]= r.ok
-            ? { status:"ready",
-                src:`/app/preview?shop=${encodeURIComponent(shopDomain)}&theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(r.previewPath)}`,
-                href:`https://${shopDomain}${r.previewPath}` }
-            : { status:"failed", error:r.error };
-        }
-        return n;
-      });
-      inFlight.current=false;
-      // Straight on to the next batch — the merchant is watching the grid fill.
-      setTimeout(flush,120);
-      return;
-    }
-
-    if(d.intent==="stage"){
-      setPreviews(p=>({...p,[d.pageId]: d.ok ? {status:"ready", src:`/app/preview?shop=${encodeURIComponent(shopDomain)}&theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`, href:`https://${shopDomain}${d.previewPath}`} : {status:"failed", error:d.error}}));
-      inFlight.current=false;
-      setTimeout(flush,120);
-    }
-  },[stager.state, stager.data, flush, shopDomain]);
 
   useEffect(()=>{
     if(applier.state==="idle" && applier.data?.intent==="apply"){ setApplied(applier.data); setConfirming(null); }
@@ -318,9 +241,9 @@ export default function PageKit(){
   }
 
   return (
-    <Page fullWidth title="Build your store" subtitle="Premium templates with live previews — one click to apply to your live theme.">
-      <BlockStack gap="500">
-        <Card>
+    <Page fullWidth title="Build your store" subtitle="Browse hand-authored homepage designs. Click Apply to write directly to your live theme.">
+      <BlockStack gap="400">
+        <Card padding="0">
           <Box padding="400">
             <BlockStack gap="300">
               <InlineStack gap="300" align="space-between" blockAlign="center" wrap={false}>
@@ -337,24 +260,6 @@ export default function PageKit(){
 
         {themeError && <Banner tone="critical" title="Could not read your theme"><p>{themeError}</p></Banner>}
 
-        {previewsBlocked && (
-          <Banner tone="warning" title="Previews are blank because your storefront is password protected">
-            <BlockStack gap="200">
-              <Text as="p" variant="bodyMd">
-                Shopify returns the password page to anything that asks for your store, including
-                this app, so there is nothing to show in the cards. Shopify does not share that
-                password with apps — enter it once in Settings and every preview here starts
-                working. Applying a design works either way.
-              </Text>
-              <InlineStack gap="200">
-                <Button url="/app/settings" variant="primary">Enter storefront password</Button>
-                <Button url={`https://${shopDomain}/admin/online_store/preferences`} target="_blank">
-                  Or remove the password in Shopify
-                </Button>
-              </InlineStack>
-            </BlockStack>
-          </Banner>
-        )}
         {applied && (
           <Banner tone={applied.ok && applied.verification?.ok ? "success" : applied.ok ? "warning" : "critical"} title={!applied.ok ? "Nothing was applied" : applied.verification?.ok ? "Applied and live ✓" : "Applied, but check required"} onDismiss={()=>setApplied(null)}>
             <BlockStack gap="200">
@@ -379,6 +284,7 @@ export default function PageKit(){
                   {visible.map(page=>{
                     const isApplying=applyingId===page.id;
                     const domainText = page.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18) + ".com";
+                    const directStorefrontLink = `https://${shopDomain}`;
                     return (
                       <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)', transition:'transform 0.2s ease, box-shadow 0.2s ease'}}>
                         {/* Browser Bar */}
@@ -392,17 +298,16 @@ export default function PageKit(){
                           <span style={{fontSize:10, fontWeight:700, color:'#9ca3af', fontFamily:'monospace'}}>{page.id.startsWith('hp-v') ? page.id : 'hp-v1'}</span>
                         </div>
 
-                        {/* Real Homepage Screenshot Banner */}
+                        {/* Clean Homepage Name Banner */}
                         <LivePreview
                           pageId={page.id}
                           poster={getThumbnailUrl(page.id)}
                           alt={page.name}
                           niche={page.niche}
-                          sectionCount={page.sections.length}
-                          onOpen={()=>setPreviewModal(page.id)}
+                          onOpen={() => window.open(directStorefrontLink, '_blank')}
                         />
 
-                        {/* Content & Section Breakdown */}
+                        {/* Content & Direct Storefront Preview Link */}
                         <Box padding="300">
                           <BlockStack gap="200">
                             <InlineStack align="space-between" blockAlign="center">
@@ -413,7 +318,7 @@ export default function PageKit(){
                             <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0, color:'#111827'}}>{page.name}</h3>
                             <p style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:34, fontSize:12, lineHeight:1.4, color:'#6b7280', margin:0}}>{page.description}</p>
 
-                            {/* Included Sections breakdown list */}
+                            {/* Included Sections list */}
                             <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
                               <div style={{fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4}}>
                                 Included Sections ({page.sections.length}):
@@ -433,7 +338,7 @@ export default function PageKit(){
 
                             <InlineStack gap="200" blockAlign="center" style={{marginTop:4}}>
                               <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply to Store</Button>
-                              <Button onClick={()=>setPreviewModal(page.id)}>Preview</Button>
+                              <Button url={directStorefrontLink} target="_blank" icon={ViewIcon}>Open on Storefront</Button>
                             </InlineStack>
                           </BlockStack>
                         </Box>
@@ -446,7 +351,6 @@ export default function PageKit(){
             </Box>
           </Tabs>
         </Card>
-        <Text as="p" variant="bodySm" tone="subdued">Tip: Hover thumbnail to auto-scroll live store. All 117+ homepages have live previews from your store — no blank pages.</Text>
       </BlockStack>
       <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
         <Modal.Section>
