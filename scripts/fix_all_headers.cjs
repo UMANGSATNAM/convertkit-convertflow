@@ -33,7 +33,7 @@ function headerLiquid(id, niche, style){
 .hdr-${id}__cart{background:var(--hdr-accent);color:${style.name==='bold'?'#111':'#fff'};padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;text-decoration:none}
 @media(max-width:768px){.hdr-${id}__nav{display:none}}
 {%- endstyle -%}
-<header class="hdr-${id}"><a href="/" class="hdr-${id}__logo">${logo} • ${id.toUpperCase()}</a><nav class="hdr-${id}__nav"><a href="/collections/all">Shop</a><a href="/collections/all">New</a><a href="/pages/about">Story</a><a href="/pages/contact">Contact</a></nav><div><a href="{{ routes.cart_url }}" class="hdr-${id}__cart">Cart {{'{{ cart.item_count }}'}}</a></div></header>
+<header class="hdr-${id}"><a href="/" class="hdr-${id}__logo">${logo} • ${id.toUpperCase()}</a><nav class="hdr-${id}__nav"><a href="/collections/all">Shop</a><a href="/collections/all">New</a><a href="/pages/about">Story</a><a href="/pages/contact">Contact</a></nav><div><a href="{{ routes.cart_url }}" class="hdr-${id}__cart">Cart ({{ cart.item_count | default: 0 }})</a></div></header>
 {% schema %}{"name":"Header ${id}","settings":[],"presets":[{"name":"Header ${id}"}]}{% endschema %}`;
 }
 function footerLiquid(id, niche, style){
