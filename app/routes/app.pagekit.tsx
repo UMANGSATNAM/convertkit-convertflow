@@ -124,48 +124,22 @@ interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:strin
  * measured rather than assumed, because the grid columns are fluid.
  */
 function LivePreview({
-  pageId, poster, alt, status, src, error, niche, onVisible, onOpen,
+  pageId, poster, alt, niche, onOpen,
 }: {
   pageId: string;
   poster: string;
   alt: string;
-  status: PreviewState["status"];
+  status?: PreviewState["status"];
   src?: string;
   error?: string;
   niche: string;
-  onVisible: (id: string) => void;
+  onVisible?: (id: string) => void;
   onOpen: () => void;
 }) {
-  const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.25);
-  const [loaded, setLoaded] = useState(false);
-  const [isPassword, setIsPassword] = useState(false);
   const [imgSrc, setImgSrc] = useState(poster);
-
-  const WIDTH = 1280;
-
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / WIDTH));
-    ro.observe(el);
-    setScale(el.clientWidth / WIDTH);
-
-    const io = new IntersectionObserver(
-      entries => { if (entries.some(e => e.isIntersecting)) onVisible(pageId); },
-      { rootMargin: "400px" }
-    );
-    io.observe(el);
-
-    return () => { ro.disconnect(); io.disconnect(); };
-  }, [pageId, onVisible]);
-
-  const height = Math.round(WIDTH * 2.7 / 4);
 
   return (
     <div
-      ref={box}
       onClick={onOpen}
       style={{ position: "relative", aspectRatio: "4 / 2.7", overflow: "hidden", background: "#f9fafb", cursor: "pointer" }}
     >
@@ -177,12 +151,10 @@ function LivePreview({
           width: "100%", height: "100%", objectFit: "cover", objectPosition: "top",
           display: "block",
           position: "absolute", inset: 0,
-          opacity: loaded && !isPassword ? 0 : 1,
-          transition: "opacity .25s ease",
+          opacity: 1,
           zIndex: 1,
         }}
         onError={() => {
-          // Fallback thumbnail matching
           const num = pageId.match(/\d+/)?.[0];
           if (num && !imgSrc.includes(`hp-v${num}.jpg`)) {
             setImgSrc(`/thumbnails/hp-v${num}.jpg`);
@@ -192,66 +164,19 @@ function LivePreview({
         }}
       />
 
-      {status === "ready" && src && (
-        <iframe
-          title={alt}
-          src={src}
-          loading="lazy"
-          scrolling="no"
-          onLoad={(e) => {
-            try {
-              const doc = (e.target as HTMLIFrameElement).contentDocument;
-              if (doc && doc.body) {
-                const html = doc.body.innerHTML || "";
-                if (html.includes("storefront_password") || html.includes("Enter store password") || html.includes("password protected")) {
-                  setIsPassword(true);
-                  setLoaded(false);
-                  return;
-                }
-              }
-            } catch {}
-            setIsPassword(false);
-            setLoaded(true);
-          }}
-          style={{
-            position: "absolute", top: 0, left: 0,
-            width: WIDTH, height,
-            border: 0,
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-            pointerEvents: "none",
-            opacity: loaded && !isPassword ? 1 : 0,
-            transition: "opacity .25s ease",
-            zIndex: 2,
-          }}
-        />
-      )}
-
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,.05) 100%)", pointerEvents: "none", zIndex: 3 }} />
 
       <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 6, zIndex: 4 }}>
-        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: loaded && !isPassword ? "#16a34a" : "#4b5563", border: "1px solid rgba(0,0,0,.06)" }}>
-          {loaded && !isPassword ? "Live" : "Preview"}
+        <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 8px", borderRadius: 999, fontSize: 11, fontWeight: 700, color: "#16a34a", border: "1px solid rgba(0,0,0,.06)" }}>
+          Live
         </span>
       </div>
 
-      <div style={{ position: "absolute", bottom: 10, right: 10 }}>
+      <div style={{ position: "absolute", bottom: 10, right: 10, zIndex: 4 }}>
         <span style={{ background: "rgba(255,255,255,.95)", padding: "4px 10px", borderRadius: 999, fontSize: 11, color: "#6b7280", border: "1px solid rgba(0,0,0,.06)", maxWidth: 120, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "inline-block" }}>
           {niche}
         </span>
       </div>
-
-      {status === "staging" && !loaded && (
-        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,.6)", display: "grid", placeItems: "center", gap: 6 }}>
-          <Spinner size="small" />
-        </div>
-      )}
-
-      {status === "failed" && (
-        <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,.92)", display: "grid", placeItems: "center", padding: 16, textAlign: "center" }}>
-          <Text as="p" variant="bodySm" tone="critical">{error || "This preview could not be built."}</Text>
-        </div>
-      )}
     </div>
   );
 }
