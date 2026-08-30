@@ -316,20 +316,13 @@ export default function PageKit(){
           <Box padding="400">
             <BlockStack gap="300">
               <InlineStack align="space-between" blockAlign="center">
-                <BlockStack gap="100">
-                  <Text as="h2" variant="headingLg">Choose your homepage</Text>
-                  <Text as="p" tone="subdued">Every design is complete — no blank sections. Previews are your store with your products.</Text>
-                </BlockStack>
-                <Badge tone="success">{`Live theme: ${themeId ? themeId.slice(0,8)+"…" : "—"}`}</Badge>
-              </InlineStack>
-              <Divider />
-              <InlineStack gap="300" wrap>
+              <InlineStack gap="300" align="space-between" blockAlign="center" wrap={false}>
                 <div style={{flex:'1 1 280px', minWidth:240}}>
                   <TextField label="" placeholder="Search by name, niche, style…" value={search} onChange={setSearch} autoComplete="off" prefix={<Icon source={SearchIcon}/>} clearButton onClearButtonClick={()=>setSearch("")}/>
                 </div>
                 <Select label="" options={allNiches.map(n=>({label: n==='all'? 'All niches' : n + " (" + visibleBase.filter(p=>p.niche===n).length + ")", value:n}))} value={nicheFilter} onChange={setNicheFilter} />
                 <Select label="" options={[{label:'Newest first',value:'newest'},{label:'Name A–Z',value:'name'},{label:'Most sections',value:'sections'}]} value={sortBy} onChange={setSortBy as any} />
-                <Text as="p" tone="subdued" variant="bodySm">{visible.length} of {pages.filter(p=>p.pageType===activeType).length} • {Object.values(previews).filter(p=>p.status==="ready").length} previews ready</Text>
+                <Text as="p" tone="subdued" variant="bodySm">{visible.length} of {pages.filter(p=>p.pageType===activeType).length} designs</Text>
               </InlineStack>
             </BlockStack>
           </Box>
@@ -374,52 +367,65 @@ export default function PageKit(){
                 <Box padding="800"><BlockStack gap="200" align="center"><Text as="p" variant="headingMd" alignment="center">No designs match</Text><Button onClick={()=>{setSearch(""); setNicheFilter("all");}}>Clear filters</Button></BlockStack></Box>
               ) : (
                 <>
-                <style>{`@media (max-width:640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width:641px) and (max-width:1024px){.hp-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}} @media (min-width:1025px) and (max-width:1440px){.hp-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}} @media (min-width:1441px){.hp-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}} @media (min-width:1800px){.hp-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}} .hp-card:hover .hp-iframe{transform:scale(0.265) translateY(-520px) !important} .hp-iframe{will-change:transform; transition:transform 6s cubic-bezier(0.4,0,0.2,1)}`}</style>
+                <style>{`@media (max-width:640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width:641px) and (max-width:1024px){.hp-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}} @media (min-width:1025px) and (max-width:1440px){.hp-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}} @media (min-width:1441px){.hp-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}} @media (min-width:1800px){.hp-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}}`}</style>
                 <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4,minmax(0,1fr))', gap:'16px'}}>
                   {visible.map(page=>{
-                    const preview=previews[page.id] || {status:"waiting"};
                     const isApplying=applyingId===page.id;
-                    // domain pill should show NAME (as per request) not id — e.g. "SKYSTREAM OVERSEAS" -> "skystreamoverseas.com" style but we show name lower
                     const domainText = page.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18) + ".com";
                     return (
-                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)'}}>
-                        {/* Browser bar — exact like screenshot: dots + centered domain pill */}
-                        <div style={{height:36, background:'#fff', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px'}}>
-                          <span style={{width:8,height:8,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
-                          <span style={{width:8,height:8,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
-                          <span style={{width:8,height:8,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
+                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)', transition:'transform 0.2s ease, box-shadow 0.2s ease'}}>
+                        {/* Browser Bar */}
+                        <div style={{height:34, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px'}}>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
                           <div style={{flex:1, display:'flex', justifyContent:'center'}}>
-                            <div style={{background:'#f3f4f6', borderRadius:999, padding:'5px 14px', fontSize:11, color:'#8b8d94', fontWeight:500, minWidth:140, textAlign:'center', maxWidth:180, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{domainText}</div>
+                            <div style={{background:'#f3f4f6', borderRadius:999, padding:'4px 12px', fontSize:11, color:'#6b7280', fontWeight:500, minWidth:130, textAlign:'center', maxWidth:170, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{domainText}</div>
                           </div>
-                          <div style={{width:24}} />
+                          <span style={{fontSize:10, fontWeight:700, color:'#9ca3af', fontFamily:'monospace'}}>{page.id.startsWith('hp-v') ? page.id : 'hp-v1'}</span>
                         </div>
-                        {/* HERO — STATIC SCREENSHOT (SS) CHIPKAVO — distinct per page, Preview opens full page */}
+
+                        {/* Real Homepage Screenshot Banner */}
                         <LivePreview
                           pageId={page.id}
-                          poster={`/thumbnails/${page.id}.jpg`}
+                          poster={getThumbnailUrl(page.id)}
                           alt={page.name}
-                          status={preview.status}
-                          src={preview.src}
-                          error={preview.error}
                           niche={page.niche}
-                          onVisible={requestPreview}
+                          sectionCount={page.sections.length}
                           onOpen={()=>setPreviewModal(page.id)}
                         />
-                        {/* Content — EXACT like screenshot: purple niche, bold title, description, Visit site button */}
+
+                        {/* Content & Section Breakdown */}
                         <Box padding="300">
-                          <BlockStack gap="150">
-                            <span style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche.toUpperCase()}</span>
-                            <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0}}>{page.name.toUpperCase()}</h3>
-                            <p style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:54, fontSize:12, lineHeight:1.5, color:'#616161', margin:0}}>{page.description}</p>
-                            <InlineStack gap="200" blockAlign="center">
-                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply</Button>
-                              {/* Opens the big preview. It deliberately does not
-                                  submit its own stage request: that shares the
-                                  `stager` fetcher with the batch, and a second
-                                  submission replaces the first one's response —
-                                  the cards waiting on that batch would sit on
-                                  "Loading…" for ever. Cards stage themselves
-                                  when they scroll into view. */}
+                          <BlockStack gap="200">
+                            <InlineStack align="space-between" blockAlign="center">
+                              <span style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche}</span>
+                              <Badge tone="success">Ready</Badge>
+                            </InlineStack>
+
+                            <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0, color:'#111827'}}>{page.name}</h3>
+                            <p style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:34, fontSize:12, lineHeight:1.4, color:'#6b7280', margin:0}}>{page.description}</p>
+
+                            {/* Included Sections breakdown list */}
+                            <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
+                              <div style={{fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4}}>
+                                Included Sections ({page.sections.length}):
+                              </div>
+                              <div style={{display:'flex', flexWrap:'wrap', gap:'4px 6px', maxHeight:44, overflow:'hidden'}}>
+                                {page.sections.slice(0, 4).map((sec, idx) => (
+                                  <span key={sec + idx} style={{display:'inline-flex', alignItems:'center', background:'#ffffff', padding:'2px 6px', borderRadius:4, border:'1px solid #e5e7eb', fontSize:10, color:'#374151', fontWeight:500}}>
+                                    <span style={{color:'#9ca3af', marginRight:3, fontWeight:600}}>{String(idx + 1).padStart(2, '0')}.</span>
+                                    {sec.replace(/^(hp\d*-|header-|footer-)/, '').replace(/-/g, ' ')}
+                                  </span>
+                                ))}
+                                {page.sections.length > 4 && (
+                                  <span style={{fontSize:10, color:'#6366f1', fontWeight:600, alignSelf:'center'}}>+{page.sections.length - 4} more</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <InlineStack gap="200" blockAlign="center" style={{marginTop:4}}>
+                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply to Store</Button>
                               <Button onClick={()=>setPreviewModal(page.id)}>Preview</Button>
                             </InlineStack>
                           </BlockStack>
