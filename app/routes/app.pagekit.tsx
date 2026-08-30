@@ -315,7 +315,6 @@ export default function PageKit(){
         <Card>
           <Box padding="400">
             <BlockStack gap="300">
-              <InlineStack align="space-between" blockAlign="center">
               <InlineStack gap="300" align="space-between" blockAlign="center" wrap={false}>
                 <div style={{flex:'1 1 280px', minWidth:240}}>
                   <TextField label="" placeholder="Search by name, niche, style…" value={search} onChange={setSearch} autoComplete="off" prefix={<Icon source={SearchIcon}/>} clearButton onClearButtonClick={()=>setSearch("")}/>
