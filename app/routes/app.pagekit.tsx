@@ -123,6 +123,14 @@ interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:strin
  * layout is the real one rather than the mobile breakpoint. The scale is
  * measured rather than assumed, because the grid columns are fluid.
  */
+function getThumbnailUrl(pageId: string): string {
+  const num = pageId.match(/\d+/)?.[0];
+  if (num) {
+    return `/thumbnails/hp-v${num}.jpg`;
+  }
+  return `/thumbnails/${pageId}.jpg`;
+}
+
 function LivePreview({
   pageId, poster, alt, niche, onOpen,
 }: {
