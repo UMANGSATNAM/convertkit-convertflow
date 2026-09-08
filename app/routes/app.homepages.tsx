@@ -120,21 +120,34 @@ export default function HomepagesGallery(){
     }
     if(d.intent==='apply' && d.ok){
       setActiveApply(null);
-      alert(`Applied ${d.hpId} live! ${d.sectionCount} sections`);
     }
   },[fetcher.state, fetcher.data]);
 
+  const lastApplied = fetcher.data?.intent === 'apply' && fetcher.data?.ok ? fetcher.data : null;
+
   return (
-    <Page title="All Homepages (v1 - v100)" subtitle="Preview every homepage. v52-v100 are niche-specific, each with distinct layout.">
+    <Page
+      fullWidth
+      title="Flagship Homepages Vault"
+      subtitle="100+ production-grade niche homepages. Click Apply to compile directly to your live theme with automatic rollback protection."
+    >
       <BlockStack gap="400">
+        {lastApplied && (
+          <Banner tone="success" title={`Successfully Applied ${lastApplied.hpId} to Live Store!`}>
+            <p>
+              Compiled {lastApplied.sectionCount} sections into your active theme. Your store was backed up before writing.
+            </p>
+          </Banner>
+        )}
+
         <Card>
-          <InlineStack gap="200" align="space-between">
-            <Text as="h2" variant="headingMd">Filter by niche</Text>
-            <Select label="" labelInline options={niches.map(n=>({label: n==='all'? 'All niches': n, value:n}))} value={activeNiche} onChange={v=>setSearchParams({niche:v})} />
+          <InlineStack gap="200" align="space-between" blockAlign="center">
+            <BlockStack gap="050">
+              <Text as="h2" variant="headingMd">Curated Niche Blueprints</Text>
+              <Text as="p" tone="subdued">{filtered.length} Flagship Homepages across {niches.length - 1} niches</Text>
+            </BlockStack>
+            <Select label="" labelInline options={niches.map(n=>({label: n==='all'? 'All Niches': n, value:n}))} value={activeNiche} onChange={v=>setSearchParams({niche:v})} />
           </InlineStack>
-          <Box paddingBlockStart="300">
-            <Text as="p" tone="subdued">{filtered.length} homepages • Click Apply to write to live theme • Previews auto-stage (3/4 scaled)</Text>
-          </Box>
         </Card>
 
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:16}}>

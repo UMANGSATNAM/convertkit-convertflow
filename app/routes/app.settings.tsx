@@ -113,7 +113,11 @@ export default function PincodeSettings() {
   ]);
 
   return (
-    <Page title="Settings" fullWidth>
+    <Page
+      title="Settings & Configuration"
+      subtitle="Manage storefront authentication for live previews, delivery SLAs, and store preferences."
+      fullWidth
+    >
       <Layout>
         {/* ── Storefront Password ── */}
         <Layout.Section>

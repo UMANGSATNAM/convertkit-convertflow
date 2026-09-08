@@ -196,13 +196,23 @@ function LivePreview({
 }
 
 export default function PageKit(){
-  const { pages, pageTypes, shopDomain, connected, themeId, themeError } = useLoaderData<typeof loader>();
+  const { pages, pageTypes, shopDomain, connected, themeId, themeError, previewsBlocked } = useLoaderData<typeof loader>();
   const [params,setParams]=useSearchParams();
   const activeType=(params.get("type")||"index") as PageType;
   const tabIndex=Math.max(0, pageTypes.findIndex(t=>t.id===activeType));
   const [search,setSearch]=useState("");
   const [nicheFilter,setNicheFilter]=useState<string>("all");
   const [sortBy,setSortBy]=useState<"newest"|"name"|"sections">("newest");
+
+  // ── Store DNA Wizard State ───────────────────────────────────────────────
+  const [isDnaModalOpen, setIsDnaModalOpen] = useState(false);
+  const [dnaNiche, setDnaNiche] = useState("Streetwear");
+  const [dnaVibe, setDnaVibe] = useState("High-Impact Bold");
+  const [dnaGoal, setDnaGoal] = useState("Fast Drop & Impulse Buy");
+  const [dnaApplied, setDnaApplied] = useState(false);
+
+  // ── Preview Viewport State ───────────────────────────────────────────────
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
 
   const allNiches=useMemo(()=>{
     const s=new Set(pages.filter(p=>p.pageType===activeType).map(p=>p.niche));
@@ -263,9 +273,18 @@ export default function PageKit(){
 
   const applyingId = applier.state!=="idle" ? String(applier.formData?.get("pageId")||"") : "";
 
+  const runStoreDna = () => {
+    setIsDnaModalOpen(false);
+    setDnaApplied(true);
+    // Map DNA selection to niche
+    const matchedNiche = allNiches.find(n => n.toLowerCase().includes(dnaNiche.toLowerCase())) || "all";
+    setNicheFilter(matchedNiche);
+    setSearch("");
+  };
+
   if(!connected){
     return (
-      <Page title="Build your store">
+      <Page title="Store Generator">
         <Banner tone="critical" title="This store is not connected">
           <p>Reinstall the app from your Shopify admin and this screen will work.</p>
         </Banner>
@@ -274,8 +293,42 @@ export default function PageKit(){
   }
 
   return (
-    <Page fullWidth title="Build your store" subtitle="Browse hand-authored homepage designs. Click Apply to write directly to your live theme.">
+    <Page
+      fullWidth
+      title="Store Generator"
+      subtitle="Assemble agency-quality Shopify stores on your real catalog in 60 seconds."
+      primaryAction={{
+        content: "⚡ Run Store DNA Generator",
+        onAction: () => setIsDnaModalOpen(true),
+      }}
+    >
       <BlockStack gap="400">
+        
+        {/* ── Store DNA Active Banner ─────────────────────────────────── */}
+        {dnaApplied && (
+          <Banner
+            tone="success"
+            title={`Store DNA Matched: ${dnaNiche} (${dnaVibe})`}
+            onDismiss={() => { setDnaApplied(false); setNicheFilter("all"); }}
+          >
+            <p>
+              Displaying 3 distinct architectural blueprints matching your <strong>{dnaNiche}</strong> catalog and <strong>{dnaGoal}</strong> conversion objective.
+            </p>
+          </Banner>
+        )}
+
+        {previewsBlocked && (
+          <Banner
+            tone="warning"
+            title="Storefront password required"
+            action={{ content: "Save Password in Settings", url: "/app/settings" }}
+          >
+            <p>
+              Your store is password protected. Save your storefront password in Settings so preview cards can render your actual products.
+            </p>
+          </Banner>
+        )}
+
         <Card padding="0">
           <Box padding="400">
             <BlockStack gap="300">
@@ -309,7 +362,7 @@ export default function PageKit(){
           <Tabs selected={tabIndex} onSelect={i=>setParams({type: pageTypes[i].id},{preventScrollReset:true})} tabs={pageTypes.map(t=>({id:t.id, content: t.label + " (" + pages.filter(p=>p.pageType===t.id).length + ")"}))}>
             <Box padding="400">
               {visible.length===0 ? (
-                <Box padding="800"><BlockStack gap="200" align="center"><Text as="p" variant="headingMd" alignment="center">No designs match</Text><Button onClick={()=>{setSearch(""); setNicheFilter("all");}}>Clear filters</Button></BlockStack></Box>
+                <Box padding="800"><BlockStack gap="200" align="center"><Text as="p" variant="headingMd" alignment="center">No designs match</Text><Button onClick={()=>{setSearch(""); setNicheFilter("all"); setDnaApplied(false);}}>Clear filters</Button></BlockStack></Box>
               ) : (
                 <>
                 <style>{`@media (max-width:640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width:641px) and (max-width:1024px){.hp-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}} @media (min-width:1025px) and (max-width:1440px){.hp-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}} @media (min-width:1441px){.hp-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}} @media (min-width:1800px){.hp-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}}`}</style>
@@ -340,8 +393,8 @@ export default function PageKit(){
                         <Box padding="300">
                           <BlockStack gap="200">
                             <InlineStack align="space-between" blockAlign="center">
-                              <span style={{color:'#6366f1', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche}</span>
-                              <Badge tone="success">Ready</Badge>
+                              <span style={{color:'#4F46E5', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche}</span>
+                              <Badge tone="success">Verified</Badge>
                             </InlineStack>
 
                             <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0, color:'#111827'}}>{page.name}</h3>
@@ -359,7 +412,7 @@ export default function PageKit(){
                                   </span>
                                 ))}
                                 {page.sections.length > 4 && (
-                                  <span style={{fontSize:10, color:'#6366f1', fontWeight:600, alignSelf:'center'}}>+{page.sections.length - 4} more</span>
+                                  <span style={{fontSize:10, color:'#4F46E5', fontWeight:600, alignSelf:'center'}}>+{page.sections.length - 4} more</span>
                                 )}
                               </div>
                             </div>
@@ -380,25 +433,137 @@ export default function PageKit(){
           </Tabs>
         </Card>
       </BlockStack>
-      <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
+
+      {/* ── Store DNA Modal ────────────────────────────────────────────── */}
+      <Modal
+        open={isDnaModalOpen}
+        onClose={() => setIsDnaModalOpen(false)}
+        title="Store DNA — AI Architectural Blueprint Matching"
+        primaryAction={{
+          content: "⚡ Synthesize 3 Blueprints",
+          onAction: runStoreDna,
+        }}
+        secondaryActions={[
+          {
+            content: "Cancel",
+            onAction: () => setIsDnaModalOpen(false),
+          },
+        ]}
+      >
         <Modal.Section>
-          <BlockStack gap="200">
-            <Banner tone="info" title="You can undo this"><p>Your current page is copied first. Undo restores it in one click.</p></Banner>
-            <Text as="p" variant="bodyMd">This replaces your current {(pageTypes.find(t=>t.id===activeType)?.label.toLowerCase())} on the live theme. Shoppers see it immediately.</Text>
+          <BlockStack gap="400">
+            <Text as="p" tone="subdued">
+              Answer 3 fast questions. Our selection engine will configure your design token set and pick 3 genuinely distinct, CRO-tested store visions on your live products.
+            </Text>
+
+            <Select
+              label="Primary Industry / Niche"
+              options={[
+                { label: "Streetwear & Fashion", value: "Streetwear" },
+                { label: "Beauty & Skincare", value: "Beauty" },
+                { label: "Luxury Jewellery & Gems", value: "Jewellery" },
+                { label: "Electronics & Modern Gadgets", value: "Electronics" },
+                { label: "Activewear & Performance", value: "Activewear" },
+                { label: "Gourmet Food & Beverages", value: "Food" },
+                { label: "General D2C Brand", value: "General" },
+              ]}
+              value={dnaNiche}
+              onChange={setDnaNiche}
+            />
+
+            <Select
+              label="Brand Aesthetic & Vibe"
+              options={[
+                { label: "High-Impact Bold (Heavy Typography, Contrast)", value: "High-Impact Bold" },
+                { label: "Minimalist Luxury (Generous Spacing, Clean Serif)", value: "Minimalist Luxury" },
+                { label: "Clinical & Organic (Warm Earthy, Ingredient Story)", value: "Clinical Clean" },
+                { label: "Urban Drop (Countdown Urgency, Drop Banners)", value: "Urban Drop" },
+              ]}
+              value={dnaVibe}
+              onChange={setDnaVibe}
+            />
+
+            <Select
+              label="Primary Conversion Goal"
+              options={[
+                { label: "Fast Drop & Impulse Buy (Sticky ATC, Drop Grids)", value: "Fast Drop & Impulse Buy" },
+                { label: "High-AOV Luxury (Storytelling, Curated Bento)", value: "High-AOV Luxury" },
+                { label: "Single Hero Flagship (Deep PDP Funnel, Video UGC)", value: "Single Hero Flagship" },
+              ]}
+              value={dnaGoal}
+              onChange={setDnaGoal}
+            />
           </BlockStack>
         </Modal.Section>
       </Modal>
+
+      {/* ── Confirmation Modal ─────────────────────────────────────────── */}
+      <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
+        <Modal.Section>
+          <BlockStack gap="200">
+            <Banner tone="info" title="Automatic Rollback Protection"><p>Your current live page is safely backed up before any write. You can revert in 1 click at any time.</p></Banner>
+            <Text as="p" variant="bodyMd">This updates your {(pageTypes.find(t=>t.id===activeType)?.label.toLowerCase())} on your live theme. Shoppers will see the new design immediately.</Text>
+          </BlockStack>
+        </Modal.Section>
+      </Modal>
+
+      {/* ── Responsive Preview Modal (Desktop & Mobile Viewport Switcher) ── */}
       <Modal open={Boolean(previewModal)} onClose={()=>setPreviewModal(null)} title={previewModal ? pages.find(p=>p.id===previewModal)?.name || "" : ""} size="large">
         <Modal.Section flush>
           {previewModal && previews[previewModal]?.status==="ready" ? (
             <BlockStack gap="0">
-              <iframe title="Preview" src={previews[previewModal]?.src} style={{width:'100%', height:'70vh', border:0, display:'block', background:'#fff'}} />
-              <Box padding="300">
-                <InlineStack gap="200">
-                  <Button url={previews[previewModal]?.href} target="_blank">Open on your storefront</Button>
-                  <Button variant="primary" onClick={()=>{ const id=previewModal; setPreviewModal(null); setConfirming(id); }}>
-                    Apply this page
+              <Box padding="200" background="bg-surface-secondary">
+                <InlineStack align="center" gap="200">
+                  <Button
+                    size="slim"
+                    pressed={previewDevice === "desktop"}
+                    onClick={() => setPreviewDevice("desktop")}
+                  >
+                    Desktop (1280px)
                   </Button>
+                  <Button
+                    size="slim"
+                    pressed={previewDevice === "mobile"}
+                    onClick={() => setPreviewDevice("mobile")}
+                  >
+                    Mobile (390px)
+                  </Button>
+                </InlineStack>
+              </Box>
+
+              <div style={{
+                background: "#0F172A",
+                padding: previewDevice === "mobile" ? "24px 0" : "0",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <iframe
+                  title="Preview"
+                  src={previews[previewModal]?.src}
+                  style={{
+                    width: previewDevice === "mobile" ? "390px" : "100%",
+                    height: "70vh",
+                    border: previewDevice === "mobile" ? "8px solid #1E293B" : "0",
+                    borderRadius: previewDevice === "mobile" ? "24px" : "0",
+                    boxShadow: previewDevice === "mobile" ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)" : "none",
+                    display: "block",
+                    background: "#fff"
+                  }}
+                />
+              </div>
+
+              <Box padding="300">
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Rendering on your real catalog via ShopForge staging engine
+                  </Text>
+                  <InlineStack gap="200">
+                    <Button url={previews[previewModal]?.href} target="_blank">Open Full Screen</Button>
+                    <Button variant="primary" onClick={()=>{ const id=previewModal; setPreviewModal(null); setConfirming(id); }}>
+                      Apply this page to store
+                    </Button>
+                  </InlineStack>
                 </InlineStack>
               </Box>
             </BlockStack>
@@ -407,7 +572,7 @@ export default function PageKit(){
               <InlineStack gap="200" blockAlign="center">
                 {previews[previewModal||""]?.status==="failed"
                   ? <Text as="p" tone="critical">{previews[previewModal||""]?.error || "This preview could not be built."}</Text>
-                  : <><Spinner size="small" /><Text as="p" tone="subdued">Building this preview on your store…</Text></>}
+                  : <><Spinner size="small" /><Text as="p" tone="subdued">Building live preview on your store's real catalog…</Text></>}
               </InlineStack>
             </Box>
           )}

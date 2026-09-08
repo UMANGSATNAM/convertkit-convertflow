@@ -107,8 +107,19 @@ export default function MyTheme() {
 
   return (
     <Page
-      title="My theme"
-      subtitle="Everything on your live storefront, read from the theme itself."
+      title="My Added Sections"
+      subtitle="View all sections currently active on your live theme. Customize in Shopify Theme Editor or remove any section with 1 click."
+      primaryAction={{
+        content: "Open Theme Editor",
+        url: `https://${shopDomain}/admin/themes/current/editor`,
+        external: true,
+      }}
+      secondaryActions={[
+        {
+          content: "Browse Section Library",
+          url: "/app",
+        },
+      ]}
     >
       <Layout>
         <Layout.Section>
@@ -120,31 +131,29 @@ export default function MyTheme() {
             )}
 
             {fetcher.data?.ok && fetcher.data.intent === "remove" && (
-              <Banner tone="success" title="Removed">
+              <Banner tone="success" title="Section Removed">
                 <p>
-                  {fetcher.data.key} is off the page. Its file is still in your theme, so
-                  adding it back keeps your settings.
+                  <strong>{fetcher.data.key}</strong> was removed from the live page.
                 </p>
               </Banner>
             )}
 
             {!connected && (
-              <Banner tone="warning" title="Finishing setup">
-                <p>This store is still being connected. Reload in a moment.</p>
+              <Banner tone="warning" title="Connecting store">
+                <p>This store is still connecting. Reload in a moment.</p>
               </Banner>
             )}
 
             {connected && total === 0 && (
               <Card>
                 <BlockStack gap="300">
-                  <Text as="h2" variant="headingMd">Nothing added yet</Text>
+                  <Text as="h2" variant="headingMd">No custom sections added yet</Text>
                   <Text as="p" tone="subdued">
-                    Your theme is running its own sections. Browse the library to add one and
-                    see it on your store first.
+                    Your theme is running its default sections. Browse our pre-made section library to add hero banners, sticky ATCs, reviews, or FAQs with 1 click!
                   </Text>
                   <Box>
-                    <Link to="/app/sections" style={{ textDecoration: "none" }}>
-                      <Button variant="primary">Browse sections</Button>
+                    <Link to="/app" style={{ textDecoration: "none" }}>
+                      <Button variant="primary">Browse Pre-Made Sections</Button>
                     </Link>
                   </Box>
                 </BlockStack>
@@ -181,7 +190,7 @@ export default function MyTheme() {
 
                           <InlineStack gap="200">
                             {s.meta && (
-                              <Button url={`/app/sections?type=${s.meta.sectionType}`}>Swap</Button>
+                              <Button url={`/app?category=${s.meta.sectionType}`}>Browse Alternatives</Button>
                             )}
                             {/* A section the merchant's own theme shipped is not
                                 ours to remove — offering it invites breaking
