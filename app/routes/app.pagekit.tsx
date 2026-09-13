@@ -8,7 +8,15 @@ import { SearchIcon, ViewIcon, CheckIcon } from "@shopify/polaris-icons";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import { ALL_PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
-import { applyToLiveTheme, stagePreview, stagePreviewBatch, restoreBackup, liveThemeId } from "../pagekit/apply.server";
+import {
+  applyToLiveTheme,
+  applyToDraftTheme,
+  publishTheme,
+  stagePreview,
+  stagePreviewBatch,
+  restoreBackup,
+  liveThemeId,
+} from "../pagekit/apply.server";
 import { verifyPage, describeVerification } from "../pagekit/verify.server";
 
 /**
@@ -95,6 +103,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const path = new URL(result.storefrontUrl).pathname;
       const verification = await verifyPage(shop.shopDomain, { path, expect: result.sectionKeys.map(k => ({ key: k, type: k.replace(/^\d+-/, "") })), storefrontPassword });
       return json({ intent, pageId, ok: true, sectionCount: result.sectionKeys.length, backedUp: result.backedUp, collectionsWired: result.collectionsWired, storefrontUrl: result.storefrontUrl, missingPartials: result.missingPartials ?? null, verification: { ok: verification.ok, message: describeVerification(verification), passwordProtected: verification.passwordProtected, rendered: verification.sections.filter(s=>s.rendered).length, total: verification.sections.length } });
+    }
+    if (intent === "apply-draft") {
+      const page = pageById(pageId);
+      if (!page) return json({ intent, pageId, ok: false, error: `No design called "${pageId}".` });
+      const result = await applyToDraftTheme(shop, page);
+      if (!result.ok) return json({ intent, pageId, ok: false, error: result.error });
+      return json({
+        intent,
+        pageId,
+        ok: true,
+        draftThemeId: result.draftThemeId,
+        draftThemeName: result.draftThemeName,
+        previewUrl: result.previewUrl,
+        editorUrl: result.editorUrl,
+        sectionCount: result.sectionKeys.length,
+      });
+    }
+    if (intent === "publish-draft") {
+      const draftThemeId = String(form.get("draftThemeId") || "");
+      if (!draftThemeId) return json({ intent, ok: false, error: "No draft theme ID provided to publish." });
+      const result = await publishTheme(shop, draftThemeId);
+      if (!result.ok) return json({ intent, ok: false, error: result.error });
+      return json({ intent, ok: true, publishedThemeId: draftThemeId });
     }
     if (intent === "undo") {
       const themeId = await liveThemeId(shop);
@@ -237,10 +268,13 @@ export default function PageKit(){
   const [confirming,setConfirming]=useState<string|null>(null);
   const [previewModal,setPreviewModal]=useState<string|null>(null);
   const [applied,setApplied]=useState<any|null>(null);
+  const [draftApplied,setDraftApplied]=useState<any|null>(null);
+  const [published,setPublished]=useState<any|null>(null);
 
   const stager=useFetcher<any>();
   const applier=useFetcher<any>();
   const undoer=useFetcher<any>();
+  const publisher=useFetcher<any>();
 
   const openPreview = useCallback((id: string) => {
     setPreviewModal(id);
@@ -269,7 +303,17 @@ export default function PageKit(){
 
   useEffect(()=>{
     if(applier.state==="idle" && applier.data?.intent==="apply"){ setApplied(applier.data); setConfirming(null); }
+    if(applier.state==="idle" && applier.data?.intent==="apply-draft"){ setDraftApplied(applier.data); setConfirming(null); }
   },[applier.state, applier.data]);
+
+  useEffect(()=>{
+    if(publisher.state==="idle" && publisher.data?.intent==="publish-draft"){
+      setPublished(publisher.data);
+      if(publisher.data.ok){
+        setDraftApplied(null);
+      }
+    }
+  },[publisher.state, publisher.data]);
 
   const applyingId = applier.state!=="idle" ? String(applier.formData?.get("pageId")||"") : "";
 
@@ -295,8 +339,8 @@ export default function PageKit(){
   return (
     <Page
       fullWidth
-      title="Store Generator"
-      subtitle="Assemble agency-quality Shopify stores on your real catalog in 60 seconds."
+      title="Full Page Kits"
+      subtitle="1-Click high-converting Home, Product (PDP), Collection, and Cart Drawer page packs."
       primaryAction={{
         content: "⚡ Run Store DNA Generator",
         onAction: () => setIsDnaModalOpen(true),
@@ -355,6 +399,59 @@ export default function PageKit(){
                 {applied.ok && <Button loading={undoer.state!=="idle"} onClick={()=>undoer.submit({intent:"undo", pageId: applied.pageId},{method:"post"})}>Undo</Button>}
               </InlineStack>
             </BlockStack>
+          </Banner>
+        )}
+
+        {draftApplied && (
+          <Banner
+            tone={draftApplied.ok ? "success" : "critical"}
+            title={draftApplied.ok ? `🛡️ Page Installed to Draft Theme: ${draftApplied.draftThemeName}` : "Draft install failed"}
+            onDismiss={() => setDraftApplied(null)}
+          >
+            <BlockStack gap="300">
+              <Text as="p" variant="bodyMd">
+                {draftApplied.ok
+                  ? `Your new page design is safely installed on your private draft theme with ${draftApplied.sectionCount} native sections. Your live store was untouched. You can preview it, customize settings in the theme editor, and publish when ready!`
+                  : draftApplied.error}
+              </Text>
+              {draftApplied.ok && (
+                <InlineStack gap="200">
+                  <Button url={draftApplied.previewUrl} target="_blank" variant="primary" icon={ViewIcon}>
+                    Preview Draft Storefront
+                  </Button>
+                  <Button url={draftApplied.editorUrl} target="_blank">
+                    Customize in Shopify Editor
+                  </Button>
+                  <Button
+                    loading={publisher.state !== "idle"}
+                    variant="primary"
+                    tone="success"
+                    onClick={() =>
+                      publisher.submit(
+                        { intent: "publish-draft", draftThemeId: draftApplied.draftThemeId },
+                        { method: "post" }
+                      )
+                    }
+                  >
+                    🚀 Publish Draft to Live Store
+                  </Button>
+                </InlineStack>
+              )}
+            </BlockStack>
+          </Banner>
+        )}
+
+        {published && (
+          <Banner
+            tone={published.ok ? "success" : "critical"}
+            title={published.ok ? "🎉 Your Store is Live!" : "Publish failed"}
+            onDismiss={() => setPublished(null)}
+          >
+            <Text as="p" variant="bodyMd">
+              {published.ok
+                ? "The draft theme is now your live, published Shopify store theme! All your customers are now seeing the new high-converting design."
+                : published.error}
+            </Text>
           </Banner>
         )}
 
@@ -497,12 +594,54 @@ export default function PageKit(){
         </Modal.Section>
       </Modal>
 
-      {/* ── Confirmation Modal ─────────────────────────────────────────── */}
-      <Modal open={Boolean(confirming)} onClose={()=>setConfirming(null)} title={confirming ? "Apply \"" + (pages.find(p=>p.id===confirming)?.name) + "\" to your live store?" : ""} primaryAction={{content:"Apply now", loading: applier.state!=="idle", onAction:()=>{ if(confirming) applier.submit({intent:"apply", pageId: confirming},{method:"post"}); }}} secondaryActions={[{content:"Cancel", onAction:()=>setConfirming(null)}]}>
+      {/* ── Confirmation Modal (Option A: Safe Draft Theme vs Live Store) ── */}
+      <Modal
+        open={Boolean(confirming)}
+        onClose={() => setConfirming(null)}
+        title={confirming ? `Install "${pages.find(p => p.id === confirming)?.name}"` : ""}
+        primaryAction={{
+          content: "🛡️ Install to Draft Theme (Safe - Recommended)",
+          loading: applier.state !== "idle" && applier.formData?.get("intent") === "apply-draft",
+          onAction: () => {
+            if (confirming) {
+              applier.submit({ intent: "apply-draft", pageId: confirming }, { method: "post" });
+            }
+          },
+        }}
+        secondaryActions={[
+          {
+            content: "⚡ Apply Directly to Live Store",
+            loading: applier.state !== "idle" && applier.formData?.get("intent") === "apply",
+            onAction: () => {
+              if (confirming) {
+                applier.submit({ intent: "apply", pageId: confirming }, { method: "post" });
+              }
+            },
+          },
+          {
+            content: "Cancel",
+            onAction: () => setConfirming(null),
+          },
+        ]}
+      >
         <Modal.Section>
-          <BlockStack gap="200">
-            <Banner tone="info" title="Automatic Rollback Protection"><p>Your current live page is safely backed up before any write. You can revert in 1 click at any time.</p></Banner>
-            <Text as="p" variant="bodyMd">This updates your {(pageTypes.find(t=>t.id===activeType)?.label.toLowerCase())} on your live theme. Shoppers will see the new design immediately.</Text>
+          <BlockStack gap="300">
+            <Banner tone="info" title="100% Risk-Free Installation (Option A)">
+              <p>
+                <strong>Draft Theme (Recommended):</strong> Installs onto an unpublished duplicate theme. Your live shoppers see no changes until you test it and click <em>Publish</em>.
+              </p>
+            </Banner>
+            <Text as="p" variant="bodyMd">
+              Choose how you want to deploy this {pageTypes.find(t => t.id === activeType)?.label.toLowerCase()} design:
+            </Text>
+            <ul style={{ paddingLeft: "20px", fontSize: "13px", color: "#374151", margin: 0, lineHeight: 1.6 }}>
+              <li>
+                <strong>🛡️ Draft Theme (Safe):</strong> Create/update a duplicate preview theme, verify real products, test on mobile, and publish whenever you are ready.
+              </li>
+              <li>
+                <strong>⚡ Live Store:</strong> Writes directly to your published theme right now (includes 1-Click Rollback / Undo).
+              </li>
+            </ul>
           </BlockStack>
         </Modal.Section>
       </Modal>

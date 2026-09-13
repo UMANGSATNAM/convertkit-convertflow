@@ -3,6 +3,7 @@ import { writeThemeFiles, ThemeWriteError } from "./upload.server";
 import { graphqlRequest } from "../services/shopify-api.server";
 import { resolveSections, bundleFor, wantsCollection, seedFor } from "./registry.server";
 import type { PageDefinition } from "./pages";
+import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server";
 
 /**
  * Writes a page onto a theme, or refuses and says why.
@@ -526,6 +527,75 @@ export async function applyToLiveTheme(
     backedUp,
     storefrontUrl: `https://${shop.shopDomain}${path}`,
   };
+}
+
+export interface DraftApplyResult extends ApplyResult {
+  draftThemeId: string;
+  draftThemeName: string;
+  previewUrl: string;
+  editorUrl: string;
+}
+
+/**
+ * Option A (Safe Mode): Applies a page onto an unpublished draft theme.
+ * Duplicates or reuses the preview theme so the live store is NEVER interrupted.
+ * Gives the merchant a preview URL and theme editor link before publishing.
+ */
+export async function applyToDraftTheme(
+  shop: any,
+  page: PageDefinition,
+  opts: { collections?: string[] } = {}
+): Promise<DraftApplyResult> {
+  const previewTheme = await ensurePreviewTheme(shop);
+  const handles = opts.collections?.length ? opts.collections : await collectionHandles(shop);
+
+  const result = await applyPage(shop, previewTheme.id, page, { collections: handles });
+
+  let path = "/";
+  if (page.pageType === "collection") path = "/collections/all";
+  else if (page.pageType === "cart") path = "/cart";
+  else if (page.pageType === "product") {
+    const handle = await sampleProductHandle(shop);
+    path = handle ? `/products/${handle}` : "/collections/all";
+  }
+
+  const shopSubdomain = shop.shopDomain.replace(".myshopify.com", "");
+  const editorUrl = `https://admin.shopify.com/store/${shopSubdomain}/themes/${previewTheme.id}/editor`;
+  const url = previewUrl(shop.shopDomain, previewTheme.id, path);
+
+  return {
+    ...result,
+    draftThemeId: previewTheme.id,
+    draftThemeName: previewTheme.name,
+    previewUrl: url,
+    editorUrl,
+  };
+}
+
+/**
+ * 1-Click Publish: Publishes an unpublished/draft theme to be the live active store theme.
+ */
+export async function publishTheme(shop: any, themeId: string): Promise<{ ok: boolean; error?: string }> {
+  const gid = themeId.startsWith("gid://") ? themeId : `gid://shopify/Theme/${themeId}`;
+  const res = await graphqlRequest(
+    shop.shopDomain,
+    shop.accessToken,
+    `
+    mutation themePublish($id: ID!) {
+      themePublish(id: $id) {
+        theme { id name role }
+        userErrors { field message }
+      }
+    }
+    `,
+    { id: gid }
+  );
+
+  const errs = res?.themePublish?.userErrors || [];
+  if (errs.length) {
+    return { ok: false, error: errs.map((e: any) => e.message).join("; ") };
+  }
+  return { ok: true };
 }
 
 /**

@@ -180,6 +180,17 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     if (intent === "install") {
+      const targetThemeChoice = String(form.get("targetThemeChoice") || "draft");
+      const useDraft = targetThemeChoice === "draft";
+      let themeToInstall = "active";
+      let themeName = "Live Store Theme";
+
+      if (useDraft) {
+        const theme = await ensurePreviewTheme(shop);
+        themeToInstall = theme.id;
+        themeName = theme.name;
+      }
+
       let target: any;
       if (sectionType === "header" || sectionType.startsWith("header")) {
         target = { kind: "group", group: "header", replace: "header" };
@@ -195,7 +206,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
       const result = await installSection(
         shop,
-        "active",
+        themeToInstall,
         { componentId, liquidPath, sectionType },
         target,
         {
@@ -215,12 +226,27 @@ export async function action({ request }: ActionFunctionArgs) {
             ? "Product Page"
             : "Homepage";
 
+      const previewPage =
+        target.kind === "template" && target.template === "product" ? "/products" : "/";
+      const draftPreviewUrl = useDraft
+        ? previewUrl(session.shop, themeToInstall, previewPage)
+        : undefined;
+
+      const shopSubdomain = session.shop.replace(".myshopify.com", "");
+      const editorUrl = useDraft
+        ? `https://admin.shopify.com/store/${shopSubdomain}/themes/${themeToInstall}/editor`
+        : `https://${session.shop}/admin/themes/current/editor`;
+
       return json({
         ok: true,
         intent,
         componentId,
         sectionName,
         targetLabel,
+        isDraftTheme: useDraft,
+        themeName,
+        previewUrl: draftPreviewUrl,
+        editorUrl,
         result,
       });
     }
@@ -289,7 +315,7 @@ export default function PreMadeSectionsStore() {
     );
   };
 
-  const submitInstall = (c: any) => {
+  const submitInstall = (c: any, targetTheme: "draft" | "live" = "draft") => {
     fetcher.submit(
       {
         intent: "install",
@@ -298,6 +324,7 @@ export default function PreMadeSectionsStore() {
         sectionType: c.sectionType,
         sectionName: c.detail?.name || c.componentId,
         targetChoice: activeTarget,
+        targetThemeChoice: targetTheme,
       },
       { method: "post" }
     );
@@ -307,14 +334,18 @@ export default function PreMadeSectionsStore() {
 
   return (
     <Page
-      title="Pre-Made Sections Library"
-      subtitle="Browse pre-made Shopify sections. Preview any design and add it directly to your live store with 1 click."
+      title="Section Store"
+      subtitle="Browse 1,650+ pre-made Shopify sections. Preview any design and add it directly to your store with 1 click."
       primaryAction={{
         content: "Open Theme Editor",
         url: themeEditorUrl,
         external: true,
       }}
       secondaryActions={[
+        {
+          content: "Full Page Kits",
+          url: "/app/pagekit",
+        },
         {
           content: "My Added Sections",
           url: "/app/theme",
@@ -330,11 +361,17 @@ export default function PreMadeSectionsStore() {
           >
             <BlockStack gap="200">
               <Text as="p">
-                Successfully added to your live theme on the <strong>{data.targetLabel}</strong>.
-                All Liquid code, styles, and settings are ready to customize.
+                {data.isDraftTheme
+                  ? `Successfully installed into your safe Draft Theme (${data.themeName}) on the ${data.targetLabel}. Your live store was not touched!`
+                  : `Successfully added to your live theme on the ${data.targetLabel}. All Liquid code, styles, and settings are ready to customize.`}
               </Text>
               <InlineStack gap="300">
-                <Button variant="primary" url={themeEditorUrl} external>
+                {data.previewUrl && (
+                  <Button variant="primary" url={data.previewUrl} external>
+                    Preview in Draft Theme
+                  </Button>
+                )}
+                <Button url={data.editorUrl || themeEditorUrl} external>
                   Customize in Shopify Theme Editor
                 </Button>
                 <Button url="/app/theme">
@@ -491,11 +528,11 @@ export default function PreMadeSectionsStore() {
                         </Button>
                         <Button
                           variant="primary"
-                          onClick={() => submitInstall(c)}
+                          onClick={() => submitInstall(c, "draft")}
                           loading={isInstalling}
                           disabled={busy}
                         >
-                          Add to Store
+                          Add to Store (Safe)
                         </Button>
                       </InlineStack>
                     </BlockStack>
@@ -513,14 +550,22 @@ export default function PreMadeSectionsStore() {
             onClose={() => setPreviewModalOpen(false)}
             title={`Preview: ${activePreview.sectionName || activePreview.componentId}`}
             primaryAction={{
-              content: "Add to Live Store",
+              content: "🛡️ Add to Draft Theme (Safe)",
               onAction: () => {
                 setPreviewModalOpen(false);
                 const c = components.find((x) => x.componentId === activePreview.componentId);
-                if (c) submitInstall(c);
+                if (c) submitInstall(c, "draft");
               },
             }}
             secondaryActions={[
+              {
+                content: "⚡ Add to Live Store",
+                onAction: () => {
+                  setPreviewModalOpen(false);
+                  const c = components.find((x) => x.componentId === activePreview.componentId);
+                  if (c) submitInstall(c, "live");
+                },
+              },
               {
                 content: "Close",
                 onAction: () => setPreviewModalOpen(false),

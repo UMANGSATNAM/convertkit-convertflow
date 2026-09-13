@@ -32,7 +32,9 @@ export default function App() {
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
-        <Link to="/app" rel="home">Section Library</Link>
+        <Link to="/app" rel="home">Section Store</Link>
+        <Link to="/app/conversion">CRO & Boosters</Link>
+        <Link to="/app/pagekit">Full Page Kits</Link>
         <Link to="/app/theme">My Added Sections</Link>
         <Link to="/app/settings">Settings</Link>
       </NavMenu>
