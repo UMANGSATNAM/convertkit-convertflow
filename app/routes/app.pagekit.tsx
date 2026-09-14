@@ -218,7 +218,7 @@ function LivePreview({
         <span style={{ fontSize: 11, fontWeight: 700, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "80%" }}>
           {alt}
         </span>
-        <span style={{ fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase" }}>
+        <span style={{ fontSize: 9, fontWeight: 700, color: "#38bdf8", textTransform: "uppercase" }}>
           {pageId.toUpperCase()}
         </span>
       </div>
@@ -243,7 +243,7 @@ export default function PageKit(){
   const [dnaApplied, setDnaApplied] = useState(false);
 
   // ── Preview Viewport State ───────────────────────────────────────────────
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
   const allNiches=useMemo(()=>{
     const s=new Set(pages.filter(p=>p.pageType===activeType).map(p=>p.niche));
@@ -340,7 +340,7 @@ export default function PageKit(){
     <Page
       fullWidth
       title="Full Page Kits"
-      subtitle="1-Click high-converting Home, Product (PDP), Collection, and Cart Drawer page packs."
+      subtitle="Preview any page design live on your store catalog, then submit directly to your theme with 1 click."
       primaryAction={{
         content: "⚡ Run Store DNA Generator",
         onAction: () => setIsDnaModalOpen(true),
@@ -356,7 +356,7 @@ export default function PageKit(){
             onDismiss={() => { setDnaApplied(false); setNicheFilter("all"); }}
           >
             <p>
-              Displaying 3 distinct architectural blueprints matching your <strong>{dnaNiche}</strong> catalog and <strong>{dnaGoal}</strong> conversion objective.
+              Displaying distinct architectural blueprints matching your <strong>{dnaNiche}</strong> catalog and <strong>{dnaGoal}</strong> conversion objective.
             </p>
           </Banner>
         )}
@@ -469,7 +469,7 @@ export default function PageKit(){
                     const domainText = page.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18) + ".com";
                     return (
                       <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)', transition:'transform 0.2s ease, box-shadow 0.2s ease'}}>
-                        <div style={{height:34, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px'}}>
+                        <div style={{height:34, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px', cursor:'pointer'}} onClick={() => openPreview(page.id)}>
                           <span style={{width:7,height:7,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
                           <span style={{width:7,height:7,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
                           <span style={{width:7,height:7,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
@@ -490,11 +490,16 @@ export default function PageKit(){
                         <Box padding="300">
                           <BlockStack gap="200">
                             <InlineStack align="space-between" blockAlign="center">
-                              <span style={{color:'#4F46E5', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche}</span>
+                              <span style={{color:'#0284c7', fontWeight:700, fontSize:11, letterSpacing:'.06em', textTransform:'uppercase'}}>{page.niche}</span>
                               <Badge tone="success">Verified</Badge>
                             </InlineStack>
 
-                            <h3 style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0, color:'#111827'}}>{page.name}</h3>
+                            <h3
+                              onClick={() => openPreview(page.id)}
+                              style={{fontWeight:800, fontSize:15, lineHeight:1.2, margin:0, color:'#111827', cursor:'pointer'}}
+                            >
+                              {page.name}
+                            </h3>
                             <p style={{display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:34, fontSize:12, lineHeight:1.4, color:'#6b7280', margin:0}}>{page.description}</p>
 
                             <div style={{background:'#f9fafb', borderRadius:8, padding:'8px 10px', border:'1px solid #f3f4f6'}}>
@@ -509,14 +514,29 @@ export default function PageKit(){
                                   </span>
                                 ))}
                                 {page.sections.length > 4 && (
-                                  <span style={{fontSize:10, color:'#4F46E5', fontWeight:600, alignSelf:'center'}}>+{page.sections.length - 4} more</span>
+                                  <span style={{fontSize:10, color:'#0284c7', fontWeight:600, alignSelf:'center'}}>+{page.sections.length - 4} more</span>
                                 )}
                               </div>
                             </div>
 
+                            {/* PageFly Flow: Preview First as Primary Action */}
                             <InlineStack gap="200" blockAlign="center" style={{marginTop:4}}>
-                              <Button variant="primary" size="medium" loading={isApplying} disabled={applier.state!=="idle" && !isApplying} onClick={()=>setConfirming(page.id)}>Apply to Store</Button>
-                              <Button onClick={() => openPreview(page.id)}>Preview Store</Button>
+                              <Button
+                                variant="primary"
+                                size="medium"
+                                icon={ViewIcon}
+                                onClick={() => openPreview(page.id)}
+                              >
+                                Preview Page
+                              </Button>
+                              <Button
+                                size="medium"
+                                loading={isApplying}
+                                disabled={applier.state!=="idle" && !isApplying}
+                                onClick={()=>setConfirming(page.id)}
+                              >
+                                Quick Submit
+                              </Button>
                             </InlineStack>
                           </BlockStack>
                         </Box>
@@ -594,13 +614,13 @@ export default function PageKit(){
         </Modal.Section>
       </Modal>
 
-      {/* ── Confirmation Modal (Option A: Safe Draft Theme vs Live Store) ── */}
+      {/* ── Quick Confirmation Modal (Option A: Safe Draft Theme vs Live Store) ── */}
       <Modal
         open={Boolean(confirming)}
         onClose={() => setConfirming(null)}
-        title={confirming ? `Install "${pages.find(p => p.id === confirming)?.name}"` : ""}
+        title={confirming ? `Submit "${pages.find(p => p.id === confirming)?.name}" to Theme` : ""}
         primaryAction={{
-          content: "🛡️ Install to Draft Theme (Safe - Recommended)",
+          content: "🛡️ Submit to Draft Theme (Safe - Recommended)",
           loading: applier.state !== "idle" && applier.formData?.get("intent") === "apply-draft",
           onAction: () => {
             if (confirming) {
@@ -610,7 +630,7 @@ export default function PageKit(){
         }}
         secondaryActions={[
           {
-            content: "⚡ Apply Directly to Live Store",
+            content: "⚡ Submit to Live Theme",
             loading: applier.state !== "idle" && applier.formData?.get("intent") === "apply",
             onAction: () => {
               if (confirming) {
@@ -626,7 +646,7 @@ export default function PageKit(){
       >
         <Modal.Section>
           <BlockStack gap="300">
-            <Banner tone="info" title="100% Risk-Free Installation (Option A)">
+            <Banner tone="info" title="PageFly-Style Theme Submission">
               <p>
                 <strong>Draft Theme (Recommended):</strong> Installs onto an unpublished duplicate theme. Your live shoppers see no changes until you test it and click <em>Publish</em>.
               </p>
@@ -636,7 +656,7 @@ export default function PageKit(){
             </Text>
             <ul style={{ paddingLeft: "20px", fontSize: "13px", color: "#374151", margin: 0, lineHeight: 1.6 }}>
               <li>
-                <strong>🛡️ Draft Theme (Safe):</strong> Create/update a duplicate preview theme, verify real products, test on mobile, and publish whenever you are ready.
+                <strong>🛡️ Draft Theme (Safe):</strong> Installs to a duplicate preview theme. Verify your products, test responsive layouts, and publish whenever you are ready.
               </li>
               <li>
                 <strong>⚡ Live Store:</strong> Writes directly to your published theme right now (includes 1-Click Rollback / Undo).
@@ -646,72 +666,189 @@ export default function PageKit(){
         </Modal.Section>
       </Modal>
 
-      {/* ── Responsive Preview Modal (Desktop & Mobile Viewport Switcher) ── */}
-      <Modal open={Boolean(previewModal)} onClose={()=>setPreviewModal(null)} title={previewModal ? pages.find(p=>p.id===previewModal)?.name || "" : ""} size="large">
+      {/* ── PageFly-Style Interactive Preview Studio Modal ── */}
+      <Modal
+        open={Boolean(previewModal)}
+        onClose={() => setPreviewModal(null)}
+        title={previewModal ? `Live Preview: ${pages.find(p => p.id === previewModal)?.name || ""}` : ""}
+        size="large"
+      >
         <Modal.Section flush>
-          {previewModal && previews[previewModal]?.status==="ready" ? (
+          {previewModal && previews[previewModal]?.status === "ready" ? (
             <BlockStack gap="0">
-              <Box padding="200" background="bg-surface-secondary">
-                <InlineStack align="center" gap="200">
-                  <Button
-                    size="slim"
-                    pressed={previewDevice === "desktop"}
-                    onClick={() => setPreviewDevice("desktop")}
-                  >
-                    Desktop (1280px)
-                  </Button>
-                  <Button
-                    size="slim"
-                    pressed={previewDevice === "mobile"}
-                    onClick={() => setPreviewDevice("mobile")}
-                  >
-                    Mobile (390px)
-                  </Button>
-                </InlineStack>
-              </Box>
+              {/* Top Studio Control Bar */}
+              <Box padding="300" background="bg-surface-secondary" borderBlockEndWidth="025" borderColor="border">
+                <InlineStack align="space-between" blockAlign="center" wrap>
+                  {/* Viewport Switcher */}
+                  <InlineStack gap="150" blockAlign="center">
+                    <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+                      Viewport:
+                    </Text>
+                    <Button
+                      size="slim"
+                      pressed={previewDevice === "desktop"}
+                      onClick={() => setPreviewDevice("desktop")}
+                    >
+                      🖥️ Desktop
+                    </Button>
+                    <Button
+                      size="slim"
+                      pressed={previewDevice === "tablet"}
+                      onClick={() => setPreviewDevice("tablet")}
+                    >
+                      💻 Tablet
+                    </Button>
+                    <Button
+                      size="slim"
+                      pressed={previewDevice === "mobile"}
+                      onClick={() => setPreviewDevice("mobile")}
+                    >
+                      📱 Mobile
+                    </Button>
+                  </InlineStack>
 
-              <div style={{
-                background: "#0F172A",
-                padding: previewDevice === "mobile" ? "24px 0" : "0",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
-                <iframe
-                  title="Preview"
-                  src={previews[previewModal]?.src}
-                  style={{
-                    width: previewDevice === "mobile" ? "390px" : "100%",
-                    height: "70vh",
-                    border: previewDevice === "mobile" ? "8px solid #1E293B" : "0",
-                    borderRadius: previewDevice === "mobile" ? "24px" : "0",
-                    boxShadow: previewDevice === "mobile" ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)" : "none",
-                    display: "block",
-                    background: "#fff"
-                  }}
-                />
-              </div>
+                  {/* Submission CTAs right in top toolbar */}
+                  <InlineStack gap="200" blockAlign="center">
+                    <Button
+                      size="slim"
+                      url={previews[previewModal]?.href}
+                      target="_blank"
+                    >
+                      Open Full Screen ↗
+                    </Button>
 
-              <Box padding="300">
-                <InlineStack align="space-between" blockAlign="center">
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    Rendering on your real catalog via ShopForge staging engine
-                  </Text>
-                  <InlineStack gap="200">
-                    <Button url={previews[previewModal]?.href} target="_blank">Open Full Screen</Button>
-                    <Button variant="primary" onClick={()=>{ const id=previewModal; setPreviewModal(null); setConfirming(id); }}>
-                      Apply this page to store
+                    <Button
+                      size="slim"
+                      variant="primary"
+                      loading={applier.state !== "idle" && applier.formData?.get("intent") === "apply-draft"}
+                      disabled={applier.state !== "idle"}
+                      onClick={() => {
+                        applier.submit({ intent: "apply-draft", pageId: previewModal }, { method: "post" });
+                      }}
+                    >
+                      🛡️ Submit to Draft Theme
+                    </Button>
+
+                    <Button
+                      size="slim"
+                      loading={applier.state !== "idle" && applier.formData?.get("intent") === "apply"}
+                      disabled={applier.state !== "idle"}
+                      onClick={() => {
+                        applier.submit({ intent: "apply", pageId: previewModal }, { method: "post" });
+                      }}
+                    >
+                      ⚡ Submit to Live Store
                     </Button>
                   </InlineStack>
                 </InlineStack>
               </Box>
+
+              {/* Status Feedback Banners inside Preview Studio */}
+              {draftApplied && draftApplied.pageId === previewModal && (
+                <Box padding="300" background="bg-surface-success">
+                  <InlineStack align="space-between" blockAlign="center" wrap>
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      🎉 Successfully installed to Draft Theme ({draftApplied.draftThemeName})!
+                    </Text>
+                    <InlineStack gap="200">
+                      <Button url={draftApplied.previewUrl} target="_blank" size="slim">
+                        Preview Draft Store
+                      </Button>
+                      <Button url={draftApplied.editorUrl} target="_blank" size="slim">
+                        Customize in Shopify Editor
+                      </Button>
+                      <Button
+                        size="slim"
+                        variant="primary"
+                        loading={publisher.state !== "idle"}
+                        onClick={() =>
+                          publisher.submit(
+                            { intent: "publish-draft", draftThemeId: draftApplied.draftThemeId },
+                            { method: "post" }
+                          )
+                        }
+                      >
+                        🚀 Publish to Live Store Now
+                      </Button>
+                    </InlineStack>
+                  </InlineStack>
+                </Box>
+              )}
+
+              {applied && applied.pageId === previewModal && (
+                <Box padding="300" background="bg-surface-success">
+                  <InlineStack align="space-between" blockAlign="center" wrap>
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      🚀 Page is now LIVE on your active store!
+                    </Text>
+                    <InlineStack gap="200">
+                      <Button url={applied.storefrontUrl} target="_blank" size="slim" variant="primary">
+                        View Live Store
+                      </Button>
+                      <Button
+                        size="slim"
+                        loading={undoer.state !== "idle"}
+                        onClick={() => undoer.submit({ intent: "undo", pageId: applied.pageId }, { method: "post" })}
+                      >
+                        Undo
+                      </Button>
+                    </InlineStack>
+                  </InlineStack>
+                </Box>
+              )}
+
+              {applier.data?.error && (
+                <Box padding="300" background="bg-surface-critical">
+                  <Text as="p" tone="critical" variant="bodyMd">
+                    {applier.data.error}
+                  </Text>
+                </Box>
+              )}
+
+              {/* Responsive Frame */}
+              <div style={{
+                background: "#0F172A",
+                padding: previewDevice === "mobile" ? "24px 0" : previewDevice === "tablet" ? "16px 0" : "0",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "68vh",
+                overflow: "hidden"
+              }}>
+                <iframe
+                  title="PageFly-Style Preview"
+                  src={previews[previewModal]?.src}
+                  style={{
+                    width: previewDevice === "mobile" ? "390px" : previewDevice === "tablet" ? "768px" : "100%",
+                    height: "70vh",
+                    border: previewDevice === "mobile" ? "8px solid #1E293B" : previewDevice === "tablet" ? "4px solid #334155" : "0",
+                    borderRadius: previewDevice === "mobile" ? "28px" : previewDevice === "tablet" ? "12px" : "0",
+                    boxShadow: previewDevice !== "desktop" ? "0 25px 50px -12px rgba(0, 0, 0, 0.6)" : "none",
+                    display: "block",
+                    background: "#fff",
+                    transition: "width 0.25s ease, border-radius 0.25s ease"
+                  }}
+                />
+              </div>
+
+              {/* Bottom Info Bar */}
+              <Box padding="300" borderBlockStartWidth="025" borderColor="border">
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    ⚡ Live store catalog preview. Shoppers see no changes until you click <strong>Submit to Theme</strong>.
+                  </Text>
+                  <Button onClick={() => setPreviewModal(null)}>
+                    Close Preview
+                  </Button>
+                </InlineStack>
+              </Box>
             </BlockStack>
           ) : (
-            <Box padding="400">
-              <InlineStack gap="200" blockAlign="center">
+            <Box padding="600">
+              <InlineStack gap="300" align="center" blockAlign="center">
                 {previews[previewModal||""]?.status==="failed"
-                  ? <Text as="p" tone="critical">{previews[previewModal||""]?.error || "This preview could not be built."}</Text>
-                  : <><Spinner size="small" /><Text as="p" tone="subdued">Building live preview on your store's real catalog…</Text></>}
+                  ? <Text as="p" tone="critical">{previews[previewModal||""]?.error || "This preview could not be loaded."}</Text>
+                  : <><Spinner size="small" /><Text as="p" tone="subdued">Building live preview with your store's real catalog…</Text></>}
               </InlineStack>
             </Box>
           )}

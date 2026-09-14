@@ -18,6 +18,7 @@ import {
   Select,
   EmptyState,
 } from "@shopify/polaris";
+import { ViewIcon } from "@shopify/polaris-icons";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 import { installSection, describeSection } from "../services/section-install.server";
@@ -99,16 +100,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       orderBy: { componentId: "asc" },
       take: 80,
     }),
-    prisma.componentRegistry.count({ where: { status: "PUBLISHED" } }),
+    prisma.componentRegistry.count({ where }),
   ]);
 
   const described = await Promise.all(
     components.map(async (c: any) => ({
-      componentId: c.componentId,
-      family: c.family,
-      visualStyle: c.visualStyle,
-      liquidPath: c.liquidPath,
-      sectionType: c.sectionType,
+      ...c,
       detail: await describeSection(c.liquidPath),
     }))
   );
@@ -119,25 +116,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
     q,
     totalCount,
     components: described,
-    hasShop: Boolean(shop),
   });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const { session } = await authenticate.admin(request);
   const form = await request.formData();
-  const intent = String(form.get("intent"));
+  const intent = String(form.get("intent") || "");
+  const componentId = String(form.get("componentId") || "");
+  const liquidPath = String(form.get("liquidPath") || "");
+  const sectionType = String(form.get("sectionType") || "");
+  const sectionName = String(form.get("sectionName") || "");
+  const targetChoice = String(form.get("targetChoice") || "auto");
 
   const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  if (!shop) return json({ error: "Store connection not ready." }, { status: 400 });
+  if (!shop) return json({ error: "Store not connected." }, { status: 400 });
 
   try {
-    const componentId = String(form.get("componentId"));
-    const liquidPath = String(form.get("liquidPath"));
-    const sectionType = String(form.get("sectionType"));
-    const sectionName = String(form.get("sectionName") || componentId);
-    const targetChoice = String(form.get("targetChoice") || "auto");
-
     if (intent === "preview") {
       const theme = await ensurePreviewTheme(shop);
 
@@ -146,7 +141,7 @@ export async function action({ request }: ActionFunctionArgs) {
           ? ({ kind: "group", group: "header", replace: "header" } as const)
           : sectionType === "footer" || sectionType.startsWith("footer")
             ? ({ kind: "group", group: "footer", replace: "footer" } as const)
-            : sectionType === "product-page" || targetChoice === "product"
+            : targetChoice === "product" || (!targetChoice && sectionType === "product-page")
               ? ({ kind: "template", template: "product", position: "bottom" } as const)
               : ({ kind: "template", template: "index", position: "top" } as const);
 
@@ -253,7 +248,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return json({ error: `Unknown intent "${intent}"` }, { status: 400 });
   } catch (err: any) {
-    console.error(`[Section Store] Error:`, err);
+    console.error(`[PreMadeSectionsStore] ${intent} failed:`, err);
     return json({ error: err.message || String(err) }, { status: 500 });
   }
 }
@@ -267,6 +262,7 @@ export default function PreMadeSectionsStore() {
   const [activePreview, setActivePreview] = useState<any>(null);
   const [activeTarget, setActiveTarget] = useState<string>("auto");
   const [searchQuery, setSearchQuery] = useState(q);
+  const [sectionDevice, setSectionDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
@@ -517,22 +513,23 @@ export default function PreMadeSectionsStore() {
 
                       <Divider />
 
-                      {/* Action Buttons */}
+                      {/* PageFly Flow: Preview First as Primary Action */}
                       <InlineStack align="space-between" blockAlign="center">
                         <Button
+                          variant="primary"
+                          icon={ViewIcon}
                           onClick={() => submitPreview(c)}
                           loading={isPreviewing}
                           disabled={busy}
                         >
-                          Preview
+                          Preview Section
                         </Button>
                         <Button
-                          variant="primary"
                           onClick={() => submitInstall(c, "draft")}
                           loading={isInstalling}
                           disabled={busy}
                         >
-                          Add to Store (Safe)
+                          Quick Add
                         </Button>
                       </InlineStack>
                     </BlockStack>
@@ -543,52 +540,145 @@ export default function PreMadeSectionsStore() {
           </Layout>
         )}
 
-        {/* Live Preview Modal */}
+        {/* ── PageFly-Style Section Preview & Submit Modal ── */}
         {activePreview && (
           <Modal
             open={previewModalOpen}
             onClose={() => setPreviewModalOpen(false)}
             title={`Preview: ${activePreview.sectionName || activePreview.componentId}`}
-            primaryAction={{
-              content: "🛡️ Add to Draft Theme (Safe)",
-              onAction: () => {
-                setPreviewModalOpen(false);
-                const c = components.find((x) => x.componentId === activePreview.componentId);
-                if (c) submitInstall(c, "draft");
-              },
-            }}
-            secondaryActions={[
-              {
-                content: "⚡ Add to Live Store",
-                onAction: () => {
-                  setPreviewModalOpen(false);
-                  const c = components.find((x) => x.componentId === activePreview.componentId);
-                  if (c) submitInstall(c, "live");
-                },
-              },
-              {
-                content: "Close",
-                onAction: () => setPreviewModalOpen(false),
-              },
-            ]}
             size="large"
           >
-            <Modal.Section>
-              <BlockStack gap="300">
-                <Text as="p" tone="subdued">
-                  Rendered live with your store's catalog in a private preview. Shoppers won't see it until you click "Add to Live Store".
-                </Text>
-                <Box
-                  borderWidth="025"
-                  borderColor="border"
-                  borderRadius="200"
-                  overflowX="hidden"
-                >
+            <Modal.Section flush>
+              <BlockStack gap="0">
+                {/* Top Studio Control Bar */}
+                <Box padding="300" background="bg-surface-secondary" borderBlockEndWidth="025" borderColor="border">
+                  <InlineStack align="space-between" blockAlign="center" wrap>
+                    {/* Viewport Switcher */}
+                    <InlineStack gap="150" blockAlign="center">
+                      <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+                        Viewport:
+                      </Text>
+                      <Button
+                        size="slim"
+                        pressed={sectionDevice === "desktop"}
+                        onClick={() => setSectionDevice("desktop")}
+                      >
+                        🖥️ Desktop
+                      </Button>
+                      <Button
+                        size="slim"
+                        pressed={sectionDevice === "tablet"}
+                        onClick={() => setSectionDevice("tablet")}
+                      >
+                        💻 Tablet
+                      </Button>
+                      <Button
+                        size="slim"
+                        pressed={sectionDevice === "mobile"}
+                        onClick={() => setSectionDevice("mobile")}
+                      >
+                        📱 Mobile
+                      </Button>
+                    </InlineStack>
+
+                    {/* Direct Submission Buttons inside top toolbar */}
+                    <InlineStack gap="200" blockAlign="center">
+                      <Button
+                        size="slim"
+                        url={activePreview.url}
+                        target="_blank"
+                      >
+                        Open Full Screen ↗
+                      </Button>
+
+                      <Button
+                        size="slim"
+                        variant="primary"
+                        loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "draft"}
+                        disabled={busy}
+                        onClick={() => {
+                          const c = components.find((x) => x.componentId === activePreview.componentId);
+                          if (c) submitInstall(c, "draft");
+                        }}
+                      >
+                        🛡️ Submit to Draft Theme
+                      </Button>
+
+                      <Button
+                        size="slim"
+                        loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "live"}
+                        disabled={busy}
+                        onClick={() => {
+                          const c = components.find((x) => x.componentId === activePreview.componentId);
+                          if (c) submitInstall(c, "live");
+                        }}
+                      >
+                        ⚡ Submit to Live Theme
+                      </Button>
+                    </InlineStack>
+                  </InlineStack>
+                </Box>
+
+                {/* Status Feedback Banner inside Preview Modal */}
+                {data?.ok && data.intent === "install" && data.componentId === activePreview.componentId && (
+                  <Box padding="300" background="bg-surface-success">
+                    <InlineStack align="space-between" blockAlign="center" wrap>
+                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                        🎉 Successfully installed to {data.themeName} ({data.targetLabel})!
+                      </Text>
+                      <InlineStack gap="200">
+                        {data.previewUrl && (
+                          <Button url={data.previewUrl} target="_blank" size="slim">
+                            Preview in Draft Theme
+                          </Button>
+                        )}
+                        <Button url={data.editorUrl} target="_blank" size="slim" variant="primary">
+                          Customize in Theme Editor
+                        </Button>
+                        <Button url="/app/theme" size="slim">
+                          View My Added Sections
+                        </Button>
+                      </InlineStack>
+                    </InlineStack>
+                  </Box>
+                )}
+
+                {/* Responsive Viewport Frame */}
+                <div style={{
+                  background: "#0F172A",
+                  padding: sectionDevice === "mobile" ? "24px 0" : sectionDevice === "tablet" ? "16px 0" : "0",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: "68vh",
+                  overflow: "hidden"
+                }}>
                   <iframe
-                    title="Section Preview"
+                    title="Section Live Preview"
                     src={activePreview.url}
-                    style={{ width: "100%", height: "650px", border: 0, display: "block" }}
+                    style={{
+                      width: sectionDevice === "mobile" ? "390px" : sectionDevice === "tablet" ? "768px" : "100%",
+                      height: "70vh",
+                      border: sectionDevice === "mobile" ? "8px solid #1E293B" : sectionDevice === "tablet" ? "4px solid #334155" : "0",
+                      borderRadius: sectionDevice === "mobile" ? "28px" : sectionDevice === "tablet" ? "12px" : "0",
+                      boxShadow: sectionDevice !== "desktop" ? "0 25px 50px -12px rgba(0, 0, 0, 0.6)" : "none",
+                      display: "block",
+                      background: "#fff",
+                      transition: "width 0.25s ease, border-radius 0.25s ease"
+                    }}
                   />
+                </div>
+
+                {/* Bottom Info Bar */}
+                <Box padding="300" borderBlockStartWidth="025" borderColor="border">
+                  <InlineStack align="space-between" blockAlign="center">
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      ⚡ Live store preview. Shoppers won't see changes until you submit.
+                    </Text>
+                    <Button onClick={() => setPreviewModalOpen(false)}>
+                      Close Preview
+                    </Button>
+                  </InlineStack>
                 </Box>
               </BlockStack>
             </Modal.Section>
