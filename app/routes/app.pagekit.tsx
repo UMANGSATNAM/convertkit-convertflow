@@ -5,7 +5,7 @@ import {
   Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Spinner, Tabs, Modal, TextField, Icon, Select, Divider
 } from "@shopify/polaris";
 import { SearchIcon, ViewIcon, CheckIcon } from "@shopify/polaris-icons";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { authenticate } from "../shopify.server";
 import { ALL_PAGES, PAGE_TYPES, pageById, type PageType } from "../pagekit/pages";
 import {
@@ -49,7 +49,7 @@ async function passwordState(shopDomain: string, saved: string | undefined) {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   let themeId: string | null = null;
   let themeError: string | null = null;
   if (shop) {
@@ -72,8 +72,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const form = await request.formData();
   const intent = String(form.get("intent") || "");
   const pageId = String(form.get("pageId") || "");
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
-  if (!shop) return json({ intent, pageId, ok: false, error: "This store is not connected yet. Reinstall the app." });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
+  if (!shop) return json({ intent, pageId, ok: false, error: "This store is not connected yet. Please click Connect Store to authorize." });
   try {
     if (intent === "stage") {
       const page = pageById(pageId);
@@ -430,9 +430,22 @@ export default function PageKit(){
 
   if(!connected){
     return (
-      <Page title="Store Generator">
-        <Banner tone="critical" title="This store is not connected">
-          <p>Reinstall the app from your Shopify admin and this screen will work.</p>
+      <Page title="Full Page Kits">
+        <Banner
+          tone="critical"
+          title="This store is not connected yet"
+          action={{
+            content: "Connect Store & Authorize",
+            url: `/auth?shop=${shopDomain}`,
+            target: "_top",
+          }}
+        >
+          <p>
+            The app needs authorization for <b>{shopDomain}</b> to preview page kits with your products and apply designs to your theme.
+          </p>
+          <p style={{ marginTop: 8 }}>
+            Click <b>Connect Store & Authorize</b> above to grant access, or reopen the app from your Shopify admin.
+          </p>
         </Banner>
       </Page>
     );

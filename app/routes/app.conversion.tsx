@@ -19,7 +19,7 @@ import {
   ProgressBar,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import {
   getConversionConfig,
   saveConversionConfig,
@@ -32,7 +32,7 @@ import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
 
   const config = await getConversionConfig(session.shop);
 
@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ error: "Shop not found" }, { status: 404 });
 
   const formData = await request.formData();

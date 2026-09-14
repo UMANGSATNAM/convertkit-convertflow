@@ -14,9 +14,15 @@ export const PLAN_STARTER = 'STARTER';
 export const PLAN_PRO = 'Pro - $19/mo';
 export const PLAN_ENTERPRISE = 'Enterprise - $49/mo';
 
+const apiKey = (process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_KEY !== "616431d20b1e35e8672963828655d4b1")
+  ? process.env.SHOPIFY_API_KEY
+  : "3c6ab6e0f48016cb9f04315789387b66";
+
+const apiSecretKey = process.env.SHOPIFY_API_SECRET || "";
+
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiKey,
+  apiSecretKey,
   apiVersion: ApiVersion.October25,
   restResources,
   scopes: process.env.SCOPES?.split(","),
@@ -24,6 +30,30 @@ const shopify = shopifyApp({
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
+  hooks: {
+    afterAuth: async ({ session }) => {
+      try {
+        shopify.registerWebhooks({ session });
+      } catch (e) {
+        console.error("registerWebhooks error:", e);
+      }
+      if (session?.shop && session?.accessToken) {
+        try {
+          await prisma.shop.upsert({
+            where: { shopDomain: session.shop },
+            update: { accessToken: session.accessToken },
+            create: {
+              shopDomain: session.shop,
+              accessToken: session.accessToken,
+            },
+          });
+          console.log(`[afterAuth] Synced shop: ${session.shop}`);
+        } catch (e) {
+          console.error(`[afterAuth] DB error for ${session.shop}:`, e);
+        }
+      }
+    },
+  },
   billing: {
     [PLAN_STARTER]: {
       amount: 999,

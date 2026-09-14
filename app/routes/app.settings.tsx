@@ -3,12 +3,12 @@ import { useSubmit, useLoaderData, useActionData } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useState, useEffect } from "react";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   
   if (!shop) return json({ pincodes: [], storefrontPassword: "" });
 
@@ -24,7 +24,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ error: "Shop not found" }, { status: 404 });
 
   const formData = await request.formData();

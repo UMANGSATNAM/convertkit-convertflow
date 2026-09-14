@@ -20,7 +20,7 @@ import {
 } from "@shopify/polaris";
 import { ViewIcon } from "@shopify/polaris-icons";
 import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { installSection, describeSection } from "../services/section-install.server";
 import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server";
 
@@ -53,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const category = url.searchParams.get("category") || "all";
   const q = (url.searchParams.get("q") || "").trim();
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
 
   // Build where clause according to category and search
   const where: any = { status: "PUBLISHED" };
@@ -129,7 +129,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const sectionName = String(form.get("sectionName") || "");
   const targetChoice = String(form.get("targetChoice") || "auto");
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ error: "Store not connected." }, { status: 400 });
 
   try {

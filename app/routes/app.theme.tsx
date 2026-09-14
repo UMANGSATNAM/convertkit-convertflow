@@ -3,7 +3,7 @@ import { Link, useLoaderData, useFetcher } from "@remix-run/react";
 import {
   Page, Layout, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Divider, Spinner,
 } from "@shopify/polaris";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { authenticate } from "../shopify.server";
 import { readFile } from "../services/theme-engine/index";
 import { removeSectionFromPage } from "../services/section-install.server";
@@ -13,30 +13,30 @@ import { deletePreviewTheme } from "../services/preview-theme.server";
  * What is actually on the merchant's storefront, read from the theme itself.
  *
  * The app previously had no screen that answered "what did I add?". A merchant
- * could install sections and then had to open Shopify's theme editor to see the
- * result, which defeats the point of the app being the place you build from.
+ * could install a hero, lose track, and have no way inside the app to see that
+ * it was running or remove it without opening the Shopify theme editor and
+ * digging through JSON templates.
  *
- * The list is read live from the theme's template JSON rather than from a table
- * of what the app believes it installed. Those two drift the moment a merchant
- * removes something in Shopify's editor, and the version that lies is the one
- * stored in our database.
+ * This screen parses the active theme's templates/index.json, product.json,
+ * and collection.json, lists every section present, marks which ones came
+ * from our library, and lets the merchant remove them cleanly.
  */
 
 const PAGES = [
-  { label: "Home", file: "templates/index.json" },
-  { label: "Header", file: "sections/header-group.json" },
-  { label: "Footer", file: "sections/footer-group.json" },
-  { label: "Product", file: "templates/product.json" },
-  { label: "Collection", file: "templates/collection.json" },
+  { id: "index", label: "Homepage", file: "templates/index.json" },
+  { id: "product", label: "Product pages", file: "templates/product.json" },
+  { id: "collection", label: "Collection pages", file: "templates/collection.json" },
 ];
 
 async function readSections(shop: any, file: string) {
   try {
     const raw = await readFile(shop, "active", file);
-    const doc = JSON.parse(raw || "{}");
-    const order: string[] = Array.isArray(doc.order) ? doc.order : Object.keys(doc.sections || {});
+    if (!raw) return [];
+    const json = JSON.parse(raw);
+    const order: string[] = json.order || [];
+    const sections = json.sections || {};
     return order
-      .map(key => ({ key, type: doc.sections?.[key]?.type }))
+      .map(key => ({ key, ...sections[key] }))
       .filter(s => s.type);
   } catch {
     return [];
@@ -45,7 +45,7 @@ async function readSections(shop: any, file: string) {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ connected: false, pages: [], shopDomain: session.shop });
 
   const pages = await Promise.all(
@@ -75,7 +75,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const form = await request.formData();
   const intent = String(form.get("intent"));
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ error: "This store is not connected yet." }, { status: 400 });
 
   try {

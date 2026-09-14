@@ -3,7 +3,7 @@ import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Spinner, Tabs, Select } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { stagePreview, applyToLiveTheme, liveThemeId } from "../pagekit/apply.server";
 import fs from "fs";
 import path from "path";
@@ -13,40 +13,35 @@ type HpDef = { id:string, version:number, name:string, niche:string, sections:st
 function nicheFromName(name:string){
   const n=name.toLowerCase();
   if(n.includes('streetwear')) return 'Streetwear';
-  if(n.includes('activewear')) return 'Activewear';
-  if(n.includes('beauty')) return 'Beauty';
-  if(n.includes('electronics')) return 'Electronics';
-  if(n.includes('ethnic')) return 'Ethnic Wear';
-  if(n.includes('gourmet')||n.includes('food')) return 'Food';
-  if(n.includes('grooming')) return 'Grooming';
-  if(n.includes('home decor')) return 'Home Decor';
-  if(n.includes('jewellery')) return 'Jewellery';
-  if(n.includes('kids')) return 'Kids';
-  if(n.includes('cyber')||n.includes('matrix')) return 'Streetwear';
-  return 'General';
+  if(n.includes('luxury')||n.includes('polki')||n.includes('solitaire')||n.includes('silver')||n.includes('royal')) return 'Jewellery';
+  if(n.includes('beauty')||n.includes('clinical')||n.includes('pure')||n.includes('pink')||n.includes('ayurveda')||n.includes('glam')) return 'Beauty';
+  if(n.includes('audio')||n.includes('tech')) return 'Electronics';
+  return 'Lifestyle';
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
   const url=new URL(request.url);
   const filter=url.searchParams.get('niche')||'all';
   const periDir=path.join(process.cwd(), "dev-theme-peri", "templates");
-  let files: string[]=[];
-  try{ files=fs.readdirSync(periDir).filter(f=>f.startsWith('index.hp-v') && f.endsWith('.json')).sort((a,b)=>{
-    const na=parseInt(a.match(/v(\d+)/)?.[1]||"0",10);
-    const nb=parseInt(b.match(/v(\d+)/)?.[1]||"0",10);
-    return na-nb;
-  }); } catch{}
+  if(!fs.existsSync(periDir)) return json({ all:[], niches:[], activeNiche:filter });
+
+  const files=fs.readdirSync(periDir).filter(f=> f.startsWith('index.hp-v') && f.endsWith('.json'));
   const all:HpDef[]=files.map(f=>{
-    const p=path.join(periDir,f);
-    let j:any={};
-    try{ j=JSON.parse(fs.readFileSync(p,'utf8'));}catch{}
-    const ver=parseInt(f.match(/v(\d+)/)?.[1]||"0",10);
-    const name=j.name||f;
-    // sections are object keys values type
-    const secs= j.sections? Object.values(j.sections).map((s:any)=>s.type) : (j.order||[]);
-    // hero style from first section
-    const heroStyle= secs.find((s:string)=>s.includes('hero')) || secs[0]||'';
+    const m=f.match(/hp-v(\d+)/);
+    const ver=m?parseInt(m[1]):0;
+    const content=fs.readFileSync(path.join(periDir,f),'utf8');
+    let name=`Homepage v${ver}`;
+    let secs:string[]=[];
+    let heroStyle='standard';
+    try{
+      const j=JSON.parse(content);
+      if(j.name) name=j.name;
+      if(j.order) secs=j.order.map((k:string)=> j.sections[k].type );
+      const heroKey=j.order?.find((k:string)=>k.includes('hero'));
+      if(heroKey && j.sections[heroKey]?.settings?.desktop_layout){
+        heroStyle=j.sections[heroKey].settings.desktop_layout;
+      }
+    }catch{}
     return { id:f.replace('.json','').replace('index.',''), version:ver, name, niche: nicheFromName(name), sections: secs, path:`/?preview_theme_id=hp-${ver}`, heroStyle };
   });
   const niches=['all', ...Array.from(new Set(all.map(a=>a.niche))).sort()];
@@ -56,7 +51,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop=await prisma.shop.findUnique({ where:{ shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if(!shop) return json({ ok:false, error:'Shop not connected' }, {status:400});
   const form=await request.formData();
   const intent=String(form.get('intent'));

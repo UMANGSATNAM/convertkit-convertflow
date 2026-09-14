@@ -6,7 +6,7 @@ import {
   Banner, Select, Spinner, Box, Divider,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
+import prisma, { getOrSyncShop } from "../db.server";
 import { installSection, describeSection } from "../services/section-install.server";
 import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server";
 
@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "header";
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
 
   const components = await prisma.componentRegistry.findMany({
     // The seed maps registry.json's "production" to "PUBLISHED" when it writes
@@ -80,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   const intent = String(form.get("intent"));
 
-  const shop = await prisma.shop.findUnique({ where: { shopDomain: session.shop } });
+  const shop = await getOrSyncShop(session.shop, session.accessToken);
   if (!shop) return json({ error: "This store is not connected yet." }, { status: 400 });
 
   try {
