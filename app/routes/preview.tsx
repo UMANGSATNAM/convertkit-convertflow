@@ -221,7 +221,7 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
   return html.trim();
 }
 
-function wrapHtmlDocument(title: string, bodyContent: string, extraCss: string = "", extraJs: string = ""): string {
+function wrapHtmlDocument(title: string, bodyContent: string, extraCss: string = "", extraJs: string = "", isEmbed: boolean = false): string {
   const baseCss = getBaseCss();
   return `<!DOCTYPE html>
 <html lang="en">
@@ -245,6 +245,7 @@ function wrapHtmlDocument(title: string, bodyContent: string, extraCss: string =
     }
     img { max-width: 100%; height: auto; display: block; }
     button, a { cursor: pointer; }
+    ${isEmbed ? `body { overflow: hidden !important; }` : `
     .preview-header-bar {
       position: sticky;
       top: 0;
@@ -269,11 +270,13 @@ function wrapHtmlDocument(title: string, bodyContent: string, extraCss: string =
       text-transform: uppercase;
       margin-left: 8px;
     }
+    `}
     ${baseCss}
     ${extraCss}
   </style>
 </head>
 <body>
+  ${!isEmbed ? `
   <header class="preview-header-bar">
     <div style="display:flex; align-items:center; gap:8px;">
       <span style="font-weight:800; font-size:14px; letter-spacing:-0.3px;">Converflow Preview Studio</span>
@@ -282,7 +285,7 @@ function wrapHtmlDocument(title: string, bodyContent: string, extraCss: string =
     <div style="font-size:12px; color:#94a3b8; font-weight:500;">
       Viewing: <strong style="color:#ffffff;">${title}</strong>
     </div>
-  </header>
+  </header>` : ""}
   <main>
     ${bodyContent}
   </main>
@@ -306,6 +309,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const id = url.searchParams.get("id") || url.searchParams.get("pageId") || "";
   const sectionId = url.searchParams.get("sectionId") || "";
+  const isEmbed = url.searchParams.get("embed") === "1";
 
   // ── 1. Single Section Preview (from Section Store) ────────────────────────
   if (sectionId) {
@@ -323,13 +327,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         .map(([, v]) => v)
         .join("\n");
 
-      const body = `<div style="max-width:1440px; margin:0 auto; padding:40px 20px;">${cleaned}</div>`;
-      const html = wrapHtmlDocument(`Section: ${sectionId}`, body, extraCss, extraJs);
+      const body = `<div style="max-width:1440px; margin:0 auto; padding:${isEmbed ? '0' : '40px 20px'};">${cleaned}</div>`;
+      const html = wrapHtmlDocument(`Section: ${sectionId}`, body, extraCss, extraJs, isEmbed);
       return new Response(html, {
         status: 200,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
           "X-Frame-Options": "ALLOWALL",
+          "Content-Security-Policy": "frame-ancestors *",
           "Cache-Control": "public, max-age=60",
         },
       });
@@ -410,12 +415,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         bodyHtml += `\n<!-- SECTION ${idx + 1}: ${sec.id} -->\n` + cleanLiquid(sec.source, idx + 1) + "\n";
       });
 
-      const html = wrapHtmlDocument(pageTitle, bodyHtml, extraCss, extraJs);
+      const html = wrapHtmlDocument(pageTitle, bodyHtml, extraCss, extraJs, isEmbed);
       return new Response(html, {
         status: 200,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
           "X-Frame-Options": "ALLOWALL",
+          "Content-Security-Policy": "frame-ancestors *",
           "Cache-Control": "public, max-age=60",
         },
       });

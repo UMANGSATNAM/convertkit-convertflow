@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   Page,
   Layout,
@@ -253,6 +253,347 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
+function BentoSectionCard({
+  component,
+  shopDomain,
+  isFeatured,
+  isInstalling,
+  isPreviewing,
+  onPreview,
+  onInstallDraft,
+  onInstallLive,
+}: {
+  component: any;
+  shopDomain: string;
+  isFeatured?: boolean;
+  isInstalling: boolean;
+  isPreviewing: boolean;
+  onPreview: () => void;
+  onInstallDraft: () => void;
+  onInstallLive: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [scale, setScale] = useState(0.28);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "350px" }
+    );
+    io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const updateScale = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.offsetWidth;
+        if (w > 0) setScale(w / 1280);
+      }
+    };
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const name = component.detail?.name || component.componentId.replace(/[-_]/g, " ");
+  const settingsCount = component.detail?.settings?.length || 0;
+  const previewUrl = `/preview?sectionId=${encodeURIComponent(component.componentId)}&shop=${encodeURIComponent(shopDomain)}&embed=1`;
+  const containerHeight = isFeatured ? 290 : 210;
+
+  return (
+    <div className={`cf-bento-card ${isFeatured ? "cf-bento-featured" : ""}`}>
+      {/* Top Browser Window Chrome */}
+      <div
+        style={{
+          height: 34,
+          background: "#0f172a",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 12px",
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
+          userSelect: "none",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#ef4444" }} />
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#f59e0b" }} />
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#10b981" }} />
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 10,
+              fontWeight: 800,
+              color: "#38bdf8",
+              letterSpacing: "0.5px",
+              textTransform: "uppercase",
+            }}
+          >
+            {component.sectionType}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: "#94a3b8",
+              fontFamily: "monospace",
+              background: "rgba(255, 255, 255, 0.08)",
+              padding: "2px 6px",
+              borderRadius: 4,
+            }}
+          >
+            {settingsCount} settings
+          </span>
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: "#64748b",
+              fontFamily: "monospace",
+            }}
+          >
+            {component.componentId}
+          </span>
+        </div>
+      </div>
+
+      {/* Live Scaled Preview Frame */}
+      <div
+        ref={containerRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={onPreview}
+        style={{
+          position: "relative",
+          width: "100%",
+          height: containerHeight,
+          overflow: "hidden",
+          background: "#f8fafc",
+          cursor: "pointer",
+        }}
+      >
+        {inView ? (
+          <div
+            style={{
+              width: 1280,
+              height: Math.round(containerHeight / scale),
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              pointerEvents: "none",
+            }}
+          >
+            <iframe
+              title={name}
+              src={previewUrl}
+              loading="lazy"
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "none",
+                background: "#ffffff",
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+            }}
+          >
+            <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>Loading live preview…</span>
+          </div>
+        )}
+
+        {/* Hover Quick Action Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.68)",
+            backdropFilter: "blur(3px)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            opacity: isHovered ? 1 : 0,
+            transition: "opacity 0.2s ease",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              background: "#0284c7",
+              color: "#ffffff",
+              padding: "7px 18px",
+              borderRadius: 999,
+              fontWeight: 700,
+              fontSize: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              boxShadow: "0 8px 20px rgba(2, 132, 199, 0.4)",
+            }}
+          >
+            👁️ Open Live Preview Studio
+          </div>
+          <span style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 500 }}>
+            Click to test viewports & 1-click submit
+          </span>
+        </div>
+      </div>
+
+      {/* Card Info & Quick Actions Footer */}
+      <div style={{ padding: "12px 14px", background: "#ffffff", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+            <h3
+              onClick={onPreview}
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 800,
+                color: "#0f172a",
+                lineHeight: 1.3,
+                cursor: "pointer",
+              }}
+            >
+              {name}
+            </h3>
+          </div>
+
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+            {component.visualStyle && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "#059669",
+                  background: "#ecfdf5",
+                  padding: "2px 6px",
+                  borderRadius: 4,
+                  textTransform: "uppercase",
+                }}
+              >
+                {component.visualStyle}
+              </span>
+            )}
+            {component.family && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: "#475569",
+                  background: "#f1f5f9",
+                  padding: "2px 6px",
+                  borderRadius: 4,
+                }}
+              >
+                {component.family}
+              </span>
+            )}
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: "#6b7280",
+                background: "#f3f4f6",
+                padding: "2px 6px",
+                borderRadius: 4,
+              }}
+            >
+              Shopify 2.0 Native
+            </span>
+          </div>
+        </div>
+
+        {/* Action Button Strip */}
+        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+          <button
+            type="button"
+            onClick={onPreview}
+            disabled={isPreviewing}
+            style={{
+              flex: 1,
+              background: "#0284c7",
+              color: "#ffffff",
+              border: "none",
+              padding: "7px 10px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            👁️ Preview
+          </button>
+          <button
+            type="button"
+            onClick={onInstallDraft}
+            disabled={isInstalling}
+            title="Safe install to private preview theme"
+            style={{
+              background: "#f1f5f9",
+              color: "#0f172a",
+              border: "1px solid #cbd5e1",
+              padding: "7px 10px",
+              borderRadius: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🛡️ Draft
+          </button>
+          <button
+            type="button"
+            onClick={onInstallLive}
+            disabled={isInstalling}
+            title="Direct install to published live store"
+            style={{
+              background: "#0f172a",
+              color: "#ffffff",
+              border: "none",
+              padding: "7px 10px",
+              borderRadius: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ⚡ Live
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PreMadeSectionsStore() {
   const { shopDomain, category, q, totalCount, components } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -467,74 +808,72 @@ export default function PreMadeSectionsStore() {
             </EmptyState>
           </Card>
         ) : (
-          <Layout>
-            {components.map((c) => {
-              const isThisInstalling = installingId === c.componentId;
-              const isThisPreviewing = previewingId === c.componentId;
-              const name = c.detail?.name || c.componentId.replace(/[-_]/g, " ");
-              const settingsCount = c.detail?.settings?.length || 0;
+          <div>
+            <style>{`
+              .cf-bento-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 20px;
+              }
+              @media (max-width: 1200px) {
+                .cf-bento-grid {
+                  grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+              }
+              @media (max-width: 768px) {
+                .cf-bento-grid {
+                  grid-template-columns: 1fr;
+                }
+              }
+              .cf-bento-card {
+                border: 1px solid #e2e8f0;
+                border-radius: 16px;
+                overflow: hidden;
+                background: #ffffff;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+                transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+              }
+              .cf-bento-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
+                border-color: #0284c7;
+              }
+              .cf-bento-featured {
+                grid-column: span 2;
+              }
+              @media (max-width: 768px) {
+                .cf-bento-featured {
+                  grid-column: span 1;
+                }
+              }
+            `}</style>
 
-              return (
-                <Layout.Section oneHalf key={c.componentId}>
-                  <Card>
-                    <BlockStack gap="300">
-                      <InlineStack align="space-between" blockAlign="start" gap="200">
-                        <BlockStack gap="100">
-                          <Text as="h2" variant="headingMd" fontWeight="bold">
-                            {name}
-                          </Text>
-                          <InlineStack gap="150" wrap>
-                            <Badge tone="info">{c.sectionType}</Badge>
-                            {c.visualStyle && <Badge tone="success">{c.visualStyle}</Badge>}
-                            {c.family && <Badge>{c.family}</Badge>}
-                          </InlineStack>
-                        </BlockStack>
+            <div className="cf-bento-grid">
+              {components.map((c, idx) => {
+                const isHero = c.sectionType === "hero" || c.sectionType?.includes("hero");
+                const isFeatured = isHero || (idx % 7 === 0);
+                const isThisInstalling = installingId === c.componentId;
+                const isThisPreviewing = previewingId === c.componentId;
 
-                        <Text as="span" variant="bodyXs" tone="subdued">
-                          {settingsCount} settings
-                        </Text>
-                      </InlineStack>
-
-                      <Box
-                        background="bg-surface-secondary"
-                        padding="300"
-                        borderRadius="200"
-                      >
-                        <InlineStack align="space-between" blockAlign="center">
-                          <Text as="span" variant="bodySm" tone="subdued">
-                            Ready for Theme Editor customization
-                          </Text>
-                          <Badge tone="magic">1-Click Install</Badge>
-                        </InlineStack>
-                      </Box>
-
-                      <Divider />
-
-                      {/* PageFly Flow: Preview First as Primary Action */}
-                      <InlineStack align="space-between" blockAlign="center">
-                        <Button
-                          variant="primary"
-                          icon={ViewIcon}
-                          onClick={() => submitPreview(c)}
-                          loading={isThisPreviewing}
-                          disabled={busy}
-                        >
-                          Preview Section
-                        </Button>
-                        <Button
-                          onClick={() => submitInstall(c, "draft")}
-                          loading={isThisInstalling}
-                          disabled={busy}
-                        >
-                          Quick Add
-                        </Button>
-                      </InlineStack>
-                    </BlockStack>
-                  </Card>
-                </Layout.Section>
-              );
-            })}
-          </Layout>
+                return (
+                  <BentoSectionCard
+                    key={c.componentId}
+                    component={c}
+                    shopDomain={shopDomain}
+                    isFeatured={isFeatured}
+                    isInstalling={isThisInstalling}
+                    isPreviewing={isThisPreviewing}
+                    onPreview={() => submitPreview(c)}
+                    onInstallDraft={() => submitInstall(c, "draft")}
+                    onInstallLive={() => submitInstall(c, "live")}
+                  />
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {/* ── PageFly-Style Section Preview & Submit Modal ── */}

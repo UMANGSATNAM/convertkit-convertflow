@@ -163,63 +163,178 @@ function getThumbnailUrl(pageId: string): string {
 }
 
 function LivePreview({
-  pageId, poster, alt, onOpen,
+  pageId,
+  alt,
+  shopDomain,
+  onOpen,
 }: {
   pageId: string;
-  poster: string;
+  poster?: string;
   alt: string;
   niche?: string;
+  shopDomain?: string;
   onOpen: () => void;
 }) {
-  const [imgSrc, setImgSrc] = useState(poster);
-  const [hasError, setHasError] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [scale, setScale] = useState(0.24);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "350px" }
+    );
+    io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const updateScale = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.offsetWidth;
+        if (w > 0) setScale(w / 1280);
+      }
+    };
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const previewUrl = `/preview?id=${encodeURIComponent(pageId)}&shop=${encodeURIComponent(shopDomain || "")}&embed=1`;
+  const containerHeight = 240;
 
   return (
     <div
+      ref={containerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={onOpen}
       style={{
         position: "relative",
-        aspectRatio: "16 / 9",
+        width: "100%",
+        height: containerHeight,
         overflow: "hidden",
-        background: "#f3f4f6",
+        background: "#f8fafc",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      {hasError ? (
-        <div style={{ padding: "20px", textAlign: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>{alt}</span>
+      {inView ? (
+        <div
+          style={{
+            width: 1280,
+            height: Math.round(containerHeight / scale),
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+            pointerEvents: "none",
+          }}
+        >
+          <iframe
+            title={alt}
+            src={previewUrl}
+            loading="lazy"
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "none",
+              background: "#ffffff",
+            }}
+          />
         </div>
       ) : (
-        <img
-          src={imgSrc}
-          alt={alt}
-          loading="lazy"
+        <div
           style={{
-            width: "100%", height: "100%", objectFit: "cover", objectPosition: "top",
-            display: "block",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
           }}
-          onError={() => {
-            const num = pageId.match(/\d+/)?.[0];
-            if (num && !imgSrc.includes(`hp-v${num}.jpg`)) {
-              setImgSrc(`/thumbnails/hp-v${num}.jpg`);
-            } else if (num && !imgSrc.includes(`hp${num}.jpg`)) {
-              setImgSrc(`/thumbnails/hp${num}.jpg`);
-            } else {
-              setHasError(true);
-            }
-          }}
-        />
+        >
+          <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>Loading template preview…</span>
+        </div>
       )}
 
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(17, 24, 39, 0.8)", backdropFilter: "blur(4px)", padding: "6px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 2 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "80%" }}>
+      {/* Hover Quick Action Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(15, 23, 42, 0.68)",
+          backdropFilter: "blur(3px)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          opacity: isHovered ? 1 : 0,
+          transition: "opacity 0.2s ease",
+          zIndex: 10,
+        }}
+      >
+        <div
+          style={{
+            background: "#0284c7",
+            color: "#ffffff",
+            padding: "6px 16px",
+            borderRadius: 999,
+            fontWeight: 700,
+            fontSize: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            boxShadow: "0 8px 20px rgba(2, 132, 199, 0.4)",
+          }}
+        >
+          👁️ Live Preview Studio
+        </div>
+        <span style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 500 }}>
+          Click to inspect & 1-click submit to theme
+        </span>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "rgba(15, 23, 42, 0.85)",
+          backdropFilter: "blur(4px)",
+          padding: "5px 10px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          zIndex: 5,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#ffffff",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "80%",
+          }}
+        >
           {alt}
         </span>
         <span style={{ fontSize: 9, fontWeight: 700, color: "#38bdf8", textTransform: "uppercase" }}>
-          {pageId.toUpperCase()}
+          LIVE PREVIEW
         </span>
       </div>
     </div>
@@ -449,21 +564,52 @@ export default function PageKit(){
                 <Box padding="800"><BlockStack gap="200" align="center"><Text as="p" variant="headingMd" alignment="center">No designs match</Text><Button onClick={()=>{setSearch(""); setNicheFilter("all"); setDnaApplied(false);}}>Clear filters</Button></BlockStack></Box>
               ) : (
                 <>
-                <style>{`@media (max-width:640px){.hp-grid{grid-template-columns:1fr !important}} @media (min-width:641px) and (max-width:1024px){.hp-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}} @media (min-width:1025px) and (max-width:1440px){.hp-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}} @media (min-width:1441px){.hp-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}} @media (min-width:1800px){.hp-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}}`}</style>
-                <div className="hp-grid" style={{display:'grid', gridTemplateColumns:'repeat(4,minmax(0,1fr))', gap:'16px'}}>
+                <style>{`
+                  .hp-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 20px;
+                  }
+                  @media (max-width: 1200px) {
+                    .hp-grid {
+                      grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                  }
+                  @media (max-width: 768px) {
+                    .hp-grid {
+                      grid-template-columns: 1fr;
+                    }
+                  }
+                  .hp-card {
+                    border: 1px solid #e2e8f0;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+                    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+                    display: flex;
+                    flex-direction: column;
+                  }
+                  .hp-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
+                    border-color: #0284c7;
+                  }
+                `}</style>
+                <div className="hp-grid">
                   {visible.map(page=>{
                     const isApplying=applyingId===page.id;
                     const domainText = page.name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18) + ".com";
                     return (
-                      <div key={page.id} className="hp-card" style={{border:'1px solid #e5e7eb', borderRadius:16, overflow:'hidden', background:'#fff', display:'flex', flexDirection:'column', boxShadow:'0 4px 12px rgba(0,0,0,.04)', transition:'transform 0.2s ease, box-shadow 0.2s ease'}}>
-                        <div style={{height:34, background:'#f9fafb', borderBottom:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:8, padding:'0 10px', cursor:'pointer'}} onClick={() => openPreview(page.id)}>
-                          <span style={{width:7,height:7,borderRadius:99,background:'#ff5f57', display:'inline-block'}}/>
-                          <span style={{width:7,height:7,borderRadius:99,background:'#ffbd2e', display:'inline-block'}}/>
-                          <span style={{width:7,height:7,borderRadius:99,background:'#28c840', display:'inline-block'}}/>
+                      <div key={page.id} className="hp-card">
+                        <div style={{height:34, background:'#0f172a', borderBottom:'1px solid #1e293b', display:'flex', alignItems:'center', gap:8, padding:'0 12px', cursor:'pointer'}} onClick={() => openPreview(page.id)}>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#ef4444', display:'inline-block'}}/>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#f59e0b', display:'inline-block'}}/>
+                          <span style={{width:7,height:7,borderRadius:99,background:'#10b981', display:'inline-block'}}/>
                           <div style={{flex:1, display:'flex', justifyContent:'center'}}>
-                            <div style={{background:'#f3f4f6', borderRadius:999, padding:'4px 12px', fontSize:11, color:'#6b7280', fontWeight:500, minWidth:130, textAlign:'center', maxWidth:170, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{domainText}</div>
+                            <div style={{background:'rgba(255,255,255,0.08)', borderRadius:999, padding:'2px 10px', fontSize:10, color:'#94a3b8', fontWeight:600, minWidth:110, textAlign:'center', maxWidth:160, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{domainText}</div>
                           </div>
-                          <span style={{fontSize:10, fontWeight:700, color:'#9ca3af', fontFamily:'monospace'}}>{page.id.startsWith('hp-v') ? page.id : 'hp-v1'}</span>
+                          <span style={{fontSize:9, fontWeight:700, color:'#38bdf8', fontFamily:'monospace'}}>{page.id.startsWith('hp-v') ? page.id : 'hp-v1'}</span>
                         </div>
 
                         <LivePreview
@@ -471,6 +617,7 @@ export default function PageKit(){
                           poster={getThumbnailUrl(page.id)}
                           alt={page.name}
                           niche={page.niche}
+                          shopDomain={shopDomain}
                           onOpen={() => openPreview(page.id)}
                         />
 
