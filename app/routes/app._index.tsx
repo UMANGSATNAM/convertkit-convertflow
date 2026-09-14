@@ -300,17 +300,12 @@ export default function PreMadeSectionsStore() {
   };
 
   const submitPreview = (c: any) => {
-    fetcher.submit(
-      {
-        intent: "preview",
-        componentId: c.componentId,
-        liquidPath: c.liquidPath,
-        sectionType: c.sectionType,
-        sectionName: c.detail?.name || c.componentId,
-        targetChoice: activeTarget,
-      },
-      { method: "post" }
-    );
+    setActivePreview({
+      componentId: c.componentId,
+      sectionName: c.detail?.name || c.componentId,
+      url: `/preview?sectionId=${encodeURIComponent(c.componentId)}&shop=${encodeURIComponent(shopDomain)}`,
+    });
+    setPreviewModalOpen(true);
   };
 
   const submitInstall = (c: any, targetTheme: "draft" | "live" = "draft") => {
@@ -589,6 +584,11 @@ export default function PreMadeSectionsStore() {
                         size="slim"
                         url={activePreview.url}
                         target="_blank"
+                        onClick={() => {
+                          if (typeof window !== "undefined" && activePreview?.url) {
+                            window.open(activePreview.url, "_blank", "noopener,noreferrer");
+                          }
+                        }}
                       >
                         Open Full Screen ↗
                       </Button>

@@ -278,28 +278,15 @@ export default function PageKit(){
 
   const openPreview = useCallback((id: string) => {
     setPreviewModal(id);
-    if (!previews[id] || previews[id].status === "failed") {
-      setPreviews(p => ({ ...p, [id]: { status: "staging" } }));
-      stager.submit({ intent: "stage", pageId: id }, { method: "post" });
-    }
-  }, [previews, stager]);
-
-  useEffect(() => {
-    if (stager.state !== "idle" || !stager.data) return;
-    const d = stager.data;
-    if (d.intent === "stage") {
-      setPreviews(p => ({
-        ...p,
-        [d.pageId]: d.ok
-          ? {
-              status: "ready",
-              src: `/app/preview?shop=${encodeURIComponent(shopDomain)}&theme=${encodeURIComponent(d.themeId)}&path=${encodeURIComponent(d.previewPath)}`,
-              href: `https://${shopDomain}${d.previewPath}`,
-            }
-          : { status: "failed", error: d.error },
-      }));
-    }
-  }, [stager.state, stager.data, shopDomain]);
+    setPreviews(p => ({
+      ...p,
+      [id]: {
+        status: "ready",
+        src: `/preview?id=${encodeURIComponent(id)}&shop=${encodeURIComponent(shopDomain)}`,
+        href: `/preview?id=${encodeURIComponent(id)}&shop=${encodeURIComponent(shopDomain)}`,
+      },
+    }));
+  }, [shopDomain]);
 
   useEffect(()=>{
     if(applier.state==="idle" && applier.data?.intent==="apply"){ setApplied(applier.data); setConfirming(null); }
@@ -713,6 +700,12 @@ export default function PageKit(){
                       size="slim"
                       url={previews[previewModal]?.href}
                       target="_blank"
+                      onClick={() => {
+                        if (typeof window !== "undefined" && previewModal) {
+                          const url = `/preview?id=${encodeURIComponent(previewModal)}&shop=${encodeURIComponent(shopDomain)}`;
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }
+                      }}
                     >
                       Open Full Screen ↗
                     </Button>
