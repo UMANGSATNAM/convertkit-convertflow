@@ -266,11 +266,13 @@ export default function PreMadeSectionsStore() {
 
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
-  const installingId = busy && fetcher.formData?.get("intent") === "install"
-    ? String(fetcher.formData.get("componentId"))
+  const isInstalling = busy && fetcher.formData?.get("intent") === "install";
+  const isPreviewing = busy && fetcher.formData?.get("intent") === "preview";
+  const installingId = isInstalling
+    ? String(fetcher.formData?.get("componentId"))
     : null;
-  const previewingId = busy && fetcher.formData?.get("intent") === "preview"
-    ? String(fetcher.formData.get("componentId"))
+  const previewingId = isPreviewing
+    ? String(fetcher.formData?.get("componentId"))
     : null;
 
   // Watch for preview response to open modal
@@ -472,8 +474,8 @@ export default function PreMadeSectionsStore() {
         ) : (
           <Layout>
             {components.map((c) => {
-              const isInstalling = installingId === c.componentId;
-              const isPreviewing = previewingId === c.componentId;
+              const isThisInstalling = installingId === c.componentId;
+              const isThisPreviewing = previewingId === c.componentId;
               const name = c.detail?.name || c.componentId.replace(/[-_]/g, " ");
               const settingsCount = c.detail?.settings?.length || 0;
 
@@ -519,14 +521,14 @@ export default function PreMadeSectionsStore() {
                           variant="primary"
                           icon={ViewIcon}
                           onClick={() => submitPreview(c)}
-                          loading={isPreviewing}
+                          loading={isThisPreviewing}
                           disabled={busy}
                         >
                           Preview Section
                         </Button>
                         <Button
                           onClick={() => submitInstall(c, "draft")}
-                          loading={isInstalling}
+                          loading={isThisInstalling}
                           disabled={busy}
                         >
                           Quick Add
