@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher, useSearchParams } from "@remix-run/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Page, Card, Text, BlockStack, InlineStack, Button, Badge, Banner, Box, Spinner, Tabs, Modal, TextField, Icon, Select, Divider
 } from "@shopify/polaris";
@@ -155,17 +155,16 @@ interface PreviewState { status:"waiting"|"staging"|"ready"|"failed"; src?:strin
  * measured rather than assumed, because the grid columns are fluid.
  */
 function getThumbnailUrl(pageId: string): string {
-  const num = pageId.match(/\d+/)?.[0];
-  if (num) {
-    return `/thumbnails/hp-v${num}.jpg`;
-  }
+  // Thumbnail files are named after the page id (e.g., peri-beauty.jpg,
+  // rawblox-streetwear.jpg, hpv6-conversion.jpg, product-skincare.jpg).
+  // For hp-v* pages there are direct files too (hp-v1.jpg, hp-v2.jpg, …).
   return `/thumbnails/${pageId}.jpg`;
 }
 
 function LivePreview({
   pageId,
+  poster,
   alt,
-  shopDomain,
   onOpen,
 }: {
   pageId: string;
@@ -175,95 +174,58 @@ function LivePreview({
   shopDomain?: string;
   onOpen: () => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  const [scale, setScale] = useState(0.24);
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "350px" }
-    );
-    io.observe(containerRef.current);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const updateScale = () => {
-      if (containerRef.current) {
-        const w = containerRef.current.offsetWidth;
-        if (w > 0) setScale(w / 1280);
-      }
-    };
-    updateScale();
-    const ro = new ResizeObserver(updateScale);
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-  const previewUrl = `/preview?id=${encodeURIComponent(pageId)}&shop=${encodeURIComponent(shopDomain || "")}&embed=1`;
-  const containerHeight = 240;
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const thumbnailSrc = poster || getThumbnailUrl(pageId);
 
   return (
     <div
-      ref={containerRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onOpen}
       style={{
         position: "relative",
         width: "100%",
-        height: containerHeight,
+        height: 260,
         overflow: "hidden",
-        background: "#f8fafc",
+        background: "#f1f5f9",
         cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
-      {inView ? (
+      {/* Real Thumbnail Image */}
+      <img
+        src={thumbnailSrc}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setImgLoaded(true)}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "top center",
+          opacity: imgLoaded ? 1 : 0,
+          transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+          transform: isHovered ? "scale(1.04)" : "scale(1)",
+        }}
+      />
+
+      {/* Skeleton placeholder while image loads */}
+      {!imgLoaded && (
         <div
           style={{
-            width: 1280,
-            height: Math.round(containerHeight / scale),
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-            pointerEvents: "none",
-          }}
-        >
-          <iframe
-            title={alt}
-            src={previewUrl}
-            loading="lazy"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              background: "#ffffff",
-            }}
-          />
-        </div>
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.5s ease-in-out infinite",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
           }}
         >
-          <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>Loading template preview…</span>
+          <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>Loading preview…</span>
         </div>
       )}
 
@@ -272,7 +234,7 @@ function LivePreview({
         style={{
           position: "absolute",
           inset: 0,
-          background: "rgba(15, 23, 42, 0.68)",
+          background: "rgba(15, 23, 42, 0.65)",
           backdropFilter: "blur(3px)",
           display: "flex",
           flexDirection: "column",
@@ -280,7 +242,7 @@ function LivePreview({
           justifyContent: "center",
           gap: 8,
           opacity: isHovered ? 1 : 0,
-          transition: "opacity 0.2s ease",
+          transition: "opacity 0.25s ease",
           zIndex: 10,
         }}
       >
@@ -288,35 +250,45 @@ function LivePreview({
           style={{
             background: "#0284c7",
             color: "#ffffff",
-            padding: "6px 16px",
+            padding: "8px 20px",
             borderRadius: 999,
             fontWeight: 700,
-            fontSize: 12,
+            fontSize: 13,
             display: "flex",
             alignItems: "center",
             gap: 6,
-            boxShadow: "0 8px 20px rgba(2, 132, 199, 0.4)",
+            boxShadow: "0 8px 24px rgba(2, 132, 199, 0.45)",
+            transform: isHovered ? "translateY(0)" : "translateY(8px)",
+            transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
-          👁️ Live Preview Studio
+          👁️ Full Preview & Apply
         </div>
-        <span style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 500 }}>
-          Click to inspect & 1-click submit to theme
+        <span
+          style={{
+            fontSize: 11,
+            color: "#cbd5e1",
+            fontWeight: 500,
+            transform: isHovered ? "translateY(0)" : "translateY(8px)",
+            transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.05s",
+          }}
+        >
+          Click to inspect & submit to theme
         </span>
       </div>
 
+      {/* Bottom info bar */}
       <div
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          background: "rgba(15, 23, 42, 0.85)",
-          backdropFilter: "blur(4px)",
-          padding: "5px 10px",
+          background: "linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0))",
+          padding: "20px 12px 6px",
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-end",
           zIndex: 5,
         }}
       >
@@ -328,13 +300,14 @@ function LivePreview({
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            maxWidth: "80%",
+            maxWidth: "75%",
+            textShadow: "0 1px 3px rgba(0,0,0,0.5)",
           }}
         >
           {alt}
         </span>
-        <span style={{ fontSize: 9, fontWeight: 700, color: "#38bdf8", textTransform: "uppercase" }}>
-          LIVE PREVIEW
+        <span style={{ fontSize: 9, fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          PREVIEW
         </span>
       </div>
     </div>
@@ -607,6 +580,10 @@ export default function PageKit(){
                     transform: translateY(-4px);
                     box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
                     border-color: #0284c7;
+                  }
+                  @keyframes shimmer {
+                    0% { background-position: 200% 0; }
+                    100% { background-position: -200% 0; }
                   }
                 `}</style>
                 <div className="hp-grid">
