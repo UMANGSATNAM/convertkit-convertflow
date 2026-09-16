@@ -15,6 +15,12 @@ export async function getOrSyncShop(shopDomain: string, sessionAccessToken?: str
   if (!shopDomain) return null;
   let shop = await prisma.shop.findUnique({ where: { shopDomain } });
   if (shop && shop.accessToken) {
+    if (sessionAccessToken && shop.accessToken !== sessionAccessToken) {
+      return await prisma.shop.update({
+        where: { shopDomain },
+        data: { accessToken: sessionAccessToken },
+      });
+    }
     return shop;
   }
 

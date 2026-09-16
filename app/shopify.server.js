@@ -20,13 +20,35 @@ const apiKey = (process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_KEY !== "
 
 const apiSecretKey = process.env.SHOPIFY_API_SECRET || "";
 
+export const DEFAULT_SCOPES = [
+  "write_products",
+  "read_products",
+  "write_orders",
+  "read_orders",
+  "write_discounts",
+  "read_discounts",
+  "read_customers",
+  "write_themes",
+  "read_themes",
+  "write_pages",
+  "read_pages",
+  "write_online_store_navigation",
+  "read_online_store_navigation",
+  "write_script_tags",
+  "read_script_tags",
+  "read_analytics",
+];
+
+const appUrl = process.env.SHOPIFY_APP_URL || process.env.APP_URL || "https://shopifyapp.up.railway.app";
+const scopes = process.env.SCOPES ? process.env.SCOPES.split(",").map((s) => s.trim()) : DEFAULT_SCOPES;
+
 const shopify = shopifyApp({
   apiKey,
   apiSecretKey,
   apiVersion: ApiVersion.October25,
   restResources,
-  scopes: process.env.SCOPES?.split(","),
-  appUrl: process.env.SHOPIFY_APP_URL || "",
+  scopes,
+  appUrl,
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
@@ -118,3 +140,4 @@ export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+export const currentApiKey = apiKey;

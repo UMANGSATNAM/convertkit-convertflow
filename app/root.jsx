@@ -24,7 +24,6 @@ export default function App() {
         <meta name="description" content="Autonomous Shopify Store & CRO Generation OS" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
         <link rel="preconnect" href="https://cdn.shopify.com/" />
         <link
