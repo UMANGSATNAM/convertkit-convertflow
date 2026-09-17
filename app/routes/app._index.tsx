@@ -56,10 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const where: any = { status: "PUBLISHED" };
 
   if (category && category !== "all") {
-    where.OR = [
-      { category: category },
-      { sectionType: { contains: category } },
-    ];
+    where.category = category;
   }
 
   if (q) {
@@ -777,8 +774,8 @@ export default function PreMadeSectionsStore() {
         <InlineStack align="space-between" blockAlign="center">
           <Text as="p" tone="subdued">
             Showing <strong>{components.length}</strong> sections
-            {category !== "all" && ` in ${CATEGORIES.find((c) => c.id === category)?.label}`}
-            {q && ` matching "${q}"`} (from {totalCount} pre-made designs)
+            {category !== "all" ? ` in ${CATEGORIES.find((c) => c.id === category)?.label}` : " in Section Store"}
+            {q && ` matching "${q}"`}
           </Text>
           <Text as="p" tone="subdued">
             Active Store: <strong>{shopDomain}</strong>
