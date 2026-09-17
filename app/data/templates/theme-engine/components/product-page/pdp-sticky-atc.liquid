@@ -1,0 +1,251 @@
+{% comment %}
+  PDP Sticky Add-To-Cart Bar - Conversion Booster
+  Category: product-page
+  Version: 2.0
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --satc-bg: {{ section.settings.bg_color | default: '#ffffff' }};
+    --satc-text: {{ section.settings.text_color | default: '#0f172a' }};
+    --satc-btn-bg: {{ section.settings.btn_bg | default: '#0f172a' }};
+    --satc-btn-text: {{ section.settings.btn_text | default: '#ffffff' }};
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: var(--satc-bg);
+    color: var(--satc-text);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    padding: 12px 24px;
+    font-family: inherit;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  }
+
+  .cf-satc-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .cf-satc-prod-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .cf-satc-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f1f5f9;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .cf-satc-details {
+    min-width: 0;
+  }
+
+  .cf-satc-title {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    color: var(--satc-text);
+  }
+
+  .cf-satc-prices {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .cf-satc-price {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--satc-text);
+  }
+
+  .cf-satc-compare {
+    font-size: 13px;
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+
+  .cf-satc-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .cf-satc-select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    cursor: pointer;
+  }
+
+  .cf-satc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--satc-btn-bg);
+    color: var(--satc-btn-text);
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    transition: opacity 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .cf-satc-btn:hover {
+    opacity: 0.92;
+  }
+
+  .cf-satc-btn:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 640px) {
+    #shopify-section-{{ section.id }} {
+      padding: 10px 16px;
+    }
+    .cf-satc-select {
+      display: none;
+    }
+    .cf-satc-title {
+      max-width: 140px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="cf-satc-container">
+  <div class="cf-satc-prod-info">
+    <img
+      src="{{ section.settings.demo_image | default: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&q=80' }}"
+      alt="{{ section.settings.product_title | default: 'Signature Chronograph Watch' }}"
+      class="cf-satc-thumb"
+      width="48"
+      height="48"
+    >
+    <div class="cf-satc-details">
+      <h3 class="cf-satc-title">{{ section.settings.product_title | default: 'Signature Chronograph Watch' }}</h3>
+      <div class="cf-satc-prices">
+        <span class="cf-satc-price">{{ section.settings.price | default: '$189.00' }}</span>
+        {% if section.settings.compare_price != blank %}
+          <span class="cf-satc-compare">{{ section.settings.compare_price | default: '$249.00' }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-satc-actions">
+    <select class="cf-satc-select" aria-label="Choose Variant">
+      <option value="1">Matte Black / 42mm</option>
+      <option value="2">Silver Steel / 42mm</option>
+      <option value="3">Rose Gold / 38mm</option>
+    </select>
+
+    <button type="button" class="cf-satc-btn" onclick="
+      var b = this;
+      b.innerText = 'Added to Bag! ✓';
+      setTimeout(function(){ b.innerText = '{{ section.settings.button_text | default: 'Add to Cart — $189' }}'; }, 2000);
+    ">
+      {{ section.settings.button_text | default: 'Add to Cart — $189' }}
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "PDP Sticky ATC Bar",
+  "tag": "section",
+  "class": "cf-pdp-sticky-atc-section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button background",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "product_title",
+      "label": "Product title",
+      "default": "Signature Chronograph Watch"
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price",
+      "default": "$189.00"
+    },
+    {
+      "type": "text",
+      "id": "compare_price",
+      "label": "Original compare price",
+      "default": "$249.00"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Add to Cart — $189"
+    },
+    {
+      "type": "text",
+      "id": "demo_image",
+      "label": "Product thumbnail URL",
+      "default": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&q=80"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP Sticky ATC Bar",
+      "settings": {
+        "product_title": "Signature Chronograph Watch",
+        "price": "$189.00"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,248 @@
+{% comment %}
+  Announcement Marquee - Infinite Smooth Ticker
+  Category: announcement
+  Version: 2.0
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --marquee-bg: {{ section.settings.bg_color | default: '#0f172a' }};
+    --marquee-text: {{ section.settings.text_color | default: '#ffffff' }};
+    --marquee-speed: {{ section.settings.speed | default: 28 }}s;
+    background-color: var(--marquee-bg);
+    color: var(--marquee-text);
+    overflow: hidden;
+    position: relative;
+    z-index: 40;
+    font-family: inherit;
+    font-size: {{ section.settings.font_size | default: 13 }}px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .cf-marquee-wrap {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 10px 0;
+  }
+
+  .cf-marquee-track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 40px;
+    animation: cf-marquee-scroll var(--marquee-speed) linear infinite;
+  }
+
+  .cf-marquee-wrap:hover .cf-marquee-track {
+    animation-play-state: {% if section.settings.pause_on_hover %}paused{% else %}running{% endif %};
+  }
+
+  .cf-marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .cf-marquee-item:hover {
+    opacity: 0.85;
+  }
+
+  .cf-marquee-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: {{ section.settings.badge_bg | default: '#38bdf8' }};
+    color: {{ section.settings.badge_text | default: '#0f172a' }};
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .cf-marquee-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+  }
+
+  @keyframes cf-marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+{%- endstyle -%}
+
+<div class="cf-marquee-wrap" role="region" aria-label="Announcement Ticker">
+  {% for i in (1..3) %}
+    <div class="cf-marquee-track" {% if forloop.index > 1 %}aria-hidden="true"{% endif %}>
+      <a href="{{ section.settings.link_1 | default: '/collections/all' }}" class="cf-marquee-item">
+        <span class="cf-marquee-badge">{{ section.settings.badge_1 | default: 'LIMITED TIME' }}</span>
+        <span>{{ section.settings.text_1 | default: '⚡ FLASH SALE: UP TO 40% OFF STOREWIDE' }}</span>
+      </a>
+      <span class="cf-marquee-dot"></span>
+      <a href="{{ section.settings.link_2 | default: '/collections/all' }}" class="cf-marquee-item">
+        <span>{{ section.settings.text_2 | default: '✨ FREE EXPRESS SHIPPING OVER $50' }}</span>
+      </a>
+      <span class="cf-marquee-dot"></span>
+      <a href="{{ section.settings.link_3 | default: '/collections/all' }}" class="cf-marquee-item">
+        <span class="cf-marquee-badge">{{ section.settings.badge_3 | default: 'NEW' }}</span>
+        <span>{{ section.settings.text_3 | default: '🌱 100% ETHICALLY SOURCED & ECO-FRIENDLY' }}</span>
+      </a>
+      <span class="cf-marquee-dot"></span>
+      <a href="{{ section.settings.link_4 | default: '/collections/all' }}" class="cf-marquee-item">
+        <span>{{ section.settings.text_4 | default: '⭐ 4.9/5 RATED BY 25,000+ HAPPY CUSTOMERS' }}</span>
+      </a>
+      <span class="cf-marquee-dot"></span>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Announcement Marquee",
+  "tag": "section",
+  "class": "cf-announcement-marquee-section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Badge background",
+      "default": "#38bdf8"
+    },
+    {
+      "type": "color",
+      "id": "badge_text",
+      "label": "Badge text color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed (seconds)",
+      "min": 15,
+      "max": 60,
+      "step": 1,
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Message 1"
+    },
+    {
+      "type": "text",
+      "id": "badge_1",
+      "label": "Badge text",
+      "default": "LIMITED TIME"
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Announcement text",
+      "default": "⚡ FLASH SALE: UP TO 40% OFF STOREWIDE"
+    },
+    {
+      "type": "url",
+      "id": "link_1",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Message 2"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Announcement text",
+      "default": "✨ FREE EXPRESS SHIPPING OVER $50"
+    },
+    {
+      "type": "url",
+      "id": "link_2",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Message 3"
+    },
+    {
+      "type": "text",
+      "id": "badge_3",
+      "label": "Badge text",
+      "default": "NEW"
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "Announcement text",
+      "default": "🌱 100% ETHICALLY SOURCED & ECO-FRIENDLY"
+    },
+    {
+      "type": "url",
+      "id": "link_3",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Message 4"
+    },
+    {
+      "type": "text",
+      "id": "text_4",
+      "label": "Announcement text",
+      "default": "⭐ 4.9/5 RATED BY 25,000+ HAPPY CUSTOMERS"
+    },
+    {
+      "type": "url",
+      "id": "link_4",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Marquee",
+      "settings": {
+        "bg_color": "#0f172a",
+        "text_color": "#ffffff",
+        "speed": 28,
+        "text_1": "⚡ FLASH SALE: UP TO 40% OFF STOREWIDE",
+        "text_2": "✨ FREE EXPRESS SHIPPING OVER $50",
+        "text_3": "🌱 100% ETHICALLY SOURCED & ECO-FRIENDLY",
+        "text_4": "⭐ 4.9/5 RATED BY 25,000+ HAPPY CUSTOMERS"
+      }
+    }
+  ]
+}
+{% endschema %}

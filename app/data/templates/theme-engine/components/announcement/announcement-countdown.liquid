@@ -1,0 +1,214 @@
+{% comment %}
+  Announcement Countdown - Flash Sale Bar with Timer & Coupon
+  Category: announcement
+  Version: 2.0
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --bar-bg: {{ section.settings.bg_color | default: '#dc2626' }};
+    --bar-text: {{ section.settings.text_color | default: '#ffffff' }};
+    background: var(--bar-bg);
+    color: var(--bar-text);
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    position: relative;
+    z-index: 40;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .cf-count-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .cf-count-badge {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .cf-count-msg {
+    font-weight: 600;
+  }
+
+  .cf-count-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .cf-count-unit {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 24px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .cf-count-coupon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px dashed rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+
+  .cf-count-coupon:hover {
+    transform: scale(1.04);
+    background: #f8fafc;
+  }
+
+  .cf-count-coupon:active {
+    transform: scale(0.97);
+  }
+
+  .cf-count-cta {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    margin-left: 4px;
+    transition: opacity 0.2s;
+  }
+
+  .cf-count-cta:hover {
+    opacity: 0.8;
+  }
+{%- endstyle -%}
+
+<div class="cf-count-container" data-countdown="{{ section.settings.end_time | default: '2026-12-31T23:59:59' }}">
+  <span class="cf-count-badge">{{ section.settings.badge | default: 'FLASH SALE' }}</span>
+  <span class="cf-count-msg">{{ section.settings.text | default: 'Hurry! 30% Off Ends In:' }}</span>
+  
+  <div class="cf-count-timer" aria-label="Countdown timer">
+    <span class="cf-count-unit" data-cf-hrs>08</span>h :
+    <span class="cf-count-unit" data-cf-mins>45</span>m :
+    <span class="cf-count-unit" data-cf-secs>20</span>s
+  </div>
+
+  {% if section.settings.coupon_code != blank %}
+    <button type="button" class="cf-count-coupon" onclick="
+      navigator.clipboard.writeText('{{ section.settings.coupon_code }}');
+      var el = this;
+      el.innerText = 'Copied! 🎉';
+      setTimeout(function(){ el.innerText = 'Code: {{ section.settings.coupon_code }} 📋'; }, 2000);
+    ">
+      Code: {{ section.settings.coupon_code }} 📋
+    </button>
+  {% endif %}
+
+  {% if section.settings.link_url != blank %}
+    <a href="{{ section.settings.link_url }}" class="cf-count-cta">{{ section.settings.link_text | default: 'Shop Now →' }}</a>
+  {% endif %}
+</div>
+
+<script>
+  (function() {
+    var endHours = 8;
+    var endTime = new Date().getTime() + (endHours * 3600 * 1000 + 45 * 60 * 1000);
+    var timerContainer = document.querySelector('#shopify-section-{{ section.id }} .cf-count-timer');
+    if (!timerContainer) return;
+    var hrsEl = timerContainer.querySelector('[data-cf-hrs]');
+    var minsEl = timerContainer.querySelector('[data-cf-mins]');
+    var secsEl = timerContainer.querySelector('[data-cf-secs]');
+
+    function update() {
+      var now = new Date().getTime();
+      var diff = Math.max(0, endTime - now);
+      var h = Math.floor(diff / (1000 * 60 * 60));
+      var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      var s = Math.floor((diff % (1000 * 60)) / 1000);
+      if (hrsEl) hrsEl.textContent = (h < 10 ? '0' : '') + h;
+      if (minsEl) minsEl.textContent = (m < 10 ? '0' : '') + m;
+      if (secsEl) secsEl.textContent = (s < 10 ? '0' : '') + s;
+    }
+    setInterval(update, 1000);
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Countdown Announcement",
+  "tag": "section",
+  "class": "cf-announcement-countdown-section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#dc2626"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge label",
+      "default": "FLASH SALE"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Sale message",
+      "default": "Hurry! 30% Off Ends In:"
+    },
+    {
+      "type": "text",
+      "id": "coupon_code",
+      "label": "Coupon code",
+      "default": "FLASH30"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link label",
+      "default": "Shop Now →"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown Announcement",
+      "settings": {
+        "bg_color": "#dc2626",
+        "text_color": "#ffffff",
+        "badge": "FLASH SALE",
+        "text": "Hurry! 30% Off Ends In:",
+        "coupon_code": "FLASH30",
+        "link_text": "Shop Now →"
+      }
+    }
+  ]
+}
+{% endschema %}

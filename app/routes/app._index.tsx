@@ -33,18 +33,15 @@ import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server
  */
 
 const CATEGORIES = [
-  { id: "all", label: "All Sections" },
-  { id: "hero", label: "Hero Banners" },
-  { id: "product-page", label: "Product Page & Sticky ATC" },
-  { id: "product-grid", label: "Product Grids & Bestsellers" },
-  { id: "trust", label: "Trust & Badges" },
-  { id: "testimonials", label: "Reviews & UGC" },
-  { id: "faq", label: "FAQs & Accordions" },
-  { id: "announcement", label: "Announcement Bars & Marquee" },
-  { id: "brand-story", label: "Brand Story" },
-  { id: "newsletter", label: "Newsletter" },
-  { id: "header", label: "Headers" },
-  { id: "footer", label: "Footers" },
+  { id: "all", label: "All Sections (37)" },
+  { id: "announcement", label: "Announcement Bars (2)" },
+  { id: "hero", label: "Hero Banners (5)" },
+  { id: "product-page", label: "PDP & Sticky ATC (5)" },
+  { id: "offer", label: "Offer & Poster Banners (5)" },
+  { id: "categories", label: "Category & Collections (5)" },
+  { id: "product-card", label: "Product Cards (5)" },
+  { id: "header", label: "Headers (5)" },
+  { id: "footer", label: "Footers (5)" },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -58,39 +55,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Build where clause according to category and search
   const where: any = { status: "PUBLISHED" };
 
-  if (category === "hero") {
-    where.sectionType = "hero";
-  } else if (category === "product-page") {
-    where.sectionType = {
-      in: ["product-page", "caratlane-pdp-main", "caratlane-pdp-recommendations", "caratlane-pdp-reviews"],
-    };
-  } else if (category === "product-grid") {
-    where.sectionType = {
-      in: ["product-grid", "collection", "bestsellers-tabs", "category-tiles", "featured-drop", "lookbook"],
-    };
-  } else if (category === "trust") {
-    where.sectionType = { in: ["trust", "trust-badges"] };
-  } else if (category === "testimonials") {
-    where.sectionType = { in: ["testimonials", "reviews", "ugc", "ugc-community"] };
-  } else if (category === "faq") {
-    where.sectionType = "faq";
-  } else if (category === "announcement") {
-    where.sectionType = { in: ["announcement", "marquee", "ticker"] };
-  } else if (category === "brand-story") {
-    where.sectionType = "brand-story";
-  } else if (category === "newsletter") {
-    where.sectionType = "newsletter";
-  } else if (category === "header") {
-    where.sectionType = { in: ["header", "header-minimal-v1", "header-luxury-v1", "header-bold-v1", "header-tech-v1"] };
-  } else if (category === "footer") {
-    where.sectionType = { in: ["footer", "footer-minimal-v1", "footer-luxury-v1", "footer-bold-v1", "footer-tech-v1"] };
+  if (category && category !== "all") {
+    where.OR = [
+      { category: category },
+      { sectionType: { contains: category } },
+    ];
   }
 
   if (q) {
-    where.OR = [
-      { componentId: { contains: q } },
-      { family: { contains: q } },
-      { visualStyle: { contains: q } },
+    where.AND = [
+      {
+        OR: [
+          { componentId: { contains: q } },
+          { family: { contains: q } },
+          { visualStyle: { contains: q } },
+          { category: { contains: q } },
+        ],
+      },
     ];
   }
 
@@ -141,7 +122,7 @@ export async function action({ request }: ActionFunctionArgs) {
           ? ({ kind: "group", group: "header", replace: "header" } as const)
           : sectionType === "footer" || sectionType.startsWith("footer")
             ? ({ kind: "group", group: "footer", replace: "footer" } as const)
-            : targetChoice === "product" || (!targetChoice && sectionType === "product-page")
+            : targetChoice === "product" || (!targetChoice && (sectionType === "product-page" || sectionType.startsWith("pdp") || sectionType.startsWith("product-card")))
               ? ({ kind: "template", template: "product", position: "bottom" } as const)
               : ({ kind: "template", template: "index", position: "top" } as const);
 
@@ -191,7 +172,7 @@ export async function action({ request }: ActionFunctionArgs) {
         target = { kind: "group", group: "header", replace: "header" };
       } else if (sectionType === "footer" || sectionType.startsWith("footer")) {
         target = { kind: "group", group: "footer", replace: "footer" };
-      } else if (targetChoice === "product" || (!targetChoice && sectionType === "product-page")) {
+      } else if (targetChoice === "product" || (!targetChoice && (sectionType === "product-page" || sectionType.startsWith("pdp") || sectionType.startsWith("product-card")))) {
         target = { kind: "template", template: "product", position: "bottom" };
       } else {
         const topTypes = ["hero", "announcement", "marquee", "ticker"];
@@ -669,7 +650,7 @@ export default function PreMadeSectionsStore() {
   return (
     <Page
       title="Section Store"
-      subtitle="Browse 1,650+ pre-made Shopify sections. Preview any design and add it directly to your store with 1 click."
+      subtitle="Browse verified, production-grade Shopify 2.0 sections. Preview any design live and add it directly to your theme with 1 click."
       primaryAction={{
         content: "Open Theme Editor",
         url: themeEditorUrl,
@@ -700,13 +681,11 @@ export default function PreMadeSectionsStore() {
                   : `Successfully added to your live theme on the ${data.targetLabel}. All Liquid code, styles, and settings are ready to customize.`}
               </Text>
               <InlineStack gap="300">
-                {data.previewUrl && (
-                  <Button variant="primary" url={data.previewUrl} external>
-                    Preview in Draft Theme
-                  </Button>
-                )}
+                <Button variant="primary" url={data.previewUrl || themeEditorUrl} external>
+                  Preview Changes
+                </Button>
                 <Button url={data.editorUrl || themeEditorUrl} external>
-                  Customize in Shopify Theme Editor
+                  Customize in Theme Editor
                 </Button>
                 <Button url="/app/theme">
                   View My Added Sections
@@ -716,11 +695,27 @@ export default function PreMadeSectionsStore() {
           </Banner>
         )}
 
-        {/* Error Banner */}
+        {/* Error Banner with 401 Reconnect Flow */}
         {data?.error && (
-          <Banner tone="critical" title="Could not complete action">
-            <p>{data.error}</p>
-          </Banner>
+          data.error.includes("401") || data.error.includes("Invalid API key") || data.error.includes("access token") ? (
+            <Banner
+              tone="warning"
+              title="⚡ Reconnect Store Needed (Session Expired)"
+              action={{
+                content: "⚡ Reconnect Store Now",
+                url: `/auth?shop=${encodeURIComponent(shopDomain)}`,
+                target: "_top",
+              }}
+            >
+              <p>
+                The Shopify Theme API access token for <strong>{shopDomain}</strong> is expired or needs permission refresh. Click <strong>Reconnect Store Now</strong> above to re-authorize in 1 click and install your sections seamlessly.
+              </p>
+            </Banner>
+          ) : (
+            <Banner tone="critical" title="Could not complete action">
+              <p>{data.error}</p>
+            </Banner>
+          )
         )}
 
         {/* Search & Placement Controls */}
