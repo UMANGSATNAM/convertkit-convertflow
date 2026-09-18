@@ -10680,6 +10680,76 @@ button {
 }
 
 /* ==========================================================================
+   Collapsible FAQ Accordion Section
+   ========================================================================== */
+.faq-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-bg);
+}
+
+.faq-container {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-ivory-border);
+  transition: var(--transition-smooth);
+}
+
+.faq-header {
+  width: 100%;
+  padding: 1.35rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-serif-editorial);
+  font-size: 1.25rem;
+  color: var(--color-emerald-deep);
+  text-align: left;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  gap: 1.5rem;
+  transition: var(--transition-smooth);
+}
+
+.faq-header:hover {
+  color: var(--color-gold-dark);
+}
+
+.faq-icon {
+  font-size: 1.1rem;
+  color: var(--color-gold-base);
+  transition: transform 0.35s ease;
+  flex-shrink: 0;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-body {
+  display: none;
+  padding-bottom: 1.5rem;
+  font-size: 0.96rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+
+.faq-item.active .faq-body {
+  display: block;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 1024px) {
@@ -10846,6 +10916,7 @@ button {
           <li><a href="#heirloom-craft" class="nav-link">The Craft & Karigari</a></li>
           <li><a href="#lookbook" class="nav-link">Lookbook</a></li>
           <li><a href="#diaries" class="nav-link">Real Brides</a></li>
+          <li><a href="#faq" class="nav-link">Bespoke FAQs</a></li>
         </ul>
       </nav>
 
@@ -10883,6 +10954,7 @@ button {
       <li><a href="#heirloom-craft" class="drawer-link">Art of Weaving & Zardozi</a></li>
       <li><a href="#lookbook" class="drawer-link">Royal Bridal Lookbook</a></li>
       <li><a href="#diaries" class="drawer-link">Real Brides Diaries</a></li>
+      <li><a href="#faq" class="drawer-link">Bespoke FAQs</a></li>
       <li><a href="#appointment-section" class="drawer-link">Book Private Salon Visit</a></li>
     </ul>
     <div class="drawer-footer">
@@ -11361,6 +11433,69 @@ button {
       </div>
     </section>
 
+    <!-- Collapsible FAQ Accordion Section -->
+    <section class="section faq-section" id="faq">
+      <div class="container faq-container">
+        <div class="section-header text-center">
+          <span class="eyebrow">FREQUENTLY ASKED QUESTIONS</span>
+          <h2 class="section-title">Craft, Sizing & International Delivery</h2>
+          <p class="section-desc">Everything you need to know about commissioning, custom tailoring, and worldwide shipping of your heirloom attire.</p>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>How does custom blouse and lehenga sizing work for online orders?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Once your order is placed, our senior master draper conducts a 1-on-1 WhatsApp video consultation with you to record 18 custom body measurement points. We also include a 4-inch secret seam allowance for effortless future alterations.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Are your silks certified by the Government Silk Mark of India?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes, each saree, anarkali, and lehenga comes with a certified Silk Mark hologram tag and laboratory weave verification certificate guaranteeing pure, untampered natural silk threads.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>What is the international delivery timeline for bridal orders?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Ready-to-wear ensembles are delivered globally within 4 to 6 business days via insured express air courier (DHL/FedEx). Bespoke bridal pieces requiring custom hand-embroidery take 4 to 6 weeks.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Can I customize the color or dupatta styling for my wedding?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes! Our master dyers offer bespoke color matching to your wedding theme or groom's sherwani. Simply tap the WhatsApp concierge button to share your moodboard with our lead stylist.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Can I book an in-person appointment at your Varanasi or Delhi atelier?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes, private appointments can be scheduled through our concierge. We arrange private salon viewings with champagne and dedicated styling drapers for the bride and immediate family.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- VIP Private Salon & Stylist Consultation Section -->
     <section class="section appointment-section" id="appointment-section">
       <div class="container">
@@ -11525,7 +11660,435 @@ button {
     </a>
   </div>
 
-  <script src="main.js"></script>
+  <script>
+/**
+ * RIWAAYAT LUXURY COUTURE - INTERACTIVE ENGINE
+ * Handcrafted Indian Ethnic Wear Landing Page
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Product Catalog Data for Quick View & Inquiries
+  const productCatalog = {
+    1: {
+      id: 1,
+      title: "The Padmavati Vermilion Lehenga",
+      collection: "Varanasi Bridal Vault",
+      category: "bridal",
+      price: "₹1,45,000",
+      originalPrice: "₹1,75,000",
+      img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
+      desc: "An heirloom bridal masterpiece inspired by Rajput royal courts. Hand-embroidered using pure gold zari, dabka, and hand-cut gota patti on 100% Katan Silk.",
+      specs: {
+        "Fabric": "Pure Katan Silk & Velvet Border",
+        "Weave / Craft": "Handloom Zardozi & Pitta Work",
+        "Atelier": "Varanasi Master Karigars (450+ Hours)",
+        "Components": "Lehenga Skirt, Custom Blouse & Dual Dupattas",
+        "Certification": "100% Silk Mark Authenticated"
+      }
+    },
+    2: {
+      id: 2,
+      title: "Shahi Emerald Shikargah Saree",
+      collection: "Shahi Dastakaar",
+      category: "sarees",
+      price: "₹68,500",
+      originalPrice: "₹82,000",
+      img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+      desc: "Depicting historic Mughal flora and royal hunting grounds (Shikargah), hand-woven on a traditional wooden pit loom with antique Roopa-Sona zari.",
+      specs: {
+        "Fabric": "12-Ply Tested Pure Katan Silk",
+        "Weave / Craft": "Authentic Kadwa Handloom Technique",
+        "Origin": "Varanasi, Uttar Pradesh",
+        "Length": "6.5 Metres (Includes Contrast Blouse Piece)",
+        "Certification": "Silk Mark & Handloom India Certified"
+      }
+    },
+    3: {
+      id: 3,
+      title: "Chandrika Ivory Kalidar Anarkali",
+      collection: "Jashn-e-Bahaar",
+      category: "festive",
+      price: "₹48,900",
+      originalPrice: "₹56,000",
+      img: "https://images.unsplash.com/photo-1583391733975-dd26487e83db?auto=format&fit=crop&w=800&q=80",
+      desc: "Designed for joyous festive evenings and royal sangeets. 32 flaring kalis of sheer Chanderi silk with delicate silver mukaish work and handcrafted tassels.",
+      specs: {
+        "Fabric": "Chanderi Silk & Organza Dupatta",
+        "Work": "Hand-hammered Mukaish & Resham Thread",
+        "Silhouette": "32-Kali Floor-length Anarkali",
+        "Includes": "Anarkali, Churidar & Scalloped Dupatta",
+        "Care": "Strict Dry Clean Only"
+      }
+    },
+    4: {
+      id: 4,
+      title: "Gulaab Baagh Rose Gold Lehenga",
+      collection: "Jaipur Rajwada",
+      category: "bridal",
+      price: "₹1,85,000",
+      originalPrice: "₹2,20,000",
+      img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80",
+      desc: "Crafted for the modern bride seeking regality with contemporary softness. Plush micro velvet accented with champagne gold dabka and natural seed pearls.",
+      specs: {
+        "Fabric": "Micro Velvet & Handwoven Tissue",
+        "Embroidery": "Jaipuri Gota Patti & Moti Work",
+        "Flair": "6.5 Metre Circumference",
+        "Customization": "Bespoke color dyeing available",
+        "Delivery": "Worldwide Insured Air Express"
+      }
+    },
+    5: {
+      id: 5,
+      title: "Swarnam Kanjeevaram Saree",
+      collection: "Kanchipuram Heritage",
+      category: "sarees",
+      price: "₹74,000",
+      originalPrice: "₹89,000",
+      img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
+      desc: "An icon of South Indian bridal majesty. Hand-woven using three shuttles (Korvai technique) with solid 24k gold zari temple motifs.",
+      specs: {
+        "Fabric": "Heavyweight Mulberry Silk",
+        "Technique": "Interlocking Korvai Weave",
+        "Zari": "Tested Silver-core 24k Electroplated Gold",
+        "Weight": "Approx. 950 grams",
+        "Certification": "Silk Mark Registered"
+      }
+    },
+    6: {
+      id: 6,
+      title: "Zoya Brocade Cape & Sharara Set",
+      collection: "Modern Riwaayat",
+      category: "contemporary",
+      price: "₹52,000",
+      originalPrice: "₹62,000",
+      img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80",
+      desc: "A stunning fusion ensemble blending a structured Banarasi brocade cape over fluid, crushed chiffon sharara trousers with mirror embroidery.",
+      specs: {
+        "Fabric": "Raw Silk Brocade & Pure Georgette",
+        "Style": "Contemporary Indo-Western Couture",
+        "Occasion": "Sangeet, Cocktail & Reception",
+        "Fit": "Tailored Relaxed Fit",
+        "Includes": "Cape Jacket, Crop Bustier & Sharara"
+      }
+    }
+  };
+
+  // State Management
+  let wishlist = new Set();
+  const WHATSAPP_PHONE = "919876543210";
+
+  // Elements
+  const siteHeader = document.getElementById('siteHeader');
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  const drawerClose = document.getElementById('drawerClose');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const productCards = document.querySelectorAll('.product-card');
+  const wishlistCount = document.getElementById('wishlistCount');
+  const quickModal = document.getElementById('quickModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalBody = document.getElementById('modalBody');
+  const appointmentForm = document.getElementById('appointmentForm');
+  const formSuccess = document.getElementById('formSuccess');
+
+  // Sticky Header Scroll Effect
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      siteHeader.classList.add('scrolled');
+    } else {
+      siteHeader.classList.remove('scrolled');
+    }
+  });
+
+  // Mobile Drawer Navigation
+  if (menuToggle && mobileDrawer) {
+    menuToggle.addEventListener('click', () => {
+      mobileDrawer.classList.add('open');
+    });
+  }
+
+  if (drawerClose && mobileDrawer) {
+    drawerClose.addEventListener('click', () => {
+      mobileDrawer.classList.remove('open');
+    });
+  }
+
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileDrawer.classList.remove('open');
+    });
+  });
+
+  // Category Filter Functionality
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const category = btn.dataset.category;
+
+      productCards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'flex';
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 30);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(15px)';
+          setTimeout(() => {
+            card.style.display = 'none';
+          }, 250);
+        }
+      });
+    });
+  });
+
+  // Wishlist Handling
+  document.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const icon = btn.querySelector('i');
+
+      if (wishlist.has(id)) {
+        wishlist.delete(id);
+        btn.classList.remove('saved');
+        icon.classList.replace('fa-solid', 'fa-regular');
+      } else {
+        wishlist.add(id);
+        btn.classList.add('saved');
+        icon.classList.replace('fa-regular', 'fa-solid');
+        showMiniToast('Added to your Private Wishlist');
+      }
+
+      wishlistCount.textContent = wishlist.size;
+    });
+  });
+
+  // Direct WhatsApp Inquiry Buttons
+  document.querySelectorAll('.btn-inquire-direct').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const title = btn.dataset.title;
+      const price = btn.dataset.price;
+      const message = \`Namaste Riwaayat Team, I am interested in inquiring about "\${title}" (\${price}). Could you please share fabric video, custom sizing options, and delivery timeline?\`;
+      const url = \`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(message)}\`;
+      window.open(url, '_blank');
+    });
+  });
+
+  // Quick View Modal
+  document.querySelectorAll('.btn-quick-view').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const productId = btn.dataset.product;
+      const item = productCatalog[productId];
+      if (!item) return;
+
+      let specsHtml = '';
+      for (const [key, val] of Object.entries(item.specs)) {
+        specsHtml += \`
+          <li>
+            <span class="spec-label">\${key}</span>
+            <span class="spec-val">\${val}</span>
+          </li>
+        \`;
+      }
+
+      modalBody.innerHTML = \`
+        <div class="modal-grid">
+          <div class="modal-img-wrap">
+            <img src="\${item.img}" alt="\${item.title}">
+          </div>
+          <div class="modal-content-pane">
+            <span class="modal-category">\${item.collection}</span>
+            <h2 class="modal-title">\${item.title}</h2>
+            <div class="modal-prices">
+              <span class="modal-current-price">\${item.price}</span>
+              <span class="modal-old-price">\${item.originalPrice}</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #5e6b66; line-height: 1.6; margin-bottom: 1.25rem;">
+              \${item.desc}
+            </p>
+            <ul class="modal-specs-list">
+              \${specsHtml}
+            </ul>
+            <div class="modal-cta-group">
+              <button class="btn btn-gold modal-wa-btn" id="modalWaBtn">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via WhatsApp Concierge
+              </button>
+              <a href="#appointment-section" class="btn btn-outline-gold" id="modalBookFitting">
+                <i class="fa-regular fa-calendar-check"></i> Book Salon Fitting
+              </a>
+            </div>
+          </div>
+        </div>
+      \`;
+
+      quickModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Attach WhatsApp handler inside modal
+      document.getElementById('modalWaBtn').addEventListener('click', () => {
+        const msg = \`Namaste Riwaayat Team, I am looking at "\${item.title}" (\${item.price}). Please connect me with a senior stylist for draping details and custom tailoring.\`;
+        window.open(\`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(msg)}\`, '_blank');
+      });
+
+      document.getElementById('modalBookFitting').addEventListener('click', () => {
+        closeModal();
+      });
+    });
+  });
+
+  function closeModal() {
+    quickModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (modalClose) {
+    modalClose.addEventListener('click', closeModal);
+  }
+
+  if (quickModal) {
+    quickModal.addEventListener('click', (e) => {
+      if (e.target === quickModal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && quickModal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  // FAQ Accordion Handlers
+  document.querySelectorAll('.faq-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('active');
+        const icon = el.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-xmark');
+          icon.classList.add('fa-plus');
+        }
+      });
+
+      if (!isActive) {
+        item.classList.add('active');
+        const icon = item.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-plus');
+          icon.classList.add('fa-xmark');
+        }
+      }
+    });
+  });
+
+  // Header Wishlist Button: Filter/highlight saved dresses
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', () => {
+      if (wishlist.size === 0) {
+        showMiniToast('Your wishlist is empty! Click the heart on any dress to save.');
+        return;
+      }
+
+      productCards.forEach(card => {
+        const id = card.querySelector('.save-btn')?.dataset.id;
+        if (id && wishlist.has(id)) {
+          card.style.display = 'flex';
+          card.style.opacity = '1';
+          card.style.boxShadow = '0 0 0 2px var(--color-accent-ruby)';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const collSection = document.getElementById('collections');
+      if (collSection) collSection.scrollIntoView({ behavior: 'smooth' });
+      showMiniToast(\`Showing \${wishlist.size} saved dress(es)\`);
+    });
+  }
+
+  // Appointment Form Submission: Real WhatsApp Dispatch
+  if (appointmentForm) {
+    appointmentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('userName').value;
+      const phone = document.getElementById('userPhone').value;
+      const event = document.getElementById('eventType').value;
+      const city = document.getElementById('userCity').value;
+
+      appointmentForm.style.display = 'none';
+      formSuccess.style.display = 'block';
+
+      // Auto trigger WhatsApp confirmation
+      const consultMsg = \`Namaste Riwaayat Team, I would like to confirm a VIP Salon Consultation.\\n\\n\` +
+        \`• Full Name: \${name}\\n\` +
+        \`• Phone/WhatsApp: \${phone}\\n\` +
+        \`• Occasion: \${event}\\n\` +
+        \`• City: \${city}\`;
+      const waUrl = \`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(consultMsg)}\`;
+      
+      const successCard = document.getElementById('formSuccess');
+      if (successCard && !successCard.querySelector('.btn-gold')) {
+        const openWaBtn = document.createElement('a');
+        openWaBtn.href = waUrl;
+        openWaBtn.target = '_blank';
+        openWaBtn.rel = 'noopener';
+        openWaBtn.className = 'btn btn-gold';
+        openWaBtn.style.marginTop = '1.25rem';
+        openWaBtn.style.display = 'inline-flex';
+        openWaBtn.style.fontSize = '0.85rem';
+        openWaBtn.style.padding = '0.65rem 1.25rem';
+        openWaBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Open WhatsApp Chat Now';
+        successCard.appendChild(openWaBtn);
+      }
+
+      setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 800);
+    });
+  }
+
+  // Lightweight Toast Notification
+  function showMiniToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'mini-toast';
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '90px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = '#082018';
+    toast.style.color = '#dfba73';
+    toast.style.padding = '0.65rem 1.4rem';
+    toast.style.borderRadius = '100px';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+    toast.style.fontSize = '0.85rem';
+    toast.style.fontWeight = '600';
+    toast.style.zIndex = '9999';
+    toast.style.border = '1px solid #c5a059';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s ease';
+
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(-10px)';
+    }, 10);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+});
+
+</script>
 </body>
 </html>
 `,
@@ -13402,6 +13965,76 @@ button {
 }
 
 /* ==========================================================================
+   Collapsible FAQ Accordion Section
+   ========================================================================== */
+.faq-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-bg);
+}
+
+.faq-container {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-ivory-border);
+  transition: var(--transition-smooth);
+}
+
+.faq-header {
+  width: 100%;
+  padding: 1.35rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-serif-editorial);
+  font-size: 1.25rem;
+  color: var(--color-emerald-deep);
+  text-align: left;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  gap: 1.5rem;
+  transition: var(--transition-smooth);
+}
+
+.faq-header:hover {
+  color: var(--color-gold-dark);
+}
+
+.faq-icon {
+  font-size: 1.1rem;
+  color: var(--color-gold-base);
+  transition: transform 0.35s ease;
+  flex-shrink: 0;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-body {
+  display: none;
+  padding-bottom: 1.5rem;
+  font-size: 0.96rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+
+.faq-item.active .faq-body {
+  display: block;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 1024px) {
@@ -13568,6 +14201,7 @@ button {
           <li><a href="#heirloom-craft" class="nav-link">The Craft & Karigari</a></li>
           <li><a href="#lookbook" class="nav-link">Lookbook</a></li>
           <li><a href="#diaries" class="nav-link">Real Brides</a></li>
+          <li><a href="#faq" class="nav-link">Bespoke FAQs</a></li>
         </ul>
       </nav>
 
@@ -13605,6 +14239,7 @@ button {
       <li><a href="#heirloom-craft" class="drawer-link">Art of Weaving & Zardozi</a></li>
       <li><a href="#lookbook" class="drawer-link">Royal Bridal Lookbook</a></li>
       <li><a href="#diaries" class="drawer-link">Real Brides Diaries</a></li>
+      <li><a href="#faq" class="drawer-link">Bespoke FAQs</a></li>
       <li><a href="#appointment-section" class="drawer-link">Book Private Salon Visit</a></li>
     </ul>
     <div class="drawer-footer">
@@ -14083,6 +14718,69 @@ button {
       </div>
     </section>
 
+    <!-- Collapsible FAQ Accordion Section -->
+    <section class="section faq-section" id="faq">
+      <div class="container faq-container">
+        <div class="section-header text-center">
+          <span class="eyebrow">FREQUENTLY ASKED QUESTIONS</span>
+          <h2 class="section-title">Craft, Sizing & International Delivery</h2>
+          <p class="section-desc">Everything you need to know about commissioning, custom tailoring, and worldwide shipping of your heirloom attire.</p>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>How does custom blouse and lehenga sizing work for online orders?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Once your order is placed, our senior master draper conducts a 1-on-1 WhatsApp video consultation with you to record 18 custom body measurement points. We also include a 4-inch secret seam allowance for effortless future alterations.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Are your silks certified by the Government Silk Mark of India?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes, each saree, anarkali, and lehenga comes with a certified Silk Mark hologram tag and laboratory weave verification certificate guaranteeing pure, untampered natural silk threads.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>What is the international delivery timeline for bridal orders?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Ready-to-wear ensembles are delivered globally within 4 to 6 business days via insured express air courier (DHL/FedEx). Bespoke bridal pieces requiring custom hand-embroidery take 4 to 6 weeks.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Can I customize the color or dupatta styling for my wedding?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes! Our master dyers offer bespoke color matching to your wedding theme or groom's sherwani. Simply tap the WhatsApp concierge button to share your moodboard with our lead stylist.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-header" aria-expanded="false">
+              <span>Can I book an in-person appointment at your Varanasi or Delhi atelier?</span>
+              <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="faq-body">
+              <p>Yes, private appointments can be scheduled through our concierge. We arrange private salon viewings with champagne and dedicated styling drapers for the bride and immediate family.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- VIP Private Salon & Stylist Consultation Section -->
     <section class="section appointment-section" id="appointment-section">
       <div class="container">
@@ -14247,7 +14945,435 @@ button {
     </a>
   </div>
 
-  <script src="main.js"></script>
+  <script>
+/**
+ * RIWAAYAT LUXURY COUTURE - INTERACTIVE ENGINE
+ * Handcrafted Indian Ethnic Wear Landing Page
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Product Catalog Data for Quick View & Inquiries
+  const productCatalog = {
+    1: {
+      id: 1,
+      title: "The Padmavati Vermilion Lehenga",
+      collection: "Varanasi Bridal Vault",
+      category: "bridal",
+      price: "₹1,45,000",
+      originalPrice: "₹1,75,000",
+      img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
+      desc: "An heirloom bridal masterpiece inspired by Rajput royal courts. Hand-embroidered using pure gold zari, dabka, and hand-cut gota patti on 100% Katan Silk.",
+      specs: {
+        "Fabric": "Pure Katan Silk & Velvet Border",
+        "Weave / Craft": "Handloom Zardozi & Pitta Work",
+        "Atelier": "Varanasi Master Karigars (450+ Hours)",
+        "Components": "Lehenga Skirt, Custom Blouse & Dual Dupattas",
+        "Certification": "100% Silk Mark Authenticated"
+      }
+    },
+    2: {
+      id: 2,
+      title: "Shahi Emerald Shikargah Saree",
+      collection: "Shahi Dastakaar",
+      category: "sarees",
+      price: "₹68,500",
+      originalPrice: "₹82,000",
+      img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+      desc: "Depicting historic Mughal flora and royal hunting grounds (Shikargah), hand-woven on a traditional wooden pit loom with antique Roopa-Sona zari.",
+      specs: {
+        "Fabric": "12-Ply Tested Pure Katan Silk",
+        "Weave / Craft": "Authentic Kadwa Handloom Technique",
+        "Origin": "Varanasi, Uttar Pradesh",
+        "Length": "6.5 Metres (Includes Contrast Blouse Piece)",
+        "Certification": "Silk Mark & Handloom India Certified"
+      }
+    },
+    3: {
+      id: 3,
+      title: "Chandrika Ivory Kalidar Anarkali",
+      collection: "Jashn-e-Bahaar",
+      category: "festive",
+      price: "₹48,900",
+      originalPrice: "₹56,000",
+      img: "https://images.unsplash.com/photo-1583391733975-dd26487e83db?auto=format&fit=crop&w=800&q=80",
+      desc: "Designed for joyous festive evenings and royal sangeets. 32 flaring kalis of sheer Chanderi silk with delicate silver mukaish work and handcrafted tassels.",
+      specs: {
+        "Fabric": "Chanderi Silk & Organza Dupatta",
+        "Work": "Hand-hammered Mukaish & Resham Thread",
+        "Silhouette": "32-Kali Floor-length Anarkali",
+        "Includes": "Anarkali, Churidar & Scalloped Dupatta",
+        "Care": "Strict Dry Clean Only"
+      }
+    },
+    4: {
+      id: 4,
+      title: "Gulaab Baagh Rose Gold Lehenga",
+      collection: "Jaipur Rajwada",
+      category: "bridal",
+      price: "₹1,85,000",
+      originalPrice: "₹2,20,000",
+      img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80",
+      desc: "Crafted for the modern bride seeking regality with contemporary softness. Plush micro velvet accented with champagne gold dabka and natural seed pearls.",
+      specs: {
+        "Fabric": "Micro Velvet & Handwoven Tissue",
+        "Embroidery": "Jaipuri Gota Patti & Moti Work",
+        "Flair": "6.5 Metre Circumference",
+        "Customization": "Bespoke color dyeing available",
+        "Delivery": "Worldwide Insured Air Express"
+      }
+    },
+    5: {
+      id: 5,
+      title: "Swarnam Kanjeevaram Saree",
+      collection: "Kanchipuram Heritage",
+      category: "sarees",
+      price: "₹74,000",
+      originalPrice: "₹89,000",
+      img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
+      desc: "An icon of South Indian bridal majesty. Hand-woven using three shuttles (Korvai technique) with solid 24k gold zari temple motifs.",
+      specs: {
+        "Fabric": "Heavyweight Mulberry Silk",
+        "Technique": "Interlocking Korvai Weave",
+        "Zari": "Tested Silver-core 24k Electroplated Gold",
+        "Weight": "Approx. 950 grams",
+        "Certification": "Silk Mark Registered"
+      }
+    },
+    6: {
+      id: 6,
+      title: "Zoya Brocade Cape & Sharara Set",
+      collection: "Modern Riwaayat",
+      category: "contemporary",
+      price: "₹52,000",
+      originalPrice: "₹62,000",
+      img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80",
+      desc: "A stunning fusion ensemble blending a structured Banarasi brocade cape over fluid, crushed chiffon sharara trousers with mirror embroidery.",
+      specs: {
+        "Fabric": "Raw Silk Brocade & Pure Georgette",
+        "Style": "Contemporary Indo-Western Couture",
+        "Occasion": "Sangeet, Cocktail & Reception",
+        "Fit": "Tailored Relaxed Fit",
+        "Includes": "Cape Jacket, Crop Bustier & Sharara"
+      }
+    }
+  };
+
+  // State Management
+  let wishlist = new Set();
+  const WHATSAPP_PHONE = "919876543210";
+
+  // Elements
+  const siteHeader = document.getElementById('siteHeader');
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  const drawerClose = document.getElementById('drawerClose');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const productCards = document.querySelectorAll('.product-card');
+  const wishlistCount = document.getElementById('wishlistCount');
+  const quickModal = document.getElementById('quickModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalBody = document.getElementById('modalBody');
+  const appointmentForm = document.getElementById('appointmentForm');
+  const formSuccess = document.getElementById('formSuccess');
+
+  // Sticky Header Scroll Effect
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      siteHeader.classList.add('scrolled');
+    } else {
+      siteHeader.classList.remove('scrolled');
+    }
+  });
+
+  // Mobile Drawer Navigation
+  if (menuToggle && mobileDrawer) {
+    menuToggle.addEventListener('click', () => {
+      mobileDrawer.classList.add('open');
+    });
+  }
+
+  if (drawerClose && mobileDrawer) {
+    drawerClose.addEventListener('click', () => {
+      mobileDrawer.classList.remove('open');
+    });
+  }
+
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileDrawer.classList.remove('open');
+    });
+  });
+
+  // Category Filter Functionality
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const category = btn.dataset.category;
+
+      productCards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'flex';
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 30);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(15px)';
+          setTimeout(() => {
+            card.style.display = 'none';
+          }, 250);
+        }
+      });
+    });
+  });
+
+  // Wishlist Handling
+  document.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const icon = btn.querySelector('i');
+
+      if (wishlist.has(id)) {
+        wishlist.delete(id);
+        btn.classList.remove('saved');
+        icon.classList.replace('fa-solid', 'fa-regular');
+      } else {
+        wishlist.add(id);
+        btn.classList.add('saved');
+        icon.classList.replace('fa-regular', 'fa-solid');
+        showMiniToast('Added to your Private Wishlist');
+      }
+
+      wishlistCount.textContent = wishlist.size;
+    });
+  });
+
+  // Direct WhatsApp Inquiry Buttons
+  document.querySelectorAll('.btn-inquire-direct').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const title = btn.dataset.title;
+      const price = btn.dataset.price;
+      const message = \`Namaste Riwaayat Team, I am interested in inquiring about "\${title}" (\${price}). Could you please share fabric video, custom sizing options, and delivery timeline?\`;
+      const url = \`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(message)}\`;
+      window.open(url, '_blank');
+    });
+  });
+
+  // Quick View Modal
+  document.querySelectorAll('.btn-quick-view').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const productId = btn.dataset.product;
+      const item = productCatalog[productId];
+      if (!item) return;
+
+      let specsHtml = '';
+      for (const [key, val] of Object.entries(item.specs)) {
+        specsHtml += \`
+          <li>
+            <span class="spec-label">\${key}</span>
+            <span class="spec-val">\${val}</span>
+          </li>
+        \`;
+      }
+
+      modalBody.innerHTML = \`
+        <div class="modal-grid">
+          <div class="modal-img-wrap">
+            <img src="\${item.img}" alt="\${item.title}">
+          </div>
+          <div class="modal-content-pane">
+            <span class="modal-category">\${item.collection}</span>
+            <h2 class="modal-title">\${item.title}</h2>
+            <div class="modal-prices">
+              <span class="modal-current-price">\${item.price}</span>
+              <span class="modal-old-price">\${item.originalPrice}</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #5e6b66; line-height: 1.6; margin-bottom: 1.25rem;">
+              \${item.desc}
+            </p>
+            <ul class="modal-specs-list">
+              \${specsHtml}
+            </ul>
+            <div class="modal-cta-group">
+              <button class="btn btn-gold modal-wa-btn" id="modalWaBtn">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via WhatsApp Concierge
+              </button>
+              <a href="#appointment-section" class="btn btn-outline-gold" id="modalBookFitting">
+                <i class="fa-regular fa-calendar-check"></i> Book Salon Fitting
+              </a>
+            </div>
+          </div>
+        </div>
+      \`;
+
+      quickModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Attach WhatsApp handler inside modal
+      document.getElementById('modalWaBtn').addEventListener('click', () => {
+        const msg = \`Namaste Riwaayat Team, I am looking at "\${item.title}" (\${item.price}). Please connect me with a senior stylist for draping details and custom tailoring.\`;
+        window.open(\`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(msg)}\`, '_blank');
+      });
+
+      document.getElementById('modalBookFitting').addEventListener('click', () => {
+        closeModal();
+      });
+    });
+  });
+
+  function closeModal() {
+    quickModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (modalClose) {
+    modalClose.addEventListener('click', closeModal);
+  }
+
+  if (quickModal) {
+    quickModal.addEventListener('click', (e) => {
+      if (e.target === quickModal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && quickModal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  // FAQ Accordion Handlers
+  document.querySelectorAll('.faq-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('active');
+        const icon = el.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-xmark');
+          icon.classList.add('fa-plus');
+        }
+      });
+
+      if (!isActive) {
+        item.classList.add('active');
+        const icon = item.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-plus');
+          icon.classList.add('fa-xmark');
+        }
+      }
+    });
+  });
+
+  // Header Wishlist Button: Filter/highlight saved dresses
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', () => {
+      if (wishlist.size === 0) {
+        showMiniToast('Your wishlist is empty! Click the heart on any dress to save.');
+        return;
+      }
+
+      productCards.forEach(card => {
+        const id = card.querySelector('.save-btn')?.dataset.id;
+        if (id && wishlist.has(id)) {
+          card.style.display = 'flex';
+          card.style.opacity = '1';
+          card.style.boxShadow = '0 0 0 2px var(--color-accent-ruby)';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const collSection = document.getElementById('collections');
+      if (collSection) collSection.scrollIntoView({ behavior: 'smooth' });
+      showMiniToast(\`Showing \${wishlist.size} saved dress(es)\`);
+    });
+  }
+
+  // Appointment Form Submission: Real WhatsApp Dispatch
+  if (appointmentForm) {
+    appointmentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('userName').value;
+      const phone = document.getElementById('userPhone').value;
+      const event = document.getElementById('eventType').value;
+      const city = document.getElementById('userCity').value;
+
+      appointmentForm.style.display = 'none';
+      formSuccess.style.display = 'block';
+
+      // Auto trigger WhatsApp confirmation
+      const consultMsg = \`Namaste Riwaayat Team, I would like to confirm a VIP Salon Consultation.\\n\\n\` +
+        \`• Full Name: \${name}\\n\` +
+        \`• Phone/WhatsApp: \${phone}\\n\` +
+        \`• Occasion: \${event}\\n\` +
+        \`• City: \${city}\`;
+      const waUrl = \`https://wa.me/\${WHATSAPP_PHONE}?text=\${encodeURIComponent(consultMsg)}\`;
+      
+      const successCard = document.getElementById('formSuccess');
+      if (successCard && !successCard.querySelector('.btn-gold')) {
+        const openWaBtn = document.createElement('a');
+        openWaBtn.href = waUrl;
+        openWaBtn.target = '_blank';
+        openWaBtn.rel = 'noopener';
+        openWaBtn.className = 'btn btn-gold';
+        openWaBtn.style.marginTop = '1.25rem';
+        openWaBtn.style.display = 'inline-flex';
+        openWaBtn.style.fontSize = '0.85rem';
+        openWaBtn.style.padding = '0.65rem 1.25rem';
+        openWaBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Open WhatsApp Chat Now';
+        successCard.appendChild(openWaBtn);
+      }
+
+      setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 800);
+    });
+  }
+
+  // Lightweight Toast Notification
+  function showMiniToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'mini-toast';
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '90px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = '#082018';
+    toast.style.color = '#dfba73';
+    toast.style.padding = '0.65rem 1.4rem';
+    toast.style.borderRadius = '100px';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+    toast.style.fontSize = '0.85rem';
+    toast.style.fontWeight = '600';
+    toast.style.zIndex = '9999';
+    toast.style.border = '1px solid #c5a059';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s ease';
+
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(-10px)';
+    }, 10);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+});
+
+</script>
 </body>
 </html>
 `,

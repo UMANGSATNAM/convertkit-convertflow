@@ -298,7 +298,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Appointment Form Submission
+  // FAQ Accordion Handlers
+  document.querySelectorAll('.faq-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('active');
+        const icon = el.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-xmark');
+          icon.classList.add('fa-plus');
+        }
+      });
+
+      if (!isActive) {
+        item.classList.add('active');
+        const icon = item.querySelector('.faq-icon i');
+        if (icon) {
+          icon.classList.remove('fa-plus');
+          icon.classList.add('fa-xmark');
+        }
+      }
+    });
+  });
+
+  // Header Wishlist Button: Filter/highlight saved dresses
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', () => {
+      if (wishlist.size === 0) {
+        showMiniToast('Your wishlist is empty! Click the heart on any dress to save.');
+        return;
+      }
+
+      productCards.forEach(card => {
+        const id = card.querySelector('.save-btn')?.dataset.id;
+        if (id && wishlist.has(id)) {
+          card.style.display = 'flex';
+          card.style.opacity = '1';
+          card.style.boxShadow = '0 0 0 2px var(--color-accent-ruby)';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const collSection = document.getElementById('collections');
+      if (collSection) collSection.scrollIntoView({ behavior: 'smooth' });
+      showMiniToast(`Showing ${wishlist.size} saved dress(es)`);
+    });
+  }
+
+  // Appointment Form Submission: Real WhatsApp Dispatch
   if (appointmentForm) {
     appointmentForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -310,9 +362,32 @@ document.addEventListener('DOMContentLoaded', () => {
       appointmentForm.style.display = 'none';
       formSuccess.style.display = 'block';
 
-      // Auto trigger WhatsApp confirmation option
-      const consultMsg = `Namaste Riwaayat, I have requested a VIP salon consultation for ${name} from ${city} for ${event}. Mobile: ${phone}.`;
-      console.log("Appointment confirmed:", consultMsg);
+      // Auto trigger WhatsApp confirmation
+      const consultMsg = `Namaste Riwaayat Team, I would like to confirm a VIP Salon Consultation.\n\n` +
+        `• Full Name: ${name}\n` +
+        `• Phone/WhatsApp: ${phone}\n` +
+        `• Occasion: ${event}\n` +
+        `• City: ${city}`;
+      const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(consultMsg)}`;
+      
+      const successCard = document.getElementById('formSuccess');
+      if (successCard && !successCard.querySelector('.btn-gold')) {
+        const openWaBtn = document.createElement('a');
+        openWaBtn.href = waUrl;
+        openWaBtn.target = '_blank';
+        openWaBtn.rel = 'noopener';
+        openWaBtn.className = 'btn btn-gold';
+        openWaBtn.style.marginTop = '1.25rem';
+        openWaBtn.style.display = 'inline-flex';
+        openWaBtn.style.fontSize = '0.85rem';
+        openWaBtn.style.padding = '0.65rem 1.25rem';
+        openWaBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Open WhatsApp Chat Now';
+        successCard.appendChild(openWaBtn);
+      }
+
+      setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 800);
     });
   }
 
